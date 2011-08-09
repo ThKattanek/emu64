@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TVSetupWindow</class>
+ <widget class="QDialog" name="TVSetupWindow">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>358</width>
+    <height>150</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>344</width>
+    <height>150</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>360</width>
+    <height>150</height>
+   </size>
+  </property>
+  <property name="font">
+   <font>
+    <family>Arial</family>
+   </font>
+  </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::NoContextMenu</enum>
+  </property>
+  <property name="windowTitle">
+   <string>TV/Video Einstellungen</string>
+  </property>
+  <property name="windowOpacity">
+   <double>1.000000000000000</double>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
+  </property>
+  <widget class="QLabel" name="label">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>7</y>
+     <width>113</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string/>
+   </property>
+   <property name="statusTip">
+    <string/>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0,0, 128);</string>
+   </property>
+   <property name="text">
+    <string>Sättigung</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>21</y>
+     <width>113</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0,0, 128);</string>
+   </property>
+   <property name="text">
+    <string>Helligkeit</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>35</y>
+     <width>113</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0,0, 128);</string>
+   </property>
+   <property name="text">
+    <string>Kontrast</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>49</y>
+     <width>106</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0,0, 128);</string>
+   </property>
+   <property name="text">
+    <string>Horizontaler Blur (Y)</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>63</y>
+     <width>116</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0,0, 128);</string>
+   </property>
+   <property name="text">
+    <string>Horizontaler Blur (UV)</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>77</y>
+     <width>116</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0,0, 128);</string>
+   </property>
+   <property name="text">
+    <string>Phasen Verschiebung</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>91</y>
+     <width>101</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0,0, 128);</string>
+   </property>
+   <property name="text">
+    <string>Scanline</string>
+   </property>
+  </widget>
+  <widget class="QScrollBar" name="helligkeit_scroll">
+   <property name="geometry">
+    <rect>
+     <x>126</x>
+     <y>21</y>
+     <width>176</width>
+     <height>14</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="maximum">
+    <number>100</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QScrollBar" name="saettigung_scroll">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>126</x>
+     <y>7</y>
+     <width>176</width>
+     <height>14</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="maximum">
+    <number>100</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QScrollBar" name="kontrast_scroll">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>126</x>
+     <y>35</y>
+     <width>176</width>
+     <height>14</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="maximum">
+    <number>100</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QScrollBar" name="horblurY_scroll">
+   <property name="geometry">
+    <rect>
+     <x>126</x>
+     <y>49</y>
+     <width>176</width>
+     <height>14</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>4</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QScrollBar" name="horblurUV_scroll">
+   <property name="geometry">
+    <rect>
+     <x>126</x>
+     <y>63</y>
+     <width>176</width>
+     <height>14</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>4</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QScrollBar" name="phase_scroll">
+   <property name="geometry">
+    <rect>
+     <x>126</x>
+     <y>77</y>
+     <width>176</width>
+     <height>14</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="maximum">
+    <number>2000</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QScrollBar" name="scanline_scroll">
+   <property name="geometry">
+    <rect>
+     <x>126</x>
+     <y>91</y>
+     <width>176</width>
+     <height>14</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="maximum">
+    <number>100</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="saettigung_out">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>308</x>
+     <y>7</y>
+     <width>43</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>36</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0,0, 128);</string>
+   </property>
+   <property name="text">
+    <string notr="true">-</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="helligkeit_out">
+   <property name="geometry">
+    <rect>
+     <x>308</x>
+     <y>21</y>
+     <width>43</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0,0, 128);</string>
+   </property>
+   <property name="text">
+    <string notr="true">-</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="kontrast_out">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>308</x>
+     <y>35</y>
+     <width>43</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0,0, 128);</string>
+   </property>
+   <property name="text">
+    <string notr="true">-</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="horblurY_out">
+   <property name="geometry">
+    <rect>
+     <x>308</x>
+     <y>49</y>
+     <width>43</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0,0, 128);</string>
+   </property>
+   <property name="text">
+    <string notr="true">-</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="horblurUV_out">
+   <property name="geometry">
+    <rect>
+     <x>308</x>
+     <y>63</y>
+     <width>43</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0,0, 128);</string>
+   </property>
+   <property name="text">
+    <string notr="true">-</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="phase_out">
+   <property name="geometry">
+    <rect>
+     <x>308</x>
+     <y>77</y>
+     <width>43</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0,0, 128);</string>
+   </property>
+   <property name="text">
+    <string notr="true">-</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="scanline_out">
+   <property name="geometry">
+    <rect>
+     <x>308</x>
+     <y>91</y>
+     <width>43</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0,0, 128);</string>
+   </property>
+   <property name="text">
+    <string notr="true">-</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Reset">
+   <property name="geometry">
+    <rect>
+     <x>21</x>
+     <y>112</y>
+     <width>309</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::TabFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 0, 0);</string>
+   </property>
+   <property name="text">
+    <string>Alles wieder auf Standard Werte zurücksetzen</string>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>saettigung_scroll</tabstop>
+  <tabstop>helligkeit_scroll</tabstop>
+  <tabstop>kontrast_scroll</tabstop>
+  <tabstop>horblurY_scroll</tabstop>
+  <tabstop>horblurUV_scroll</tabstop>
+  <tabstop>phase_scroll</tabstop>
+  <tabstop>scanline_scroll</tabstop>
+  <tabstop>Reset</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

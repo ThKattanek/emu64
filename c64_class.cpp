@@ -1,0 +1,1706 @@
+//////////////////////////////////////////////////
+//						//
+// Emu64                                        //
+// von Thorsten Kattanek			//
+//                                              //
+// #file: c64_class.cpp                         //
+//						//
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek		//
+//						//
+// Letzte Änderung am 02.08.2011		//
+// www.emu64.de					//
+//						//
+//////////////////////////////////////////////////
+
+#include "c64_class.h"
+#include "c64_keys.h"
+
+void AudioMix(void *nichtVerwendet, Uint8 *stream, int laenge);
+int SDLThread(void *userdat);
+int SDLThreadLoad(void *userdat);
+
+#define AudioSampleRate 44100
+#define AudioPufferSize 882
+
+C64Class::C64Class(int *ret_error, function<void(unsigned short,unsigned char)> jam_proc):
+    pal(0),
+    BreakGroupAnz(0),
+    FloppyFoundBreakpoint(false)
+{
+    /// SDL Installieren ///
+
+    if(SDL_Init(SDL_INIT_EVERYTHING) < 0)
+    {
+        *ret_error = -1;
+    }
+
+    /// SLD Audio Installieren (C64 Emulation) ///
+    SDL_AudioSpec format;
+    format.freq = AudioSampleRate;
+    format.format = AUDIO_S16;
+    format.channels = 1;
+    format.samples = AudioPufferSize;
+    format.callback = AudioMix;
+    format.userdata = this;
+
+    if(SDL_OpenAudio(&format,NULL) < 0)
+    {
+        *ret_error = -2;
+    }
+
+    isFullscreen = false;
+    AktWindowXW = xw;
+    AktWindowYW = yw;
+    C64Screen = SDL_SetVideoMode(xw,yw,color_bits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+    C64ScreenBack = SDL_CreateRGBSurface(0,xw,yw,color_bits,0,0,0,0);
+
+    SDL_WM_SetIcon(SDL_LoadBMP("c64window.bmp"),0);
+    SDL_WM_SetCaption("C64 Screen",0);
+
+    /// Init Classes ///
+    mmu = new MMU();
+    cpu = new MOS6510();
+    vic = new VICII();
+    sid1 = new MOS6581_8085(0,format.freq,format.samples,ret_error);
+    sid2 = new MOS6581_8085(1,format.freq,format.samples,ret_error);
+    cia1 = new MOS6526(0);
+    cia2 = new MOS6526(1);
+    crt = new CRTClass();
+
+    cia2->FloppyIEC = &FloppyIEC;
+    cia2->C64IEC = &C64IEC;
+
+    /// Floppy mit C64 verbinden ///
+
+    for(int i=0;i<FloppyAnzahl;i++)
+    {
+        floppy[i] = new Floppy1541(&RESET,format.freq,format.samples,&FloppyFoundBreakpoint);
+        floppy[i]->SetResetReady(&FloppyResetReady[i],0xEBFF);
+        floppy[i]->SetC64IEC(&C64IEC);
+        floppy[i]->SetDeviceNummer(8+i);
+        floppy[i]->LoadDosRom((char*)"roms/1541.rom");
+        floppy[i]->LoadFloppySounds((char*)"floppy_sounds/motor.raw",(char*)"floppy_sounds/motor_on.raw",(char*)"floppy_sounds/motor_off.raw",(char*)"floppy_sounds/anschlag.raw",(char*)"floppy_sounds/stepper_inc.raw",(char*)"floppy_sounds/stepper_dec.raw");
+        floppy[i]->SetEnableFloppy(false);
+        floppy[i]->SetEnableFloppySound(true);
+    }
+
+    /// Init Vars ///
+    C64HistoryPointer = 0;
+    IOSource = 0;
+    ComandZeileSize = 0;
+    ComandZeileCount = 0;
+    ComandZeileStatus = false;
+    ComandZeileCountS = false;
+    DebugMode = OneZyk = OneOpc = false;
+    CycleCounter = 0;
+    DebugAnimation = false;
+    AnimationRefreshProc = 0;
+    AnimationSpeedAdd = (double)AudioPufferSize/(double)AudioSampleRate;
+    AnimationSpeedCounter = 0;
+
+    for(int i=0;i<8;i++)
+    {
+        KeyboardMatrixToPAExt[i] = KeyboardMatrixToPA[i] = 0;
+        KeyboardMatrixToPBExt[i] = KeyboardMatrixToPB[i] = 0;
+    }
+
+    /// Callbackroutinen setzen ///
+    ReadProcTbl = mmu->CPUReadProcTbl;
+    WriteProcTbl = mmu->CPUWriteProcTbl;
+    cpu->ReadProcTbl = mmu->CPUReadProcTbl;
+    cpu->WriteProcTbl = mmu->CPUWriteProcTbl;
+    vic->ReadProcTbl = mmu->VICReadProcTbl;
+    vic->RefreshProc = bind(&C64Class::VicRefresh,this,_1);
+
+    //reu->SetReadProcTable( mmu_GetCPUReadProcTable());
+    //reu->SetWriteProcTable(mmu_GetCPUWriteProcTable());
+
+
+    mmu->VicIOWriteProc = bind(&VICII::WriteIO,vic,_1,_2);
+    mmu->VicIOReadProc = bind(&VICII::ReadIO,vic,_1);
+    mmu->SidIOWriteProc = bind(&C64Class::WriteSidIO,this,_1,_2);
+    mmu->SidIOReadProc = bind(&C64Class::ReadSidIO,this,_1);
+    mmu->Cia1IOWriteProc = bind(&MOS6526::WriteIO,cia1,_1,_2);
+    mmu->Cia1IOReadProc = bind(&MOS6526::ReadIO,cia1,_1);
+    mmu->Cia2IOWriteProc = bind(&MOS6526::WriteIO,cia2,_1,_2);
+    mmu->Cia2IOReadProc = bind(&MOS6526::ReadIO,cia2,_1);
+
+    mmu->CRTRom1WriteProc = bind(&CRTClass::WriteRom1,crt,_1,_2);
+    mmu->CRTRom2WriteProc = bind(&CRTClass::WriteRom2,crt,_1,_2);
+    mmu->CRTRom3WriteProc = bind(&CRTClass::WriteRom3,crt,_1,_2);
+    mmu->CRTRom1ReadProc = bind(&CRTClass::ReadRom1,crt,_1);
+    mmu->CRTRom2ReadProc = bind(&CRTClass::ReadRom2,crt,_1);
+    mmu->CRTRom3ReadProc = bind(&CRTClass::ReadRom3,crt,_1);
+    mmu->IO1ReadProc = bind(&C64Class::ReadIO1,this,_1);
+    mmu->IO1WriteProc = bind(&C64Class::WriteIO1,this,_1,_2);
+    mmu->IO2ReadProc = bind(&C64Class::ReadIO2,this,_1);
+    mmu->IO2WriteProc = bind(&C64Class::WriteIO2,this,_1,_2);
+
+    crt->ChangeMemMapProc = bind(&MMU::ChangeMemMap,mmu);
+
+    /// Module mit Virtuellen Leitungen verbinden
+    mmu->GAME = &GAME;
+    mmu->EXROM = &EXROM;
+    mmu->RAM_H = &RAM_H;
+    mmu->RAM_L = &RAM_L;
+    mmu->CPU_PORT = &CPU_PORT;
+    crt->EXROM = &EXROM;
+    crt->GAME = &GAME;
+    crt->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
+    crt->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
+    cpu->RDY = &RDY_BA;
+    cpu->RESET = &RESET;
+    cpu->ResetReady = &C64ResetReady;
+    cpu->ResetReadyAdr = 0xE5CD;
+    cia1->RESET = &RESET;
+    cia1->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
+    cia1->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
+    cia1->VicTriggerLP = bind(&VICII::TriggerLightpen,vic);
+    cia1->PA = &CIA1_PA;
+    cia1->PB = &CIA1_PB;
+    cia2->RESET = &RESET;
+    cia2->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
+    cia2->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
+    cia2->PA = &CIA2_PA;
+    cia2->PB = &CIA2_PB;
+    vic->BA = &RDY_BA;
+    vic->RESET = &RESET;
+    vic->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
+    vic->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
+    vic->FarbRam = mmu->GetFarbramPointer();
+    vic->CIA2_PA = CIA2_PA.GetOutputBitsPointer();
+    sid1->RESET = &RESET;
+    sid2->RESET = &RESET;
+    //reu->BA = &RDY_BA;
+    //reu->CpuTriggerInterrupt = (TRIGGER_INTERRUPT)cpu_TriggerInterrupt;
+    //reu->CpuClearInterrupt = (CLEAR_INTERRUPT)cpu_ClearInterrupt;
+    //reu->RESET = &RESET;
+    //reu->WRITE_FF00 = &cpu_WRITE_FF00;
+
+    /// Datasette mit C64 verbinden ///
+    //tape->CPU_PORT = &CPU_PORT;
+    //cia1_FLAG_PIN = &tape->CassRead;
+
+    /// CRT mit MMU verbinden ///
+    crt->RAM_C64 = mmu->GetRAMPointer();
+    mmu->EasyFlashDirty1 = crt->GetFlash040Dirty(0);
+    mmu->EasyFlashDirty2 = crt->GetFlash040Dirty(1);
+    mmu->EasyFlashByte1 = crt->GetFlash040Byte(0);
+    mmu->EasyFlashByte2 = crt->GetFlash040Byte(1);
+
+    mmu->EasyFlashDirty1 = &EasyFlashDirty;
+    mmu->EasyFlashDirty2 = &EasyFlashDirty;
+    mmu->EasyFlashByte1 = &EasyFlashByte;
+    mmu->EasyFlashByte2 = &EasyFlashByte;
+
+    RDY_BA = true;
+    GAME = true;
+    EXROM = true;
+
+    WaitResetReady = false;
+
+    mmu->Reset();
+    cia1->Reset();
+    cia2->Reset();
+
+    sid1->RESET = &RESET;
+    sid1->SetC64Zyklen(985248);
+    sid1->SetChipType(MOS_8580);
+    sid1->SoundOutputEnable = true;
+    sid1->CycleExact = true;
+    sid1->FilterOn = true;
+    sid1->Reset();
+
+    sid2->RESET = &RESET;
+    sid2->SetC64Zyklen(985248);
+    sid2->SetChipType(MOS_8580);
+    sid2->SoundOutputEnable = false;
+    sid2->CycleExact = true;
+    sid2->FilterOn = true;
+    sid2->Reset();
+
+    StereoEnable = false;
+    Sid2Adresse = 0xD420;
+
+    vic->RESET = &RESET;
+    vic->BA = &RDY_BA;
+    vic->CIA2_PA = cia2->PA->GetOutputBitsPointer();
+
+    /// Breakpoints ///
+    BreakpointProc = 0;
+    cpu->BreakStatus = &BreakStatus;
+    cpu->BreakWerte = BreakWerte;
+    cpu->Breakpoints = Breakpoints;
+
+    vic->BreakStatus = &BreakStatus;
+    vic->BreakWerte = BreakWerte;
+    vic->Breakpoints = Breakpoints;
+
+    cpu->History = C64History;
+    cpu->HistoryPointer = &C64HistoryPointer;
+
+    for(int i=0;i<0x10000;i++) Breakpoints[i] = 0;
+
+    /// SLD Thread starten (ab hier startet auch die C64 Emulation ///
+    sdl_thread = SDL_CreateThread(SDLThread, this);
+    SDL_PauseAudio(0);
+}
+
+C64Class::~C64Class()
+{
+    LoopThreadEnd = true;
+
+    SDL_Delay(50);
+
+    SDL_AudioQuit();
+    SDL_Quit();
+
+    delete mmu;
+    delete cpu;
+    delete vic;
+    delete sid1;
+    delete sid2;
+    delete cia1;
+    delete cia2;
+    delete crt;
+}
+
+void AudioMix(void *userdat, Uint8 *stream, int laenge)
+{
+    C64Class *c64 = (C64Class*)userdat;
+    c64->FillAudioBuffer(stream,laenge);
+}
+
+int SDLThread(void *userdat)
+{
+    C64Class *c64 = (C64Class*)userdat;
+
+    SDL_Event event;
+
+    c64->LoopThreadEnd = false;
+    while (!c64->LoopThreadEnd)
+    {
+        while (SDL_PollEvent (&event))
+        {
+          switch (event.type)
+            {
+            case SDL_VIDEORESIZE:
+                if(!c64->isFullscreen)
+                {
+                    c64->AktWindowXW = event.resize.w;
+                    c64->AktWindowYW = event.resize.h;
+                    c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,color_bits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                }
+                break;
+            case SDL_KEYDOWN:
+                switch(event.key.keysym.sym)
+                {
+                case SDLK_ESCAPE:
+                    c64->WaitResetReady = false;
+                    c64->RESET = false;
+                    break;
+                case SDLK_F12:
+                    c64->isFullscreen = !c64->isFullscreen;
+                    if(c64->isFullscreen)
+                    {
+                        SDL_ShowCursor(false);
+                        c64->C64Screen = SDL_SetVideoMode(1280,1024,color_bits,SDL_FULLSCREEN | SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                    }
+                    else
+                    {
+                        SDL_ShowCursor(true);
+                        c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,color_bits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                    }
+                    break;
+
+                default:
+                    break;
+                }
+
+                for(int i=0;i<C64KeyNum;i++)
+                {
+                    if(C64KeyTable[i].SDLKeyCode == event.key.keysym.sym)
+                    {
+                        c64->KeyEvent(C64KeyTable[i].MatrixCode,KEY_DOWN,C64KeyTable[i].Shift);
+                    }
+                }
+                break;
+
+            case SDL_KEYUP:
+                switch(event.key.keysym.sym)
+                {
+                case SDLK_ESCAPE:
+                    c64->RESET = true;
+                case SDLK_F12:
+
+                    break;
+                default:
+                    break;
+                }
+
+                for(int i=0;i<C64KeyNum;i++)
+                {
+                    if(C64KeyTable[i].SDLKeyCode == event.key.keysym.sym)
+                    {
+                        c64->KeyEvent(C64KeyTable[i].MatrixCode,KEY_UP,C64KeyTable[i].Shift);
+                    }
+                }
+                break;
+
+            case SDL_MOUSEMOTION:
+                break;
+            case SDL_QUIT:
+#ifdef _WIN32
+                c64->LoopThreadEnd = true;
+#endif
+                break;
+
+            default:
+                break;
+            }
+        }
+
+        if(!c64->LoopThreadEnd)
+        {
+            SDL_Rect rec_src = {0,0,xw,yw};
+            SDL_Rect rec_dst = {0,0,c64->C64Screen->w,c64->C64Screen->h};
+            SDL_SoftStretch(c64->C64ScreenBack,&rec_src,c64->C64Screen,&rec_dst);
+            SDL_Flip(c64->C64Screen);
+            SDL_Delay(1);
+        }
+    }
+    return 0;
+}
+
+void C64Class::VicRefresh(unsigned char *vic_puffer)
+{
+    if(pal == 0) return;
+
+    SDL_LockSurface(C64ScreenBack);
+    pal->ConvertVideo((void*)C64ScreenBack->pixels,C64ScreenBack->pitch,vic_puffer,xw,yw,504,312,false);
+    SDL_UnlockSurface(C64ScreenBack);
+}
+
+void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
+{
+    unsigned short* puffer = (unsigned short*) stream;
+
+    sid1->SoundBufferPos = 0;
+    sid2->SoundBufferPos = 0;
+    for(int i=0; i< FloppyAnzahl; i++)
+        floppy[i]->ZeroSoundBufferPos();
+
+    if(!DebugMode)
+    {
+        while((sid1->SoundBufferPos < (laenge/2) && (DebugMode == false)))
+        {
+            CheckKeys();
+            CycleCounter++;
+
+            /// Für Externe Erweiterungen ///
+            //if(ExtZyklus) ZyklusProcExt();
+
+            FloppyIEC = 0;
+            for(int i=0; i<FloppyAnzahl; i++)
+            {
+                floppy[i]->OneZyklus();
+                FloppyIEC |= ~floppy[i]->FloppyIECLocal;
+            }
+            FloppyIEC = ~FloppyIEC;
+
+            vic->OneZyklus();
+            cia1->OneZyklus();
+            cia2->OneZyklus();
+            sid1->OneZyklus();
+            //sid2->OneZyklus();
+            cpu->OneZyklus();
+
+            if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) if(CheckBreakpoints()) break;
+
+
+            ////////////////////////// Testweise //////////////////////////
+
+            static int zyklen_counter = 0;
+            if(++zyklen_counter == 19656)
+            {
+                zyklen_counter = 0;
+                if(WaitResetReady)
+                {
+                    if(!floppy[0]->GetEnableFloppy())
+                    {
+                        if(C64ResetReady)
+                        {
+                            SDL_CreateThread(SDLThreadLoad,this);
+                            WaitResetReady = false;
+                        }
+                    }
+                    else
+                    {
+                        if((C64ResetReady == true) && (FloppyResetReady[0] == true))
+                        {
+                            SDL_CreateThread(SDLThreadLoad,this);
+                            WaitResetReady = false;
+                        }
+                    }
+                }
+
+                if(ComandZeileCountS)
+                {
+                    ComandZeileCountS=false;
+                    if(ComandZeileStatus)
+                    {
+                        if(ComandZeileCount==ComandZeileSize)
+                        {
+                            ComandZeileStatus=false;
+                        }
+                        else
+                        {
+                            WriteC64Byte(0xC6,1);
+                            WriteC64Byte(0x277,ComandZeile[ComandZeileCount]);
+                            ComandZeileCount++;
+                        }
+                    }
+                }
+                if(ReadC64Byte(0xC6)==0)
+                {
+                    ComandZeileCountS=true;
+                }
+            }
+            //////////////////////////////////////////////////////////////////////////////
+        }
+        SDL_MixAudio((unsigned char*)puffer,(unsigned char*)sid1->SoundBuffer,laenge,100);
+        //SDL_MixAudio((unsigned char*)puffer,(unsigned char*)sid2->SoundBuffer,laenge,100);
+        for(int i=0; i< FloppyAnzahl; i++)
+        {
+            if(floppy[i]->GetEnableFloppySound()) SDL_MixAudio((unsigned char*)puffer,(unsigned char*)floppy[i]->GetSoundBuffer(),laenge,255);
+        }
+
+    }
+    else
+    {
+        if(DebugAnimation)
+        {
+            AnimationSpeedCounter += AnimationSpeedAdd;
+            if(AnimationSpeedCounter >= 1)
+            {
+                for(int i=0;i<(int)AnimationSpeedCounter;i++)
+                {
+                    CheckKeys();
+                    CycleCounter++;
+
+                    /// Für Externe Erweiterungen ///
+                    //if(ExtZyklus) ZyklusProcExt();
+
+                    FloppyIEC = 0;
+                    for(int i=0; i<FloppyAnzahl; i++)
+                    {
+                        floppy[i]->OneZyklus();
+                        FloppyIEC |= ~floppy[i]->FloppyIECLocal;
+                    }
+                    FloppyIEC = ~FloppyIEC;
+
+                    vic->OneZyklus();
+                    cia1->OneZyklus();
+                    cia2->OneZyklus();
+                    sid1->OneZyklus();
+                    //sid2->OneZyklus();
+                    cpu->OneZyklus();
+
+                    if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) if(CheckBreakpoints()) break;
+                }
+                AnimationSpeedCounter = 0;
+            }
+            if(AnimationRefreshProc != 0) AnimationRefreshProc();
+        }
+        else
+        {
+            if(OneZyk)
+            {
+                OneZyk = false;
+
+                CheckKeys();
+                CycleCounter++;
+
+                /// Für Externe Erweiterungen ///
+                //if(ExtZyklus) ZyklusProcExt();
+
+                FloppyIEC = 0;
+                for(int i=0; i<FloppyAnzahl; i++)
+                {
+                    floppy[i]->OneZyklus();
+                    FloppyIEC |= ~floppy[i]->FloppyIECLocal;
+                }
+                FloppyIEC = ~FloppyIEC;
+
+                vic->OneZyklus();
+                cia1->OneZyklus();
+                cia2->OneZyklus();
+                sid1->OneZyklus();
+                //sid2->OneZyklus();
+                cpu->OneZyklus();
+
+                if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) CheckBreakpoints();
+
+                if(AnimationRefreshProc != 0) AnimationRefreshProc();
+            }
+
+            if(OneOpc)
+            {
+                OneOpc = false;
+
+loop_wait_next_opc:
+
+                CheckKeys();
+                CycleCounter++;
+
+                /// Für Externe Erweiterungen ///
+                //if(ExtZyklus) ZyklusProcExt();
+
+                vic->OneZyklus();
+                cia1->OneZyklus();
+                cia2->OneZyklus();
+                sid1->OneZyklus();
+                //sid2->OneZyklus();
+
+                if(OneOpcSource > 0)
+                {
+                    int FloppyNr = OneOpcSource - 1;
+                    FloppyIEC = 0;
+                    for(int i=0; i<FloppyAnzahl; i++)
+                    {
+                        if(i != FloppyNr)
+                        {
+                            floppy[i]->OneZyklus();
+                            FloppyIEC |= ~floppy[i]->FloppyIECLocal;
+                        }
+                    }
+                    bool ret = floppy[FloppyNr]->OneZyklus();
+                    FloppyIEC |= ~floppy[FloppyNr]->FloppyIECLocal;
+                    FloppyIEC = ~FloppyIEC;
+                    if(!ret)  goto loop_wait_next_opc;
+                }
+                else if(!cpu->OneZyklus()) goto loop_wait_next_opc;
+
+                if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) CheckBreakpoints();
+
+                if(AnimationRefreshProc != 0) AnimationRefreshProc();
+            }
+        }
+    }
+}
+
+void C64Class::KeyEvent(unsigned char matrix_code,KeyStatus key_status, bool isAutoShift)
+{
+    const unsigned char AutoShift = 0x17; // C64 Shift Links
+
+    switch(key_status)
+    {
+    case KEY_DOWN:
+        KeyboardMatrixToPB[matrix_code>>4]|=1<<(matrix_code&0x07);
+        if(isAutoShift) KeyboardMatrixToPB[AutoShift>>4]|=1<<(AutoShift&0x07);
+
+        KeyboardMatrixToPA[matrix_code&0x07]|=(1<<(matrix_code>>4));
+        if(isAutoShift) KeyboardMatrixToPA[AutoShift&0x07]|=(1<<(AutoShift>>4));
+        break;
+    case KEY_UP:
+        KeyboardMatrixToPB[matrix_code>>4]&=~(1<<(matrix_code&0x07));
+        if(isAutoShift) KeyboardMatrixToPB[AutoShift>>4]&=~(1<<(AutoShift&0x07));
+
+        KeyboardMatrixToPA[matrix_code&0x07]&=~(1<<(matrix_code>>4));
+        if(isAutoShift) KeyboardMatrixToPA[AutoShift&0x07]&=~(1<<(AutoShift>>4));
+        break;
+    }
+}
+
+void C64Class::SoftReset()
+{
+    WaitResetReady = false;
+    SetReset(false,true);
+    SDL_Delay(20);
+    SetReset(true,true);
+}
+
+void C64Class::HardReset()
+{
+    WaitResetReady = false;
+    SetReset(false,false);
+    SDL_Delay(20);
+    SetReset(true,true);
+}
+
+inline void C64Class::SetReset(int status, int hard_reset)
+{
+    RESET = status;
+    if(!status)
+    {
+        crt->Reset();
+        RDY_BA = true;
+        if(!hard_reset) mmu->Reset();
+        KillCommandLine();
+    }
+}
+
+inline void C64Class::CheckKeys(void)
+{
+    unsigned char OUT_PA, OUT_PB;
+    unsigned char IN_PA, IN_PB;
+
+    OUT_PA = ~CIA1_PA.GetOutput();
+    OUT_PB = ~CIA1_PB.GetOutput();
+
+    IN_PA = IN_PB = 0;
+
+    unsigned char cbit = 1;
+    for(int i=0;i<8;i++)
+    {
+        if(OUT_PA & cbit) IN_PB |= (KeyboardMatrixToPB[i]|KeyboardMatrixToPBExt[i]);
+        if(OUT_PB & cbit) IN_PA |= (KeyboardMatrixToPA[i]|KeyboardMatrixToPAExt[i]);
+        cbit <<= 1;
+    }
+    //CIA1_PA.SetInput(~(IN_PA|GamePortB));
+    //CIA1_PB.SetInput(~(IN_PB|GamePortA));
+    CIA1_PA.SetInput(~(IN_PA));
+    CIA1_PB.SetInput(~(IN_PB));
+}
+
+void C64Class::ResetC64CycleCounter(void)
+{
+    CycleCounter = 0;
+}
+
+bool C64Class::LoadC64Roms(char *kernalrom,char *basicrom,char *charrom)
+{
+    if(!mmu->LoadKernalRom(kernalrom)) return false;
+    if(!mmu->LoadBasicRom(basicrom)) return false;
+    if(!mmu->LoadCharRom(charrom)) return false;
+    return true;
+}
+
+bool C64Class::LoadFloppyRom(int floppy_nr,char *dos1541rom)
+{
+    if(floppy_nr < FloppyAnzahl)
+    {
+        if(!floppy[floppy_nr]->LoadDosRom(dos1541rom)) return false;
+        return true;
+    }
+    return false;
+}
+
+bool C64Class::LoadDiskImage(int floppy_nr, char *filename)
+{
+    if(floppy_nr < FloppyAnzahl)
+    {
+        return floppy[floppy_nr]->LoadDiskImage(filename);
+    }
+    return false;
+}
+
+void C64Class::SetCommandLine(char* c64_command)
+{
+    strcpy(ComandZeile,c64_command);
+    ComandZeileSize=(int)strlen(ComandZeile);
+    ComandZeileCount=0;
+    ComandZeileStatus=true;
+    ComandZeileCountS=true;
+}
+
+void C64Class::KillCommandLine(void)
+{
+    ComandZeileSize=0;
+    ComandZeileStatus=false;
+    ComandZeileCountS=false;
+}
+
+unsigned char C64Class::ReadC64Byte(unsigned short adresse)
+{
+    return ReadProcTbl[(adresse)>>8](adresse);
+}
+
+void C64Class::WriteC64Byte(unsigned short adresse,unsigned char wert)
+{
+    WriteProcTbl[(adresse)>>8](adresse,wert);
+}
+
+int SDLThreadLoad(void *userdat)
+{
+    unsigned short PRGStartAdresse;
+    C64Class *c64 = (C64Class*)userdat;
+
+    switch(c64->AutoLoadMode)
+    {
+    case 0:
+        c64->SetCommandLine(c64->AutoLoadCommandLine);
+        break;
+    case 1:
+        c64->LoadPRG(c64->AutoLoadFilename,&PRGStartAdresse);
+        if(PRGStartAdresse <= 0x0801) sprintf(c64->AutoLoadCommandLine,"RUN%c",13);
+        else sprintf(c64->AutoLoadCommandLine,"SYS %d%c",PRGStartAdresse,13);
+        c64->SetCommandLine(c64->AutoLoadCommandLine);
+        break;
+    case 2:
+        c64->LoadPRG(c64->AutoLoadFilename,&PRGStartAdresse);
+        //if(LoadPRG(c64->AutoLoadFilename,&PRGStartAdresse) == 5) return 4; Behandlung wenn mehr als 1 File in T64
+        if(PRGStartAdresse <= 0x0801) sprintf(c64->AutoLoadCommandLine,"RUN%c",13);
+        else sprintf(c64->AutoLoadCommandLine,"SYS %d%c",PRGStartAdresse,13);
+        c64->SetCommandLine(c64->AutoLoadCommandLine);
+        break;
+    }
+    return 0;
+}
+
+// ret 0=OK 1=nicht unterstütztes Format 2=D64 n.IO 3=G64 n.IO 4=OK nur es war ein CRT
+int C64Class::LoadAutoRun(int floppy_nr, char *filename)
+{
+    char EXT[4];
+
+    int len = (int)strlen(filename);
+    strcpy(EXT,filename+len-3);
+
+    EXT[0]=toupper(EXT[0]);
+    EXT[1]=toupper(EXT[1]);
+    EXT[2]=toupper(EXT[2]);
+
+    if(0==strcmp("D64",EXT))
+    {
+        if(!LoadDiskImage(floppy_nr,filename)) return 2;
+
+        KillCommandLine();
+        AutoLoadMode = 0;
+        sprintf(AutoLoadCommandLine,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
+        HardReset();
+        WaitResetReady = true;
+        C64ResetReady = false;
+        FloppyResetReady[0] = false;
+        return 0;
+    }
+
+    if(0==strcmp("G64",EXT))
+    {
+        if(!LoadDiskImage(floppy_nr,filename)) return 3;
+
+        KillCommandLine();
+        AutoLoadMode = 0;
+        sprintf(AutoLoadCommandLine,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
+        HardReset();
+        WaitResetReady = true;
+        C64ResetReady = false;
+        FloppyResetReady[0] = false;
+        return 0;
+    }
+
+    if(0==strcmp("PRG",EXT))
+    {
+        KillCommandLine();
+        AutoLoadMode = 1;
+        strcpy(AutoLoadFilename,filename);
+        HardReset();
+        WaitResetReady = true;
+        C64ResetReady = false;
+        FloppyResetReady[0] = false;
+        return 0;
+    }
+
+    if(0==strcmp("T64",EXT))
+    {
+        KillCommandLine();
+        AutoLoadMode = 2;
+        strcpy(AutoLoadFilename,filename);
+        HardReset();
+        WaitResetReady = true;
+        C64ResetReady = false;
+        FloppyResetReady[0] = false;
+        return 0;
+    }
+
+    if(0==strcmp("P00",EXT))
+    {
+        KillCommandLine();
+        AutoLoadMode = 1;
+        strcpy(AutoLoadFilename,filename);
+        HardReset();
+        WaitResetReady = true;
+        C64ResetReady = false;
+        FloppyResetReady[0] = false;
+        return 0;
+    }
+
+    if(0==strcmp("FRZ",EXT))
+    {
+        KillCommandLine();
+
+        //LoadFreez(filename,FreezReturn);
+        return 0;
+    }
+
+    if(0==strcmp("CRT",EXT))
+    {
+        KillCommandLine();
+
+        LoadCRT(filename);
+        return 4;
+    }
+    return 1;
+}
+
+int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
+{
+    unsigned char *RAM = mmu->GetRAMPointer();
+    FILE *file;
+    char EXT[4];
+
+    int len = (int)strlen(filename);
+    strcpy(EXT,filename+len-3);
+
+    EXT[0]=toupper(EXT[0]);
+    EXT[1]=toupper(EXT[1]);
+    EXT[2]=toupper(EXT[2]);
+
+    if(0==strcmp("PRG",EXT))
+    {
+        unsigned short StartAdresse;
+        int reading_bytes;
+        unsigned char temp[2];
+        file = fopen (filename, "rb");
+        if (file == NULL)
+        {
+                return 0x01;
+        }
+        reading_bytes = fread (&temp,1,2,file);
+        StartAdresse=temp[0]|(temp[1]<<8);
+        if(ret_startadresse != 0) *ret_startadresse = StartAdresse;
+
+        reading_bytes=fread (RAM+StartAdresse,1,0xFFFF,file);
+
+        RAM[0x2B] = 0x01;
+        RAM[0x2C] = 0x08;
+
+        StartAdresse+=(unsigned short)reading_bytes;
+        RAM[0x2D] = (unsigned char)StartAdresse;
+        RAM[0x2E] = (unsigned char)(StartAdresse>>8);
+        RAM[0xAE] = (unsigned char)StartAdresse;
+        RAM[0xAF] = (unsigned char)(StartAdresse>>8);
+
+        fclose(file);
+        return 0x00;
+    }
+
+    if(0==strcmp("T64",EXT))
+    {
+        int reading_bytes;
+        char Kennung[32];
+        unsigned short T64Entries;
+        unsigned short StartAdresse;
+        unsigned short EndAdresse;
+        int FileStartOffset;
+
+        file = fopen (filename, "rb");
+        if (file == NULL)
+        {
+                return 0x01;
+        }
+
+        reading_bytes = fread(Kennung,1,32,file);
+
+        fseek(file,4,SEEK_CUR);
+        reading_bytes = fread(&T64Entries,1,2,file);
+
+        if(T64Entries==0)
+        {
+                fclose(file);
+                return 0x04;
+        }
+
+        /*
+        if(T64Entries>1)
+        {
+                fclose(file);
+                return 0x05;
+        }
+        */
+
+        fseek(file,0x42,SEEK_SET);
+        reading_bytes = fread(&StartAdresse,1,2,file);
+        if(ret_startadresse != 0) *ret_startadresse = StartAdresse;
+        reading_bytes = fread(&EndAdresse,1,2,file);
+        fseek(file,2,SEEK_CUR);
+        reading_bytes = fread(&FileStartOffset,1,4,file);
+
+        fseek(file,FileStartOffset,SEEK_SET);
+        reading_bytes = fread(RAM+StartAdresse,1,EndAdresse-StartAdresse,file);
+        fclose(file);
+
+        RAM[0x2B] = 0x01;
+        RAM[0x2C] = 0x08;
+
+        RAM[0x2D] = (unsigned char)EndAdresse;
+        RAM[0x2E] = (unsigned char)(EndAdresse>>8);
+        RAM[0xAE] = (unsigned char)EndAdresse;
+        RAM[0xAF] = (unsigned char)(EndAdresse>>8);
+
+        return 0x00;
+    }
+
+    if(0==strcmp("P00",EXT))
+    {
+        char Kennung[8];
+        unsigned short StartAdresse;
+        int reading_bytes;
+        unsigned char temp[2];
+        file = fopen (filename, "rb");
+        if (file == NULL)
+        {
+                return 0x01;
+        }
+
+        reading_bytes = fread(Kennung,1,7,file);
+        Kennung[7]=0;
+        if(0!=strcmp("C64File",Kennung))
+        {
+                fclose(file);
+                return 0x06;
+        }
+
+        fseek(file,0x1A,SEEK_SET);
+
+        reading_bytes = fread (&temp,1,2,file);
+        StartAdresse=temp[0]|(temp[1]<<8);
+        if(ret_startadresse != 0) *ret_startadresse = StartAdresse;
+
+        reading_bytes=fread (RAM+StartAdresse,1,0xFFFF,file);
+
+        RAM[0x2B] = 0x01;
+        RAM[0x2C] = 0x08;
+
+        StartAdresse+=(unsigned short)reading_bytes;
+        RAM[0x2D] = (unsigned char)StartAdresse;
+        RAM[0x2E] = (unsigned char)(StartAdresse>>8);
+        RAM[0xAE] = (unsigned char)StartAdresse;
+        RAM[0xAF] = (unsigned char)(StartAdresse>>8);
+
+        fclose(file);
+        return 0x00;
+    }
+    return 0x02;
+}
+
+int C64Class::LoadCRT(char *filename)
+{
+    //reu->Remove();
+    //georam->Remove();
+
+    int ret = crt->LoadCRTImage(filename);
+    if(ret == 0)
+    {
+        IOSource = 1;
+
+        KillCommandLine();
+        HardReset();
+    }
+    return ret;
+}
+
+void C64Class::RemoveCRT(void)
+{
+    crt->RemoveCRTImage();
+    IOSource = 0;
+    KillCommandLine();
+    HardReset();
+}
+
+void C64Class::SetDebugMode(bool status)
+{
+    DebugMode = status;
+    if(DebugMode)
+    {
+        OneZyk = false;
+        OneOpc = false;
+        sid1->SoundOutputEnable = false;
+        sid2->SoundOutputEnable = false;
+        for(int i=0; i<FloppyAnzahl; i++) floppy[i]->SetEnableFloppySound(false);
+    }
+    else
+    {
+        OneZyk = false;
+        OneOpc = false;
+        sid1->SoundOutputEnable = true;
+        sid2->SoundOutputEnable = true;
+        for(int i=0; i<FloppyAnzahl; i++) floppy[i]->SetEnableFloppySound(true);
+    }
+}
+
+void C64Class::OneZyklus(void)
+{
+    DebugAnimation = false;
+    OneZyk = true;
+}
+
+void C64Class::OneOpcode(int source)
+{
+    DebugAnimation = false;
+    OneOpcSource = source;
+    OneOpc = true;
+}
+
+void C64Class::SetDebugAnimation(bool status)
+{
+    DebugAnimation = status;
+}
+
+void C64Class::SetDebugAnimationSpeed(int cycle_sek)
+{
+    AnimationSpeedCounter = 0;
+    AnimationSpeedAdd = (double)AudioPufferSize/(double)AudioSampleRate*(double)cycle_sek;
+}
+
+void C64Class::GetC64CpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg)
+{
+    cpu->GetInterneRegister(ireg);
+    ireg->CycleCounter = CycleCounter;
+    ireg->GAME = GAME;
+    ireg->EXROM = EXROM;
+    cpu->GetRegister(reg);
+}
+
+int C64Class::AddBreakGroup(void)
+{
+    if(BreakGroupAnz == MAX_BREAK_GROUPS) return -1;
+
+    BreakGroup[BreakGroupAnz] = new BREAK_GROUP;
+    memset(BreakGroup[BreakGroupAnz],0,sizeof(BREAK_GROUP));
+    BreakGroup[BreakGroupAnz]->iRZZyklus = 1;
+    BreakGroupAnz ++;
+    return BreakGroupAnz - 1;
+}
+
+void C64Class::DelBreakGroup(int index)
+{
+    if(index >= BreakGroupAnz) return;
+    delete BreakGroup[index];
+    BreakGroupAnz--;
+    for(int i = index; i < BreakGroupAnz; i++) BreakGroup[i] = BreakGroup[i+1];
+    UpdateBreakGroup();
+}
+
+BREAK_GROUP* C64Class::GetBreakGroup(int index)
+{
+    if(index >= BreakGroupAnz) return 0;
+    return BreakGroup[index];
+}
+
+void C64Class::UpdateBreakGroup(void)
+{
+    for(int i=0; i<0x10000;i++) Breakpoints[i] = 0;
+    for(int i=0;i<BreakGroupAnz;i++)
+    {
+        BREAK_GROUP* bg = BreakGroup[i];
+        if(bg->Enable)
+        {
+            if(bg->bPC) Breakpoints[bg->iPC] |= 1;
+            if(bg->bAC) Breakpoints[bg->iAC] |= 2;
+            if(bg->bXR) Breakpoints[bg->iXR] |= 4;
+            if(bg->bYR) Breakpoints[bg->iYR] |= 8;
+            if(bg->bRAdresse) Breakpoints[bg->iRAdresse] |= 16;
+            if(bg->bWAdresse) Breakpoints[bg->iWAdresse] |= 32;
+            if(bg->bRWert) Breakpoints[bg->iRWert] |= 64;
+            if(bg->bWWert) Breakpoints[bg->iWWert] |= 128;
+            if(bg->bRZ) Breakpoints[bg->iRZ] |= 256;
+            if(bg->bRZZyklus) Breakpoints[bg->iRZZyklus] |= 512;
+        }
+    }
+
+    for(int i=0;i<FloppyAnzahl;i++)
+    {
+        if(floppy[i]->GetEnableFloppy())
+        {
+            floppy[i]->UpdateBreakGroup();
+        }
+    }
+}
+
+void C64Class::DeleteAllBreakGroups(void)
+{
+    for(int i=0;i<BreakGroupAnz;i++)
+    {
+        delete BreakGroup[i];
+    }
+    BreakGroupAnz = 0;
+    UpdateBreakGroup();
+}
+
+int C64Class::GetBreakGroupAnz(void)
+{
+    return BreakGroupAnz;
+}
+
+int C64Class::LoadBreakGroups(char *filename)
+{
+    FILE *file;
+    char Kennung[10];
+    char Version;
+    unsigned char Groupanzahl;
+
+    DeleteAllBreakGroups();
+
+    file = fopen (filename, "rb");
+    if (file == NULL)
+    {
+            /// Datei konnte nicht geöffnet werden ///
+            return -1;
+    }
+
+    /// Kennung ///
+    fread(Kennung,sizeof(Kennung),1,file);
+    if(0 != strcmp("EMU64_BPT",Kennung))
+    {
+        /// Kein Emu64 Format ///
+        fclose(file);
+        return -2;
+    }
+
+    /// Version ///
+    fread(&Version,sizeof(Version),1,file);
+    if(Version > 1) return -3;
+
+    /// Groupanzahl ///
+    fread(&Groupanzahl,sizeof(Groupanzahl),1,file);
+    if(Groupanzahl == 0) return -4;
+
+    /// Groups ///
+    for(int ii=0;ii<Groupanzahl;ii++)
+    {
+        int i = AddBreakGroup();
+        fread(BreakGroup[i]->Name,sizeof(BreakGroup[i]->Name),1,file);
+        fread(&BreakGroup[i]->Enable,sizeof(BreakGroup[i]->Enable),1,file);
+        fread(&BreakGroup[i]->bPC,sizeof(BreakGroup[i]->bPC),1,file);
+        fread(&BreakGroup[i]->iPC,sizeof(BreakGroup[i]->iPC),1,file);
+        fread(&BreakGroup[i]->bAC,sizeof(BreakGroup[i]->bAC),1,file);
+        fread(&BreakGroup[i]->iAC,sizeof(BreakGroup[i]->iAC),1,file);
+        fread(&BreakGroup[i]->bXR,sizeof(BreakGroup[i]->bXR),1,file);
+        fread(&BreakGroup[i]->iXR,sizeof(BreakGroup[i]->iXR),1,file);
+        fread(&BreakGroup[i]->bYR,sizeof(BreakGroup[i]->bYR),1,file);
+        fread(&BreakGroup[i]->iYR,sizeof(BreakGroup[i]->iYR),1,file);
+        fread(&BreakGroup[i]->bRAdresse,sizeof(BreakGroup[i]->bRAdresse),1,file);
+        fread(&BreakGroup[i]->iRAdresse,sizeof(BreakGroup[i]->iRAdresse),1,file);
+        fread(&BreakGroup[i]->bWAdresse,sizeof(BreakGroup[i]->bWAdresse),1,file);
+        fread(&BreakGroup[i]->iWAdresse,sizeof(BreakGroup[i]->iWAdresse),1,file);
+        fread(&BreakGroup[i]->bRWert,sizeof(BreakGroup[i]->bRWert),1,file);
+        fread(&BreakGroup[i]->iRWert,sizeof(BreakGroup[i]->iRWert),1,file);
+        fread(&BreakGroup[i]->bWWert,sizeof(BreakGroup[i]->bWWert),1,file);
+        fread(&BreakGroup[i]->iWWert,sizeof(BreakGroup[i]->iWWert),1,file);
+        fread(&BreakGroup[i]->bRZ,sizeof(BreakGroup[i]->bRZ),1,file);
+        fread(&BreakGroup[i]->iRZ,sizeof(BreakGroup[i]->iRZ),1,file);
+        fread(&BreakGroup[i]->bRZZyklus,sizeof(BreakGroup[i]->bRZZyklus),1,file);
+        fread(&BreakGroup[i]->iRZZyklus,sizeof(BreakGroup[i]->iRZZyklus),1,file);
+    }
+    return 0;
+}
+
+bool C64Class::SaveBreakGroups(char *filename)
+{
+    FILE *file;
+    char Kennung[]  = "EMU64_BPT";
+    char Version    = 1;
+
+    file = fopen (filename, "wb");
+    if (file == NULL)
+    {
+            return false;
+    }
+
+    /// Kennung ///
+    fwrite(Kennung,sizeof(Kennung),1,file);
+
+    /// Version ///
+    fwrite(&Version,sizeof(Version),1,file);
+
+    /// Groupanzahl ///
+    fwrite(&BreakGroupAnz,sizeof(BreakGroupAnz),1,file);
+
+    /// Groups ///
+    for(int i=0;i<BreakGroupAnz;i++)
+    {
+        fwrite(BreakGroup[i]->Name,sizeof(BreakGroup[i]->Name),1,file);
+        fwrite(&BreakGroup[i]->Enable,sizeof(BreakGroup[i]->Enable),1,file);
+        fwrite(&BreakGroup[i]->bPC,sizeof(BreakGroup[i]->bPC),1,file);
+        fwrite(&BreakGroup[i]->iPC,sizeof(BreakGroup[i]->iPC),1,file);
+        fwrite(&BreakGroup[i]->bAC,sizeof(BreakGroup[i]->bAC),1,file);
+        fwrite(&BreakGroup[i]->iAC,sizeof(BreakGroup[i]->iAC),1,file);
+        fwrite(&BreakGroup[i]->bXR,sizeof(BreakGroup[i]->bXR),1,file);
+        fwrite(&BreakGroup[i]->iXR,sizeof(BreakGroup[i]->iXR),1,file);
+        fwrite(&BreakGroup[i]->bYR,sizeof(BreakGroup[i]->bYR),1,file);
+        fwrite(&BreakGroup[i]->iYR,sizeof(BreakGroup[i]->iYR),1,file);
+        fwrite(&BreakGroup[i]->bRAdresse,sizeof(BreakGroup[i]->bRAdresse),1,file);
+        fwrite(&BreakGroup[i]->iRAdresse,sizeof(BreakGroup[i]->iRAdresse),1,file);
+        fwrite(&BreakGroup[i]->bWAdresse,sizeof(BreakGroup[i]->bWAdresse),1,file);
+        fwrite(&BreakGroup[i]->iWAdresse,sizeof(BreakGroup[i]->iWAdresse),1,file);
+        fwrite(&BreakGroup[i]->bRWert,sizeof(BreakGroup[i]->bRWert),1,file);
+        fwrite(&BreakGroup[i]->iRWert,sizeof(BreakGroup[i]->iRWert),1,file);
+        fwrite(&BreakGroup[i]->bWWert,sizeof(BreakGroup[i]->bWWert),1,file);
+        fwrite(&BreakGroup[i]->iWWert,sizeof(BreakGroup[i]->iWWert),1,file);
+        fwrite(&BreakGroup[i]->bRZ,sizeof(BreakGroup[i]->bRZ),1,file);
+        fwrite(&BreakGroup[i]->iRZ,sizeof(BreakGroup[i]->iRZ),1,file);
+        fwrite(&BreakGroup[i]->bRZZyklus,sizeof(BreakGroup[i]->bRZZyklus),1,file);
+        fwrite(&BreakGroup[i]->iRZZyklus,sizeof(BreakGroup[i]->iRZZyklus),1,file);
+    }
+
+    fclose(file);
+    return true;
+}
+
+bool C64Class::ExportPRG(char *filename, unsigned short start_adresse, unsigned short end_adresse, int source)
+{
+    FILE *file;
+    unsigned char *RAM;
+
+    if(source > 0)
+    {
+        RAM = floppy[source-1]->GetRamPointer();
+    }
+    else RAM = mmu->GetRAMPointer();
+
+    if(RAM == 0) return false;
+
+    file = fopen (filename, "wb");
+    if (file == NULL)
+    {
+        return false;
+    }
+    fwrite(&start_adresse,sizeof(start_adresse),1,file);
+    for(int i=start_adresse;i<end_adresse;i++) fwrite(&RAM[i],1,1,file);
+    fclose(file);
+
+    return true;
+}
+
+bool C64Class::ExportRAW(char *filename, unsigned short start_adresse, unsigned short end_adresse, int source)
+{
+    FILE *file;
+    unsigned char *RAM;
+
+    if(source > 0)
+    {
+        RAM = floppy[source-1]->GetRamPointer();
+    }
+    else RAM = mmu->GetRAMPointer();
+
+    if(RAM == 0) return false;
+
+    file = fopen (filename, "wb");
+    if (file == NULL)
+    {
+        return false;
+    }
+    for(int i=start_adresse;i<end_adresse;i++) fwrite(&RAM[i],1,1,file);
+    fclose(file);
+
+    return true;
+}
+
+bool C64Class::ExportASM(char *filename, unsigned short start_adresse, unsigned short end_adresse, int source)
+{
+    FILE *file;
+
+    file = fopen (filename, "w");
+    if (file == NULL)
+    {
+        return false;
+    }
+
+    char *source_str;
+
+    switch(source)
+    {
+    case 0:
+        source_str = "C64";
+        break;
+    case 1:
+        source_str = "Floppy #08";
+        break;
+    case 2:
+        source_str = "Floppy #09";
+        break;
+    case 3:
+        source_str = "Floppy #10";
+        break;
+    case 4:
+        source_str = "Floppy #11";
+        break;
+    }
+
+    fprintf(file,"Disassembler Listing wurde mit Emu64 %s erzeugt\n",str_emu64_version);
+    fprintf(file,"-------------------------------------------------\n");
+    fprintf(file,"Von: $%4.4X Bis: $%4.4X Quelle: %s",start_adresse,end_adresse,source_str);
+    fprintf(file,"\n");
+    fprintf(file,"\n");
+
+    int pc = start_adresse;
+L10:
+    pc = DisAss(file,pc,true,source);
+    if(pc < end_adresse) goto L10;
+
+    fclose(file);
+    return true;
+}
+
+int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)
+{
+    char Ausgabe[36];Ausgabe[0]=0;
+    char Adresse[7];Adresse[0]=0;
+    char Speicher[14];Speicher[0]=0;
+    char Opcode[5];Opcode[0]=0;
+    char Anhang[10];Anhang[0]=0;
+
+    int TMP;
+    int OPC;
+
+    unsigned short int word;
+    unsigned short int A;
+    char B;
+
+    unsigned char ram0;
+    unsigned char ram1;
+    unsigned char ram2;
+
+    if(source > 0)
+    {
+        ram0 = floppy[source-1]->ReadByte(PC+0);
+        ram1 = floppy[source-1]->ReadByte(PC+1);
+        ram2 = floppy[source-1]->ReadByte(PC+2);
+    }
+    else
+    {
+        ram0 = ReadC64Byte(PC+0);
+        ram1 = ReadC64Byte(PC+1);
+        ram2 = ReadC64Byte(PC+2);
+    }
+
+    sprintf(Adresse,"$%4.4X ",PC);			// Adresse Ausgeben
+
+    OPC=ram0*3;					// Opcodes Ausgeben //
+    sprintf(Opcode,"%c%c%c ",CpuOPC[OPC+0],CpuOPC[OPC+1],CpuOPC[OPC+2]);
+
+    TMP=CpuOPCInfo[ram0];		// Memory und Adressierung Ausgeben //
+    TMP=TMP>>4;
+    TMP=TMP&15;
+
+    switch (TMP)
+    {
+    case 0:									// Implizit //
+        sprintf(Speicher,"$%2.2X          ",ram0);
+        Anhang[0] = 0;
+        PC++;
+        break;
+    case 1:									// Unmittelbar //
+        sprintf(Speicher,"$%2.2X $%2.2X      ",ram0,ram1);
+        sprintf(Anhang,"#$%2.2X",ram1);
+        PC+=2;
+        break;
+    case 2:									// Absolut //
+        sprintf(Speicher,"$%2.2X $%2.2X $%2.2X  ",ram0,ram1,ram2);
+        word=ram1;
+        word|=ram2<<8;
+        sprintf(Anhang,"$%4.4X",word);
+        PC+=3;
+        break;
+    case 3:									// Zerropage //
+        sprintf(Speicher,"$%2.2X $%2.2X      ",ram0,ram1);
+        sprintf(Anhang,"$%2.2X",ram1);
+        PC+=2;
+        break;
+    case 4:									// Absolut X Indexziert //
+        sprintf(Speicher,"$%2.2X $%2.2X $%2.2X  ",ram0,ram1,ram2);
+        word=ram1;
+        word|=ram2<<8;
+        sprintf(Anhang,"$%4.4X,X",word);
+        PC+=3;
+        break;
+    case 5:									// Absolut Y Indexziert //
+        sprintf(Speicher,"$%2.2X $%2.2X $%2.2X  ",ram0,ram1,ram2);
+        word=ram1;
+        word|=ram2<<8;
+        sprintf(Anhang,"$%4.4X,Y",word);
+        PC+=3;
+        break;
+    case 6:									// Zerropage X Indexziert //
+        sprintf(Speicher,"$%2.2X $%2.2X      ",ram0,ram1);
+        sprintf(Anhang,"$%2.2X,X",ram1);
+        PC+=2;
+        break;
+    case 7:									// Indirekt X Indiziert //
+        sprintf(Speicher,"$%2.2X $%2.2X      ",ram0,ram1);
+        sprintf(Anhang,"($%2.2X,X)",ram1);
+        PC+=2;
+        break;
+    case 8:									// Indirekt Y Indiziert //
+        sprintf(Speicher,"$%2.2X $%2.2X      ",ram0,ram1);
+        sprintf(Anhang,"($%2.2X),Y",ram1);
+        PC+=2;
+        break;
+    case 9:
+        sprintf(Speicher,"$%2.2X $%2.2X      ",ram0,ram1);
+        B=ram1;
+        A=(PC+2)+B;
+        sprintf(Anhang,"$%4.4X",A);
+        PC+=2;
+        break;
+    case 10:									// Indirekt //
+        sprintf(Speicher,"$%2.2X $%2.2X $%2.2X  ",ram0,ram1,ram2);
+        word=ram1;
+        word|=ram2<<8;
+        sprintf(Anhang,"($%4.4X)",word);
+        PC+=3;
+        break;
+    case 11:									// Zerropage Y Indexziert //
+        sprintf(Speicher,"$%2.2X $%2.2X      ",ram0,ram1);
+        sprintf(Anhang,"$%2.2X,Y",ram1);
+        PC+=2;
+        break;
+    }
+
+    sprintf(Ausgabe,"%s%s%s%s",Adresse,Speicher,Opcode,Anhang);
+    fprintf(file,"%s\n",Ausgabe);
+
+    OPC/=3;
+    if(((OPC==0x40)||(OPC==0x60)||(OPC==0x4C)) && (line_draw == true))
+    {
+        fprintf(file,"------------------------------\n");
+    }
+
+    return PC;
+}
+
+bool C64Class::CheckBreakpoints(void)
+{
+    int BreaksIO = 0;
+
+    for (int i=0;i<BreakGroupAnz;i++)
+    {
+        BREAK_GROUP* bg = BreakGroup[i];
+        int count1 = 0;
+        int count2 = 0;
+
+        if(bg->Enable)
+        {
+            if(bg->bPC)
+            {
+                count1++;
+                if((BreakStatus&1) && (BreakWerte[0] == bg->iPC)) count2++;
+            }
+            if(bg->bAC)
+            {
+                count1++;
+                if((BreakStatus&2) && (BreakWerte[1] == bg->iAC)) count2++;
+            }
+            if(bg->bXR)
+            {
+                count1++;
+                if((BreakStatus&4) && (BreakWerte[2] == bg->iXR)) count2++;
+            }
+            if(bg->bYR)
+            {
+                count1++;
+                if((BreakStatus&8) && (BreakWerte[3] == bg->iYR)) count2++;
+            }
+            if(bg->bRAdresse)
+            {
+                count1++;
+                if((BreakStatus&16) && (BreakWerte[4] == bg->iRAdresse)) count2++;
+            }
+            if(bg->bWAdresse)
+            {
+                count1++;
+                if((BreakStatus&32) && (BreakWerte[5] == bg->iWAdresse)) count2++;
+            }
+            if(bg->bRWert)
+            {
+                count1++;
+                if((BreakStatus&64) && (BreakWerte[6] == bg->iRWert)) count2++;
+            }
+            if(bg->bWWert)
+            {
+                count1++;
+                if((BreakStatus&128) && (BreakWerte[7] == bg->iWWert)) count2++;
+            }
+            if(bg->bRZ)
+            {
+                count1++;
+                if((BreakStatus&256) && (BreakWerte[8] == bg->iRZ)) count2++;
+            }
+            if(bg->bRZZyklus)
+            {
+                count1++;
+                if((BreakStatus&512) && (BreakWerte[9] == bg->iRZZyklus)) count2++;
+            }
+        }
+        if((count1 == count2) && (count1 > 0))
+        {
+            BreakGroup[i]->bTrue = true;
+            BreaksIO++;
+        }
+        else BreakGroup[i]->bTrue = false;
+    }
+    BreakStatus = 0;
+
+    FloppyFoundBreakpoint = false;
+    int floppy_break = 0;
+    for(int i=0;i<FloppyAnzahl;i++)
+    {
+        if(floppy[i]->GetEnableFloppy())
+        {
+            if(floppy[i]->CheckBreakpoints()) floppy_break |= 1;
+        }
+    }
+
+    if((BreaksIO > 0) || (floppy_break == 1))
+    {
+        if(!DebugMode)
+        {
+            DebugMode = true;
+            DebugAnimation = false;
+            OneZyk = false;
+            OneOpc = false;
+            sid1->SoundOutputEnable = false;
+            sid2->SoundOutputEnable = false;
+            for(int i=0; i<FloppyAnzahl; i++) floppy[i]->SetEnableFloppySound(false);
+            if(BreakpointProc != NULL) BreakpointProc();
+            return true;
+        }
+        else
+        {
+            DebugAnimation = false;
+            OneOpc = false;
+            OneZyk = false;
+            if(BreakpointProc != NULL) BreakpointProc();
+            return true;
+        }
+    }
+    return false;
+}
+
+void C64Class::WriteSidIO(unsigned short adresse,unsigned char wert)
+{
+    if(StereoEnable)
+    {
+        if((adresse & 0xFFE0) == 0xD400) sid1->WriteIO(adresse,wert);
+        if((adresse & 0xFFE0) == Sid2Adresse) sid2->WriteIO(adresse,wert);
+    }
+    else
+    {
+        sid1->WriteIO(adresse,wert);
+    }
+}
+
+unsigned char C64Class::ReadSidIO(unsigned short adresse)
+{
+    /*
+    if(StereoEnable)
+    {
+        if(Sid2Adresse == 0xD400)
+        {
+            return sid1_ReadIO(adresse);
+        }
+        else
+        {
+            if((adresse && 0x001F) == 0x00) return sid1_ReadIO(adresse);
+            else return sid2_ReadIO(adresse);
+        }
+    }
+    else
+    {
+        return sid1_ReadIO(adresse);
+    }
+    */
+    return 0;
+}
+
+/// $DE00
+void C64Class::WriteIO1(unsigned short adresse,unsigned char wert)
+{
+    switch(IOSource)
+    {
+    case 0: // NO_MODUL
+        break;
+    case 1:	// CRT
+        crt->WriteIO1(adresse,wert);
+        break;
+    case 2:	// REU
+        //reu->WriteIO1(adresse,wert);
+        break;
+    case 3:	// GEORAM
+        //georam->WriteIO1(adresse,wert);
+        break;
+    default:
+        break;
+    }
+}
+
+/// $DF00
+void C64Class::WriteIO2(unsigned short adresse,unsigned char wert)
+{
+    switch(IOSource)
+    {
+    case 0: // NO_MODUL
+        break;
+    case 1: // CRT
+        crt->WriteIO2(adresse,wert);
+        break;
+    case 2: // REU
+        //reu->WriteIO2(adresse,wert);
+        break;
+    case 3: // GEORAM
+        //georam->WriteIO2(adresse,wert);
+        break;
+    default:
+        break;
+    }
+}
+
+/// $DE00
+unsigned char C64Class::ReadIO1(unsigned short adresse)
+{
+    switch(IOSource)
+    {
+    case 0: // NO_MODUL
+        return 0;
+        break;
+    case 1: // CRT
+        return crt->ReadIO1(adresse);
+        break;
+    case 2: // REU
+        //return reu->ReadIO1(adresse);
+        break;
+    case 3: // GEORAM
+        //return georam->ReadIO1(adresse);
+        break;
+    default:
+        return 0;
+        break;
+    }
+    return 0;
+}
+
+/// $DF00
+
+unsigned char C64Class::ReadIO2(unsigned short adresse)
+{
+    switch(IOSource)
+    {
+    case 0: // NO_MODUL
+        return 0;
+        break;
+    case 1: // CRT
+        return crt->ReadIO2(adresse);
+        break;
+    case 2: // REU
+        // return reu->ReadIO2(adresse);
+        break;
+    case 3: // GEORAM
+        //return georam->ReadIO2(adresse);
+        break;
+    default:
+        return 0;
+        break;
+    }
+    return 0;
+}

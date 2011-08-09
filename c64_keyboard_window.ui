@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C64KeyboardWindow</class>
+ <widget class="QDialog" name="C64KeyboardWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>660</width>
+    <height>195</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>2</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>572</width>
+    <height>169</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>5000</width>
+    <height>5000</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Virtuelle C64 Tastatur</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">border-image: url(:/grafik/c64-tastatur.png);</string>
+  </property>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,973 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>420</width>
+    <height>197</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>8</pointsize>
+   </font>
+  </property>
+  <property name="mouseTracking">
+   <bool>false</bool>
+  </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::NoContextMenu</enum>
+  </property>
+  <property name="windowTitle">
+   <string notr="true"/>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="emu64.qrc">
+    <normaloff>:/grafik/emu64.ico</normaloff>:/grafik/emu64.ico</iconset>
+  </property>
+  <property name="windowOpacity">
+   <double>1.000000000000000</double>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">#playButton{
+background-image: url(:/Grafik/play_blue_transprent.png);
+background-repeat: no-repeat;
+background-position: center
+}
+
+#stopButton{
+background-image: url(:/Grafik/stop_blue_transprent.png);
+background-repeat: no-repeat;
+background-position: center
+}</string>
+  </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonTextOnly</enum>
+  </property>
+  <property name="dockNestingEnabled">
+   <bool>false</bool>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>false</bool>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <widget class="QTableWidget" name="FloppyTabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>396</width>
+      <height>98</height>
+     </rect>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::NoSelection</enum>
+    </property>
+    <property name="showGrid">
+     <bool>false</bool>
+    </property>
+    <attribute name="horizontalHeaderVisible">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="horizontalHeaderHighlightSections">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="verticalHeaderVisible">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="verticalHeaderHighlightSections">
+     <bool>false</bool>
+    </attribute>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusBar">
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string notr="true">toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>true</bool>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonIconOnly</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionBeenden"/>
+   <addaction name="menu_main_info"/>
+   <addaction name="actionHandbuch"/>
+   <addaction name="actionFloppy_1541_II"/>
+   <addaction name="actionBandlaufwerk_1530"/>
+   <addaction name="actionSteckmodule"/>
+   <addaction name="actionDebugger_Disassembler"/>
+   <addaction name="actionSoftreset"/>
+   <addaction name="actionHardreset"/>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>420</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string/>
+   </property>
+   <property name="whatsThis">
+    <string/>
+   </property>
+   <property name="defaultUp">
+    <bool>false</bool>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>false</bool>
+   </property>
+   <widget class="QMenu" name="menu_main_help">
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="title">
+     <string>Hilfe</string>
+    </property>
+    <addaction name="menu_main_info"/>
+    <addaction name="actionHandbuch"/>
+   </widget>
+   <widget class="QMenu" name="menuC64_Dateien">
+    <property name="toolTip">
+     <string/>
+    </property>
+    <property name="title">
+     <string>C64 Dateien</string>
+    </property>
+    <addaction name="actionFloppy_1541_II"/>
+    <addaction name="actionBandlaufwerk_1530"/>
+    <addaction name="actionSteckmodule"/>
+    <addaction name="actionAutostart"/>
+    <addaction name="actionC64_Programme_direkt_laden"/>
+   </widget>
+   <widget class="QMenu" name="menuReset">
+    <property name="title">
+     <string>Reset</string>
+    </property>
+    <addaction name="actionSoftreset"/>
+    <addaction name="actionHardreset"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionQuick_C64_Snapshot"/>
+    <addaction name="actionScreenshot"/>
+    <addaction name="actionSID_Dump"/>
+    <addaction name="actionSID_Player"/>
+    <addaction name="actionDebugger_Disassembler"/>
+    <addaction name="actionC64_Geschwindigkeit"/>
+    <addaction name="actionCross_Assembler"/>
+    <addaction name="actionLan64"/>
+    <addaction name="actionVirtuelle_C64_Tastatur"/>
+    <addaction name="actionGameBase64"/>
+    <addaction name="actionREU_1764_16MB"/>
+    <addaction name="actionGEO_NEO_RAM_2MB"/>
+    <addaction name="actionAudio_und_Video_Aufnahme"/>
+   </widget>
+   <widget class="QMenu" name="menuEinstellungen">
+    <property name="title">
+     <string>Einstellungen</string>
+    </property>
+    <addaction name="actionEmu64_Einstellungen"/>
+    <addaction name="actionTV_Video_Einstellungen"/>
+    <addaction name="actionVollbild"/>
+    <addaction name="actionC64_Tastaturbelegung_ndern"/>
+    <addaction name="actionC64_Tastaturbelegung_zur_cksetzen"/>
+    <addaction name="actionFenster_Optionen"/>
+   </widget>
+   <widget class="QMenu" name="menuSprache">
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="title">
+     <string>Sprache</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuDatei">
+    <property name="toolTip">
+     <string/>
+    </property>
+    <property name="title">
+     <string>Datei</string>
+    </property>
+    <addaction name="actionBeenden"/>
+   </widget>
+   <addaction name="menuDatei"/>
+   <addaction name="menuC64_Dateien"/>
+   <addaction name="menuReset"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuEinstellungen"/>
+   <addaction name="menu_main_help"/>
+   <addaction name="menuSprache"/>
+  </widget>
+  <action name="menu_main_info">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="emu64.qrc">
+     <normaloff>:/grafik/toolbar32/info.png</normaloff>:/grafik/toolbar32/info.png</iconset>
+   </property>
+   <property name="text">
+    <string>Info</string>
+   </property>
+   <property name="statusTip">
+    <string>Infos zur aktuellen Emu64 Version.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionFloppy_1541_II">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="emu64.qrc">
+     <normaloff>:/grafik/toolbar32/floppy.png</normaloff>:/grafik/toolbar32/floppy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Floppy 1541 II</string>
+   </property>
+   <property name="toolTip">
+    <string>Floppy 1541 II</string>
+   </property>
+   <property name="statusTip">
+    <string>Hier können Sie C64 Diskimages auswählen oder bearbeiten. [D64,G64,ZIP]</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Alt+D</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionBandlaufwerk_1530">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="emu64.qrc">
+     <normaloff>:/grafik/toolbar32/datasette.png</normaloff>:/grafik/toolbar32/datasette.png</iconset>
+   </property>
+   <property name="text">
+    <string>Kassettenlaufwerk 1530</string>
+   </property>
+   <property name="iconText">
+    <string>Kassettenlaufwerk 1530</string>
+   </property>
+   <property name="toolTip">
+    <string>Kassettenlaufwerk 1530</string>
+   </property>
+   <property name="statusTip">
+    <string>Alle Funktionen eines Kassettenlaufwerks 1530. [TAP,WAV]</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Alt+K</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSteckmodule">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="emu64.qrc">
+     <normaloff>:/grafik/toolbar32/crt.png</normaloff>:/grafik/toolbar32/crt.png</iconset>
+   </property>
+   <property name="text">
+    <string>Steckmodule</string>
+   </property>
+   <property name="toolTip">
+    <string>Steckmodule</string>
+   </property>
+   <property name="statusTip">
+    <string>Hier können Sie ein Steckmodul in den Emu64 einsetzen. [CRT]</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Alt+M</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionAutostart">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Autostart</string>
+   </property>
+   <property name="statusTip">
+    <string>Die schnellste möglichkeit ein C64 Programm zu laden und zu starten. [PRG,T64,P00,FRZ,D64,G64]</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Alt+R</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionC64_Programme_direkt_laden">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>C64 Programme direkt laden</string>
+   </property>
+   <property name="statusTip">
+    <string>Hier wird das Programm direkt in den Speicher geladen ohne C64 Laderoutiene. [PRG,T64,P00,FRZ]</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Alt+L</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSoftreset">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="emu64.qrc">
+     <normaloff>:/grafik/toolbar32/sreset.png</normaloff>:/grafik/toolbar32/sreset.png</iconset>
+   </property>
+   <property name="text">
+    <string>Softreset</string>
+   </property>
+   <property name="statusTip">
+    <string>Führt ein Softreset des C64 durch. Das C64 RAM wird dabei nicht gelöscht.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Esc</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionHardreset">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="emu64.qrc">
+     <normaloff>:/grafik/toolbar32/hreset.png</normaloff>:/grafik/toolbar32/hreset.png</iconset>
+   </property>
+   <property name="text">
+    <string>Hardreset</string>
+   </property>
+   <property name="statusTip">
+    <string>Führt ein Hardreset des C64 durch. Das C64 RAM wird dabei gelöscht. Es gleicht dem Ein- und Auschalten des C64.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Shift+Esc</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionBeenden">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="emu64.qrc">
+     <normaloff>:/grafik/toolbar32/aus.png</normaloff>:/grafik/toolbar32/aus.png</iconset>
+   </property>
+   <property name="text">
+    <string>Beenden</string>
+   </property>
+   <property name="iconText">
+    <string>Beenden</string>
+   </property>
+   <property name="toolTip">
+    <string>Beenden</string>
+   </property>
+   <property name="statusTip">
+    <string>Beendet den Emu64.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Alt+X</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionQuick_C64_Snapshot">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Quick C64 Snapshot</string>
+   </property>
+   <property name="statusTip">
+    <string>Den aktuellen Zustand des C64 speichern, um zu einem späteren Zeitpunkt wieder zu laden.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionScreenshot">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Screenshot</string>
+   </property>
+   <property name="statusTip">
+    <string>Erzeugt ein Bildschirmfoto vom C64 Bildschirm.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSID_Dump">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>SID Dump</string>
+   </property>
+   <property name="statusTip">
+    <string>Zeichnen Sie alle SID (Sound Interface Device) Signale auf um sie später mit dem  mitgelieferten SID Player abzuspielen.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>8</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSID_Player">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>SID Player</string>
+   </property>
+   <property name="statusTip">
+    <string>Schaltet in den SID Player Modus. Damit wird der Emu64 zu einem vollwertigen SID Player.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionDebugger_Disassembler">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="emu64.qrc">
+     <normaloff>:/grafik/toolbar32/debug.png</normaloff>:/grafik/toolbar32/debug.png</iconset>
+   </property>
+   <property name="text">
+    <string>Debugger/Disassembler</string>
+   </property>
+   <property name="statusTip">
+    <string>Sehr Komfortabler Debugger und Disassembler.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionC64_Geschwindigkeit">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>C64 Geschwindigkeit</string>
+   </property>
+   <property name="statusTip">
+    <string>Hier können Sie die C64 Geschwindigkeit von 10% bis 1000% einstellen.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionCross_Assembler">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Cross Assembler</string>
+   </property>
+   <property name="statusTip">
+    <string>Integrierter 2Pass Assembler der an TurboAss angelehnt ist.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionLan64">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Lan64 </string>
+   </property>
+   <property name="statusTip">
+    <string>Hiermit kann man Programme vom PC zum C64 übertragen.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionVirtuelle_C64_Tastatur">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Virtuelle C64 Tastatur</string>
+   </property>
+   <property name="statusTip">
+    <string>Eine Virtuelle C64 Tastatur, diese zeigt auch alle C64 Symbole.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionREU_1764_16MB">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>REU 1764 (16MB)</string>
+   </property>
+   <property name="statusTip">
+    <string>Es wird eine Komplette REU 1764 mit 16 MB emuliert.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionGEO_NEO_RAM_2MB">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>GEO- / NEO-RAM (2MB)</string>
+   </property>
+   <property name="statusTip">
+    <string>Es wird eine komplette Geo- /NeoRam mit 2 MB emuliert.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionAudio_und_Video_Aufnahme">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Audio und Video Aufnahme</string>
+   </property>
+   <property name="statusTip">
+    <string>Mit diesem Tool können sie die den Ton und das Videobild aufnehmen.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionEmu64_Einstellungen">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Emu64 Einstellungen</string>
+   </property>
+   <property name="statusTip">
+    <string>Hier stellen sie den Emu64 nach ihren wünschen ein.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionTV_Video_Einstellungen">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>TV/Video Einstellungen</string>
+   </property>
+   <property name="statusTip">
+    <string>Hiermit kann man das Aussehen der Videoausgabe verändern. z.B.: Sättigung, Helligkeit und Kontrast.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionVollbild">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Vollbild</string>
+   </property>
+   <property name="statusTip">
+    <string>Emu64 wird im Vollbild ausgeführt.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Alt+Return</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionC64_Tastaturbelegung_ndern">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>C64 Tastaturbelegung ändern</string>
+   </property>
+   <property name="statusTip">
+    <string>Hiermit können Sie die komplette Tastaturbelegung(C64) ändern.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionC64_Tastaturbelegung_zur_cksetzen">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>C64 Tastaturbelegung zurücksetzen</string>
+   </property>
+   <property name="statusTip">
+    <string>Hiermit wird die Tastaturbelegung auf Standardwerte zurück gesetzt.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionFenster_Optionen">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Fenster Optionen</string>
+   </property>
+   <property name="statusTip">
+    <string>Funktionen die die Emu64 Fenster beeinflussen.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionHandbuch">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="emu64.qrc">
+     <normaloff>:/grafik/toolbar32/handbuch.png</normaloff>:/grafik/toolbar32/handbuch.png</iconset>
+   </property>
+   <property name="text">
+    <string>Handbuch</string>
+   </property>
+   <property name="statusTip">
+    <string>Öffnet das Emu64 Handbuch.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionGameBase64">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>GameBase64</string>
+   </property>
+   <property name="statusTip">
+    <string>Über dieses Tool ist es möglich auf alle Spiele die es in der GameBase64 gibt zuzugreifen.</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="emu64.qrc"/>
+ </resources>
+ <connections/>
+</ui>
