@@ -50,8 +50,8 @@
     <rect>
      <x>0</x>
      <y>1</y>
-     <width>20</width>
-     <height>20</height>
+     <width>24</width>
+     <height>24</height>
     </rect>
    </property>
    <property name="statusTip">
@@ -293,8 +293,8 @@ border-right-color: rgb(50, 50, 50);</string>
     <rect>
      <x>370</x>
      <y>1</y>
-     <width>20</width>
-     <height>20</height>
+     <width>24</width>
+     <height>24</height>
     </rect>
    </property>
    <property name="statusTip">
@@ -305,6 +305,12 @@ border-right-color: rgb(50, 50, 50);</string>
    </property>
    <property name="text">
     <string notr="true"/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
    </property>
    <property name="flat">
     <bool>true</bool>
