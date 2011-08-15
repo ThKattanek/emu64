@@ -65,8 +65,8 @@
    </property>
    <property name="iconSize">
     <size>
-     <width>10</width>
-     <height>10</height>
+     <width>14</width>
+     <height>14</height>
     </size>
    </property>
    <property name="flat">
