@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>420</width>
-    <height>197</height>
+    <height>192</height>
    </rect>
   </property>
   <property name="font">
@@ -70,8 +70,8 @@ background-position: center
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>396</width>
-      <height>98</height>
+      <width>401</width>
+      <height>103</height>
      </rect>
     </property>
     <property name="focusPolicy">
@@ -147,7 +147,7 @@ background-position: center
      <x>0</x>
      <y>0</y>
      <width>420</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="font">
