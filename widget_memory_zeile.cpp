@@ -43,6 +43,8 @@ WidgetMemoryZeile::WidgetMemoryZeile(QWidget *parent) :
     ui->EditValue_13->setFont(font1);
     ui->EditValue_14->setFont(font1);
     ui->EditValue_15->setFont(font1);
+    ui->ReadOut->setFont(font1);
+    ui->WriteOut->setFont(font1);
 }
 
 WidgetMemoryZeile::~WidgetMemoryZeile()
@@ -118,7 +120,6 @@ bool WidgetMemoryZeile::ConvHex(QString str, unsigned char *value)
     v = in_str.toUShort(&ok,0);
     if(!ok)
     {
-        //QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es werden nur 8Bit Hexzahlen ohne '$' aktzeptiert."));
         return false;
     }
     *value = (unsigned char)v;

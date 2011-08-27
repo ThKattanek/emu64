@@ -371,35 +371,18 @@ bool MOS6510::OneZyklus(void)
             if(JAMFlag) return false;
             CHK_RDY
 
-            /*
-            if(isNMI)
-            {
-                    NMIState = false;
-                    MCT = ((unsigned char*)MicroCodeTable6510 + (0x102*MCTItemSize));
-                    isNMI = false;
-                    return false;
-            }
 
-            if(isIRQ)
-            {
-                    MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
-                    isIRQ = false;
-                    return false;
-            }
-            */
-
-            if((NMIState == true) && (NMICounter > 2))
+            if((NMIState == true) && (NMICounter > 0))
             {
                     NMIState = false;
                     MCT = ((unsigned char*)MicroCodeTable6510 + (0x102*MCTItemSize));
                     return false;
             }
-            else if((Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]) && (IRQCounter > 2) && ((SR&4)==0))
+            else if((Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]) && (IRQCounter > 0) && ((SR&4)==0))
             {
                             MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
                             return false;
             }
-
 
             MCT = ((unsigned char*)MicroCodeTable6510 + (Read(PC)*MCTItemSize));
 

@@ -1219,7 +1219,7 @@ void VICII::OneZyklus(void)
 	case 58:
 		DrawGraphics();
 		
-		
+                /*
 		if ((RC == 7) && (BadLineStatus == false)) 
 		{
 			VCBASE = VC;
@@ -1231,8 +1231,7 @@ void VICII::OneZyklus(void)
 		{
 			RC = (RC + 1) & 7;
 		}
-		
-
+*/
 		/// Sprite ///
 		// In der ersten Phase von Zyklus 58 wird für jedes Sprite MC mit MCBASE
 		// geladen (MCBASE->MC) und geprüft, ob der DMA für das Sprite angeschaltet
@@ -1264,7 +1263,7 @@ void VICII::OneZyklus(void)
 	case 60:
 		DrawGraphics();
 
-		/*
+
 		if (RC == 7) 
 		{
 			VCBASE = VC;
@@ -1276,7 +1275,7 @@ void VICII::OneZyklus(void)
 		{
 			RC = (RC + 1) & 7;
 		}
-		*/
+
 
 		DrawSprites();
 		DrawBorder();

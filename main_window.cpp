@@ -37,8 +37,8 @@ MainWindow::MainWindow(QWidget *parent) :
     /// Klassen installieren ///
     videopal = new VideoPalClass();
     videopal->SetDisplayMode(color_bits);
-    videopal->EnablePALOutput(true);
-    videopal->EnableVideoDoubleSize(true);
+    videopal->EnablePALOutput(false);
+    videopal->EnableVideoDoubleSize(false);
 
     /// INI Dateiverwaltung erstellen ///
     ini = new QSettings("emu64.ini",QSettings::IniFormat,this);

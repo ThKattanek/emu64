@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>485</width>
+    <width>516</width>
     <height>16</height>
    </rect>
   </property>
@@ -583,12 +583,12 @@ background-color: rgb(180,180, 255);
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="AdresseOut_2">
+  <widget class="QLabel" name="ReadOut">
    <property name="geometry">
     <rect>
      <x>365</x>
      <y>0</y>
-     <width>60</width>
+     <width>75</width>
      <height>16</height>
     </rect>
    </property>
@@ -605,12 +605,12 @@ color: rgb(170, 170, 255);</string>
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="AdresseOut_3">
+  <widget class="QLabel" name="WriteOut">
    <property name="geometry">
     <rect>
-     <x>425</x>
+     <x>440</x>
      <y>0</y>
-     <width>60</width>
+     <width>75</width>
      <height>16</height>
     </rect>
    </property>

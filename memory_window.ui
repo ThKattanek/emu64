@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>510</width>
-    <height>299</height>
+    <width>550</width>
+    <height>311</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>5</x>
      <y>5</y>
-     <width>486</width>
-     <height>274</height>
+     <width>521</width>
+     <height>278</height>
     </rect>
    </property>
    <property name="focusPolicy">
@@ -44,10 +44,10 @@
   <widget class="QScrollBar" name="MemoryScroll">
    <property name="geometry">
     <rect>
-     <x>491</x>
-     <y>5</y>
-     <width>16</width>
-     <height>274</height>
+     <x>523</x>
+     <y>3</y>
+     <width>21</width>
+     <height>281</height>
     </rect>
    </property>
    <property name="maximum">
@@ -66,11 +66,14 @@
   <widget class="QCheckBox" name="BitAnzeige">
    <property name="geometry">
     <rect>
-     <x>5</x>
-     <y>280</y>
-     <width>96</width>
+     <x>10</x>
+     <y>290</y>
+     <width>101</width>
      <height>17</height>
     </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="text">
     <string>Bit Anzeige</string>

@@ -109,18 +109,28 @@ RESOURCES += \
     emu64.qrc
 
 win32{
+RC_FILE = emu64.rc
 DESTDIR = "../bin/win32"
 LIBS += -lSDL
 }
 
-linux-g++{
-DESTDIR = "../bin/linux"
+linux-g++-64{
+DESTDIR = "../bin/linux_x86_64"
+LIBS += -lSDL
+}
+
+linux-g++-32{
+DESTDIR = "../bin/linux_i586"
 LIBS += -lSDL
 }
 
 macx{
+ICON = grafik/emu64.ico
 DESTDIR = "../bin/mac"
 SOURCES += /Library/Frameworks/SDL.framework/devel-lite/SDLMain.m
 LIBS += -framework SDL
 LIBS += -framework cocoa
 }
+
+OTHER_FILES += \
+    emu64.rc
