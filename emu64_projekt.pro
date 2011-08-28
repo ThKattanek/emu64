@@ -125,7 +125,7 @@ LIBS += -lSDL
 }
 
 macx{
-ICON = grafik/emu64.ico
+ICON =
 DESTDIR = "../bin/mac"
 SOURCES += /Library/Frameworks/SDL.framework/devel-lite/SDLMain.m
 LIBS += -framework SDL
