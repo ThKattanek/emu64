@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 03.08.2011		//
+// Letzte Änderung am 28.08.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -55,6 +55,7 @@ private:
     int AktFloppyNr;
     int AktViewAdresse;
     bool NoFocusRun;
+    QStringList MemScrDest;
 };
 
 #endif // MEMORY_WINDOW_H

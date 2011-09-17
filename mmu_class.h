@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 20.07.2011		//
+// Letzte Änderung am 28.08.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -37,6 +37,8 @@ public:
     bool LoadKernalRom(char* filename);
     bool LoadBasicRom(char* filename);
     bool LoadCharRom(char* filename);
+    unsigned char GetReadSource(unsigned char page);
+    unsigned char GetWriteDestination(unsigned char page);
     //bool SaveFreez(FILE* File);
     //bool LoadFreez(FILE *File,unsigned short Version);
     /// Variablen ///
@@ -117,7 +119,8 @@ private:
     unsigned char FARB_RAM[0x0400];		// 1KB ab 0xD800
     unsigned char KERNAL_ROM[0x2000];		// 8KB ab 0xE000
 
-    /// AktMemoryMap Visual ///
-    unsigned char MapVisuel[1024];
+    /// AktMemoryMap Visuall ///
+    unsigned char MapReadSource[0x100];
+    unsigned char MapWriteDestination[0x100];
 };
 #endif // MMU_CLASS_H

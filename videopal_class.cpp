@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 11.07.2011		//
+// Letzte Änderung am 28.08.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -490,7 +490,7 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                         }
 }
 
-void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VICOutPuffer,int OutXW,int OutYW,int InXW,int InYW,bool FlipTex)
+void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VICOutPuffer,int OutXW,int OutYW,int InXW,int,bool)
 {
     static unsigned char w0,w1,w2,w3;
     VideoSource8 = (unsigned char*)VICOutPuffer;
@@ -620,6 +620,7 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
                 }
                 break;
             case 32:
+
                 for(int y=0;y<OutYW;y++)
                 {
                     DXOutpuffer32 = ((unsigned long*)DXOutpuffer + ((y)*Pitch/4));
@@ -652,6 +653,7 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
                     }
                     VideoSource8 = VideoSource8+InXW;
                 }
+
                 break;
             }
         }

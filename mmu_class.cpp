@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 20.07.2011		//
+// Letzte Änderung am 28.08.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -135,7 +135,17 @@ bool MMU::LoadFreez(FILE* File,unsigned short Version)
 
 unsigned char* MMU::GetRAMPointer(void)
 {
-	return RAM;
+    return RAM;
+}
+
+unsigned char MMU::GetReadSource(unsigned char page)
+{
+    return MapReadSource[page];
+}
+
+unsigned char MMU::GetWriteDestination(unsigned char page)
+{
+    return MapWriteDestination[page];
 }
 
 ///////////////////// Intern ////////////////////////
@@ -161,11 +171,16 @@ void MMU::ChangeMemMap()
 			{
                             CPUReadProcTbl[0x10+i] = bind(&MMU::ReadRam,this,_1);
                             CPUWriteProcTbl[0x10+i] = bind(&MMU::WriteRam,this,_1,_2);
+                            MapReadSource[0x10+i] = MV_RAM;
+                            MapWriteDestination[0x10+i] = MV_RAM;
+
 			}
 			for(int i=0;i<16;i++)
 			{
                             CPUReadProcTbl[0xC0+i] = bind(&MMU::ReadRam,this,_1);
                             CPUWriteProcTbl[0xC0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                            MapReadSource[0xC0+i] = MV_RAM;
+                            MapWriteDestination[0xC0+i] = MV_RAM;
 			}
 			break;
 	}
@@ -180,17 +195,27 @@ void MMU::ChangeMemMap()
                                 CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,_1);
                                 CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadBasicRom,this,_1);
                                 CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,_1);
+                                MapReadSource[0x80+i] = MV_RAM;
+                                MapReadSource[0xA0+i] = MV_BASIC_ROM;
+                                MapReadSource[0xE0+i] = MV_KERNAL_ROM;
 			}
 			for(int i=0;i<4;++i)
 			{
                                 CPUReadProcTbl[0xD0+i] = VicIOReadProc;
                                 CPUReadProcTbl[0xD4+i] = SidIOReadProc;
                                 CPUReadProcTbl[0xD8+i] = bind(&MMU::ReadFarbRam,this,_1);
+                                MapReadSource[0xD0+i] = MV_VIC;
+                                MapReadSource[0xD4+i] = MV_SID;
+                                MapReadSource[0xD8+i] = MV_FARB_RAM;
 			}
                         CPUReadProcTbl[0xDC] = Cia1IOReadProc;
                         CPUReadProcTbl[0xDD] = Cia2IOReadProc;
                         CPUReadProcTbl[0xDE] = IO1ReadProc;
                         CPUReadProcTbl[0xDF] = IO2ReadProc;
+                        MapReadSource[0xDC] = MV_CIA1;
+                        MapReadSource[0xDD] = MV_CIA2;
+                        MapReadSource[0xDE] = MV_IO1;
+                        MapReadSource[0xDF] = MV_IO2;
 
 			/// WRITE
 			for(int i=0;i<32;++i)
@@ -198,17 +223,27 @@ void MMU::ChangeMemMap()
                                 CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0x80+i] = MV_RAM;
+                                MapWriteDestination[0xA0+i] = MV_RAM;
+                                MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<4;++i)
 			{
                                 CPUWriteProcTbl[0xD0+i] = VicIOWriteProc;
                                 CPUWriteProcTbl[0xD4+i] = SidIOWriteProc;
                                 CPUWriteProcTbl[0xD8+i] = bind(&MMU::WriteFarbRam,this,_1,_2);
+                                MapWriteDestination[0xD0+i] = MV_VIC;
+                                MapWriteDestination[0xD4+i] = MV_SID;
+                                MapWriteDestination[0xD8+i] = MV_FARB_RAM;
 			}
                         CPUWriteProcTbl[0xDC] = Cia1IOWriteProc;
                         CPUWriteProcTbl[0xDD] = Cia2IOWriteProc;
                         CPUWriteProcTbl[0xDE] = IO1WriteProc;
                         CPUWriteProcTbl[0xDF] = IO2WriteProc;
+                        MapWriteDestination[0xDC] = MV_CIA1;
+                        MapWriteDestination[0xDD] = MV_CIA2;
+                        MapWriteDestination[0xDE] = MV_IO1;
+                        MapWriteDestination[0xDF] = MV_IO2;
 		}break;
 
 		case 27:
@@ -219,10 +254,14 @@ void MMU::ChangeMemMap()
                                 CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,_1);
                                 CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadBasicRom,this,_1);
                                 CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,_1);
+                                MapReadSource[0x80+i] = MV_RAM;
+                                MapReadSource[0xA0+i] = MV_BASIC_ROM;
+                                MapReadSource[0xE0+i] = MV_KERNAL_ROM;
 			}
 			for(int i=0;i<16;++i)
 			{
                                 CPUReadProcTbl[0xD0+i] = bind(&MMU::ReadCharRom,this,_1);
+                                MapReadSource[0xD0+i] = MV_CHAR_ROM;
 			}
 
 			/// WRITE
@@ -231,10 +270,14 @@ void MMU::ChangeMemMap()
                                 CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0x80+i] = MV_RAM;
+                                MapWriteDestination[0xA0+i] = MV_RAM;
+                                MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
                                 CPUWriteProcTbl[0xD0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0xD0+i] = MV_RAM;
 			}
 		}break;
 
@@ -246,17 +289,27 @@ void MMU::ChangeMemMap()
                                 CPUReadProcTbl[0x80+i] = bind(&MMU::ReadCRT1,this,_1);
                                 CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadBasicRom,this,_1);
                                 CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,_1);
+                                MapReadSource[0x80+i] = MV_CRT_1;
+                                MapReadSource[0xA0+i] = MV_BASIC_ROM;
+                                MapReadSource[0xE0+i] = MV_KERNAL_ROM;
 			}
 			for(int i=0;i<4;++i)
 			{
                                 CPUReadProcTbl[0xD0+i] = VicIOReadProc;
                                 CPUReadProcTbl[0xD4+i] = SidIOReadProc;
                                 CPUReadProcTbl[0xD8+i] = bind(&MMU::ReadFarbRam,this,_1);
+                                MapReadSource[0xD0+i] = MV_VIC;
+                                MapReadSource[0xD4+i] = MV_SID;
+                                MapReadSource[0xD8+i] = MV_FARB_RAM;
 			}
                         CPUReadProcTbl[0xDC] = Cia1IOReadProc;
                         CPUReadProcTbl[0xDD] = Cia2IOReadProc;
                         CPUReadProcTbl[0xDE] = IO1ReadProc;
                         CPUReadProcTbl[0xDF] = IO2ReadProc;
+                        MapReadSource[0xDC] = MV_CIA1;
+                        MapReadSource[0xDD] = MV_CIA2;
+                        MapReadSource[0xDE] = MV_IO1;
+                        MapReadSource[0xDF] = MV_IO2;
 
 			/// WRITE
 			for(int i=0;i<32;++i)
@@ -264,17 +317,27 @@ void MMU::ChangeMemMap()
                                 CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteCRT1,this,_1,_2);
                                 CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0x80+i] = MV_CRT_1;
+                                MapWriteDestination[0xA0+i] = MV_RAM;
+                                MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<4;++i)
 			{
                                 CPUWriteProcTbl[0xD0+i] = VicIOWriteProc;
                                 CPUWriteProcTbl[0xD4+i] = SidIOWriteProc;
                                 CPUWriteProcTbl[0xD8+i] = bind(&MMU::WriteFarbRam,this,_1,_2);
+                                MapWriteDestination[0xD0+i] = MV_VIC;
+                                MapWriteDestination[0xD4+i] = MV_SID;
+                                MapWriteDestination[0xD8+i] = MV_FARB_RAM;
 			}
                         CPUWriteProcTbl[0xDC] = Cia1IOWriteProc;
                         CPUWriteProcTbl[0xDD] = Cia2IOWriteProc;
                         CPUWriteProcTbl[0xDE] = IO1WriteProc;
                         CPUWriteProcTbl[0xDF] = IO2WriteProc;
+                        MapWriteDestination[0xDC] = MV_CIA1;
+                        MapWriteDestination[0xDD] = MV_CIA2;
+                        MapWriteDestination[0xDE] = MV_IO1;
+                        MapWriteDestination[0xDF] = MV_IO2;
 		}break;
 
 		case 25:
@@ -285,10 +348,14 @@ void MMU::ChangeMemMap()
                                 CPUReadProcTbl[0x80+i] = bind(&MMU::ReadCRT1,this,_1);
                                 CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadBasicRom,this,_1);
                                 CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,_1);
+                                MapReadSource[0x80+i] = MV_CRT_1;
+                                MapReadSource[0xA0+i] = MV_BASIC_ROM;
+                                MapReadSource[0xE0+i] = MV_KERNAL_ROM;
 			}
 			for(int i=0;i<16;++i)
 			{
                                 CPUReadProcTbl[0xD0+i] = bind(&MMU::ReadCharRom,this,_1);
+                                MapReadSource[0xD0+i] = MV_CHAR_ROM;
 			}
 
 			/// WRITE
@@ -297,10 +364,14 @@ void MMU::ChangeMemMap()
                                 CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteCRT1,this,_1,_2);
                                 CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0x80+i] = MV_CRT_1;
+                                MapWriteDestination[0xA0+i] = MV_RAM;
+                                MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
                                 CPUWriteProcTbl[0xD0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0xD0+i] = MV_RAM;
 			}
 		}break;
 
@@ -312,17 +383,27 @@ void MMU::ChangeMemMap()
                                 CPUReadProcTbl[0x80+i] = bind(&MMU::ReadCRT1,this,_1);
                                 CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadCRT2,this,_1);
                                 CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,_1);
+                                MapReadSource[0x80+i] = MV_CRT_1;
+                                MapReadSource[0xA0+i] = MV_CRT_2;
+                                MapReadSource[0xE0+i] = MV_KERNAL_ROM;
 			}
 			for(int i=0;i<4;++i)
 			{
                                 CPUReadProcTbl[0xD0+i] = VicIOReadProc;
                                 CPUReadProcTbl[0xD4+i] = SidIOReadProc;
                                 CPUReadProcTbl[0xD8+i] = bind(&MMU::ReadFarbRam,this,_1);
+                                MapReadSource[0xD0+i] = MV_VIC;
+                                MapReadSource[0xD4+i] = MV_SID;
+                                MapReadSource[0xD8+i] = MV_FARB_RAM;
 			}
                         CPUReadProcTbl[0xDC] = Cia1IOReadProc;
                         CPUReadProcTbl[0xDD] = Cia2IOReadProc;
                         CPUReadProcTbl[0xDE] = IO1ReadProc;
                         CPUReadProcTbl[0xDF] = IO2ReadProc;
+                        MapReadSource[0xDC] = MV_CIA1;
+                        MapReadSource[0xDD] = MV_CIA2;
+                        MapReadSource[0xDE] = MV_IO1;
+                        MapReadSource[0xDF] = MV_IO2;
 
 			/// WRITE
 			for(int i=0;i<32;++i)
@@ -330,17 +411,27 @@ void MMU::ChangeMemMap()
                                 CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteCRT1,this,_1,_2);
                                 CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteCRT2,this,_1,_2);
                                 CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0x80+i] = MV_CRT_1;
+                                MapWriteDestination[0xA0+i] = MV_CRT_2;
+                                MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<4;++i)
 			{
                                 CPUWriteProcTbl[0xD0+i] = VicIOWriteProc;
                                 CPUWriteProcTbl[0xD4+i] = SidIOWriteProc;
                                 CPUWriteProcTbl[0xD8+i] = bind(&MMU::WriteFarbRam,this,_1,_2);
+                                MapWriteDestination[0xD0+i] = MV_VIC;
+                                MapWriteDestination[0xD4+i] = MV_SID;
+                                MapWriteDestination[0xD8+i] = MV_FARB_RAM;
 			}
                         CPUWriteProcTbl[0xDC] = Cia1IOWriteProc;
                         CPUWriteProcTbl[0xDD] = Cia2IOWriteProc;
                         CPUWriteProcTbl[0xDE] = IO1WriteProc;
                         CPUWriteProcTbl[0xDF] = IO2WriteProc;
+                        MapWriteDestination[0xDC] = MV_CIA1;
+                        MapWriteDestination[0xDD] = MV_CIA2;
+                        MapWriteDestination[0xDE] = MV_IO1;
+                        MapWriteDestination[0xDF] = MV_IO2;
 		}break;
 
 		case 24:
@@ -351,10 +442,14 @@ void MMU::ChangeMemMap()
                                 CPUReadProcTbl[0x80+i] = bind(&MMU::ReadCRT1,this,_1);
                                 CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadCRT2,this,_1);
                                 CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,_1);
+                                MapReadSource[0x80+i] = MV_CRT_1;
+                                MapReadSource[0xA0+i] = MV_CRT_2;
+                                MapReadSource[0xE0+i] = MV_KERNAL_ROM;
 			}
 			for(int i=0;i<16;++i)
 			{
                                 CPUReadProcTbl[0xD0+i] = bind(&MMU::ReadCharRom,this,_1);
+                                MapReadSource[0xD0+i] = MV_CHAR_ROM;
 			}
 
 			/// WRITE
@@ -363,10 +458,14 @@ void MMU::ChangeMemMap()
                                 CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteCRT1,this,_1,_2);
                                 CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteCRT2,this,_1,_2);
                                 CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0x80+i] = MV_CRT_1;
+                                MapWriteDestination[0xA0+i] = MV_CRT_2;
+                                MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
                                 CPUWriteProcTbl[0xD0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0xD0+i] = MV_RAM;
 			}
 		}break;
 
@@ -378,17 +477,27 @@ void MMU::ChangeMemMap()
                                 CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,_1);
                                 CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadCRT2,this,_1);
                                 CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,_1);
+                                MapReadSource[0x80+i] = MV_RAM;
+                                MapReadSource[0xA0+i] = MV_CRT_2;
+                                MapReadSource[0xE0+i] = MV_KERNAL_ROM;
 			}
 			for(int i=0;i<4;++i)
 			{
                                 CPUReadProcTbl[0xD0+i] = VicIOReadProc;
                                 CPUReadProcTbl[0xD4+i] = SidIOReadProc;
                                 CPUReadProcTbl[0xD8+i] = bind(&MMU::ReadFarbRam,this,_1);
+                                MapReadSource[0xD0+i] = MV_VIC;
+                                MapReadSource[0xD4+i] = MV_SID;
+                                MapReadSource[0xD8+i] = MV_FARB_RAM;
 			}
                         CPUReadProcTbl[0xDC] = Cia1IOReadProc;
                         CPUReadProcTbl[0xDD] = Cia2IOReadProc;
                         CPUReadProcTbl[0xDE] = IO1ReadProc;
                         CPUReadProcTbl[0xDF] = IO2ReadProc;
+                        MapReadSource[0xDC] = MV_CIA1;
+                        MapReadSource[0xDD] = MV_CIA2;
+                        MapReadSource[0xDE] = MV_IO1;
+                        MapReadSource[0xDF] = MV_IO2;
 
 			/// WRITE
 			for(int i=0;i<32;++i)
@@ -396,17 +505,27 @@ void MMU::ChangeMemMap()
                                 CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteCRT2,this,_1,_2);
                                 CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0x80+i] = MV_RAM;
+                                MapWriteDestination[0xA0+i] = MV_CRT_2;
+                                MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<4;++i)
 			{
                                 CPUWriteProcTbl[0xD0+i] = VicIOWriteProc;
                                 CPUWriteProcTbl[0xD4+i] = SidIOWriteProc;
                                 CPUWriteProcTbl[0xD8+i] = bind(&MMU::WriteFarbRam,this,_1,_2);
+                                MapWriteDestination[0xD0+i] = MV_VIC;
+                                MapWriteDestination[0xD4+i] = MV_SID;
+                                MapWriteDestination[0xD8+i] = MV_FARB_RAM;
 			}
                         CPUWriteProcTbl[0xDC] = Cia1IOWriteProc;
                         CPUWriteProcTbl[0xDD] = Cia2IOWriteProc;
                         CPUWriteProcTbl[0xDE] = IO1WriteProc;
                         CPUWriteProcTbl[0xDF] = IO2WriteProc;
+                        MapWriteDestination[0xDC] = MV_CIA1;
+                        MapWriteDestination[0xDD] = MV_CIA2;
+                        MapWriteDestination[0xDE] = MV_IO1;
+                        MapWriteDestination[0xDF] = MV_IO2;
 		}break;
 
 		case 8:
@@ -417,10 +536,14 @@ void MMU::ChangeMemMap()
                                 CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,_1);
                                 CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadCRT2,this,_1);
                                 CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,_1);
+                                MapReadSource[0x80+i] = MV_RAM;
+                                MapReadSource[0xA0+i] = MV_CRT_2;
+                                MapReadSource[0xE0+i] = MV_KERNAL_ROM;
 			}
 			for(int i=0;i<16;++i)
 			{
                                 CPUReadProcTbl[0xD0+i] = bind(&MMU::ReadCharRom,this,_1);
+                                MapReadSource[0xD0+i] = MV_CHAR_ROM;
 			}
 
 			/// WRITE
@@ -430,10 +553,14 @@ void MMU::ChangeMemMap()
                                 CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteCRT2,this,_1,_2);
                                 CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0x80+i] = MV_RAM;
+                                MapWriteDestination[0xA0+i] = MV_CRT_2;
+                                MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
                                 CPUWriteProcTbl[0xD0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0xD0+i] = MV_RAM;
 			}
 		}break;
 
@@ -445,17 +572,27 @@ void MMU::ChangeMemMap()
                                 CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,_1);
                                 CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadRam,this,_1);
                                 CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,_1);
+                                MapReadSource[0x80+i] = MV_RAM;
+                                MapReadSource[0xA0+i] = MV_RAM;
+                                MapReadSource[0xE0+i] = MV_KERNAL_ROM;
 			}
 			for(int i=0;i<4;++i)
 			{
                                 CPUReadProcTbl[0xD0+i] = VicIOReadProc;
                                 CPUReadProcTbl[0xD4+i] = SidIOReadProc;
                                 CPUReadProcTbl[0xD8+i] = bind(&MMU::ReadFarbRam,this,_1);
+                                MapReadSource[0xD0+i] = MV_VIC;
+                                MapReadSource[0xD4+i] = MV_SID;
+                                MapReadSource[0xD8+i] = MV_FARB_RAM;
 			}
                         CPUReadProcTbl[0xDC] = Cia1IOReadProc;
                         CPUReadProcTbl[0xDD] = Cia2IOReadProc;
                         CPUReadProcTbl[0xDE] = IO1ReadProc;
                         CPUReadProcTbl[0xDF] = IO2ReadProc;
+                        MapReadSource[0xDC] = MV_CIA1;
+                        MapReadSource[0xDD] = MV_CIA2;
+                        MapReadSource[0xDE] = MV_IO1;
+                        MapReadSource[0xDF] = MV_IO2;
 
 			/// WRITE
 			for(int i=0;i<32;++i)
@@ -463,17 +600,27 @@ void MMU::ChangeMemMap()
                                 CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0x80+i] = MV_RAM;
+                                MapWriteDestination[0xA0+i] = MV_RAM;
+                                MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<4;++i)
 			{
                                 CPUWriteProcTbl[0xD0+i] = VicIOWriteProc;
                                 CPUWriteProcTbl[0xD4+i] = SidIOWriteProc;
                                 CPUWriteProcTbl[0xD8+i] = bind(&MMU::WriteFarbRam,this,_1,_2);
+                                MapWriteDestination[0xD0+i] = MV_VIC;
+                                MapWriteDestination[0xD4+i] = MV_SID;
+                                MapWriteDestination[0xD8+i] = MV_FARB_RAM;
 			}
                         CPUWriteProcTbl[0xDC] = Cia1IOWriteProc;
                         CPUWriteProcTbl[0xDD] = Cia2IOWriteProc;
                         CPUWriteProcTbl[0xDE] = IO1WriteProc;
                         CPUWriteProcTbl[0xDF] = IO2WriteProc;
+                        MapWriteDestination[0xDC] = MV_CIA1;
+                        MapWriteDestination[0xDD] = MV_CIA2;
+                        MapWriteDestination[0xDE] = MV_IO1;
+                        MapWriteDestination[0xDF] = MV_IO2;
 		}break;
 
 		case 9: case 11:
@@ -484,10 +631,14 @@ void MMU::ChangeMemMap()
                                 CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,_1);
                                 CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadRam,this,_1);
                                 CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,_1);
+                                MapReadSource[0x80+i] = MV_RAM;
+                                MapReadSource[0xA0+i] = MV_RAM;
+                                MapReadSource[0xE0+i] = MV_KERNAL_ROM;
 			}
 			for(int i=0;i<16;++i)
 			{
                                 CPUReadProcTbl[0xD0+i] = bind(&MMU::ReadCharRom,this,_1);
+                                MapReadSource[0xD0+i] = MV_CHAR_ROM;
 			}
 
 			/// WRITE
@@ -496,10 +647,14 @@ void MMU::ChangeMemMap()
                                 CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0x80+i] = MV_RAM;
+                                MapWriteDestination[0xA0+i] = MV_RAM;
+                                MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
                                 CPUWriteProcTbl[0xD0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0xD0+i] = MV_RAM;
 			}
 		}break;
 
@@ -511,34 +666,54 @@ void MMU::ChangeMemMap()
                                 CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,_1);
                                 CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadRam,this,_1);
                                 CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadRam,this,_1);
+                                MapReadSource[0x80+i] = MV_RAM;
+                                MapReadSource[0xA0+i] = MV_RAM;
+                                MapReadSource[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<4;++i)
 			{
                                 CPUReadProcTbl[0xD0+i] = VicIOReadProc;
                                 CPUReadProcTbl[0xD4+i] = SidIOReadProc;
                                 CPUReadProcTbl[0xD8+i] = bind(&MMU::ReadFarbRam,this,_1);
+                                MapReadSource[0xD0+i] = MV_VIC;
+                                MapReadSource[0xD4+i] = MV_SID;
+                                MapReadSource[0xD8+i] = MV_FARB_RAM;
 			}
                         CPUReadProcTbl[0xDC] = Cia1IOReadProc;
                         CPUReadProcTbl[0xDD] = Cia2IOReadProc;
                         CPUReadProcTbl[0xDE] = IO1ReadProc;
                         CPUReadProcTbl[0xDF] = IO2ReadProc;
+                        MapReadSource[0xDC] = MV_CIA1;
+                        MapReadSource[0xDD] = MV_CIA2;
+                        MapReadSource[0xDE] = MV_IO1;
+                        MapReadSource[0xDF] = MV_IO2;
 
 			for(int i=0;i<32;++i)
 			{
                                 CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0x80+i] = MV_RAM;
+                                MapWriteDestination[0xA0+i] = MV_RAM;
+                                MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<4;++i)
 			{
                                 CPUWriteProcTbl[0xD0+i] = VicIOWriteProc;
                                 CPUWriteProcTbl[0xD4+i] = SidIOWriteProc;
                                 CPUWriteProcTbl[0xD8+i] = bind(&MMU::WriteFarbRam,this,_1,_2);
+                                MapWriteDestination[0xD0+i] = MV_VIC;
+                                MapWriteDestination[0xD4+i] = MV_SID;
+                                MapWriteDestination[0xD8+i] = MV_FARB_RAM;
 			}
                         CPUWriteProcTbl[0xDC] = Cia1IOWriteProc;
                         CPUWriteProcTbl[0xDD] = Cia2IOWriteProc;
                         CPUWriteProcTbl[0xDE] = IO1WriteProc;
                         CPUWriteProcTbl[0xDF] = IO2WriteProc;
+                        MapWriteDestination[0xDC] = MV_CIA1;
+                        MapWriteDestination[0xDD] = MV_CIA2;
+                        MapWriteDestination[0xDE] = MV_IO1;
+                        MapWriteDestination[0xDF] = MV_IO2;
 		}break;
 
 		case 17: case 19:
@@ -549,10 +724,14 @@ void MMU::ChangeMemMap()
                                 CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,_1);
                                 CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadRam,this,_1);
                                 CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadRam,this,_1);
+                                MapReadSource[0x80+i] = MV_RAM;
+                                MapReadSource[0xA0+i] = MV_RAM;
+                                MapReadSource[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
                                 CPUReadProcTbl[0xD0+i] = bind(&MMU::ReadCharRom,this,_1);
+                                MapReadSource[0xD0+i] = MV_CHAR_ROM;
 			}
 
 			/// WRITE
@@ -561,10 +740,14 @@ void MMU::ChangeMemMap()
                                 CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0x80+i] = MV_RAM;
+                                MapWriteDestination[0xA0+i] = MV_RAM;
+                                MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
                                 CPUWriteProcTbl[0xD0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0xD0+i] = MV_RAM;
 			}
 		}break;
 
@@ -576,10 +759,14 @@ void MMU::ChangeMemMap()
                                 CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,_1);
                                 CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadRam,this,_1);
                                 CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadRam,this,_1);
+                                MapReadSource[0x80+i] = MV_RAM;
+                                MapReadSource[0xA0+i] = MV_RAM;
+                                MapReadSource[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
                                 CPUReadProcTbl[0xD0+i] = bind(&MMU::ReadRam,this,_1);
+                                MapReadSource[0xD0+i] = MV_RAM;
 			}
 
 			/// WRITE
@@ -588,10 +775,14 @@ void MMU::ChangeMemMap()
                                 CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,_1,_2);
                                 CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0x80+i] = MV_RAM;
+                                MapWriteDestination[0xA0+i] = MV_RAM;
+                                MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
                                 CPUWriteProcTbl[0xD0+i] = bind(&MMU::WriteRam,this,_1,_2);
+                                MapWriteDestination[0xD0+i] = MV_RAM;
 			}
 		}break;
 
@@ -599,50 +790,80 @@ void MMU::ChangeMemMap()
 		case 2: case 18: case 10: case 6: case 26: case 22: case 14: case 30:
 		{
 			/// READ
-                        for(int i=0;i<112;i++) CPUReadProcTbl[0x10+i] = bind(&MMU::ReadOpenAdress,this,_1);
-                        for(int i=0;i<16;i++) CPUReadProcTbl[0xC0+i] = bind(&MMU::ReadOpenAdress,this,_1);
+                        for(int i=0;i<112;i++)
+                        {
+                            CPUReadProcTbl[0x10+i] = bind(&MMU::ReadOpenAdress,this,_1);
+                            MapReadSource[0x10+i] = MV_OPEN;
+                        }
+                        for(int i=0;i<16;i++)
+                        {
+                            CPUReadProcTbl[0xC0+i] = bind(&MMU::ReadOpenAdress,this,_1);
+                            MapReadSource[0xC0+i] = MV_OPEN;
+                        }
 			for(int i=0;i<32;++i)
 			{
                                 CPUReadProcTbl[0x80+i] = bind(&MMU::ReadCRT1,this,_1);
                                 CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadOpenAdress,this,_1);
                                 CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadCRT3,this,_1);
+                                MapReadSource[0x80+i] = MV_CRT_1;
+                                MapReadSource[0xA0+i] = MV_OPEN;
+                                MapReadSource[0xE0+i] = MV_CRT_3;
 			}
 			for(int i=0;i<4;++i)
 			{
                                 CPUReadProcTbl[0xD0+i] = VicIOReadProc;
                                 CPUReadProcTbl[0xD4+i] = SidIOReadProc;
                                 CPUReadProcTbl[0xD8+i] = bind(&MMU::ReadFarbRam,this,_1);
+                                MapReadSource[0xD0+i] = MV_VIC;
+                                MapReadSource[0xD4+i] = MV_SID;
+                                MapReadSource[0xD8+i] = MV_FARB_RAM;
 			}
                         CPUReadProcTbl[0xDC] = Cia1IOReadProc;
                         CPUReadProcTbl[0xDD] = Cia2IOReadProc;
                         CPUReadProcTbl[0xDE] = IO1ReadProc;
                         CPUReadProcTbl[0xDF] = IO2ReadProc;
+                        MapReadSource[0xDC] = MV_CIA1;
+                        MapReadSource[0xDD] = MV_CIA2;
+                        MapReadSource[0xDE] = MV_IO1;
+                        MapReadSource[0xDF] = MV_IO2;
 
 			/// WRITE
 			for(int i=0;i<112;i++)
 			{
                                 CPUWriteProcTbl[0x10+i] = bind(&MMU::WriteOpenAdress,this,_1,_2);
+                                MapWriteDestination[0x10+i] = MV_OPEN;
 			}
 			for(int i=0;i<16;i++)
 			{
                                 CPUWriteProcTbl[0xC0+i] = bind(&MMU::WriteOpenAdress,this,_1,_2);
+                                MapWriteDestination[0xC0+i] = MV_OPEN;
 			}
 			for(int i=0;i<32;++i)
 			{
                                 CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteCRT1,this,_1,_2);
                                 CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteOpenAdress,this,_1,_2);
                                 CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteCRT3,this,_1,_2);
+                                MapWriteDestination[0x80+i] = MV_CRT_1;
+                                MapWriteDestination[0xA0+i] = MV_OPEN;
+                                MapWriteDestination[0xE0+i] = MV_CRT_3;
 			}
 			for(int i=0;i<4;++i)
 			{
                                 CPUWriteProcTbl[0xD0+i] = VicIOWriteProc;
                                 CPUWriteProcTbl[0xD4+i] = SidIOWriteProc;
                                 CPUWriteProcTbl[0xD8+i] = bind(&MMU::WriteFarbRam,this,_1,_2);
+                                MapWriteDestination[0xD0+i] = MV_VIC;
+                                MapWriteDestination[0xD4+i] = MV_SID;
+                                MapWriteDestination[0xD8+i] = MV_FARB_RAM;
 			}
                         CPUWriteProcTbl[0xDC] = Cia1IOWriteProc;
                         CPUWriteProcTbl[0xDD] = Cia2IOWriteProc;
                         CPUWriteProcTbl[0xDE] = IO1WriteProc;
                         CPUWriteProcTbl[0xDF] = IO2WriteProc;
+                        MapWriteDestination[0xDC] = MV_CIA1;
+                        MapWriteDestination[0xDD] = MV_CIA2;
+                        MapWriteDestination[0xDE] = MV_IO1;
+                        MapWriteDestination[0xDF] = MV_IO2;
 		}break;
 	}
         MEMORY_MAP_OLD = MEMORY_MAP;
@@ -655,6 +876,8 @@ inline void MMU::InitProcTables(void)
                 CPUReadProcTbl[i] =  bind(&MMU::ReadRam,this,_1);
                 CPUWriteProcTbl[i] = bind(&MMU::WriteRam,this,_1,_2);
                 VICReadProcTbl[i] = bind(&MMU::ReadVicRam,this,_1);
+                MapReadSource[i] = MV_RAM;
+                MapWriteDestination[i] = MV_RAM;
 	}
 
 	for(int i=0;i<16;++i)
@@ -826,12 +1049,12 @@ unsigned char MMU::ReadVicRam(unsigned short adresse)
         return RAM[adresse];
 }
 
-unsigned char MMU::ReadOpenAdress(unsigned short adresse)
+unsigned char MMU::ReadOpenAdress(unsigned short)
 {
 	return 0x88;	// evtl. auf Zufallszahlen !? (steht eigtl. in der Doku)
 }
 
-void MMU::WriteOpenAdress(unsigned short adresse, unsigned char wert)
+void MMU::WriteOpenAdress(unsigned short, unsigned char)
 {
 	return;
 }

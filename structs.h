@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 26.07.2011		//
+// Letzte Änderung am 28.08.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -37,6 +37,25 @@
 #define TAPE_KEY_PAUSE 32
 
 typedef unsigned char boolean;
+
+enum
+{
+    MV_RAM,
+    MV_KERNAL_ROM,
+    MV_BASIC_ROM,
+    MV_VIC,
+    MV_FARB_RAM,
+    MV_SID,
+    MV_CIA1,
+    MV_CIA2,
+    MV_IO1,
+    MV_IO2,
+    MV_CHAR_ROM,
+    MV_CRT_1,
+    MV_CRT_2,
+    MV_CRT_3,
+    MV_OPEN
+};
 
 enum
 {

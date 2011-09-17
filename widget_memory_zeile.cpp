@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 03.08.2011		//
+// Letzte Änderung am 28.08.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -52,7 +52,7 @@ WidgetMemoryZeile::~WidgetMemoryZeile()
     delete ui;
 }
 
-void WidgetMemoryZeile::Fill(unsigned short adr, unsigned char *byte_puffer)
+void WidgetMemoryZeile::Fill(unsigned short adr, unsigned char *byte_puffer,QString ReadSource,QString WriteDestination)
 {
     adresse = adr;
 
@@ -91,6 +91,9 @@ void WidgetMemoryZeile::Fill(unsigned short adr, unsigned char *byte_puffer)
     if(!ui->EditValue_14->hasFocus()) ui->EditValue_14->setText(QString(str00));
     sprintf(str00,"%2.2X",byte_puffer[15]);
     if(!ui->EditValue_15->hasFocus()) ui->EditValue_15->setText(QString(str00));
+
+    ui->ReadOut->setText(ReadSource);
+    ui->WriteOut->setText(WriteDestination);
 
     ui->BitLeiste_0->SetValue(byte_puffer[0]);
     ui->BitLeiste_1->SetValue(byte_puffer[1]);

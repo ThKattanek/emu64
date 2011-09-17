@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 24.0.2011                 //
+// Letzte Änderung am 28.08.2011                //
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -123,7 +123,7 @@ void C64KeyboardWindow::resizeEvent(QResizeEvent *event)
     scaling_y = (float)event->size().height() / 260.0f;   
 }
 
-void C64KeyboardWindow::showEvent(QShowEvent *event)
+void C64KeyboardWindow::showEvent(QShowEvent*)
 {
     isOneShowed = true;
 }
@@ -287,7 +287,7 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void C64KeyboardWindow::mouseReleaseEvent(QMouseEvent *event)
+void C64KeyboardWindow::mouseReleaseEvent(QMouseEvent*)
 {
     if(!Recording)
     {
@@ -300,7 +300,7 @@ void C64KeyboardWindow::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-void C64KeyboardWindow::paintEvent(QPaintEvent *event)
+void C64KeyboardWindow::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
     QPen pen1(QBrush(QColor(255,255,0)),3);

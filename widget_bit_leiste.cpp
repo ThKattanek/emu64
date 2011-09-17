@@ -1,3 +1,18 @@
+//////////////////////////////////////////////////
+//						//
+// Emu64                                        //
+// von Thorsten Kattanek			//
+//                                              //
+// #file: widget_bit_leiste.cpp                 //
+//						//
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek		//
+//						//
+// Letzte Änderung am 28.08.2011		//
+// www.emu64.de					//
+//						//
+//////////////////////////////////////////////////
+
 #include "widget_bit_leiste.h"
 #include "ui_widget_bit_leiste.h"
 
@@ -15,7 +30,7 @@ WidgetBitLeiste::~WidgetBitLeiste()
     delete ui;
 }
 
-void WidgetBitLeiste::paintEvent(QPaintEvent *e)
+void WidgetBitLeiste::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
     p.setPen(QColor(0,50,0));

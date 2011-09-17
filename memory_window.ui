@@ -68,7 +68,7 @@
     <rect>
      <x>10</x>
      <y>290</y>
-     <width>101</width>
+     <width>111</width>
      <height>17</height>
     </rect>
    </property>
@@ -80,6 +80,19 @@
    </property>
    <property name="checked">
     <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>290</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Nur RAM anzeigen</string>
    </property>
   </widget>
  </widget>

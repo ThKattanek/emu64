@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 02.08.2011		//
+// Letzte Änderung am 28.08.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -376,14 +376,14 @@ void DebuggerWindow::SetC64Pointer(C64Class *_c64)
     c64->BreakpointProc = bind(&DebuggerWindow::BreakpointProc,this);
 }
 
-void DebuggerWindow::showEvent(QShowEvent *event)
+void DebuggerWindow::showEvent(QShowEvent*)
 {
     isOneShowed = true;
     c64->SetDebugMode(true);
     RefreshGUI();
 }
 
-void DebuggerWindow::hideEvent(QHideEvent *event)
+void DebuggerWindow::hideEvent(QHideEvent*)
 {
     /// HIDE ///
 
@@ -1627,7 +1627,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
         }
         else bg = c64->GetBreakGroup(bg_index);
 
-        if(column == 0);
+        if(column == 0)
         {
             QString tmp_str = item->text(1);
             bool ok;

@@ -674,7 +674,7 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     fclose(File);
 
     FloppySoundsLoaded = true;
-    return NULL;
+    return 0;
 }
 
 void Floppy1541::ResetCycleCounter(void)
@@ -789,11 +789,11 @@ void Floppy1541::SetResetReady(bool* ResetReady,unsigned short ResetReadyAdr)
     cpu->ResetReadyAdr = ResetReadyAdr;
 }
 
-void Floppy1541::WriteNoMem(unsigned short adresse,unsigned char wert)
+void Floppy1541::WriteNoMem(unsigned short,unsigned char)
 {
 }
 
-unsigned char Floppy1541::ReadNoMem(unsigned short adresse)
+unsigned char Floppy1541::ReadNoMem(unsigned short)
 {
     return 0x0;
 }

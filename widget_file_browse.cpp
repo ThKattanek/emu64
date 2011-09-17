@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 20.07.2011		//
+// Letzte Änderung am 28.08.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -54,7 +54,7 @@ void WidgetFileBrowse::on_treeView_dir_clicked(QModelIndex index)
     ui->listView_files->setRootIndex(filemodel->setRootPath(sPath));
 }
 
-void WidgetFileBrowse::onlistView_files_currentChanged(const QModelIndex &current, const QModelIndex &previous)
+void WidgetFileBrowse::onlistView_files_currentChanged(const QModelIndex &current, const QModelIndex &)
 {
     emit select_file(filemodel->fileInfo(current).absoluteFilePath());
 }

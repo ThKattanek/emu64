@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 03.06.2011		//
+// Letzte Änderung am 28.08.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -22,7 +22,7 @@ LabelWidgetMod::LabelWidgetMod(QWidget *parent) :
 
 }
 
-void LabelWidgetMod::mousePressEvent(QMouseEvent* event)
+void LabelWidgetMod::mousePressEvent(QMouseEvent*)
 {
     pressed = true;
 }

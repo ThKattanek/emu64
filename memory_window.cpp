@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 03.08.2011		//
+// Letzte Änderung am 28.08.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -25,6 +25,8 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->MemoryTable->setColumnCount(1);
     ui->MemoryTable->setRowCount(MemZeilenAnz);
+
+    MemScrDest << "RAM" << "KERNAL" << "BASIC" << "VIC" << "FARBRAM" << "SID" << "CIA1" << "CIA2" << "IO1" << "IO2" << "CHARROM" << "ROM-LO" << "ROM-HI" << "ROM-HI" << "ADR.OPEN";
 
     for(int i=0;i<MemZeilenAnz;i++)
     {
@@ -106,7 +108,12 @@ void MemoryWindow::UpdateMemoryList(void)
             for(int x=0;x<16;x++) puffer[x] = c64->ReadC64Byte(AktViewAdresse + (i*16) + x);
         }
         w = (WidgetMemoryZeile*)ui->MemoryTable->cellWidget(i+1,0);
-        w->Fill(AktViewAdresse + (i*16),puffer);
+
+        unsigned char page = (AktViewAdresse + (i*16)) >> 8;
+        unsigned char mem_read_source = c64->GetMapReadSource(page);
+        unsigned char mem_write_destinatio = c64->GetMapWriteDestination(page);
+
+        w->Fill(AktViewAdresse + (i*16),puffer,MemScrDest[mem_read_source],MemScrDest[mem_write_destinatio]);
     }
 }
 

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 20.07.2011		//
+// Letzte Änderung am 28.08.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -94,7 +94,7 @@ void CrtWindow::LoadIni(void)
     ////////////////////////////////////
 }
 
-void CrtWindow::showEvent(QShowEvent *event)
+void CrtWindow::showEvent(QShowEvent*)
 {
     isOneShowed = true;
 }
@@ -212,7 +212,7 @@ void CrtWindow::onSelectFile(QString filename)
     }
 }
 
-void CrtWindow::onChipList_currentChanged(const QModelIndex &current, const QModelIndex &previous)
+void CrtWindow::onChipList_currentChanged(const QModelIndex &current, const QModelIndex &)
 {
     char str00[256];
     ui->ChipData->clear();

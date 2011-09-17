@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 02.08.2011		//
+// Letzte Änderung am 28.08.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -43,6 +43,7 @@ using namespace std::tr1::placeholders;
 
 class C64Class
 {
+
 public:
     C64Class(int *ret_error,function<void(unsigned short,unsigned char)> jam_proc);
     ~C64Class();
@@ -83,6 +84,9 @@ public:
     bool ExportPRG(char *filename, unsigned short start_adresse, unsigned short end_adresse, int source);
     bool ExportRAW(char *filename, unsigned short start_adresse, unsigned short end_adresse, int source);
     bool ExportASM(char* filename, unsigned short start_adresse, unsigned short end_adresse, int source);
+
+    unsigned char GetMapReadSource(unsigned char page);
+    unsigned char GetMapWriteDestination(unsigned char page);
 
     int             AktWindowXW;
     int             AktWindowYW;

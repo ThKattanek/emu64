@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 03.08.2011		//
+// Letzte Änderung am 28.08.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -30,7 +30,7 @@ class WidgetMemoryZeile : public QWidget
 public:
     explicit WidgetMemoryZeile(QWidget *parent = 0);
     ~WidgetMemoryZeile();
-    void Fill(unsigned short adr, unsigned char* byte_puffer);
+    void Fill(unsigned short adr, unsigned char* byte_puffer,QString ReadSource,QString WriteDestination);
     void EndableBitLeiste(bool status);
 
 private slots:

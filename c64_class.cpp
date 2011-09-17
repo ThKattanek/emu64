@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 02.08.2011		//
+// Letzte Änderung am 28.08.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -23,11 +23,12 @@ int SDLThreadLoad(void *userdat);
 #define AudioSampleRate 44100
 #define AudioPufferSize 882
 
-C64Class::C64Class(int *ret_error, function<void(unsigned short,unsigned char)> jam_proc):
-    pal(0),
-    BreakGroupAnz(0),
-    FloppyFoundBreakpoint(false)
+C64Class::C64Class(int *ret_error, function<void(unsigned short,unsigned char)>)
 {
+    pal = 0;
+    BreakGroupAnz = 0;
+    FloppyFoundBreakpoint = false;
+
     /// SDL Installieren ///
 
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0)
@@ -1307,24 +1308,24 @@ bool C64Class::ExportASM(char *filename, unsigned short start_adresse, unsigned 
         return false;
     }
 
-    char *source_str;
+    char *source_str = (char*)"";
 
     switch(source)
     {
     case 0:
-        source_str = "C64";
+        source_str = (char*)"C64";
         break;
     case 1:
-        source_str = "Floppy #08";
+        source_str = (char*)"Floppy #08";
         break;
     case 2:
-        source_str = "Floppy #09";
+        source_str = (char*)"Floppy #09";
         break;
     case 3:
-        source_str = "Floppy #10";
+        source_str = (char*)"Floppy #10";
         break;
     case 4:
-        source_str = "Floppy #11";
+        source_str = (char*)"Floppy #11";
         break;
     }
 
@@ -1341,6 +1342,16 @@ L10:
 
     fclose(file);
     return true;
+}
+
+unsigned char C64Class::GetMapReadSource(unsigned char page)
+{
+    return mmu->GetReadSource(page);
+}
+
+unsigned char C64Class::GetMapWriteDestination(unsigned char page)
+{
+    return mmu->GetWriteDestination(page);
 }
 
 int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)
@@ -1591,7 +1602,7 @@ void C64Class::WriteSidIO(unsigned short adresse,unsigned char wert)
     }
 }
 
-unsigned char C64Class::ReadSidIO(unsigned short adresse)
+unsigned char C64Class::ReadSidIO(unsigned short)
 {
     /*
     if(StereoEnable)

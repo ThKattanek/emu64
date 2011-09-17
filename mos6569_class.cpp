@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 31.07.2011		//
+// Letzte Änderung am 28.08.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -520,8 +520,10 @@ inline void VICII::DrawGraphics(void)
 
 					for(int i=6;i>-1;i-=2)
 					{
-						*VideoPufferLine_XScroll++ = Colors[(GfxData>>(i))&3];
-						*VideoPufferLine_XScroll++ = VideoPufferLine_XScroll[-1];
+                                                *VideoPufferLine_XScroll = Colors[(GfxData>>(i))&3];
+                                                VideoPufferLine_XScroll++;
+                                                *VideoPufferLine_XScroll = VideoPufferLine_XScroll[-1];
+                                                VideoPufferLine_XScroll++;
 					}
 					VideoPufferLine += 8;
 				}
@@ -543,8 +545,10 @@ inline void VICII::DrawGraphics(void)
 				
 				for(int i=6;i>-1;i-=2)
 				{
-					*VideoPufferLine_XScroll++ = Colors[(GfxData>>(i))&3];
-					*VideoPufferLine_XScroll++ = VideoPufferLine_XScroll[-1];
+                                        *VideoPufferLine_XScroll = Colors[(GfxData>>(i))&3];
+                                        VideoPufferLine_XScroll++;
+                                        *VideoPufferLine_XScroll = VideoPufferLine_XScroll[-1];
+                                        VideoPufferLine_XScroll++;
 				}
 				VideoPufferLine += 8;
 				break;
@@ -631,8 +635,10 @@ inline void VICII::DrawGraphics(void)
 
 					for(int i=6;i>-1;i-=2)
 					{
-						*VideoPufferLine_XScroll++ = Colors[(GfxData>>(i))&3];
-						*VideoPufferLine_XScroll++ = VideoPufferLine_XScroll[-1];
+                                                *VideoPufferLine_XScroll = Colors[(GfxData>>(i))&3];
+                                                VideoPufferLine_XScroll++;
+                                                *VideoPufferLine_XScroll = VideoPufferLine_XScroll[-1];
+                                                VideoPufferLine_XScroll++;
 					}
 					VideoPufferLine += 8;
 				}
@@ -654,8 +660,10 @@ inline void VICII::DrawGraphics(void)
 				
 				for(int i=6;i>-1;i-=2)
 				{
-					*VideoPufferLine_XScroll++ = Colors[(GfxData>>(i))&3];
-					*VideoPufferLine_XScroll++ = VideoPufferLine_XScroll[-1];
+                                        *VideoPufferLine_XScroll = Colors[(GfxData>>(i))&3];
+                                        VideoPufferLine_XScroll++;
+                                        *VideoPufferLine_XScroll = VideoPufferLine_XScroll[-1];
+                                        VideoPufferLine_XScroll++;
 				}
 				VideoPufferLine += 8;
 

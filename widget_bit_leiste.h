@@ -1,3 +1,18 @@
+//////////////////////////////////////////////////
+//						//
+// Emu64                                        //
+// von Thorsten Kattanek			//
+//                                              //
+// #file: widget_bit_leiste.h                   //
+//						//
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek		//
+//						//
+// Letzte Änderung am 28.08.2011		//
+// www.emu64.de					//
+//						//
+//////////////////////////////////////////////////
+
 #ifndef WIDGET_BIT_LEISTE_H
 #define WIDGET_BIT_LEISTE_H
 
