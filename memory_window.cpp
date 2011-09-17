@@ -79,7 +79,12 @@ void MemoryWindow::SetC64Pointer(C64Class *_c64)
 void MemoryWindow::ChangeSource(int source)
 {
     AktSource = source;
-    if(AktSource > 0) AktFloppyNr = AktSource - 1;
+    if(AktSource > 0)
+    {
+        AktFloppyNr = AktSource - 1;
+        ui->OnlyRam->setEnabled(false);
+    }
+    else ui->OnlyRam->setEnabled(true);
 
     switch(AktSource)
     {
@@ -120,6 +125,7 @@ void MemoryWindow::UpdateMemoryList(void)
 
     WidgetMemoryZeile *w;
     unsigned char puffer[16];
+    unsigned char* ram_puffer;
 
     for(int i=0;i<MemZeilenAnz-1;i++)
     {
@@ -129,7 +135,12 @@ void MemoryWindow::UpdateMemoryList(void)
         }
         else
         {
-            for(int x=0;x<16;x++) puffer[x] = c64->ReadC64Byte(AktViewAdresse + (i*16) + x);
+            if(ui->OnlyRam->isChecked())
+            {
+                ram_puffer = c64->GetRAMPointer(AktViewAdresse + (i*16));
+                for(int x=0;x<16;x++) puffer[x] = ram_puffer[x];
+            }
+            else for(int x=0;x<16;x++) puffer[x] = c64->ReadC64Byte(AktViewAdresse + (i*16) + x);
         }
         w = (WidgetMemoryZeile*)ui->MemoryTable->cellWidget(i+1,0);
 
@@ -183,5 +194,5 @@ void MemoryWindow::on_BitAnzeige_clicked(bool checked)
 
 void MemoryWindow::on_OnlyRam_clicked(bool checked)
 {
-
+    UpdateMemoryList();
 }

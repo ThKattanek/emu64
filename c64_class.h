@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 28.08.2011		//
+// Letzte Änderung am 17.09.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -56,6 +56,7 @@ public:
     void KillCommandLine(void);
     unsigned char ReadC64Byte(unsigned short adresse);
     void WriteC64Byte(unsigned short adresse,unsigned char wert);
+    unsigned char* GetRAMPointer(unsigned short adresse);
 
     void SoftReset(void);
     void HardReset(void);

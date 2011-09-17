@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 28.08.2011		//
+// Letzte Änderung am 17.09.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -721,6 +721,11 @@ unsigned char C64Class::ReadC64Byte(unsigned short adresse)
 void C64Class::WriteC64Byte(unsigned short adresse,unsigned char wert)
 {
     WriteProcTbl[(adresse)>>8](adresse,wert);
+}
+
+unsigned char* C64Class::GetRAMPointer(unsigned short adresse)
+{
+    return mmu->GetRAMPointer() + adresse;
 }
 
 int SDLThreadLoad(void *userdat)
