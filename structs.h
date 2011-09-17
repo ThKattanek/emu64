@@ -59,6 +59,15 @@ enum
 
 enum
 {
+    FMV_RAM,
+    FMV_VIA1,
+    FMV_VIA2,
+    FMV_DOS,
+    FMV_OPEN
+};
+
+enum
+{
         TAPE_IS_STOP,
         TAPE_IS_PLAY,
         TAPE_IS_REW,

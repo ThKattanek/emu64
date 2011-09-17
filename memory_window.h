@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 28.08.2011		//
+// Letzte Änderung am 17.09.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -45,6 +45,8 @@ private slots:
 
     void on_BitAnzeige_clicked(bool checked);
 
+    void on_OnlyRam_clicked(bool checked);
+
 signals:
     void NoFocus(void);
 
@@ -55,7 +57,13 @@ private:
     int AktFloppyNr;
     int AktViewAdresse;
     bool NoFocusRun;
+
+    /// FloppyMemoryMap Visuall ///
+    unsigned char MapReadSource[0x100];
+    unsigned char MapWriteDestination[0x100];
+
     QStringList MemScrDest;
+    QStringList FloppyMemScrDest;
 };
 
 #endif // MEMORY_WINDOW_H

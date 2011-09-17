@@ -82,7 +82,7 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox">
+  <widget class="QCheckBox" name="OnlyRam">
    <property name="geometry">
     <rect>
      <x>130</x>

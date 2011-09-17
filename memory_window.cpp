@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 28.08.2011		//
+// Letzte Änderung am 17.09.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -27,6 +27,30 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
     ui->MemoryTable->setRowCount(MemZeilenAnz);
 
     MemScrDest << "RAM" << "KERNAL" << "BASIC" << "VIC" << "FARBRAM" << "SID" << "CIA1" << "CIA2" << "IO1" << "IO2" << "CHARROM" << "ROM-LO" << "ROM-HI" << "ROM-HI" << "ADR.OPEN";
+    FloppyMemScrDest << "RAM" << "VIA1" << "VIA2" << "ROM" << "OPEN";
+
+    for(int i=0;i<256;++i)
+    {
+        MapReadSource[i] = FMV_OPEN;
+        MapWriteDestination[i] = FMV_OPEN;
+    }
+
+    for(int i=0;i<8;i++)
+    {
+        MapReadSource[i] = FMV_RAM;
+        MapWriteDestination[i] = FMV_RAM;
+    }
+    MapReadSource[0x18] = FMV_VIA1;
+    MapWriteDestination[0x18] = FMV_VIA1;
+
+    MapReadSource[0x1C] = FMV_VIA2;
+    MapWriteDestination[0x1C] = FMV_VIA2;
+
+    for(int i=0;i<64;i++)
+    {
+        MapReadSource[i+0xC0] = FMV_DOS;
+        MapWriteDestination[i+0xC0] = FMV_OPEN;
+    }
 
     for(int i=0;i<MemZeilenAnz;i++)
     {
@@ -110,10 +134,21 @@ void MemoryWindow::UpdateMemoryList(void)
         w = (WidgetMemoryZeile*)ui->MemoryTable->cellWidget(i+1,0);
 
         unsigned char page = (AktViewAdresse + (i*16)) >> 8;
-        unsigned char mem_read_source = c64->GetMapReadSource(page);
-        unsigned char mem_write_destinatio = c64->GetMapWriteDestination(page);
+        unsigned char mem_read_source;
+        unsigned char mem_write_destination;
 
-        w->Fill(AktViewAdresse + (i*16),puffer,MemScrDest[mem_read_source],MemScrDest[mem_write_destinatio]);
+        if(AktSource > 0)
+        {
+            mem_read_source = MapReadSource[page];
+            mem_write_destination = MapWriteDestination[page];
+            w->Fill(AktViewAdresse + (i*16),puffer,FloppyMemScrDest[mem_read_source],FloppyMemScrDest[mem_write_destination]);
+        }
+        else
+        {
+            mem_read_source = c64->GetMapReadSource(page);
+            mem_write_destination = c64->GetMapWriteDestination(page);
+            w->Fill(AktViewAdresse + (i*16),puffer,MemScrDest[mem_read_source],MemScrDest[mem_write_destination]);
+        }
     }
 }
 
@@ -144,4 +179,9 @@ void MemoryWindow::on_BitAnzeige_clicked(bool checked)
         w = (WidgetMemoryZeile*)ui->MemoryTable->cellWidget(i+1,0);
         w->EndableBitLeiste(checked);
     }
+}
+
+void MemoryWindow::on_OnlyRam_clicked(bool checked)
+{
+
 }
