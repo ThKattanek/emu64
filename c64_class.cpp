@@ -16,7 +16,8 @@
 #include "c64_class.h"
 #include "c64_keys.h"
 
-#define floppy_asyncron
+#define floppy_asyncron                  // Schaltet die Floppy Asyncron
+#define more_one_floppy_cylce_count 66   // alle "more_one_floppy_cycle_counts" wird 1 FloppyZyklus doppelt ausgeführt
 
 void AudioMix(void *nichtVerwendet, Uint8 *stream, int laenge);
 int SDLThread(void *userdat);
@@ -410,14 +411,15 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
             {
                 floppy[i]->OneZyklus();
 
-#ifdef floppy_asyncron
+                #ifdef floppy_asyncron
                 counter_plus++;
-                if(counter_plus == 67)
+                if(counter_plus == more_one_floppy_cylce_count)
                 {
                     counter_plus = 0;
                     floppy[i]->OneZyklus();
                 }
-#endif
+                #endif
+
                 FloppyIEC |= ~floppy[i]->FloppyIECLocal;
             }
             FloppyIEC = ~FloppyIEC;
@@ -509,6 +511,16 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                     for(int i=0; i<FloppyAnzahl; i++)
                     {
                         floppy[i]->OneZyklus();
+
+                        #ifdef floppy_asyncron
+                        counter_plus++;
+                        if(counter_plus == more_one_floppy_cylce_count)
+                        {
+                            counter_plus = 0;
+                            floppy[i]->OneZyklus();
+                        }
+                        #endif
+
                         FloppyIEC |= ~floppy[i]->FloppyIECLocal;
                     }
                     FloppyIEC = ~FloppyIEC;
@@ -542,6 +554,16 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                 for(int i=0; i<FloppyAnzahl; i++)
                 {
                     floppy[i]->OneZyklus();
+
+                    #ifdef floppy_asyncron
+                    counter_plus++;
+                    if(counter_plus == more_one_floppy_cylce_count)
+                    {
+                        counter_plus = 0;
+                        floppy[i]->OneZyklus();
+                    }
+                    #endif
+
                     FloppyIEC |= ~floppy[i]->FloppyIECLocal;
                 }
                 FloppyIEC = ~FloppyIEC;
@@ -585,6 +607,16 @@ loop_wait_next_opc:
                         if(i != FloppyNr)
                         {
                             floppy[i]->OneZyklus();
+
+                            #ifdef floppy_asyncron
+                            counter_plus++;
+                            if(counter_plus == more_one_floppy_cylce_count)
+                            {
+                                counter_plus = 0;
+                                floppy[i]->OneZyklus();
+                            }
+                            #endif
+
                             FloppyIEC |= ~floppy[i]->FloppyIECLocal;
                         }
                     }

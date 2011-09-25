@@ -1611,12 +1611,12 @@ bool MOS6510::OneZyklus(void)
 
         if(*MCT == 0)
         {
-                if((NMIState == true) && (NMICounter > 2))
+                if((NMIState == true) && (NMICounter > 1))
                 {
                         isNMI = true;
                         return false;
                 }
-                else if((Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]) && (IRQCounter > 2) && ((SR&4)==0))
+                else if((Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]) && (IRQCounter > 1) && ((SR&4)==0))
                 {
                         isIRQ = true;
                         return false;
