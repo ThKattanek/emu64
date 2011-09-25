@@ -192,7 +192,7 @@ void MemoryWindow::on_BitAnzeige_clicked(bool checked)
     }
 }
 
-void MemoryWindow::on_OnlyRam_clicked(bool checked)
+void MemoryWindow::on_OnlyRam_clicked(bool)
 {
     UpdateMemoryList();
 }

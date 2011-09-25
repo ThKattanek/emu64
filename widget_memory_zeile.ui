@@ -48,9 +48,6 @@ color: rgb(170, 170, 255);
      <height>15</height>
     </rect>
    </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;
 background-color: rgb(200, 200, 255);
@@ -71,9 +68,6 @@ background-color: rgb(200, 200, 255);
      <width>20</width>
      <height>15</height>
     </rect>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
    </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;
@@ -96,9 +90,6 @@ background-color: rgb(180,180, 255);
      <height>15</height>
     </rect>
    </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;
 background-color: rgb(200, 200, 255);
@@ -119,9 +110,6 @@ background-color: rgb(200, 200, 255);
      <width>20</width>
      <height>15</height>
     </rect>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
    </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;
@@ -144,9 +132,6 @@ background-color: rgb(180,180, 255);
      <height>15</height>
     </rect>
    </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;
 background-color: rgb(200, 200, 255);
@@ -167,9 +152,6 @@ background-color: rgb(200, 200, 255);
      <width>20</width>
      <height>15</height>
     </rect>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
    </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;
@@ -192,9 +174,6 @@ background-color: rgb(180,180, 255);
      <height>15</height>
     </rect>
    </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;
 background-color: rgb(200, 200, 255);
@@ -215,9 +194,6 @@ background-color: rgb(200, 200, 255);
      <width>20</width>
      <height>15</height>
     </rect>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
    </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;
@@ -240,9 +216,6 @@ background-color: rgb(180,180, 255);
      <height>15</height>
     </rect>
    </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;
 background-color: rgb(200, 200, 255);
@@ -263,9 +236,6 @@ background-color: rgb(200, 200, 255);
      <width>20</width>
      <height>15</height>
     </rect>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
    </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;
@@ -288,9 +258,6 @@ background-color: rgb(180,180, 255);
      <height>15</height>
     </rect>
    </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;
 background-color: rgb(200, 200, 255);
@@ -311,9 +278,6 @@ background-color: rgb(200, 200, 255);
      <width>20</width>
      <height>15</height>
     </rect>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
    </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;
@@ -336,9 +300,6 @@ background-color: rgb(180,180, 255);
      <height>15</height>
     </rect>
    </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;
 background-color: rgb(200, 200, 255);
@@ -359,9 +320,6 @@ background-color: rgb(200, 200, 255);
      <width>20</width>
      <height>15</height>
     </rect>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
    </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;
@@ -384,9 +342,6 @@ background-color: rgb(180,180, 255);
      <height>15</height>
     </rect>
    </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;
 background-color: rgb(200, 200, 255);
@@ -407,9 +362,6 @@ background-color: rgb(200, 200, 255);
      <width>20</width>
      <height>15</height>
     </rect>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
    </property>
    <property name="styleSheet">
     <string notr="true">border: 0px solid gray;

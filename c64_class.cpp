@@ -16,6 +16,8 @@
 #include "c64_class.h"
 #include "c64_keys.h"
 
+#define floppy_asyncron
+
 void AudioMix(void *nichtVerwendet, Uint8 *stream, int laenge);
 int SDLThread(void *userdat);
 int SDLThreadLoad(void *userdat);
@@ -386,6 +388,7 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
 void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
 {
     unsigned short* puffer = (unsigned short*) stream;
+    unsigned int counter_plus=0;
 
     sid1->SoundBufferPos = 0;
     sid2->SoundBufferPos = 0;
@@ -406,6 +409,15 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
             for(int i=0; i<FloppyAnzahl; i++)
             {
                 floppy[i]->OneZyklus();
+
+#ifdef floppy_asyncron
+                counter_plus++;
+                if(counter_plus == 67)
+                {
+                    counter_plus = 0;
+                    floppy[i]->OneZyklus();
+                }
+#endif
                 FloppyIEC |= ~floppy[i]->FloppyIECLocal;
             }
             FloppyIEC = ~FloppyIEC;
