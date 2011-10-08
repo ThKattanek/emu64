@@ -1345,15 +1345,17 @@ void VICII::OneZyklus(void)
 
 		/// Sprite 4 ///
 		if(SpriteDMA & 0x10)  SetBALow();
+                if(TOTAL_ZYKLEN_LINE == 63) AktZyklus = 0;
 
-		if(TOTAL_ZYKLEN_LINE == 63) AktZyklus = 0;
-		break;
-		case 64:
-			if(TOTAL_ZYKLEN_LINE == 64) AktZyklus = 0;
-			break;
-		case 65:
-			AktZyklus = 0;
-			break;
+                break;
+
+    case 64:
+            if(TOTAL_ZYKLEN_LINE == 64) AktZyklus = 0;
+            break;
+
+    case 65:
+            AktZyklus = 0;
+            break;
 	}
 	AktZyklus++;
 
