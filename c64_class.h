@@ -34,9 +34,9 @@
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
 
-#define xw 384
-#define yw 272
-#define color_bits 16
+#define xw 384*2
+#define yw 272*2
+#define color_bits 32
 
 #define FloppyAnzahl 4
 #define MAX_BREAK_GROUPS 255

@@ -18,10 +18,6 @@
 #include "math.h"
 #include "SDL/SDL.h"
 
-//#define Mode16Bit_555		; setzen für 16Bit Mode 5/5/5
-//#define Mode16Bit_565		; setzen für 16Bit Mode 5/6/5
-#define Mode16Bit_538          ; setzen für 16Bit Mode 5/3/8    // MAC OSX
-
 #define VIC_SATURATION	48.0f		//48.0f
 #define VIC_PHASE	-4.5f
 
@@ -67,9 +63,7 @@ VideoPalClass::VideoPalClass(void):
     pixel_format(0)
 {
     AktFarbMode = 0;
-    CreateVicIIColors();
     Double2x = false;
-
     Kontrast = 0.8;
 }
 
@@ -80,6 +74,7 @@ VideoPalClass::~VideoPalClass(void)
 void VideoPalClass::SetPixelFormat(SDL_PixelFormat *format)
 {
     pixel_format = format;
+    CreateVicIIColors();
 }
 
 void VideoPalClass::SetDisplayMode(int DisplayMode)
@@ -136,69 +131,21 @@ void VideoPalClass::SetKontrast(float wert)
 
 void VideoPalClass::SetC64Palette(int palnr)
 {
-    unsigned short Farbe16;
-    unsigned int COLOR32 = 0;
-    unsigned char *temp = (unsigned char*)&COLOR32;
-    unsigned char color;
-
     AktFarbMode = palnr;
 
     int ij = 0;
     for(int j=0;j<16;j++)
     {
-    /// Für 32Bit Video Display ///
-    unsigned char *COLOR_RGBA1 = (unsigned char*)&C64_FARBEN[palnr*16*4];
+        uint8_t *COLOR_RGBA1 = (uint8_t*)&C64_FARBEN[palnr*16*4];
+
         for(int i=0;i<16;i++)
         {
-            ///SDL "BGR"
-            COLOR32 = COLOR_RGBA1[0] | COLOR_RGBA1[1]<<8 | COLOR_RGBA1[2]<<16;
+            /// Für 32Bit Video Display ///
+            Palette32Bit[ij] = COLOR_RGBA1[2] | COLOR_RGBA1[1]<<8 | COLOR_RGBA1[1]<<16;
 
-            color = temp[2];
-            temp[2] = temp[0];
-            temp[0]=color;
-
-            Palette32Bit[ij] = COLOR32;
-
-#ifdef Mode16Bit_565
-
-            /// Für 16 Bit 5/6/5 ///
-            Wert=(*COLOR_RGBA1*31)/255;
-            Farbe16=Wert;
-            COLOR_RGBA1++;
-            Wert=(*COLOR_RGBA1*63)/255;
-            Farbe16|=Wert<<5;
-            COLOR_RGBA1++;
-            Wert=(*COLOR_RGBA1*31)/255;
-            Farbe16|=Wert<<11;
-            COLOR_RGBA1++;
-            COLOR_RGBA1++;
-#endif
-
-#ifdef Mode16Bit_555
-
-            /// Für 16 Bit 5/5/5 ///
-            Wert=(*COLOR_RGBA1*31)/255;
-            Farbe16=Wert;
-            COLOR_RGBA1++;
-            Wert=(*COLOR_RGBA1*31)/255;
-            Farbe16|=Wert<<5;
-            COLOR_RGBA1++;
-            Wert=(*COLOR_RGBA1*31)/255;
-            Farbe16|=Wert<<10;
-            COLOR_RGBA1++;
-            COLOR_RGBA1++;
-
-#endif
-
-#ifdef Mode16Bit_538
-
-            /// Für 16 Bit 5/3/8 ///
-
-            Farbe16 = (unsigned short)SDL_MapRGB(pixel_format,COLOR_RGBA1[0],COLOR_RGBA1[1],COLOR_RGBA1[2]);
+            /// Für 16Bit Video Display ///
+            Palette16Bit[ij] = (uint16_t)SDL_MapRGB(pixel_format,COLOR_RGBA1[0],COLOR_RGBA1[1],COLOR_RGBA1[2]);
             COLOR_RGBA1+=4;
-#endif
-            Palette16Bit[ij] = Farbe16 & 0xFFFF;
-            ////////////////////////
             ij++;
         }
     }
@@ -409,91 +356,42 @@ inline void VideoPalClass::CreateVicIIColors(void)
 
                                                 if(DestDisplayMode == 16)
                                                 {
-                                                        /// Für 16 Bit 5/5/5 ///
-                                                        #ifdef Mode16Bit_555
-                                                        RGBTmp = BlurTable0[x[0]][x[1]][x[2]][x[3]];
-                                                        tmp=(((RGBTmp&0x00FF0000)>>16)*31)/255;		// ROT
-                                                        Farbe16=tmp<<10;
-                                                        tmp=(((RGBTmp&0x0000FF00)>>8)*31)/255;		// GRUEN
-                                                        Farbe16|=tmp<<5;
-                                                        tmp=(((RGBTmp&0x000000FF))*31)/255;	// BLAU
-                                                        Farbe16|=tmp;
-                                                        BlurTable0[x[0]][x[1]][x[2]][x[3]] = Farbe16 & 0x7FFF;
+                                                    if(pixel_format != 0)
+                                                    {
+                                                        unsigned long RGBTmp = BlurTable0[x[0]][x[1]][x[2]][x[3]];
+                                                        r=(((RGBTmp&0x00FF0000)>>16)&0xFF);	// ROT
+                                                        g=(((RGBTmp&0x0000FF00)>>8)&0xFF);	// GRUEN
+                                                        b=(((RGBTmp&0x000000FF))&0xFF);         // BLAU
+                                                        BlurTable0[x[0]][x[1]][x[2]][x[3]] = (unsigned long)SDL_MapRGB(pixel_format,r,g,b);
+
 
                                                         RGBTmp = BlurTable1[x[0]][x[1]][x[2]][x[3]];
-                                                        tmp=(((RGBTmp&0x00FF0000)>>16)*31)/255;		// ROT
-                                                        Farbe16=tmp<<10;
-                                                        tmp=(((RGBTmp&0x0000FF00)>>8)*31)/255;		// GRUEN
-                                                        Farbe16|=tmp<<5;
-                                                        tmp=(((RGBTmp&0x000000FF))*31)/255;	// BLAU
-                                                        Farbe16|=tmp;
-                                                        BlurTable1[x[0]][x[1]][x[2]][x[3]] = Farbe16 & 0x7FFF;
+                                                        r=(((RGBTmp&0x00FF0000)>>16)&0xFF);	// ROT
+                                                        g=(((RGBTmp&0x0000FF00)>>8)&0xFF);	// GRUEN
+                                                        b=(((RGBTmp&0x000000FF))&0xFF);         // BLAU
+                                                        BlurTable1[x[0]][x[1]][x[2]][x[3]] = (unsigned long)SDL_MapRGB(pixel_format,r,g,b);
 
                                                         RGBTmp = BlurTable0S[x[0]][x[1]][x[2]][x[3]];
-                                                        tmp=(((RGBTmp&0x00FF0000)>>16)*31)/255;		// ROT
-                                                        Farbe16=tmp<<10;
-                                                        tmp=(((RGBTmp&0x0000FF00)>>8)*31)/255;		// GRUEN
-                                                        Farbe16|=tmp<<5;
-                                                        tmp=(((RGBTmp&0x000000FF))*31)/255;	// BLAU
-                                                        Farbe16|=tmp;
-                                                        BlurTable0S[x[0]][x[1]][x[2]][x[3]] = Farbe16 & 0x7FFF;
+                                                        r=(((RGBTmp&0x00FF0000)>>16)&0xFF);	// ROT
+                                                        g=(((RGBTmp&0x0000FF00)>>8)&0xFF);	// GRUEN
+                                                        b=(((RGBTmp&0x000000FF))&0xFF);         // BLAU
+                                                        BlurTable0S[x[0]][x[1]][x[2]][x[3]] = (unsigned long)SDL_MapRGB(pixel_format,r,g,b);
 
                                                         RGBTmp = BlurTable1S[x[0]][x[1]][x[2]][x[3]];
-                                                        tmp=(((RGBTmp&0x00FF0000)>>16)*31)/255;		// ROT
-                                                        Farbe16=tmp<<10;
-                                                        tmp=(((RGBTmp&0x0000FF00)>>8)*31)/255;		// GRUEN
-                                                        Farbe16|=tmp<<5;
-                                                        tmp=(((RGBTmp&0x000000FF))*31)/255;	// BLAU
-                                                        Farbe16|=tmp;
-                                                        BlurTable1S[x[0]][x[1]][x[2]][x[3]] = Farbe16 & 0x7FFF;
-                                                        #endif
+                                                        r=(((RGBTmp&0x00FF0000)>>16)&0xFF);	// ROT
+                                                        g=(((RGBTmp&0x0000FF00)>>8)&0xFF);	// GRUEN
+                                                        b=(((RGBTmp&0x000000FF))&0xFF);         // BLAU
+                                                        BlurTable1S[x[0]][x[1]][x[2]][x[3]] = (unsigned long)SDL_MapRGB(pixel_format,r,g,b);
+                                                    }
 
-                                                        /// Für 16 Bit 5/6/5 ///
-                                                        #ifdef Mode16Bit_565
-                                                        RGBTmp = BlurTable0[x[0]][x[1]][x[2]][x[3]];
-                                                        tmp=(((RGBTmp&0x00FF0000)>>16)*31)/255;		// ROT
-                                                        Farbe16=tmp<<11;
-                                                        tmp=(((RGBTmp&0x0000FF00)>>8)*63)/255;		// GRUEN
-                                                        Farbe16|=tmp<<5;
-                                                        tmp=(((RGBTmp&0x000000FF))*31)/255;	// BLAU
-                                                        Farbe16|=tmp;
-                                                        BlurTable0[x[0]][x[1]][x[2]][x[3]] = Farbe16;
-
-                                                        RGBTmp = BlurTable1[x[0]][x[1]][x[2]][x[3]];
-                                                        tmp=(((RGBTmp&0x00FF0000)>>16)*31)/255;		// ROT
-                                                        Farbe16=tmp<<11;
-                                                        tmp=(((RGBTmp&0x0000FF00)>>8)*63)/255;		// GRUEN
-                                                        Farbe16|=tmp<<5;
-                                                        tmp=(((RGBTmp&0x000000FF))*31)/255;	// BLAU
-                                                        Farbe16|=tmp;
-                                                        BlurTable1[x[0]][x[1]][x[2]][x[3]] = Farbe16;
-
-                                                        RGBTmp = BlurTable0S[x[0]][x[1]][x[2]][x[3]];
-                                                        tmp=(((RGBTmp&0x00FF0000)>>16)*31)/255;		// ROT
-                                                        Farbe16=tmp<<11;
-                                                        tmp=(((RGBTmp&0x0000FF00)>>8)*63)/255;		// GRUEN
-                                                        Farbe16|=tmp<<5;
-                                                        tmp=(((RGBTmp&0x000000FF))*31)/255;	// BLAU
-                                                        Farbe16|=tmp;
-                                                        BlurTable0S[x[0]][x[1]][x[2]][x[3]] = Farbe16;
-
-                                                        RGBTmp = BlurTable1S[x[0]][x[1]][x[2]][x[3]];
-                                                        tmp=(((RGBTmp&0x00FF0000)>>16)*31)/255;		// ROT
-                                                        Farbe16=tmp<<11;
-                                                        tmp=(((RGBTmp&0x0000FF00)>>8)*63)/255;		// GRUEN
-                                                        Farbe16|=tmp<<5;
-                                                        tmp=(((RGBTmp&0x000000FF))*31)/255;	// BLAU
-                                                        Farbe16|=tmp;
-                                                        BlurTable1S[x[0]][x[1]][x[2]][x[3]] = Farbe16;
-                                                        #endif
                                                 }
                                         }
 }
 
-void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VICOutPuffer,int OutXW,int OutYW,int InXW,int,bool)
+void VideoPalClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOutPuffer,int OutXW,int OutYW,int InXW,int,bool)
 {
-    static unsigned char w0,w1,w2,w3;
-    VideoSource8 = (unsigned char*)VICOutPuffer;
+    static uint8_t w0,w1,w2,w3;
+    VideoSource8 = (uint8_t*)VICOutPuffer;
 
     if(PALOutput)
     {
@@ -502,21 +400,21 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
             switch(DestDisplayMode)
             {
             case 16:
-                for(int y=OutYW-1;y>-1;y--)
+                for(int y=0;y<OutYW/2;y++)
                 {
-                    DXOutpuffer16 = ((unsigned short*)DXOutpuffer + (((y*2)+1)*Pitch/2));
-                    DXOutpuffer16Scanline = ((unsigned short*)DXOutpuffer + ((y*2)*(Pitch/2)));
+                    Outpuffer16 = ((uint16_t*)Outpuffer + (((y*2)+1)*Pitch/2));
+                    Outpuffer16Scanline = ((uint16_t*)Outpuffer + ((y*2)*(Pitch/2)));
 
                     w0 = w1 = w2 = w3 = *VideoSource8 & 0x0F;
                     switch(y&1)
                     {
                     case 0:
-                        for(int x=0;x<(OutXW);x++)
+                        for(int x=0;x<(OutXW/2);x++)
                         {
-                            *(DXOutpuffer16++) = (unsigned short)BlurTable0[w0][w1][w2][w3];
-                            *(DXOutpuffer16++) = (unsigned short)BlurTable0[w0][w1][w2][w3];
-                            *(DXOutpuffer16Scanline++) = (unsigned short)BlurTable0S[w0][w1][w2][w3];
-                            *(DXOutpuffer16Scanline++) = (unsigned short)BlurTable0S[w0][w1][w2][w3];
+                            *(Outpuffer16++) = (unsigned short)BlurTable0[w0][w1][w2][w3];
+                            *(Outpuffer16++) = (unsigned short)BlurTable0[w0][w1][w2][w3];
+                            *(Outpuffer16Scanline++) = (unsigned short)BlurTable0S[w0][w1][w2][w3];
+                            *(Outpuffer16Scanline++) = (unsigned short)BlurTable0S[w0][w1][w2][w3];
                             w3 = w2;
                             w2 = w1;
                             w1 = w0;
@@ -524,12 +422,12 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
                         }
                         break;
                     case 1:
-                        for(int x=0;x<(OutXW);x++)
+                        for(int x=0;x<(OutXW/2);x++)
                         {
-                            *(DXOutpuffer16++) = (unsigned short)BlurTable1[w0][w1][w2][w3];
-                            *(DXOutpuffer16++) = (unsigned short)BlurTable1[w0][w1][w2][w3];
-                            *(DXOutpuffer16Scanline++) = (unsigned short)BlurTable1S[w0][w1][w2][w3];
-                            *(DXOutpuffer16Scanline++) = (unsigned short)BlurTable1S[w0][w1][w2][w3];
+                            *(Outpuffer16++) = (unsigned short)BlurTable1[w0][w1][w2][w3];
+                            *(Outpuffer16++) = (unsigned short)BlurTable1[w0][w1][w2][w3];
+                            *(Outpuffer16Scanline++) = (unsigned short)BlurTable1S[w0][w1][w2][w3];
+                            *(Outpuffer16Scanline++) = (unsigned short)BlurTable1S[w0][w1][w2][w3];
                             w3 = w2;
                             w2 = w1;
                             w1 = w0;
@@ -543,8 +441,8 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
             case 32:
                 for(int y=0;y<(OutYW/2);y++)
                 {
-                    DXOutpuffer32 = ((unsigned long*)DXOutpuffer + ((y*2)*Pitch/4));
-                    DXOutpuffer32Scanline = ((unsigned long*)DXOutpuffer + (((y*2)+1)*(Pitch/4)));
+                    Outpuffer32 = ((uint32_t*)Outpuffer + ((y*2)*Pitch/4));
+                    Outpuffer32Scanline = ((uint32_t*)Outpuffer + (((y*2)+1)*(Pitch/4)));
 
                     w0 = w1 = w2 = w3 = *VideoSource8 & 0x0F;
 
@@ -553,10 +451,10 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
                     case 0:
                         for(int x=0;x<(OutXW/2);x++)
                         {
-                            *(DXOutpuffer32++) = BlurTable0[w0][w1][w2][w3];
-                            *(DXOutpuffer32++) = BlurTable0[w0][w1][w2][w3];
-                            *(DXOutpuffer32Scanline++) = BlurTable0S[w0][w1][w2][w3];
-                            *(DXOutpuffer32Scanline++) = BlurTable0S[w0][w1][w2][w3];
+                            *(Outpuffer32++) = BlurTable0[w0][w1][w2][w3];
+                            *(Outpuffer32++) = BlurTable0[w0][w1][w2][w3];
+                            *(Outpuffer32Scanline++) = BlurTable0S[w0][w1][w2][w3];
+                            *(Outpuffer32Scanline++) = BlurTable0S[w0][w1][w2][w3];
                             w3 = w2;
                             w2 = w1;
                             w1 = w0;
@@ -566,10 +464,10 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
                     case 1:
                         for(int x=0;x<(OutXW/2);x++)
                         {
-                            *(DXOutpuffer32++) = BlurTable1[w0][w1][w2][w3];
-                            *(DXOutpuffer32++) = BlurTable1[w0][w1][w2][w3];
-                            *(DXOutpuffer32Scanline++) = BlurTable1S[w0][w1][w2][w3];
-                            *(DXOutpuffer32Scanline++) = BlurTable1S[w0][w1][w2][w3];
+                            *(Outpuffer32++) = BlurTable1[w0][w1][w2][w3];
+                            *(Outpuffer32++) = BlurTable1[w0][w1][w2][w3];
+                            *(Outpuffer32Scanline++) = BlurTable1S[w0][w1][w2][w3];
+                            *(Outpuffer32Scanline++) = BlurTable1S[w0][w1][w2][w3];
                             w3 = w2;
                             w2 = w1;
                             w1 = w0;
@@ -587,9 +485,9 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
             switch(DestDisplayMode)
             {
             case 16:
-                for(int y=OutYW-1;y>-1;y--)
+                for(int y=0;y<OutYW;y++)
                 {
-                    DXOutpuffer16 = ((unsigned short*)DXOutpuffer + ((y)*Pitch/2));
+                    Outpuffer16 = ((unsigned short*)Outpuffer + ((y)*Pitch/2));
 
                     w0 = w1 = w2 = w3 = *VideoSource8 & 0x0F;
 
@@ -598,7 +496,7 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
                     case 0:
                         for(int x=0;x<(OutXW);x++)
                         {
-                            *(DXOutpuffer16++) = (unsigned short)BlurTable0[w0][w1][w2][w3];
+                            *(Outpuffer16++) = (unsigned short)BlurTable0[w0][w1][w2][w3];
                             w3 = w2;
                             w2 = w1;
                             w1 = w0;
@@ -608,7 +506,7 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
                     case 1:
                         for(int x=0;x<(OutXW);x++)
                         {
-                            *(DXOutpuffer16++) = (unsigned short)BlurTable1[w0][w1][w2][w3];
+                            *(Outpuffer16++) = (unsigned short)BlurTable1[w0][w1][w2][w3];
                             w3 = w2;
                             w2 = w1;
                             w1 = w0;
@@ -623,8 +521,8 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
 
                 for(int y=0;y<OutYW;y++)
                 {
-                    DXOutpuffer32 = ((unsigned long*)DXOutpuffer + ((y)*Pitch/4));
-                    DXOutpuffer32Scanline = ((unsigned long*)DXOutpuffer + (((y*2)+1)*(Pitch/4)));
+                    Outpuffer32 = ((uint32_t*)Outpuffer + ((y)*Pitch/4));
+                    Outpuffer32Scanline = ((uint32_t*)Outpuffer + (((y*2)+1)*(Pitch/4)));
 
                     w0 = w1 = w2 = w3 = *VideoSource8 & 0x0F;
 
@@ -633,7 +531,7 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
                     case 0:
                         for(int x=0;x<(OutXW);x++)
                         {
-                                *(DXOutpuffer32++) = BlurTable0[w0][w1][w2][w3];
+                                *(Outpuffer32++) = BlurTable0[w0][w1][w2][w3];
                                 w3 = w2;
                                 w2 = w1;
                                 w1 = w0;
@@ -643,7 +541,7 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
                     case 1:
                         for(int x=0;x<(OutXW);x++)
                         {
-                                *(DXOutpuffer32++) = BlurTable1[w0][w1][w2][w3];
+                                *(Outpuffer32++) = BlurTable1[w0][w1][w2][w3];
                                 w3 = w2;
                                 w2 = w1;
                                 w1 = w0;
@@ -668,15 +566,15 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
         case 16: /// OK
             for(int y=0;y<(OutYW/2);y++)
             {
-                DXOutpuffer16 = ((unsigned short*)DXOutpuffer + (((y*2)+1)*Pitch/2));
-                DXOutpuffer16Scanline = ((unsigned short*)DXOutpuffer + ((y*2)*(Pitch/2)));
+                Outpuffer16 = ((uint16_t*)Outpuffer + (((y*2)+1)*Pitch/2));
+                Outpuffer16Scanline = ((uint16_t*)Outpuffer + ((y*2)*(Pitch/2)));
 
                 for(int x=0;x<(OutXW/2);x++)
                 {
-                    *(DXOutpuffer16++) = Palette16Bit[VideoSource8[x] & 0x0F];
-                    *(DXOutpuffer16++) = Palette16Bit[VideoSource8[x] & 0x0F];
-                    *(DXOutpuffer16Scanline++) = Palette16Bit[VideoSource8[x] & 0x0F];
-                    *(DXOutpuffer16Scanline++) = Palette16Bit[VideoSource8[x] & 0x0F];
+                    *(Outpuffer16++) = Palette16Bit[VideoSource8[x] & 0x0F];
+                    *(Outpuffer16++) = Palette16Bit[VideoSource8[x] & 0x0F];
+                    *(Outpuffer16Scanline++) = Palette16Bit[VideoSource8[x] & 0x0F];
+                    *(Outpuffer16Scanline++) = Palette16Bit[VideoSource8[x] & 0x0F];
                 }
                 VideoSource8 = VideoSource8+InXW;
             }
@@ -684,14 +582,14 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
         case 32: /// OK
             for(int y=0;y<(OutYW/2);y++)
             {
-                DXOutpuffer32 = ((unsigned long*)DXOutpuffer + ((y*2)*Pitch/4));
-                DXOutpuffer32Scanline = ((unsigned long*)DXOutpuffer + (((y*2)+1)*(Pitch/4)));
+                Outpuffer32 = ((uint32_t*)Outpuffer + ((y*2)*Pitch/4));
+                Outpuffer32Scanline = ((uint32_t*)Outpuffer + (((y*2)+1)*(Pitch/4)));
                 for(int x=0;x<(OutXW/2);x++)
                 {
-                    *(DXOutpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
-                    *(DXOutpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
-                    *(DXOutpuffer32Scanline++) = Palette32Bit[VideoSource8[x] & 0x0F];
-                    *(DXOutpuffer32Scanline++) = Palette32Bit[VideoSource8[x] & 0x0F];
+                    *(Outpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
+                    *(Outpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
+                    *(Outpuffer32Scanline++) = Palette32Bit[VideoSource8[x] & 0x0F];
+                    *(Outpuffer32Scanline++) = Palette32Bit[VideoSource8[x] & 0x0F];
                 }
                 VideoSource8 = VideoSource8+InXW;
             }
@@ -705,17 +603,17 @@ void VideoPalClass::ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VIC
         case 16: /// OK
             for(int y=0;y<OutYW;y++)
             {
-                    DXOutpuffer16 = ((unsigned short*)DXOutpuffer + ((y)*Pitch/2));
-                    for(int x=0;x<OutXW;x++)*(DXOutpuffer16++) = Palette16Bit[VideoSource8[x] & 0x0F];
+                    Outpuffer16 = (uint16_t*)(Outpuffer + (y*Pitch));
+                    for(int x=0;x<OutXW;x++) *(Outpuffer16++) = Palette16Bit[VideoSource8[x] & 0x0F];
                     VideoSource8 = VideoSource8+InXW;
             }
             break;
         case 32: /// OK
             for(int y=0;y<OutYW;y++)
             {
-                    DXOutpuffer32 = ((unsigned long*)DXOutpuffer + ((y)*Pitch/4));
-                    for(int x=0;x<(OutXW);x++) *(DXOutpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
-                    VideoSource8 = VideoSource8+InXW;
+                Outpuffer32= (uint32_t*)(Outpuffer + (y*Pitch));
+                for(int x=0;x<OutXW;x++) *(Outpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
+                VideoSource8 = VideoSource8+InXW;
             }
             break;
         }

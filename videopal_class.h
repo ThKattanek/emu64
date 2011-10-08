@@ -44,7 +44,7 @@ public:
         VideoPalClass(void);
         ~VideoPalClass(void);
         void SetPixelFormat(SDL_PixelFormat *format);
-        void ConvertVideo(void* DXOutpuffer,long Pitch,unsigned char* VICOutPuffer,int OutXW,int OutYW,int InXW,int InYW,bool FlipTex);
+        void ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOutPuffer,int OutXW,int OutYW,int InXW,int InYW,bool FlipTex);
         void SetDisplayMode(int DisplayMode);
         void UpdateParameter(void);
         void SetPhaseAltLineOffset(int offset);
@@ -60,20 +60,20 @@ public:
         unsigned long YHistogramm[256];
 
 private:
-        SDL_PixelFormat *pixel_format;
+        SDL_PixelFormat     *pixel_format;
 
-        bool		Double2x;
-        bool		PALOutput;
-        unsigned long	DestDisplayMode;
-        unsigned short	*DXOutpuffer16;
-        unsigned short	*DXOutpuffer16Scanline;
-        unsigned long	*DXOutpuffer32;
-        unsigned long	*DXOutpuffer32Scanline;
-        unsigned char	*VideoSource8;
+        bool                Double2x;
+        bool                PALOutput;
+        uint32_t            DestDisplayMode;
+        uint16_t            *Outpuffer16;
+        uint16_t            *Outpuffer16Scanline;
+        uint32_t            *Outpuffer32;
+        uint32_t            *Outpuffer32Scanline;
+        uint8_t             *VideoSource8;
 
         //////// Normaler Palettenmodus //////////
-        unsigned short	Palette16Bit[256];
-        unsigned long	Palette32Bit[256];
+        uint16_t	Palette16Bit[256];
+        uint32_t	Palette32Bit[256];
         int		AktFarbMode;
         //////////////////////////////////////////
 
@@ -87,9 +87,9 @@ private:
         float blur_y_mul;
         float blur_uv_mul;
 
-        unsigned long RGB;
-        unsigned long RGBScanline;
-        unsigned long RGB_OLD[1024];
+        uint32_t RGB;
+        uint32_t RGBScanline;
+        uint32_t RGB_OLD[1024];
         double _y,_u,_v;
 
         double  _y1,_u1,_v1;
@@ -100,21 +100,21 @@ private:
         float   blur_y_sum;
         float   blur_u_sum;
         float   blur_v_sum;
-        unsigned char ContrastTransform[256];
+        uint8_t ContrastTransform[256];
 
         //// Einstellbare Werte
         float	Saturation;				// 0 - 2000
         float	Helligkeit;				// 0 - 2
         float	Kontrast;				// 0 - 1
-        int     HoBlurWY;
-        int	HoBlurWUV;
-        int     PhaseAlternatingLine;		// 0 - 2000
+        int32_t HoBlurWY;
+        int32_t	HoBlurWUV;
+        int32_t PhaseAlternatingLine;		// 0 - 2000
         float   Scanline;
 
         // NEU //
-        unsigned long BlurTable0[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
-        unsigned long BlurTable1[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
-        unsigned long BlurTable0S[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
-        unsigned long BlurTable1S[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
+        uint32_t BlurTable0[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
+        uint32_t BlurTable1[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
+        uint32_t BlurTable0S[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
+        uint32_t BlurTable1S[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
 };
 #endif // VIDEOPAL_CLASS_H
