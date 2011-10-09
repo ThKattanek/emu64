@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 28.08.2011		//
+// Letzte Änderung am 09.10.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -52,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
     c64_keyboard_window = new C64KeyboardWindow(this,ini);
     crt_window = new CrtWindow(this,ini);
     debugger_window = new DebuggerWindow(this,ini);
+    setup_window = new SetupWindow(this,ini);
 
     /// Translator installieren ///
     langPath = "languages";
@@ -175,6 +176,7 @@ MainWindow::~MainWindow()
     delete c64_keyboard_window;
     delete crt_window;
     delete debugger_window;
+    delete setup_window;
     delete ui;
 
     delete ini;
@@ -261,6 +263,7 @@ void MainWindow::RetranslateUi()
     floppy_window->RetranslateUi();
     crt_window->RetranslateUi();
     debugger_window->RetranslateUi();
+    setup_window->RetranslateUi();
 }
 
 void MainWindow::on_menu_main_info_triggered()
@@ -362,4 +365,10 @@ void MainWindow::on_actionDebugger_Disassembler_triggered()
 {
     if(debugger_window->isHidden()) debugger_window->show();
     else debugger_window->hide();
+}
+
+void MainWindow::on_actionEmu64_Einstellungen_triggered()
+{
+    if(setup_window->isHidden()) setup_window->show();
+    else setup_window->hide();
 }

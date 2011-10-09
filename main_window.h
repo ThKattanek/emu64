@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 21.07.2011		//
+// Letzte Änderung am 09.10.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -27,14 +27,16 @@
 #include <stdlib.h>
 
 /// Windows ///
+#include "widget_floppy_status.h"
 #include "info_window.h"
 #include "tv_setup_window.h"
 #include "floppy_window.h"
 #include "c64_keyboard_window.h"
 #include "crt_window.h"
 #include "debugger_window.h"
+#include "setup_window.h"
+
 #include "c64_class.h"
-#include "widget_floppy_status.h"
 
 #define loging 'if(log!=0) *log'
 #define ErrorMsg(title, msg) QMessageBox::critical(this,title,msg,0,0);
@@ -75,6 +77,8 @@ private slots:
 
     void on_actionC64_Programme_direkt_laden_triggered();
 
+    void on_actionEmu64_Einstellungen_triggered();
+
 protected:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
@@ -98,6 +102,7 @@ private:
     C64KeyboardWindow *c64_keyboard_window;     // Virtuelle C64 Tastatur
     CrtWindow *crt_window;                      // CRT Auswahl Fenster
     DebuggerWindow *debugger_window;            // Debugger / Disassembler Fenster
+    SetupWindow *setup_window;                  // Setup Fenster
 };
 
 #endif // MAINWINDOW_H

@@ -43,7 +43,8 @@ SOURCES += \
     d64_class.cpp \
     memory_window.cpp \
     widget_memory_zeile.cpp \
-    widget_bit_leiste.cpp
+    widget_bit_leiste.cpp \
+    setup_window.cpp
 
 HEADERS  += \
     version.h \
@@ -87,7 +88,8 @@ HEADERS  += \
     cpu_info.h \
     memory_window.h \
     widget_memory_zeile.h \
-    widget_bit_leiste.h
+    widget_bit_leiste.h \
+    setup_window.h
 
 FORMS    += \
     info_window.ui \
@@ -103,7 +105,8 @@ FORMS    += \
     widget_floppy_status.ui \
     memory_window.ui \
     widget_memory_zeile.ui \
-    widget_bit_leiste.ui
+    widget_bit_leiste.ui \
+    setup_window.ui
 
 RESOURCES += \
     emu64.qrc
@@ -134,3 +137,6 @@ LIBS += -framework cocoa
 
 OTHER_FILES += \
     emu64.rc
+
+
+

@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>420</width>
+    <width>437</width>
     <height>192</height>
    </rect>
   </property>
@@ -146,7 +146,7 @@ background-position: center
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>420</width>
+     <width>437</width>
      <height>20</height>
     </rect>
    </property>
@@ -791,7 +791,7 @@ background-position: center
   </action>
   <action name="actionEmu64_Einstellungen">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Emu64 Einstellungen</string>
