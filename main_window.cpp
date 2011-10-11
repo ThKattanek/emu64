@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 09.10.2011		//
+// Letzte Änderung am 11.10.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -19,7 +19,8 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    c64(0)
 {
     /// Haputfenster UI setzen ///
     ui->setupUi(this);
@@ -36,9 +37,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     /// Klassen installieren ///
     videopal = new VideoPalClass();
-    videopal->SetDisplayMode(color_bits);
-    videopal->EnablePALOutput(true);
-    videopal->EnableVideoDoubleSize(true);
 
     /// INI Dateiverwaltung erstellen ///
     ini = new QSettings("emu64.ini",QSettings::IniFormat,this);
@@ -52,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     c64_keyboard_window = new C64KeyboardWindow(this,ini);
     crt_window = new CrtWindow(this,ini);
     debugger_window = new DebuggerWindow(this,ini);
-    setup_window = new SetupWindow(this,ini);
+    setup_window = new SetupWindow(this,SLOT(onChangeGrafikModi(bool,bool,bool,bool)),videopal,ini);
 
     /// Translator installieren ///
     langPath = "languages";
@@ -67,12 +65,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     /// C64 Klasse Installieren ... Das HERZ ///
     int ret_error;
-    c64 = new C64Class(&ret_error,0);
+    c64 = new C64Class(&ret_error,videopal,0);
     if(ret_error != 0) ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim installieren der C64 Klasse"))
-
-    c64->pal = videopal;
-    videopal->SetPixelFormat(c64->C64ScreenBack->format);
-    videopal->SetC64Palette(5);
 
     /// Debugger Window mit C64 verbinden ///
     debugger_window->SetC64Pointer(c64);
@@ -371,4 +365,12 @@ void MainWindow::on_actionEmu64_Einstellungen_triggered()
 {
     if(setup_window->isHidden()) setup_window->show();
     else setup_window->hide();
+}
+
+void MainWindow::onChangeGrafikModi(bool fullscreen, bool palmode, bool doublemode, bool bit32mode)
+{
+    if(!fullscreen)
+    {
+        if(c64 != 0) c64->SetGrafikModi(bit32mode,doublemode,palmode,0,0);
+    }
 }

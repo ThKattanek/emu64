@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 25.04.2011		//
+// Letzte Änderung am 11.10.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -58,6 +58,10 @@ public:
         void EnableVideoDoubleSize(bool enabled);
         void EnablePALOutput(bool enabled);
         unsigned long YHistogramm[256];
+
+        bool StartC64isColorBit32;
+        bool StartC64isDoublesize;
+        bool StartC64isPalmode;
 
 private:
         SDL_PixelFormat     *pixel_format;

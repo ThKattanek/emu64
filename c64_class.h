@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 17.09.2011		//
+// Letzte Änderung am 11.10.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -34,10 +34,6 @@
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
 
-#define xw 384*2
-#define yw 272*2
-#define color_bits 32
-
 #define FloppyAnzahl 4
 #define MAX_BREAK_GROUPS 255
 
@@ -45,7 +41,7 @@ class C64Class
 {
 
 public:
-    C64Class(int *ret_error,function<void(unsigned short,unsigned char)> jam_proc);
+    C64Class(int *ret_error,VideoPalClass *_pal, function<void(unsigned short,unsigned char)> jam_proc);
     ~C64Class();
     void FillAudioBuffer(unsigned char *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
     void KeyEvent(unsigned char  matrix_code,KeyStatus status, bool isAutoShift);
@@ -57,6 +53,7 @@ public:
     unsigned char ReadC64Byte(unsigned short adresse);
     void WriteC64Byte(unsigned short adresse,unsigned char wert);
     unsigned char* GetRAMPointer(unsigned short adresse);
+    void SetGrafikModi(bool colbits32, bool doublesize,bool enable_pal, int fullres_xw = 0, int fullres_yw = 0);
 
     void SoftReset(void);
     void HardReset(void);
@@ -91,11 +88,16 @@ public:
 
     int             AktWindowXW;
     int             AktWindowYW;
+    int             AktWindowColorBits;
+    int             AktC64ScreenXW;
+    int             AktC64ScreenYW;
     bool            isFullscreen;
 
     SDL_Surface     *C64Screen;
     SDL_Surface     *C64ScreenBack;
     SDL_Thread      *sdl_thread;
+    bool            sdl_thread_pause;
+    bool            sdl_thread_is_paused;
 
     VideoPalClass   *pal;
 
@@ -143,6 +145,8 @@ private:
     void WriteIO2(unsigned short adresse,unsigned char wert);
     unsigned char ReadIO1(unsigned short adresse);
     unsigned char ReadIO2(unsigned short adresse);
+    void SDLThreadPauseBegin(void);
+    void SDLThreadPauseEnd(void);
 
     function<unsigned char(unsigned short)> *ReadProcTbl;
     function<void(unsigned short,unsigned char)> *WriteProcTbl;

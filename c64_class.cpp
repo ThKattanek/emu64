@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 17.09.2011		//
+// Letzte Änderung am 11.10.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -26,11 +26,12 @@ int SDLThreadLoad(void *userdat);
 #define AudioSampleRate 44100
 #define AudioPufferSize 882
 
-C64Class::C64Class(int *ret_error, function<void(unsigned short,unsigned char)>)
+C64Class::C64Class(int *ret_error,VideoPalClass *_pal, function<void(unsigned short,unsigned char)>)
 {
-    pal = 0;
+    pal = _pal;
     BreakGroupAnz = 0;
     FloppyFoundBreakpoint = false;
+    C64ScreenBack = 0;
 
     /// SDL Installieren ///
 
@@ -53,11 +54,7 @@ C64Class::C64Class(int *ret_error, function<void(unsigned short,unsigned char)>)
         *ret_error = -2;
     }
 
-    isFullscreen = false;
-    AktWindowXW = xw;
-    AktWindowYW = yw;
-    C64Screen = SDL_SetVideoMode(xw,yw,color_bits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
-    C64ScreenBack = SDL_CreateRGBSurface(0,xw,yw,color_bits,0,0,0,0);
+    SetGrafikModi(pal->StartC64isColorBit32,pal->StartC64isDoublesize,pal->StartC64isPalmode);
 
     SDL_WM_SetIcon(SDL_LoadBMP("c64window.bmp"),0);
     SDL_WM_SetCaption("C64 Screen",0);
@@ -254,8 +251,8 @@ C64Class::C64Class(int *ret_error, function<void(unsigned short,unsigned char)>)
 C64Class::~C64Class()
 {
     LoopThreadEnd = true;
-
-    SDL_Delay(50);
+    SDL_WaitThread(sdl_thread,0);
+    //SDL_Delay(50);
 
     SDL_AudioQuit();
     SDL_Quit();
@@ -270,108 +267,127 @@ C64Class::~C64Class()
     delete crt;
 }
 
+
 void AudioMix(void *userdat, Uint8 *stream, int laenge)
 {
     C64Class *c64 = (C64Class*)userdat;
     c64->FillAudioBuffer(stream,laenge);
 }
 
+void C64Class::SDLThreadPauseBegin()
+{
+    sdl_thread_is_paused = false;
+    sdl_thread_pause = true;
+    SDL_Delay(40);
+}
+
+void C64Class::SDLThreadPauseEnd()
+{
+    sdl_thread_pause = false;
+}
+
 int SDLThread(void *userdat)
 {
     C64Class *c64 = (C64Class*)userdat;
-
     SDL_Event event;
+    c64->sdl_thread_pause = false;
 
     c64->LoopThreadEnd = false;
     while (!c64->LoopThreadEnd)
     {
-        while (SDL_PollEvent (&event))
+        if(!c64->sdl_thread_pause)
         {
-          switch (event.type)
+            while (SDL_PollEvent (&event))
             {
-            case SDL_VIDEORESIZE:
-                if(!c64->isFullscreen)
+              switch (event.type)
                 {
-                    c64->AktWindowXW = event.resize.w;
-                    c64->AktWindowYW = event.resize.h;
-                    c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,color_bits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
-                }
-                break;
-            case SDL_KEYDOWN:
-                switch(event.key.keysym.sym)
-                {
-                case SDLK_ESCAPE:
-                    c64->WaitResetReady = false;
-                    c64->RESET = false;
+                case SDL_VIDEORESIZE:
+                    if(!c64->isFullscreen)
+                    {
+                        c64->AktWindowXW = event.resize.w;
+                        c64->AktWindowYW = event.resize.h;
+                        c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                    }
                     break;
-                case SDLK_F12:
-                    c64->isFullscreen = !c64->isFullscreen;
-                    if(c64->isFullscreen)
+                case SDL_KEYDOWN:
+                    switch(event.key.keysym.sym)
                     {
-                        SDL_ShowCursor(false);
-                        c64->C64Screen = SDL_SetVideoMode(1280,1024,color_bits,SDL_FULLSCREEN | SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                    case SDLK_ESCAPE:
+                        c64->WaitResetReady = false;
+                        c64->RESET = false;
+                        break;
+                    case SDLK_F12:
+                        c64->isFullscreen = !c64->isFullscreen;
+                        if(c64->isFullscreen)
+                        {
+                            SDL_ShowCursor(false);
+                            c64->C64Screen = SDL_SetVideoMode(1280,1024,c64->AktWindowColorBits,SDL_FULLSCREEN | SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                        }
+                        else
+                        {
+                            SDL_ShowCursor(true);
+                            c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                        }
+                        break;
+
+                    default:
+                        break;
                     }
-                    else
+
+                    for(int i=0;i<C64KeyNum;i++)
                     {
-                        SDL_ShowCursor(true);
-                        c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,color_bits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                        if(C64KeyTable[i].SDLKeyCode == event.key.keysym.sym)
+                        {
+                            c64->KeyEvent(C64KeyTable[i].MatrixCode,KEY_DOWN,C64KeyTable[i].Shift);
+                        }
                     }
+                    break;
+
+                case SDL_KEYUP:
+                    switch(event.key.keysym.sym)
+                    {
+                    case SDLK_ESCAPE:
+                        c64->RESET = true;
+                    case SDLK_F12:
+
+                        break;
+                    default:
+                        break;
+                    }
+
+                    for(int i=0;i<C64KeyNum;i++)
+                    {
+                        if(C64KeyTable[i].SDLKeyCode == event.key.keysym.sym)
+                        {
+                            c64->KeyEvent(C64KeyTable[i].MatrixCode,KEY_UP,C64KeyTable[i].Shift);
+                        }
+                    }
+                    break;
+
+                case SDL_MOUSEMOTION:
+                    break;
+                case SDL_QUIT:
+    #ifdef _WIN32
+                    c64->LoopThreadEnd = true;
+    #endif
                     break;
 
                 default:
                     break;
                 }
-
-                for(int i=0;i<C64KeyNum;i++)
-                {
-                    if(C64KeyTable[i].SDLKeyCode == event.key.keysym.sym)
-                    {
-                        c64->KeyEvent(C64KeyTable[i].MatrixCode,KEY_DOWN,C64KeyTable[i].Shift);
-                    }
-                }
-                break;
-
-            case SDL_KEYUP:
-                switch(event.key.keysym.sym)
-                {
-                case SDLK_ESCAPE:
-                    c64->RESET = true;
-                case SDLK_F12:
-
-                    break;
-                default:
-                    break;
-                }
-
-                for(int i=0;i<C64KeyNum;i++)
-                {
-                    if(C64KeyTable[i].SDLKeyCode == event.key.keysym.sym)
-                    {
-                        c64->KeyEvent(C64KeyTable[i].MatrixCode,KEY_UP,C64KeyTable[i].Shift);
-                    }
-                }
-                break;
-
-            case SDL_MOUSEMOTION:
-                break;
-            case SDL_QUIT:
-#ifdef _WIN32
-                c64->LoopThreadEnd = true;
-#endif
-                break;
-
-            default:
-                break;
             }
-        }
-
-        if(!c64->LoopThreadEnd)
+            if(!c64->LoopThreadEnd)
+            {
+                SDL_Rect rec_src = {0,0,c64->AktC64ScreenXW,c64->AktC64ScreenYW};
+                SDL_Rect rec_dst = {0,0,c64->C64Screen->w,c64->C64Screen->h};
+                SDL_SoftStretch(c64->C64ScreenBack,&rec_src,c64->C64Screen,&rec_dst);
+                SDL_Flip(c64->C64Screen);
+                SDL_Delay(1);
+            }
+        }else
         {
-            SDL_Rect rec_src = {0,0,xw,yw};
-            SDL_Rect rec_dst = {0,0,c64->C64Screen->w,c64->C64Screen->h};
-            SDL_SoftStretch(c64->C64ScreenBack,&rec_src,c64->C64Screen,&rec_dst);
-            SDL_Flip(c64->C64Screen);
             SDL_Delay(1);
+            c64->sdl_thread_is_paused = true;
         }
     }
     return 0;
@@ -379,10 +395,10 @@ int SDLThread(void *userdat)
 
 void C64Class::VicRefresh(unsigned char *vic_puffer)
 {
-    if(pal == 0) return;
+    if((pal == 0) || (sdl_thread_pause == true)) return;
 
     SDL_LockSurface(C64ScreenBack);
-    pal->ConvertVideo((void*)C64ScreenBack->pixels,C64ScreenBack->pitch,vic_puffer,xw,yw,504,312,false);
+    pal->ConvertVideo((void*)C64ScreenBack->pixels,C64ScreenBack->pitch,vic_puffer,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
     SDL_UnlockSurface(C64ScreenBack);
 }
 
@@ -770,6 +786,41 @@ void C64Class::WriteC64Byte(unsigned short adresse,unsigned char wert)
 unsigned char* C64Class::GetRAMPointer(unsigned short adresse)
 {
     return mmu->GetRAMPointer() + adresse;
+}
+
+void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool enable_pal, int fullres_xw, int fullres_yw)
+{
+    SDLThreadPauseBegin();
+
+    if((fullres_xw != 0) && (fullres_yw != 0))
+        isFullscreen  = true;
+    else isFullscreen = false;
+
+    AktWindowXW = 384;
+    AktWindowYW = 272;
+
+    if(doublesize)
+    {
+        AktWindowXW *=2;
+        AktWindowYW *=2;
+    }
+
+    AktC64ScreenXW = AktWindowXW;
+    AktC64ScreenYW = AktWindowYW;
+
+    if(colbits32) AktWindowColorBits = 32;
+    AktWindowColorBits = 16;
+
+    pal->SetDisplayMode(AktWindowColorBits);
+    pal->EnablePALOutput(enable_pal);
+    pal->EnableVideoDoubleSize(doublesize);
+
+    C64Screen = SDL_SetVideoMode(AktWindowXW,AktWindowYW,AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+    if(C64ScreenBack != 0) delete C64ScreenBack;
+    C64ScreenBack = SDL_CreateRGBSurface(0,AktWindowXW,AktWindowYW,AktWindowColorBits,0,0,0,0);
+    pal->SetPixelFormat(C64ScreenBack->format);
+
+    SDLThreadPauseEnd();
 }
 
 int SDLThreadLoad(void *userdat)

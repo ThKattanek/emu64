@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 28.08.2011		//
+// Letzte Änderung am 11.10.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -74,6 +74,7 @@ VideoPalClass::~VideoPalClass(void)
 void VideoPalClass::SetPixelFormat(SDL_PixelFormat *format)
 {
     pixel_format = format;
+    SetC64Palette(AktFarbMode);
     CreateVicIIColors();
 }
 
@@ -133,6 +134,8 @@ void VideoPalClass::SetC64Palette(int palnr)
 {
     AktFarbMode = palnr;
 
+    if(pixel_format == 0) return;
+
     int ij = 0;
     for(int j=0;j<16;j++)
     {
@@ -141,7 +144,8 @@ void VideoPalClass::SetC64Palette(int palnr)
         for(int i=0;i<16;i++)
         {
             /// Für 32Bit Video Display ///
-            Palette32Bit[ij] = COLOR_RGBA1[2] | COLOR_RGBA1[1]<<8 | COLOR_RGBA1[1]<<16;
+
+            Palette32Bit[ij] = COLOR_RGBA1[0]<<16 | COLOR_RGBA1[1]<<8 | COLOR_RGBA1[2];
 
             /// Für 16Bit Video Display ///
             Palette16Bit[ij] = (uint16_t)SDL_MapRGB(pixel_format,COLOR_RGBA1[0],COLOR_RGBA1[1],COLOR_RGBA1[2]);

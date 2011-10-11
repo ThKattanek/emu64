@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 09.10.2011		//
+// Letzte Änderung am 11.10.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -72,12 +72,10 @@ private slots:
     void on_actionVirtuelle_C64_Tastatur_triggered();
     void on_actionSteckmodule_triggered();
     void on_actionDebugger_Disassembler_triggered();
-
     void on_actionHardreset_triggered();
-
     void on_actionC64_Programme_direkt_laden_triggered();
-
     void on_actionEmu64_Einstellungen_triggered();
+    void onChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode);
 
 protected:
     void keyPressEvent(QKeyEvent *event);
