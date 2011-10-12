@@ -19,6 +19,7 @@
 #define SDL_USE_NIB_FILE 1
 
 #include "SDL/SDL.h"
+#include "SDL/SDL_framerate.h"
 #include "version.h"
 #include "videopal_class.h"
 #include "mmu_class.h"
@@ -93,8 +94,11 @@ public:
     int             AktC64ScreenYW;
     bool            isFullscreen;
 
+    FPSmanager      fps_manager;
     SDL_Surface     *C64Screen;
-    SDL_Surface     *C64ScreenBack;
+    SDL_Surface     *C64ScreenBack[10];
+    int             DrawBackPointer;
+    int             ViewBackpointer;
     SDL_Thread      *sdl_thread;
     bool            sdl_thread_pause;
     bool            sdl_thread_is_paused;

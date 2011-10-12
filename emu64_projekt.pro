@@ -114,17 +114,17 @@ RESOURCES += \
 win32{
 RC_FILE = emu64.rc
 DESTDIR = "../bin/win32"
-LIBS += -lSDL
+LIBS += -lSDL -lSDL_gfx
 }
 
 linux-g++-64{
 DESTDIR = "../bin/linux_x86_64"
-LIBS += -lSDL
+LIBS += -lSDL -lSDL_gfx
 }
 
 linux-g++-32{
 DESTDIR = "../bin/linux_i586"
-LIBS += -lSDL
+LIBS += -lSDL -lSDL_gfx
 }
 
 macx{
