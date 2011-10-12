@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 01.08.2011		//
+// Letzte Änderung am 12.10.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -36,13 +36,15 @@ public:
     void SetGeraeteID(unsigned char id);
     QString GetAktFilename(void);
     bool GetEnableFloppy(void);
-    void SetAktFilename(QString filename);
+    void SetAktFilename(QString filename, QString d64name);
     void SetEnableFloppy(bool status);
     void SetFloppyVolume(int mode);
     int GetFloppyVolume(void);
 
 signals:
    void ChangeEnableFloppy(void);
+   void LoadImage(int floppynr);
+   void RemoveImage(int floppynr);
 
 private slots:
     void onTimer();

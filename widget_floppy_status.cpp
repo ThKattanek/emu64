@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 01.08.2011		//
+// Letzte Änderung am 12.10.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -119,24 +119,7 @@ void WidgetFloppyStatus::on_PowerLED_clicked()
 
 void WidgetFloppyStatus::on_InstertImage_clicked()
 {
-    AktFileName = QFileDialog::getOpenFileName(this,tr("Disk Image öffnen"),ui->DisknameOut->statusTip(),"Disk Image Dateien (*.d64 *.g64);;Alle Dateien (*.*)");
-
-    if(AktFileName != 0)
-    {
-        if(floppy->LoadDiskImage(AktFileName.toAscii().data()))
-        {
-            D64Class d64;
-            d64.LoadD64(AktFileName.toAscii().data());
-            ui->DisknameOut->setText(d64.D64Name);
-            ui->DisknameOut->setToolTip(AktFileName);
-        }
-        else
-        {
-            AktFileName = "";
-            ui->DisknameOut->setText(AktFileName);
-            ui->DisknameOut->setToolTip(AktFileName);
-        }
-    }
+    emit LoadImage(GeraeteID-8);
 }
 
 void WidgetFloppyStatus::on_EjectImage_clicked()
@@ -146,6 +129,8 @@ void WidgetFloppyStatus::on_EjectImage_clicked()
     AktFileName = "";
     ui->DisknameOut->setText(AktFileName);
     ui->DisknameOut->setToolTip(AktFileName);
+
+    emit RemoveImage(GeraeteID-8);
 }
 
 QString WidgetFloppyStatus::GetAktFilename(void)
@@ -158,25 +143,11 @@ bool WidgetFloppyStatus::GetEnableFloppy(void)
     return floppy->GetEnableFloppy();
 }
 
-void WidgetFloppyStatus::SetAktFilename(QString filename)
+void WidgetFloppyStatus::SetAktFilename(QString filename, QString d64name)
 {
     AktFileName = filename;
-
-    if(AktFileName != 0)
-    {
-        if(floppy->LoadDiskImage(AktFileName.toAscii().data()))
-        {
-            D64Class d64;
-            d64.LoadD64(AktFileName.toAscii().data());
-            ui->DisknameOut->setText(d64.D64Name);
-            ui->DisknameOut->setToolTip(AktFileName);
-        }
-        else
-        {
-            ui->DisknameOut->setText("");
-            ui->DisknameOut->setToolTip("");
-        }
-    }
+    ui->DisknameOut->setText(d64name);
+    ui->DisknameOut->setToolTip(AktFileName);
 }
 
 void WidgetFloppyStatus::SetEnableFloppy(bool status)

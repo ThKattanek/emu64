@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 11.10.2011		//
+// Letzte Änderung am 12.10.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     info_window = new InfoWindow(this);
     tv_setup_window = new TVSetupWindow(this,videopal,ini);
-    floppy_window = new FloppyWindow(this);
+    floppy_window = new FloppyWindow(this,ini);
     c64_keyboard_window = new C64KeyboardWindow(this,ini);
     crt_window = new CrtWindow(this,ini);
     debugger_window = new DebuggerWindow(this,ini);
@@ -98,12 +98,17 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->FloppyTabel->setCellWidget(i,0,w);
         ui->FloppyTabel->setColumnWidth(0,w->width());
         connect(w,SIGNAL(ChangeEnableFloppy()),debugger_window,SLOT(onChangeFloppyStatus()));
+        connect(w,SIGNAL(LoadImage(int)),floppy_window,SLOT(OnChangeFloppyNummer(int)));
+        connect(w,SIGNAL(RemoveImage(int)),floppy_window,SLOT(OnRemoveImage(int)));
     }
 
+    connect(floppy_window,SIGNAL(ChangeFloppyImage(int)),this,SLOT(OnChangeFloppyImage(int)));
 
     ////////// Load from INI ///////////
     if(ini != NULL)
     {
+        floppy_window->LoadIni();
+
         ini->beginGroup("MainWindow");
         if(ini->contains("Geometry")) restoreGeometry(ini->value("Geometry").toByteArray());
         if(ini->contains("State")) restoreState(ini->value("State").toByteArray());
@@ -116,18 +121,20 @@ MainWindow::MainWindow(QWidget *parent) :
             sprintf(group_name,"Floppy1541_%2.2X",i+8);
             ini->beginGroup(group_name);
             WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(i,0);
+
+            w->SetAktFilename(floppy_window->GetAktFilename(i),floppy_window->GetAktD64Name(i));
+            c64->LoadDiskImage(i,floppy_window->GetAktFilename(i).toAscii().data());
+
             w->SetEnableFloppy(ini->value("Enabled",false).toBool());
-            w->SetAktFilename(ini->value("AktFilename","").toString());
             w->SetFloppyVolume(ini->value("VolumeMode",2).toInt());
             ini->endGroup();
         }
+
+        /// CRT Ini erst jetzt laden ///
+        crt_window->LoadIni();
     }
     this->update();
     /////////////////////////////////////
-
-    /// CRT Ini erst jetzt laden ///
-    crt_window->LoadIni();
-
     c64->HardReset();
 }
 
@@ -152,7 +159,6 @@ MainWindow::~MainWindow()
             WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(i,0);
             value = w->GetEnableFloppy();
             ini->setValue("Enabled",value);
-            ini->setValue("AktFilename",w->GetAktFilename());
             ini->setValue("VolumeMode",w->GetFloppyVolume());
             ini->endGroup();
         }
@@ -332,7 +338,8 @@ void MainWindow::on_actionTV_Video_Einstellungen_triggered()
 
 void MainWindow::on_actionFloppy_1541_II_triggered()
 {
-    floppy_window->show();
+    if(floppy_window->isHidden()) floppy_window->show();
+    else floppy_window->hide();
 }
 
 void MainWindow::on_actionVirtuelle_C64_Tastatur_triggered()
@@ -373,4 +380,11 @@ void MainWindow::onChangeGrafikModi(bool fullscreen, bool palmode, bool doublemo
     {
         if(c64 != 0) c64->SetGrafikModi(bit32mode,doublemode,palmode,0,0);
     }
+}
+
+void MainWindow::OnChangeFloppyImage(int floppynr)
+{
+    WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(floppynr,0);
+    w->SetAktFilename(floppy_window->GetAktFilename(floppynr),floppy_window->GetAktD64Name(floppynr));
+    c64->LoadDiskImage(floppynr,floppy_window->GetAktFilename(floppynr).toAscii().data());
 }

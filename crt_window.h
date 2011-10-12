@@ -22,6 +22,8 @@
 #include "c64_class.h"
 #include "structs.h"
 
+
+
 namespace Ui {
     class CrtWindow;
 }

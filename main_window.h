@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 11.10.2011		//
+// Letzte Änderung am 12.10.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -76,6 +76,7 @@ private slots:
     void on_actionC64_Programme_direkt_laden_triggered();
     void on_actionEmu64_Einstellungen_triggered();
     void onChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode);
+    void OnChangeFloppyImage(int floppynr);
 
 protected:
     void keyPressEvent(QKeyEvent *event);

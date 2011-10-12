@@ -8,15 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 11.10.2011		//
+// Letzte Änderung am 12.10.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
 
 #include "c64_class.h"
 #include "c64_keys.h"
-
-#include <QDebug>
 
 #define floppy_asyncron                  // Schaltet die Floppy Asyncron
 #define more_one_floppy_cylce_count 67   // alle "more_one_floppy_cycle_counts" wird 1 FloppyZyklus doppelt ausgeführt
