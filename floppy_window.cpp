@@ -18,6 +18,8 @@
 #include "floppy_window.h"
 #include "ui_floppy_window.h"
 
+#define MAX_D64_FILES 128
+
 FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini) :
     QDialog(parent),
     ui(new Ui::FloppyWindow),
@@ -28,19 +30,22 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini) :
 
     QFontDatabase fontDB;
     fontDB.addApplicationFont(":/fonts/emu64.ttf");
-
-    //ui->treeWidget->setFont(QFont("Emu64 D64 Directory",16));
-
-    QFont font("Emu64 D64 Directory",16);
-    font.setBold(false);
-    ui->label->setFont(font);
-
-    ui->treeWidget->setColumnCount(3);
-    QStringList headers;
-    headers << tr("Dateien") << tr("Göse") << tr("Position");
-    ui->treeWidget->setHeaderLabels(headers);
+    c64_font = new QFont("Emu64 D64 Directory",16);
 
     connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(OnSelectFile(QString)));
+
+    ui->D64Table->setRowCount(MAX_D64_FILES);
+    ui->D64Table->setColumnCount(1);
+
+    for(int i=0; i<MAX_D64_FILES; i++)
+    {
+        ui->D64Table->setRowHeight(i,8);
+        WidgetD64File *w = new WidgetD64File(this);
+        ui->D64Table->setCellWidget(i,0,w);
+        ui->D64Table->setColumnWidth(0,w->width());
+    }
+
+    FileTypes = QStringList() << "DEL" << "SEQ" << "PRG" << "USR" << "REL" << "CBM" << "E00" << "E?C";
 }
 
 FloppyWindow::~FloppyWindow()
@@ -98,6 +103,7 @@ void FloppyWindow::LoadIni()
 
         ui->FileBrowser->SetAktDir(AktDir[0]);
         ui->FileBrowser->SetAktFile(AktDir[0],AktFile[0]);
+        RefreshD64Table();
     }
     ////////////////////////////////////
 }
@@ -118,6 +124,7 @@ void FloppyWindow::OnSelectFile(QString filename)
         AktDir[FloppyNr] = ui->FileBrowser->GetAktDir();
         AktFile[FloppyNr] = ui->FileBrowser->GetAktFile();
         d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toAscii().data());
+        RefreshD64Table();
         emit ChangeFloppyImage(FloppyNr);
     }
 }
@@ -146,6 +153,7 @@ void FloppyWindow::on_FloppySelect_currentIndexChanged(int index)
     {
         ui->FileBrowser->SetAktDir(AktDir[index]);
         ui->FileBrowser->SetAktFile(AktDir[index],AktFile[index]);
+        RefreshD64Table();
     }
 }
 
@@ -157,4 +165,79 @@ QString FloppyWindow::GetAktFilename(int floppynr)
 QString FloppyWindow::GetAktD64Name(int floppynr)
 {
     return d64[floppynr].D64Name;
+}
+
+void FloppyWindow::RefreshD64Table(void)
+{
+    QString filename;
+    QString spur;
+    QString sektor;
+    QString adresse;
+    QString size;
+    QString typ;
+
+    unsigned short Adresse;
+    unsigned char Typ;
+    unsigned char Spur;
+    unsigned char Sektor;
+    unsigned short Laenge;
+
+    int floppy = ui->FloppySelect->currentIndex();
+    int d64_files = d64[floppy].DateiAnzahl;
+
+    WidgetD64File *w;
+
+    for(int i=0; i<MAX_D64_FILES;i++)
+    {
+        if(ui->D64Table->isRowHidden(i)) break;
+        ui->D64Table->setRowHidden(i,true);
+    }
+    for(int i=0; i<d64_files;i++)
+    {
+        if(MAX_D64_FILES == i) break;
+
+        w = (WidgetD64File*)ui->D64Table->cellWidget(i,0);
+
+        Adresse = d64[floppy].D64Files[i].Adresse;
+        Typ = d64[floppy].D64Files[i].Typ;
+        Spur = d64[floppy].D64Files[i].Track;
+        Sektor = d64[floppy].D64Files[i].Sektor;
+        Laenge = d64[floppy].D64Files[i].Laenge;
+
+        if((Adresse == 0x0801) && ((Typ & 0x07) == 2)) w->SetRMode(0);
+        else
+        {
+            if((Adresse < 0x0801) && ((Typ & 0x07) == 2)) w->SetRMode(1);
+            else w->SetRMode(2);
+        }
+        filename = d64[floppy].D64Files[i].Name;
+        filename = "   " + filename;
+        if(Typ & 0x40) typ = FileTypes[Typ&0x07] + "<";
+        else typ = FileTypes[Typ&0x07];
+        if(Typ & 0x80) typ = "  " + typ;
+        else typ = " *" + typ;
+
+
+        char str01[16];
+        sprintf(str01,"%2.2d",Sektor);
+        sektor = str01;
+
+        sprintf(str01,"%2.2d",Spur);
+        spur = str01;
+
+        sprintf(str01,"$%4.4X",Adresse);
+        adresse = str01;
+
+        sprintf(str01,"%d",Laenge);
+        size = str01;
+        size = " " + size;
+
+        w->SetLabels(filename,spur,sektor,adresse,size,typ);
+        ui->D64Table->setRowHidden(i,false);
+    }
+}
+
+void FloppyWindow::on_D64Table_cellDoubleClicked(int row, int column)
+{
+    qDebug() << "Row: " << row << " -- Column:" << column;
 }

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WidgetD64File</class>
+ <widget class="QWidget" name="WidgetD64File">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>385</width>
+    <height>16</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QLabel" name="FileName">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>160</width>
+     <height>9</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(60,60, 180,50);
+color: rgb(0, 0, 180);</string>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Plain</enum>
+   </property>
+   <property name="text">
+    <string>ANDONE</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::LogText</enum>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+   </property>
+   <property name="wordWrap">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Spur">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>0</y>
+     <width>35</width>
+     <height>9</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(40,40, 180,70);
+color: rgb(0, 0, 180);</string>
+   </property>
+   <property name="text">
+    <string>ANDONE</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Sektor">
+   <property name="geometry">
+    <rect>
+     <x>195</x>
+     <y>0</y>
+     <width>35</width>
+     <height>9</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(60,60, 180,50);
+color: rgb(0, 0, 180);</string>
+   </property>
+   <property name="text">
+    <string>ANDONE</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Adresse">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>0</y>
+     <width>50</width>
+     <height>9</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(40,40, 180,70);
+color: rgb(0, 0, 180);</string>
+   </property>
+   <property name="text">
+    <string>ANDONE</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Size">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>0</y>
+     <width>40</width>
+     <height>9</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(60,60, 180,50);
+color: rgb(0, 0, 180);</string>
+   </property>
+   <property name="text">
+    <string>ANDONE</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Typ">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>0</y>
+     <width>65</width>
+     <height>9</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(40,40, 180,70);
+color: rgb(0, 0, 180);</string>
+   </property>
+   <property name="text">
+    <string>ANDONE</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="RunMode">
+   <property name="geometry">
+    <rect>
+     <x>3</x>
+     <y>0</y>
+     <width>7</width>
+     <height>7</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string notr="true"/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>7</width>
+     <height>7</height>
+    </size>
+   </property>
+   <property name="flat">
+    <bool>true</bool>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

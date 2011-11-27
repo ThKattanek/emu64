@@ -18,8 +18,8 @@
 
 MOS6502::MOS6502(void)
 {
-    ReadProcTbl = NULL;
-    WriteProcTbl = NULL;
+    ReadProcTbl = 0;
+    WriteProcTbl = 0;
 
     MCT = ((unsigned char*)MicroCodeTable6502 + (0x100*MCTItemSize));
     Pointer = 0;
@@ -97,7 +97,7 @@ void MOS6502::ClearJAMFlag(void)
 
 void MOS6502::SetRegister(REG_STRUCT *reg)
 {
-    if(reg == NULL) return;
+    if(reg == 0) return;
 
     unsigned char mask = reg->REG_MASK;
     if((mask&1) == 1)
@@ -119,7 +119,7 @@ void MOS6502::SetRegister(REG_STRUCT *reg)
 
 void MOS6502::GetRegister(REG_STRUCT *reg)
 {
-    if(reg == NULL) return;
+    if(reg == 0) return;
 
     unsigned char mask = reg->REG_MASK;
     if((mask&1) == 1) reg->PC = PC;
@@ -153,7 +153,7 @@ void MOS6502::GetRegister(REG_STRUCT *reg)
 
 void MOS6502::GetInterneRegister(IREG_STRUCT* ireg)
 {
-    if(ireg == NULL) return;
+    if(ireg == 0) return;
     ireg->AktOpcodePC = AktOpcodePC;
     ireg->AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
     ireg->AktMicroCode = *MCT;

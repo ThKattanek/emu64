@@ -118,6 +118,7 @@ L30:
     {
         D64Files[DateiAnzahl].Name[z]=Block[SI+5+z];
         if((unsigned char)D64Files[DateiAnzahl].Name[z]==0xA0) D64Files[DateiAnzahl].Name[z]=0;
+        if((unsigned char)D64Files[DateiAnzahl].Name[z]==173) D64Files[DateiAnzahl].Name[z]=157;
     }
 
     SI+=32;

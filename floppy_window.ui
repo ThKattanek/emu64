@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>518</width>
-    <height>290</height>
+    <width>593</width>
+    <height>319</height>
    </rect>
   </property>
   <property name="font">
@@ -21,10 +21,13 @@
    <string>Floppy 1541 II (Diskeditor)</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
+   <property name="margin">
+    <number>1</number>
+   </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <property name="spacing">
-      <number>-1</number>
+      <number>0</number>
      </property>
      <item>
       <widget class="QComboBox" name="FloppySelect">
@@ -67,6 +70,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item>
       <widget class="WidgetFileBrowse" name="FileBrowser" native="true">
        <property name="minimumSize">
@@ -79,46 +85,100 @@
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>25</width>
+             <height>10</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <item>
-          <widget class="QTreeWidget" name="treeWidget">
+          <widget class="QTableWidget" name="D64Table">
            <property name="minimumSize">
             <size>
-             <width>300</width>
-             <height>250</height>
+             <width>385</width>
+             <height>0</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>300</width>
+             <width>385</width>
              <height>16777215</height>
             </size>
            </property>
-           <column>
-            <property name="text">
-             <string notr="true">1</string>
-            </property>
-           </column>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::SingleSelection</enum>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectItems</enum>
+           </property>
+           <property name="showGrid">
+            <bool>false</bool>
+           </property>
+           <attribute name="horizontalHeaderVisible">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="horizontalHeaderHighlightSections">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="verticalHeaderVisible">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="verticalHeaderHighlightSections">
+            <bool>false</bool>
+           </attribute>
           </widget>
          </item>
         </layout>
        </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_2">
-         <item>
-          <widget class="QLabel" name="label">
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>20</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>EMU64 MAL ANDERS</string>
-           </property>
-          </widget>
-         </item>
+         <property name="spacing">
+          <number>0</number>
+         </property>
         </layout>
        </item>
       </layout>

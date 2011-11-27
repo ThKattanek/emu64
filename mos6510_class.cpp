@@ -21,8 +21,8 @@
 
 MOS6510::MOS6510(void)
 {
-    ReadProcTbl = NULL;
-    WriteProcTbl = NULL;
+    ReadProcTbl = 0;
+    WriteProcTbl = 0;
 
     MCT = ((unsigned char*)MicroCodeTable6510 + (0x100*MCTItemSize));
     Pointer = 0;
@@ -116,7 +116,7 @@ void MOS6510::ClearJAMFlag(void)
 
 void MOS6510::SetRegister(REG_STRUCT *reg)
 {
-    if(reg == NULL) return;
+    if(reg == 0) return;
 
     unsigned char mask = reg->REG_MASK;
     if((mask&1) == 1)
@@ -143,7 +143,7 @@ bool MOS6510::GetInterrupts(int typ)
 
 void MOS6510::GetRegister(REG_STRUCT *reg)
 {
-    if(reg == NULL) return;
+    if(reg == 0) return;
 
     unsigned char mask = reg->REG_MASK;
     if((mask&1) == 1) reg->PC = PC;
@@ -177,7 +177,7 @@ void MOS6510::GetRegister(REG_STRUCT *reg)
 
 void MOS6510::GetInterneRegister(IREG_STRUCT* ireg)
 {
-    if(ireg == NULL) return;
+    if(ireg == 0) return;
     ireg->AktOpcodePC = AktOpcodePC;
     ireg->AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
     ireg->AktMicroCode = *MCT;

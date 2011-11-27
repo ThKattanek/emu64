@@ -13,7 +13,6 @@
         <file>grafik/toolbar32/hreset.png</file>
         <file>grafik/toolbar32/sreset.png</file>
         <file>grafik/toolbar32/crt.png</file>
-        <file>fonts/emu64.ttf</file>
         <file>grafik/c64-tastatur.png</file>
         <file>grafik/easy_flash_logo.png</file>
         <file>fonts/lucon.ttf</file>
@@ -48,5 +47,6 @@
         <file>grafik/toolbar32/floppy.png</file>
         <file>grafik/export-24x24.png</file>
         <file>grafik/memory-icon.png</file>
+        <file>fonts/emu64.ttf</file>
     </qresource>
 </RCC>

@@ -18,6 +18,8 @@
 
 #define SDL_USE_NIB_FILE 1
 
+#include "QtDebug"
+
 #include "SDL/SDL.h"
 #include "SDL/SDL_framerate.h"
 #include "version.h"
@@ -87,6 +89,11 @@ public:
     unsigned char GetMapReadSource(unsigned char page);
     unsigned char GetMapWriteDestination(unsigned char page);
 
+    int GetJoyAnzahl(void);
+    const char* GetJoyName(int index);
+    void SetJoy(int port, int joy_num);
+    void RemoveJoy(int port);
+
     int             AktWindowXW;
     int             AktWindowYW;
     int             AktWindowColorBits;
@@ -141,6 +148,7 @@ public:
 private:
     void VicRefresh(unsigned char *vic_puffer);
     void CheckKeys(void);
+    void UpdateJoyPorts(void);
     int DisAss(FILE *file, int pc, bool line_draw, int source);
     bool CheckBreakpoints(void);
     void WriteSidIO(unsigned short adresse,unsigned char wert);
@@ -177,6 +185,12 @@ private:
 
     unsigned char   KeyboardMatrixToPB[8];
     unsigned char   KeyboardMatrixToPA[8];
+
+    unsigned char   GamePort1;
+    unsigned char   GamePort2;
+
+    SDL_Joystick* joy[MAX_JOYS];
+    JOY_PREFS joyprefs[MAX_JOYS];
 
     /////////////////////// BREAKPOINTS ////////////////////////
 

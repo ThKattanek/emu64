@@ -130,6 +130,9 @@ MainWindow::MainWindow(QWidget *parent) :
             ini->endGroup();
         }
 
+        /// SETUP Ini laden ///
+        setup_window->LoadINI(c64);
+
         /// CRT Ini erst jetzt laden ///
         crt_window->LoadIni();
     }

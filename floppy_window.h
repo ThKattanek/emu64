@@ -18,9 +18,11 @@
 
 #define FloppyAnzahl 4
 
-#include <QDialog>
+#include <QtGui>
+#include <QtCore>
 #include <QSettings>
 #include "d64_class.h"
+#include "widget_d64_file.h"
 
 namespace Ui {
     class FloppyWindow;
@@ -38,6 +40,7 @@ public:
     void showEvent(QShowEvent *event);
     QString GetAktFilename(int floppynr);
     QString GetAktD64Name(int floppynr);
+    QStringList FileTypes;
 
 signals:
     void ChangeFloppyImage(int floppynr);
@@ -47,15 +50,18 @@ private slots:
     void OnChangeFloppyNummer(int floppynr);
     void OnRemoveImage(int floppynr);
     void on_FloppySelect_currentIndexChanged(int index);
+    void on_D64Table_cellDoubleClicked(int row, int column);
 
 private:
     Ui::FloppyWindow *ui;
+    QFont *c64_font;
     QSettings *ini;
     bool isOneShowed;
     QString AktDir[FloppyAnzahl];
     QString AktFile[FloppyAnzahl];
     QString AktFileName[FloppyAnzahl];
     D64Class d64[FloppyAnzahl];
+    void RefreshD64Table(void);
 };
 
 #endif // FLOPPY_WINDOW_H

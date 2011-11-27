@@ -24,7 +24,7 @@ int SDLThread(void *userdat);
 int SDLThreadLoad(void *userdat);
 
 #define AudioSampleRate 44100
-#define AudioPufferSize 882*2
+#define AudioPufferSize 882*1
 
 C64Class::C64Class(int *ret_error,VideoPalClass *_pal, function<void(unsigned short,unsigned char)>)
 {
@@ -33,10 +33,11 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal, function<void(unsigned sh
     FloppyFoundBreakpoint = false;
 
     for(int i=0; i<10; i++) C64ScreenBack[i] = 0;
+    for(int i=0;i<MAX_JOYS; i++) joy[i] = 0;
 
     /// SDL Installieren ///
 
-    if(SDL_Init(SDL_INIT_EVERYTHING) < 0)
+    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
     {
         *ret_error = -1;
     }
@@ -62,6 +63,11 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal, function<void(unsigned sh
 
     SDL_initFramerate(&fps_manager);
     SDL_setFramerate(&fps_manager,50);
+
+    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+
+    GamePort1 = 0;
+    GamePort2 = 0;
 
     /// Init Classes ///
     mmu = new MMU();
@@ -313,6 +319,7 @@ int SDLThread(void *userdat)
                         c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
                     }
                     break;
+
                 case SDL_KEYDOWN:
                     switch(event.key.keysym.sym)
                     {
@@ -417,6 +424,7 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
         DrawBackPointer = 0;
     }
 
+    UpdateJoyPorts();
 }
 
 void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
@@ -736,10 +744,83 @@ inline void C64Class::CheckKeys(void)
         if(OUT_PB & cbit) IN_PA |= (KeyboardMatrixToPA[i]|KeyboardMatrixToPAExt[i]);
         cbit <<= 1;
     }
-    //CIA1_PA.SetInput(~(IN_PA|GamePortB));
-    //CIA1_PB.SetInput(~(IN_PB|GamePortA));
-    CIA1_PA.SetInput(~(IN_PA));
-    CIA1_PB.SetInput(~(IN_PB));
+    CIA1_PA.SetInput(~(IN_PA|GamePort2));
+    CIA1_PB.SetInput(~(IN_PB|GamePort1));
+}
+
+void C64Class::UpdateJoyPorts()
+{
+    /// Port 1 ///
+    GamePort1 = 0;
+
+    int buttons = 0;
+    for(int i=0;i<16;i++) buttons += SDL_JoystickGetButton(joy[JOY_PORT_1],i);
+    if(buttons > 0) GamePort1 |= 16;
+
+    unsigned char pos = SDL_JoystickGetHat (joy[JOY_PORT_1],0);
+    switch(pos)
+    {
+    case SDL_HAT_UP:
+        GamePort1 |= 1;
+        break;
+    case SDL_HAT_DOWN:
+        GamePort1 |= 2;
+        break;
+    case SDL_HAT_LEFT:
+        GamePort1 |= 4;
+        break;
+    case SDL_HAT_RIGHT:
+        GamePort1 |= 8;
+        break;
+    case SDL_HAT_RIGHTUP:
+        GamePort1 |= 9;
+        break;
+    case SDL_HAT_RIGHTDOWN:
+        GamePort1 |= 10;
+        break;
+    case SDL_HAT_LEFTUP:
+        GamePort1 |= 5;
+        break;
+    case SDL_HAT_LEFTDOWN:
+        GamePort1 |= 6;
+        break;
+    }
+
+    /// Port 2
+    GamePort2 = 0;
+
+    buttons = 0;
+    for(int i=0;i<16;i++) buttons += SDL_JoystickGetButton(joy[JOY_PORT_2],i);
+    if(buttons > 0) GamePort2 |= 16;
+
+    pos = SDL_JoystickGetHat (joy[JOY_PORT_2],0);
+    switch(pos)
+    {
+    case SDL_HAT_UP:
+        GamePort2 |= 1;
+        break;
+    case SDL_HAT_DOWN:
+        GamePort2 |= 2;
+        break;
+    case SDL_HAT_LEFT:
+        GamePort2 |= 4;
+        break;
+    case SDL_HAT_RIGHT:
+        GamePort2 |= 8;
+        break;
+    case SDL_HAT_RIGHTUP:
+        GamePort2 |= 9;
+        break;
+    case SDL_HAT_RIGHTDOWN:
+        GamePort2 |= 10;
+        break;
+    case SDL_HAT_LEFTUP:
+        GamePort2 |= 5;
+        break;
+    case SDL_HAT_LEFTDOWN:
+        GamePort2 |= 6;
+        break;
+    }
 }
 
 void C64Class::ResetC64CycleCounter(void)
@@ -1477,6 +1558,52 @@ unsigned char C64Class::GetMapReadSource(unsigned char page)
 unsigned char C64Class::GetMapWriteDestination(unsigned char page)
 {
     return mmu->GetWriteDestination(page);
+}
+
+int C64Class::GetJoyAnzahl()
+{
+    SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+    return SDL_NumJoysticks();
+}
+
+const char* C64Class::GetJoyName(int index)
+{
+    return SDL_JoystickName(index);
+}
+
+void C64Class::SetJoy(int port, int joy_num)
+{
+    if(port >= MAX_JOYS) return;
+
+    if(joy[port])
+    {
+        SDL_JoystickClose(joy[port]);
+        joy[port] = 0;
+    }
+
+    joy[port] = SDL_JoystickOpen(joy_num);
+    /*
+    if(joy[port])
+    {
+        joyprefs[port].num_axes = SDL_JoystickNumAxes(joy[port]);
+        joyprefs[port].num_balls = SDL_JoystickNumBalls(joy[port]);
+        joyprefs[port].num_buttons = SDL_JoystickNumButtons(joy[port]);
+        joyprefs[port].num_hats = SDL_JoystickNumHats(joy[port]);
+    }
+    */
+}
+
+void C64Class::RemoveJoy(int port)
+{
+    if(port < MAX_JOYS)
+    {
+        if(joy[port])
+        {
+            SDL_JoystickClose(joy[port]);
+            joy[port] = 0;
+        }
+    }
 }
 
 int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)
