@@ -16,7 +16,7 @@
 #include "mos6510_class.h"
 #include "micro_code_tbl_6510.h"
 
-#define CHK_RDY	if(!*RDY){CpuWait=true;MCT--;break;}
+#define CHK_RDY	if(!*RDY && !CpuWait){CpuWait=true;MCT--;IRQCounter++;NMICounter++;break;}
 #define OLD_IRQHandling
 
 MOS6510::MOS6510(void)
@@ -359,6 +359,11 @@ bool MOS6510::OneZyklus(void)
     }
     RESET_OLD = *RESET;
 
+    if(*RDY)
+    {
+
+    }
+
     NMICounter++;
     IRQCounter++;
 
@@ -371,6 +376,7 @@ bool MOS6510::OneZyklus(void)
             if(JAMFlag) return false;
             CHK_RDY
 
+                    /*
             if(isNMI)
             {
                 NMIState = false;
@@ -385,9 +391,9 @@ bool MOS6510::OneZyklus(void)
                 isIRQ = false;
                 return false;
             }
+            */
 
 
-            /*
             if((NMIState == true) && (NMICounter > 2))
             {
                     NMIState = false;
@@ -399,7 +405,7 @@ bool MOS6510::OneZyklus(void)
                             MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
                             return false;
             }
-            */
+
 
             MCT = ((unsigned char*)MicroCodeTable6510 + (Read(PC)*MCTItemSize));
 

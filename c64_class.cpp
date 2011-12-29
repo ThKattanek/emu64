@@ -398,7 +398,7 @@ int SDLThread(void *userdat)
 
                 c64->ViewBackpointer++;
                 if(c64->ViewBackpointer == 10) c64->ViewBackpointer = 0;
-    SDL_framerateDelay(&c64->fps_manager);
+                SDL_framerateDelay(&c64->fps_manager);
                 }
 
             }
@@ -423,7 +423,6 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
     {
         DrawBackPointer = 0;
     }
-
     UpdateJoyPorts();
 }
 
@@ -1600,6 +1599,7 @@ void C64Class::RemoveJoy(int port)
     {
         if(joy[port])
         {
+            //pal->ConvertVid
             SDL_JoystickClose(joy[port]);
             joy[port] = 0;
         }
