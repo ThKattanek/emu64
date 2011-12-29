@@ -73,6 +73,7 @@ public:
     void SetDebugAnimation(bool status);
     void SetDebugAnimationSpeed(int cycle_sek);
     void GetC64CpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg);
+    void GetVicReg(VIC_STRUCT *vic_reg);
 
     int AddBreakGroup(void);
     void DelBreakGroup(int index);

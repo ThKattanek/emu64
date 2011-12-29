@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 02.08.2011		//
+// Letzte Änderung am 29.12.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -22,6 +22,7 @@
 #include "label_widget_mod.h"
 #include "cpu_info.h"
 #include "memory_window.h"
+#include "debugger_vic_window.h"
 
 #define DisAssZeilen 20
 #define HistoryZeilen 7
@@ -79,6 +80,8 @@ private slots:
     void onChangeFloppyStatus(void);
     void on_MemEdit_clicked();
 
+    void on_VIC_clicked();
+
 private:
 
     void UpdateRegister(void);
@@ -96,6 +99,7 @@ private:
     C64Class *c64;
     Ui::DebuggerWindow *ui;
     MemoryWindow *memory_window;
+    DebuggerVicWindow *vic_window;
     QSettings *ini;
     QStringList MicroCodeStringTable6510;
     QStringList RWString;

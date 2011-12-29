@@ -1093,7 +1093,6 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
 
     if(0==strcmp("T64",EXT))
     {
-        int reading_bytes;
         char Kennung[32];
         unsigned short T64Entries;
         unsigned short StartAdresse;
@@ -1106,10 +1105,10 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
                 return 0x01;
         }
 
-        reading_bytes = fread(Kennung,1,32,file);
+        fread(Kennung,1,32,file);
 
         fseek(file,4,SEEK_CUR);
-        reading_bytes = fread(&T64Entries,1,2,file);
+        fread(&T64Entries,1,2,file);
 
         if(T64Entries==0)
         {
@@ -1126,14 +1125,14 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         */
 
         fseek(file,0x42,SEEK_SET);
-        reading_bytes = fread(&StartAdresse,1,2,file);
+        fread(&StartAdresse,1,2,file);
         if(ret_startadresse != 0) *ret_startadresse = StartAdresse;
-        reading_bytes = fread(&EndAdresse,1,2,file);
+        fread(&EndAdresse,1,2,file);
         fseek(file,2,SEEK_CUR);
-        reading_bytes = fread(&FileStartOffset,1,4,file);
+        fread(&FileStartOffset,1,4,file);
 
         fseek(file,FileStartOffset,SEEK_SET);
-        reading_bytes = fread(RAM+StartAdresse,1,EndAdresse-StartAdresse,file);
+        fread(RAM+StartAdresse,1,EndAdresse-StartAdresse,file);
         fclose(file);
 
         RAM[0x2B] = 0x01;
@@ -1266,6 +1265,12 @@ void C64Class::GetC64CpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg)
     ireg->GAME = GAME;
     ireg->EXROM = EXROM;
     cpu->GetRegister(reg);
+}
+
+void C64Class::GetVicReg(VIC_STRUCT *vic_reg)
+{
+    vic->GetRegister(vic_reg);
+    vic_reg->IRQ = cpu->GetInterrupts(VIC_IRQ);
 }
 
 int C64Class::AddBreakGroup(void)

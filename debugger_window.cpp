@@ -32,8 +32,11 @@ DebuggerWindow::DebuggerWindow(QWidget *parent, QSettings *_ini) :
     old_make_idx = 0;
 
     ui->setupUi(this);
+
     memory_window = new MemoryWindow(this);
     memory_window->ChangeSource(0);
+
+    vic_window = new DebuggerVicWindow(this);
 
     NewRefresh = false;
     timer1 = new QTimer(this);
@@ -137,6 +140,9 @@ DebuggerWindow::~DebuggerWindow()
     delete iOn;
     delete timer1;
     delete ui;
+
+    delete memory_window;
+    delete vic_window;
 }
 
 void DebuggerWindow::AnimationRefreshProc()
@@ -170,6 +176,7 @@ void DebuggerWindow::onTimerAnimationRefresh(void)
         UpdateRegister();
         FillHistoryList(ui->HistoryScroll->value());
         memory_window->UpdateMemoryList();
+        vic_window->UpdateOutputList();
     }
 
     if(NewBreakpointfound)
@@ -372,6 +379,7 @@ void DebuggerWindow::SetC64Pointer(C64Class *_c64)
 {
     c64 = _c64;
     memory_window->SetC64Pointer(_c64);
+    vic_window->SetC64Pointer(_c64);
     c64->AnimationRefreshProc = bind(&DebuggerWindow::AnimationRefreshProc,this);
     c64->BreakpointProc = bind(&DebuggerWindow::BreakpointProc,this);
 }
@@ -388,6 +396,7 @@ void DebuggerWindow::hideEvent(QHideEvent*)
     /// HIDE ///
 
     memory_window->hide();
+    vic_window->hide();
 
     c64->SetDebugMode(false);
     c64->SetDebugAnimation(false);
@@ -2309,6 +2318,7 @@ void DebuggerWindow::RefreshGUI(void)
     UpdateRegister();
     FillHistoryList(ui->HistoryScroll->value());
     memory_window->UpdateMemoryList();
+    vic_window->UpdateOutputList();
 
     on_AnimationSpeed_valueChanged(ui->AnimationSpeed->value());
 }
@@ -2321,4 +2331,14 @@ void DebuggerWindow::on_MemEdit_clicked()
         memory_window->UpdateMemoryList();
     }
     else memory_window->hide();
+}
+
+void DebuggerWindow::on_VIC_clicked()
+{
+    if(vic_window->isHidden())
+    {
+        vic_window->show();
+        vic_window->UpdateOutputList();
+    }
+    else vic_window->hide();
 }

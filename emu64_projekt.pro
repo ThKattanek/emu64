@@ -45,7 +45,8 @@ SOURCES += \
     widget_memory_zeile.cpp \
     widget_bit_leiste.cpp \
     setup_window.cpp \
-    widget_d64_file.cpp
+    widget_d64_file.cpp \
+    debugger_vic_window.cpp
 
 HEADERS  += \
     version.h \
@@ -91,7 +92,8 @@ HEADERS  += \
     widget_memory_zeile.h \
     widget_bit_leiste.h \
     setup_window.h \
-    widget_d64_file.h
+    widget_d64_file.h \
+    debugger_vic_window.h
 
 FORMS    += \
     info_window.ui \
@@ -109,7 +111,8 @@ FORMS    += \
     widget_memory_zeile.ui \
     widget_bit_leiste.ui \
     setup_window.ui \
-    widget_d64_file.ui
+    widget_d64_file.ui \
+    debugger_vic_window.ui
 
 RESOURCES += \
     emu64.qrc
@@ -140,6 +143,15 @@ LIBS += -framework cocoa
 
 OTHER_FILES += \
     emu64.rc
+
+
+
+
+
+
+
+
+
 
 
 

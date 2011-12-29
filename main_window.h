@@ -52,13 +52,13 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    Ui::MainWindow *ui;
 
     QTextStream *log;
 
     /// C64 Klasse ///
     C64Class *c64;
     VideoPalClass *videopal;
-    Ui::MainWindow *ui;
 
 private slots:
     void on_menu_main_info_triggered();
