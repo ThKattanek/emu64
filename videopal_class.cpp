@@ -607,7 +607,7 @@ void VideoPalClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
         case 16: /// OK
             for(int y=0;y<OutYW;y++)
             {
-                    Outpuffer16 = (uint16_t*)(Outpuffer + (y*Pitch));
+                    Outpuffer16 = ((uint16_t*)Outpuffer + (y*Pitch));
                     for(int x=0;x<OutXW;x++) *(Outpuffer16++) = Palette16Bit[VideoSource8[x] & 0x0F];
                     VideoSource8 = VideoSource8+InXW;
             }
@@ -615,7 +615,7 @@ void VideoPalClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
         case 32: /// OK
             for(int y=0;y<OutYW;y++)
             {
-                Outpuffer32= (uint32_t*)(Outpuffer + (y*Pitch));
+                Outpuffer32= ((uint32_t*)Outpuffer + (y*Pitch));
                 for(int x=0;x<OutXW;x++) *(Outpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
                 VideoSource8 = VideoSource8+InXW;
             }

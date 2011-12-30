@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 28.08.2011		//
+// Letzte Änderung am 30.12.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -476,7 +476,7 @@ inline void VICII::DrawGraphics(void)
 	
 	if(DisplayStatus)	// Display Mode
 	{
-		if((AktZyklus < 17) || (AktZyklus > 56)) // Außerhalb des Anzeigebereichs (40Zyklen)
+                if((AktZyklus < 17) || (AktZyklus > 56)) // Außerhalb des Anzeigebereichs (40Zyklen)
 		{
 				*VideoPufferLine_XScroll++ = Colors[0];
 				*VideoPufferLine_XScroll++ = Colors[0];
@@ -591,16 +591,19 @@ inline void VICII::DrawGraphics(void)
 	}
 	else	// Idle Mode
 	{
-		if((AktZyklus < 17) || (AktZyklus > 56)) // Außerhalb des Anzeigebereichs (40Zyklen)
+                Colors[0] = B0C;
+                Colors[1] = 0 | 0x80;
+
+                if((AktZyklus < 16) || (AktZyklus > 56)) // Außerhalb des Anzeigebereichs (40Zyklen)
 		{
-				*VideoPufferLine_XScroll++ = Colors[0];
-				*VideoPufferLine_XScroll++ = Colors[0];
-				*VideoPufferLine_XScroll++ = Colors[0];
-				*VideoPufferLine_XScroll++ = Colors[0];
-				*VideoPufferLine_XScroll++ = Colors[0];
-				*VideoPufferLine_XScroll++ = Colors[0];
-				*VideoPufferLine_XScroll++ = Colors[0];
-				*VideoPufferLine_XScroll++ = Colors[0];
+                                *VideoPufferLine_XScroll++ = Colors[0];
+                                *VideoPufferLine_XScroll++ = Colors[0];
+                                *VideoPufferLine_XScroll++ = Colors[0];
+                                *VideoPufferLine_XScroll++ = Colors[0];
+                                *VideoPufferLine_XScroll++ = Colors[0];
+                                *VideoPufferLine_XScroll++ = Colors[0];
+                                *VideoPufferLine_XScroll++ = Colors[0];
+                                *VideoPufferLine_XScroll++ = Colors[0];
 				VideoPufferLine += 8;
 		}
 		else
@@ -609,10 +612,9 @@ inline void VICII::DrawGraphics(void)
 			{
 			case 0:
 				/// Standard Text Modus (ECM/BMM/MCM = 0/0/0) ///
-				Colors[0] = B0C;
-				Colors[1] = 0 | 0x80;
+
 					
-				for(int i=7;i>-1;i--) *VideoPufferLine_XScroll++ = Colors[(GfxData>>(i))&1];
+                                for(int i=7;i>-1;i--) *VideoPufferLine_XScroll++ = Colors[(GfxData>>(i))&1];
 				VideoPufferLine += 8;
 				break;
 			case 1:
@@ -1082,7 +1084,7 @@ void VICII::OneZyklus(void)
 		break;
 
 	case 13:	/// Erste Sichtbarer Zyklus im Emu64 ///
-		DrawGraphics();
+                DrawGraphics();
 
 		FetchIfBadLine();
 		AktXKoordinate = 0xFFFC;

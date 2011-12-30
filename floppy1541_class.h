@@ -147,7 +147,7 @@ private:
     static const int	NUM_TRACKS = 42;
     static const int	GCR_SECTOR_SIZE = 364;  // SYNC Header Gap SYNC Data Gap (should be 5 SYNC bytes each) ///  ALF Sector in Byte
     static const int	GCR_TRACK_SIZE = 7928;  // Each track in gcr_data has 21 sectors
-    int                 AktHalbSpur;		// Aktuelle Halbspur Nummer (2..70)
+    unsigned char       AktHalbSpur;		// Aktuelle Halbspur Nummer (2..70)
     unsigned char *     GCR_PTR;                // Zeiger auf GCR Daten Unter R/W Kopf
     unsigned char *     GCRSpurStart;		// Zeiger auf Start der GCR Daten auf Aktuellen Track
     unsigned char *     GCRSpurEnde;		// Zeiger auf Ende der GCR Daten auf Aktuellen Track
