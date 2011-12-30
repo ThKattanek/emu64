@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 02.08.2011		//
+// Letzte Änderung am 30.12.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -155,7 +155,7 @@ void MOS6502::GetInterneRegister(IREG_STRUCT* ireg)
 {
     if(ireg == 0) return;
     ireg->AktOpcodePC = AktOpcodePC;
-    ireg->AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
+    ireg->AktOpcode = AktOpcode;
     ireg->AktMicroCode = *MCT;
     ireg->JAMFlag = JAMFlag;
     ireg->Pointer = Pointer;
@@ -254,10 +254,11 @@ bool MOS6502::OneZyklus(void)
         Interrupts[VIA1_IRQ] = false;
         Interrupts[VIA2_IRQ] = false;
         SR=0x24;
-        MCT = ((unsigned char*)MicroCodeTable6502 + (0x100*MCTItemSize));
         JAMFlag = false;
         AktOpcodePC = PC;
         PC++;
+        MCT = ((unsigned char*)MicroCodeTable6502 + (0x100*MCTItemSize));
+        AktOpcode = 0x100;
     }
 
     IRQCounter++;
@@ -270,11 +271,13 @@ bool MOS6502::OneZyklus(void)
         if((Interrupts[VIA1_IRQ] || Interrupts[VIA2_IRQ]) && (IRQCounter >= 2) && ((SR&4)==0))
         {
             MCT = ((unsigned char*)MicroCodeTable6502 + (0x101*MCTItemSize));
+            AktOpcode = 0x101;
             return false;
         }
         else
         {
             MCT = ((unsigned char*)MicroCodeTable6502 + (Read(PC)*MCTItemSize));
+            AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
 
             *HistoryPointer = *HistoryPointer+1;
             History[*HistoryPointer] = AktOpcodePC;

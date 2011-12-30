@@ -123,13 +123,13 @@ bool SIDDumpClass::LoadDump(char* filename)
 
     char Kennung[9];
     Kennung[8]=0;
-    int size_read = fread (Kennung,1,8,PlayFile);
+    fread (Kennung,1,8,PlayFile);
     if(0!=strcmp("SID_DUMP",Kennung))
     {
         return false;
     }
 
-    size_read = fread (Dump,1,DumpSize,PlayFile);
+    fread (Dump,1,DumpSize,PlayFile);
 
     fclose(PlayFile);
 

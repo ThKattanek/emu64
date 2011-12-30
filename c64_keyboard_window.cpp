@@ -137,9 +137,6 @@ void C64KeyboardWindow::mouseMoveEvent(QMouseEvent *event)
     int mx = mousePos.x();
     int my = mousePos.y();
 
-    bool found_x = false;
-    bool found_y = false;
-
     for(int i=0;i<7;i++)
     {
         ymin = int(Y_MIN[i] * scaling_y);
@@ -148,7 +145,6 @@ void C64KeyboardWindow::mouseMoveEvent(QMouseEvent *event)
         if(my>=ymin && my<=ymax)
         {
             AKT_Y_KEY = i;
-            found_y = true;
 
             for(int i=0;i<KEYS_Y[AKT_Y_KEY];i++)
             {
@@ -158,7 +154,6 @@ void C64KeyboardWindow::mouseMoveEvent(QMouseEvent *event)
                 if(mx>=xmin && mx<=xmax)
                 {
                     AKT_X_KEY = i;
-                    found_x = true;
                     goto Lend;
                 }
                 else AKT_X_KEY = 0xFF;
@@ -212,7 +207,7 @@ Lend:
 
 void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
 {
-   QPoint mouse_offset = event->pos();
+   //QPoint mouse_offset = event->pos();
 
     if(!Recording)
     {

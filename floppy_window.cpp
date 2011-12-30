@@ -73,7 +73,7 @@ FloppyWindow::~FloppyWindow()
     delete ui;
 }
 
-void FloppyWindow::showEvent(QShowEvent *event)
+void FloppyWindow::showEvent(QShowEvent*)
 {
     isOneShowed = true;
 }

@@ -22,6 +22,8 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
     AktViewAdresse(0),
     NoFocusRun(true)
 {
+    c64 = 0;
+
     ui->setupUi(this);
     ui->MemoryTable->setColumnCount(1);
     ui->MemoryTable->setRowCount(MemZeilenAnz);

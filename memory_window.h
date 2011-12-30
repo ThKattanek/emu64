@@ -42,9 +42,7 @@ private slots:
     void on_MemoryScroll_valueChanged(int value);
     void on_MemoryScroll_sliderPressed();
     void on_MemoryScroll_sliderReleased();
-
     void on_BitAnzeige_clicked(bool checked);
-
     void on_OnlyRam_clicked(bool checked);
 
 signals:

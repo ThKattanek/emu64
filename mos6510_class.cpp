@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 20.07.2011		//
+// Letzte Änderung am 30.12.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -179,7 +179,7 @@ void MOS6510::GetInterneRegister(IREG_STRUCT* ireg)
 {
     if(ireg == 0) return;
     ireg->AktOpcodePC = AktOpcodePC;
-    ireg->AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
+    ireg->AktOpcode = AktOpcode;
     ireg->AktMicroCode = *MCT;
     ireg->CpuWait = CpuWait;
     ireg->JAMFlag = JAMFlag;
@@ -356,6 +356,7 @@ bool MOS6510::OneZyklus(void)
         JAMFlag = false;
         SR = 0x04;
         MCT = ((unsigned char*)MicroCodeTable6510 + (0x100*MCTItemSize));
+        AktOpcode = 0x100;
     }
     RESET_OLD = *RESET;
 
@@ -398,16 +399,19 @@ bool MOS6510::OneZyklus(void)
             {
                     NMIState = false;
                     MCT = ((unsigned char*)MicroCodeTable6510 + (0x102*MCTItemSize));
+                    AktOpcode = 0x102;
                     return false;
             }
             else if((Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]) && (IRQCounter > 2) && ((SR&4)==0))
             {
                             MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
+                            AktOpcode = 0x101;
                             return false;
             }
 
 
             MCT = ((unsigned char*)MicroCodeTable6510 + (Read(PC)*MCTItemSize));
+            AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
 
             *HistoryPointer = *HistoryPointer+1;
             History[*HistoryPointer] = AktOpcodePC;

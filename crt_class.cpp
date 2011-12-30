@@ -89,7 +89,6 @@ unsigned char* CRTClass::GetFlash040Byte(int nr)
 int CRTClass::LoadCRTImage(char* filename)
 {
         FILE *file;
-        int reading_bytes;
         char Kennung[17];
         unsigned short Version;
         unsigned int HeaderLength;
@@ -106,7 +105,7 @@ int CRTClass::LoadCRTImage(char* filename)
                 return 0x01;
         }
 
-        reading_bytes = fread(Kennung,1,16,file);
+        fread(Kennung,1,16,file);
         Kennung[16] = 0;
 
         if(0!=strcmp("C64 CARTRIDGE   ",Kennung))
@@ -115,16 +114,16 @@ int CRTClass::LoadCRTImage(char* filename)
                 return 0x02;
         }
 
-        reading_bytes = fread(&HeaderLength,1,sizeof(HeaderLength),file);
+        fread(&HeaderLength,1,sizeof(HeaderLength),file);
         HeaderLength = conv_dword(HeaderLength);
 
-        reading_bytes = fread(&Version,1,sizeof(Version),file);
+        fread(&Version,1,sizeof(Version),file);
 
-        reading_bytes = fread(&CRTTyp,1,sizeof(CRTTyp),file);
+        fread(&CRTTyp,1,sizeof(CRTTyp),file);
         CRTTyp = CRTTyp<<8 | CRTTyp>>8;
 
-        reading_bytes = fread(&exrom,1,sizeof(exrom),file);
-        reading_bytes = fread(&game,1,sizeof(game),file);
+        fread(&exrom,1,sizeof(exrom),file);
+        fread(&game,1,sizeof(game),file);
 
         if(exrom == 0) CRT_EXROM = false;
         else CRT_EXROM = true;
@@ -150,33 +149,33 @@ L1:
                         //MessageBox(0,"Fehler 128 in CRT Modul","Emu64",0);
                         goto L2;
                 }
-                reading_bytes = fread(&HeaderLength,1,sizeof(HeaderLength),file);
+                fread(&HeaderLength,1,sizeof(HeaderLength),file);
                 HeaderLength = conv_dword(HeaderLength);
                 akt_pos += HeaderLength;
 
                 fseek(file,4,SEEK_CUR);
-                reading_bytes = fread(&chip_adr,1,2,file);
+                fread(&chip_adr,1,2,file);
                 chip_adr = chip_adr<<8 | chip_adr>>8;
-                reading_bytes = fread(&chip_size,1,2,file);
+                fread(&chip_size,1,2,file);
                 chip_size = chip_size<<8 | chip_size>>8;
 
                 switch(chip_adr)
                 {
                 case 0x8000:
-                        reading_bytes = fread(CRT_ROM_BANK1 + Bank1Pos,1,0x2000,file);
+                        fread(CRT_ROM_BANK1 + Bank1Pos,1,0x2000,file);
                         Bank1Pos += 0x2000;
                         if(chip_size == 0x4000)
                         {
-                                reading_bytes = fread(CRT_ROM_BANK2 + Bank2Pos,1,0x2000,file);
+                                fread(CRT_ROM_BANK2 + Bank2Pos,1,0x2000,file);
                                 Bank2Pos += 0x2000;
                         }
                         break;
                 case 0xA000:
-                        reading_bytes = fread(CRT_ROM_BANK2 + Bank2Pos,1,0x2000,file);
+                        fread(CRT_ROM_BANK2 + Bank2Pos,1,0x2000,file);
                         Bank2Pos += 0x2000;
                         break;
                 case 0xE000:
-                                reading_bytes = fread(CRT_ROM_BANK2 + Bank2Pos,1,0x2000,file);
+                                fread(CRT_ROM_BANK2 + Bank2Pos,1,0x2000,file);
                                 Bank2Pos += 0x2000;
                         break;
                 }
@@ -418,7 +417,6 @@ void CRTClass::SetEasyFlashJumper(bool enabled)
 int CRTClass::GetCRTInfo(char* filename,CRT_INFO_STRUCT* crtinfo)
 {
         FILE *File;
-        int reading_bytes;
         char Kennung[17];
         unsigned short Version;
         unsigned int HeaderLength;
@@ -432,7 +430,7 @@ int CRTClass::GetCRTInfo(char* filename,CRT_INFO_STRUCT* crtinfo)
                 return 0x01;
         }
 
-        reading_bytes = fread(Kennung,1,16,File);
+        fread(Kennung,1,16,File);
         Kennung[16] = 0;
 
         if(0!=strcmp("C64 CARTRIDGE   ",Kennung))
@@ -441,23 +439,23 @@ int CRTClass::GetCRTInfo(char* filename,CRT_INFO_STRUCT* crtinfo)
                 return 0x02;
         }
 
-        reading_bytes = fread(&HeaderLength,1,sizeof(HeaderLength),File);
+        fread(&HeaderLength,1,sizeof(HeaderLength),File);
         HeaderLength = conv_dword(HeaderLength);
 
-        reading_bytes = fread(&Version,1,sizeof(Version),File);
+        fread(&Version,1,sizeof(Version),File);
 
         sprintf(crtinfo->Version,"%X.%2.2X",(unsigned char)Version,Version>>8);
 
-        reading_bytes = fread(&crtinfo->HardwareType,1,sizeof(crtinfo->HardwareType),File);
+        fread(&crtinfo->HardwareType,1,sizeof(crtinfo->HardwareType),File);
         crtinfo->HardwareType = crtinfo->HardwareType<<8 | crtinfo->HardwareType>>8;
         if(crtinfo->HardwareType > 32) crtinfo->HardwareTypeString = (char*)TYPE_STRING[33];
         else crtinfo->HardwareTypeString = (char*)TYPE_STRING[crtinfo->HardwareType];
 
-        reading_bytes = fread(&crtinfo->EXROM,1,sizeof(crtinfo->EXROM),File);
-        reading_bytes = fread(&crtinfo->GAME,1,sizeof(crtinfo->GAME),File);
+        fread(&crtinfo->EXROM,1,sizeof(crtinfo->EXROM),File);
+        fread(&crtinfo->GAME,1,sizeof(crtinfo->GAME),File);
 
         fseek(File,0x0020,SEEK_SET);
-        reading_bytes = fread(crtinfo->Name,1,32,File);
+        fread(crtinfo->Name,1,32,File);
 
         akt_pos = 0x40;
         crtinfo->ChipCount = 0;
@@ -468,42 +466,42 @@ L1:
         Kennung[4] = 0;
         if(0==strcmp("CHIP",Kennung))
         {
-                reading_bytes = fread(&HeaderLength,1,sizeof(HeaderLength),File);
+                fread(&HeaderLength,1,sizeof(HeaderLength),File);
                 HeaderLength = conv_dword(HeaderLength);
 
-                reading_bytes = fread(&tmp,1,2,File);
+                fread(&tmp,1,2,File);
                 tmp = tmp<<8 | tmp>>8;
                 crtinfo->ChipInfo[crtinfo->ChipCount].Type = tmp;
-                reading_bytes = fread(&tmp,1,2,File);
+                fread(&tmp,1,2,File);
                 tmp = tmp<<8 | tmp>>8;
                 crtinfo->ChipInfo[crtinfo->ChipCount].BankLocation = tmp;
-                reading_bytes = fread(&tmp,1,2,File);
+                fread(&tmp,1,2,File);
                 tmp = tmp<<8 | tmp>>8;
                 crtinfo->ChipInfo[crtinfo->ChipCount].LoadAdress = tmp;
-                reading_bytes = fread(&tmp,1,2,File);
+                fread(&tmp,1,2,File);
                 tmp = tmp<<8 | tmp>>8;
                 crtinfo->ChipInfo[crtinfo->ChipCount].ChipSize = tmp;
 
                 switch(crtinfo->ChipInfo[crtinfo->ChipCount].LoadAdress)
                 {
                 case 0x8000:
-                        reading_bytes = fread(CRT_ROM_BANK1_TMP + Bank1Pos,1,0x2000,File);
+                        fread(CRT_ROM_BANK1_TMP + Bank1Pos,1,0x2000,File);
                         crtinfo->ChipInfo[crtinfo->ChipCount].BufferPointer = CRT_ROM_BANK1_TMP + Bank1Pos;
                         Bank1Pos += 0x2000;
                         if(tmp == 0x4000)
                         {
-                                reading_bytes = fread(CRT_ROM_BANK1_TMP + Bank1Pos,1,0x2000,File);
+                                fread(CRT_ROM_BANK1_TMP + Bank1Pos,1,0x2000,File);
                                 //crtinfo->ChipInfoHi[crtinfo->ChipCount].BufferPointer = CRT_ROM_BANK2_TMP + Bank2Pos;
                                 Bank1Pos += 0x2000;
                         }
                         break;
                 case 0xA000:
-                        reading_bytes = fread(CRT_ROM_BANK2_TMP + Bank2Pos,1,0x2000,File);
+                        fread(CRT_ROM_BANK2_TMP + Bank2Pos,1,0x2000,File);
                         crtinfo->ChipInfo[crtinfo->ChipCount].BufferPointer = CRT_ROM_BANK2_TMP + Bank2Pos;
                         Bank2Pos += 0x2000;
                         break;
                 case 0xE000:
-                        reading_bytes = fread(CRT_ROM_BANK2_TMP + Bank2Pos,1,0x2000,File);
+                        fread(CRT_ROM_BANK2_TMP + Bank2Pos,1,0x2000,File);
                         crtinfo->ChipInfo[crtinfo->ChipCount].BufferPointer = CRT_ROM_BANK2_TMP + Bank2Pos;
                         Bank2Pos += 0x2000;
                         break;

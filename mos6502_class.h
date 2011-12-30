@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 02.08.2011		//
+// Letzte Änderung am 30.12.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -79,6 +79,7 @@ private:
     unsigned char   Pointer;
     unsigned short  Adresse;
     unsigned short  BranchAdresse;
+    unsigned short  AktOpcode;
     unsigned short  AktOpcodePC;
     bool            JAMFlag;
     unsigned char   TMPByte;
