@@ -469,6 +469,8 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
             cia2->OneZyklus();
             sid1->OneZyklus();
             //sid2->OneZyklus();
+
+            if(EnableExtLines) RDY_BA = ExtRDY;
             cpu->OneZyklus();
 
             if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) if(CheckBreakpoints()) break;
@@ -566,10 +568,13 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                     FloppyIEC = ~FloppyIEC;
 
                     vic->OneZyklus();
+
                     cia1->OneZyklus();
                     cia2->OneZyklus();
                     sid1->OneZyklus();
                     //sid2->OneZyklus();
+
+                    if(EnableExtLines) RDY_BA = ExtRDY;
                     cpu->OneZyklus();
 
                     if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) if(CheckBreakpoints()) break;
@@ -613,6 +618,8 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                 cia2->OneZyklus();
                 sid1->OneZyklus();
                 //sid2->OneZyklus();
+
+                if(EnableExtLines) RDY_BA = ExtRDY;
                 cpu->OneZyklus();
 
                 if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) CheckBreakpoints();
@@ -665,7 +672,11 @@ loop_wait_next_opc:
                     FloppyIEC = ~FloppyIEC;
                     if(!ret)  goto loop_wait_next_opc;
                 }
-                else if(!cpu->OneZyklus()) goto loop_wait_next_opc;
+                else
+                {
+                    if(EnableExtLines) RDY_BA = ExtRDY;
+                    if(!cpu->OneZyklus()) goto loop_wait_next_opc;
+                }
 
                 if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) CheckBreakpoints();
 
@@ -1232,6 +1243,25 @@ void C64Class::SetDebugMode(bool status)
         sid2->SoundOutputEnable = true;
         for(int i=0; i<FloppyAnzahl; i++) floppy[i]->SetEnableFloppySound(true);
     }
+}
+
+void C64Class::SetCpuExtLines(bool status)
+{
+    EnableExtLines = status;
+    if(status)
+    {
+        cpu->ClearInterrupt(CIA_IRQ);
+        cpu->ClearInterrupt(CIA_NMI);
+        cpu->ClearInterrupt(REU_IRQ);
+        cpu->ClearInterrupt(VIC_IRQ);
+        cpu->ClearInterrupt(CRT_NMI);
+    }
+    cpu->EnableExtInterrupts = status;
+}
+
+void C64Class::SetExtRDY(bool status)
+{
+    ExtRDY = status;
 }
 
 void C64Class::OneZyklus(void)

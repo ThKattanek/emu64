@@ -59,9 +59,9 @@ VICII::VICII()
 	MX8 = 0;
 	CTRL1 = 0;
 	CTRL2 = 0;
-    Y_SCROLL = 0;
-    X_SCROLL = 0;
-    VBASE = 0;
+        Y_SCROLL = 0;
+        X_SCROLL = 0;
+        VBASE = 0;
 	IRQ_RASTER = 0;
 	LPX = 0;
 	LPY = 0;
@@ -995,13 +995,13 @@ void VICII::OneZyklus(void)
                 if(!*BA) sZugriff(3);
 		break;
 	
-	case 2:
-			if (VBlanking) 
-			{ 
-				LPTriggered = VBlanking = false;
-				if (IRQ_RASTER == 0) RasterIRQ();
-			}
-			DisplayIfBadLine();
+        case 2:
+                if (VBlanking)
+                {
+                        LPTriggered = VBlanking = false;
+                        if (IRQ_RASTER == 0) RasterIRQ();
+                }
+                DisplayIfBadLine();
 
 		/// Sprite 5 ///
                 if(SpriteDMA & 0x20)  SetBALow();
@@ -1071,6 +1071,7 @@ void VICII::OneZyklus(void)
 
 	case 10:
 		DisplayIfBadLine();
+
 		break;
 
 	case 11:
@@ -1230,7 +1231,7 @@ void VICII::OneZyklus(void)
 	case 58:
 		DrawGraphics();
 		
-
+/*
 		if ((RC == 7) && (BadLineStatus == false)) 
 		{
 			VCBASE = VC;
@@ -1242,7 +1243,7 @@ void VICII::OneZyklus(void)
 		{
 			RC = (RC + 1) & 7;
 		}
-
+*/
 
 		/// Sprite ///
 		// In der ersten Phase von Zyklus 58 wird für jedes Sprite MC mit MCBASE
@@ -1275,7 +1276,7 @@ void VICII::OneZyklus(void)
 	case 60:
 		DrawGraphics();
 
-                /*
+
 		if (RC == 7) 
 		{
 			VCBASE = VC;
@@ -1287,7 +1288,7 @@ void VICII::OneZyklus(void)
 		{
 			RC = (RC + 1) & 7;
 		}
-                */
+
 
 		DrawSprites();
 		DrawBorder();

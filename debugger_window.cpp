@@ -522,12 +522,16 @@ void DebuggerWindow::UpdateRegister()
 
         if(C64CpuIReg.CpuWait) ui->wait_led->setIcon(*iOn);
         else ui->wait_led->setIcon(*iOff);
-        if(C64CpuIReg.IRQ) ui->irq_led->setIcon(*iOn);
-        else ui->irq_led->setIcon(*iOff);
-        if(C64CpuIReg.NMI) ui->nmi_led->setIcon(*iOn);
-        else ui->nmi_led->setIcon(*iOff);
-        if(!C64CpuIReg.BA) ui->ba_led->setIcon(*iOn);
-        else ui->ba_led->setIcon(*iOff);
+
+        if(!ui->man_lines->checkState())
+        {
+            if(C64CpuIReg.IRQ) ui->irq_led->setIcon(*iOn);
+            else ui->irq_led->setIcon(*iOff);
+            if(C64CpuIReg.NMI) ui->nmi_led->setIcon(*iOn);
+            else ui->nmi_led->setIcon(*iOff);
+            if(C64CpuIReg.RDY) ui->rdy_led->setIcon(*iOn);
+            else ui->rdy_led->setIcon(*iOff);
+        }
         if(!C64CpuIReg.RESET) ui->reset_led->setIcon(*iOn);
         else ui->reset_led->setIcon(*iOff);
         if(C64CpuIReg.EXROM) ui->exrom_led->setIcon(*iOn);
@@ -2189,7 +2193,7 @@ void DebuggerWindow::RefreshGUI(void)
         ui->label_exrom->setVisible(false);
         ui->label_game->setVisible(false);
         ui->nmi_led->setVisible(false);
-        ui->ba_led->setVisible(false);
+        ui->rdy_led->setVisible(false);
         ui->exrom_led->setVisible(false);
         ui->game_led->setVisible(false);
 
@@ -2297,7 +2301,7 @@ void DebuggerWindow::RefreshGUI(void)
         ui->label_exrom->setVisible(true);
         ui->label_game->setVisible(true);
         ui->nmi_led->setVisible(true);
-        ui->ba_led->setVisible(true);
+        ui->rdy_led->setVisible(true);
         ui->exrom_led->setVisible(true);
         ui->game_led->setVisible(true);
 
@@ -2341,4 +2345,63 @@ void DebuggerWindow::on_VIC_clicked()
         vic_window->UpdateOutputList();
     }
     else vic_window->hide();
+}
+
+void DebuggerWindow::on_man_lines_clicked(bool checked)
+{
+    c64->SetCpuExtLines(checked);
+
+    if(!checked)
+    {
+        if(C64CpuIReg.IRQ) ui->irq_led->setIcon(*iOn);
+        else ui->irq_led->setIcon(*iOff);
+        if(C64CpuIReg.NMI) ui->nmi_led->setIcon(*iOn);
+        else ui->nmi_led->setIcon(*iOff);
+        if(C64CpuIReg.RDY) ui->rdy_led->setIcon(*iOn);
+        else ui->rdy_led->setIcon(*iOff);
+    }
+    else
+    {
+        ui->rdy_led->setChecked(true);
+        ui->rdy_led->setIcon(*iOn);
+        c64->SetExtRDY(true);
+
+        ui->irq_led->setChecked(false);
+        ui->irq_led->setIcon(*iOff);
+
+        ui->nmi_led->setChecked(false);
+        ui->nmi_led->setIcon(*iOff);
+    }
+}
+
+void DebuggerWindow::on_rdy_led_clicked(bool checked)
+{
+    if(ui->man_lines->checkState())
+    {
+        c64->SetExtRDY(checked);
+        if(checked) ui->rdy_led->setIcon(*iOn);
+        else ui->rdy_led->setIcon(*iOff);
+    }
+}
+
+void DebuggerWindow::on_irq_led_clicked(bool checked)
+{
+    if(ui->man_lines->checkState())
+    {
+        if(checked) c64->cpu->TriggerInterrupt(EXT_IRQ);
+        else c64->cpu->ClearInterrupt(EXT_IRQ);
+        if(checked) ui->irq_led->setIcon(*iOn);
+        else ui->irq_led->setIcon(*iOff);
+    }
+}
+
+void DebuggerWindow::on_nmi_led_clicked(bool checked)
+{
+    if(ui->man_lines->checkState())
+    {
+        if(checked) c64->cpu->TriggerInterrupt(EXT_NMI);
+        else c64->cpu->ClearInterrupt(EXT_NMI);
+        if(checked) ui->nmi_led->setIcon(*iOn);
+        else ui->nmi_led->setIcon(*iOff);
+    }
 }

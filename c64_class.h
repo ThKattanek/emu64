@@ -68,6 +68,8 @@ public:
 
     void ResetC64CycleCounter(void);
     void SetDebugMode(bool status);
+    void SetCpuExtLines(bool status);
+    void SetExtRDY(bool status);
     void OneZyklus(void);
     void OneOpcode(int source);
     void SetDebugAnimation(bool status);
@@ -123,7 +125,7 @@ public:
     CRTClass        *crt;
     Floppy1541      *floppy[FloppyAnzahl];
 
-    bool RESET;             // Reset Leitung -> Für Alle Module mit Reset Eingang
+    bool RESET;     // Reset Leitung -> Für Alle Module mit Reset Eingang
 
     bool            StereoEnable;
     unsigned short  Sid2Adresse;
@@ -171,6 +173,9 @@ private:
     bool RAM_H;             // Leitung Expansionsport --> MMU;
     bool RAM_L;             // Leitung Expansionsport --> MMU;
     MOS6510_PORT CPU_PORT;  // Prozessor Port
+
+    bool EnableExtLines;
+    bool ExtRDY;
 
     unsigned char   C64IEC;     // Leitungen vom C64 zur Floppy Bit 0=ATN 1=CLK 2=DATA
     unsigned char   FloppyIEC;	// Leitungen von Floppy zur c64 Bit 0=ATN 1=CLK 2=DATA

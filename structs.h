@@ -87,7 +87,10 @@ enum
         CIA_NMI,
         REU_IRQ,
         CRT_NMI,
-        CRT_IRQ
+        CRT_IRQ,
+        EXT_IRQ,
+        EXT_NMI,
+        NOP_INT
 };
 
 #define IntQuellenFloppy 2
@@ -178,7 +181,7 @@ struct IREG_STRUCT
     unsigned char   TMPByte;
     bool            IRQ;
     bool            NMI;
-    bool            BA;
+    bool            RDY;
     bool            RESET;
     bool            CpuWait;
     bool            JAMFlag;

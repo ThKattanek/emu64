@@ -1512,7 +1512,7 @@ border-right-color: rgb(255, 255, 255);</string>
      <string notr="true">color: rgb(0, 0, 150);</string>
     </property>
     <property name="text">
-     <string notr="true">BA:</string>
+     <string notr="true">RDY:</string>
     </property>
    </widget>
    <widget class="QPushButton" name="irq_led">
@@ -1527,6 +1527,9 @@ border-right-color: rgb(255, 255, 255);</string>
     <property name="text">
      <string notr="true"/>
     </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QPushButton" name="nmi_led">
     <property name="geometry">
@@ -1540,8 +1543,11 @@ border-right-color: rgb(255, 255, 255);</string>
     <property name="text">
      <string notr="true"/>
     </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
    </widget>
-   <widget class="QPushButton" name="ba_led">
+   <widget class="QPushButton" name="rdy_led">
     <property name="geometry">
      <rect>
       <x>42</x>
@@ -1553,12 +1559,15 @@ border-right-color: rgb(255, 255, 255);</string>
     <property name="text">
      <string notr="true"/>
     </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QLabel" name="label_reset">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>21</y>
+      <x>76</x>
+      <y>22</y>
       <width>43</width>
       <height>16</height>
      </rect>
@@ -1632,7 +1641,7 @@ border-right-color: rgb(255, 255, 255);</string>
    <widget class="QPushButton" name="reset_led">
     <property name="geometry">
      <rect>
-      <x>119</x>
+      <x>125</x>
       <y>22</y>
       <width>12</width>
       <height>12</height>
@@ -1671,14 +1680,33 @@ border-right-color: rgb(255, 255, 255);</string>
    <widget class="QPushButton" name="IEC">
     <property name="geometry">
      <rect>
-      <x>68</x>
-      <y>40</y>
-      <width>65</width>
+      <x>80</x>
+      <y>45</y>
+      <width>56</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>IEC BUS</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="man_lines">
+    <property name="geometry">
+     <rect>
+      <x>37</x>
+      <y>3</y>
+      <width>21</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Ist hier ein Haken gesetzt, so werden alle 3 Leitungen
+IRQ;NMI;RDY zu den Customchips getrennt. So hat man die
+möglichkeit die Leitungen manuell zu setzen. Dies dient nur zu
+Testzwecken.</string>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>

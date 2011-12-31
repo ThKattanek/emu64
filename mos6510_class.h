@@ -51,6 +51,8 @@ public:
     bool *RESET;
     bool WRITE_FF00;
 
+    bool EnableExtInterrupts;
+
     bool *ResetReady;	// Wird bei einem Reset False und beim erreichen einer
 						// Adresse wird es True
     unsigned short ResetReadyAdr;
@@ -93,6 +95,8 @@ private:
     int             NMICounter;
     bool            Interrupts[IntQuellenC64];
     bool            NMIState;
+    bool            isIRQ;
+    bool            isNMI;
 };
 
 #define SetAdresseLo(wert) Adresse = ((Adresse&0xFF00)|wert)
@@ -114,7 +118,7 @@ public:
     ~MOS6510_PORT(void);
     void Reset(void);
     void ConfigChanged(int tape_sense, int caps_sense,unsigned char pullup);
-    //bool SaveFreez(FILE* File);
+    //bool SaveFreez(FILE               //IRQCounter = 0;* File);
     //bool LoadFreez(FILE* File,unsigned short Version);
 
     /// Variablen ///
