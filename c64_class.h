@@ -109,9 +109,9 @@ public:
 
     FPSmanager      fps_manager;
     SDL_Surface     *C64Screen;
-    SDL_Surface     *C64ScreenBack[10];
-    int             DrawBackPointer;
-    int             ViewBackpointer;
+    SDL_Surface     *C64ScreenBack;
+    bool            DrawScreenBack;
+
     SDL_Thread      *sdl_thread;
     bool            sdl_thread_pause;
     bool            sdl_thread_is_paused;

@@ -16,7 +16,7 @@
 #include "c64_class.h"
 #include "c64_keys.h"
 
-#define floppy_asyncron                  // Schaltet die Floppy Asyncron
+//#define floppy_asyncron                  // Schaltet die Floppy Asyncron
 #define more_one_floppy_cylce_count 67   // alle "more_one_floppy_cycle_counts" wird 1 FloppyZyklus doppelt ausgeführt
 
 void AudioMix(void *nichtVerwendet, Uint8 *stream, int laenge);
@@ -33,7 +33,9 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal, function<void(unsigned sh
     FloppyFoundBreakpoint = false;
     EnableExtLines = false;
 
-    for(int i=0; i<10; i++) C64ScreenBack[i] = 0;
+    C64ScreenBack = 0;
+    DrawScreenBack = false;
+
     for(int i=0;i<MAX_JOYS; i++) joy[i] = 0;
 
     /// SDL Installieren ///
@@ -66,8 +68,6 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal, function<void(unsigned sh
     SDL_setFramerate(&fps_manager,50);
 
     SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-
-
 
     GamePort1 = 0;
     GamePort2 = 0;
@@ -393,18 +393,20 @@ int SDLThread(void *userdat)
             }
             if(!c64->LoopThreadEnd)
             {
-                SDL_Rect rec_src = {0,0,c64->AktC64ScreenXW,c64->AktC64ScreenYW};
-                SDL_Rect rec_dst = {0,0,c64->C64Screen->w,c64->C64Screen->h};
-                if(c64->ViewBackpointer != c64->DrawBackPointer)
+                if(c64->DrawScreenBack)
                 {
-                SDL_SoftStretch(c64->C64ScreenBack[c64->ViewBackpointer],&rec_src,c64->C64Screen,&rec_dst);
-                SDL_Flip(c64->C64Screen);
+                    SDL_Rect rec_src = {0,0,c64->AktC64ScreenXW,c64->AktC64ScreenYW};
+                    SDL_Rect rec_dst = {0,0,c64->C64Screen->w,c64->C64Screen->h};
 
-                c64->ViewBackpointer++;
-                if(c64->ViewBackpointer == 10) c64->ViewBackpointer = 0;
-                SDL_framerateDelay(&c64->fps_manager);
+                    SDL_SoftStretch(c64->C64ScreenBack,&rec_src,c64->C64Screen,&rec_dst);
+                    SDL_Flip(c64->C64Screen);
+
+                    SDL_framerateDelay(&c64->fps_manager);
+
+                    c64->DrawScreenBack = false;
+
                 }
-
+                else SDL_Delay(1);
             }
         }else
         {
@@ -419,14 +421,14 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
 {
     if((pal == 0) || (sdl_thread_pause == true)) return;
 
-    SDL_LockSurface(C64ScreenBack[DrawBackPointer]);
-    pal->ConvertVideo((void*)C64ScreenBack[DrawBackPointer]->pixels,C64ScreenBack[DrawBackPointer]->pitch,vic_puffer,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
-    SDL_UnlockSurface(C64ScreenBack[DrawBackPointer]);
-    DrawBackPointer++;
-    if(DrawBackPointer == 10)
-    {
-        DrawBackPointer = 0;
-    }
+    if(DrawScreenBack) SDL_Delay(2);
+
+    SDL_LockSurface(C64ScreenBack);
+    pal->ConvertVideo((void*)C64ScreenBack->pixels,C64ScreenBack->pitch,vic_puffer,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
+    SDL_UnlockSurface(C64ScreenBack);
+
+    DrawScreenBack = true;
+
     UpdateJoyPorts();
 }
 
@@ -929,16 +931,10 @@ void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool enable_pal, in
 
     C64Screen = SDL_SetVideoMode(AktWindowXW,AktWindowYW,AktWindowColorBits,SDL_VIDEORESIZE | SDL_HWSURFACE | SDL_DOUBLEBUF);
 
-    for(int i=0; i<10; i++)
-    {
-        if(C64ScreenBack[i] != 0) delete C64ScreenBack[i];
-        C64ScreenBack[i] = SDL_CreateRGBSurface(0,AktWindowXW,AktWindowYW,AktWindowColorBits,0,0,0,0);
-    }
+    if(C64ScreenBack != 0) delete C64ScreenBack;
+    C64ScreenBack = SDL_CreateRGBSurface(0,AktWindowXW,AktWindowYW,AktWindowColorBits,0,0,0,0);
 
-    DrawBackPointer = 0;
-    ViewBackpointer = 0;
-
-    pal->SetPixelFormat(C64ScreenBack[0]->format);
+    pal->SetPixelFormat(C64ScreenBack->format);
 
     SDLThreadPauseEnd();
 }
