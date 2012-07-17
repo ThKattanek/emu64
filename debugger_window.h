@@ -80,13 +80,9 @@ private slots:
     void onChangeFloppyStatus(void);
     void on_MemEdit_clicked();
     void on_VIC_clicked();
-
     void on_man_lines_clicked(bool checked);
-
     void on_rdy_led_clicked(bool checked);
-
     void on_irq_led_clicked(bool checked);
-
     void on_nmi_led_clicked(bool checked);
 
 private:

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>171</width>
-    <height>510</height>
+    <height>360</height>
    </rect>
   </property>
   <property name="font">
@@ -39,6 +39,12 @@
          <pointsize>7</pointsize>
         </font>
        </property>
+       <property name="showDropIndicator" stdset="0">
+        <bool>true</bool>
+       </property>
+       <attribute name="headerVisible">
+        <bool>false</bool>
+       </attribute>
       </widget>
      </item>
      <item>
@@ -49,20 +55,27 @@
          <pointsize>7</pointsize>
         </font>
        </property>
-       <property name="frameShape">
-        <enum>QFrame::VLine</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
        <property name="autoScroll">
         <bool>true</bool>
        </property>
-       <property name="layoutMode">
-        <enum>QListView::SinglePass</enum>
+       <property name="spacing">
+        <number>2</number>
        </property>
-       <property name="viewMode">
-        <enum>QListView::ListMode</enum>
+      </widget>
+     </item>
+     <item>
+      <widget class="QListWidget" name="listWidget_zip">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>100</height>
+        </size>
        </property>
       </widget>
      </item>

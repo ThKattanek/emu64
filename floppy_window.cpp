@@ -33,6 +33,7 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini) :
     c64_font = new QFont("Emu64 D64 Directory",16);
 
     connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(OnSelectFile(QString)));
+    ui->FileBrowser->SetFileFilter(QStringList()<<"*.d64"<<"*.g64");
 
     ui->D64Table->setRowCount(MAX_D64_FILES);
     ui->D64Table->setColumnCount(1);
@@ -123,9 +124,12 @@ void FloppyWindow::OnSelectFile(QString filename)
         AktFileName[FloppyNr] = filename;
         AktDir[FloppyNr] = ui->FileBrowser->GetAktDir();
         AktFile[FloppyNr] = ui->FileBrowser->GetAktFile();
-        d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toAscii().data());
-        RefreshD64Table();
-        emit ChangeFloppyImage(FloppyNr);
+        if("D64" == AktFileName[FloppyNr].right(3).toUpper())
+        {
+            d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toAscii().data());
+            RefreshD64Table();
+            emit ChangeFloppyImage(FloppyNr);
+        }
     }
 }
 

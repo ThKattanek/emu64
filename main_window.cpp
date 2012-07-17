@@ -66,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent) :
     /// C64 Klasse Installieren ... Das HERZ ///
     int ret_error;
     c64 = new C64Class(&ret_error,videopal,0);
-    if(ret_error != 0) ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim installieren der C64 Klasse"))
+    if(ret_error != 0) ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim installieren der C64 Klasse"))       
 
     /// Debugger Window mit C64 verbinden ///
     debugger_window->SetC64Pointer(c64);
@@ -74,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent) :
     /// CRT Klasse mit CRT Window verbinden ///
     crt_window->crt = c64->crt;
     crt_window->c64 = c64;
+    c64->crt->ChangeLED = bind(&CrtWindow::ChangeLED,crt_window,_1,_2);
 
     /// C64 Systemroms laden ///
     if(!c64->LoadC64Roms((char*)"roms/kernal.rom",(char*)"roms/basic.rom",(char*)"roms/char.rom"))

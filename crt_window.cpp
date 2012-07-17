@@ -25,6 +25,16 @@ CrtWindow::CrtWindow(QWidget *parent, QSettings *_ini) :
 
     ui->setupUi(this);
 
+    LedRedOff = new QIcon(":/grafik/RedLED_Off.png");
+    LedRedOn = new QIcon(":/grafik/RedLED_On.png");
+    ui->FC3_LED->setIcon(*LedRedOff);
+    ui->EF_LED->setIcon(*LedRedOff);
+
+    ui->PageEasyFlash->setEnabled(false);
+    ui->PageFC->setEnabled(false);
+
+    ui->MoreCRTPage->setMinimumWidth(0);
+
     QFontDatabase fontDB;
     fontDB.addApplicationFont(":/fonts/lucon.ttf");
     QFont font("Lucida Console",8);
@@ -32,11 +42,13 @@ CrtWindow::CrtWindow(QWidget *parent, QSettings *_ini) :
     connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(onSelectFile(QString)));
     connect(ui->ChipList->selectionModel(),SIGNAL(currentChanged(QModelIndex,QModelIndex)),this,SLOT(onChipList_currentChanged(QModelIndex,QModelIndex)));
 
-    ui->FileBrowser->SetFileFilter(QStringList()<<"*.crt"<<"*.zip");
+    ui->FileBrowser->SetFileFilter(QStringList()<<"*.crt");
 
     isOneShowed = false;
     ChipDataExpand = false;
     CRTIsSelected = false;
+    win_exp = false;
+    insterted_hwtyp = 0;
 
     ui->CRTInfo->setColumnWidth(0,80);
 
@@ -54,6 +66,11 @@ CrtWindow::CrtWindow(QWidget *parent, QSettings *_ini) :
 
 CrtWindow::~CrtWindow()
 {
+    if(win_exp)
+    {
+        this->setMinimumWidth(this->minimumWidth()-200);
+        this->resize(this->width()-200,this->height());
+    }
     ////////// Save to INI ///////////
     if(ini != 0)
     {
@@ -193,9 +210,41 @@ void CrtWindow::onSelectFile(QString filename)
 
             ui->ChipList->addTopLevelItem(item);
         }
-    {
         ui->ChipList->setCurrentIndex(ui->ChipList->model()->index(0,0,QModelIndex()));
-    }
+
+        switch(crt_info.HardwareType)
+        {
+        case 3: // FC_III
+            if(!win_exp)
+            {
+                this->resize(this->width()+200,this->height());
+                this->setMinimumWidth(this->minimumWidth()+200);
+            }
+            ui->MoreCRTPage->setMinimumWidth(200);
+            ui->MoreCRTPage->setCurrentIndex(1);
+            win_exp = true;
+            break;
+        case 32: // EasyFlash
+            if(!win_exp)
+            {
+                this->resize(this->width()+200,this->height());
+                this->setMinimumWidth(this->minimumWidth()+200);
+            }
+            ui->MoreCRTPage->setMinimumWidth(200);
+            ui->MoreCRTPage->setCurrentIndex(0);
+            win_exp = true;
+            break;
+        default:
+            if(win_exp)
+            {
+                this->setMinimumWidth(this->minimumWidth()-200);
+                this->resize(this->width()-200,this->height());
+            }
+            ui->MoreCRTPage->setMinimumWidth(0);
+            win_exp = false;
+            break;
+        }
+
         break;
     case 1:
         CRTIsSelected = false;
@@ -247,11 +296,53 @@ void CrtWindow::on_InsertCRT_clicked()
 {
     if(CRTIsSelected)
     {
-        c64->LoadCRT(SelCRTFileName.toAscii().data());
+        if(0 == c64->LoadCRT(SelCRTFileName.toAscii().data()))
+        {
+            ui->PageFC->setEnabled(false);
+            ui->PageEasyFlash->setEnabled(false);
+            insterted_hwtyp = crt_info.HardwareType;
+            switch(insterted_hwtyp)
+            {
+            case 3:
+                ui->PageFC->setEnabled(true);
+                break;
+            case 32:
+                ui->PageEasyFlash->setEnabled(true);
+                break;
+            }
+        }
+        else QMessageBox::warning(this,tr("CRT Fehler"),tr("Fehler beim Laden des ausgewählten CRT Files"));
     }
 }
 
 void CrtWindow::on_RemoveCRT_clicked()
 {
+    ui->PageFC->setEnabled(false);
+    ui->PageEasyFlash->setEnabled(false);
     c64->RemoveCRT();
+}
+
+void CrtWindow::ChangeLED(int LedNr, bool LedStatus)
+{
+    switch(LedNr)
+    {
+    case 0: /// FC3
+        if(LedStatus) ui->FC3_LED->setIcon(*LedRedOn);
+        else ui->FC3_LED->setIcon(*LedRedOff);
+        break;
+    case 1: /// EF
+        if(LedStatus) ui->EF_LED->setIcon(*LedRedOn);
+        else ui->EF_LED->setIcon(*LedRedOff);
+        break;
+    }
+}
+
+void CrtWindow::on_FreezButtonFC3_clicked()
+{
+    crt->Freeze();
+}
+
+void CrtWindow::on_EF_JUMPER0_toggled(bool checked)
+{
+    crt->SetEasyFlashJumper(!checked);
 }

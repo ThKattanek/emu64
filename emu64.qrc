@@ -48,5 +48,8 @@
         <file>grafik/export-24x24.png</file>
         <file>grafik/memory-icon.png</file>
         <file>fonts/emu64.ttf</file>
+        <file>grafik/fc3_logo.png</file>
+        <file>grafik/red-off-20.png</file>
+        <file>grafik/red-on-20.png</file>
     </qresource>
 </RCC>

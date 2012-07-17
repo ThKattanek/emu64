@@ -40,6 +40,9 @@ using namespace std::tr1::placeholders;
 #define FloppyAnzahl 4
 #define MAX_BREAK_GROUPS 255
 
+#define SDL_ALPHA_OPAQUE 255
+#define SDL_ALPHA_TRANSPARENT 0
+
 class C64Class
 {
 

@@ -67,7 +67,8 @@ void MOS6510::TriggerInterrupt(int typ)
     }
 
     /////////////// Wird von EnableExtInterrups nicht beeinflusst /////////////////
-
+    //// V5.00 ////
+    /*
     if(*RDY)
     {
         if((typ == CIA_IRQ) || (typ == VIC_IRQ) || (typ == REU_IRQ))
@@ -111,6 +112,45 @@ void MOS6510::TriggerInterrupt(int typ)
             }
         }
         Interrupts[typ] = true;
+    }
+    */
+
+    /// V4.40 ///
+    switch (typ)
+    {
+    case CIA_IRQ:
+            if (!(Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]))
+            {
+                    IRQCounter = 0;
+            }
+            Interrupts[CIA_IRQ] = true;
+            break;
+    case CIA_NMI:
+            if(Interrupts[CIA_NMI] == true) return;
+            Interrupts[CIA_NMI] = true;
+            NMICounter = 0;
+            if(Interrupts[CRT_NMI] == false) NMIState = true;
+            break;
+    case VIC_IRQ:
+            if (!(Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]))
+            {
+                    IRQCounter = 0;
+            }
+            Interrupts[VIC_IRQ] = true;
+            break;
+    case REU_IRQ:
+            if (!(Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]))
+            {
+                    IRQCounter = 0;
+            }
+            Interrupts[REU_IRQ] = true;
+            break;
+    case CRT_NMI:
+            if(Interrupts[CRT_NMI] == true) return;
+            Interrupts[CRT_NMI] = true;
+            NMICounter = 0;
+            if(Interrupts[CIA_NMI] == false) NMIState = true;
+            break;
     }
 }
 
@@ -132,6 +172,8 @@ void MOS6510::ClearInterrupt(int typ)
         }
     }
 
+    /// V5.00 ///
+    /*
     if(*RDY)
     {
         Interrupts[typ] = false;
@@ -161,6 +203,28 @@ void MOS6510::ClearInterrupt(int typ)
            isNMI = false;
            NMIState = false;
         }
+    }
+    */
+    /// V4.40 ///
+    switch (typ)
+    {
+    case CIA_IRQ:
+            Interrupts[CIA_IRQ] = false;
+            break;
+    case CIA_NMI:
+            Interrupts[CIA_NMI] = false;
+            if(Interrupts[CRT_NMI] == false) NMIState = false;
+            break;
+    case VIC_IRQ:
+            Interrupts[VIC_IRQ] = false;
+            break;
+    case REU_IRQ:
+            Interrupts[REU_IRQ] = false;
+            break;
+    case CRT_NMI:
+            Interrupts[CRT_NMI] = false;
+            if(Interrupts[CIA_NMI] == false) NMIState = false;
+            break;
     }
 }
 
@@ -382,7 +446,8 @@ bool MOS6510::OneZyklus(void)
 {
     static bool RESET_OLD = false;
     static unsigned char   idxReg = 0;
-    static bool RDY_OLD = false;
+    //static bool RDY_OLD = false;
+    static bool LastOPC_CLI = false;
 
     unsigned int    tmp;
     unsigned int    tmp1;
@@ -390,6 +455,8 @@ bool MOS6510::OneZyklus(void)
     unsigned short  src;
     bool            carry_tmp;
 
+    /// V5.00 ///
+    /*
     if((RDY_OLD == false)  && (*RDY == true))
     {
         if(isIRQ)
@@ -412,6 +479,9 @@ bool MOS6510::OneZyklus(void)
         NMICounter++;
         IRQCounter++;
     }
+    */
+    /// V4.40 ///
+    if(*RDY) CpuWait = false;
 
     if(!*RESET)
     {
@@ -434,6 +504,10 @@ bool MOS6510::OneZyklus(void)
     }
     RESET_OLD = *RESET;
 
+    /// V4.40 ///
+    NMICounter++;
+    IRQCounter++;
+
     if(!CpuWait)
     {
         switch(*MCT)
@@ -443,17 +517,40 @@ bool MOS6510::OneZyklus(void)
             if(JAMFlag) return false;
             CHK_RDY
 
-            if((isNMI == true) && (NMIState == true) && (NMICounter > 2))
+            /// V5.00 ///
+            /*
+            if((isNMI == true) && (NMIState == true) && (NMICounter > 1))
             {
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x102*MCTItemSize));
                 AktOpcode = 0x102;
                 NMIState = false;
                 return false;
             }
-            else if((isIRQ == true) && ((SR&4)==0) && (IRQCounter > 2))
+            else if((isIRQ == true) && ((SR&4)==0) && (IRQCounter > 1) && (LastOPC_CLI == false))
             {
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
                 AktOpcode = 0x101;
+                return false;
+            }
+
+            if(LastOPC_CLI)
+            {
+                LastOPC_CLI = false;
+            }
+            */
+            /// V4.40 ///
+            if(isNMI)
+            {
+                NMIState = false;
+                MCT = ((unsigned char*)MicroCodeTable6510 + (0x102*MCTItemSize));
+                isNMI = false;
+                return false;
+            }
+
+            if(isIRQ)
+            {
+                MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
+                isIRQ = false;
                 return false;
             }
 
@@ -1075,6 +1172,7 @@ bool MOS6510::OneZyklus(void)
                 CHK_RDY
                 TMPByte = Read(PC);
                 SR &= 0xFB;
+                LastOPC_CLI = true;
                 break;
         //R // TMPByte von Adresse lesen // OverflowFalg=0
         case 72:
@@ -1668,6 +1766,17 @@ bool MOS6510::OneZyklus(void)
 
         if(*MCT == 0)
         {
+                if((NMIState == true) && (NMICounter > 1))
+                {
+                    isNMI = true;
+                    return false;
+                }
+                else if((Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]) && (IRQCounter > 1) && ((SR&4)==0))
+                {
+                    isIRQ = true;
+                    return false;
+                }
+
                 AktOpcodePC = PC;
                 if(Breakpoints[PC] & 1)
                 {

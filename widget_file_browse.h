@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 20.07.2011		//
+// Letzte Änderung am 17.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -18,6 +18,8 @@
 
 #include <QtGui>
 #include <QtCore>
+#include "quazip/quazip.h"
+#include "quazip/quazipfile.h"
 
 namespace Ui {
     class WidgetFileBrowse;
@@ -39,11 +41,13 @@ public:
 private slots:
     void on_treeView_dir_clicked(QModelIndex index);
     void onlistView_files_currentChanged(const QModelIndex &current, const QModelIndex &previous);
+    void on_listWidget_zip_itemSelectionChanged();
 
 private:
     Ui::WidgetFileBrowse *ui;
     QFileSystemModel *dirmodel;
     QFileSystemModel *filemodel;
+    QStringList ZIPExt;
 
 signals:
     void select_file(QString filename);

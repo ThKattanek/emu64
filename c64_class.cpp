@@ -31,6 +31,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal, function<void(unsigned sh
     pal = _pal;
     BreakGroupAnz = 0;
     FloppyFoundBreakpoint = false;
+    EnableExtLines = false;
 
     for(int i=0; i<10; i++) C64ScreenBack[i] = 0;
     for(int i=0;i<MAX_JOYS; i++) joy[i] = 0;
@@ -65,6 +66,8 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal, function<void(unsigned sh
     SDL_setFramerate(&fps_manager,50);
 
     SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+
+
 
     GamePort1 = 0;
     GamePort2 = 0;
@@ -164,6 +167,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal, function<void(unsigned sh
     cpu->RESET = &RESET;
     cpu->ResetReady = &C64ResetReady;
     cpu->ResetReadyAdr = 0xE5CD;
+    cpu->EnableExtInterrupts = EnableExtLines;
     cia1->RESET = &RESET;
     cia1->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
     cia1->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
@@ -923,7 +927,7 @@ void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool enable_pal, in
     pal->EnablePALOutput(enable_pal);
     pal->EnableVideoDoubleSize(doublesize);
 
-    C64Screen = SDL_SetVideoMode(AktWindowXW,AktWindowYW,AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+    C64Screen = SDL_SetVideoMode(AktWindowXW,AktWindowYW,AktWindowColorBits,SDL_VIDEORESIZE | SDL_HWSURFACE | SDL_DOUBLEBUF);
 
     for(int i=0; i<10; i++)
     {

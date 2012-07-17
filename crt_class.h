@@ -56,6 +56,7 @@ public:
     function<void(void)> ChangeMemMapProc;
     function<void(int)> CpuTriggerInterrupt;
     function<void(int)> CpuClearInterrupt;
+    function<void(int,bool)> ChangeLED;
 
     // Variablen
     bool            *EXROM;
@@ -72,7 +73,10 @@ public:
 
     unsigned char   *RAM_C64;	// Kompletter C64 RAM
 
-    bool            LED_00;
+    bool            LED_00;             // LED FCIII
+    bool            LED_00_OLD;
+    bool            LED_01;             // LED EF
+    bool            LED_01_OLD;
 
     private:
     // Variablen
@@ -94,6 +98,9 @@ public:
 
     //// Action Replay 4 ////
     bool            ActionReplayAktiv;
+
+private:
+    void ResetAllLEDS(void);
 };
 
 #endif // CRT_CLASS_H

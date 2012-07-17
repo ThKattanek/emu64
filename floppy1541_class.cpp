@@ -16,10 +16,12 @@
 #include "floppy1541_class.h"
 
 Floppy1541::Floppy1541(bool *reset, int samplerate,int puffersize, bool *floppy_found_breakpoint):
-    FloppyEnabled(false),
-    BreakGroupAnz(0)
+    FloppyEnabled(false)
+
 {
     RESET = reset;
+    GCR_PTR = 0;
+    BreakGroupAnz = 0;
 
     CycleCounter = 0;
 
@@ -134,7 +136,7 @@ void Floppy1541::SetEnableFloppy(bool status)
 
         AktHalbSpur = -1; //1
         GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
-        GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
+        GCRSpurEnde = GCRSpurStart + TrackSize[(int)AktHalbSpur];
     }
     else
     {
@@ -819,8 +821,10 @@ bool Floppy1541::SyncFound(void)
     {
 L1:
         GCR_PTR++;
+        if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
         if(*GCR_PTR == 0xFF) goto L1;
         GCR_PTR--;
+        if(GCR_PTR < GCRSpurStart) GCR_PTR = GCRSpurEnde;
         return true;
     }
     else

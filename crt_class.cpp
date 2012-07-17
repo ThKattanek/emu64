@@ -39,10 +39,20 @@ CRTClass::CRTClass()
     EasyFlashJumper = false;	// false = Boot
     am29f040Lo = new AM29F040Class(CRT_ROM_BANK1,1);
     am29f040Hi = new AM29F040Class(CRT_ROM_BANK2,1);
+
+    ChangeLED = 0;
+    ResetAllLEDS();
 }
 
 CRTClass::~CRTClass()
 {
+}
+
+void CRTClass::ResetAllLEDS(void)
+{
+    LED_00=LED_00_OLD=LED_01=LED_01_OLD=false;
+    if(ChangeLED != 0) ChangeLED(0,LED_00);
+    if(ChangeLED != 0) ChangeLED(1,LED_01);
 }
 
 inline unsigned long CRTClass::conv_dword(unsigned long wert)
@@ -189,6 +199,7 @@ L2:
         ROM_HI = CRT_ROM_BANK2;
 
         CRTInsert = true;
+        ResetAllLEDS();
 
         Reset();
 
@@ -200,6 +211,7 @@ void CRTClass::RemoveCRTImage()
         CRTInsert = false;
         *GAME = true;
         *EXROM = true;
+        ResetAllLEDS();
 }
 
 int CRTClass::NewEasyFlashImage(char* filename,char* crt_name)
@@ -562,7 +574,6 @@ void CRTClass::Freeze(void)
                 /// Final Cartridge III
                 case 3:
                         WriteIO2(0xDFFF,16);
-                        //CpuTriggerInterrupt(CRT_NMI);
                         break;
         }
 }
@@ -668,7 +679,9 @@ void CRTClass::WriteIO1(unsigned short adresse,unsigned char wert)
                 }
                 if(adresse == 0xDE02)
                 {
-                        LED_00 = !!(wert & 0x80);
+                        LED_01 = !!(wert & 0x80);
+                        if(LED_01 != LED_01_OLD) if(ChangeLED != 0) ChangeLED(1,LED_01);
+                        LED_01_OLD = LED_01;
                         *EXROM = !!(~wert & 0x02);
 
                         if(wert & 0x04) *GAME = !!(~wert & 0x01);
@@ -724,6 +737,8 @@ void CRTClass::WriteIO2(unsigned short adresse,unsigned char wert)
                         if((wert & 0x30) == 0x10) CpuTriggerInterrupt(CRT_NMI);
                         if(wert & 0x40) CpuClearInterrupt(CRT_NMI);
                         LED_00 = (~wert>>7) & 1;
+                        if(LED_00 != LED_00_OLD) if(ChangeLED != 0)  ChangeLED(0,LED_00);
+                        LED_00_OLD = LED_00;
                 }
                 break;
         case 8:		// Super Games

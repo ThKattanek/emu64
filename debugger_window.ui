@@ -1443,7 +1443,7 @@ border-right-color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="label_irq_2">
     <property name="geometry">
      <rect>
-      <x>14</x>
+      <x>37</x>
       <y>21</y>
       <width>29</width>
       <height>16</height>
@@ -1468,7 +1468,7 @@ border-right-color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="label_nmi_2">
     <property name="geometry">
      <rect>
-      <x>14</x>
+      <x>37</x>
       <y>35</y>
       <width>29</width>
       <height>16</height>
@@ -1493,7 +1493,7 @@ border-right-color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="label_ba">
     <property name="geometry">
      <rect>
-      <x>14</x>
+      <x>37</x>
       <y>49</y>
       <width>29</width>
       <height>16</height>
@@ -1518,7 +1518,7 @@ border-right-color: rgb(255, 255, 255);</string>
    <widget class="QPushButton" name="irq_led">
     <property name="geometry">
      <rect>
-      <x>42</x>
+      <x>65</x>
       <y>22</y>
       <width>12</width>
       <height>12</height>
@@ -1534,7 +1534,7 @@ border-right-color: rgb(255, 255, 255);</string>
    <widget class="QPushButton" name="nmi_led">
     <property name="geometry">
      <rect>
-      <x>42</x>
+      <x>65</x>
       <y>36</y>
       <width>12</width>
       <height>12</height>
@@ -1550,7 +1550,7 @@ border-right-color: rgb(255, 255, 255);</string>
    <widget class="QPushButton" name="rdy_led">
     <property name="geometry">
      <rect>
-      <x>42</x>
+      <x>65</x>
       <y>50</y>
       <width>12</width>
       <height>12</height>
@@ -1566,8 +1566,8 @@ border-right-color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="label_reset">
     <property name="geometry">
      <rect>
-      <x>76</x>
-      <y>22</y>
+      <x>90</x>
+      <y>20</y>
       <width>43</width>
       <height>16</height>
      </rect>
@@ -1641,7 +1641,7 @@ border-right-color: rgb(255, 255, 255);</string>
    <widget class="QPushButton" name="reset_led">
     <property name="geometry">
      <rect>
-      <x>125</x>
+      <x>135</x>
       <y>22</y>
       <width>12</width>
       <height>12</height>
@@ -1680,7 +1680,7 @@ border-right-color: rgb(255, 255, 255);</string>
    <widget class="QPushButton" name="IEC">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>90</x>
       <y>45</y>
       <width>56</width>
       <height>23</height>
@@ -1691,12 +1691,15 @@ border-right-color: rgb(255, 255, 255);</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="man_lines">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>37</x>
-      <y>3</y>
+      <x>10</x>
+      <y>20</y>
       <width>21</width>
-      <height>18</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="toolTip">

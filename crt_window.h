@@ -38,6 +38,7 @@ public:
     void LoadIni(void);
     void RetranslateUi();
     void showEvent(QShowEvent *event);
+    void ChangeLED(int,bool);
 
     CRTClass *crt;
     C64Class *c64;
@@ -48,17 +49,22 @@ private slots:
     void onSelectFile(QString filename);
     void on_InsertCRT_clicked();
     void onChipList_currentChanged(const QModelIndex &current, const QModelIndex &previous);
-
     void on_RemoveCRT_clicked();
+    void on_FreezButtonFC3_clicked();
+    void on_EF_JUMPER0_toggled(bool checked);
 
 private:
     Ui::CrtWindow *ui;
     QSettings *ini;
     bool isOneShowed;
     bool ChipDataExpand;
+    bool win_exp;
+    unsigned short insterted_hwtyp;
     CRT_INFO_STRUCT crt_info;
     bool CRTIsSelected;
     QString SelCRTFileName;
+    QIcon *LedRedOn;
+    QIcon *LedRedOff;
 };
 
 #endif // CRT_WINDOW_H

@@ -92,7 +92,7 @@ private:
     QTranslator appTranslator;   // Application Translator
     QTranslator qtTranslator;    // Qt library Translator
     QString langPath;            // Pfad für alle Sprachfiles
-
+    QString tmpPath;             // Pfad für alle Temporären Dateien die Emu64 erzeugt (Wird beim Start und Ende geleert)
     QSettings *ini;
 
     InfoWindow *info_window;                    // Info Fenster Klasse (wird vom MainWindow als Modal gestartet)
