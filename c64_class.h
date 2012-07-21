@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 30.12.2011		//
+// Letzte Änderung am 21.07.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -21,6 +21,7 @@
 #include "QtDebug"
 
 #include "SDL/SDL.h"
+#include "SDL/SDL_opengl.h"
 #include "SDL/SDL_framerate.h"
 #include "version.h"
 #include "videopal_class.h"
@@ -47,7 +48,7 @@ class C64Class
 {
 
 public:
-    C64Class(int *ret_error,VideoPalClass *_pal, function<void(unsigned short,unsigned char)> jam_proc);
+    C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(unsigned short,unsigned char)> jam_proc);
     ~C64Class();
     void FillAudioBuffer(unsigned char *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
     void KeyEvent(unsigned char  matrix_code,KeyStatus status, bool isAutoShift);
@@ -111,6 +112,7 @@ public:
     SDL_Surface     *C64Screen;
     SDL_Surface     *C64ScreenBack;
     bool            DrawScreenBack;
+    bool            OpenGLEnable;
 
     SDL_Thread      *sdl_thread;
     bool            sdl_thread_pause;

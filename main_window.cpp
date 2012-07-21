@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 12.10.2011		//
+// Letzte Änderung am 21.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -65,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     /// C64 Klasse Installieren ... Das HERZ ///
     int ret_error;
-    c64 = new C64Class(&ret_error,videopal,0);
+    c64 = new C64Class(&ret_error,videopal,true,0);
     if(ret_error != 0) ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim installieren der C64 Klasse"))       
 
     /// Debugger Window mit C64 verbinden ///

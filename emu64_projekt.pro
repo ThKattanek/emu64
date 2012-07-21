@@ -46,8 +46,7 @@ SOURCES += \
     widget_bit_leiste.cpp \
     setup_window.cpp \
     widget_d64_file.cpp \
-    debugger_vic_window.cpp \
-    SDL_bilinear.c
+    debugger_vic_window.cpp
 
 HEADERS  += \
     version.h \
@@ -94,8 +93,7 @@ HEADERS  += \
     widget_bit_leiste.h \
     setup_window.h \
     widget_d64_file.h \
-    debugger_vic_window.h \
-    SDL_bilinear.h
+    debugger_vic_window.h
 
 FORMS    += \
     info_window.ui \
@@ -122,17 +120,17 @@ RESOURCES += \
 win32{
 RC_FILE = emu64.rc
 DESTDIR = "../bin/win32"
-LIBS += -lSDL -lSDL_gfx -lquazip
+LIBS += -lSDL -lSDL_gfx -lquazip -lopengl32
 }
 
 linux-g++-64{
 DESTDIR = "../bin/linux_x86_64"
-LIBS += -lSDL -lSDL_gfx -lquazip
+LIBS += -lSDL -lSDL_gfx -lquazip -lGL
 }
 
 linux-g++-32{
 DESTDIR = "../bin/linux_i586"
-LIBS += -lSDL -lSDL_gfx -lquazip
+LIBS += -lSDL -lSDL_gfx -lquazip -lGL
 }
 
 macx{
@@ -144,7 +142,11 @@ LIBS += -framework cocoa
 }
 
 OTHER_FILES += \
-    emu64.rc
+    emu64.rc \
+    docs/ToDo
+
+
+
 
 
 

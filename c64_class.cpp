@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 30.12.2011		//
+// Letzte Änderung am 21.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -16,8 +16,8 @@
 #include "c64_class.h"
 #include "c64_keys.h"
 
-//#define floppy_asyncron                  // Schaltet die Floppy Asyncron
-#define more_one_floppy_cylce_count 67   // alle "more_one_floppy_cycle_counts" wird 1 FloppyZyklus doppelt ausgeführt
+#define floppy_asyncron                  // Schaltet die Floppy Asyncron
+#define more_one_floppy_cylce_count 66   // alle "more_one_floppy_cycle_counts" wird 1 FloppyZyklus doppelt ausgeführt
 
 void AudioMix(void *nichtVerwendet, Uint8 *stream, int laenge);
 int SDLThread(void *userdat);
@@ -26,15 +26,20 @@ int SDLThreadLoad(void *userdat);
 #define AudioSampleRate 44100
 #define AudioPufferSize 882*1
 
-C64Class::C64Class(int *ret_error,VideoPalClass *_pal, function<void(unsigned short,unsigned char)>)
+bool Test = false;
+
+C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(unsigned short,unsigned char)>)
 {
     pal = _pal;
     BreakGroupAnz = 0;
     FloppyFoundBreakpoint = false;
     EnableExtLines = false;
 
+    C64Screen = 0;
     C64ScreenBack = 0;
     DrawScreenBack = false;
+
+    OpenGLEnable = OpenGLOn;
 
     for(int i=0;i<MAX_JOYS; i++) joy[i] = 0;
 
@@ -266,7 +271,6 @@ C64Class::~C64Class()
 {
     LoopThreadEnd = true;
     SDL_WaitThread(sdl_thread,0);
-    //SDL_Delay(50);
 
     SDL_AudioQuit();
     SDL_Quit();
@@ -320,7 +324,16 @@ int SDLThread(void *userdat)
                     {
                         c64->AktWindowXW = event.resize.w;
                         c64->AktWindowYW = event.resize.h;
-                        c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+
+                        if(c64->OpenGLEnable)
+                        {
+                            /// OpenGL Version ///
+                        }
+                        else
+                        {
+                            /// SDL Version ///
+                            c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                        }
                     }
                     break;
 
@@ -333,15 +346,24 @@ int SDLThread(void *userdat)
                         break;
                     case SDLK_F12:
                         c64->isFullscreen = !c64->isFullscreen;
-                        if(c64->isFullscreen)
+
+                        if(c64->OpenGLEnable)
                         {
-                            SDL_ShowCursor(false);
-                            c64->C64Screen = SDL_SetVideoMode(1280,1024,c64->AktWindowColorBits,SDL_FULLSCREEN | SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                            /// OpenGL Version ///
                         }
                         else
                         {
-                            SDL_ShowCursor(true);
-                            c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                            /// SDL Version ///
+                            if(c64->isFullscreen)
+                            {
+                                SDL_ShowCursor(false);
+                                c64->C64Screen = SDL_SetVideoMode(1280,1024,c64->AktWindowColorBits,SDL_FULLSCREEN | SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                            }
+                            else
+                            {
+                                SDL_ShowCursor(true);
+                                c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                            }
                         }
                         break;
 
@@ -393,22 +415,29 @@ int SDLThread(void *userdat)
             }
             if(!c64->LoopThreadEnd)
             {
-                if(c64->DrawScreenBack)
+                if(c64->OpenGLEnable)
                 {
-                    SDL_Rect rec_src = {0,0,c64->AktC64ScreenXW,c64->AktC64ScreenYW};
-                    SDL_Rect rec_dst = {0,0,c64->C64Screen->w,c64->C64Screen->h};
-
-                    SDL_SoftStretch(c64->C64ScreenBack,&rec_src,c64->C64Screen,&rec_dst);
-                    SDL_Flip(c64->C64Screen);
-
-                    SDL_framerateDelay(&c64->fps_manager);
-
-                    c64->DrawScreenBack = false;
-
+                    /// OpenGL Version ///
                 }
-                else SDL_Delay(1);
+                else
+                {
+                    /// SDL Version ///
+                    if(c64->DrawScreenBack)
+                    {
+                        SDL_Rect rec_src = {0,0,c64->AktC64ScreenXW,c64->AktC64ScreenYW};
+                        SDL_Rect rec_dst = {0,0,c64->C64Screen->w,c64->C64Screen->h};
+
+                        SDL_SoftStretch(c64->C64ScreenBack,&rec_src,c64->C64Screen,&rec_dst);
+                        SDL_Flip(c64->C64Screen);
+
+                        SDL_framerateDelay(&c64->fps_manager);
+                        c64->DrawScreenBack = false;
+                    }
+                    else SDL_Delay(1);
+                }
             }
-        }else
+        }
+        else
         {
             SDL_Delay(1);
             c64->sdl_thread_is_paused = true;
@@ -419,23 +448,34 @@ int SDLThread(void *userdat)
 
 void C64Class::VicRefresh(unsigned char *vic_puffer)
 {
+    static int frames = 0;
+    qDebug() << frames;
+    frames ++;
+
     if((pal == 0) || (sdl_thread_pause == true)) return;
 
-    if(DrawScreenBack) SDL_Delay(2);
+    if(OpenGLEnable)
+    {
+        /// OpenGL Version ///
+    }
+    else
+    {
+        /// SDL Version ///
+        if(DrawScreenBack) SDL_Delay(2);
 
-    SDL_LockSurface(C64ScreenBack);
-    pal->ConvertVideo((void*)C64ScreenBack->pixels,C64ScreenBack->pitch,vic_puffer,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
-    SDL_UnlockSurface(C64ScreenBack);
+        SDL_LockSurface(C64ScreenBack);
+        pal->ConvertVideo((void*)C64ScreenBack->pixels,C64ScreenBack->pitch,vic_puffer,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
+        SDL_UnlockSurface(C64ScreenBack);
 
-    DrawScreenBack = true;
-
+        DrawScreenBack = true;
+    }
     UpdateJoyPorts();
 }
 
 void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
 {
     unsigned short* puffer = (unsigned short*) stream;
-    unsigned int counter_plus=0;
+    static unsigned int counter_plus=0;
 
     sid1->SoundBufferPos = 0;
     sid2->SoundBufferPos = 0;
@@ -906,35 +946,41 @@ void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool enable_pal, in
 {
     SDLThreadPauseBegin();
 
-    if((fullres_xw != 0) && (fullres_yw != 0))
-        isFullscreen  = true;
-    else isFullscreen = false;
-
-    AktWindowXW = 384;
-    AktWindowYW = 272;
-
-    if(doublesize)
+    if(OpenGLEnable)
     {
-        AktWindowXW *=2;
-        AktWindowYW *=2;
+        /// OpenGL Version ///
     }
+    else
+    {
+        /// SDL Version ///
+        if((fullres_xw != 0) && (fullres_yw != 0))
+            isFullscreen  = true;
+        else isFullscreen = false;
 
-    AktC64ScreenXW = AktWindowXW;
-    AktC64ScreenYW = AktWindowYW;
+        AktWindowXW = 384; // 384;
+        AktWindowYW = 272; // 272;
 
-    if(colbits32) AktWindowColorBits = 32;
-    AktWindowColorBits = 16;
+        if(doublesize)
+        {
+            AktWindowXW *=2;
+            AktWindowYW *=2;
+        }
 
-    pal->SetDisplayMode(AktWindowColorBits);
-    pal->EnablePALOutput(enable_pal);
-    pal->EnableVideoDoubleSize(doublesize);
+        AktC64ScreenXW = AktWindowXW;
+        AktC64ScreenYW = AktWindowYW;
 
-    C64Screen = SDL_SetVideoMode(AktWindowXW,AktWindowYW,AktWindowColorBits,SDL_VIDEORESIZE | SDL_HWSURFACE | SDL_DOUBLEBUF);
+        if(colbits32) AktWindowColorBits = 32;
+        AktWindowColorBits = 16;
 
-    if(C64ScreenBack != 0) delete C64ScreenBack;
-    C64ScreenBack = SDL_CreateRGBSurface(0,AktWindowXW,AktWindowYW,AktWindowColorBits,0,0,0,0);
+        pal->SetDisplayMode(AktWindowColorBits);
+        pal->EnablePALOutput(enable_pal);
+        pal->EnableVideoDoubleSize(doublesize);
 
-    pal->SetPixelFormat(C64ScreenBack->format);
+        C64Screen = SDL_SetVideoMode(AktWindowXW,AktWindowYW,AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+        C64ScreenBack = SDL_CreateRGBSurface(0,AktWindowXW,AktWindowYW,AktWindowColorBits,0,0,0,0);
+
+        pal->SetPixelFormat(C64ScreenBack->format);
+    }
 
     SDLThreadPauseEnd();
 }
