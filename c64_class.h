@@ -16,13 +16,6 @@
 #ifndef C64CLASS_H
 #define C64CLASS_H
 
-#define SDL_USE_NIB_FILE 1
-
-#include "QtDebug"
-
-#include "SDL/SDL.h"
-#include "SDL/SDL_opengl.h"
-#include "SDL/SDL_framerate.h"
 #include "version.h"
 #include "videopal_class.h"
 #include "mmu_class.h"
@@ -34,15 +27,16 @@
 #include "floppy1541_class.h"
 #include "cpu_info.h"
 
+#include <SDL/SDL.h>
+#include <SDL/SDL_opengl.h>
+#include <SDL/SDL_framerate.h>
+
 #include "tr1/functional"
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
 
 #define FloppyAnzahl 4
 #define MAX_BREAK_GROUPS 255
-
-#define SDL_ALPHA_OPAQUE 255
-#define SDL_ALPHA_TRANSPARENT 0
 
 class C64Class
 {
@@ -106,11 +100,20 @@ public:
     int             AktWindowColorBits;
     int             AktC64ScreenXW;
     int             AktC64ScreenYW;
+    bool            ColBits32;
+    bool            DoubleSize;
+    bool            PalEnable;
+    int             FullResXW;
+    int             FullResYW;
     bool            isFullscreen;
+    bool            ChangeGrafikModi;
+    bool            HoldVicRefresh;
+    bool            VicRefreshIsHold;
 
     FPSmanager      fps_manager;
     SDL_Surface     *C64Screen;
     SDL_Surface     *C64ScreenBack;
+    unsigned char   *C64ScreenBuffer;
     bool            DrawScreenBack;
     bool            OpenGLEnable;
 

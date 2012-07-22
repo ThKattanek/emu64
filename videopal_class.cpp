@@ -16,7 +16,7 @@
 #include "videopal_class.h"
 #include "c64_colors.h"
 #include "math.h"
-#include "SDL/SDL.h"
+//#include "SDL/SDL.h"
 
 #define VIC_SATURATION	48.0f		//48.0f
 #define VIC_PHASE	-4.5f
@@ -59,8 +59,7 @@ static VIC_COLOR_STRUCT VicFarben[16] =
 
 #define MATH_PI	3.141592653589793238462643383279
 
-VideoPalClass::VideoPalClass(void):
-    pixel_format(0)
+VideoPalClass::VideoPalClass(void)
 {
     AktFarbMode = 0;
     Double2x = false;
@@ -71,12 +70,14 @@ VideoPalClass::~VideoPalClass(void)
 {
 }
 
-void VideoPalClass::SetPixelFormat(SDL_PixelFormat *format)
+/*
+void VideoPalClass::SetPixelFormat()
 {
     pixel_format = format;
     SetC64Palette(AktFarbMode);
     CreateVicIIColors();
 }
+*/
 
 void VideoPalClass::SetDisplayMode(int DisplayMode)
 {
@@ -134,7 +135,7 @@ void VideoPalClass::SetC64Palette(int palnr)
 {
     AktFarbMode = palnr;
 
-    if(pixel_format == 0) return;
+    //if(pixel_format == 0) return;
 
     int ij = 0;
     for(int j=0;j<16;j++)
@@ -148,7 +149,7 @@ void VideoPalClass::SetC64Palette(int palnr)
             Palette32Bit[ij] = COLOR_RGBA1[0]<<16 | COLOR_RGBA1[1]<<8 | COLOR_RGBA1[2];
 
             /// Für 16Bit Video Display ///
-            Palette16Bit[ij] = (uint16_t)SDL_MapRGB(pixel_format,COLOR_RGBA1[0],COLOR_RGBA1[1],COLOR_RGBA1[2]);
+            //Palette16Bit[ij] = (uint16_t)SDL_MapRGB(pixel_format,COLOR_RGBA1[0],COLOR_RGBA1[1],COLOR_RGBA1[2]);
             COLOR_RGBA1+=4;
             ij++;
         }
@@ -360,6 +361,7 @@ inline void VideoPalClass::CreateVicIIColors(void)
 
                                                 if(DestDisplayMode == 16)
                                                 {
+                                                    /*
                                                     if(pixel_format != 0)
                                                     {
                                                         unsigned long RGBTmp = BlurTable0[x[0]][x[1]][x[2]][x[3]];
@@ -387,7 +389,7 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                         b=(((RGBTmp&0x000000FF))&0xFF);         // BLAU
                                                         BlurTable1S[x[0]][x[1]][x[2]][x[3]] = (unsigned long)SDL_MapRGB(pixel_format,r,g,b);
                                                     }
-
+                                                    */
                                                 }
                                         }
 }

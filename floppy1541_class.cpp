@@ -134,7 +134,7 @@ void Floppy1541::SetEnableFloppy(bool status)
 
         StepperIncWait = true;
 
-        AktHalbSpur = -1; //1
+        AktHalbSpur = 1; //1
         GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
         GCRSpurEnde = GCRSpurStart + TrackSize[(int)AktHalbSpur];
     }
@@ -189,6 +189,7 @@ void Floppy1541::SetFloppySoundVolume(double volume)
 
 bool Floppy1541::LoadDiskImage(char* filename)
 {
+    cout << "OK";
     FILE *file;
     char EXT[4];
 
@@ -817,6 +818,8 @@ unsigned char Floppy1541::ReadRom(unsigned short adresse)
 
 bool Floppy1541::SyncFound(void)
 {
+    if(GCR_PTR == 0) return false;
+
     if(*GCR_PTR == 0xFF)
     {
 L1:

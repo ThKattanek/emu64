@@ -43,7 +43,7 @@ class VideoPalClass
 public:
         VideoPalClass(void);
         ~VideoPalClass(void);
-        void SetPixelFormat(SDL_PixelFormat *format);
+        //void SetPixelFormat(SDL_PixelFormat *format);
         void ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOutPuffer,int OutXW,int OutYW,int InXW,int InYW,bool FlipTex);
         void SetDisplayMode(int DisplayMode);
         void UpdateParameter(void);
@@ -64,7 +64,7 @@ public:
         bool StartC64isPalmode;
 
 private:
-        SDL_PixelFormat     *pixel_format;
+        //SDL_PixelFormat     *pixel_format;
 
         bool                Double2x;
         bool                PALOutput;

@@ -125,12 +125,12 @@ LIBS += -lSDL -lSDL_gfx -lquazip -lopengl32
 
 linux-g++-64{
 DESTDIR = "../bin/linux_x86_64"
-LIBS += -lSDL -lSDL_gfx -lquazip -lGL
+LIBS += -lSDL -lSDL_gfx -lquazip -lGL -lGLU
 }
 
-linux-g++-32{
+linux-g++{
 DESTDIR = "../bin/linux_i586"
-LIBS += -lSDL -lSDL_gfx -lquazip -lGL
+LIBS += -lSDL -lSDL_gfx -lquazip -lGL -lGLU
 }
 
 macx{
@@ -143,7 +143,17 @@ LIBS += -framework cocoa
 
 OTHER_FILES += \
     emu64.rc \
-    docs/ToDo
+    docs/ToDo \
+    ../bin/Creating Final Versions/Linux/readme.txt \
+    docs/readme linux.txt \
+    docs/readme linux.txt \
+    docs/readme linux.txt \
+    docs/readme.txt
+
+
+
+
+
 
 
 

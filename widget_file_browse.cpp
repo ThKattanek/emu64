@@ -70,7 +70,6 @@ void WidgetFileBrowse::onlistView_files_currentChanged(const QModelIndex &curren
         QuaZip zip(AktFileName);
         if(zip.open(QuaZip::mdUnzip))
         {
-            qDebug() << "zip is open";
             QStringList FileList;
             for(int i=0;i<ZIPExt.count();i++)
             {
@@ -80,7 +79,6 @@ void WidgetFileBrowse::onlistView_files_currentChanged(const QModelIndex &curren
             FileList.sort();
             ui->listWidget_zip->addItems(FileList);
             zip.close();
-            qDebug() << "zip is closed";
         }
     }
     else
@@ -132,7 +130,7 @@ void WidgetFileBrowse::SetAktFile(QString akt_dir, QString akt_file)
 }
 
 void WidgetFileBrowse::on_listWidget_zip_itemSelectionChanged()
-{/*
+{
     QString AktZIPName = filemodel->fileInfo(ui->listView_files->currentIndex()).absoluteFilePath();
     QString ZIPInFile = ui->listWidget_zip->currentItem()->text();
     QString OutFileName = QCoreApplication::applicationDirPath() + "/tmp/" + ZIPInFile;
@@ -160,5 +158,4 @@ void WidgetFileBrowse::on_listWidget_zip_itemSelectionChanged()
         zip.close();
         emit select_file(OutFileName);
     }
-    */
 }
