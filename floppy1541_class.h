@@ -18,8 +18,6 @@
 
 #include "cstring"
 #include <fstream>
-#include <iostream>
-using namespace std;
 
 #include "mos6502_class.h"
 #include "mos6522_class.h"
