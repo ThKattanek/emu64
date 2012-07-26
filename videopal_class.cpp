@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 11.10.2011		//
+// Letzte Änderung am 26.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -607,18 +607,25 @@ void VideoPalClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
         switch(DestDisplayMode)
         {
         case 16: /// OK
-            for(int y=0;y<OutYW;y++)
+            for(int y=0;y<(OutYW);y++)
             {
-                    Outpuffer16 = ((uint16_t*)Outpuffer + (y*Pitch));
-                    for(int x=0;x<OutXW;x++) *(Outpuffer16++) = Palette16Bit[VideoSource8[x] & 0x0F];
-                    VideoSource8 = VideoSource8+InXW;
+                Outpuffer16 = ((uint16_t*)Outpuffer + (((y)+1)*Pitch/2));
+
+                for(int x=0;x<(OutXW);x++)
+                {
+                    *(Outpuffer16++) = Palette16Bit[VideoSource8[x] & 0x0F];
+                }
+                VideoSource8 = VideoSource8+InXW;
             }
             break;
         case 32: /// OK
-            for(int y=0;y<OutYW;y++)
+            for(int y=0;y<(OutYW);y++)
             {
-                Outpuffer32= ((uint32_t*)Outpuffer + (y*Pitch));
-                for(int x=0;x<OutXW;x++) *(Outpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
+                Outpuffer32 = ((uint32_t*)Outpuffer + ((y)*Pitch/4));
+                for(int x=0;x<(OutXW);x++)
+                {
+                    *(Outpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
+                }
                 VideoSource8 = VideoSource8+InXW;
             }
             break;

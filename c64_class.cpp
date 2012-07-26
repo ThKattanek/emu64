@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 23.07.2012		//
+// Letzte Änderung am 26.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -1095,8 +1095,8 @@ unsigned char* C64Class::GetRAMPointer(unsigned short adresse)
 
 void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool pal_enable, int fullres_xw, int fullres_yw)
 {
-    //ColBits32 = colbits32;
-    ColBits32 = true;
+    ColBits32 = colbits32;
+    //ColBits32 = true;
     DoubleSize = doublesize;
     PalEnable =  pal_enable;
     FullResXW = fullres_xw;
