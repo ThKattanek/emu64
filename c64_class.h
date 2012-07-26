@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 21.07.2011		//
+// Letzte Änderung am 26.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -113,6 +113,7 @@ public:
     FPSmanager      fps_manager;
     SDL_Surface     *C64Screen;
     SDL_Surface     *C64ScreenBack;
+    SDL_Surface     *C64ScreenIcon;
     unsigned char   *C64ScreenBuffer;
     bool            DrawScreenBack;
     bool            OpenGLEnable;

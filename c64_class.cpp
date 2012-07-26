@@ -66,7 +66,10 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
 
     SetGrafikModi(pal->StartC64isColorBit32,pal->StartC64isDoublesize,pal->StartC64isPalmode);
 
-    SDL_WM_SetIcon(SDL_LoadBMP("c64window.bmp"),0);
+    C64ScreenIcon = SDL_LoadBMP("c64window.bmp");
+    SDL_SetColorKey(C64ScreenIcon,SDL_SRCCOLORKEY,SDL_MapRGB(C64ScreenIcon->format,0,0,0));
+
+    SDL_WM_SetIcon(C64ScreenIcon,NULL);
     SDL_WM_SetCaption("C64 Screen",0);
 
     SDL_initFramerate(&fps_manager);
@@ -1095,8 +1098,8 @@ unsigned char* C64Class::GetRAMPointer(unsigned short adresse)
 
 void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool pal_enable, int fullres_xw, int fullres_yw)
 {
-    ColBits32 = colbits32;
-    //ColBits32 = true;
+    //ColBits32 = colbits32;
+    ColBits32 = true;
     DoubleSize = doublesize;
     PalEnable =  pal_enable;
     FullResXW = fullres_xw;
