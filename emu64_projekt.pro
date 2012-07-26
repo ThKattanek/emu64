@@ -9,7 +9,6 @@ TRANSLATIONS = emu64_en.ts
 
 QT += core gui
 
-TARGET = emu64
 TEMPLATE = app
 
 SOURCES += \
@@ -117,19 +116,29 @@ FORMS    += \
 RESOURCES += \
     emu64.qrc
 
-win32{
+win32-g++{
+TARGET = emu64
 RC_FILE = emu64.rc
-DESTDIR = "../bin/win32"
+DESTDIR = "bin/windows_x32"
+LIBS += -lSDL -lSDL_gfx -lquazip -lopengl32
+}
+
+win32-g++-64{
+TARGET = emu64
+RC_FILE = emu64.rc
+DESTDIR = "bin/windows_x64"
 LIBS += -lSDL -lSDL_gfx -lquazip -lopengl32
 }
 
 linux-g++-64{
-DESTDIR = "../bin/linux_x86_64"
+TARGET = emu64
+DESTDIR = "bin/linux_x86_64"
 LIBS += -lSDL -lSDL_gfx -lquazip -lGL -lGLU
 }
 
 linux-g++{
-DESTDIR = "../bin/linux_i586"
+TARGET = emu64
+DESTDIR = "bin/linux_i586"
 LIBS += -lSDL -lSDL_gfx -lquazip -lGL -lGLU
 }
 

@@ -34,7 +34,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="EmualtionTab">
     <property name="enabled">
@@ -136,6 +136,9 @@
       </property>
      </widget>
      <widget class="QCheckBox" name="WVsync">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -149,6 +152,9 @@
       </property>
      </widget>
      <widget class="QCheckBox" name="WFilter">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>310</x>
@@ -174,10 +180,13 @@
        <string>16 Bit</string>
       </property>
       <property name="checked">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
      </widget>
      <widget class="QRadioButton" name="W32Bit">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>310</x>
@@ -189,9 +198,15 @@
       <property name="text">
        <string>32 Bit</string>
       </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
      </widget>
     </widget>
     <widget class="QGroupBox" name="FullscreenGroup">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>5</x>
@@ -210,6 +225,9 @@
      </property>
     </widget>
     <widget class="QGroupBox" name="screenshot_group">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>5</x>
@@ -245,6 +263,9 @@
       </property>
      </widget>
      <widget class="QComboBox" name="comboBox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>55</x>

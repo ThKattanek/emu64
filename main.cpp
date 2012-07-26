@@ -51,5 +51,7 @@ int main(int argc, char *argv[])
     w.log = log;
     w.show();
 
+    delete log;
+
     return a.exec();
 };

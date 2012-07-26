@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright gesch¸tzt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte ƒnderung am 21.07.2012		//
+// Letzte ƒnderung am 27.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -33,13 +33,16 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle("Emu64 Version " + QString(str_emu64_version) + " --- [Linux]");
 #endif
 
+    /// ApplicationPath holen und abspeichern ///
+    appPath = QApplication::applicationDirPath();
+
     setWindowIcon(QIcon(":/grafik/emu64.ico"));
 
     /// Klassen installieren ///
     videopal = new VideoPalClass();
 
     /// INI Dateiverwaltung erstellen ///
-    ini = new QSettings("emu64.ini",QSettings::IniFormat,this);
+    ini = new QSettings(appPath+"/emu64.ini",QSettings::IniFormat,this);
 
     /// Window Klassen erstellen ///
     /// Unter MAC sollte ohne ¸bergabe des this Zeigers die Klasseb erstellt werden
@@ -53,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setup_window = new SetupWindow(this,SLOT(onChangeGrafikModi(bool,bool,bool,bool)),videopal,ini);
 
     /// Translator installieren ///
-    langPath = "languages";
+    langPath = appPath+"/languages";
     qApp->installTranslator(&qtTranslator);
     qApp->installTranslator(&appTranslator);
     QString SystemLocale = QLocale::system().name();       // "de_DE"
@@ -77,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent) :
     c64->crt->ChangeLED = bind(&CrtWindow::ChangeLED,crt_window,_1,_2);
 
     /// C64 Systemroms laden ///
-    if(!c64->LoadC64Roms((char*)"roms/kernal.rom",(char*)"roms/basic.rom",(char*)"roms/char.rom"))
+    if(!c64->LoadC64Roms((char*)QString(appPath+"/roms/kernal.rom").toAscii().data(),(char*)QString(appPath+"/roms/basic.rom").toAscii().data(),(char*)QString(appPath+"/roms/char.rom").toAscii().data()))
     {
         ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim laden der C64 ROMs."))
     }
@@ -169,7 +172,6 @@ MainWindow::~MainWindow()
     }
     /////////////////////////////////////
 
-
     /// WindowKlassen schlieﬂen ///
 
     delete c64;
@@ -182,7 +184,6 @@ MainWindow::~MainWindow()
     delete debugger_window;
     delete setup_window;
     delete ui;
-
     delete ini;
 }
 

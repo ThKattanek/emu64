@@ -13,3 +13,4 @@ Abhängigkeiten:
 Emu64 Windows Version 32Bit
 ---------------------------
 
+- läuft problemlos unter x64 Systemen da alle DLL mitgeliefert werden

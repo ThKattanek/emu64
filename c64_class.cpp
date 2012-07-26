@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 21.07.2012		//
+// Letzte Änderung am 23.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -41,7 +41,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
 
     OpenGLEnable = OpenGLOn;
 
-    for(int i=0;i<MAX_JOYS; i++) joy[i] = 0;
+    for(int i=0;i<MAX_JOYS; i++) joy[i] = NULL;
 
     /// SDL Installieren ///
 
@@ -270,6 +270,16 @@ C64Class::~C64Class()
 {
     LoopThreadEnd = true;
     SDL_WaitThread(sdl_thread,0);
+
+    // Absturz unter Win32 //
+    RemoveJoy(0);
+    RemoveJoy(1);
+
+    // Absturz unter Linux //
+    /*
+    for(int i=0;0<MAX_JOYS;i++)
+        if(joy[i] != NULL) SDL_JoystickClose(joy[i]);
+    */
 
     SDL_AudioQuit();
     SDL_Quit();
@@ -568,8 +578,16 @@ int SDLThread(void *userdat)
         }
     }
 
+    c64->ChangeGrafikModi = false;
+
+    /// VicRefresh stoppen und solange warten bis wirklich Stop ist ///
+    c64->HoldVicRefresh = true;
+    c64->VicRefreshIsHold = false;
+
     if(c64->C64ScreenBuffer != 0)
         delete[] c64->C64ScreenBuffer;
+
+    SDL_Quit();
 
     return 0;
 }

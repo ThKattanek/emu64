@@ -91,6 +91,7 @@ private:
     /// Varialen ///
     QTranslator appTranslator;   // Application Translator
     QTranslator qtTranslator;    // Qt library Translator
+    QString appPath;             // Pfad der emu64 Datei
     QString langPath;            // Pfad für alle Sprachfiles
     QString tmpPath;             // Pfad für alle Temporären Dateien die Emu64 erzeugt (Wird beim Start und Ende geleert)
     QSettings *ini;
