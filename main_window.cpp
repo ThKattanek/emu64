@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
     ini = new QSettings(appPath+"/emu64.ini",QSettings::IniFormat,this);
     LogText(QString(">> INI System wurde erzeugt: " + appPath+"/emu64.ini\n").toAscii().data());
 
+
     /// Window Klassen erstellen ///
     /// Unter MAC sollte ohne übergabe des this Zeigers die Klasseb erstellt werden
 
@@ -72,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
     LogText(tr(">> CrtWindow wurde erzeugt\n").toAscii().data());
     debugger_window = new DebuggerWindow(this,ini);
     LogText(tr(">> DebuggerWindow wurde erzeugt\n").toAscii().data());
-    setup_window = new SetupWindow(this,SLOT(onChangeGrafikModi(bool,bool,bool,bool)),videopal,ini);
+    setup_window = new SetupWindow(this,SLOT(onChangeGrafikModi(bool,bool,bool,bool,bool)),videopal,ini);
     LogText(tr(">> SetupWindow wurde erzeugt\n").toAscii().data());
 
     ini->beginGroup("MainWindow");
@@ -82,7 +83,9 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
     /// C64 Klasse Installieren ... Das HERZ ///
     int ret_error;
     c64 = new C64Class(&ret_error,videopal,true,bind(&MainWindow::LogText,this,_1));
-    if(ret_error != 0) ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim installieren der C64 Klasse"))       
+    if(ret_error != 0) ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim installieren der C64 Klasse"))
+
+    setup_window->ReSetup();
 
     SDL_WM_SetCaption((const char*)tr("C64 Bildschirm").toAscii().data(),0);
 
@@ -409,11 +412,11 @@ void MainWindow::on_actionEmu64_Einstellungen_triggered()
     else setup_window->hide();
 }
 
-void MainWindow::onChangeGrafikModi(bool fullscreen, bool palmode, bool doublemode, bool bit32mode)
+void MainWindow::onChangeGrafikModi(bool fullscreen, bool palmode, bool doublemode, bool bit32mode, bool filter)
 {
     if(!fullscreen)
     {
-        if(c64 != 0) c64->SetGrafikModi(bit32mode,doublemode,palmode,0,0);
+        if(c64 != 0) c64->SetGrafikModi(bit32mode,doublemode,palmode,filter,0,0);
     }
 }
 

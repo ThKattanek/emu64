@@ -70,7 +70,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     }
     LogText((char*)">> SDL_Audio wurde installiert\n");
 
-    SetGrafikModi(pal->StartC64isColorBit32,pal->StartC64isDoublesize,pal->StartC64isPalmode);
+    SetGrafikModi(pal->StartC64isColorBit32,pal->StartC64isDoublesize,pal->StartC64isPalmode,false);
 
     C64ScreenIcon = SDL_LoadBMP("c64window.bmp");
     SDL_SetColorKey(C64ScreenIcon,SDL_SRCCOLORKEY,SDL_MapRGB(C64ScreenIcon->format,0,0,0));
@@ -394,11 +394,16 @@ int SDLThread(void *userdat)
                 glBindTexture( GL_TEXTURE_2D, C64ScreenTexture);
 
                 // Set the texture's stretching properties
-                glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-                glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-
-                //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-                //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+                if(c64->FilterEnable)
+                {
+                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+                }
+                else
+                {
+                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+                }
 
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
@@ -1092,19 +1097,20 @@ unsigned char* C64Class::GetRAMPointer(unsigned short adresse)
     return mmu->GetRAMPointer() + adresse;
 }
 
-void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool pal_enable, int fullres_xw, int fullres_yw)
+void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool pal_enable,bool filter_enable, int fullres_xw, int fullres_yw)
 {
     //ColBits32 = colbits32;
     ColBits32 = true;
     DoubleSize = doublesize;
     PalEnable =  pal_enable;
+    FilterEnable = filter_enable;
     FullResXW = fullres_xw;
     FullResYW = fullres_yw;
 
     ChangeGrafikModi = true;
 
     char str00[100];
-    sprintf(str00,">>   32Bit = %d\n>>   Doublesize = %d\n>>   PAL = %d\n>>   FullResXW = %d\n>>   FullResrYW = %d\n",ColBits32,DoubleSize,PalEnable,FullResXW,FullResYW);
+    sprintf(str00,">>   32Bit = %d\n>>   Doublesize = %d\n>>   PAL = %d\n>>   Filter = %d\n>>   FullResXW = %d\n>>   FullResrYW = %d\n",ColBits32,DoubleSize,PalEnable,FilterEnable,FullResXW,FullResYW);
 
     LogText((char*)">> Grafikmodus wurde gesetzt:\n");
     LogText(str00);

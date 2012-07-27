@@ -76,7 +76,7 @@ private slots:
     void on_actionHardreset_triggered();
     void on_actionC64_Programme_direkt_laden_triggered();
     void on_actionEmu64_Einstellungen_triggered();
-    void onChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode);
+    void onChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode, bool filter);
     void OnChangeFloppyImage(int floppynr);
 
 protected:

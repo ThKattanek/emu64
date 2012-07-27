@@ -54,7 +54,7 @@ public:
     unsigned char ReadC64Byte(unsigned short adresse);
     void WriteC64Byte(unsigned short adresse,unsigned char wert);
     unsigned char* GetRAMPointer(unsigned short adresse);
-    void SetGrafikModi(bool colbits32, bool doublesize,bool enable_pal, int fullres_xw = 0, int fullres_yw = 0);
+    void SetGrafikModi(bool colbits32, bool doublesize,bool enable_pal,bool filter_enable, int fullres_xw = 0, int fullres_yw = 0);
 
     void SoftReset(void);
     void HardReset(void);
@@ -98,6 +98,7 @@ public:
     bool            ColBits32;
     bool            DoubleSize;
     bool            PalEnable;
+    bool            FilterEnable;
     int             FullResXW;
     int             FullResYW;
     bool            isFullscreen;

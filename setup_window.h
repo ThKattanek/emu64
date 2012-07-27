@@ -34,9 +34,10 @@ public:
     ~SetupWindow();
     void RetranslateUi();
     void LoadINI(C64Class *_c64);
+    void ReSetup(void);
 
 signals:
-    void ChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode);
+    void ChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode, bool filter);
 
 private slots:
     void on_C64Farbmodus_currentIndexChanged(int index);
@@ -44,6 +45,7 @@ private slots:
     void on_WDouble_toggled(bool checked);
     void on_W16Bit_toggled(bool checked);
     void on_W32Bit_toggled(bool checked);
+    void on_WFilter_toggled(bool checked);
 
 private:
     Ui::SetupWindow *ui;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 30.12.2011		//
+// Letzte Änderung am 27.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -2010,7 +2010,7 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
             switch(ret)
             {
             case -1:
-                QMessageBox::warning(this,tr("Fehler..."),tr("Die Datei konnten nicht geöffnet werden."));
+                QMessageBox::warning(this,tr("Fehler..."),tr("Die Datei konnte nicht geöffnet werden."));
                 break;
             case -2:
                 QMessageBox::warning(this,tr("Fehler..."),tr("Es handelt sich nicht um eine Emu64 Datei."));
