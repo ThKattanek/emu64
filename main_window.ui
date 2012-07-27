@@ -830,7 +830,7 @@ background-position: center
     <string>TV/Video Einstellungen</string>
    </property>
    <property name="statusTip">
-    <string>Hiermit kann man das Aussehen der Videoausgabe verändern. z.B.: Sättigung, Helligkeit und Kontrast.</string>
+    <string>Hiermit kann man das Aussehen der Videoausgabe verändern. Z.B.: Sättigung, Helligkeit und Kontrast.</string>
    </property>
    <property name="font">
     <font>

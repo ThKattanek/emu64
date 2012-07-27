@@ -83,7 +83,7 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
     /// C64 Klasse Installieren ... Das HERZ ///
     int ret_error;
     c64 = new C64Class(&ret_error,videopal,true,bind(&MainWindow::LogText,this,_1));
-    if(ret_error != 0) ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim installieren der C64 Klasse"))
+    if(ret_error != 0) ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim Installieren der C64 Klasse"))
 
     setup_window->ReSetup();
 
@@ -100,7 +100,7 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
     /// C64 Systemroms laden ///
     if(!c64->LoadC64Roms((char*)QString(appPath+"/roms/kernal.rom").toAscii().data(),(char*)QString(appPath+"/roms/basic.rom").toAscii().data(),(char*)QString(appPath+"/roms/char.rom").toAscii().data()))
     {
-        ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim laden der C64 ROMs."))
+        ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim Laden der C64 ROMs."))
     }
 
     /// C64 Keyboard Matrix mit dem Virtual Keyboard verbinden ///

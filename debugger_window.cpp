@@ -1600,7 +1600,7 @@ void DebuggerWindow::AddBreakpointTreeChild(QTreeWidgetItem *parent, unsigned sh
     else item->setCheckState(0,Qt::Unchecked);
     item->setDisabled(false);
     item->setToolTip(0,tooltip);
-    item->setToolTip(1,tr("Doppeltklick um Werte zu verändern."));
+    item->setToolTip(1,tr("Doppelklick um Werte zu verändern."));
     item->setBackgroundColor(1,QColor(200,200,255));
     item->setForeground(1,QColor(200,0,0));
     parent->addChild(item);
