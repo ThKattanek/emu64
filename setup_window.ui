@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>411</width>
-    <height>345</height>
+    <height>321</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,7 +34,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="EmualtionTab">
     <property name="enabled">
@@ -307,78 +307,6 @@
     <attribute name="title">
      <string>Steuerung</string>
     </attribute>
-    <widget class="QLabel" name="label_GamePort1">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>81</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Game Port 1</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_GamePort2">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>50</y>
-       <width>81</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Game Port 2</string>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="GamePort1">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>25</y>
-       <width>256</width>
-       <height>21</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="GamePort2">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>65</y>
-       <width>256</width>
-       <height>21</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="JoySwap">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>90</y>
-       <width>201</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Port 1 mit Port 2 vertauschen</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="JoyScan">
-     <property name="geometry">
-      <rect>
-       <x>215</x>
-       <y>90</y>
-       <width>51</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>SCAN</string>
-     </property>
-    </widget>
    </widget>
    <widget class="QWidget" name="Lan64Tab">
     <property name="enabled">
@@ -396,19 +324,6 @@
      <string>GameBase64</string>
     </attribute>
    </widget>
-  </widget>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>5</x>
-     <y>320</y>
-     <width>111</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Temp Test Button</string>
-   </property>
   </widget>
  </widget>
  <resources/>

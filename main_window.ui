@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>437</width>
-    <height>192</height>
+    <height>199</height>
    </rect>
   </property>
   <property name="font">
@@ -101,12 +101,24 @@ background-position: center
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar">
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
    <property name="font">
     <font>
      <family>Arial</family>
      <weight>50</weight>
      <bold>false</bold>
     </font>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="sizeGripEnabled">
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QToolBar" name="toolBar">
@@ -329,16 +341,16 @@ background-position: center
      <normaloff>:/grafik/toolbar32/datasette.png</normaloff>:/grafik/toolbar32/datasette.png</iconset>
    </property>
    <property name="text">
-    <string>Kassettenlaufwerk 1530</string>
+    <string>Datasette 1530</string>
    </property>
    <property name="iconText">
-    <string>Kassettenlaufwerk 1530</string>
+    <string>Datasette 1530</string>
    </property>
    <property name="toolTip">
-    <string>Kassettenlaufwerk 1530</string>
+    <string>Datasette 1530</string>
    </property>
    <property name="statusTip">
-    <string>Alle Funktionen eines Kassettenlaufwerks 1530. [TAP,WAV]</string>
+    <string>Alle Funktionen der Datasette 1530. [TAP,WAV]</string>
    </property>
    <property name="font">
     <font>

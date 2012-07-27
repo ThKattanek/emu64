@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 26.07.2012		//
+// Letzte Änderung am 27.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -42,7 +42,7 @@ class C64Class
 {
 
 public:
-    C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(unsigned short,unsigned char)> jam_proc);
+    C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(char*)> log_function);
     ~C64Class();
     void FillAudioBuffer(unsigned char *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
     void KeyEvent(unsigned char  matrix_code,KeyStatus status, bool isAutoShift);
@@ -89,11 +89,6 @@ public:
 
     unsigned char GetMapReadSource(unsigned char page);
     unsigned char GetMapWriteDestination(unsigned char page);
-
-    int GetJoyAnzahl(void);
-    const char* GetJoyName(int index);
-    void SetJoy(int port, int joy_num);
-    void RemoveJoy(int port);
 
     int             AktWindowXW;
     int             AktWindowYW;
@@ -153,6 +148,7 @@ public:
 
     function<void(void)> AnimationRefreshProc;
     function<void(void)> BreakpointProc;
+    function<void(char*)> LogText;
 
     unsigned short	C64History[256];
     unsigned char	C64HistoryPointer;
@@ -203,9 +199,6 @@ private:
 
     unsigned char   GamePort1;
     unsigned char   GamePort2;
-
-    SDL_Joystick* joy[MAX_JOYS];
-    JOY_PREFS joyprefs[MAX_JOYS];
 
     /////////////////////// BREAKPOINTS ////////////////////////
 

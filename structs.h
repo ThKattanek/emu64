@@ -8,18 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 17.09.2011		//
+// Letzte Änderung am 27.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
 
 #ifndef STRUCTS_H
 #define STRUCTS_H
-
-#define	MAX_JOYS 2
-#define MAX_JOYNAME_LENGTH 260
-#define JOY_PORT_1 0
-#define JOY_PORT_2 1
 
 #define REG_MASK_ALL 255
 #define REG_MASK_PC 1
@@ -303,14 +298,6 @@ struct CPU_TUNING_STRUCT
 struct EMU_TUNING_STRUCT
 {
     CPU_TUNING_STRUCT	cpu;
-};
-
-struct JOY_PREFS
-{
-    int num_axes;
-    int num_balls;
-    int num_buttons;
-    int num_hats;
 };
 
 #endif // STRUCTS_H

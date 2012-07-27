@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 26.07.2012		//
+// Letzte Änderung am 27.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -28,8 +28,12 @@ int SDLThreadLoad(void *userdat);
 
 bool Test = false;
 
-C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(unsigned short,unsigned char)>)
+C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(char*)> log_function)
 {
+    LogText = log_function;
+
+    LogText((char*)">> C64 Klasse wurde gestartet...\n");
+
     pal = _pal;
     BreakGroupAnz = 0;
     FloppyFoundBreakpoint = false;
@@ -41,14 +45,14 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
 
     OpenGLEnable = OpenGLOn;
 
-    for(int i=0;i<MAX_JOYS; i++) joy[i] = NULL;
-
     /// SDL Installieren ///
 
-    if(SDL_Init(SDL_INIT_VIDEO ) < 0)
+    if(SDL_Init(SDL_INIT_VIDEO) < 0)
     {
+         LogText((char*)"ERROR: Fehler beim installieren von SDL\n");
         *ret_error = -1;
     }
+    LogText((char*)">> SDL wurde installiert\n");
 
     /// SLD Audio Installieren (C64 Emulation) ///
     SDL_AudioSpec format;
@@ -61,8 +65,10 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
 
     if(SDL_OpenAudio(&format,NULL) < 0)
     {
+        LogText((char*)"ERROR: Fehler beim installieren von SDL_Audio\n");
         *ret_error = -2;
     }
+    LogText((char*)">> SDL_Audio wurde installiert\n");
 
     SetGrafikModi(pal->StartC64isColorBit32,pal->StartC64isDoublesize,pal->StartC64isPalmode);
 
@@ -70,12 +76,9 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     SDL_SetColorKey(C64ScreenIcon,SDL_SRCCOLORKEY,SDL_MapRGB(C64ScreenIcon->format,0,0,0));
 
     SDL_WM_SetIcon(C64ScreenIcon,NULL);
-    SDL_WM_SetCaption("C64 Screen",0);
 
     SDL_initFramerate(&fps_manager);
     SDL_setFramerate(&fps_manager,50);
-
-    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 
     GamePort1 = 0;
     GamePort2 = 0;
@@ -274,18 +277,7 @@ C64Class::~C64Class()
     LoopThreadEnd = true;
     SDL_WaitThread(sdl_thread,0);
 
-    // Absturz unter Win32 //
-    RemoveJoy(0);
-    RemoveJoy(1);
-
-    // Absturz unter Linux //
-    /*
-    for(int i=0;0<MAX_JOYS;i++)
-        if(joy[i] != NULL) SDL_JoystickClose(joy[i]);
-    */
-
     SDL_AudioQuit();
-    SDL_Quit();
 
     delete mmu;
     delete cpu;
@@ -961,6 +953,7 @@ inline void C64Class::CheckKeys(void)
 void C64Class::UpdateJoyPorts()
 {
     /// Port 1 ///
+    /*
     GamePort1 = 0;
 
     int buttons = 0;
@@ -995,8 +988,10 @@ void C64Class::UpdateJoyPorts()
         GamePort1 |= 6;
         break;
     }
+    */
 
     /// Port 2
+    /*
     GamePort2 = 0;
 
     buttons = 0;
@@ -1031,6 +1026,7 @@ void C64Class::UpdateJoyPorts()
         GamePort2 |= 6;
         break;
     }
+    */
 }
 
 void C64Class::ResetC64CycleCounter(void)
@@ -1106,6 +1102,12 @@ void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool pal_enable, in
     FullResYW = fullres_yw;
 
     ChangeGrafikModi = true;
+
+    char str00[100];
+    sprintf(str00,">>   32Bit = %d\n>>   Doublesize = %d\n>>   PAL = %d\n>>   FullResXW = %d\n>>   FullResrYW = %d\n",ColBits32,DoubleSize,PalEnable,FullResXW,FullResYW);
+
+    LogText((char*)">> Grafikmodus wurde gesetzt:\n");
+    LogText(str00);
 }
 
 int SDLThreadLoad(void *userdat)
@@ -1242,15 +1244,22 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
     EXT[1]=toupper(EXT[1]);
     EXT[2]=toupper(EXT[2]);
 
+    char str00[256];
+
     if(0==strcmp("PRG",EXT))
     {
+        LogText((char*)">> PRG laden: ");
+        LogText(filename);
+        LogText((char*)"\n");
+
         unsigned short StartAdresse;
         int reading_bytes;
         unsigned char temp[2];
         file = fopen (filename, "rb");
         if (file == NULL)
         {
-                return 0x01;
+            LogText((char*)"<< ERROR: Datei konnte nicht geöffnet werden");
+            return 0x01;
         }
         reading_bytes = fread (&temp,1,2,file);
         StartAdresse=temp[0]|(temp[1]<<8);
@@ -1261,6 +1270,9 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         RAM[0x2B] = 0x01;
         RAM[0x2C] = 0x08;
 
+        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",StartAdresse,StartAdresse);
+        LogText(str00);
+
         StartAdresse+=(unsigned short)reading_bytes;
         RAM[0x2D] = (unsigned char)StartAdresse;
         RAM[0x2E] = (unsigned char)(StartAdresse>>8);
@@ -1268,11 +1280,19 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         RAM[0xAF] = (unsigned char)(StartAdresse>>8);
 
         fclose(file);
+
+        sprintf(str00,"EndAdresse: $%4.4X(%d)\n",StartAdresse,StartAdresse);
+        LogText(str00);
+
         return 0x00;
     }
 
     if(0==strcmp("T64",EXT))
     {
+        LogText((char*)">> T64 laden: ");
+        LogText(filename);
+        LogText((char*)"\n");
+
         char Kennung[32];
         unsigned short T64Entries;
         unsigned short StartAdresse;
@@ -1282,6 +1302,7 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         file = fopen (filename, "rb");
         if (file == NULL)
         {
+            LogText((char*)"<< ERROR: Datei konnte nicht geöffnet werden");
                 return 0x01;
         }
 
@@ -1323,11 +1344,20 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         RAM[0xAE] = (unsigned char)EndAdresse;
         RAM[0xAF] = (unsigned char)(EndAdresse>>8);
 
+        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",StartAdresse,StartAdresse);
+        LogText(str00);
+        sprintf(str00,"EndAdresse: $%4.4X(%d)\n",EndAdresse,EndAdresse);
+        LogText(str00);
+
         return 0x00;
     }
 
     if(0==strcmp("P00",EXT))
     {
+        LogText((char*)">> P00 laden: ");
+        LogText(filename);
+        LogText((char*)"\n");
+
         char Kennung[8];
         unsigned short StartAdresse;
         int reading_bytes;
@@ -1335,6 +1365,7 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         file = fopen (filename, "rb");
         if (file == NULL)
         {
+            LogText((char*)"<< ERROR: Datei konnte nicht geöffnet werden");
                 return 0x01;
         }
 
@@ -1357,6 +1388,9 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         RAM[0x2B] = 0x01;
         RAM[0x2C] = 0x08;
 
+        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",StartAdresse,StartAdresse);
+        LogText(str00);
+
         StartAdresse+=(unsigned short)reading_bytes;
         RAM[0x2D] = (unsigned char)StartAdresse;
         RAM[0x2E] = (unsigned char)(StartAdresse>>8);
@@ -1364,6 +1398,10 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         RAM[0xAF] = (unsigned char)(StartAdresse>>8);
 
         fclose(file);
+
+        sprintf(str00,"EndAdresse: $%4.4X(%d)\n",StartAdresse,StartAdresse);
+        LogText(str00);
+
         return 0x00;
     }
     return 0x02;
@@ -1761,53 +1799,6 @@ unsigned char C64Class::GetMapReadSource(unsigned char page)
 unsigned char C64Class::GetMapWriteDestination(unsigned char page)
 {
     return mmu->GetWriteDestination(page);
-}
-
-int C64Class::GetJoyAnzahl()
-{
-    SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-    return SDL_NumJoysticks();
-}
-
-const char* C64Class::GetJoyName(int index)
-{
-    return SDL_JoystickName(index);
-}
-
-void C64Class::SetJoy(int port, int joy_num)
-{
-    if(port >= MAX_JOYS) return;
-
-    if(joy[port])
-    {
-        SDL_JoystickClose(joy[port]);
-        joy[port] = 0;
-    }
-
-    joy[port] = SDL_JoystickOpen(joy_num);
-    /*
-    if(joy[port])
-    {
-        joyprefs[port].num_axes = SDL_JoystickNumAxes(joy[port]);
-        joyprefs[port].num_balls = SDL_JoystickNumBalls(joy[port]);
-        joyprefs[port].num_buttons = SDL_JoystickNumButtons(joy[port]);
-        joyprefs[port].num_hats = SDL_JoystickNumHats(joy[port]);
-    }
-    */
-}
-
-void C64Class::RemoveJoy(int port)
-{
-    if(port < MAX_JOYS)
-    {
-        if(joy[port])
-        {
-            //pal->ConvertVid
-            SDL_JoystickClose(joy[port]);
-            joy[port] = 0;
-        }
-    }
 }
 
 int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)

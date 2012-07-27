@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 23.07.2011		//
+// Letzte Änderung am 27.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -28,7 +28,6 @@ int main(int argc, char *argv[])
     QFile LogFile("emu64.log");
 
     QApplication a(argc, argv);
-    MainWindow w;
 
     if(LogFile.open(QIODevice::WriteOnly | QIODevice::Text))
     {
@@ -44,14 +43,17 @@ int main(int argc, char *argv[])
 #endif
 
     if(log!=0) *log << "Emu64 Version: " << str_emu64_version << "\n\n";
+
+    /*
     if(log!=0) *log << "comandline count: " << argc << "\n";
     for(int i=0;i<argc;i++)
         if(log!=0) *log << "comand [" << i << "] " << argv[i];
+    */
+
+    MainWindow w(0,log);
 
     w.log = log;
     w.show();
-
-    delete log;
 
     return a.exec();
 };

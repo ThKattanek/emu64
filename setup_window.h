@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 11.10.2011		//
+// Letzte Änderung am 27.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -39,18 +39,11 @@ signals:
     void ChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode);
 
 private slots:
-    void on_pushButton_clicked();
     void on_C64Farbmodus_currentIndexChanged(int index);
     void on_WPal_toggled(bool checked);
     void on_WDouble_toggled(bool checked);
     void on_W16Bit_toggled(bool checked);
     void on_W32Bit_toggled(bool checked);
-
-    void on_JoyScan_clicked();
-
-    void on_GamePort1_currentIndexChanged(int index);
-
-    void on_GamePort2_currentIndexChanged(int index);
 
 private:
     Ui::SetupWindow *ui;

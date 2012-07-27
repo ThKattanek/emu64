@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 12.10.2011		//
+// Letzte Änderung am 27.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -50,11 +50,12 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = 0,QTextStream *_log = NULL);
     ~MainWindow();
     Ui::MainWindow *ui;
 
     QTextStream *log;
+    void LogText(char*);
 
     /// C64 Klasse ///
     C64Class *c64;

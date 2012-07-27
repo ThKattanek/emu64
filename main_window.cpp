@@ -17,11 +17,13 @@
 #include "ui_main_window.h"
 #include "version.h"
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     c64(0)
 {
+    log = _log;
+
     /// Haputfenster UI setzen ///
     ui->setupUi(this);
 
@@ -36,25 +38,6 @@ MainWindow::MainWindow(QWidget *parent) :
     /// ApplicationPath holen und abspeichern ///
     appPath = QApplication::applicationDirPath();
 
-    setWindowIcon(QIcon(":/grafik/emu64.ico"));
-
-    /// Klassen installieren ///
-    videopal = new VideoPalClass();
-
-    /// INI Dateiverwaltung erstellen ///
-    ini = new QSettings(appPath+"/emu64.ini",QSettings::IniFormat,this);
-
-    /// Window Klassen erstellen ///
-    /// Unter MAC sollte ohne übergabe des this Zeigers die Klasseb erstellt werden
-
-    info_window = new InfoWindow(this);
-    tv_setup_window = new TVSetupWindow(this,videopal,ini);
-    floppy_window = new FloppyWindow(this,ini);
-    c64_keyboard_window = new C64KeyboardWindow(this,ini);
-    crt_window = new CrtWindow(this,ini);
-    debugger_window = new DebuggerWindow(this,ini);
-    setup_window = new SetupWindow(this,SLOT(onChangeGrafikModi(bool,bool,bool,bool)),videopal,ini);
-
     /// Translator installieren ///
     langPath = appPath+"/languages";
     qApp->installTranslator(&qtTranslator);
@@ -62,14 +45,46 @@ MainWindow::MainWindow(QWidget *parent) :
     QString SystemLocale = QLocale::system().name();       // "de_DE"
     SystemLocale.truncate(SystemLocale.lastIndexOf('_'));  // "de"
 
+    LogText(QString(tr(">> Translator wurde intsalliert: Systemsprache = ") + SystemLocale + "\n").toAscii().data());
+
+    setWindowIcon(QIcon(":/grafik/emu64.ico"));
+
+    /// Klassen installieren ///
+    videopal = new VideoPalClass();
+    LogText(tr(">> VideoPal Klasse wurde installiert\n").toAscii().data());
+
+    /// INI Dateiverwaltung erstellen ///
+    ini = new QSettings(appPath+"/emu64.ini",QSettings::IniFormat,this);
+    LogText(QString(">> INI System wurde erzeugt: " + appPath+"/emu64.ini\n").toAscii().data());
+
+    /// Window Klassen erstellen ///
+    /// Unter MAC sollte ohne übergabe des this Zeigers die Klasseb erstellt werden
+
+    info_window = new InfoWindow(this);
+    LogText(tr(">> InfoWindow wurde erzeugt\n").toAscii().data());
+    tv_setup_window = new TVSetupWindow(this,videopal,ini);
+    LogText(tr(">> TVSetupWindow wurde erzeugt\n").toAscii().data());
+    floppy_window = new FloppyWindow(this,ini);
+    LogText(tr(">> FloppyWindow wurde erzeugt\n").toAscii().data());
+    c64_keyboard_window = new C64KeyboardWindow(this,ini);
+    LogText(tr(">> C64KeyboardWindow wurde erzeugt\n").toAscii().data());
+    crt_window = new CrtWindow(this,ini);
+    LogText(tr(">> CrtWindow wurde erzeugt\n").toAscii().data());
+    debugger_window = new DebuggerWindow(this,ini);
+    LogText(tr(">> DebuggerWindow wurde erzeugt\n").toAscii().data());
+    setup_window = new SetupWindow(this,SLOT(onChangeGrafikModi(bool,bool,bool,bool)),videopal,ini);
+    LogText(tr(">> SetupWindow wurde erzeugt\n").toAscii().data());
+
     ini->beginGroup("MainWindow");
     CreateLanguageMenu(ini->value("lang",SystemLocale).toString());
     ini->endGroup();
 
     /// C64 Klasse Installieren ... Das HERZ ///
     int ret_error;
-    c64 = new C64Class(&ret_error,videopal,true,0);
+    c64 = new C64Class(&ret_error,videopal,true,bind(&MainWindow::LogText,this,_1));
     if(ret_error != 0) ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim installieren der C64 Klasse"))       
+
+    SDL_WM_SetCaption((const char*)tr("C64 Bildschirm").toAscii().data(),0);
 
     /// Debugger Window mit C64 verbinden ///
     debugger_window->SetC64Pointer(c64);
@@ -185,6 +200,19 @@ MainWindow::~MainWindow()
     delete setup_window;
     delete ui;
     delete ini;
+    LogText(tr(">> Es wurden alle Klassen wieder entfernt\n").toAscii().data());
+
+    LogText(tr("\n>> Emu64 wurde sauber beendet...").toAscii().data());
+    delete log;
+
+}
+
+void MainWindow::LogText(char *log_text)
+{
+    if(log != NULL)
+    {
+        *log << log_text;
+    }
 }
 
 void MainWindow::changeEvent(QEvent *event)
@@ -269,6 +297,8 @@ void MainWindow::RetranslateUi()
     crt_window->RetranslateUi();
     debugger_window->RetranslateUi();
     setup_window->RetranslateUi();
+
+    SDL_WM_SetCaption(tr("C64 Bildschirm").toAscii().data(),0);
 }
 
 void MainWindow::on_menu_main_info_triggered()
