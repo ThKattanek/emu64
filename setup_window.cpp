@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 27.07.2012		//
+// Letzte Änderung am 29.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -122,4 +122,9 @@ void SetupWindow::on_WFilter_toggled(bool)
 void SetupWindow::ReSetup()
 {
     emit ChangeGrafikModi(false,ui->WPal->isChecked(),ui->WDouble->isChecked(),ui->W32Bit->isChecked(),ui->WFilter->isChecked());
+}
+
+void SetupWindow::on_RecJoy_clicked()
+{
+    c64->StartRecJoystickMapping(0);
 }

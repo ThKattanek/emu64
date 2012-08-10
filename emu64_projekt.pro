@@ -45,7 +45,8 @@ SOURCES += \
     widget_bit_leiste.cpp \
     setup_window.cpp \
     widget_d64_file.cpp \
-    debugger_vic_window.cpp
+    debugger_vic_window.cpp \
+    single_application.cpp
 
 HEADERS  += \
     version.h \
@@ -92,7 +93,8 @@ HEADERS  += \
     widget_bit_leiste.h \
     setup_window.h \
     widget_d64_file.h \
-    debugger_vic_window.h
+    debugger_vic_window.h \
+    single_application.h
 
 FORMS    += \
     info_window.ui \
@@ -120,26 +122,26 @@ win32-g++{
 TARGET = emu64
 RC_FILE = emu64.rc
 DESTDIR = "bin/windows_x32"
-LIBS += -lSDL -lSDL_gfx -lquazip -lopengl32
+LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lopengl32 -lglu32
 }
 
 win32-g++-64{
 TARGET = emu64
 RC_FILE = emu64.rc
 DESTDIR = "bin/windows_x64"
-LIBS += -lSDL -lSDL_gfx -lquazip -lopengl32
+LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lopengl32 -lglu32
 }
 
 linux-g++-64{
 TARGET = emu64
 DESTDIR = "bin/linux_x86_64"
-LIBS += -lSDL -lSDL_gfx -lquazip -lGL -lGLU
+LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU
 }
 
 linux-g++{
 TARGET = emu64
 DESTDIR = "bin/linux_i586"
-LIBS += -lSDL -lSDL_gfx -lquazip -lGL -lGLU
+LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU
 }
 
 macx{
@@ -158,6 +160,12 @@ OTHER_FILES += \
     docs/readme linux.txt \
     docs/readme linux.txt \
     docs/readme.txt
+
+
+
+
+
+
 
 
 

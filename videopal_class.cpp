@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 26.07.2012		//
+// Letzte Änderung am 28.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -146,7 +146,7 @@ void VideoPalClass::SetC64Palette(int palnr)
         {
             /// Für 32Bit Video Display ///
 
-            Palette32Bit[ij] = COLOR_RGBA1[0]<<16 | COLOR_RGBA1[1]<<8 | COLOR_RGBA1[2];
+            Palette32Bit[ij] = 0xff000000 | COLOR_RGBA1[0]<<16 | COLOR_RGBA1[1]<<8 | COLOR_RGBA1[2];
 
             /// Für 16Bit Video Display ///
             //Palette16Bit[ij] = (uint16_t)SDL_MapRGB(pixel_format,COLOR_RGBA1[0],COLOR_RGBA1[1],COLOR_RGBA1[2]);

@@ -8,13 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 27.07.2012		//
+// Letzte Änderung am 10.08.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
 
-#include <QtGui/QApplication>
-#include <QMessageBox>
+#include "single_application.h"
 #include "main_window.h"
 #include "version.h"
 
@@ -27,7 +26,12 @@ int main(int argc, char *argv[])
     QTextStream *log = 0;
     QFile LogFile("emu64.log");
 
-    QApplication a(argc, argv);
+    SingleApplication app(argc, argv,  "some unique key string");
+    if (app.alreadyExists())
+    {
+        for(int i=0;i<argc;i++) app.sendMessage(argv[i]);
+        return 0;
+    }
 
     if(LogFile.open(QIODevice::WriteOnly | QIODevice::Text))
     {
@@ -44,16 +48,20 @@ int main(int argc, char *argv[])
 
     if(log!=0) *log << "Emu64 Version: " << str_emu64_version << "\n\n";
 
-    /*
-    if(log!=0) *log << "comandline count: " << argc << "\n";
-    for(int i=0;i<argc;i++)
-        if(log!=0) *log << "comand [" << i << "] " << argv[i];
-    */
-
     MainWindow w(0,log);
+
+    QObject::connect(&app,SIGNAL(messageAvailable(QStringList)),&w,SLOT(OnMessage(QStringList)));
 
     w.log = log;
     w.show();
 
-    return a.exec();
+    QStringList msg_list;
+    for(int i=0;i<argc;i++)
+    {
+        msg_list << argv[i];
+    }
+
+    w.OnMessage(msg_list);
+
+    return app.exec();
 };

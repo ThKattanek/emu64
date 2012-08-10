@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 27.07.2012		//
+// Letzte Änderung am 28.07.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -46,6 +46,7 @@ private slots:
     void on_W16Bit_toggled(bool checked);
     void on_W32Bit_toggled(bool checked);
     void on_WFilter_toggled(bool checked);
+    void on_RecJoy_clicked();
 
 private:
     Ui::SetupWindow *ui;

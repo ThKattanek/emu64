@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 27.07.2012		//
+// Letzte Änderung am 10.08.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -30,19 +30,22 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
 #include <SDL/SDL_framerate.h>
+#include <SDL/SDL_image.h>
 
 #include "tr1/functional"
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
 
 #define FloppyAnzahl 4
-#define MAX_BREAK_GROUPS 255
+#define MAX_BREAK_GROUPS 256
+#define MAX_JOYSTICKS 16
+#define MAX_VJOYS 256
 
 class C64Class
 {
 
 public:
-    C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(char*)> log_function);
+    C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(char*)> log_function, const char* gfx_path);
     ~C64Class();
     void FillAudioBuffer(unsigned char *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
     void KeyEvent(unsigned char  matrix_code,KeyStatus status, bool isAutoShift);
@@ -86,6 +89,8 @@ public:
     bool ExportPRG(char *filename, unsigned short start_adresse, unsigned short end_adresse, int source);
     bool ExportRAW(char *filename, unsigned short start_adresse, unsigned short end_adresse, int source);
     bool ExportASM(char* filename, unsigned short start_adresse, unsigned short end_adresse, int source);
+    void JoystickNewScan(void);
+    void StartRecJoystickMapping(int mapping_typ);
 
     unsigned char GetMapReadSource(unsigned char page);
     unsigned char GetMapWriteDestination(unsigned char page);
@@ -113,6 +118,22 @@ public:
     unsigned char   *C64ScreenBuffer;
     bool            DrawScreenBack;
     bool            OpenGLEnable;
+
+    SDL_Surface     *Pfeil0;
+    SDL_Surface     *Pfeil1;
+    SDL_Surface     *Kreis0;
+    SDL_Surface     *Kreis1;
+    bool            RecJoyMapping;
+    int             RecJoyMappingPos;          // 0-4 // Hoch - Runter - Links - Rechts - Feuer
+    int             RecJoyMappingTyp;          // 0 - Keyboard / 1 - Joystick
+    int             RecAktJoy;                 // 0 - MAX_VJOYS
+
+    VIRTUAL_JOY_STRUCT  VJoys[MAX_VJOYS];
+    int                 VPort1;
+    int                 VPort2;
+
+    unsigned char   GamePort1;
+    unsigned char   GamePort2;
 
     SDL_Thread      *sdl_thread;
     bool            sdl_thread_pause;
@@ -168,9 +189,19 @@ private:
     unsigned char ReadIO2(unsigned short adresse);
     void SDLThreadPauseBegin(void);
     void SDLThreadPauseEnd(void);
+    void OpenSDLJoystick(void);
+    void CloseSDLJoystick(void);
 
     function<unsigned char(unsigned short)> *ReadProcTbl;
     function<void(unsigned short,unsigned char)> *WriteProcTbl;
+
+    const char* GfxPath;
+
+    bool SDLJoystickIsOpen;
+    int  JoystickAnzahl;
+    const char *JoystickNamen[MAX_JOYSTICKS];
+    bool StopJoystickUpdate;
+    bool JoyStickUdateIsStop;
 
     bool RDY_BA;            // Leitung CPU <-- VIC
     bool HRESET;            // Zusatz Anzeige für MMU Reset
@@ -197,9 +228,6 @@ private:
 
     unsigned char   KeyboardMatrixToPB[8];
     unsigned char   KeyboardMatrixToPA[8];
-
-    unsigned char   GamePort1;
-    unsigned char   GamePort2;
 
     /////////////////////// BREAKPOINTS ////////////////////////
 

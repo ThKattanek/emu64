@@ -34,7 +34,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="EmualtionTab">
     <property name="enabled">
@@ -304,9 +304,102 @@
     <property name="enabled">
      <bool>true</bool>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
     <attribute name="title">
      <string>Steuerung</string>
     </attribute>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="geometry">
+      <rect>
+       <x>5</x>
+       <y>5</y>
+       <width>381</width>
+       <height>156</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Virtuelle - Joystick's</string>
+     </property>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Slot</string>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="tableWidget">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>35</y>
+        <width>196</width>
+        <height>116</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="RecJoy">
+      <property name="geometry">
+       <rect>
+        <x>225</x>
+        <y>125</y>
+        <width>126</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Lernmodus starten</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="geometry">
+      <rect>
+       <x>5</x>
+       <y>165</y>
+       <width>381</width>
+       <height>106</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>C64 Gameport's</string>
+     </property>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>35</y>
+        <width>36</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Port 1</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>295</x>
+        <y>35</y>
+        <width>36</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Port 2</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
    <widget class="QWidget" name="Lan64Tab">
     <property name="enabled">

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 27.07.2012		//
+// Letzte Änderung am 10.08.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -298,6 +298,14 @@ struct CPU_TUNING_STRUCT
 struct EMU_TUNING_STRUCT
 {
     CPU_TUNING_STRUCT	cpu;
+};
+
+struct VIRTUAL_JOY_STRUCT
+{
+    int             Type;                   // 0 = Tastatur ; 1 = Joystick
+    char            Name[32];
+    unsigned char   KeyDown[5];             // [0]=Hoch [1]=Runter [2]=Links [3]=Rechts [4]=Feuer
+    unsigned char   KeyUp[5];               // [0]=Hoch [1]=Runter [2]=Links [3]=Rechts [4]=Feuer
 };
 
 #endif // STRUCTS_H

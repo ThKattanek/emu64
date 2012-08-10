@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 27.07.2012		//
+// Letzte Änderung am 10.08.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -82,7 +82,7 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
 
     /// C64 Klasse Installieren ... Das HERZ ///
     int ret_error;
-    c64 = new C64Class(&ret_error,videopal,true,bind(&MainWindow::LogText,this,_1));
+    c64 = new C64Class(&ret_error,videopal,true,bind(&MainWindow::LogText,this,_1),QString(appPath + "/gfx/").toAscii().data());
     if(ret_error != 0) ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim Installieren der C64 Klasse"))
 
     setup_window->ReSetup();
@@ -187,6 +187,11 @@ MainWindow::~MainWindow()
             ini->setValue("VolumeMode",w->GetFloppyVolume());
             ini->endGroup();
         }
+
+        ini->beginGroup("VJoys");
+
+        ini->setValue("VJoyMapping",QVariant((char*) c64->VJoys));
+        ini->endGroup();
     }
     /////////////////////////////////////
 
@@ -208,6 +213,12 @@ MainWindow::~MainWindow()
     LogText(tr("\n>> Emu64 wurde sauber beendet...").toAscii().data());
     delete log;
 
+}
+
+void MainWindow::OnMessage(QStringList msg)
+{
+    for(int i=0;i<msg.length();i++)
+        QMessageBox::information(this,"Komandozeile",msg[i]);
 }
 
 void MainWindow::LogText(char *log_text)
@@ -254,6 +265,9 @@ void MainWindow::CreateLanguageMenu(QString defaultLocale)
 
       QString lang = QLocale::languageToString(QLocale(locale).language());
 
+      if(lang == "German") lang = "Deutsch";
+
+
       QAction *action = new QAction(lang, this);
       action->setCheckable(true);
       action->setData(locale);
@@ -263,7 +277,7 @@ void MainWindow::CreateLanguageMenu(QString defaultLocale)
       iconfile = dir.filePath(iconfile + ".png");
       action->setIcon(QIcon(iconfile));
       action->setIconVisibleInMenu(true);
-      action->setStatusTip(tr("Sprache: ") + lang);
+      action->setStatusTip(tr("Wechseln zur Sprache: ") + lang);
 
       ui->menuSprache->addAction(action);
       langGroup->addAction(action);
@@ -408,7 +422,11 @@ void MainWindow::on_actionDebugger_Disassembler_triggered()
 
 void MainWindow::on_actionEmu64_Einstellungen_triggered()
 {
-    if(setup_window->isHidden()) setup_window->show();
+    if(setup_window->isHidden())
+    {
+        c64->JoystickNewScan();
+        setup_window->show();
+    }
     else setup_window->hide();
 }
 

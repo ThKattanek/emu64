@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 27.07.2012		//
+// Letzte Änderung am 10.08.2012		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -60,6 +60,9 @@ public:
     /// C64 Klasse ///
     C64Class *c64;
     VideoPalClass *videopal;
+
+public slots:
+    void OnMessage(QStringList msg);
 
 private slots:
     void on_menu_main_info_triggered();
