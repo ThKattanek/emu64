@@ -219,7 +219,23 @@ OTHER_FILES += \
     emu64_en.qm \
     emu64_de.ts \
     emu64_de.qm \
-    emu64_en.ts
+    emu64_en.ts \
+    grafik/flaggen/emu64_en.png \
+    grafik/flaggen/emu64_de.png \
+    floppy_sounds/stepper_inc.raw \
+    floppy_sounds/stepper_dec.raw \
+    floppy_sounds/motor_on.raw \
+    floppy_sounds/motor_off.raw \
+    floppy_sounds/motor.raw \
+    floppy_sounds/FloppySound Hinweis.txt \
+    floppy_sounds/anschlag.raw \
+    grafik/pfeil1.png \
+    grafik/pfeil0.png \
+    grafik/kreis1.png \
+    grafik/kreis0.png
+
+
+
 
 
 
