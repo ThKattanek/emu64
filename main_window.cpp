@@ -225,8 +225,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::OnMessage(QStringList msg)
 {
+    /*
     for(int i=0;i<msg.length();i++)
         QMessageBox::information(this,"Komandozeile",msg[i]);
+    */
 }
 
 void MainWindow::LogText(char *log_text)
