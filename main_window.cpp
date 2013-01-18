@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 10.08.2012		//
+// Letzte Änderung am 18.01.2013		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -57,7 +57,6 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
     ini = new QSettings(appPath+"/emu64.ini",QSettings::IniFormat,this);
     LogText(QString(">> INI System wurde erzeugt: " + appPath+"/emu64.ini\n").toAscii().data());
 
-
     /// Window Klassen erstellen ///
     /// Unter MAC sollte ohne übergabe des this Zeigers die Klasseb erstellt werden
 
@@ -83,7 +82,11 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
     /// C64 Klasse Installieren ... Das HERZ ///
     int ret_error;
     c64 = new C64Class(&ret_error,videopal,true,bind(&MainWindow::LogText,this,_1),QString(appPath + "/gfx/").toAscii().data());
-    if(ret_error != 0) ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim Installieren der C64 Klasse"))
+    if(ret_error != 0)
+    {
+        ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim Installieren der C64 Klasse"))
+        this->close();
+    }
 
     setup_window->ReSetup();
 
@@ -100,7 +103,10 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
     /// C64 Systemroms laden ///
     if(!c64->LoadC64Roms((char*)QString(appPath+"/roms/kernal.rom").toAscii().data(),(char*)QString(appPath+"/roms/basic.rom").toAscii().data(),(char*)QString(appPath+"/roms/char.rom").toAscii().data()))
     {
-        ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim Laden der C64 ROMs."))
+        LogText((char*)"<< ERROR: Fehler beim laden der C64 Roms\n\t");
+        LogText(QString(appPath+"/roms/kernal.rom").toAscii().data());LogText("\n\t");
+        LogText(QString(appPath+"/roms/basic.rom").toAscii().data());LogText("\n\t");
+        LogText(QString(appPath+"/roms/char.rom").toAscii().data());LogText("\n");
     }
 
     /// C64 Keyboard Matrix mit dem Virtual Keyboard verbinden ///
@@ -159,7 +165,9 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
         crt_window->LoadIni();
     }
     this->update();
+
     /////////////////////////////////////
+    c64->StartEmulation();
     c64->HardReset();
 }
 

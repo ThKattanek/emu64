@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 10.08.2012		//
+// Letzte Änderung am 18.01.2013		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -47,6 +47,7 @@ class C64Class
 public:
     C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(char*)> log_function, const char* gfx_path);
     ~C64Class();
+    void StartEmulation(void);
     void FillAudioBuffer(unsigned char *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
     void KeyEvent(unsigned char  matrix_code,KeyStatus status, bool isAutoShift);
     bool LoadC64Roms(char *kernalrom,char *basicrom,char *charrom);

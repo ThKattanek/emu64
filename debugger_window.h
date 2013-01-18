@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 30.12.2011		//
+// Letzte Änderung am 18.01.2013		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -97,6 +97,7 @@ private:
     void AddBreakpointTreeRoot(QString name,BREAK_GROUP *bg);
     void AddBreakpointTreeChild(QTreeWidgetItem *parent, unsigned short value, unsigned char checked, QString tooltip);
     void ClearAllBreakpointBackcolors(void);
+    void FillMicroCodeStringTable(void);
     void RefreshGUI(void);
 
     C64Class *c64;

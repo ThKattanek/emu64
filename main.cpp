@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 10.08.2012		//
+// Letzte Änderung am 18.01.2013		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     QTextStream *log = 0;
     QFile LogFile("emu64.log");
 
-    SingleApplication app(argc, argv,  "some unique key string");
+    SingleApplication app(argc, argv,  "Emu64_By_Thorsten_Kattanek");
     if (app.alreadyExists())
     {
         for(int i=0;i<argc;i++) app.sendMessage(argv[i]);

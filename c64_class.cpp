@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 10.08.2012		//
+// Letzte Änderung am 18.01.2013		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -71,15 +71,18 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
         LogText((char*)"<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
         LogText(filename);
         LogText((char*)"\n");
+
+        //*ret_error = -2;
     }
     else
     {
         LogText((char*)">> Folgendes Bild wurde erfolgreich geladen --- ");
         LogText(filename);
         LogText((char*)"\n");
+
+        if ( (Pfeil0->w & (Pfeil0->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
+        if ( (Pfeil0->h & (Pfeil0->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
     }
-    if ( (Pfeil0->w & (Pfeil0->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-    if ( (Pfeil0->h & (Pfeil0->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
 
     sprintf(filename,"%spfeil1.png",GfxPath);
     Pfeil1 = IMG_Load(filename);
@@ -88,16 +91,18 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
         LogText((char*)"<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
         LogText(filename);
         LogText((char*)"\n");
+
+        //*ret_error = -3;
     }
     else
     {
         LogText((char*)">> Folgendes Bild wurde erfolgreich geladen --- ");
         LogText(filename);
         LogText((char*)"\n");
-    }
-    if ( (Pfeil1->w & (Pfeil1->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-    if ( (Pfeil1->h & (Pfeil1->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
 
+        if ( (Pfeil1->w & (Pfeil1->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
+        if ( (Pfeil1->h & (Pfeil1->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
+    }
 
     sprintf(filename,"%skreis0.png",GfxPath);
     Kreis0 = IMG_Load(filename);
@@ -106,15 +111,18 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
         LogText((char*)"<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
         LogText(filename);
         LogText((char*)"\n");
+
+        //*ret_error = -4;
     }
     else
     {
         LogText((char*)">> Folgendes Bild wurde erfolgreich geladen --- ");
         LogText(filename);
         LogText((char*)"\n");
+
+        if ( (Kreis0->w & (Kreis0->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
+        if ( (Kreis0->h & (Kreis0->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
     }
-    if ( (Kreis0->w & (Kreis0->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-    if ( (Kreis0->h & (Kreis0->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
 
     sprintf(filename,"%skreis1.png",GfxPath);
     Kreis1 = IMG_Load(filename);
@@ -123,15 +131,18 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
         LogText((char*)"<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
         LogText(filename);
         LogText((char*)"\n");
+
+       // *ret_error = -5;
     }
     else
     {
         LogText((char*)">> Folgendes Bild wurde erfolgreich geladen --- ");
         LogText(filename);
         LogText((char*)"\n");
+
+        if ( (Kreis1->w & (Kreis1->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
+        if ( (Kreis1->h & (Kreis1->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
     }
-    if ( (Kreis1->w & (Kreis1->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-    if ( (Kreis1->h & (Kreis1->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
 
     /// SLD Audio Installieren (C64 Emulation) ///
     SDL_AudioSpec format;
@@ -144,8 +155,8 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
 
     if(SDL_OpenAudio(&format,NULL) < 0)
     {
-        LogText((char*)"ERROR: Fehler beim installieren von SDL_Audio\n");
-        *ret_error = -2;
+        LogText((char*)"<< ERROR: Fehler beim installieren von SDL_Audio\n");
+        *ret_error = -6;
     }
     LogText((char*)">> SDL_Audio wurde installiert\n");
 
@@ -154,9 +165,13 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     SetGrafikModi(pal->StartC64isColorBit32,pal->StartC64isDoublesize,pal->StartC64isPalmode,false);
 
     C64ScreenIcon = SDL_LoadBMP("c64window.bmp");
-    SDL_SetColorKey(C64ScreenIcon,SDL_SRCCOLORKEY,SDL_MapRGB(C64ScreenIcon->format,0,0,0));
-
-    SDL_WM_SetIcon(C64ScreenIcon,NULL);
+    if(C64ScreenIcon != NULL)
+    {
+        SDL_SetColorKey(C64ScreenIcon,SDL_SRCCOLORKEY,SDL_MapRGB(C64ScreenIcon->format,0,0,0));
+        SDL_WM_SetIcon(C64ScreenIcon,NULL);
+    }
+    else
+        LogText((char*)"<< ERROR: Fehler beim laden des SLDFenster Icons\n");
 
     SDL_initFramerate(&fps_manager);
     SDL_setFramerate(&fps_manager,50);
@@ -347,10 +362,6 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     cpu->HistoryPointer = &C64HistoryPointer;
 
     for(int i=0;i<0x10000;i++) Breakpoints[i] = 0;
-
-    /// SLD Thread starten (ab hier startet auch die C64 Emulation ///
-    sdl_thread = SDL_CreateThread(SDLThread, this);
-    SDL_PauseAudio(0);
 }
 
 C64Class::~C64Class()
@@ -372,6 +383,12 @@ C64Class::~C64Class()
     delete crt;
 }
 
+void C64Class::StartEmulation()
+{
+    /// SLD Thread starten (ab hier startet auch die C64 Emulation ///
+    sdl_thread = SDL_CreateThread(SDLThread, this);
+    SDL_PauseAudio(0);
+}
 
 void AudioMix(void *userdat, Uint8 *stream, int laenge)
 {
@@ -505,21 +522,24 @@ int SDLThread(void *userdat)
                 GLenum  TextureFormat;
                 GLint   NofColors;
 
-                NofColors = c64->Pfeil0->format->BytesPerPixel;
+                if(c64->Pfeil0 != NULL)
+                {
+                    NofColors = c64->Pfeil0->format->BytesPerPixel;
 
-                if(NofColors == 4)
-                {
-                    if(c64->Pfeil0->format->Rmask==0x000000ff)
-                        TextureFormat=GL_RGBA;
-                    else
-                        TextureFormat=GL_BGRA;
-                }
-                else if(NofColors == 3) //no alpha channel
-                {
-                    if(c64->Pfeil0->format->Rmask==0x000000ff)
-                        TextureFormat=GL_RGB;
-                    else
-                        TextureFormat=GL_BGR;
+                    if(NofColors == 4)
+                    {
+                        if(c64->Pfeil0->format->Rmask==0x000000ff)
+                            TextureFormat=GL_RGBA;
+                        else
+                            TextureFormat=GL_BGRA;
+                    }
+                    else if(NofColors == 3) //no alpha channel
+                    {
+                        if(c64->Pfeil0->format->Rmask==0x000000ff)
+                            TextureFormat=GL_RGB;
+                        else
+                            TextureFormat=GL_BGR;
+                    }
                 }
 
                 // Ich setze mal vorraus das alle 4 Images das selbe Format haben !! //
@@ -535,6 +555,7 @@ int SDLThread(void *userdat)
                     //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, c64->Pfeil0->w, c64->Pfeil0->h, 0,TextureFormat, GL_UNSIGNED_BYTE, c64->Pfeil0->pixels );
                     gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, c64->Pfeil0->w, c64->Pfeil0->h,TextureFormat, GL_UNSIGNED_BYTE, c64->Pfeil0->pixels );
                 }
+
                 if(c64->Pfeil1 != NULL)
                 {
                     glGenTextures(1,&Pfeil1Texture);
@@ -546,6 +567,7 @@ int SDLThread(void *userdat)
                     //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, c64->Pfeil1->w, c64->Pfeil1->h, 0,TextureFormat, GL_UNSIGNED_BYTE, c64->Pfeil1->pixels );
                     gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, c64->Pfeil1->w, c64->Pfeil1->h,TextureFormat, GL_UNSIGNED_BYTE, c64->Pfeil1->pixels );
                 }
+
                 if(c64->Kreis0 != NULL)
                 {
                     glGenTextures(1,&Kreis0Texture);
@@ -557,6 +579,7 @@ int SDLThread(void *userdat)
                     //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, c64->Kreis0->w, c64->Kreis0->h, 0,TextureFormat, GL_UNSIGNED_BYTE, c64->Kreis0->pixels );
                     gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, c64->Kreis0->w, c64->Kreis0->h,TextureFormat, GL_UNSIGNED_BYTE, c64->Kreis0->pixels );
                 }
+
                 if(c64->Kreis1 != NULL)
                 {
                     glGenTextures(1,&Kreis1Texture);
