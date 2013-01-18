@@ -45,8 +45,8 @@ DebuggerWindow::DebuggerWindow(QWidget *parent, QSettings *_ini) :
     connect(timer1,SIGNAL(timeout()),this,SLOT(onTimerAnimationRefresh()));
     timer1->setInterval(10);
 
-    iOff = new QIcon(":/grafik/BlueLED_Off.png");
-    iOn = new QIcon(":/grafik/BlueLED_On.png");
+    iOff = new QIcon(":/grafik/blue_led_off.png");
+    iOn = new QIcon(":/grafik/blue_led_on.png");
     ui->EingabeFeld->hide();
 
     QFontDatabase fontDB;

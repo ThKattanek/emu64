@@ -276,7 +276,7 @@ border-right-color: rgb(50, 50, 50);</string>
    </property>
    <property name="icon">
     <iconset resource="emu64.qrc">
-     <normaloff>:/grafik/Eject1.png</normaloff>:/grafik/Eject1.png</iconset>
+     <normaloff>:/grafik/eject1.png</normaloff>:/grafik/eject1.png</iconset>
    </property>
    <property name="iconSize">
     <size>

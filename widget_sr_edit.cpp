@@ -22,8 +22,8 @@ WidgetSREdit::WidgetSREdit(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    iOff = new QIcon(":/grafik/BlueLED_Off.png");
-    iOn = new QIcon(":/grafik/BlueLED_On.png");
+    iOff = new QIcon(":/grafik/blue_led_off.png");
+    iOn = new QIcon(":/grafik/blue_led_on.png");
 
     /// Alle Bits auf Off stellen ///
     ui->Bit0->setIcon(*iOff);

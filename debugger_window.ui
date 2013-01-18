@@ -1190,7 +1190,7 @@ Hier wird die Sprungadresse der Brachbefehle gebildet.</string>
     </property>
     <property name="icon">
      <iconset resource="emu64.qrc">
-      <normaloff>:/grafik/OneZyklus.png</normaloff>:/grafik/OneZyklus.png</iconset>
+      <normaloff>:/grafik/one_zyklus.png</normaloff>:/grafik/one_zyklus.png</iconset>
     </property>
    </widget>
    <widget class="QPushButton" name="OneOpcode">
@@ -1210,7 +1210,7 @@ Hier wird die Sprungadresse der Brachbefehle gebildet.</string>
     </property>
     <property name="icon">
      <iconset resource="emu64.qrc">
-      <normaloff>:/grafik/OneOpcode.png</normaloff>:/grafik/OneOpcode.png</iconset>
+      <normaloff>:/grafik/one_opcode.png</normaloff>:/grafik/one_opcode.png</iconset>
     </property>
    </widget>
    <widget class="QPushButton" name="AnimationStart">
@@ -1231,7 +1231,7 @@ Die Geschwindigkeit ist Einstellbar.</string>
     </property>
     <property name="icon">
      <iconset resource="emu64.qrc">
-      <normaloff>:/grafik/Animation.png</normaloff>:/grafik/Animation.png</iconset>
+      <normaloff>:/grafik/animation.png</normaloff>:/grafik/animation.png</iconset>
     </property>
    </widget>
    <widget class="QPushButton" name="AnimationStop">
@@ -1251,7 +1251,7 @@ Die Geschwindigkeit ist Einstellbar.</string>
     </property>
     <property name="icon">
      <iconset resource="emu64.qrc">
-      <normaloff>:/grafik/Stop.png</normaloff>:/grafik/Stop.png</iconset>
+      <normaloff>:/grafik/stop.png</normaloff>:/grafik/stop.png</iconset>
     </property>
    </widget>
    <widget class="QScrollBar" name="AnimationSpeed">
@@ -1950,7 +1950,7 @@ Testzwecken.</string>
     </property>
     <property name="icon">
      <iconset resource="emu64.qrc">
-      <normaloff>:/grafik/Plus-icon.png</normaloff>:/grafik/Plus-icon.png</iconset>
+      <normaloff>:/grafik/plus_icon.png</normaloff>:/grafik/plus_icon.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -1976,7 +1976,7 @@ Testzwecken.</string>
     </property>
     <property name="icon">
      <iconset resource="emu64.qrc">
-      <normaloff>:/grafik/Minus-icon.png</normaloff>:/grafik/Minus-icon.png</iconset>
+      <normaloff>:/grafik/minus_icon.png</normaloff>:/grafik/minus_icon.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -2002,7 +2002,7 @@ Testzwecken.</string>
     </property>
     <property name="icon">
      <iconset resource="emu64.qrc">
-      <normaloff>:/grafik/Open_24x24.png</normaloff>:/grafik/Open_24x24.png</iconset>
+      <normaloff>:/grafik/open_24x24.png</normaloff>:/grafik/open_24x24.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -2028,7 +2028,7 @@ Testzwecken.</string>
     </property>
     <property name="icon">
      <iconset resource="emu64.qrc">
-      <normaloff>:/grafik/Save_24x24.png</normaloff>:/grafik/Save_24x24.png</iconset>
+      <normaloff>:/grafik/save_24x24.png</normaloff>:/grafik/save_24x24.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -2090,7 +2090,7 @@ Testzwecken.</string>
     </property>
     <property name="icon">
      <iconset resource="emu64.qrc">
-      <normaloff>:/grafik/Remove_24x24.png</normaloff>:/grafik/Remove_24x24.png</iconset>
+      <normaloff>:/grafik/remove_24x24.png</normaloff>:/grafik/remove_24x24.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -2235,7 +2235,7 @@ Testzwecken.</string>
     </property>
     <property name="icon">
      <iconset resource="emu64.qrc">
-      <normaloff>:/grafik/export-24x24.png</normaloff>:/grafik/export-24x24.png</iconset>
+      <normaloff>:/grafik/export_24x24.png</normaloff>:/grafik/export_24x24.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -2262,7 +2262,7 @@ Testzwecken.</string>
    </property>
    <property name="icon">
     <iconset resource="emu64.qrc">
-     <normaloff>:/grafik/memory-icon.png</normaloff>:/grafik/memory-icon.png</iconset>
+     <normaloff>:/grafik/memory_icon.png</normaloff>:/grafik/memory_icon.png</iconset>
    </property>
    <property name="iconSize">
     <size>

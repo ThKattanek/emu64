@@ -162,8 +162,6 @@ OTHER_FILES += \
     docs/readme.txt \
     grafik/yellow_led_on.png \
     grafik/yellow_led_off.png \
-    grafik/yellow-on-32.png \
-    grafik/yellow-off-32.png \
     grafik/thorsten.jpg \
     grafik/stop_blue_transprent.png \
     grafik/stop.png \
@@ -175,20 +173,16 @@ OTHER_FILES += \
     grafik/red_led_off.png \
     grafik/red_kreuz.png \
     grafik/qt_sdl_logo_300x113.png \
-    grafik/plus-icon.png \
     grafik/play_blue_transprent.png \
-    grafik/green-off-32.png \
     grafik/export_24x24.png \
     grafik/easy_flash_logo.png \
     grafik/c64_tastatur.png \
     grafik/open_24x24.png \
     grafik/one_zyklus.png \
     grafik/one_opcode.png \
-    grafik/minus-icon.png \
     grafik/memory_icon.png \
     grafik/green_led_on.png \
     grafik/green_led_off.png \
-    grafik/green-on-32.png \
     grafik/blue_led_on.png \
     grafik/blue_led_off.png \
     grafik/audio_volume_mute.png \
@@ -210,7 +204,25 @@ OTHER_FILES += \
     grafik/toolbar32/crt.png \
     grafik/toolbar32/aus.png \
     fonts/lucon.ttf \
-    fonts/emu64.ttf
+    fonts/emu64.ttf \
+    grafik/green_off_32.png \
+    grafik/green_on_32.png \
+    grafik/yellow_off_32.png \
+    grafik/yellow_on_32.png \
+    grafik/plus_icon.png \
+    grafik/minus_icon.png
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

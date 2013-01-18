@@ -30,10 +30,10 @@
         <file>grafik/yellow_led_on.png</file>
         <file>grafik/toolbar32/debug.png</file>
         <file>grafik/disk.png</file>
-        <file>grafik/green-off-32.png</file>
-        <file>grafik/green-on-32.png</file>
-        <file>grafik/yellow-off-32.png</file>
-        <file>grafik/yellow-on-32.png</file>
+        <file>grafik/green_off_32.png</file>
+        <file>grafik/green_on_32.png</file>
+        <file>grafik/yellow_off_32.png</file>
+        <file>grafik/yellow_on_32.png</file>
         <file>grafik/eject1.png</file>
         <file>grafik/audio_volume_high.png</file>
         <file>grafik/audio_volume_low.png</file>
@@ -42,8 +42,8 @@
         <file>grafik/open_24x24.png</file>
         <file>grafik/save_24x24.png</file>
         <file>grafik/remove_24x24.png</file>
-        <file>grafik/minus-icon.png</file>
-        <file>grafik/plus-icon.png</file>
+        <file>grafik/minus_icon.png</file>
+        <file>grafik/plus_icon.png</file>
         <file>grafik/toolbar32/floppy.png</file>
         <file>grafik/export_24x24.png</file>
         <file>grafik/memory_icon.png</file>

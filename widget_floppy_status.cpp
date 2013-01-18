@@ -33,16 +33,16 @@ WidgetFloppyStatus::WidgetFloppyStatus(QWidget *parent, int floppy_nr, Floppy154
     font.setBold(false);
     ui->DisknameOut->setFont(font);
 
-    iGreenLedOff = new QIcon(":/grafik/green-off-32.png");
-    iGreenLedOn = new QIcon(":/grafik/green-on-32.png");
+    iGreenLedOff = new QIcon(":/grafik/green_off_32.png");
+    iGreenLedOn = new QIcon(":/grafik/green_on_32.png");
 
-    iYellowLedOff = new QIcon(":/grafik/yellow-off-32.png");
-    iYellowLedOn = new QIcon(":/grafik/yellow-on-32.png");
+    iYellowLedOff = new QIcon(":/grafik/yellow_off_32.png");
+    iYellowLedOn = new QIcon(":/grafik/yellow_on_32.png");
 
-    iVol_mute = new QIcon(":/grafik/audio-volume-mute.png");
-    iVol_low = new QIcon(":/grafik/audio-volume-low.png");
-    iVol_medium = new QIcon(":/grafik/audio-volume-medium.png");
-    iVol_high = new QIcon(":/grafik/audio-volume-high.png");
+    iVol_mute = new QIcon(":/grafik/audio_volume_mute.png");
+    iVol_low = new QIcon(":/grafik/audio_volume_low.png");
+    iVol_medium = new QIcon(":/grafik/audio_volume_medium.png");
+    iVol_high = new QIcon(":/grafik/audio_volume_high.png");
 
     SetFloppyVolume(2);
 
