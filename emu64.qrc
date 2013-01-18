@@ -51,5 +51,9 @@
         <file>grafik/fc3_logo.png</file>
         <file>grafik/red_off_20.png</file>
         <file>grafik/red_on_20.png</file>
+        <file>roms/1541.rom</file>
+        <file>roms/basic.rom</file>
+        <file>roms/char.rom</file>
+        <file>roms/kernal.rom</file>
     </qresource>
 </RCC>
