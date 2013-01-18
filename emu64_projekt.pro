@@ -159,7 +159,61 @@ OTHER_FILES += \
     docs/readme linux.txt \
     docs/readme linux.txt \
     docs/readme linux.txt \
-    docs/readme.txt
+    docs/readme.txt \
+    grafik/yellow_led_on.png \
+    grafik/yellow_led_off.png \
+    grafik/yellow-on-32.png \
+    grafik/yellow-off-32.png \
+    grafik/thorsten.jpg \
+    grafik/stop_blue_transprent.png \
+    grafik/stop.png \
+    grafik/save_24x24.png \
+    grafik/remove_24x24.png \
+    grafik/red_on_20.png \
+    grafik/red_off_20.png \
+    grafik/red_led_on.png \
+    grafik/red_led_off.png \
+    grafik/red_kreuz.png \
+    grafik/qt_sdl_logo_300x113.png \
+    grafik/plus-icon.png \
+    grafik/play_blue_transprent.png \
+    grafik/green-off-32.png \
+    grafik/export_24x24.png \
+    grafik/easy_flash_logo.png \
+    grafik/c64_tastatur.png \
+    grafik/open_24x24.png \
+    grafik/one_zyklus.png \
+    grafik/one_opcode.png \
+    grafik/minus-icon.png \
+    grafik/memory_icon.png \
+    grafik/green_led_on.png \
+    grafik/green_led_off.png \
+    grafik/green-on-32.png \
+    grafik/blue_led_on.png \
+    grafik/blue_led_off.png \
+    grafik/audio_volume_mute.png \
+    grafik/audio_volume_medium.png \
+    grafik/audio_volume_low.png \
+    grafik/audio_volume_high.png \
+    grafik/fc3_logo.png \
+    grafik/emu64.ico \
+    grafik/eject1.png \
+    grafik/disk.png \
+    grafik/animation.png \
+    grafik/toolbar32/sreset.png \
+    grafik/toolbar32/info.png \
+    grafik/toolbar32/hreset.png \
+    grafik/toolbar32/handbuch.png \
+    grafik/toolbar32/floppy.png \
+    grafik/toolbar32/debug.png \
+    grafik/toolbar32/datasette.png \
+    grafik/toolbar32/crt.png \
+    grafik/toolbar32/aus.png \
+    fonts/lucon.ttf \
+    fonts/emu64.ttf
+
+
+
 
 
 
