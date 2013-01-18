@@ -13,43 +13,43 @@
         <file>grafik/toolbar32/hreset.png</file>
         <file>grafik/toolbar32/sreset.png</file>
         <file>grafik/toolbar32/crt.png</file>
-        <file>grafik/c64-tastatur.png</file>
+        <file>grafik/c64_tastatur.png</file>
         <file>grafik/easy_flash_logo.png</file>
         <file>fonts/lucon.ttf</file>
-        <file>grafik/Animation.png</file>
-        <file>grafik/OneOpcode.png</file>
-        <file>grafik/OneZyklus.png</file>
-        <file>grafik/Stop.png</file>
-        <file>grafik/BlueLED_Off.png</file>
-        <file>grafik/BlueLED_On.png</file>
-        <file>grafik/GreenLED_Off.png</file>
-        <file>grafik/GreenLED_On.png</file>
-        <file>grafik/RedLED_Off.png</file>
-        <file>grafik/RedLED_On.png</file>
-        <file>grafik/YellowLED_Off.png</file>
-        <file>grafik/YellowLED_On.png</file>
+        <file>grafik/animation.png</file>
+        <file>grafik/one_opcode.png</file>
+        <file>grafik/one_zyklus.png</file>
+        <file>grafik/stop.png</file>
+        <file>grafik/blue_led_off.png</file>
+        <file>grafik/blue_led_on.png</file>
+        <file>grafik/green_led_off.png</file>
+        <file>grafik/green_led_on.png</file>
+        <file>grafik/red_led_off.png</file>
+        <file>grafik/red_led_on.png</file>
+        <file>grafik/yellow_led_off.png</file>
+        <file>grafik/yellow_led_on.png</file>
         <file>grafik/toolbar32/debug.png</file>
         <file>grafik/disk.png</file>
         <file>grafik/green-off-32.png</file>
         <file>grafik/green-on-32.png</file>
         <file>grafik/yellow-off-32.png</file>
         <file>grafik/yellow-on-32.png</file>
-        <file>grafik/Eject1.png</file>
-        <file>grafik/audio-volume-high.png</file>
-        <file>grafik/audio-volume-low.png</file>
-        <file>grafik/audio-volume-medium.png</file>
-        <file>grafik/audio-volume-mute.png</file>
-        <file>grafik/Open_24x24.png</file>
-        <file>grafik/Save_24x24.png</file>
-        <file>grafik/Remove_24x24.png</file>
-        <file>grafik/Minus-icon.png</file>
-        <file>grafik/Plus-icon.png</file>
+        <file>grafik/eject1.png</file>
+        <file>grafik/audio_volume_high.png</file>
+        <file>grafik/audio_volume_low.png</file>
+        <file>grafik/audio_volume_medium.png</file>
+        <file>grafik/audio_volume_mute.png</file>
+        <file>grafik/open_24x24.png</file>
+        <file>grafik/save_24x24.png</file>
+        <file>grafik/remove_24x24.png</file>
+        <file>grafik/minus-icon.png</file>
+        <file>grafik/plus-icon.png</file>
         <file>grafik/toolbar32/floppy.png</file>
-        <file>grafik/export-24x24.png</file>
-        <file>grafik/memory-icon.png</file>
+        <file>grafik/export_24x24.png</file>
+        <file>grafik/memory_icon.png</file>
         <file>fonts/emu64.ttf</file>
         <file>grafik/fc3_logo.png</file>
-        <file>grafik/red-off-20.png</file>
-        <file>grafik/red-on-20.png</file>
+        <file>grafik/red_off_20.png</file>
+        <file>grafik/red_on_20.png</file>
     </qresource>
 </RCC>
