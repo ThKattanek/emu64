@@ -210,7 +210,19 @@ OTHER_FILES += \
     grafik/yellow_off_32.png \
     grafik/yellow_on_32.png \
     grafik/plus_icon.png \
-    grafik/minus_icon.png
+    grafik/minus_icon.png \
+    roms/kernal.rom \
+    roms/char.rom \
+    roms/basic.rom \
+    roms/1541.rom \
+    readme.md \
+    emu64_en.qm \
+    emu64_de.ts \
+    emu64_de.qm \
+    emu64_en.ts
+
+
+
 
 
 
