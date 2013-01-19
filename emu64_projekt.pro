@@ -232,7 +232,9 @@ OTHER_FILES += \
     grafik/pfeil1.png \
     grafik/pfeil0.png \
     grafik/kreis1.png \
-    grafik/kreis0.png
+    grafik/kreis0.png \
+    grafik/sdl_icon.png
+
 
 
 

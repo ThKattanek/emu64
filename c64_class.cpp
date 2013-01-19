@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 18.01.2013		//
+// Letzte Änderung am 19.01.2013		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
@@ -164,7 +164,8 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
 
     SetGrafikModi(pal->StartC64isColorBit32,pal->StartC64isDoublesize,pal->StartC64isPalmode,false);
 
-    C64ScreenIcon = SDL_LoadBMP("c64window.bmp");
+    sprintf(filename,"%ssdl_icon.png",GfxPath);
+    C64ScreenIcon = IMG_Load(filename);
     if(C64ScreenIcon != NULL)
     {
         SDL_SetColorKey(C64ScreenIcon,SDL_SRCCOLORKEY,SDL_MapRGB(C64ScreenIcon->format,0,0,0));

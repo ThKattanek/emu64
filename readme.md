@@ -18,3 +18,4 @@ Was gehört in den Emu64 Arbeitsordner:
 - 1 Verzeichnis "floppy_sounds" welcher auch einfach aus dem emu64_source Verzeichnis kopiert werden kann
 - 1 Verzeichnis "gfx" welches folgende Dateien aus dem grafik Verzeichnis enthalten muss
                             kreis0.png / kreis1.png / pfeil0.png / pfeil1.png
+                            sdl_icon.png
