@@ -18,8 +18,7 @@
 
 #define FloppyAnzahl 4
 
-#include <QtGui>
-#include <QtCore>
+#include <QDialog>
 #include <QSettings>
 #include "d64_class.h"
 #include "widget_d64_file.h"

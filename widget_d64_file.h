@@ -16,8 +16,7 @@
 #ifndef WIDGET_D64_FILE_H
 #define WIDGET_D64_FILE_H
 
-#include <QtGui>
-#include <QtCore>
+#include <QWidget>
 
 namespace Ui {
     class WidgetD64File;

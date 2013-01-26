@@ -13,6 +13,9 @@
 //						//
 //////////////////////////////////////////////////
 
+#include <QFontDatabase>
+#include <QTimer>
+
 #include "widget_floppy_status.h"
 #include "ui_widget_floppy_status.h"
 

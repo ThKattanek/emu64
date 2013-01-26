@@ -13,6 +13,9 @@
 //						//
 //////////////////////////////////////////////////
 
+#include <QFontDatabase>
+#include <cstdio>
+
 #include "widget_memory_zeile.h"
 #include "ui_widget_memory_zeile.h"
 

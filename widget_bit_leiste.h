@@ -16,8 +16,7 @@
 #ifndef WIDGET_BIT_LEISTE_H
 #define WIDGET_BIT_LEISTE_H
 
-#include <QtCore>
-#include <QtGui>
+#include <QWidget>
 
 namespace Ui {
     class WidgetBitLeiste;

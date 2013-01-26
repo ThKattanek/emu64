@@ -45,35 +45,35 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
     QString SystemLocale = QLocale::system().name();       // "de_DE"
     SystemLocale.truncate(SystemLocale.lastIndexOf('_'));  // "de"
 
-    LogText(QString(tr(">> Translator wurde intsalliert: Systemsprache = ") + SystemLocale + "\n").toAscii().data());
+    LogText(QString(tr(">> Translator wurde intsalliert: Systemsprache = ") + SystemLocale + "\n").toLatin1().data());
 
     setWindowIcon(QIcon(":/grafik/emu64.ico"));
 
     /// Klassen installieren ///
     videopal = new VideoPalClass();
-    LogText(tr(">> VideoPal Klasse wurde installiert\n").toAscii().data());
+    LogText(tr(">> VideoPal Klasse wurde installiert\n").toLatin1().data());
 
     /// INI Dateiverwaltung erstellen ///
     ini = new QSettings(appPath+"/emu64.ini",QSettings::IniFormat,this);
-    LogText(QString(">> INI System wurde erzeugt: " + appPath+"/emu64.ini\n").toAscii().data());
+    LogText(QString(">> INI System wurde erzeugt: " + appPath+"/emu64.ini\n").toLatin1().data());
 
     /// Window Klassen erstellen ///
     /// Unter MAC sollte ohne übergabe des this Zeigers die Klasseb erstellt werden
 
     info_window = new InfoWindow(this);
-    LogText(tr(">> InfoWindow wurde erzeugt\n").toAscii().data());
+    LogText(tr(">> InfoWindow wurde erzeugt\n").toLatin1().data());
     tv_setup_window = new TVSetupWindow(this,videopal,ini);
-    LogText(tr(">> TVSetupWindow wurde erzeugt\n").toAscii().data());
+    LogText(tr(">> TVSetupWindow wurde erzeugt\n").toLatin1().data());
     floppy_window = new FloppyWindow(this,ini);
-    LogText(tr(">> FloppyWindow wurde erzeugt\n").toAscii().data());
+    LogText(tr(">> FloppyWindow wurde erzeugt\n").toLatin1().data());
     c64_keyboard_window = new C64KeyboardWindow(this,ini);
-    LogText(tr(">> C64KeyboardWindow wurde erzeugt\n").toAscii().data());
+    LogText(tr(">> C64KeyboardWindow wurde erzeugt\n").toLatin1().data());
     crt_window = new CrtWindow(this,ini);
-    LogText(tr(">> CrtWindow wurde erzeugt\n").toAscii().data());
+    LogText(tr(">> CrtWindow wurde erzeugt\n").toLatin1().data());
     debugger_window = new DebuggerWindow(this,ini);
-    LogText(tr(">> DebuggerWindow wurde erzeugt\n").toAscii().data());
+    LogText(tr(">> DebuggerWindow wurde erzeugt\n").toLatin1().data());
     setup_window = new SetupWindow(this,SLOT(onChangeGrafikModi(bool,bool,bool,bool,bool)),videopal,ini);
-    LogText(tr(">> SetupWindow wurde erzeugt\n").toAscii().data());
+    LogText(tr(">> SetupWindow wurde erzeugt\n").toLatin1().data());
 
     ini->beginGroup("MainWindow");
     CreateLanguageMenu(ini->value("lang",SystemLocale).toString());
@@ -81,7 +81,7 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
 
     /// C64 Klasse Installieren ... Das HERZ ///
     int ret_error;
-    c64 = new C64Class(&ret_error,videopal,true,bind(&MainWindow::LogText,this,_1),QString(appPath + "/gfx/").toAscii().data());
+    c64 = new C64Class(&ret_error,videopal,true,bind(&MainWindow::LogText,this,_1),QString(appPath + "/gfx/").toLatin1().data());
     if(ret_error != 0)
     {
         ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim Installieren der C64 Klasse"))
@@ -90,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
 
     setup_window->ReSetup();
 
-    SDL_WM_SetCaption((const char*)tr("C64 Bildschirm").toAscii().data(),0);
+    SDL_WM_SetCaption((const char*)tr("C64 Bildschirm").toLatin1().data(),0);
 
     /// Debugger Window mit C64 verbinden ///
     debugger_window->SetC64Pointer(c64);
@@ -101,12 +101,12 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
     c64->crt->ChangeLED = bind(&CrtWindow::ChangeLED,crt_window,_1,_2);
 
     /// C64 Systemroms laden ///
-    if(!c64->LoadC64Roms((char*)QString(appPath+"/roms/kernal.rom").toAscii().data(),(char*)QString(appPath+"/roms/basic.rom").toAscii().data(),(char*)QString(appPath+"/roms/char.rom").toAscii().data()))
+    if(!c64->LoadC64Roms((char*)QString(appPath+"/roms/kernal.rom").toLatin1().data(),(char*)QString(appPath+"/roms/basic.rom").toLatin1().data(),(char*)QString(appPath+"/roms/char.rom").toLatin1().data()))
     {
         LogText((char*)"<< ERROR: Fehler beim laden der C64 Roms\n\t");
-        LogText(QString(appPath+"/roms/kernal.rom").toAscii().data());LogText("\n\t");
-        LogText(QString(appPath+"/roms/basic.rom").toAscii().data());LogText("\n\t");
-        LogText(QString(appPath+"/roms/char.rom").toAscii().data());LogText("\n");
+        LogText(QString(appPath+"/roms/kernal.rom").toLatin1().data());LogText("\n\t");
+        LogText(QString(appPath+"/roms/basic.rom").toLatin1().data());LogText("\n\t");
+        LogText(QString(appPath+"/roms/char.rom").toLatin1().data());LogText("\n");
     }
 
     /// C64 Keyboard Matrix mit dem Virtual Keyboard verbinden ///
@@ -151,7 +151,7 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
             WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(i,0);
 
             w->SetAktFilename(floppy_window->GetAktFilename(i),floppy_window->GetAktD64Name(i));
-            c64->LoadDiskImage(i,floppy_window->GetAktFilename(i).toAscii().data());
+            c64->LoadDiskImage(i,floppy_window->GetAktFilename(i).toLatin1().data());
 
             w->SetEnableFloppy(ini->value("Enabled",false).toBool());
             w->SetFloppyVolume(ini->value("VolumeMode",2).toInt());
@@ -216,9 +216,9 @@ MainWindow::~MainWindow()
     delete setup_window;
     delete ui;
     delete ini;
-    LogText(tr(">> Es wurden alle Klassen wieder entfernt\n").toAscii().data());
+    LogText(tr(">> Es wurden alle Klassen wieder entfernt\n").toLatin1().data());
 
-    LogText(tr("\n>> Emu64 wurde sauber beendet...").toAscii().data());
+    LogText(tr("\n>> Emu64 wurde sauber beendet...").toLatin1().data());
     delete log;
 
 }
@@ -325,7 +325,7 @@ void MainWindow::RetranslateUi()
     debugger_window->RetranslateUi();
     setup_window->RetranslateUi();
 
-    SDL_WM_SetCaption(tr("C64 Bildschirm").toAscii().data(),0);
+    SDL_WM_SetCaption(tr("C64 Bildschirm").toLatin1().data(),0);
 }
 
 void MainWindow::on_menu_main_info_triggered()
@@ -379,7 +379,7 @@ void MainWindow::on_actionAutostart_triggered()
     QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),"",tr("C64 Programm Dateien") + "(*.prg *.p00 *.t64 *.d64 *.g64 *.frz);;" + tr("Alle Dateien") + "(*.*)");
     if(filename != "")
     {
-        c64->LoadAutoRun(0,filename.toAscii().data());
+        c64->LoadAutoRun(0,filename.toLatin1().data());
     }
 }
 
@@ -388,7 +388,7 @@ void MainWindow::on_actionC64_Programme_direkt_laden_triggered()
     QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),"",tr("C64 Programm Dateien") + "(*.prg *.p00 *.t64 *.frz);;" + tr("Alle Dateien") + "(*.*)");
     if(filename != "")
     {
-        c64->LoadPRG(filename.toAscii().data(),0);
+        c64->LoadPRG(filename.toLatin1().data(),0);
     }
 }
 
@@ -452,5 +452,5 @@ void MainWindow::OnChangeFloppyImage(int floppynr)
 {
     WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(floppynr,0);
     w->SetAktFilename(floppy_window->GetAktFilename(floppynr),floppy_window->GetAktD64Name(floppynr));
-    c64->LoadDiskImage(floppynr,floppy_window->GetAktFilename(floppynr).toAscii().data());
+    c64->LoadDiskImage(floppynr,floppy_window->GetAktFilename(floppynr).toLatin1().data());
 }

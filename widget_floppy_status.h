@@ -16,8 +16,7 @@
 #ifndef WIDGET_FLOPPY_STATUS_H
 #define WIDGET_FLOPPY_STATUS_H
 
-#include <QtGui>
-#include <QtCore>
+#include <QWidget>
 
 #include "floppy1541_class.h"
 #include "d64_class.h"

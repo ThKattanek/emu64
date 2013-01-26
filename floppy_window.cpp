@@ -14,6 +14,7 @@
 //////////////////////////////////////////////////
 
 #include <QFontDatabase>
+#include <QDebug>
 
 #include "floppy_window.h"
 #include "ui_floppy_window.h"
@@ -97,7 +98,7 @@ void FloppyWindow::LoadIni()
             AktDir[i] = ini->value("AktDir","").toString();
             AktFile[i] = ini->value("AktFile","").toString();
             AktFileName[i] = AktDir[i] + "/" + AktFile[i];
-            d64[i].LoadD64(AktFileName[i].toAscii().data());
+            d64[i].LoadD64(AktFileName[i].toLatin1().data());
 
             ini->endGroup();
         }
@@ -126,7 +127,7 @@ void FloppyWindow::OnSelectFile(QString filename)
         AktFile[FloppyNr] = ui->FileBrowser->GetAktFile();
         if("D64" == AktFileName[FloppyNr].right(3).toUpper())
         {
-            d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toAscii().data());
+            d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toLatin1().data());
             RefreshD64Table();
             emit ChangeFloppyImage(FloppyNr);
         }

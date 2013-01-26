@@ -16,8 +16,7 @@
 #ifndef WIDGET_MEMORY_ZEILE_H
 #define WIDGET_MEMORY_ZEILE_H
 
-#include <QtGui>
-#include <QtCore>
+#include <QLineEdit>
 
 namespace Ui {
     class WidgetMemoryZeile;

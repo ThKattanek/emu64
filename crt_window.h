@@ -16,8 +16,9 @@
 #ifndef CRT_WINDOW_H
 #define CRT_WINDOW_H
 
-#include <QtGui>
-#include <QtCore>
+#include <QDialog>
+#include <QSettings>
+
 #include "crt_class.h"
 #include "c64_class.h"
 #include "structs.h"

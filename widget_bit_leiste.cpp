@@ -13,6 +13,8 @@
 //						//
 //////////////////////////////////////////////////
 
+#include <QPainter>
+
 #include "widget_bit_leiste.h"
 #include "ui_widget_bit_leiste.h"
 

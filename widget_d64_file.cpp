@@ -13,6 +13,8 @@
 //						//
 //////////////////////////////////////////////////
 
+#include <QFontDatabase>
+
 #include "widget_d64_file.h"
 #include "ui_widget_d64_file.h"
 

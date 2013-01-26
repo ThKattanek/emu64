@@ -16,8 +16,9 @@
 #ifndef WIDGET_FILE_BROWSE_H
 #define WIDGET_FILE_BROWSE_H
 
-#include <QtGui>
-#include <QtCore>
+#include <QWidget>
+#include <QFileSystemModel>
+
 #include "quazip/quazip.h"
 #include "quazip/quazipfile.h"
 

@@ -16,8 +16,10 @@
 #ifndef DEBUGGER_WINDOW_H
 #define DEBUGGER_WINDOW_H
 
-#include <QtGui>
-#include <QtCore>
+#include <QTreeWidgetItem>
+#include <QTableWidgetItem>
+#include <QSettings>
+
 #include "c64_class.h"
 #include "label_widget_mod.h"
 #include "cpu_info.h"

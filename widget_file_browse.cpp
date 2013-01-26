@@ -13,6 +13,8 @@
 //						//
 //////////////////////////////////////////////////
 
+#include <QDebug>
+
 #include "widget_file_browse.h"
 #include "ui_widget_file_browse.h"
 

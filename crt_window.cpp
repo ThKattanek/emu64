@@ -13,6 +13,9 @@
 //						//
 //////////////////////////////////////////////////
 
+#include <QMessageBox>
+#include <QFontDatabase>
+
 #include "crt_window.h"
 #include "ui_crt_window.h"
 
@@ -158,7 +161,7 @@ void CrtWindow::onSelectFile(QString filename)
     char str00[256];
 
     if(crt == 0) return;
-    int res = crt->GetCRTInfo(filename.toAscii().data(),&crt_info);
+    int res = crt->GetCRTInfo(filename.toLatin1().data(),&crt_info);
     switch(res)
     {
     case 0:
@@ -296,7 +299,7 @@ void CrtWindow::on_InsertCRT_clicked()
 {
     if(CRTIsSelected)
     {
-        if(0 == c64->LoadCRT(SelCRTFileName.toAscii().data()))
+        if(0 == c64->LoadCRT(SelCRTFileName.toLatin1().data()))
         {
             ui->PageFC->setEnabled(false);
             ui->PageEasyFlash->setEnabled(false);

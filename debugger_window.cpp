@@ -13,6 +13,12 @@
 //						//
 //////////////////////////////////////////////////
 
+#include <QMenu>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QTimer>
+#include <QFontDatabase>
+
 #include "debugger_window.h"
 #include "ui_debugger_window.h"
 #include "micro_code_tbl_6510.h"
@@ -885,7 +891,7 @@ bool DebuggerWindow::getSaveFileName(QWidget *parent, QString caption, QString f
    saveDialog.setWindowTitle(caption);
    saveDialog.setAcceptMode(QFileDialog::AcceptSave);
    saveDialog.setConfirmOverwrite(false);
-   saveDialog.setFilter(filter);
+   //saveDialog.setFilter(filter);
    saveDialog.selectFile(*fileName);
 
    *fileName = "";
@@ -903,10 +909,12 @@ bool DebuggerWindow::getSaveFileName(QWidget *parent, QString caption, QString f
    QFileInfo fileInfo(tmpFileName);
    if (fileInfo.suffix().isEmpty()) {
       // Add the suffix selected by the user
+      /*
       extension = saveDialog.selectedFilter();
       extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
       extension = extension.left(extension.indexOf(")"));
       extension = extension.simplified();
+      */
       // If the filter specifies more than one extension, choose the first one
       if (extension.indexOf(" ") != -1)
          extension = extension.left(extension.indexOf(" "));
@@ -917,10 +925,12 @@ bool DebuggerWindow::getSaveFileName(QWidget *parent, QString caption, QString f
 
    // Does the file already exist?
    if (QFile::exists(tmpFileName)) {
+       /*
        extension = saveDialog.selectedFilter();
        extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
        extension = extension.left(extension.indexOf(")"));
        extension = extension.simplified();
+       */
       int result = QMessageBox::question(parent, QObject::tr("Überschreiben?"),
          QObject::tr("Soll die Datei \"%1\" überschrieben werden?").arg(fileInfo.fileName()),
          QMessageBox::Yes,
@@ -2150,8 +2160,8 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
     if(filename != "")
     {
        int ret;
-       if(AktSource > 0) ret = c64->floppy[AktFloppyNr]->LoadBreakGroups(filename.toAscii().data());
-       else ret = c64->LoadBreakGroups(filename.toAscii().data());
+       if(AktSource > 0) ret = c64->floppy[AktFloppyNr]->LoadBreakGroups(filename.toLatin1().data());
+       else ret = c64->LoadBreakGroups(filename.toLatin1().data());
 
        if(ret != 0)
        {
@@ -2209,12 +2219,12 @@ void DebuggerWindow::on_SaveBreakpoints_clicked()
 
     if(AktSource > 0)
     {
-        if(!c64->floppy[AktFloppyNr]->SaveBreakGroups(filename.toAscii().data()))
+        if(!c64->floppy[AktFloppyNr]->SaveBreakGroups(filename.toLatin1().data()))
             QMessageBox::warning(this,tr("Fehler..."),tr("Die Haltepunkte konnten nicht gespeichert werden."));
     }
     else
     {
-        if(!c64->SaveBreakGroups(filename.toAscii().data()))
+        if(!c64->SaveBreakGroups(filename.toLatin1().data()))
           QMessageBox::warning(this,tr("Fehler..."),tr("Die Haltepunkte konnten nicht gespeichert werden."));
     }
 }
@@ -2278,7 +2288,7 @@ void DebuggerWindow::on_ExportDisAss_clicked()
     fileext = fileext.toUpper();
     if(fileext == "TXT")
     {
-        if(!c64->ExportASM(filename.toAscii().data(),start,end,AktSource))
+        if(!c64->ExportASM(filename.toLatin1().data(),start,end,AktSource))
             QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der Disassembler Datei."));
     }
 
@@ -2289,7 +2299,7 @@ void DebuggerWindow::on_ExportDisAss_clicked()
             QMessageBox::warning(this,tr("Fehler..."),tr("Floppy RAM geht nur von $0000 - $07FF (2KB)."));
             return;
         }
-        if(!c64->ExportPRG(filename.toAscii().data(),start,end,AktSource))
+        if(!c64->ExportPRG(filename.toLatin1().data(),start,end,AktSource))
             QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der Programm Datei."));
     }
 }
