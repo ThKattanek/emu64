@@ -18,6 +18,7 @@
 
 #include <QDialog>
 #include <QSettings>
+#include <QModelIndex>
 
 #include "crt_class.h"
 #include "c64_class.h"
