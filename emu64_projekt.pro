@@ -120,6 +120,14 @@ FORMS    += \
 RESOURCES += \
     emu64.qrc
 
+
+win32-g++-cross{
+TARGET = emu64
+RC_FILE = emu64.rc
+DESTDIR = "bin/windows_x32"
+LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lopengl32 -lglu32
+}
+
 win32-g++{
 TARGET = emu64
 RC_FILE = emu64.rc
