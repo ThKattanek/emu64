@@ -120,46 +120,30 @@ FORMS    += \
 RESOURCES += \
     emu64.qrc
 
-
-win32-g++-cross{
-TARGET = emu64
-RC_FILE = emu64.rc
-DESTDIR = "bin/windows_x32"
-LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lopengl32 -lglu32
-}
-
-win32-g++{
-TARGET = emu64
-RC_FILE = emu64.rc
-DESTDIR = "bin/windows_x32"
-LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lopengl32 -lglu32
-}
-
-win32-g++-64{
-TARGET = emu64
-RC_FILE = emu64.rc
-DESTDIR = "bin/windows_x64"
-LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lopengl32 -lglu32
-}
-
 linux-g++-64{
 TARGET = emu64
 DESTDIR = "bin/linux_x86_64"
 LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU
 }
 
-linux-g++{
+linux-g++-32{
 TARGET = emu64
-DESTDIR = "bin/linux_i586"
+DESTDIR = "bin/linux_i686"
 LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU
 }
 
-macx{
-ICON =
-DESTDIR = "../bin/mac"
-SOURCES += /Library/Frameworks/SDL.framework/devel-lite/SDLMain.m
-LIBS += -framework SDL
-LIBS += -framework cocoa
+win32-g++-cross{
+TARGET = emu64
+RC_FILE = emu64.rc
+DESTDIR = "bin/win_x32"
+LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image
+}
+
+win64-g++-cross{
+TARGET = emu64
+RC_FILE = emu64.rc
+DESTDIR = "bin/win_x64"
+LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image
 }
 
 OTHER_FILES += \
@@ -243,19 +227,9 @@ OTHER_FILES += \
     grafik/pfeil0.png \
     grafik/kreis1.png \
     grafik/kreis0.png \
-    grafik/sdl_icon.png
-
-
-
-
-
-
-
-
-
-
-
-
+    grafik/sdl_icon.png \
+    lizenz.pdf \
+    license.pdf
 
 
 

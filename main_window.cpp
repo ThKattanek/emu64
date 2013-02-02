@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
     ui->setupUi(this);
 
 #ifdef _WIN32
-    setWindowTitle("Emu64 Version " + QString(str_emu64_version) + " --- [Win32]");
+    setWindowTitle("Emu64 Version " + QString(str_emu64_version) + " --- [Windows]");
 #endif
 
 #ifdef __linux__
