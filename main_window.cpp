@@ -167,7 +167,12 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
     this->update();
 
     /////////////////////////////////////
-    c64->StartEmulation();
+    if(ret_error == 0) c64->StartEmulation();
+    else
+    {
+        this->close();
+        return;
+    }
     c64->HardReset();
 }
 

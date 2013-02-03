@@ -16,7 +16,7 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define d_emu64_version 5.00
-#define str_emu64_version "5.00"
+#define d_emu64_version 5.0.2
+#define str_emu64_version "5.0.2 < Dev-Snapshot >"
 
 #endif // VERSION_H

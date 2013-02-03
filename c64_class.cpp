@@ -61,7 +61,8 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
          LogText((char*)"<< ERROR: Fehler beim installieren von SDL\n");
         *ret_error = -1;
     }
-    LogText((char*)">> SDL wurde installiert\n");
+    else
+        LogText((char*)">> SDL wurde installiert\n");
 
     char filename[FILENAME_MAX];
     sprintf(filename,"%spfeil0.png",GfxPath);
