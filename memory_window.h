@@ -56,7 +56,7 @@ private:
     int AktViewAdresse;
     bool NoFocusRun;
 
-    /// FloppyMemoryMap Visuall ///
+    /// FloppyMemoryMap Visuall //
     unsigned char MapReadSource[0x100];
     unsigned char MapWriteDestination[0x100];
 
