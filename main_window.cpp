@@ -459,3 +459,8 @@ void MainWindow::OnChangeFloppyImage(int floppynr)
     w->SetAktFilename(floppy_window->GetAktFilename(floppynr),floppy_window->GetAktD64Name(floppynr));
     c64->LoadDiskImage(floppynr,floppy_window->GetAktFilename(floppynr).toLatin1().data());
 }
+
+void MainWindow::on_actionScreenshot_triggered()
+{
+    c64->SaveScreenshot("/home/thorsten/emu64_001.bmp");
+}

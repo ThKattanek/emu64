@@ -96,6 +96,8 @@ public:
     unsigned char GetMapReadSource(unsigned char page);
     unsigned char GetMapWriteDestination(unsigned char page);
 
+    void SaveScreenshot(char *filename);
+
     int             AktWindowXW;
     int             AktWindowYW;
     int             AktWindowColorBits;
@@ -175,6 +177,9 @@ public:
 
     unsigned short	C64History[256];
     unsigned char	C64HistoryPointer;
+
+    bool StartScreenshot;
+    char* ScreenshotFilename;
 
 private:
     void VicRefresh(unsigned char *vic_puffer);

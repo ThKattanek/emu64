@@ -82,6 +82,8 @@ private slots:
     void onChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode, bool filter);
     void OnChangeFloppyImage(int floppynr);
 
+    void on_actionScreenshot_triggered();
+
 protected:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);

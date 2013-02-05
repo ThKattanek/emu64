@@ -159,7 +159,7 @@ background-position: center
      <x>0</x>
      <y>0</y>
      <width>488</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="font">
@@ -567,7 +567,7 @@ background-position: center
   </action>
   <action name="actionScreenshot">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Screenshot</string>

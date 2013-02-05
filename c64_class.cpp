@@ -16,6 +16,8 @@
 #include "c64_class.h"
 #include "c64_keys.h"
 
+#include "QDebug"
+
 #define floppy_asyncron                  // Schaltet die Floppy Asyncron
 #define more_one_floppy_cylce_count 66   // alle "more_one_floppy_cycle_counts" wird 1 FloppyZyklus doppelt ausgeführt
 
@@ -51,6 +53,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     C64Screen = 0;
     C64ScreenBack = 0;
     DrawScreenBack = false;
+    StartScreenshot = false;
 
     OpenGLEnable = OpenGLOn;
 
@@ -438,7 +441,7 @@ int SDLThread(void *userdat)
             c64->VicRefreshIsHold = false;
             while(!c64->VicRefreshIsHold)
             {
-                SDL_Delay(1);
+                  SDL_Delay(1);
             }
 
             /// Allegmeine Einstellungen ///
@@ -900,7 +903,38 @@ int SDLThread(void *userdat)
                         glEnd();
                     }
 
+                    if(c64->StartScreenshot)
+                    {
+                        c64->StartScreenshot = false;
+                        SDL_Surface * temp = SDL_CreateRGBSurface(SDL_SWSURFACE, c64->AktC64ScreenXW, c64->AktC64ScreenYW, 24,
+                        #if SDL_BYTEORDER == SDL_LIL_ENDIAN
+                        0x000000FF, 0x0000FF00, 0x00FF0000, 0
+                        #else
+                        0x00FF0000, 0x0000FF00, 0x000000FF, 0
+                        #endif
+                        );
+                        if (temp == NULL)
+                        return -1;
+
+                        unsigned char* pixels = new unsigned char[3 * c64->AktC64ScreenXW * c64->AktC64ScreenYW];
+                        if (pixels == NULL)
+                        {
+                        SDL_FreeSurface(temp);
+                        return -1;
+                        }
+
+                        glReadPixels(0, 0, c64->AktC64ScreenXW, c64->AktC64ScreenYW, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+                        for (int i=0; i<c64->AktC64ScreenYW; i++)
+                        memcpy(((char *) temp->pixels) + temp->pitch * i, pixels + 3*c64->AktC64ScreenXW * (c64->AktC64ScreenYW-i-1), c64->AktC64ScreenXW*3);
+                        delete pixels;
+
+                        SDL_SaveBMP(temp, c64->ScreenshotFilename);
+                        SDL_FreeSurface(temp);
+                    }
+
                     SDL_GL_SwapBuffers();
+
                     SDL_framerateDelay(&c64->fps_manager);
                     c64->DrawScreenBack = false;
                 }
@@ -911,6 +945,13 @@ int SDLThread(void *userdat)
                     {
                         SDL_Rect rec_src = {0,0,c64->AktC64ScreenXW,c64->AktC64ScreenYW};
                         SDL_Rect rec_dst = {0,0,c64->C64Screen->w,c64->C64Screen->h};
+
+                        /// Auf Screenshot Start prüfen ///
+                        if(c64->StartScreenshot)
+                        {
+                            c64->StartScreenshot = false;
+                            SDL_SaveBMP(c64->C64ScreenBack,c64->ScreenshotFilename);
+                        }
 
                         SDL_SoftStretch(c64->C64ScreenBack,&rec_src,c64->C64Screen,&rec_dst);
                         SDL_Flip(c64->C64Screen);
@@ -2162,6 +2203,12 @@ unsigned char C64Class::GetMapReadSource(unsigned char page)
 unsigned char C64Class::GetMapWriteDestination(unsigned char page)
 {
     return mmu->GetWriteDestination(page);
+}
+
+void C64Class::SaveScreenshot(char *filename)
+{
+    ScreenshotFilename = filename;
+    StartScreenshot = true;
 }
 
 int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)
