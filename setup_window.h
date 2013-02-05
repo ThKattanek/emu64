@@ -48,6 +48,8 @@ private slots:
     void on_WFilter_toggled(bool checked);
     void on_RecJoy_clicked();
 
+    void on_ResetSShotCounter_clicked();
+
 private:
     Ui::SetupWindow *ui;
     VideoPalClass* videopal;

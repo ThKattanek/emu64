@@ -100,7 +100,11 @@ private:
     QString appPath;             // Pfad der emu64 Datei
     QString langPath;            // Pfad für alle Sprachfiles
     QString tmpPath;             // Pfad für alle Temporären Dateien die Emu64 erzeugt (Wird beim Start und Ende geleert)
+    QString screenshotPath;       // Pfad für alle Emu64 Screenshots (nicht änderbar)
     QSettings *ini;
+
+    bool ScreenshotsEnable;       // Konnte kein Screenshot Verzeichnis gefunden werden und auch nicht erstellt werden so ist es false
+    int ScreenshotNumber;         // Nummer des nächsten Screenshots
 
     InfoWindow *info_window;                    // Info Fenster Klasse (wird vom MainWindow als Modal gestartet)
     TVSetupWindow *tv_setup_window;             // TV Einstellungsfenster

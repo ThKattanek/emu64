@@ -17,6 +17,9 @@
 #include "ui_main_window.h"
 #include "version.h"
 
+#include "QDebug"
+#include "QDir"
+
 MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -49,6 +52,38 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
 
     setWindowIcon(QIcon(":/grafik/emu64.ico"));
 
+    /// ScreenshotPath erstellen ///
+    screenshotPath = appPath + "/screenshots/";
+
+    QDir* dir = new QDir(screenshotPath);
+
+    if(dir->exists())
+    {
+        LogText(tr(">> Ein Screenshot Verzeichnis ist vorhanden\n").toLatin1().data());
+        ScreenshotsEnable = true;
+    }
+    else
+    {
+        LogText(tr("<< Ein Screenshot Verzeichnis ist nicht vorhanden\n").toLatin1().data());
+        if(dir->mkdir(screenshotPath))
+        {
+            LogText(tr(">> Ein neues Screenshot Verzeichnis wurde erstellt\n").toLatin1().data());
+            ScreenshotsEnable = true;
+        }
+        else
+        {
+            LogText(tr("<< Ein neues Screenshot Verzeichnis konnte nicht erstellt werden\n<< Keine Screenshots möglich !!").toLatin1().data());
+            ScreenshotsEnable = false;
+        }
+    }
+
+    if(ScreenshotsEnable)
+    {
+        LogText(">> screenshotPath = ");
+        LogText(screenshotPath.toLatin1().data());
+        LogText("\n");
+    }
+
     /// Klassen installieren ///
     videopal = new VideoPalClass();
     LogText(tr(">> VideoPal Klasse wurde installiert\n").toLatin1().data());
@@ -77,6 +112,7 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
 
     ini->beginGroup("MainWindow");
     CreateLanguageMenu(ini->value("lang",SystemLocale).toString());
+    ScreenshotNumber = (int)ini->value("ScreenshotCounter",0).toInt();
     ini->endGroup();
 
     /// C64 Klasse Installieren ... Das HERZ ///
@@ -185,6 +221,7 @@ MainWindow::~MainWindow()
         ini->beginGroup("MainWindow");
         ini->setValue("Geometry",saveGeometry());
         ini->setValue("State",saveState());
+        ini->setValue("ScreenshotCounter",ScreenshotNumber);
         ini->endGroup();
 
         char group_name[32];
@@ -462,5 +499,10 @@ void MainWindow::OnChangeFloppyImage(int floppynr)
 
 void MainWindow::on_actionScreenshot_triggered()
 {
-    c64->SaveScreenshot("/home/thorsten/emu64_001.bmp");
+    if(ScreenshotsEnable)
+    {
+        qDebug() << QString(screenshotPath + "emu64_" + QVariant(ScreenshotNumber).toString() + ".bmp");
+        //c64->SaveScreenshot(QString(screenshotPath + "emu64_" + QVariant(ScreenshotNumber).toString() + ".bmp").toLatin1().data());
+    }
+    else QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.\nÜberprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !"));
 }

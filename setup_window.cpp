@@ -128,3 +128,8 @@ void SetupWindow::on_RecJoy_clicked()
 {
     c64->StartRecJoystickMapping(0);
 }
+
+void SetupWindow::on_ResetSShotCounter_clicked()
+{
+
+}

@@ -34,7 +34,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="EmualtionTab">
     <property name="enabled">
@@ -226,7 +226,7 @@
     </widget>
     <widget class="QGroupBox" name="screenshot_group">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -264,7 +264,7 @@
      </widget>
      <widget class="QComboBox" name="comboBox">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="geometry">
        <rect>
@@ -279,13 +279,18 @@
         <pointsize>9</pointsize>
        </font>
       </property>
+      <item>
+       <property name="text">
+        <string>BMP</string>
+       </property>
+      </item>
      </widget>
-     <widget class="QPushButton" name="pushButton_2">
+     <widget class="QPushButton" name="ResetSShotCounter">
       <property name="geometry">
        <rect>
         <x>125</x>
         <y>25</y>
-        <width>136</width>
+        <width>161</width>
         <height>21</height>
        </rect>
       </property>
@@ -295,7 +300,7 @@
        </font>
       </property>
       <property name="text">
-       <string>PushButton</string>
+       <string>Counter Zurücksetzen</string>
       </property>
      </widget>
     </widget>
