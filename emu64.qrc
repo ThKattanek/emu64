@@ -55,5 +55,6 @@
         <file>roms/basic.rom</file>
         <file>roms/char.rom</file>
         <file>roms/kernal.rom</file>
+        <file>grafik/toolbar32/screenshot.png</file>
     </qresource>
 </RCC>

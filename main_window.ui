@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>488</width>
+    <width>460</width>
     <height>204</height>
    </rect>
   </property>
@@ -145,6 +145,7 @@ background-position: center
    </attribute>
    <addaction name="actionBeenden"/>
    <addaction name="menu_main_info"/>
+   <addaction name="actionScreenshot"/>
    <addaction name="actionHandbuch"/>
    <addaction name="actionFloppy_1541_II"/>
    <addaction name="actionBandlaufwerk_1530"/>
@@ -158,7 +159,7 @@ background-position: center
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>488</width>
+     <width>460</width>
      <height>19</height>
     </rect>
    </property>
@@ -569,6 +570,10 @@ background-position: center
    <property name="enabled">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="emu64.qrc">
+     <normaloff>:/grafik/toolbar32/screenshot.png</normaloff>:/grafik/toolbar32/screenshot.png</iconset>
+   </property>
    <property name="text">
     <string>Screenshot</string>
    </property>
@@ -581,6 +586,9 @@ background-position: center
      <weight>50</weight>
      <bold>false</bold>
     </font>
+   </property>
+   <property name="shortcut">
+    <string>F12</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
