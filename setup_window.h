@@ -38,6 +38,7 @@ public:
 
 signals:
     void ChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode, bool filter);
+    void ResetSreenshotCounter(void);
 
 private slots:
     void on_C64Farbmodus_currentIndexChanged(int index);

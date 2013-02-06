@@ -131,5 +131,5 @@ void SetupWindow::on_RecJoy_clicked()
 
 void SetupWindow::on_ResetSShotCounter_clicked()
 {
-
+    emit ResetSreenshotCounter();
 }

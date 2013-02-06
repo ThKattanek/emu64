@@ -16,8 +16,6 @@
 #include "c64_class.h"
 #include "c64_keys.h"
 
-#include "QDebug"
-
 #define floppy_asyncron                  // Schaltet die Floppy Asyncron
 #define more_one_floppy_cylce_count 66   // alle "more_one_floppy_cycle_counts" wird 1 FloppyZyklus doppelt ausgeführt
 
@@ -2207,7 +2205,7 @@ unsigned char C64Class::GetMapWriteDestination(unsigned char page)
 
 void C64Class::SaveScreenshot(char *filename)
 {
-    ScreenshotFilename = filename;
+    strcpy(ScreenshotFilename,filename);
     StartScreenshot = true;
 }
 

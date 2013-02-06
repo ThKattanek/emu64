@@ -179,7 +179,7 @@ public:
     unsigned char	C64HistoryPointer;
 
     bool StartScreenshot;
-    char* ScreenshotFilename;
+    char ScreenshotFilename[1024];
 
 private:
     void VicRefresh(unsigned char *vic_puffer);

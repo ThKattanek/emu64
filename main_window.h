@@ -81,6 +81,7 @@ private slots:
     void on_actionEmu64_Einstellungen_triggered();
     void onChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode, bool filter);
     void OnChangeFloppyImage(int floppynr);
+    void OnResetScreenshotCounter(void);
 
     void on_actionScreenshot_triggered();
 

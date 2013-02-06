@@ -202,6 +202,10 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
     }
     this->update();
 
+    /// Screenshot Reset mit SetupWindow verbinden ///
+    connect(setup_window,SIGNAL(ResetSreenshotCounter()),this,SLOT(OnResetScreenshotCounter()));
+
+
     /////////////////////////////////////
     if(ret_error == 0) c64->StartEmulation();
     else
@@ -497,12 +501,17 @@ void MainWindow::OnChangeFloppyImage(int floppynr)
     c64->LoadDiskImage(floppynr,floppy_window->GetAktFilename(floppynr).toLatin1().data());
 }
 
+void MainWindow::OnResetScreenshotCounter()
+{
+    ScreenshotNumber = 0;
+}
+
 void MainWindow::on_actionScreenshot_triggered()
 {
     if(ScreenshotsEnable)
     {
-        qDebug() << QString(screenshotPath + "emu64_" + QVariant(ScreenshotNumber).toString() + ".bmp");
-        //c64->SaveScreenshot(QString(screenshotPath + "emu64_" + QVariant(ScreenshotNumber).toString() + ".bmp").toLatin1().data());
+        c64->SaveScreenshot(QString(screenshotPath + "emu64_" + QVariant(ScreenshotNumber).toString() + ".bmp").toLatin1().data());
+        ScreenshotNumber++;
     }
     else QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.\nÜberprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !"));
 }
