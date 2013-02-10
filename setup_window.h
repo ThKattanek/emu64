@@ -18,6 +18,8 @@
 
 #include <QDialog>
 #include <QSettings>
+#include <QTableWidgetItem>
+#include <QDebug>
 #include "videopal_class.h"
 #include "c64_class.h"
 
@@ -34,6 +36,7 @@ public:
     ~SetupWindow();
     void RetranslateUi();
     void LoadINI(C64Class *_c64);
+    void SaveINI();
     void ReSetup(void);
 
 signals:
@@ -48,8 +51,10 @@ private slots:
     void on_W32Bit_toggled(bool checked);
     void on_WFilter_toggled(bool checked);
     void on_RecJoy_clicked();
-
     void on_ResetSShotCounter_clicked();
+    void on_VJoySlots_cellChanged(int row, int column);
+    void on_Port1_currentIndexChanged(int index);
+    void on_Port2_currentIndexChanged(int index);
 
 private:
     Ui::SetupWindow *ui;

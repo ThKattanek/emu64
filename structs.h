@@ -300,12 +300,35 @@ struct EMU_TUNING_STRUCT
     CPU_TUNING_STRUCT	cpu;
 };
 
+enum
+{
+    VJOY_TYPE_UNDEF,
+    VJOY_TYPE_KEY,
+    VJOY_TYPE_BUTTON,
+    VJOY_TYPE_HAT,
+    VJOY_TYPE_AXIS
+};
+
 struct VIRTUAL_JOY_STRUCT
 {
-    int             Type;                   // 0 = Tastatur ; 1 = Joystick
-    char            Name[32];
+    char            Name[256];
+    unsigned char   Type[5];                // [0]=Keyboard [1]=JOYBUTTON [2]=JOYHAT [3]=JOYAXIS
+    unsigned char   JoyIndex[5];
+
+    // VJOY_TYPE_KEY
     unsigned char   KeyDown[5];             // [0]=Hoch [1]=Runter [2]=Links [3]=Rechts [4]=Feuer
     unsigned char   KeyUp[5];               // [0]=Hoch [1]=Runter [2]=Links [3]=Rechts [4]=Feuer
+
+    // VJOY_TYPE_BUTTON
+    unsigned char ButtonNr[5];
+
+    // VJOY_TYPE_HAT
+    unsigned char HatNr[5];
+    unsigned char HatValue[5];
+
+    // VJOY_TYPE_AXIS
+    unsigned char AxisNr[5];
+    unsigned char AxisValue[5];             // 0 = Plus Richtung // 1 = Minus Richtung
 };
 
 #endif // STRUCTS_H

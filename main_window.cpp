@@ -241,17 +241,14 @@ MainWindow::~MainWindow()
             ini->setValue("VolumeMode",w->GetFloppyVolume());
             ini->endGroup();
         }
-
-        ini->beginGroup("VJoys");
-
-        ini->setValue("VJoyMapping",QVariant((char*) c64->VJoys));
-        ini->endGroup();
     }
     /////////////////////////////////////
 
     /// WindowKlassen schließen ///
 
+    delete setup_window;
     delete c64;
+
     delete videopal;
     delete info_window;
     delete tv_setup_window;
@@ -259,7 +256,7 @@ MainWindow::~MainWindow()
     delete c64_keyboard_window;
     delete crt_window;
     delete debugger_window;
-    delete setup_window;
+
     delete ui;
     delete ini;
     LogText(tr(">> Es wurden alle Klassen wieder entfernt\n").toLatin1().data());

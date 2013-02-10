@@ -16,6 +16,8 @@
 #include "c64_class.h"
 #include "c64_keys.h"
 
+#include <QDebug>
+
 #define floppy_asyncron                  // Schaltet die Floppy Asyncron
 #define more_one_floppy_cylce_count 66   // alle "more_one_floppy_cycle_counts" wird 1 FloppyZyklus doppelt ausgeführt
 
@@ -32,8 +34,9 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     SDLJoystickIsOpen(false),
     JoystickAnzahl(0),StopJoystickUpdate(true),JoyStickUdateIsStop(true),
     RecJoyMapping(false),VPort1(-1),VPort2(-1)
-{
-    VPort2 = 0;
+{   
+    VPort1 = 0;
+    VPort2 = 1;
 
     LogText = log_function;
     GfxPath = gfx_path;
@@ -413,6 +416,8 @@ void C64Class::SDLThreadPauseEnd()
 
 int SDLThread(void *userdat)
 {
+    char str00[512];
+
     C64Class *c64 = (C64Class*)userdat;
     SDL_Event event;
     c64->LoopThreadEnd = false;
@@ -610,191 +615,384 @@ int SDLThread(void *userdat)
         {
             while (SDL_PollEvent (&event))
             {
-              switch (event.type)
+                switch (event.type)
                 {
-                case SDL_VIDEORESIZE:
-                    if(!c64->isFullscreen)
+                    case SDL_VIDEORESIZE:
                     {
-                        c64->AktWindowXW = event.resize.w;
-                        c64->AktWindowYW = event.resize.h;
+                        if(!c64->isFullscreen)
+                        {
+                            c64->AktWindowXW = event.resize.w;
+                            c64->AktWindowYW = event.resize.h;
 
-                        if(c64->OpenGLEnable)
-                        {
-                            /// OpenGL Version ///
-                            c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_OPENGL);
-                            glViewport(0,0,c64->AktWindowXW,c64->AktWindowYW);
-                            glMatrixMode(GL_PROJECTION);
-                            glLoadIdentity();
-
-                            glOrtho(0,c64->AktWindowXW,c64->AktWindowYW,0,-1,1);
-                            glLoadIdentity();
-                        }
-                        else
-                        {
-                            /// SDL Version ///
-                            c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
-                        }
-                    }
-                    break;
-
-                case SDL_KEYDOWN:
-                    switch(event.key.keysym.sym)
-                    {
-                    case SDLK_ESCAPE:
-                        if(c64->RecJoyMapping)
-                        {
-                            c64->RecJoyMapping = false;
-                        }
-                        else
-                        {
-                            c64->WaitResetReady = false;
-                            c64->RESET = false;
-                        }
-                        break;
-                    case SDLK_F12:
-                        c64->isFullscreen = !c64->isFullscreen;
-
-                        if(c64->OpenGLEnable)
-                        {
-                            /// OpenGL Version ///
-                        }
-                        else
-                        {
-                            /// SDL Version ///
-                            if(c64->isFullscreen)
+                            if(c64->OpenGLEnable)
                             {
-                                SDL_ShowCursor(false);
-                                c64->C64Screen = SDL_SetVideoMode(1280,1024,c64->AktWindowColorBits,SDL_FULLSCREEN | SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                                /// OpenGL Version ///
+                                c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_OPENGL);
+                                glViewport(0,0,c64->AktWindowXW,c64->AktWindowYW);
+                                glMatrixMode(GL_PROJECTION);
+                                glLoadIdentity();
+
+                                glOrtho(0,c64->AktWindowXW,c64->AktWindowYW,0,-1,1);
+                                glLoadIdentity();
                             }
                             else
                             {
-                                SDL_ShowCursor(true);
+                                /// SDL Version ///
                                 c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
                             }
                         }
-                        break;
-
-                    default:
-                        break;
+                    break;
                     }
 
-                    if((c64->RecJoyMapping == true) && (c64->RecJoyMappingTyp == 0))
+                    case SDL_JOYBUTTONDOWN:
+                    case SDL_JOYBUTTONUP:
                     {
-                        c64->RecAktJoy= 0;
-                        c64->VJoys[c64->RecAktJoy].KeyDown[c64->RecJoyMappingPos] = event.key.keysym.scancode;
-                    }
-                    else
-                    {
-                        for(int i=0;i<C64KeyNum;i++)
+                        if((c64->RecJoyMapping == true) && (event.jbutton.type == SDL_JOYBUTTONDOWN))
                         {
-                            if(C64KeyTable[i].SDLKeyCode == event.key.keysym.sym)
+                            c64->VJoys[c64->RecJoySlotNr].Type[c64->RecJoyMappingPos] = VJOY_TYPE_BUTTON;
+                            c64->VJoys[c64->RecJoySlotNr].JoyIndex[c64->RecJoyMappingPos] = event.jbutton.which;
+                            c64->VJoys[c64->RecJoySlotNr].ButtonNr[c64->RecJoyMappingPos] = event.jbutton.button;
+
+                        }
+                        else if((c64->RecJoyMapping == true) && (event.jbutton.type == SDL_JOYBUTTONUP))
+                        {
+                            c64->RecJoyMappingPos++;
+                            if(c64->RecJoyMappingPos == 5)
                             {
-                                c64->KeyEvent(C64KeyTable[i].MatrixCode,KEY_DOWN,C64KeyTable[i].Shift);
+                                /// Rec Mapping ist fertig ///
+                                c64->RecJoyMapping = false;
                             }
                         }
+                        else
+                        {
+                            /// VJoyStick abfrage ///
+                            /// Port1
+                            if((c64->VPort1 >= 0) && (c64->VPort1 < MAX_VJOYS))
+                            {
+                                for(int i=0;i<5;i++)
+                                {
+                                    if((c64->VJoys[c64->VPort1].ButtonNr[i] == event.jbutton.button) &&
+                                            (c64->VJoys[c64->VPort1].Type[i] == VJOY_TYPE_BUTTON) &&
+                                            (c64->VJoys[c64->VPort1].JoyIndex[i] == event.jbutton.which))
+                                    {
+                                        if(event.jbutton.state == 1) c64->GamePort1 |= 1<<i;
+                                        else c64->GamePort1 &= ~(1<<i);
+                                    }
+                                }
+                            }
+
+                            /// Port2
+                            if((c64->VPort2 >= 0) && (c64->VPort2 < MAX_VJOYS))
+                            {
+                                for(int i=0;i<5;i++)
+                                {
+                                    if((c64->VJoys[c64->VPort2].ButtonNr[i] == event.jbutton.button) &&
+                                            (c64->VJoys[c64->VPort2].Type[i] == VJOY_TYPE_BUTTON) &&
+                                            (c64->VJoys[c64->VPort2].JoyIndex[i] == event.jbutton.which))
+                                    {
+                                        if(event.jbutton.state == 1) c64->GamePort2 |= 1<<i;
+                                        else c64->GamePort2 &= ~(1<<i);
+                                    }
+                                }
+                            }
+                        }
+                        break;
                     }
 
-                    /// VJoyStick abfrage ///
-                    /// Port1
-                    if((c64->VPort1 >= 0) && (c64->VPort1 < MAX_VJOYS))
+                    case SDL_JOYHATMOTION:
                     {
-                        if(c64->VJoys[c64->VPort1].Type == 0)
+                        if(c64->RecJoyMapping == true)
+                        {
+                            if(event.jhat.value > 0)
+                            {
+                                c64->VJoys[c64->RecJoySlotNr].Type[c64->RecJoyMappingPos] = VJOY_TYPE_HAT;
+                                c64->VJoys[c64->RecJoySlotNr].JoyIndex[c64->RecJoyMappingPos] = event.jhat.which;
+                                c64->VJoys[c64->RecJoySlotNr].HatNr[c64->RecJoyMappingPos] = event.jhat.hat;
+                                c64->VJoys[c64->RecJoySlotNr].HatValue[c64->RecJoyMappingPos] = event.jhat.value;
+                            }
+                            else
+                            {
+                                c64->RecJoyMappingPos++;
+                                if(c64->RecJoyMappingPos == 5)
+                                {
+                                    /// Rec Mapping ist fertig ///
+                                    c64->RecJoyMapping = false;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            /// VJoyStick abfrage ///
+                            /// Port1
+                            if((c64->VPort1 >= 0) && (c64->VPort1 < MAX_VJOYS))
+                            {
+                                for(int i=0;i<5;i++)
+                                {
+                                    if((c64->VJoys[c64->VPort1].HatNr[i] == event.jhat.hat) &&
+                                            (c64->VJoys[c64->VPort1].Type[i] == VJOY_TYPE_HAT) &&
+                                            (c64->VJoys[c64->VPort1].JoyIndex[i] == event.jhat.which))
+                                    {
+                                        if((event.jhat.value & c64->VJoys[c64->VPort1].HatValue[i]) == c64->VJoys[c64->VPort1].HatValue[i]) c64->GamePort1 |= 1<<i;
+                                        else c64->GamePort1 &= ~(1<<i);
+                                    }
+                                }
+                            }
+
+                            /// VJoyStick abfrage ///
+                            /// Port2
+                            if((c64->VPort2 >= 0) && (c64->VPort2 < MAX_VJOYS))
+                            {
+                                for(int i=0;i<5;i++)
+                                {
+                                    if((c64->VJoys[c64->VPort2].HatNr[i] == event.jhat.hat) &&
+                                            (c64->VJoys[c64->VPort2].Type[i] == VJOY_TYPE_HAT) &&
+                                            (c64->VJoys[c64->VPort2].JoyIndex[i] == event.jhat.which))
+                                    {
+                                        if((event.jhat.value & c64->VJoys[c64->VPort2].HatValue[i]) == c64->VJoys[c64->VPort2].HatValue[i]) c64->GamePort2 |= 1<<i;
+                                        else c64->GamePort2 &= ~(1<<i);
+                                    }
+                                }
+                            }
+
+                        }
+                      break;
+                    }
+
+                    case SDL_JOYAXISMOTION:
+                    {
+                        if(c64->RecJoyMapping == true)
+                        {
+                            if(event.jaxis.value != 0)
+                            {
+                                c64->VJoys[c64->RecJoySlotNr].Type[c64->RecJoyMappingPos] = VJOY_TYPE_AXIS;
+                                c64->VJoys[c64->RecJoySlotNr].JoyIndex[c64->RecJoyMappingPos] = event.jaxis.which;
+                                c64->VJoys[c64->RecJoySlotNr].AxisNr[c64->RecJoyMappingPos] = event.jaxis.axis;
+                                if(event.jaxis.value > 0) c64->VJoys[c64->RecJoySlotNr].AxisValue[c64->RecJoyMappingPos] = 0;
+                                else c64->VJoys[c64->RecJoySlotNr].AxisValue[c64->RecJoyMappingPos] = 1;
+                            }
+                            else
+                            {
+                                c64->RecJoyMappingPos++;
+                                if(c64->RecJoyMappingPos == 5)
+                                {
+                                    /// Rec Mapping ist fertig ///
+                                    c64->RecJoyMapping = false;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            /// VJoyStick abfrage ///
+                            /// Port1
+                            if((c64->VPort1 >= 0) && (c64->VPort1 < MAX_VJOYS))
+                            {
+                                for(int i=0;i<5;i++)
+                                {
+                                    if((c64->VJoys[c64->VPort1].AxisNr[i] == event.jaxis.axis) &&
+                                            (c64->VJoys[c64->VPort1].Type[i] == VJOY_TYPE_AXIS) &&
+                                            (c64->VJoys[c64->VPort1].JoyIndex[i] == event.jaxis.which))
+                                    {
+                                        if(event.jaxis.value != 0)
+                                        {
+                                            if(event.jaxis.value > 16000)
+                                            {
+                                                if(c64->VJoys[c64->VPort1].AxisValue[i] == 0) c64->GamePort1 |= 1<<i;
+                                            }
+                                            else if(event.jaxis.value < -16000)
+                                            {
+                                                if(c64->VJoys[c64->VPort1].AxisValue[i] == 1) c64->GamePort1 |= 1<<i;
+                                            }
+                                        }
+                                        else c64->GamePort1 &= ~(1<<i);
+                                    }
+                                }
+                            }
+
+                            /// VJoyStick abfrage ///
+                            /// Port2
+                            if((c64->VPort2 >= 0) && (c64->VPort2 < MAX_VJOYS))
+                            {
+                                for(int i=0;i<5;i++)
+                                {
+                                    if((c64->VJoys[c64->VPort2].AxisNr[i] == event.jaxis.axis) &&
+                                            (c64->VJoys[c64->VPort2].Type[i] == VJOY_TYPE_AXIS) &&
+                                            (c64->VJoys[c64->VPort2].JoyIndex[i] == event.jaxis.which))
+                                    {
+                                        if(event.jaxis.value != 0)
+                                        {
+                                            if(event.jaxis.value > 16000)
+                                            {
+                                                if(c64->VJoys[c64->VPort2].AxisValue[i] == 0) c64->GamePort2 |= 1<<i;
+                                            }
+                                            else if(event.jaxis.value < -16000)
+                                            {
+                                                if(c64->VJoys[c64->VPort2].AxisValue[i] == 1) c64->GamePort2 |= 1<<i;
+                                            }
+                                        }
+                                        else c64->GamePort2 &= ~(1<<i);
+                                    }
+                                }
+                            }
+                        }
+                      break;
+                    }
+
+                    case SDL_KEYDOWN:
+                    {
+                        switch(event.key.keysym.sym)
+                        {
+                        case SDLK_ESCAPE:
+                            if(c64->RecJoyMapping)
+                            {
+                                c64->RecJoyMapping = false;
+                            }
+                            else
+                            {
+                                c64->WaitResetReady = false;
+                                c64->RESET = false;
+                            }
+                            break;
+
+                        case SDLK_F12:
+                            c64->isFullscreen = !c64->isFullscreen;
+
+                            if(c64->OpenGLEnable)
+                            {
+                                /// OpenGL Version ///
+                            }
+                            else
+                            {
+                                /// SDL Version ///
+                                if(c64->isFullscreen)
+                                {
+                                    SDL_ShowCursor(false);
+                                    c64->C64Screen = SDL_SetVideoMode(1280,1024,c64->AktWindowColorBits,SDL_FULLSCREEN | SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                                }
+                                else
+                                {
+                                    SDL_ShowCursor(true);
+                                    c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
+                                }
+                            }
+                            break;
+
+                        default:
+                            break;
+                        }
+
+                        if(c64->RecJoyMapping == true)
+                        {
+                            c64->VJoys[c64->RecJoySlotNr].Type[c64->RecJoyMappingPos] = VJOY_TYPE_KEY;
+                            c64->VJoys[c64->RecJoySlotNr].KeyDown[c64->RecJoyMappingPos] = event.key.keysym.scancode;
+                        }
+                        else
+                        {
+                            for(int i=0;i<C64KeyNum;i++)
+                            {
+                                if(C64KeyTable[i].SDLKeyCode == event.key.keysym.sym)
+                                {
+                                    c64->KeyEvent(C64KeyTable[i].MatrixCode,KEY_DOWN,C64KeyTable[i].Shift);
+                                }
+                            }
+                        }
+
+                        /// VJoyStick abfrage ///
+                        /// Port1
+                        if((c64->VPort1 >= 0) && (c64->VPort1 < MAX_VJOYS))
                         {
                             for(int i=0;i<5;i++)
                             {
-                                if(c64->VJoys[c64->VPort1].KeyDown[i] == event.key.keysym.scancode)
+                                if((c64->VJoys[c64->VPort1].KeyDown[i] == event.key.keysym.scancode) &&
+                                        (c64->VJoys[c64->VPort1].Type[i] == VJOY_TYPE_KEY))
                                     c64->GamePort1 |= 1<<i;
                             }
                         }
-                    }
 
-                    /// Port2
-                    if((c64->VPort2 >= 0) && (c64->VPort2 < MAX_VJOYS))
-                    {
-                        if(c64->VJoys[c64->VPort2].Type == 0)
+                        /// Port2
+                        if((c64->VPort2 >= 0) && (c64->VPort2 < MAX_VJOYS))
                         {
                             for(int i=0;i<5;i++)
                             {
-                                if(c64->VJoys[c64->VPort2].KeyDown[i] == event.key.keysym.scancode)
+                                if((c64->VJoys[c64->VPort2].KeyDown[i] == event.key.keysym.scancode) &&
+                                        (c64->VJoys[c64->VPort2].Type[i] == VJOY_TYPE_KEY))
                                     c64->GamePort2 |= 1<<i;
                             }
                         }
-                    }
-                    break;
-
-                case SDL_KEYUP:
-                    switch(event.key.keysym.sym)
-                    {
-                    case SDLK_ESCAPE:
-                        c64->RESET = true;
-                    case SDLK_F12:
-
-                        break;
-                    default:
                         break;
                     }
 
-                    if((c64->RecJoyMapping == true) && (c64->RecJoyMappingTyp == 0))
+                    case SDL_KEYUP:
                     {
-                        c64->RecAktJoy = 0;
-                        c64->VJoys[c64->RecAktJoy].KeyUp[c64->RecJoyMappingPos] = event.key.keysym.scancode;
-
-                        c64->RecJoyMappingPos++;
-                        if(c64->RecJoyMappingPos == 5)
+                        switch(event.key.keysym.sym)
                         {
-                            /// Rec Mapping ist fertig ///
-                            c64->RecJoyMapping = false;
+                        case SDLK_ESCAPE:
+                            c64->RESET = true;
+                        case SDLK_F12:
+
+                            break;
+                        default:
+                            break;
                         }
-                    }
-                    else
-                    {
-                        for(int i=0;i<C64KeyNum;i++)
+
+                        if(c64->RecJoyMapping == true)
                         {
-                            if(C64KeyTable[i].SDLKeyCode == event.key.keysym.sym)
+                            c64->VJoys[c64->RecJoySlotNr].Type[c64->RecJoyMappingPos] = VJOY_TYPE_KEY;
+                            c64->VJoys[c64->RecJoySlotNr].KeyUp[c64->RecJoyMappingPos] = event.key.keysym.scancode;
+
+                            c64->RecJoyMappingPos++;
+                            if(c64->RecJoyMappingPos == 5)
                             {
-                                c64->KeyEvent(C64KeyTable[i].MatrixCode,KEY_UP,C64KeyTable[i].Shift);
+                                /// Rec Mapping ist fertig ///
+                                c64->RecJoyMapping = false;
                             }
                         }
-                    }
+                        else
+                        {
+                            for(int i=0;i<C64KeyNum;i++)
+                            {
+                                if(C64KeyTable[i].SDLKeyCode == event.key.keysym.sym)
+                                {
+                                    c64->KeyEvent(C64KeyTable[i].MatrixCode,KEY_UP,C64KeyTable[i].Shift);
+                                }
+                            }
+                        }
 
-                    /// VJoyStick abfrage ///
-                    /// Port1
-                    if((c64->VPort1 >= 0) && (c64->VPort1 < MAX_VJOYS))
-                    {
-                        if(c64->VJoys[c64->VPort1].Type == 0)
+                        /// VJoyStick abfrage ///
+                        /// Port1
+                        if((c64->VPort1 >= 0) && (c64->VPort1 < MAX_VJOYS))
                         {
                             for(int i=0;i<5;i++)
                             {
-                                if(c64->VJoys[c64->VPort1].KeyUp[i] == event.key.keysym.scancode)
+                                if((c64->VJoys[c64->VPort1].KeyUp[i] == event.key.keysym.scancode) &&
+                                        (c64->VJoys[c64->VPort1].Type[i] == VJOY_TYPE_KEY))
                                     c64->GamePort1 &= ~(1<<i);
                             }
                         }
-                    }
 
-                    /// Port2
-                    if((c64->VPort2 >= 0) && (c64->VPort2 < MAX_VJOYS))
-                    {
-                        if(c64->VJoys[c64->VPort2].Type == 0)
+                        /// Port2
+                        if((c64->VPort2 >= 0) && (c64->VPort2 < MAX_VJOYS))
                         {
                             for(int i=0;i<5;i++)
                             {
-                                if(c64->VJoys[c64->VPort2].KeyUp[i] == event.key.keysym.scancode)
+                                if((c64->VJoys[c64->VPort2].KeyUp[i] == event.key.keysym.scancode) &&
+                                        (c64->VJoys[c64->VPort2].Type[i] == VJOY_TYPE_KEY))
                                     c64->GamePort2 &= ~(1<<i);
                             }
                         }
+                        break;
                     }
-                    break;
 
-                case SDL_MOUSEMOTION:
-                    break;
-                case SDL_QUIT:
+                    case SDL_MOUSEMOTION:
+                        break;
+
+                    case SDL_QUIT:
     #ifdef _WIN32
                     c64->LoopThreadEnd = true;
     #endif
                     break;
 
-                default:
-                    break;
+                    default:
+                        break;
                 }
             }
             if(!c64->LoopThreadEnd)
@@ -2577,15 +2775,12 @@ void C64Class::JoystickNewScan()
     OpenSDLJoystick();
 }
 
-void C64Class::StartRecJoystickMapping(int mapping_typ)
+void C64Class::StartRecJoystickMapping(int slot_nr)
 {
-    RecAktJoy = 0;
+    RecJoySlotNr = slot_nr;
 
-    RecJoyMappingTyp = mapping_typ;
-    RecJoyMapping = true;
     RecJoyMappingPos = 0;
-
-    VJoys[RecAktJoy].Type = RecJoyMappingTyp;
+    RecJoyMapping = true;
 }
 
 void C64Class::OpenSDLJoystick()
@@ -2637,8 +2832,9 @@ void C64Class::OpenSDLJoystick()
             for(int i=0; i<JoystickAnzahl;i++)
             {
                 JoystickNamen[i] = SDL_JoystickName(i);
-                sprintf(str00,">>   [%2.2d] %s\n",i+1,JoystickNamen[i]);
+                sprintf(str00,">>   [%2.2d] %s\n",i,JoystickNamen[i]);
                 LogText(str00);
+                SDL_JoystickOpen(i);
             }
         }
     }

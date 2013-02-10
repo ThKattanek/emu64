@@ -39,7 +39,7 @@ using namespace std::tr1::placeholders;
 #define FloppyAnzahl 4
 #define MAX_BREAK_GROUPS 256
 #define MAX_JOYSTICKS 16
-#define MAX_VJOYS 256
+#define MAX_VJOYS 16
 
 class C64Class
 {
@@ -91,7 +91,7 @@ public:
     bool ExportRAW(char *filename, unsigned short start_adresse, unsigned short end_adresse, int source);
     bool ExportASM(char* filename, unsigned short start_adresse, unsigned short end_adresse, int source);
     void JoystickNewScan(void);
-    void StartRecJoystickMapping(int mapping_typ);
+    void StartRecJoystickMapping(int slot_nr);
 
     unsigned char GetMapReadSource(unsigned char page);
     unsigned char GetMapWriteDestination(unsigned char page);
@@ -128,8 +128,7 @@ public:
     SDL_Surface     *Kreis1;
     bool            RecJoyMapping;
     int             RecJoyMappingPos;          // 0-4 // Hoch - Runter - Links - Rechts - Feuer
-    int             RecJoyMappingTyp;          // 0 - Keyboard / 1 - Joystick
-    int             RecAktJoy;                 // 0 - MAX_VJOYS
+    int             RecJoySlotNr;              // 0 - (MAX_VJOYS-1)
 
     VIRTUAL_JOY_STRUCT  VJoys[MAX_VJOYS];
     int                 VPort1;

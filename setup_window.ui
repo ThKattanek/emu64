@@ -34,7 +34,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="EmualtionTab">
     <property name="enabled">
@@ -320,10 +320,10 @@
     <widget class="QGroupBox" name="groupBox">
      <property name="geometry">
       <rect>
-       <x>5</x>
-       <y>5</y>
-       <width>381</width>
-       <height>156</height>
+       <x>6</x>
+       <y>10</y>
+       <width>385</width>
+       <height>217</height>
       </rect>
      </property>
      <property name="title">
@@ -339,27 +339,39 @@
        </rect>
       </property>
       <property name="text">
-       <string>Slot</string>
+       <string>Slots</string>
       </property>
      </widget>
-     <widget class="QTableWidget" name="tableWidget">
+     <widget class="QTableWidget" name="VJoySlots">
       <property name="geometry">
        <rect>
         <x>5</x>
         <y>35</y>
         <width>196</width>
-        <height>116</height>
+        <height>177</height>
        </rect>
       </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+      <property name="showGrid">
+       <bool>false</bool>
+      </property>
+      <attribute name="horizontalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
      </widget>
      <widget class="QPushButton" name="RecJoy">
       <property name="geometry">
        <rect>
-        <x>225</x>
-        <y>125</y>
-        <width>126</width>
+        <x>224</x>
+        <y>188</y>
+        <width>141</width>
         <height>23</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Startet die Zuweisung der Tasten/Buttons usw. für den ausgewählten Slot.</string>
       </property>
       <property name="text">
        <string>Lernmodus starten</string>
@@ -369,10 +381,10 @@
     <widget class="QGroupBox" name="groupBox_2">
      <property name="geometry">
       <rect>
-       <x>5</x>
-       <y>165</y>
-       <width>381</width>
-       <height>106</height>
+       <x>8</x>
+       <y>232</y>
+       <width>385</width>
+       <height>51</height>
       </rect>
      </property>
      <property name="title">
@@ -381,8 +393,8 @@
      <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>35</y>
+        <x>4</x>
+        <y>20</y>
         <width>36</width>
         <height>16</height>
        </rect>
@@ -394,14 +406,37 @@
      <widget class="QLabel" name="label_3">
       <property name="geometry">
        <rect>
-        <x>295</x>
-        <y>35</y>
+        <x>200</x>
+        <y>20</y>
         <width>36</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
        <string>Port 2</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="Port1">
+      <property name="geometry">
+       <rect>
+        <x>44</x>
+        <y>16</y>
+        <width>137</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="editable">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="Port2">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>16</y>
+        <width>137</width>
+        <height>24</height>
+       </rect>
       </property>
      </widget>
     </widget>
