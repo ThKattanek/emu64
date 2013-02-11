@@ -760,9 +760,17 @@ int SDLThread(void *userdat)
 
                     case SDL_JOYAXISMOTION:
                     {
+                        char str00[255];
+                        sprintf(str00,"### wich: %d\n",event.jaxis.which);
+                        c64->LogText(str00);
+                        sprintf(str00,"### axis: %d\n",event.jaxis.axis);
+                        c64->LogText(str00);
+                        sprintf(str00,"### value: %d\n",event.jaxis.value);
+                        c64->LogText(str00);
+
                         if(c64->RecJoyMapping == true)
                         {
-                            if(event.jaxis.value != 0)
+                            if((event.jaxis.value >= -10) && (event.jaxis.value <= 10))
                             {
                                 c64->VJoys[c64->RecJoySlotNr].Type[c64->RecJoyMappingPos] = VJOY_TYPE_AXIS;
                                 c64->VJoys[c64->RecJoySlotNr].JoyIndex[c64->RecJoyMappingPos] = event.jaxis.which;
@@ -792,7 +800,7 @@ int SDLThread(void *userdat)
                                             (c64->VJoys[c64->VPort1].Type[i] == VJOY_TYPE_AXIS) &&
                                             (c64->VJoys[c64->VPort1].JoyIndex[i] == event.jaxis.which))
                                     {
-                                        if(event.jaxis.value != 0)
+                                        if((event.jaxis.value >= -10) && (event.jaxis.value <= 10))
                                         {
                                             if(event.jaxis.value > 16000)
                                             {
