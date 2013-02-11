@@ -20,6 +20,7 @@
 #include <QSettings>
 #include <QTableWidgetItem>
 #include <QDebug>
+#include "button_mod.h"
 #include "videopal_class.h"
 #include "c64_class.h"
 
@@ -50,11 +51,10 @@ private slots:
     void on_W16Bit_toggled(bool checked);
     void on_W32Bit_toggled(bool checked);
     void on_WFilter_toggled(bool checked);
-    void on_RecJoy_clicked();
     void on_ResetSShotCounter_clicked();
     void on_VJoySlots_cellChanged(int row, int column);
-    void on_Port1_currentIndexChanged(int index);
-    void on_Port2_currentIndexChanged(int index);
+    void on_VJoySlots_cellClicked(int row, int column);
+    void onClickButton(int idx, int idy);
 
 private:
     Ui::SetupWindow *ui;

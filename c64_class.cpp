@@ -760,14 +760,6 @@ int SDLThread(void *userdat)
 
                     case SDL_JOYAXISMOTION:
                     {
-                        char str00[255];
-                        sprintf(str00,"### wich: %d\n",event.jaxis.which);
-                        c64->LogText(str00);
-                        sprintf(str00,"### axis: %d\n",event.jaxis.axis);
-                        c64->LogText(str00);
-                        sprintf(str00,"### value: %d\n",event.jaxis.value);
-                        c64->LogText(str00);
-
                         if(c64->RecJoyMapping == true)
                         {
                             if(!((event.jaxis.value >= -10) && (event.jaxis.value <= 10)))
@@ -2786,9 +2778,28 @@ void C64Class::JoystickNewScan()
 void C64Class::StartRecJoystickMapping(int slot_nr)
 {
     RecJoySlotNr = slot_nr;
-
     RecJoyMappingPos = 0;
     RecJoyMapping = true;
+}
+
+void C64Class::ClearJoystickMapping(int slot_nr)
+{
+    char str00[32];
+    sprintf(str00,"Slot %d",slot_nr+1);
+    strcpy(VJoys[slot_nr].Name, str00);
+
+    for(int i=0;i<5;i++)
+    {
+        VJoys[slot_nr].Type[i] = 0;
+        VJoys[slot_nr].JoyIndex[i] = 0;
+        VJoys[slot_nr].KeyDown[i] = 0;
+        VJoys[slot_nr].KeyUp[i] = 0;
+        VJoys[slot_nr].ButtonNr[i] = 0;
+        VJoys[slot_nr].HatNr[i] = 0;
+        VJoys[slot_nr].HatValue[i] = 0;
+        VJoys[slot_nr].AxisNr[i] = 0;
+        VJoys[slot_nr].AxisValue[i] = 0;
+    }
 }
 
 void C64Class::OpenSDLJoystick()

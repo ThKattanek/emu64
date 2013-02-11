@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>grafik/thorsten.jpg</file>
         <file>grafik/emu64.ico</file>
         <file>grafik/play_blue_transprent.png</file>
         <file>grafik/stop_blue_transprent.png</file>
@@ -56,5 +55,7 @@
         <file>roms/char.rom</file>
         <file>roms/kernal.rom</file>
         <file>grafik/toolbar32/screenshot.png</file>
+        <file>grafik/competition_pro.png</file>
+        <file>grafik/thorsten.png</file>
     </qresource>
 </RCC>

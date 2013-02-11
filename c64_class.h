@@ -92,6 +92,7 @@ public:
     bool ExportASM(char* filename, unsigned short start_adresse, unsigned short end_adresse, int source);
     void JoystickNewScan(void);
     void StartRecJoystickMapping(int slot_nr);
+    void ClearJoystickMapping(int slot_nr);
 
     unsigned char GetMapReadSource(unsigned char page);
     unsigned char GetMapWriteDestination(unsigned char page);

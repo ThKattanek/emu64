@@ -52,21 +52,47 @@ void SetupWindow::LoadINI(C64Class *_c64)
     {
         char group_name[32];
         ui->VJoySlots->setRowCount(MAX_VJOYS);
-        ui->VJoySlots->setColumnCount(1);
-        ui->VJoySlots->setColumnWidth(0,150);
+        ui->VJoySlots->setColumnCount(5);
+        ui->VJoySlots->setColumnWidth(0,125);
+        ui->VJoySlots->setColumnWidth(1,45);
+        ui->VJoySlots->setColumnWidth(2,45);
+        ui->VJoySlots->setColumnWidth(3,54);
+        ui->VJoySlots->setColumnWidth(4,59);
+
+        QStringList header_label;
+        header_label << tr("Bezeichnung") << "Port 1" << "Port 2" << "" << "";
+        ui->VJoySlots->setHorizontalHeaderLabels(header_label);
 
         for(int i=0; i<MAX_VJOYS; i++)
         {
             sprintf(group_name,"VJSlot_%2.2d",i);
             ini->beginGroup(group_name);
 
-            QTableWidgetItem *item = new QTableWidgetItem(ini->value("Name","").toString());
+            QTableWidgetItem *item = new QTableWidgetItem(ini->value("Name","Slot " + QVariant(i+1).toString()).toString());
             item->setToolTip(tr("Mit einem doppelklick kann man den Namen ändern."));
             ui->VJoySlots->setItem(i,0,item);
             ui->VJoySlots->setRowHeight(i,18);
 
-            ui->Port1->addItem(QVariant(i).toString() + " " + ini->value("Name","").toString());
-            ui->Port2->addItem(QVariant(i).toString() + " " + ini->value("Name","").toString());
+            item = new QTableWidgetItem("");
+            item->setFlags(Qt::ItemIsEditable);
+            item->setToolTip(tr("Verbindet diesen Slot mit dem C64 Gameport 1"));
+            ui->VJoySlots->setItem(i,1,item);
+
+            item = new QTableWidgetItem("");
+            item->setFlags(Qt::ItemIsEditable);
+            item->setToolTip(tr("Verbindet diesen Slot mit dem C64 Gameport 2"));
+            ui->VJoySlots->setItem(i,2,item);
+
+            ButtonMod *button;
+            button = new ButtonMod(0,i);
+            button->setText("Lernen");
+            connect(button,SIGNAL(Clicked(int,int)),this,SLOT(onClickButton(int,int)));
+            ui->VJoySlots->setCellWidget(i,3,button);
+
+            button = new ButtonMod(1,i);
+            button->setText("Löschen");
+            connect(button,SIGNAL(Clicked(int,int)),this,SLOT(onClickButton(int,int)));
+            ui->VJoySlots->setCellWidget(i,4,button);
 
             QByteArray array = ini->value("Type",0).toByteArray();
             if (array != 0) for(int j=0;j<5;j++) c64->VJoys[i].Type[j] = array[j];
@@ -97,7 +123,6 @@ void SetupWindow::LoadINI(C64Class *_c64)
 
             ini->endGroup();
         }
-        ui->VJoySlots->item(0,0)->setSelected(true);
 
         int value;
         bool bvalue;
@@ -123,11 +148,13 @@ void SetupWindow::LoadINI(C64Class *_c64)
         on_WFilter_toggled(bvalue);
 
         value = ini->value("Port1",0).toInt();
-        ui->Port1->setCurrentIndex(value);
+        ui->VJoySlots->item(value,1)->setBackground(QBrush(QColor(50,255,50)));
+        ui->VJoySlots->item(value,1)->setText("Port 1");
         c64->VPort1 = value;
 
         value = ini->value("Port2",0).toInt();
-        ui->Port2->setCurrentIndex(value);
+        ui->VJoySlots->item(value,2)->setBackground(QBrush(QColor(50,255,50)));
+        ui->VJoySlots->item(value,2)->setText("Port 2");
         c64->VPort2 = value;
 
         ini->endGroup();
@@ -209,25 +236,56 @@ void SetupWindow::on_ResetSShotCounter_clicked()
     emit ResetSreenshotCounter();
 }
 
-void SetupWindow::on_RecJoy_clicked()
+void SetupWindow::onClickButton(int idx, int idy)
 {
-    c64->StartRecJoystickMapping(ui->VJoySlots->selectedItems()[0]->row());
+    if(idx == 0)
+    {
+        /// Lernen ///
+        c64->StartRecJoystickMapping(idy);
+    }
+
+    if(idx == 1)
+    {
+        /// Löschen ///
+        c64->ClearJoystickMapping(idy);
+        ui->VJoySlots->item(idy,0)->setText(c64->VJoys[idy].Name);
+    }
 }
 
 void SetupWindow::on_VJoySlots_cellChanged(int row, int column)
 {
-   strcpy(c64->VJoys[row].Name,ui->VJoySlots->item(row,column)->text().toLatin1().data());
-
-   ui->Port1->setItemText(row,QVariant(row+1).toString() + " " + ui->VJoySlots->item(row,column)->text());
-   ui->Port2->setItemText(row,QVariant(row+1).toString() + " " + ui->VJoySlots->item(row,column)->text());
+    if(column == 0)
+    {
+        strcpy(c64->VJoys[row].Name,ui->VJoySlots->item(row,column)->text().toLatin1().data());
+    }
 }
 
-void SetupWindow::on_Port1_currentIndexChanged(int index)
+void SetupWindow::on_VJoySlots_cellClicked(int row, int column)
 {
-    c64->VPort1 = index;
-}
+    if(column == 0) return;
 
-void SetupWindow::on_Port2_currentIndexChanged(int index)
-{
-    c64->VPort2 = index;
+    switch(column)
+    {
+    case 1:
+        for(int i=0;i<MAX_VJOYS;i++)
+        {
+            ui->VJoySlots->item(i,1)->setBackground(QBrush(QColor(255,255,255)));
+            ui->VJoySlots->item(i,1)->setText("");
+        }
+        ui->VJoySlots->item(row,column)->setBackground(QBrush(QColor(50,255,50)));
+        ui->VJoySlots->item(row,column)->setText("Port 1");
+        c64->VPort1 = row;
+        break;
+
+    case 2:
+        for(int i=0;i<MAX_VJOYS;i++)
+        {
+            ui->VJoySlots->item(i,2)->setBackground(QBrush(QColor(255,255,255)));
+            ui->VJoySlots->item(i,2)->setText("");
+        }
+        ui->VJoySlots->item(row,column)->setBackground(QBrush(QColor(50,255,50)));
+        ui->VJoySlots->item(row,column)->setText("Port 2");
+        c64->VPort2 = row;
+        break;
+    }
 }

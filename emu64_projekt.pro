@@ -48,7 +48,8 @@ SOURCES += \
     setup_window.cpp \
     widget_d64_file.cpp \
     debugger_vic_window.cpp \
-    single_application.cpp
+    single_application.cpp \
+    button_mod.cpp
 
 HEADERS  += \
     version.h \
@@ -96,7 +97,8 @@ HEADERS  += \
     setup_window.h \
     widget_d64_file.h \
     debugger_vic_window.h \
-    single_application.h
+    single_application.h \
+    button_mod.h
 
 FORMS    += \
     info_window.ui \
@@ -156,7 +158,6 @@ OTHER_FILES += \
     docs/readme.txt \
     grafik/yellow_led_on.png \
     grafik/yellow_led_off.png \
-    grafik/thorsten.jpg \
     grafik/stop_blue_transprent.png \
     grafik/stop.png \
     grafik/save_24x24.png \
@@ -229,7 +230,9 @@ OTHER_FILES += \
     grafik/kreis0.png \
     grafik/sdl_icon.png \
     lizenz.pdf \
-    license.pdf
+    license.pdf \
+    grafik/competition_pro.png \
+    grafik/thorsten.png
 
 
 

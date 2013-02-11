@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>411</width>
-    <height>321</height>
+    <height>324</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,7 +25,7 @@
      <x>5</x>
      <y>5</y>
      <width>401</width>
-     <height>311</height>
+     <height>313</height>
     </rect>
    </property>
    <property name="font">
@@ -320,124 +320,50 @@
     <widget class="QGroupBox" name="groupBox">
      <property name="geometry">
       <rect>
-       <x>6</x>
-       <y>10</y>
+       <x>8</x>
+       <y>8</y>
        <width>385</width>
-       <height>217</height>
+       <height>277</height>
       </rect>
      </property>
      <property name="title">
       <string>Virtuelle - Joystick's</string>
      </property>
-     <widget class="QLabel" name="label_4">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>20</y>
-        <width>31</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Slots</string>
-      </property>
-     </widget>
      <widget class="QTableWidget" name="VJoySlots">
       <property name="geometry">
        <rect>
-        <x>5</x>
-        <y>35</y>
-        <width>196</width>
-        <height>177</height>
+        <x>4</x>
+        <y>16</y>
+        <width>377</width>
+        <height>257</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>8</pointsize>
+       </font>
       </property>
       <property name="selectionMode">
-       <enum>QAbstractItemView::SingleSelection</enum>
+       <enum>QAbstractItemView::NoSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectItems</enum>
       </property>
       <property name="showGrid">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
-      <attribute name="horizontalHeaderVisible">
+      <property name="gridStyle">
+       <enum>Qt::SolidLine</enum>
+      </property>
+      <attribute name="horizontalHeaderCascadingSectionResizes">
        <bool>false</bool>
       </attribute>
-     </widget>
-     <widget class="QPushButton" name="RecJoy">
-      <property name="geometry">
-       <rect>
-        <x>224</x>
-        <y>188</y>
-        <width>141</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Startet die Zuweisung der Tasten/Buttons usw. für den ausgewählten Slot.</string>
-      </property>
-      <property name="text">
-       <string>Lernmodus starten</string>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="geometry">
-      <rect>
-       <x>8</x>
-       <y>232</y>
-       <width>385</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="title">
-      <string>C64 Gameport's</string>
-     </property>
-     <widget class="QLabel" name="label_2">
-      <property name="geometry">
-       <rect>
-        <x>4</x>
-        <y>20</y>
-        <width>36</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Port 1</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_3">
-      <property name="geometry">
-       <rect>
-        <x>200</x>
-        <y>20</y>
-        <width>36</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Port 2</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="Port1">
-      <property name="geometry">
-       <rect>
-        <x>44</x>
-        <y>16</y>
-        <width>137</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="editable">
+      <attribute name="horizontalHeaderHighlightSections">
        <bool>false</bool>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="Port2">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>16</y>
-        <width>137</width>
-        <height>24</height>
-       </rect>
-      </property>
+      </attribute>
+      <attribute name="verticalHeaderHighlightSections">
+       <bool>false</bool>
+      </attribute>
      </widget>
     </widget>
    </widget>
