@@ -770,7 +770,7 @@ int SDLThread(void *userdat)
 
                         if(c64->RecJoyMapping == true)
                         {
-                            if((event.jaxis.value >= -10) && (event.jaxis.value <= 10))
+                            if(!((event.jaxis.value >= -10) && (event.jaxis.value <= 10)))
                             {
                                 c64->VJoys[c64->RecJoySlotNr].Type[c64->RecJoyMappingPos] = VJOY_TYPE_AXIS;
                                 c64->VJoys[c64->RecJoySlotNr].JoyIndex[c64->RecJoyMappingPos] = event.jaxis.which;
@@ -800,7 +800,7 @@ int SDLThread(void *userdat)
                                             (c64->VJoys[c64->VPort1].Type[i] == VJOY_TYPE_AXIS) &&
                                             (c64->VJoys[c64->VPort1].JoyIndex[i] == event.jaxis.which))
                                     {
-                                        if((event.jaxis.value >= -10) && (event.jaxis.value <= 10))
+                                        if(!((event.jaxis.value >= -10) && (event.jaxis.value <= 10)))
                                         {
                                             if(event.jaxis.value > 16000)
                                             {
@@ -826,7 +826,7 @@ int SDLThread(void *userdat)
                                             (c64->VJoys[c64->VPort2].Type[i] == VJOY_TYPE_AXIS) &&
                                             (c64->VJoys[c64->VPort2].JoyIndex[i] == event.jaxis.which))
                                     {
-                                        if(event.jaxis.value != 0)
+                                        if(!((event.jaxis.value >= -10) && (event.jaxis.value <= 10)))
                                         {
                                             if(event.jaxis.value > 16000)
                                             {
