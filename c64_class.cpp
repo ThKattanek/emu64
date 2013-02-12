@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: c64_class.cpp                         //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 19.01.2013		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 12.02.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include "c64_class.h"
@@ -27,6 +27,7 @@ int SDLThreadLoad(void *userdat);
 
 #define AudioSampleRate 44100
 #define AudioPufferSize 882*1
+#define RecPollingWaitStart 20
 
 bool Test = false;
 
@@ -399,6 +400,13 @@ void C64Class::StartEmulation()
 void AudioMix(void *userdat, Uint8 *stream, int laenge)
 {
     C64Class *c64 = (C64Class*)userdat;
+
+    if(c64->RecPollingWait)
+    {
+        c64->RecPollingWaitCounter--;
+        if(c64->RecPollingWaitCounter == 0) c64->RecPollingWait = false;
+    }
+
     c64->FillAudioBuffer(stream,laenge);
 }
 
@@ -652,15 +660,19 @@ int SDLThread(void *userdat)
                             c64->VJoys[c64->RecJoySlotNr].Type[c64->RecJoyMappingPos] = VJOY_TYPE_BUTTON;
                             c64->VJoys[c64->RecJoySlotNr].JoyIndex[c64->RecJoyMappingPos] = event.jbutton.which;
                             c64->VJoys[c64->RecJoySlotNr].ButtonNr[c64->RecJoyMappingPos] = event.jbutton.button;
-
                         }
-                        else if((c64->RecJoyMapping == true) && (event.jbutton.type == SDL_JOYBUTTONUP))
+                        else if((c64->RecJoyMapping == true) && (event.jbutton.type == SDL_JOYBUTTONUP) && (c64->RecPollingWait == false))
                         {
                             c64->RecJoyMappingPos++;
                             if(c64->RecJoyMappingPos == 5)
                             {
                                 /// Rec Mapping ist fertig ///
                                 c64->RecJoyMapping = false;
+                            }
+                            else
+                            {
+                                c64->RecPollingWait = true;
+                                c64->RecPollingWaitCounter = RecPollingWaitStart;
                             }
                         }
                         else
@@ -701,7 +713,7 @@ int SDLThread(void *userdat)
 
                     case SDL_JOYHATMOTION:
                     {
-                        if(c64->RecJoyMapping == true)
+                        if((c64->RecJoyMapping == true) && (c64->RecPollingWait == false))
                         {
                             if(event.jhat.value > 0)
                             {
@@ -717,6 +729,11 @@ int SDLThread(void *userdat)
                                 {
                                     /// Rec Mapping ist fertig ///
                                     c64->RecJoyMapping = false;
+                                }
+                                else
+                                {
+                                    c64->RecPollingWait = true;
+                                    c64->RecPollingWaitCounter = RecPollingWaitStart;
                                 }
                             }
                         }
@@ -760,7 +777,7 @@ int SDLThread(void *userdat)
 
                     case SDL_JOYAXISMOTION:
                     {
-                        if(c64->RecJoyMapping == true)
+                        if((c64->RecJoyMapping == true) && (c64->RecPollingWait == false))
                         {
                             if(!((event.jaxis.value >= -10) && (event.jaxis.value <= 10)))
                             {
@@ -777,6 +794,11 @@ int SDLThread(void *userdat)
                                 {
                                     /// Rec Mapping ist fertig ///
                                     c64->RecJoyMapping = false;
+                                }
+                                else
+                                {
+                                    c64->RecPollingWait = true;
+                                    c64->RecPollingWaitCounter = RecPollingWaitStart;
                                 }
                             }
                         }
@@ -1208,7 +1230,6 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
 
         DrawScreenBack = true;
     }
-    UpdateJoyPorts();
 }
 
 void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
@@ -1317,7 +1338,6 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
         {
             if(floppy[i]->GetEnableFloppySound()) SDL_MixAudio((unsigned char*)puffer,(unsigned char*)floppy[i]->GetSoundBuffer(),laenge,255);
         }
-
     }
     else
     {
@@ -1541,90 +1561,6 @@ inline void C64Class::CheckKeys(void)
     }
     CIA1_PA.SetInput(~(IN_PA|GamePort2));
     CIA1_PB.SetInput(~(IN_PB|GamePort1));
-}
-
-void C64Class::UpdateJoyPorts()
-{
-    if(StopJoystickUpdate)
-    {
-        JoyStickUdateIsStop = true;
-        return;
-    }
-    /// Port 1 ///
-    /*
-    GamePort1 = 0;
-
-    int buttons = 0;
-    for(int i=0;i<16;i++) buttons += SDL_JoystickGetButton(joy[JOY_PORT_1],i);
-    if(buttons > 0) GamePort1 |= 16;
-
-    unsigned char pos = SDL_JoystickGetHat (joy[JOY_PORT_1],0);
-    switch(pos)
-    {
-    case SDL_HAT_UP:
-        GamePort1 |= 1;
-        break;
-    case SDL_HAT_DOWN:
-        GamePort1 |= 2;
-        break;
-    case SDL_HAT_LEFT:
-        GamePort1 |= 4;
-        break;
-    case SDL_HAT_RIGHT:
-        GamePort1 |= 8;
-        break;
-    case SDL_HAT_RIGHTUP:
-        GamePort1 |= 9;
-        break;
-    case SDL_HAT_RIGHTDOWN:
-        GamePort1 |= 10;
-        break;
-    case SDL_HAT_LEFTUP:
-        GamePort1 |= 5;
-        break;
-    case SDL_HAT_LEFTDOWN:
-        GamePort1 |= 6;
-        break;
-    }
-    */
-
-    /// Port 2
-    /*
-    GamePort2 = 0;
-
-    buttons = 0;
-    for(int i=0;i<16;i++) buttons += SDL_JoystickGetButton(joy[JOY_PORT_2],i);
-    if(buttons > 0) GamePort2 |= 16;
-
-    pos = SDL_JoystickGetHat (joy[JOY_PORT_2],0);
-    switch(pos)
-    {
-    case SDL_HAT_UP:
-        GamePort2 |= 1;
-        break;
-    case SDL_HAT_DOWN:
-        GamePort2 |= 2;
-        break;
-    case SDL_HAT_LEFT:
-        GamePort2 |= 4;
-        break;
-    case SDL_HAT_RIGHT:
-        GamePort2 |= 8;
-        break;
-    case SDL_HAT_RIGHTUP:
-        GamePort2 |= 9;
-        break;
-    case SDL_HAT_RIGHTDOWN:
-        GamePort2 |= 10;
-        break;
-    case SDL_HAT_LEFTUP:
-        GamePort2 |= 5;
-        break;
-    case SDL_HAT_LEFTDOWN:
-        GamePort2 |= 6;
-        break;
-    }
-    */
 }
 
 void C64Class::ResetC64CycleCounter(void)
@@ -2777,6 +2713,7 @@ void C64Class::JoystickNewScan()
 
 void C64Class::StartRecJoystickMapping(int slot_nr)
 {
+    RecPollingWait = false;
     RecJoySlotNr = slot_nr;
     RecJoyMappingPos = 0;
     RecJoyMapping = true;
@@ -2812,6 +2749,7 @@ void C64Class::OpenSDLJoystick()
         SDL_Delay(1);
         AbbruchCounter--;
     }
+
     if(SDLJoystickIsOpen)
     {
         SDLJoystickIsOpen = false;

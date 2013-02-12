@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: c64_class.h                           //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 18.01.2013		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 12.02.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef C64CLASS_H
@@ -130,6 +130,8 @@ public:
     bool            RecJoyMapping;
     int             RecJoyMappingPos;          // 0-4 // Hoch - Runter - Links - Rechts - Feuer
     int             RecJoySlotNr;              // 0 - (MAX_VJOYS-1)
+    int             RecPollingWait;
+    int             RecPollingWaitCounter;
 
     VIRTUAL_JOY_STRUCT  VJoys[MAX_VJOYS];
     int                 VPort1;
@@ -184,7 +186,6 @@ public:
 private:
     void VicRefresh(unsigned char *vic_puffer);
     void CheckKeys(void);
-    void UpdateJoyPorts(void);
     int DisAss(FILE *file, int pc, bool line_draw, int source);
     bool CheckBreakpoints(void);
     void WriteSidIO(unsigned short adresse,unsigned char wert);
@@ -267,14 +268,14 @@ private:
     bool	ComandZeileStatus;
     bool	ComandZeileCountS;
 
-    int         CycleCounter;
-    bool        DebugMode;
+    int     CycleCounter;
+    bool    DebugMode;
     bool	DebugAnimation;
-    double      AnimationSpeedAdd;
+    double  AnimationSpeedAdd;
     double	AnimationSpeedCounter;
     bool	OneZyk;
     bool	OneOpc;
-    int         OneOpcSource;
+    int     OneOpcSource;
 };
 
 #endif // C64CLASS_H
