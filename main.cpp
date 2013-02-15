@@ -1,21 +1,25 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: main.cpp                              //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 18.01.2013		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 15.02.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include "single_application.h"
 #include "main_window.h"
 #include "version.h"
+
+#include <QSplashScreen>
+#include <QBitmap>
+#include <QTimer>
 
 #ifdef _WIN32
 int qMain(int argc, char *argv[])
@@ -33,6 +37,12 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    QPixmap pixmap(":/splash");
+    QSplashScreen *splash = new QSplashScreen();
+    splash->setPixmap(pixmap);
+    splash->setMask(pixmap.mask());
+    splash->show();
+
     if(LogFile.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         log = new QTextStream(&LogFile);
@@ -48,12 +58,11 @@ int main(int argc, char *argv[])
 
     if(log!=0) *log << "Emu64 Version: " << str_emu64_version << "\n\n";
 
-    MainWindow w(0,log);
+    MainWindow w(0,splash,log);
 
     QObject::connect(&app,SIGNAL(messageAvailable(QStringList)),&w,SLOT(OnMessage(QStringList)));
 
     w.log = log;
-    w.show();
 
     QStringList msg_list;
     for(int i=0;i<argc;i++)
@@ -62,6 +71,8 @@ int main(int argc, char *argv[])
     }
 
     w.OnMessage(msg_list);
+
+    QTimer::singleShot(500, &w, SLOT(OnInit()));
 
     return app.exec();
 };

@@ -1,21 +1,22 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: main_window.h                         //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 10.08.2012		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 15.02.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QSplashScreen>
 #include <QTextStream>
 #include <QTranslator>
 #include <QSettings>
@@ -50,9 +51,11 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0,QTextStream *_log = NULL);
+    explicit MainWindow(QWidget *parent = 0,QSplashScreen* _splash = NULL,QTextStream *_log = NULL);
     ~MainWindow();
     Ui::MainWindow *ui;
+
+    QSplashScreen *splash;
 
     QTextStream *log;
     void LogText(char*);
@@ -63,6 +66,7 @@ public:
 
 public slots:
     void OnMessage(QStringList msg);
+    void OnInit();
 
 private slots:
     void on_menu_main_info_triggered();

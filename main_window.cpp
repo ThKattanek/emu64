@@ -1,30 +1,31 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: main_window.cpp                       //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 18.01.2013		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 15.02.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include "main_window.h"
 #include "ui_main_window.h"
 #include "version.h"
 
-#include "QDebug"
-#include "QDir"
+#include <QDebug>
+#include <QDir>
 
-MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
+MainWindow::MainWindow(QWidget *parent,QSplashScreen* _splash,QTextStream *_log) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     c64(0)
 {
+    splash = _splash;
     log = _log;
 
     /// Haputfenster UI setzen ///
@@ -37,7 +38,59 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
 #ifdef __linux__
     setWindowTitle("Emu64 Version " + QString(str_emu64_version) + " --- [Linux]");
 #endif
+}
 
+MainWindow::~MainWindow()
+{
+    showNormal();
+    //////////// Save to INI ////////////
+    if(ini != NULL)
+    {
+        ini->beginGroup("MainWindow");
+        ini->setValue("Geometry",saveGeometry());
+        ini->setValue("State",saveState());
+        ini->setValue("ScreenshotCounter",ScreenshotNumber);
+        ini->endGroup();
+
+        char group_name[32];
+        bool value;
+
+        for(int i=0; i<FloppyAnzahl; i++)
+        {
+            sprintf(group_name,"Floppy1541_%2.2X",i+8);
+            ini->beginGroup(group_name);
+            WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(i,0);
+            value = w->GetEnableFloppy();
+            ini->setValue("Enabled",value);
+            ini->setValue("VolumeMode",w->GetFloppyVolume());
+            ini->endGroup();
+        }
+    }
+    /////////////////////////////////////
+
+    /// WindowKlassen schließen ///
+
+    delete setup_window;
+    delete c64;
+
+    delete videopal;
+    delete info_window;
+    delete tv_setup_window;
+    delete floppy_window;
+    delete c64_keyboard_window;
+    delete crt_window;
+    delete debugger_window;
+
+    delete ui;
+    delete ini;
+    LogText(tr(">> Es wurden alle Klassen wieder entfernt\n").toLatin1().data());
+
+    LogText(tr("\n>> Emu64 wurde sauber beendet...").toLatin1().data());
+    delete log;
+}
+
+void MainWindow::OnInit()
+{
     /// ApplicationPath holen und abspeichern ///
     appPath = QApplication::applicationDirPath();
 
@@ -214,56 +267,9 @@ MainWindow::MainWindow(QWidget *parent,QTextStream *_log) :
         return;
     }
     c64->HardReset();
-}
 
-MainWindow::~MainWindow()
-{
-    showNormal();
-    //////////// Save to INI ////////////
-    if(ini != NULL)
-    {
-        ini->beginGroup("MainWindow");
-        ini->setValue("Geometry",saveGeometry());
-        ini->setValue("State",saveState());
-        ini->setValue("ScreenshotCounter",ScreenshotNumber);
-        ini->endGroup();
-
-        char group_name[32];
-        bool value;
-
-        for(int i=0; i<FloppyAnzahl; i++)
-        {
-            sprintf(group_name,"Floppy1541_%2.2X",i+8);
-            ini->beginGroup(group_name);
-            WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(i,0);
-            value = w->GetEnableFloppy();
-            ini->setValue("Enabled",value);
-            ini->setValue("VolumeMode",w->GetFloppyVolume());
-            ini->endGroup();
-        }
-    }
-    /////////////////////////////////////
-
-    /// WindowKlassen schließen ///
-
-    delete setup_window;
-    delete c64;
-
-    delete videopal;
-    delete info_window;
-    delete tv_setup_window;
-    delete floppy_window;
-    delete c64_keyboard_window;
-    delete crt_window;
-    delete debugger_window;
-
-    delete ui;
-    delete ini;
-    LogText(tr(">> Es wurden alle Klassen wieder entfernt\n").toLatin1().data());
-
-    LogText(tr("\n>> Emu64 wurde sauber beendet...").toLatin1().data());
-    delete log;
-
+    splash->close();
+    this->show();
 }
 
 void MainWindow::OnMessage(QStringList msg)

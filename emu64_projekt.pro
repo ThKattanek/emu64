@@ -232,7 +232,8 @@ OTHER_FILES += \
     lizenz.pdf \
     license.pdf \
     grafik/competition_pro.png \
-    grafik/thorsten.png
+    grafik/thorsten.png \
+    grafik/splash_picture.png
 
 
 
