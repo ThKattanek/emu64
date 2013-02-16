@@ -59,5 +59,6 @@
         <file>grafik/thorsten.png</file>
         <file alias="splash">grafik/splash_screen.png</file>
         <file>grafik/emu64_logo_120_120.png</file>
+        <file>grafik/toolbar32/speed.png</file>
     </qresource>
 </RCC>

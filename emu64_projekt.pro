@@ -50,7 +50,8 @@ SOURCES += \
     debugger_vic_window.cpp \
     single_application.cpp \
     button_mod.cpp \
-    custom_splashscreen.cpp
+    custom_splashscreen.cpp \
+    c64_speed_window.cpp
 
 HEADERS  += \
     version.h \
@@ -100,7 +101,8 @@ HEADERS  += \
     debugger_vic_window.h \
     single_application.h \
     button_mod.h \
-    custom_splashscreen.h
+    custom_splashscreen.h \
+    c64_speed_window.h
 
 FORMS    += \
     info_window.ui \
@@ -119,7 +121,8 @@ FORMS    += \
     widget_bit_leiste.ui \
     setup_window.ui \
     widget_d64_file.ui \
-    debugger_vic_window.ui
+    debugger_vic_window.ui \
+    c64_speed_window.ui
 
 RESOURCES += \
     emu64.qrc

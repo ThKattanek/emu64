@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>460</width>
+    <width>505</width>
     <height>204</height>
    </rect>
   </property>
@@ -128,6 +128,9 @@ background-position: center
    <property name="movable">
     <bool>true</bool>
    </property>
+   <property name="allowedAreas">
+    <set>Qt::AllToolBarAreas</set>
+   </property>
    <property name="iconSize">
     <size>
      <width>32</width>
@@ -153,14 +156,15 @@ background-position: center
    <addaction name="actionDebugger_Disassembler"/>
    <addaction name="actionSoftreset"/>
    <addaction name="actionHardreset"/>
+   <addaction name="actionC64_Geschwindigkeit"/>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>460</width>
-     <height>19</height>
+     <width>505</width>
+     <height>22</height>
     </rect>
    </property>
    <property name="font">
@@ -664,13 +668,17 @@ background-position: center
   </action>
   <action name="actionC64_Geschwindigkeit">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="emu64.qrc">
+     <normaloff>:/grafik/toolbar32/speed.png</normaloff>:/grafik/toolbar32/speed.png</iconset>
    </property>
    <property name="text">
     <string>C64 Geschwindigkeit</string>
    </property>
    <property name="statusTip">
-    <string>Hier können Sie die C64 Geschwindigkeit von 10% bis 1000% einstellen.</string>
+    <string>Hier können Sie die C64 Geschwindigkeit sufenlos von 5% bis 500% einstellen.</string>
    </property>
    <property name="font">
     <font>

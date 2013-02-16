@@ -38,6 +38,7 @@
 #include "crt_window.h"
 #include "debugger_window.h"
 #include "setup_window.h"
+#include "c64_speed_window.h"
 
 #include "c64_class.h"
 
@@ -91,6 +92,8 @@ private slots:
 
     void on_actionScreenshot_triggered();
 
+    void on_actionC64_Geschwindigkeit_triggered();
+
 protected:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
@@ -120,6 +123,7 @@ private:
     CrtWindow *crt_window;                      // CRT Auswahl Fenster
     DebuggerWindow *debugger_window;            // Debugger / Disassembler Fenster
     SetupWindow *setup_window;                  // Setup Fenster
+    C64SpeedWindow *speed_window;               // C64 Speed Window
 };
 
 #endif // MAINWINDOW_H

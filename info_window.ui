@@ -59,7 +59,7 @@
     </font>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string>INFO</string>
    </property>
   </widget>
   <widget class="QLabel" name="Emu64Version">
@@ -152,6 +152,9 @@
     <font>
      <pointsize>7</pointsize>
     </font>
+   </property>
+   <property name="selectionMode">
+    <enum>QAbstractItemView::NoSelection</enum>
    </property>
    <item>
     <property name="text">

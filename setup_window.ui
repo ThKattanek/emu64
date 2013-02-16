@@ -34,7 +34,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="EmualtionTab">
     <property name="enabled">
@@ -91,6 +91,9 @@
        <pointsize>9</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>Setzt das C64 Farbschema wenn kein PAL ausgewählt wurde.</string>
+     </property>
     </widget>
     <widget class="QGroupBox" name="WindowGroup">
      <property name="geometry">
@@ -114,9 +117,12 @@
        <rect>
         <x>10</x>
         <y>20</y>
-        <width>136</width>
+        <width>177</width>
         <height>21</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Schaltet die PAL Emulation der Grafikausgabe ein. (Sollte vorrangig benutzt werden)</string>
       </property>
       <property name="text">
        <string>PAL Videoemulation</string>
@@ -127,9 +133,12 @@
        <rect>
         <x>10</x>
         <y>40</y>
-        <width>156</width>
+        <width>177</width>
         <height>21</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Verdoppelt die Textur in der Breite und in der Höhe. (Schärferes Bild beim Skalieren)</string>
       </property>
       <property name="text">
        <string>Texturgröße verdoppeln</string>
@@ -163,6 +172,9 @@
         <height>21</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Schaltet einen Bilineare Filterung mit zu. (Das Bild wird etwas verwaschener)</string>
+      </property>
       <property name="text">
        <string>Filter</string>
       </property>
@@ -175,6 +187,9 @@
         <width>61</width>
         <height>21</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Schaltet den internen Farbmodus auf 16Bit pro Pixel um.</string>
       </property>
       <property name="text">
        <string>16 Bit</string>
@@ -194,6 +209,9 @@
         <width>61</width>
         <height>21</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Schaltet den internen Farbmodus auf 32Bit pro Pixel um.</string>
       </property>
       <property name="text">
        <string>32 Bit</string>
@@ -279,6 +297,9 @@
         <pointsize>9</pointsize>
        </font>
       </property>
+      <property name="toolTip">
+       <string>Hier kann man das Screenshot Format einstellen.</string>
+      </property>
       <item>
        <property name="text">
         <string>BMP</string>
@@ -298,6 +319,9 @@
        <font>
         <pointsize>9</pointsize>
        </font>
+      </property>
+      <property name="toolTip">
+       <string>Setzt den Zähler für die angehängte Zahl an der Screenshot Datei zurück.</string>
       </property>
       <property name="text">
        <string>Counter Zurücksetzen</string>

@@ -59,6 +59,7 @@ public:
     void WriteC64Byte(unsigned short adresse,unsigned char wert);
     unsigned char* GetRAMPointer(unsigned short adresse);
     void SetGrafikModi(bool colbits32, bool doublesize,bool enable_pal,bool filter_enable, int fullres_xw = 0, int fullres_yw = 0);
+    void SetC64Speed(int speed);
 
     void SoftReset(void);
     void HardReset(void);
@@ -122,6 +123,9 @@ public:
     unsigned char   *C64ScreenBuffer;
     bool            DrawScreenBack;
     bool            OpenGLEnable;
+
+    int				FrameSkip;
+    int				FrameSkipCounter;
 
     SDL_Surface     *Pfeil0;
     SDL_Surface     *Pfeil1;

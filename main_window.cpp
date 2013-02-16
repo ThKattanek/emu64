@@ -80,6 +80,7 @@ MainWindow::~MainWindow()
     delete c64_keyboard_window;
     delete crt_window;
     delete debugger_window;
+    delete speed_window;
 
     delete ui;
     delete ini;
@@ -191,6 +192,10 @@ void MainWindow::OnInit()
     setup_window = new SetupWindow(this,SLOT(onChangeGrafikModi(bool,bool,bool,bool,bool)),videopal,ini);
     LogText(tr(">> SetupWindow wurde erzeugt\n").toLatin1().data());
 
+    splash->showStatusMessage(tr("C64SpeedWindow wird erstellt."),Qt::darkBlue);
+    speed_window = new C64SpeedWindow(this,ini);
+    LogText(tr(">> C64SpeedWindow wurde erzeugt\n").toLatin1().data());
+
     splash->showStatusMessage(tr("Sprachmenü wir erstellt."),Qt::darkBlue);
     ini->beginGroup("MainWindow");
     CreateLanguageMenu(ini->value("lang",SystemLocale).toString());
@@ -216,8 +221,12 @@ void MainWindow::OnInit()
     SDL_WM_SetCaption((const char*)tr("C64 Bildschirm").toLatin1().data(),0);
 
     /// Debugger Window mit C64 verbinden ///
-    splash->showStatusMessage(tr("Debugger Window wird mit C64 Klasee verbunden."),Qt::darkBlue);
+    splash->showStatusMessage(tr("Debugger Window wird mit C64 Klasse verbunden."),Qt::darkBlue);
     debugger_window->SetC64Pointer(c64);
+
+    /// C64 Speed Window mit C64 verbinden ///
+    splash->showStatusMessage(tr("C64 Speed Window wird mit C64 Klasse verbunden."),Qt::darkBlue);
+    speed_window->SetC64Pointer(c64);
 
     /// CRT Klasse mit CRT Window verbinden ///
     splash->showStatusMessage(tr("CRT Window wird mit CRT Klasee verbunden."),Qt::darkBlue);
@@ -239,7 +248,6 @@ void MainWindow::OnInit()
     splash->showStatusMessage(tr("C64 Key-Matrix wird mit Virtual Keyboard verbunden."),Qt::darkBlue);
     c64_keyboard_window->KeyMatrixToPA = c64->KeyboardMatrixToPAExt;
     c64_keyboard_window->KeyMatrixToPB = c64->KeyboardMatrixToPBExt;
-
 
     /// Tabelle für Floppy's Ertsellen ///
     splash->showStatusMessage(tr("Tabelle für Floppy's wird erstellt."),Qt::darkBlue);
@@ -414,6 +422,7 @@ void MainWindow::RetranslateUi()
     crt_window->RetranslateUi();
     debugger_window->RetranslateUi();
     setup_window->RetranslateUi();
+    speed_window->RetranslateUi();
 
     SDL_WM_SetCaption(tr("C64 Bildschirm").toLatin1().data(),0);
 }
@@ -568,4 +577,10 @@ void MainWindow::on_actionScreenshot_triggered()
         ScreenshotNumber++;
     }
     else QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.\nÜberprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !"));
+}
+
+void MainWindow::on_actionC64_Geschwindigkeit_triggered()
+{
+    if(speed_window->isHidden()) speed_window->show();
+    else speed_window->hide();
 }

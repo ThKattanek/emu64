@@ -34,7 +34,7 @@ bool Test = false;
 C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(char*)> log_function, const char* gfx_path):
     SDLJoystickIsOpen(false),
     JoystickAnzahl(0),StopJoystickUpdate(true),JoyStickUdateIsStop(true),
-    RecJoyMapping(false),VPort1(-1),VPort2(-1)
+    RecJoyMapping(false)
 {   
     VPort1 = 0;
     VPort2 = 1;
@@ -56,6 +56,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     C64ScreenBack = 0;
     DrawScreenBack = false;
     StartScreenshot = false;
+    FrameSkipCounter=1;
 
     OpenGLEnable = OpenGLOn;
 
@@ -1227,7 +1228,6 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
         SDL_LockSurface(C64ScreenBack);
         pal->ConvertVideo((void*)C64ScreenBack->pixels,C64ScreenBack->pitch,vic_puffer,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
         SDL_UnlockSurface(C64ScreenBack);
-
         DrawScreenBack = true;
     }
 }
@@ -1643,6 +1643,11 @@ void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool pal_enable,boo
 
     LogText((char*)">> Grafikmodus wurde gesetzt:\n");
     LogText(str00);
+}
+
+void C64Class::SetC64Speed(int speed)
+{
+    sid1->SetC64Zyklen(985248.f*(float)speed/100.f);
 }
 
 int SDLThreadLoad(void *userdat)

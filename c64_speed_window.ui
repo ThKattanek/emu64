@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C64SpeedWindow</class>
+ <widget class="QDialog" name="C64SpeedWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>230</width>
+    <height>105</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1000</width>
+    <height>1000</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>C64 Geschwindigkeit</string>
+  </property>
+  <widget class="QSpinBox" name="C64Speed">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>4</y>
+     <width>93</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Hier kannst du die C64 Geschwindigkeit manuell eingeben.</string>
+   </property>
+   <property name="wrapping">
+    <bool>false</bool>
+   </property>
+   <property name="buttonSymbols">
+    <enum>QAbstractSpinBox::PlusMinus</enum>
+   </property>
+   <property name="accelerated">
+    <bool>false</bool>
+   </property>
+   <property name="suffix">
+    <string>%</string>
+   </property>
+   <property name="prefix">
+    <string/>
+   </property>
+   <property name="minimum">
+    <number>5</number>
+   </property>
+   <property name="maximum">
+    <number>5000</number>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Set5">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>52</y>
+     <width>53</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Die C64 Geschwindigkeit wird auf 5% gestellt.</string>
+   </property>
+   <property name="text">
+    <string>5%</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Set25">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>52</y>
+     <width>53</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Die C64 Geschwindigkeit wird auf 25% gestellt.</string>
+   </property>
+   <property name="text">
+    <string>25%</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Set50">
+   <property name="geometry">
+    <rect>
+     <x>116</x>
+     <y>52</y>
+     <width>53</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Die C64 Geschwindigkeit wird auf 50% gestellt.</string>
+   </property>
+   <property name="text">
+    <string>50%</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Set100">
+   <property name="geometry">
+    <rect>
+     <x>172</x>
+     <y>52</y>
+     <width>53</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Die C64 Geschwindigkeit wird auf 100% gestellt.</string>
+   </property>
+   <property name="text">
+    <string>100%</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Set200">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>76</y>
+     <width>53</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Die C64 Geschwindigkeit wird auf 200% gestellt.</string>
+   </property>
+   <property name="text">
+    <string>200%</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Set300">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>76</y>
+     <width>53</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Die C64 Geschwindigkeit wird auf 300% gestellt.</string>
+   </property>
+   <property name="text">
+    <string>300%</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Set400">
+   <property name="geometry">
+    <rect>
+     <x>116</x>
+     <y>76</y>
+     <width>53</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Die C64 Geschwindigkeit wird auf 400% gestellt.</string>
+   </property>
+   <property name="text">
+    <string>400%</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Set500">
+   <property name="geometry">
+    <rect>
+     <x>172</x>
+     <y>76</y>
+     <width>53</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Die C64 Geschwindigkeit wird auf 500% gestellt.</string>
+   </property>
+   <property name="text">
+    <string>500%</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Pause">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>4</y>
+     <width>73</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string/>
+   </property>
+   <property name="text">
+    <string>Pause</string>
+   </property>
+  </widget>
+  <widget class="QScrollBar" name="ScrollC64Speed">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>32</y>
+     <width>221</width>
+     <height>14</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Stufenlos einstellbare Geschwindigkeit.</string>
+   </property>
+   <property name="minimum">
+    <number>5</number>
+   </property>
+   <property name="maximum">
+    <number>500</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
