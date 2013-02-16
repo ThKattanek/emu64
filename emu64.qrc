@@ -57,6 +57,7 @@
         <file>grafik/toolbar32/screenshot.png</file>
         <file>grafik/competition_pro.png</file>
         <file>grafik/thorsten.png</file>
-        <file alias="splash">grafik/splash_picture.png</file>
+        <file alias="splash">grafik/splash_screen.png</file>
+        <file>grafik/emu64_logo_120_120.png</file>
     </qresource>
 </RCC>

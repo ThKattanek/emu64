@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.02.2013                //
+// Letzte Änderung am 16.02.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -420,6 +420,16 @@ void MainWindow::RetranslateUi()
 
 void MainWindow::on_menu_main_info_triggered()
 {
+    SDL_version compiled;
+    SDL_VERSION(&compiled);
+
+    QString sdl_version = QVariant(compiled.major).toString() + "." + QVariant(compiled.minor).toString() + "." + QVariant(compiled.patch).toString();
+    QString emu64_version = QString("Emu64 V") + QString(str_emu64_version);
+
+    info_window->SetEmu64VersionText(emu64_version);
+    info_window->SetMoreInfoText("Qt Version: " + QString(qVersion()) + " / SDL Version: " + sdl_version);
+
+
     info_window->show();
 }
 

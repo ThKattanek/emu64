@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>317</width>
-    <height>239</height>
+    <width>346</width>
+    <height>426</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,10 +16,10 @@
   <widget class="QWidget" name="widget" native="true">
    <property name="geometry">
     <rect>
-     <x>7</x>
-     <y>7</y>
-     <width>155</width>
-     <height>106</height>
+     <x>188</x>
+     <y>56</y>
+     <width>105</width>
+     <height>69</height>
     </rect>
    </property>
    <property name="autoFillBackground">
@@ -34,14 +34,226 @@
   <widget class="QWidget" name="widget_2" native="true">
    <property name="geometry">
     <rect>
-     <x>7</x>
-     <y>119</y>
-     <width>302</width>
+     <x>4</x>
+     <y>296</y>
+     <width>337</width>
      <height>113</height>
     </rect>
    </property>
    <property name="styleSheet">
     <string notr="true">border-image: url(:/grafik/qt_sdl_logo_300x113.png);</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="moreinfosOut">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>408</y>
+     <width>333</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Emu64Version">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>4</y>
+     <width>201</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>13</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0, 0,100);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>152</x>
+     <y>24</y>
+     <width>177</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>von Thorsten Kattanek</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+   <property name="openExternalLinks">
+    <bool>false</bool>
+   </property>
+   <property name="textInteractionFlags">
+    <set>Qt::LinksAccessibleByMouse</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>152</x>
+     <y>36</y>
+     <width>177</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.emu64.de&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;www.emu64.de&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+   <property name="openExternalLinks">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listWidget">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>144</y>
+     <width>337</width>
+     <height>149</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>7</pointsize>
+    </font>
+   </property>
+   <item>
+    <property name="text">
+     <string>Thomas Daden (+ Emu64 Handbuch, Emu64-Wiki, Emu64 Webspace)</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Selmiak (+ Emu64 Logo, engl. Übersetzung, Emu64-Wiki)</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Peggy</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Andreas Goller</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Hoeppi</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>6581freak</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>purmike</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Tracker</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Yeti</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>radischen</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Evil.Joe</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Tuxist</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Matuschek</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Retro-Schulzi</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>128</y>
+     <width>165</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Betatester und mehr ...</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="widget_3" native="true">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>4</y>
+     <width>120</width>
+     <height>120</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border-image: url(:/grafik/emu64_logo_120_120.png);</string>
    </property>
   </widget>
  </widget>
