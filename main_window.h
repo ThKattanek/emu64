@@ -16,7 +16,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QSplashScreen>
 #include <QTextStream>
 #include <QTranslator>
 #include <QSettings>
@@ -24,10 +23,13 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QBitmap>
+#include <QRect>
 #include <QThread>
 #include <stdlib.h>
 
 /// Windows ///
+#include "custom_splashscreen.h"
 #include "widget_floppy_status.h"
 #include "info_window.h"
 #include "tv_setup_window.h"
@@ -51,11 +53,11 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0,QSplashScreen* _splash = NULL,QTextStream *_log = NULL);
+    explicit MainWindow(QWidget *parent = 0,customSplashScreen* _splash = NULL,QTextStream *_log = NULL);
     ~MainWindow();
     Ui::MainWindow *ui;
 
-    QSplashScreen *splash;
+    customSplashScreen *splash;
 
     QTextStream *log;
     void LogText(char*);

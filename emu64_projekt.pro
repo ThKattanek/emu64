@@ -49,7 +49,8 @@ SOURCES += \
     widget_d64_file.cpp \
     debugger_vic_window.cpp \
     single_application.cpp \
-    button_mod.cpp
+    button_mod.cpp \
+    custom_splashscreen.cpp
 
 HEADERS  += \
     version.h \
@@ -98,7 +99,8 @@ HEADERS  += \
     widget_d64_file.h \
     debugger_vic_window.h \
     single_application.h \
-    button_mod.h
+    button_mod.h \
+    custom_splashscreen.h
 
 FORMS    += \
     info_window.ui \

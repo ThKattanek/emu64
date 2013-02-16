@@ -17,7 +17,7 @@
 #include "main_window.h"
 #include "version.h"
 
-#include <QSplashScreen>
+#include "custom_splashscreen.h"
 #include <QBitmap>
 #include <QTimer>
 
@@ -37,12 +37,6 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    QPixmap pixmap(":/splash");
-    QSplashScreen *splash = new QSplashScreen();
-    splash->setPixmap(pixmap);
-    splash->setMask(pixmap.mask());
-    splash->show();
-
     if(LogFile.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         log = new QTextStream(&LogFile);
@@ -57,6 +51,13 @@ int main(int argc, char *argv[])
 #endif
 
     if(log!=0) *log << "Emu64 Version: " << str_emu64_version << "\n\n";
+
+    QPixmap image(":/splash");
+    customSplashScreen *splash = new customSplashScreen(image);
+    splash->setPixmap(image);
+    splash->setMask(image.mask());
+    splash->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::SplashScreen);
+    splash->show();
 
     MainWindow w(0,splash,log);
 
