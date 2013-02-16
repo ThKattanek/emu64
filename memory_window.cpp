@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: memory_window.cpp                     //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 17.09.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 16.02.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include "memory_window.h"
@@ -71,6 +71,13 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
 MemoryWindow::~MemoryWindow()
 {
     delete ui;
+}
+
+void MemoryWindow::RetranslateUi()
+{
+    ui->retranslateUi(this);
+    this->update();
+    ChangeSource(AktSource);
 }
 
 void MemoryWindow::SetC64Pointer(C64Class *_c64)

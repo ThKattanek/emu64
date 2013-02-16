@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: widget_floppy_status.cpp              //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 12.10.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 16.02.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include <QFontDatabase>
@@ -68,6 +68,12 @@ WidgetFloppyStatus::~WidgetFloppyStatus()
 {
     delete timer;
     delete ui;
+}
+
+void WidgetFloppyStatus::RetranslateUi()
+{
+    ui->retranslateUi(this);
+    this->update();
 }
 
 void WidgetFloppyStatus::onTimer()

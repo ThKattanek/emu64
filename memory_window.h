@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: memory_window.h                       //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 17.09.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 16.02.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef MEMORY_WINDOW_H
@@ -33,6 +33,7 @@ class MemoryWindow : public QDialog
 public:
     explicit MemoryWindow(QWidget *parent = 0);
     ~MemoryWindow();
+    void RetranslateUi();
     void SetC64Pointer(C64Class *_c64);
     void ChangeSource(int source);
     void UpdateMemoryList(void);

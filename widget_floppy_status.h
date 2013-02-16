@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: widget_floppy_status.h                //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 12.10.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 12.10.2011                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef WIDGET_FLOPPY_STATUS_H
@@ -32,6 +32,7 @@ class WidgetFloppyStatus : public QWidget
 public:
     explicit WidgetFloppyStatus(QWidget *parent = 0, int floppy_nr = 0, Floppy1541 *_floppy = 0);
     ~WidgetFloppyStatus();
+    void RetranslateUi();
     void SetGeraeteID(unsigned char id);
     QString GetAktFilename(void);
     bool GetEnableFloppy(void);

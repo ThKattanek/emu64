@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: widget_sr_edit.cpp                    //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 03.06.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 16.02.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include "widget_sr_edit.h"

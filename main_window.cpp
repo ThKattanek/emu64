@@ -415,6 +415,13 @@ void MainWindow::slotLanguageChanged(QAction* action)
 void MainWindow::RetranslateUi()
 {
     ui->retranslateUi(this);
+
+    for(int i=0; i<FloppyAnzahl; i++)
+    {
+        WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(i,0);
+        if(w != NULL) w->RetranslateUi();
+    }
+
     info_window->RetranslateUi();
     tv_setup_window->RetranslateUi();
     c64_keyboard_window->RetranslateUi();
@@ -423,6 +430,8 @@ void MainWindow::RetranslateUi()
     debugger_window->RetranslateUi();
     setup_window->RetranslateUi();
     speed_window->RetranslateUi();
+
+
 
     SDL_WM_SetCaption(tr("C64 Bildschirm").toLatin1().data(),0);
 }

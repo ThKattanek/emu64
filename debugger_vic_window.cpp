@@ -34,6 +34,12 @@ DebuggerVicWindow::~DebuggerVicWindow()
     delete ui;
 }
 
+void DebuggerVicWindow::RetranslateUi()
+{
+    ui->retranslateUi(this);
+    this->update();
+}
+
 void DebuggerVicWindow::SetC64Pointer(C64Class *_c64)
 {
     c64 = _c64;

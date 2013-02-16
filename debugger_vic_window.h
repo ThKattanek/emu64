@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: debugger_vic_window.h                 //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 29.12.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 16.02.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef DEBUGGER_VIC_WINDOW_H
@@ -30,6 +30,7 @@ class DebuggerVicWindow : public QDialog
 public:
     explicit DebuggerVicWindow(QWidget *parent = 0);
     ~DebuggerVicWindow();
+    void RetranslateUi();
     void SetC64Pointer(C64Class *_c64);
     void UpdateOutputList(void);
 

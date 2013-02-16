@@ -20,8 +20,6 @@ C64SpeedWindow::C64SpeedWindow(QWidget *parent, QSettings *_ini) :
         ini->endGroup();
     }
     ////////////////////////////////////
-
-    SetPauseTooltip();
 }
 
 C64SpeedWindow::~C64SpeedWindow()
@@ -41,6 +39,8 @@ void C64SpeedWindow::RetranslateUi()
 {
     ui->retranslateUi(this);
     this->update();
+
+    SetPauseTooltip();
 }
 
 void C64SpeedWindow::SetC64Pointer(C64Class *_c64)

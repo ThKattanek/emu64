@@ -10,6 +10,130 @@
     </message>
 </context>
 <context>
+    <name>C64SpeedWindow</name>
+    <message>
+        <location filename="c64_speed_window.ui" line="26"/>
+        <source>C64 Geschwindigkeit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="38"/>
+        <source>Hier kannst du die C64 Geschwindigkeit manuell eingeben.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="50"/>
+        <source>%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="72"/>
+        <source>Die C64 Geschwindigkeit wird auf 5% gestellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="75"/>
+        <source>5%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="88"/>
+        <source>Die C64 Geschwindigkeit wird auf 25% gestellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="91"/>
+        <source>25%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="104"/>
+        <source>Die C64 Geschwindigkeit wird auf 50% gestellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="107"/>
+        <source>50%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="120"/>
+        <source>Die C64 Geschwindigkeit wird auf 100% gestellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="123"/>
+        <source>100%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="136"/>
+        <source>Die C64 Geschwindigkeit wird auf 200% gestellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="139"/>
+        <source>200%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="152"/>
+        <source>Die C64 Geschwindigkeit wird auf 300% gestellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="155"/>
+        <source>300%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="168"/>
+        <source>Die C64 Geschwindigkeit wird auf 400% gestellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="171"/>
+        <source>400%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="184"/>
+        <source>Die C64 Geschwindigkeit wird auf 500% gestellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="187"/>
+        <source>500%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="203"/>
+        <location filename="c64_speed_window.cpp" line="123"/>
+        <source>Pause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.ui" line="216"/>
+        <source>Stufenlos einstellbare Geschwindigkeit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.cpp" line="117"/>
+        <source>Weiter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.cpp" line="133"/>
+        <source>Lässt den C64, mit der eingestellten Geschwindigkeit, weiterlaufen.</source>
+        <translation>Lässt den C64 mit der eingestellten Geschwindigkeit weiterlaufen.</translation>
+    </message>
+    <message>
+        <location filename="c64_speed_window.cpp" line="137"/>
+        <source>Hält den C64 komplett an.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CrtWindow</name>
     <message>
         <location filename="crt_window.ui" line="25"/>
@@ -275,7 +399,11 @@ Es können folgende Zahlenformate eingegeben werden.
 
 - ohne Vorzeichen Dezimalsystem (Bsp. 128)
 - $ Hexadezinal System (Bsp. $a7)</source>
-        <translation type="unfinished"></translation>
+        <translation>Um den Wert zu ändern, bitte drauf klicken und mit RETURN bestätigen.
+Es können folgende Zahlenformate eingegeben werden.
+
+- ohne Vorzeichen Dezimalsystem (Bsp. 128)
+- $ Hexadezimalsystem (Bsp. $a7)</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="387"/>
@@ -330,7 +458,7 @@ Es können folgende Zahlenformate eingegeben werden.
     <message>
         <location filename="debugger_window.ui" line="748"/>
         <source>Zeigt die Position, an welche sich der aktuelle Opcode befindet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeigt die Position an, an der sich der aktuelle Opcode befindet.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="773"/>
@@ -366,7 +494,7 @@ Hier wird die Sprungadresse der Brachbefehle gebildet.</source>
     <message>
         <location filename="debugger_window.ui" line="1092"/>
         <source>Zeigt den aktuellen Opcode als Menmonic an der gerade abgearbeitet wird.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeigt den aktuellen Opcode,  der gerade abgearbeitet wird, als Mnemonic an.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="1117"/>
@@ -392,7 +520,8 @@ Hier wird die Sprungadresse der Brachbefehle gebildet.</source>
         <location filename="debugger_window.ui" line="1226"/>
         <source>Die Programmausführung wird animiert. 
 Die Geschwindigkeit ist Einstellbar.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Programmausführung wird animiert. 
+Die Geschwindigkeit ist einstellbar.</translation>
     </message>
     <message utf8="true">
         <location filename="debugger_window.ui" line="1247"/>
@@ -403,7 +532,7 @@ Die Geschwindigkeit ist Einstellbar.</source>
         <location filename="debugger_window.ui" line="1267"/>
         <source>Hiermit stellen sie die Animationsgeschwindigkeit ein.
 In Zyklen pro Sekunde.</source>
-        <translation type="unfinished"></translation>
+        <translation>Animationsgeschwindigkeit in Zyklen pro Sekunde einstellen.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="1293"/>
@@ -456,7 +585,10 @@ In Zyklen pro Sekunde.</source>
 IRQ;NMI;RDY zu den Customchips getrennt. So hat man die
 möglichkeit die Leitungen manuell zu setzen. Dies dient nur zu
 Testzwecken.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ist hier ein Haken gesetzt, so werden alle 3 Leitungen
+IRQ;NMI;RDY zu den Customchips getrennt. So hat man die
+Möglichkeit, die Leitungen manuell zu setzen. Dies dient nur zu
+Testzwecken</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="1726"/>
@@ -516,12 +648,12 @@ Testzwecken.</source>
     <message utf8="true">
         <location filename="debugger_window.ui" line="1946"/>
         <source>Fügt ein Haltepunkt hinzu.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fügt einen Haltepunkt hinzu.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="1972"/>
         <source>Entfernt ein Haltepunkt.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Entfernt einen Haltepunkt.</translation>
     </message>
     <message utf8="true">
         <location filename="debugger_window.ui" line="1998"/>
@@ -1511,12 +1643,12 @@ Testzwecken.</source>
     <message>
         <location filename="debugger_window.cpp" line="1738"/>
         <source>Wenn ein Lesezugriff an dieser Adresse statt findet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn ein Lesezugriff an dieser Adresse stattfindet.</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1739"/>
         <source>Wenn ein Schreibzugriff an dieser Adresse statt findet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn ein Schreibzugriff an dieser Adresse stattfindet.</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1740"/>
@@ -1526,17 +1658,17 @@ Testzwecken.</source>
     <message>
         <location filename="debugger_window.cpp" line="1741"/>
         <source>Wenn in einer Adresse dieser Wert geschrieben wird.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn dieser Wert in eine Adresse geschrieben wird.</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1744"/>
         <source>Wenn der Wert gleich der Aktuellen Rasterzeile ist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn der Wert gleich der aktuellen Rasterzeile ist.</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1745"/>
         <source>Wenn der Wert gleich dem Aktuellen Zyklus in einer Rasterzeile ist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn der Wert gleich dem aktuellen Zyklus in einer Rasterzeile ist.</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1761"/>
@@ -1664,7 +1796,7 @@ Möchten Sie fortfahren?</source>
     <message>
         <location filename="debugger_window.cpp" line="2292"/>
         <source>Fehler beim speichern der Disassembler Datei.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Speichern der Disassembler Datei.</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="2299"/>
@@ -1674,7 +1806,7 @@ Möchten Sie fortfahren?</source>
     <message>
         <location filename="debugger_window.cpp" line="2303"/>
         <source>Fehler beim speichern der Programm Datei.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Speichern der Programm Datei.</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="2327"/>
@@ -1699,7 +1831,7 @@ Möchten Sie fortfahren?</source>
     <message>
         <location filename="debugger_window.cpp" line="2215"/>
         <source>Haltepunkte speichern</source>
-        <translation type="unfinished"></translation>
+        <translation>Haltepunkte Speichern</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="2171"/>
@@ -1753,480 +1885,711 @@ Möchten Sie fortfahren?</source>
         <source>Emu64 Information</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="info_window.ui" line="62"/>
+        <source>INFO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="106"/>
+        <source>von Thorsten Kattanek</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="133"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.emu64.de&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;www.emu64.de&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="161"/>
+        <source>Thomas Daden (+ Emu64 Handbuch, Emu64-Wiki, Emu64 Webspace)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="info_window.ui" line="166"/>
+        <source>Selmiak (+ Emu64 Logo, engl. Übersetzung, Emu64-Wiki)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="171"/>
+        <source>Peggy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="176"/>
+        <source>Andreas Goller</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="181"/>
+        <source>Hoeppi</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="186"/>
+        <source>6581freak</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="191"/>
+        <source>purmike</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="196"/>
+        <source>Tracker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="201"/>
+        <source>Yeti</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="206"/>
+        <source>radischen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="211"/>
+        <source>Evil.Joe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="216"/>
+        <source>Tuxist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="221"/>
+        <source>Matuschek</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="226"/>
+        <source>Retro-Schulzi</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="246"/>
+        <source>Betatester und mehr ...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="main_window.ui" line="194"/>
+        <location filename="main_window.ui" line="198"/>
         <source>Hilfe</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="204"/>
+        <location filename="main_window.ui" line="208"/>
         <source>C64 Dateien</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="214"/>
+        <location filename="main_window.ui" line="218"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="221"/>
+        <location filename="main_window.ui" line="225"/>
         <source>Tools</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="239"/>
+        <location filename="main_window.ui" line="243"/>
         <source>Einstellungen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="257"/>
+        <location filename="main_window.ui" line="261"/>
         <source>Sprache</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="265"/>
+        <location filename="main_window.ui" line="269"/>
         <source>Datei</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="289"/>
+        <location filename="main_window.ui" line="293"/>
         <source>Info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="292"/>
+        <location filename="main_window.ui" line="296"/>
         <source>Infos zur aktuellen Emu64 Version.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="314"/>
-        <location filename="main_window.ui" line="317"/>
+        <location filename="main_window.ui" line="318"/>
+        <location filename="main_window.ui" line="321"/>
         <source>Floppy 1541 II</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="320"/>
+        <location filename="main_window.ui" line="324"/>
         <source>Hier können Sie C64 Diskimages auswählen oder bearbeiten. [D64,G64,ZIP]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="345"/>
-        <location filename="main_window.ui" line="348"/>
-        <location filename="main_window.ui" line="351"/>
+        <location filename="main_window.ui" line="349"/>
+        <location filename="main_window.ui" line="352"/>
+        <location filename="main_window.ui" line="355"/>
         <source>Datasette 1530</source>
         <oldsource>Kassettenlaufwerk 1530</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="354"/>
+        <location filename="main_window.ui" line="358"/>
         <source>Alle Funktionen der Datasette 1530. [TAP,WAV]</source>
         <oldsource>Alle Funktionen eines Kassettenlaufwerks 1530. [TAP,WAV]</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="379"/>
-        <location filename="main_window.ui" line="382"/>
+        <location filename="main_window.ui" line="383"/>
+        <location filename="main_window.ui" line="386"/>
         <source>Steckmodule</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="385"/>
+        <location filename="main_window.ui" line="389"/>
         <source>Hier können Sie ein Steckmodul in den Emu64 einsetzen. [CRT]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="406"/>
+        <location filename="main_window.ui" line="410"/>
         <source>Autostart</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="409"/>
+        <location filename="main_window.ui" line="413"/>
         <source>Die schnellste möglichkeit ein C64 Programm zu laden und zu starten. [PRG,T64,P00,FRZ,D64,G64]</source>
-        <translation type="unfinished"></translation>
+        <translation>Die schnellste Möglichkeit ein C64 Programm zu laden und zu starten. [PRG,T64,P00,FRZ,D64,G64]</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="436"/>
+        <location filename="main_window.ui" line="440"/>
         <source>C64 Programme direkt laden</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="439"/>
+        <location filename="main_window.ui" line="443"/>
         <source>Hier wird das Programm direkt in den Speicher geladen ohne C64 Laderoutiene. [PRG,T64,P00,FRZ]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="464"/>
+        <location filename="main_window.ui" line="468"/>
         <source>Softreset</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="467"/>
+        <location filename="main_window.ui" line="471"/>
         <source>Führt ein Softreset des C64 durch. Das C64 RAM wird dabei nicht gelöscht.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="492"/>
+        <location filename="main_window.ui" line="496"/>
         <source>Hardreset</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="495"/>
+        <location filename="main_window.ui" line="499"/>
         <source>Führt ein Hardreset des C64 durch. Das C64 RAM wird dabei gelöscht. Es gleicht dem Ein- und Auschalten des C64.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="520"/>
-        <location filename="main_window.ui" line="523"/>
-        <location filename="main_window.ui" line="526"/>
+        <location filename="main_window.ui" line="524"/>
+        <location filename="main_window.ui" line="527"/>
+        <location filename="main_window.ui" line="530"/>
         <source>Beenden</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="529"/>
+        <location filename="main_window.ui" line="533"/>
         <source>Beendet den Emu64.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="550"/>
+        <location filename="main_window.ui" line="554"/>
         <source>Quick C64 Snapshot</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="553"/>
+        <location filename="main_window.ui" line="557"/>
         <source>Den aktuellen Zustand des C64 speichern, um zu einem späteren Zeitpunkt wieder zu laden.</source>
-        <translation type="unfinished"></translation>
+        <translation>Den aktuellen Zustand des C64 speichern, um diesen zu einem späteren Zeitpunkt wieder zu laden.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="578"/>
+        <location filename="main_window.ui" line="582"/>
         <source>Screenshot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="581"/>
+        <location filename="main_window.ui" line="585"/>
         <source>Erzeugt ein Bildschirmfoto vom C64 Bildschirm.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="591"/>
+        <location filename="main_window.ui" line="595"/>
         <source>F12</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="602"/>
+        <location filename="main_window.ui" line="606"/>
         <source>SID Dump</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="605"/>
+        <location filename="main_window.ui" line="609"/>
         <source>Zeichnen Sie alle SID (Sound Interface Device) Signale auf um sie später mit dem  mitgelieferten SID Player abzuspielen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="624"/>
+        <location filename="main_window.ui" line="628"/>
         <source>SID Player</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="627"/>
+        <location filename="main_window.ui" line="631"/>
         <source>Schaltet in den SID Player Modus. Damit wird der Emu64 zu einem vollwertigen SID Player.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="649"/>
+        <location filename="main_window.ui" line="653"/>
         <source>Debugger/Disassembler</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="652"/>
+        <location filename="main_window.ui" line="656"/>
         <source>Sehr Komfortabler Debugger und Disassembler.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sehr komfortabler Debugger und Disassembler.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="670"/>
+        <location filename="main_window.ui" line="678"/>
         <source>C64 Geschwindigkeit</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="673"/>
-        <source>Hier können Sie die C64 Geschwindigkeit von 10% bis 1000% einstellen.</source>
-        <translation type="unfinished"></translation>
+        <location filename="main_window.ui" line="681"/>
+        <source>Hier können Sie die C64 Geschwindigkeit sufenlos von 5% bis 500% einstellen.</source>
+        <translation>Hier können Sie die C64 Geschwindigkeit stufenlos von 5% bis 500% einstellen.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="691"/>
+        <location filename="main_window.ui" line="699"/>
         <source>Cross Assembler</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="694"/>
+        <location filename="main_window.ui" line="702"/>
         <source>Integrierter 2Pass Assembler der an TurboAss angelehnt ist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="712"/>
+        <location filename="main_window.ui" line="720"/>
         <source>Lan64 </source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="715"/>
+        <location filename="main_window.ui" line="723"/>
         <source>Hiermit kann man Programme vom PC zum C64 übertragen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="733"/>
+        <location filename="main_window.ui" line="741"/>
         <source>Virtuelle C64 Tastatur</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="736"/>
+        <location filename="main_window.ui" line="744"/>
         <source>Eine Virtuelle C64 Tastatur, diese zeigt auch alle C64 Symbole.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Virtuelle C64 Tastatur zeigt auch alle C64 Symbole.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="754"/>
+        <location filename="main_window.ui" line="762"/>
         <source>REU 1764 (16MB)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="757"/>
+        <location filename="main_window.ui" line="765"/>
         <source>Es wird eine Komplette REU 1764 mit 16 MB emuliert.</source>
-        <translation type="unfinished"></translation>
+        <translation>Es wird eine komplette REU 1764 mit 16 MB emuliert.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="775"/>
+        <location filename="main_window.ui" line="783"/>
         <source>GEO- / NEO-RAM (2MB)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="778"/>
+        <location filename="main_window.ui" line="786"/>
         <source>Es wird eine komplette Geo- /NeoRam mit 2 MB emuliert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="796"/>
+        <location filename="main_window.ui" line="804"/>
         <source>Audio und Video Aufnahme</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="799"/>
+        <location filename="main_window.ui" line="807"/>
         <source>Mit diesem Tool können sie die den Ton und das Videobild aufnehmen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mit diesem Tool können Sie den Ton und das Videobild aufnehmen.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="817"/>
+        <location filename="main_window.ui" line="825"/>
         <source>Emu64 Einstellungen</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="820"/>
+        <location filename="main_window.ui" line="828"/>
         <source>Hier stellen sie den Emu64 nach ihren wünschen ein.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hier konfigurieren Sie den Emu64 nach ihren Wünschen.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="838"/>
+        <location filename="main_window.ui" line="846"/>
         <source>TV/Video Einstellungen</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="841"/>
+        <location filename="main_window.ui" line="849"/>
         <source>Hiermit kann man das Aussehen der Videoausgabe verändern. Z.B.: Sättigung, Helligkeit und Kontrast.</source>
         <oldsource>Hiermit kann man das Aussehen der Videoausgabe verändern. z.B.: Sättigung, Helligkeit und Kontrast.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="859"/>
+        <location filename="main_window.ui" line="867"/>
         <source>Vollbild</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="862"/>
+        <location filename="main_window.ui" line="870"/>
         <source>Emu64 wird im Vollbild ausgeführt.</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="883"/>
+        <location filename="main_window.ui" line="891"/>
         <source>C64 Tastaturbelegung ändern</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="886"/>
+        <location filename="main_window.ui" line="894"/>
         <source>Hiermit können Sie die komplette Tastaturbelegung(C64) ändern.</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="904"/>
+        <location filename="main_window.ui" line="912"/>
         <source>C64 Tastaturbelegung zurücksetzen</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="907"/>
+        <location filename="main_window.ui" line="915"/>
         <source>Hiermit wird die Tastaturbelegung auf Standardwerte zurück gesetzt.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiermit wird die Tastaturbelegung auf Standardwerte zurückgesetzt.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="925"/>
+        <location filename="main_window.ui" line="933"/>
         <source>Fenster Optionen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="928"/>
+        <location filename="main_window.ui" line="936"/>
         <source>Funktionen die die Emu64 Fenster beeinflussen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Einstellungen, die die Emu64 Fenster beeinflussen.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="950"/>
+        <location filename="main_window.ui" line="958"/>
         <source>Handbuch</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="953"/>
+        <location filename="main_window.ui" line="961"/>
         <source>Öffnet das Emu64 Handbuch.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="971"/>
+        <location filename="main_window.ui" line="979"/>
         <source>GameBase64</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="974"/>
+        <location filename="main_window.ui" line="982"/>
         <source>Über dieses Tool ist es möglich auf alle Spiele die es in der GameBase64 gibt zuzugreifen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="89"/>
+        <location filename="main_window.cpp" line="157"/>
         <source>&gt;&gt; VideoPal Klasse wurde installiert
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="99"/>
+        <location filename="main_window.cpp" line="169"/>
         <source>&gt;&gt; InfoWindow wurde erzeugt
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="101"/>
+        <location filename="main_window.cpp" line="173"/>
         <source>&gt;&gt; TVSetupWindow wurde erzeugt
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="103"/>
+        <location filename="main_window.cpp" line="177"/>
         <source>&gt;&gt; FloppyWindow wurde erzeugt
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="105"/>
+        <location filename="main_window.cpp" line="181"/>
         <source>&gt;&gt; C64KeyboardWindow wurde erzeugt
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="107"/>
+        <location filename="main_window.cpp" line="185"/>
         <source>&gt;&gt; CrtWindow wurde erzeugt
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="109"/>
+        <location filename="main_window.cpp" line="189"/>
         <source>&gt;&gt; DebuggerWindow wurde erzeugt
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="111"/>
+        <location filename="main_window.cpp" line="193"/>
         <source>&gt;&gt; SetupWindow wurde erzeugt
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="123"/>
+        <location filename="main_window.cpp" line="213"/>
         <source>Fehler beim Installieren der C64 Klasse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="333"/>
+        <location filename="main_window.cpp" line="232"/>
+        <source>CRT Window wird mit CRT Klasee verbunden.</source>
+        <translation>CRT Window wird mit CRT Klasse verbunden.</translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="238"/>
+        <source>C64 Systemroms werden geladen.</source>
+        <translation>C64 SystemROMs werden geladen.</translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="248"/>
+        <source>C64 Key-Matrix wird mit Virtual Keyboard verbunden.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="253"/>
+        <source>Tabelle für Floppy&apos;s wird erstellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="259"/>
+        <source>Floppy: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="273"/>
+        <source>Einstellungen werden von INI geladen und gesetzt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="311"/>
+        <source>C64 EMULATION WIRD NUN GESTARET.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="388"/>
         <source>Wechseln zur Sprache: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="51"/>
+        <location filename="main_window.cpp" line="116"/>
         <source>&gt;&gt; Translator wurde intsalliert: Systemsprache = </source>
+        <translation>&gt;&gt; Translator wurde installiert: Systemsprache = </translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="115"/>
+        <source>Translator wurde installiert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="62"/>
+        <location filename="main_window.cpp" line="125"/>
+        <source>Screenshotverzeichnis wird gesucht.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="128"/>
         <source>&gt;&gt; Ein Screenshot Verzeichnis ist vorhanden
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="67"/>
+        <location filename="main_window.cpp" line="133"/>
+        <source>Screenshotverzeichnis wird erstellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="134"/>
         <source>&lt;&lt; Ein Screenshot Verzeichnis ist nicht vorhanden
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="70"/>
+        <location filename="main_window.cpp" line="137"/>
         <source>&gt;&gt; Ein neues Screenshot Verzeichnis wurde erstellt
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="75"/>
+        <location filename="main_window.cpp" line="142"/>
         <source>&lt;&lt; Ein neues Screenshot Verzeichnis konnte nicht erstellt werden
 &lt;&lt; Keine Screenshots möglich !!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="123"/>
-        <location filename="main_window.cpp" line="513"/>
+        <location filename="main_window.cpp" line="155"/>
+        <source>VideoPal Klasse wird initialisiert.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="160"/>
+        <source>INI Dateiverwaltung wird initialisiert.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="167"/>
+        <source>InfoWindow wird erstellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="171"/>
+        <source>TVSetupWindow wird erstellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="175"/>
+        <source>FloppyWindow wird erstellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="179"/>
+        <source>C64KeyboardWindow wird erstellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="183"/>
+        <source>CRTWindow wird erstellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="187"/>
+        <source>DebuggerWindow wird erstellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="191"/>
+        <source>SetupWindow wird erstellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="195"/>
+        <source>C64SpeedWindow wird erstellt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="197"/>
+        <source>&gt;&gt; C64SpeedWindow wurde erzeugt
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="199"/>
+        <source>Sprachmenü wir erstellt.</source>
+        <translation>Sprachmenü wird erstellt.</translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="203"/>
+        <source>Screenshotnummer wir geladen.</source>
+        <translation>Screenshotnummer wird geladen.</translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="208"/>
+        <source>C64 Klasse wird initialisiert.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="213"/>
+        <location filename="main_window.cpp" line="579"/>
         <source>Emu64 Fehler ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="129"/>
-        <location filename="main_window.cpp" line="371"/>
+        <location filename="main_window.cpp" line="217"/>
+        <source>SetupWindow wird mit INI abgeglichen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="220"/>
+        <source>SDL Window Titelleiste wird benannt.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="221"/>
+        <location filename="main_window.cpp" line="427"/>
         <source>C64 Bildschirm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="262"/>
+        <location filename="main_window.cpp" line="87"/>
         <source>&gt;&gt; Es wurden alle Klassen wieder entfernt
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="264"/>
+        <location filename="main_window.cpp" line="89"/>
         <source>
 &gt;&gt; Emu64 wurde sauber beendet...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="422"/>
-        <location filename="main_window.cpp" line="431"/>
+        <location filename="main_window.cpp" line="224"/>
+        <source>Debugger Window wird mit C64 Klasse verbunden.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="228"/>
+        <source>C64 Speed Window wird mit C64 Klasse verbunden.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="488"/>
+        <location filename="main_window.cpp" line="497"/>
         <source>C64 Dateien öffnen </source>
         <oldsource>C64 Dateien öffnen</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="422"/>
-        <location filename="main_window.cpp" line="431"/>
+        <location filename="main_window.cpp" line="488"/>
+        <location filename="main_window.cpp" line="497"/>
         <source>C64 Programm Dateien</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="422"/>
-        <location filename="main_window.cpp" line="431"/>
+        <location filename="main_window.cpp" line="488"/>
+        <location filename="main_window.cpp" line="497"/>
         <source>Alle Dateien</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="513"/>
+        <location filename="main_window.cpp" line="579"/>
         <source>Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.
 Überprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !</source>
         <translation type="unfinished"></translation>
@@ -2310,83 +2673,123 @@ Möchten Sie fortfahren?</source>
         <source>C64 Farbmodus:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message utf8="true">
+        <location filename="setup_window.ui" line="95"/>
+        <source>Setzt das C64 Farbschema wenn kein PAL ausgewählt wurde.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
-        <location filename="setup_window.ui" line="110"/>
+        <location filename="setup_window.ui" line="113"/>
         <source>Fenstermodus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="setup_window.ui" line="122"/>
+        <location filename="setup_window.ui" line="125"/>
+        <source>Schaltet die PAL Emulation der Grafikausgabe ein. (Sollte vorrangig benutzt werden)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="setup_window.ui" line="128"/>
         <source>PAL Videoemulation</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="setup_window.ui" line="135"/>
+        <location filename="setup_window.ui" line="141"/>
+        <source>Verdoppelt die Textur in der Breite und in der Höhe. (Schärferes Bild beim Skalieren)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="setup_window.ui" line="144"/>
         <source>Texturgröße verdoppeln</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="setup_window.ui" line="151"/>
+        <location filename="setup_window.ui" line="160"/>
         <source>Vertikal Sync</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="setup_window.ui" line="167"/>
+        <location filename="setup_window.ui" line="176"/>
+        <source>Schaltet einen Bilineare Filterung mit zu. (Das Bild wird etwas verwaschener)</source>
+        <translation>Schaltet einen Bilinearen Filter dazu. (Das Bild wird etwas verwaschener)</translation>
+    </message>
+    <message>
+        <location filename="setup_window.ui" line="179"/>
         <source>Filter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="setup_window.ui" line="180"/>
+        <location filename="setup_window.ui" line="192"/>
+        <source>Schaltet den internen Farbmodus auf 16Bit pro Pixel um.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="setup_window.ui" line="195"/>
         <source>16 Bit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="setup_window.ui" line="199"/>
+        <location filename="setup_window.ui" line="214"/>
+        <source>Schaltet den internen Farbmodus auf 32Bit pro Pixel um.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="setup_window.ui" line="217"/>
         <source>32 Bit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="setup_window.ui" line="224"/>
+        <location filename="setup_window.ui" line="242"/>
         <source>Vollbildmodus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="setup_window.ui" line="245"/>
+        <location filename="setup_window.ui" line="263"/>
         <source>Bildschirmfotos vom C64</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="setup_window.ui" line="262"/>
+        <location filename="setup_window.ui" line="280"/>
         <source>Format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="setup_window.ui" line="284"/>
+        <location filename="setup_window.ui" line="301"/>
+        <source>Hier kann man das Screenshot Format einstellen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="setup_window.ui" line="305"/>
         <source>BMP</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="setup_window.ui" line="303"/>
+        <location filename="setup_window.ui" line="324"/>
+        <source>Setzt den Zähler für die angehängte Zahl an der Screenshot Datei zurück.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="setup_window.ui" line="327"/>
         <source>Counter Zurücksetzen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="setup_window.ui" line="318"/>
+        <location filename="setup_window.ui" line="342"/>
         <source>Steuerung</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="setup_window.ui" line="330"/>
+        <location filename="setup_window.ui" line="354"/>
         <source>Virtuelle - Joystick&apos;s</source>
-        <translation type="unfinished"></translation>
+        <translation>Virtuelle Joysticks</translation>
     </message>
     <message>
-        <location filename="setup_window.ui" line="375"/>
+        <location filename="setup_window.ui" line="399"/>
         <source>Lan64</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="setup_window.ui" line="383"/>
+        <location filename="setup_window.ui" line="407"/>
         <source>GameBase64</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2403,7 +2806,7 @@ Möchten Sie fortfahren?</source>
     <message>
         <location filename="setup_window.cpp" line="72"/>
         <source>Mit einem doppelklick kann man den Namen ändern.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mit einem Doppelklick kann man den Namen ändern.</translation>
     </message>
     <message>
         <location filename="setup_window.cpp" line="78"/>
@@ -2515,7 +2918,7 @@ Möchten Sie fortfahren?</source>
     <message utf8="true">
         <location filename="widget_floppy_status.ui" line="138"/>
         <source>Anzeige für den Schreib- /Lesezugriff.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anzeige für den Schreib-/Lesezugriff.</translation>
     </message>
     <message>
         <location filename="widget_floppy_status.ui" line="171"/>

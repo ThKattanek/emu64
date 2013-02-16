@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: debugger_window.cpp                   //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 18.01.2013		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 16.02.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include <QMenu>
@@ -527,6 +527,9 @@ void DebuggerWindow::RetranslateUi()
 
     this->update();
     this->UpdateRegister();
+
+    vic_window->RetranslateUi();
+    memory_window->RetranslateUi();
 }
 
 void DebuggerWindow::SetC64Pointer(C64Class *_c64)
