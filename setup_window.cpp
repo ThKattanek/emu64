@@ -40,6 +40,7 @@ SetupWindow::~SetupWindow()
 void SetupWindow::RetranslateUi()
 {
     ui->retranslateUi(this);
+    UpdateToolTips();
     this->update();
 }
 
@@ -60,8 +61,8 @@ void SetupWindow::LoadINI(C64Class *_c64)
         ui->VJoySlots->setColumnWidth(4,59);
 
         QStringList header_label;
-        header_label << tr("Bezeichnung") << "Port 1" << "Port 2" << "" << "";
-        ui->VJoySlots->setHorizontalHeaderLabels(header_label);
+        //header_label << tr("Bezeichnung") << "Port 1" << "Port 2" << "" << "";
+        //ui->VJoySlots->setHorizontalHeaderLabels(header_label);
 
         for(int i=0; i<MAX_VJOYS; i++)
         {
@@ -69,28 +70,28 @@ void SetupWindow::LoadINI(C64Class *_c64)
             ini->beginGroup(group_name);
 
             QTableWidgetItem *item = new QTableWidgetItem(ini->value("Name","Slot " + QVariant(i+1).toString()).toString());
-            item->setToolTip(tr("Mit einem doppelklick kann man den Namen ändern."));
+            //item->setToolTip(tr("Mit einem doppelklick kann man den Namen ändern."));
             ui->VJoySlots->setItem(i,0,item);
             ui->VJoySlots->setRowHeight(i,18);
 
             item = new QTableWidgetItem("");
             item->setFlags(Qt::ItemIsEditable);
-            item->setToolTip(tr("Verbindet diesen Slot mit dem C64 Gameport 1"));
+            //item->setToolTip(tr("Verbindet diesen Slot mit dem C64 Gameport 1"));
             ui->VJoySlots->setItem(i,1,item);
 
             item = new QTableWidgetItem("");
             item->setFlags(Qt::ItemIsEditable);
-            item->setToolTip(tr("Verbindet diesen Slot mit dem C64 Gameport 2"));
+            //item->setToolTip(tr("Verbindet diesen Slot mit dem C64 Gameport 2"));
             ui->VJoySlots->setItem(i,2,item);
 
             ButtonMod *button;
             button = new ButtonMod(0,i);
-            button->setText("Lernen");
+            //button->setText("Lernen");
             connect(button,SIGNAL(Clicked(int,int)),this,SLOT(onClickButton(int,int)));
             ui->VJoySlots->setCellWidget(i,3,button);
 
             button = new ButtonMod(1,i);
-            button->setText("Löschen");
+            //button->setText("Löschen");
             connect(button,SIGNAL(Clicked(int,int)),this,SLOT(onClickButton(int,int)));
             ui->VJoySlots->setCellWidget(i,4,button);
 
@@ -160,6 +161,8 @@ void SetupWindow::LoadINI(C64Class *_c64)
         ini->endGroup();
     }
     ////////////////////////////////////
+
+    UpdateToolTips();
 }
 
 void SetupWindow::SaveINI()
@@ -287,5 +290,31 @@ void SetupWindow::on_VJoySlots_cellClicked(int row, int column)
         ui->VJoySlots->item(row,column)->setText("Port 2");
         c64->VPort2 = row;
         break;
+    }
+}
+
+void SetupWindow::UpdateToolTips()
+{
+    QTableWidgetItem *item;
+    ButtonMod *button;
+
+    QStringList header_label;
+    header_label << tr("Bezeichnung") << "Port 1" << "Port 2" << "" << "";
+    ui->VJoySlots->setHorizontalHeaderLabels(header_label);
+
+    for(int i=0; i<MAX_VJOYS; i++)
+    {
+        item = ui->VJoySlots->item(i,0);
+        if(item != NULL) item->setToolTip(tr("Mit einem doppelklick kann man den Namen ändern."));
+        item = ui->VJoySlots->item(i,1);
+        if(item != NULL) item->setToolTip(tr("Verbindet diesen Slot mit dem C64 Gameport 1"));
+        item = ui->VJoySlots->item(i,2);
+        if(item != NULL) item->setToolTip(tr("Verbindet diesen Slot mit dem C64 Gameport 2"));
+
+
+        button = (ButtonMod*)ui->VJoySlots->cellWidget(i,3);
+        if(button != NULL) button->setText(tr("Lernen"));
+        button = (ButtonMod*)ui->VJoySlots->cellWidget(i,4);
+        if(button != NULL) button->setText(tr("Löschen"));
     }
 }

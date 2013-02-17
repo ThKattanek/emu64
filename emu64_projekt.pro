@@ -180,7 +180,8 @@ OTHER_FILES += \
     floppy_sounds/FloppySound Hinweis.txt \
     floppy_sounds/anschlag.raw \
     lizenz.pdf \
-    license.pdf
+    license.pdf \
+    qt_de.qm
 
 
 

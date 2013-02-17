@@ -57,6 +57,7 @@ private slots:
     void onClickButton(int idx, int idy);
 
 private:
+    void UpdateToolTips();
     Ui::SetupWindow *ui;
     VideoPalClass* videopal;
     QSettings *ini;

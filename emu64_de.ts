@@ -1519,328 +1519,328 @@ Testzwecken</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="706"/>
+        <location filename="debugger_window.cpp" line="709"/>
         <source>Test1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="781"/>
-        <location filename="debugger_window.cpp" line="797"/>
-        <location filename="debugger_window.cpp" line="806"/>
-        <location filename="debugger_window.cpp" line="815"/>
-        <location filename="debugger_window.cpp" line="824"/>
-        <location filename="debugger_window.cpp" line="833"/>
-        <location filename="debugger_window.cpp" line="1242"/>
-        <location filename="debugger_window.cpp" line="2260"/>
-        <location filename="debugger_window.cpp" line="2270"/>
+        <location filename="debugger_window.cpp" line="784"/>
+        <location filename="debugger_window.cpp" line="800"/>
+        <location filename="debugger_window.cpp" line="809"/>
+        <location filename="debugger_window.cpp" line="818"/>
+        <location filename="debugger_window.cpp" line="827"/>
+        <location filename="debugger_window.cpp" line="836"/>
+        <location filename="debugger_window.cpp" line="1245"/>
+        <location filename="debugger_window.cpp" line="2263"/>
+        <location filename="debugger_window.cpp" line="2273"/>
         <source>Eingabefehler...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="781"/>
-        <location filename="debugger_window.cpp" line="1242"/>
+        <location filename="debugger_window.cpp" line="784"/>
+        <location filename="debugger_window.cpp" line="1245"/>
         <source>Es wurde kein gültiges Zahlenformat benutzt !</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="797"/>
+        <location filename="debugger_window.cpp" line="800"/>
         <source>Der Wert muss zwischen 0 und 511 liegen !</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="806"/>
-        <location filename="debugger_window.cpp" line="815"/>
-        <location filename="debugger_window.cpp" line="824"/>
-        <location filename="debugger_window.cpp" line="833"/>
+        <location filename="debugger_window.cpp" line="809"/>
+        <location filename="debugger_window.cpp" line="818"/>
+        <location filename="debugger_window.cpp" line="827"/>
+        <location filename="debugger_window.cpp" line="836"/>
         <source>Der Wert muss zwischen 0 und 255 liegen !</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1474"/>
-        <location filename="debugger_window.cpp" line="1479"/>
-        <location filename="debugger_window.cpp" line="1484"/>
-        <location filename="debugger_window.cpp" line="1489"/>
-        <location filename="debugger_window.cpp" line="1494"/>
+        <location filename="debugger_window.cpp" line="1477"/>
+        <location filename="debugger_window.cpp" line="1482"/>
+        <location filename="debugger_window.cpp" line="1487"/>
+        <location filename="debugger_window.cpp" line="1492"/>
+        <location filename="debugger_window.cpp" line="1497"/>
         <source>Fehler...!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1474"/>
+        <location filename="debugger_window.cpp" line="1477"/>
         <source>Fehlerhafte Adresse.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1479"/>
+        <location filename="debugger_window.cpp" line="1482"/>
         <source>Unbekanntes Mnemonic.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1484"/>
+        <location filename="debugger_window.cpp" line="1487"/>
         <source>Unbekannte Adressierung.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1489"/>
+        <location filename="debugger_window.cpp" line="1492"/>
         <source>Spungweite für Branchbefehl ist zu groß.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1494"/>
+        <location filename="debugger_window.cpp" line="1497"/>
         <source>Dieser Opcode unterstützt nicht diese Adressierung.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1651"/>
+        <location filename="debugger_window.cpp" line="1654"/>
         <source> Zyklus/Sek</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1652"/>
+        <location filename="debugger_window.cpp" line="1655"/>
         <source> Zyklen/Sek</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1685"/>
+        <location filename="debugger_window.cpp" line="1688"/>
         <source>Haltepunkt (</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1713"/>
+        <location filename="debugger_window.cpp" line="1716"/>
         <source>Haltepunkt löschen...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1713"/>
+        <location filename="debugger_window.cpp" line="1716"/>
         <source>Möchten Sie den folgenden Haltepunkt löschen?
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1730"/>
+        <location filename="debugger_window.cpp" line="1733"/>
         <source>Der Name des Haltepunkts kann frei gewählt werden.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1734"/>
+        <location filename="debugger_window.cpp" line="1737"/>
         <source>Wenn der Wert gleich dem Programm Counter (PC) ist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1735"/>
+        <location filename="debugger_window.cpp" line="1738"/>
         <source>Wenn der Wert gleich dem Accu Register (AC) ist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1736"/>
+        <location filename="debugger_window.cpp" line="1739"/>
         <source>Wenn der Wert gleich dem X Register (XR) ist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1737"/>
+        <location filename="debugger_window.cpp" line="1740"/>
         <source>Wenn der Wert gleich dem Y Register (YR) ist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1738"/>
+        <location filename="debugger_window.cpp" line="1741"/>
         <source>Wenn ein Lesezugriff an dieser Adresse statt findet.</source>
         <translation>Wenn ein Lesezugriff an dieser Adresse stattfindet.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1739"/>
+        <location filename="debugger_window.cpp" line="1742"/>
         <source>Wenn ein Schreibzugriff an dieser Adresse statt findet.</source>
         <translation>Wenn ein Schreibzugriff an dieser Adresse stattfindet.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1740"/>
+        <location filename="debugger_window.cpp" line="1743"/>
         <source>Wenn aus einer Adresse dieser Wert ausgelesen wird.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1741"/>
+        <location filename="debugger_window.cpp" line="1744"/>
         <source>Wenn in einer Adresse dieser Wert geschrieben wird.</source>
         <translation>Wenn dieser Wert in eine Adresse geschrieben wird.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1744"/>
+        <location filename="debugger_window.cpp" line="1747"/>
         <source>Wenn der Wert gleich der Aktuellen Rasterzeile ist.</source>
         <translation>Wenn der Wert gleich der aktuellen Rasterzeile ist.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1745"/>
+        <location filename="debugger_window.cpp" line="1748"/>
         <source>Wenn der Wert gleich dem Aktuellen Zyklus in einer Rasterzeile ist.</source>
         <translation>Wenn der Wert gleich dem aktuellen Zyklus in einer Rasterzeile ist.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1761"/>
+        <location filename="debugger_window.cpp" line="1764"/>
         <source>Doppelklick um Werte zu verändern.</source>
         <oldsource>Doppeltklick um Werte zu verändern.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1939"/>
+        <location filename="debugger_window.cpp" line="1942"/>
         <source>Lesen von Adresse:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1964"/>
+        <location filename="debugger_window.cpp" line="1967"/>
         <source>Schreiben in Adresse:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1989"/>
+        <location filename="debugger_window.cpp" line="1992"/>
         <source>Lesen von Wert:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2023"/>
+        <location filename="debugger_window.cpp" line="2026"/>
         <source>Schreiben von Wert:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2057"/>
+        <location filename="debugger_window.cpp" line="2060"/>
         <source>Rasterzeile:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2091"/>
+        <location filename="debugger_window.cpp" line="2094"/>
         <source>Zyklus:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2151"/>
+        <location filename="debugger_window.cpp" line="2154"/>
         <source>Haltepunkte laden...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2151"/>
-        <location filename="debugger_window.cpp" line="2235"/>
+        <location filename="debugger_window.cpp" line="2154"/>
+        <location filename="debugger_window.cpp" line="2238"/>
         <source>Es werden alle Haltepunkte gelöscht !
 Möchten Sie fortfahren?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2159"/>
+        <location filename="debugger_window.cpp" line="2162"/>
         <source>Haltepunkte öffnen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2159"/>
-        <location filename="debugger_window.cpp" line="2215"/>
+        <location filename="debugger_window.cpp" line="2162"/>
+        <location filename="debugger_window.cpp" line="2218"/>
         <source>Emu64 Haltepunkt Datei </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2171"/>
         <location filename="debugger_window.cpp" line="2174"/>
         <location filename="debugger_window.cpp" line="2177"/>
         <location filename="debugger_window.cpp" line="2180"/>
-        <location filename="debugger_window.cpp" line="2223"/>
-        <location filename="debugger_window.cpp" line="2228"/>
-        <location filename="debugger_window.cpp" line="2277"/>
-        <location filename="debugger_window.cpp" line="2292"/>
-        <location filename="debugger_window.cpp" line="2299"/>
-        <location filename="debugger_window.cpp" line="2303"/>
+        <location filename="debugger_window.cpp" line="2183"/>
+        <location filename="debugger_window.cpp" line="2226"/>
+        <location filename="debugger_window.cpp" line="2231"/>
+        <location filename="debugger_window.cpp" line="2280"/>
+        <location filename="debugger_window.cpp" line="2295"/>
+        <location filename="debugger_window.cpp" line="2302"/>
+        <location filename="debugger_window.cpp" line="2306"/>
         <source>Fehler...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2174"/>
+        <location filename="debugger_window.cpp" line="2177"/>
         <source>Es handelt sich nicht um eine Emu64 Datei.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2177"/>
+        <location filename="debugger_window.cpp" line="2180"/>
         <source>Diese Datei wurde mit einer neueren Emu64 Version erstellt.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2180"/>
+        <location filename="debugger_window.cpp" line="2183"/>
         <source>Diese Datei enthält keine Haltepunkte.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2235"/>
+        <location filename="debugger_window.cpp" line="2238"/>
         <source>Achtung...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2260"/>
+        <location filename="debugger_window.cpp" line="2263"/>
         <source>Es wurde kein gültiges Zahlenformat benutzt ! [Export Von:]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2270"/>
+        <location filename="debugger_window.cpp" line="2273"/>
         <source>Es wurde kein gültiges Zahlenformat benutzt ! [Export Bis:]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2277"/>
+        <location filename="debugger_window.cpp" line="2280"/>
         <source>Startadresse muss kleiner sein als Endadresse.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2283"/>
+        <location filename="debugger_window.cpp" line="2286"/>
         <source>Export...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2283"/>
+        <location filename="debugger_window.cpp" line="2286"/>
         <source>Disassembler Listing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2283"/>
+        <location filename="debugger_window.cpp" line="2286"/>
         <source>C64 Programm Datei</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2292"/>
+        <location filename="debugger_window.cpp" line="2295"/>
         <source>Fehler beim speichern der Disassembler Datei.</source>
         <translation>Fehler beim Speichern der Disassembler Datei.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2299"/>
+        <location filename="debugger_window.cpp" line="2302"/>
         <source>Floppy RAM geht nur von $0000 - $07FF (2KB).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2303"/>
+        <location filename="debugger_window.cpp" line="2306"/>
         <source>Fehler beim speichern der Programm Datei.</source>
         <translation>Fehler beim Speichern der Programm Datei.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2327"/>
+        <location filename="debugger_window.cpp" line="2330"/>
         <source>CPU 6502 Register</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2336"/>
+        <location filename="debugger_window.cpp" line="2339"/>
         <source>CPU 6502 Interne Register (Emu64 Modell)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2435"/>
+        <location filename="debugger_window.cpp" line="2438"/>
         <source>CPU 6510 Register</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2444"/>
+        <location filename="debugger_window.cpp" line="2447"/>
         <source>CPU 6510 Interne Register (Emu64 Modell)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2215"/>
+        <location filename="debugger_window.cpp" line="2218"/>
         <source>Haltepunkte speichern</source>
         <translation>Haltepunkte Speichern</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2171"/>
+        <location filename="debugger_window.cpp" line="2174"/>
         <source>Die Datei konnte nicht geöffnet werden.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2223"/>
-        <location filename="debugger_window.cpp" line="2228"/>
+        <location filename="debugger_window.cpp" line="2226"/>
+        <location filename="debugger_window.cpp" line="2231"/>
         <source>Die Haltepunkte konnten nicht gespeichert werden.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2527,7 +2527,7 @@ Möchten Sie fortfahren?</source>
     </message>
     <message>
         <location filename="main_window.cpp" line="213"/>
-        <location filename="main_window.cpp" line="579"/>
+        <location filename="main_window.cpp" line="588"/>
         <source>Emu64 Fehler ...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2543,7 +2543,7 @@ Möchten Sie fortfahren?</source>
     </message>
     <message>
         <location filename="main_window.cpp" line="221"/>
-        <location filename="main_window.cpp" line="427"/>
+        <location filename="main_window.cpp" line="436"/>
         <source>C64 Bildschirm</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2570,26 +2570,26 @@ Möchten Sie fortfahren?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="488"/>
         <location filename="main_window.cpp" line="497"/>
+        <location filename="main_window.cpp" line="506"/>
         <source>C64 Dateien öffnen </source>
         <oldsource>C64 Dateien öffnen</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="488"/>
         <location filename="main_window.cpp" line="497"/>
+        <location filename="main_window.cpp" line="506"/>
         <source>C64 Programm Dateien</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="488"/>
         <location filename="main_window.cpp" line="497"/>
+        <location filename="main_window.cpp" line="506"/>
         <source>Alle Dateien</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="579"/>
+        <location filename="main_window.cpp" line="588"/>
         <source>Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.
 Überprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !</source>
         <translation type="unfinished"></translation>
@@ -2608,27 +2608,27 @@ Möchten Sie fortfahren?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="memory_window.cpp" line="94"/>
+        <location filename="memory_window.cpp" line="101"/>
         <source>C64 Speicher</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="memory_window.cpp" line="97"/>
+        <location filename="memory_window.cpp" line="104"/>
         <source>Floppy #08 Speicher</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="memory_window.cpp" line="100"/>
+        <location filename="memory_window.cpp" line="107"/>
         <source>Floppy #09Speicher</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="memory_window.cpp" line="103"/>
+        <location filename="memory_window.cpp" line="110"/>
         <source>Floppy #10 Speicher</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="memory_window.cpp" line="106"/>
+        <location filename="memory_window.cpp" line="113"/>
         <source>Floppy #11 Speicher</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2636,12 +2636,12 @@ Möchten Sie fortfahren?</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="debugger_window.cpp" line="934"/>
+        <location filename="debugger_window.cpp" line="937"/>
         <source>Überschreiben?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="935"/>
+        <location filename="debugger_window.cpp" line="938"/>
         <source>Soll die Datei &quot;%1&quot; überschrieben werden?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2799,23 +2799,33 @@ Möchten Sie fortfahren?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="setup_window.cpp" line="63"/>
+        <location filename="setup_window.cpp" line="302"/>
         <source>Bezeichnung</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="setup_window.cpp" line="72"/>
+        <location filename="setup_window.cpp" line="308"/>
         <source>Mit einem doppelklick kann man den Namen ändern.</source>
         <translation>Mit einem Doppelklick kann man den Namen ändern.</translation>
     </message>
     <message>
-        <location filename="setup_window.cpp" line="78"/>
+        <location filename="setup_window.cpp" line="310"/>
         <source>Verbindet diesen Slot mit dem C64 Gameport 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="setup_window.cpp" line="83"/>
+        <location filename="setup_window.cpp" line="312"/>
         <source>Verbindet diesen Slot mit dem C64 Gameport 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="setup_window.cpp" line="316"/>
+        <source>Lernen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="setup_window.cpp" line="318"/>
+        <source>Löschen</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2946,22 +2956,22 @@ Möchten Sie fortfahren?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="widget_floppy_status.cpp" line="194"/>
+        <location filename="widget_floppy_status.cpp" line="200"/>
         <source>Floppygeräusche sind ausgeschaltet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="widget_floppy_status.cpp" line="200"/>
+        <location filename="widget_floppy_status.cpp" line="206"/>
         <source>Floppygeräusche sind auf 30% gestellt.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="widget_floppy_status.cpp" line="206"/>
+        <location filename="widget_floppy_status.cpp" line="212"/>
         <source>Floppygeräusche sind auf 70% gestellt.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="widget_floppy_status.cpp" line="212"/>
+        <location filename="widget_floppy_status.cpp" line="218"/>
         <source>Floppygeräusche sind auf 100% gestellt.</source>
         <translation type="unfinished"></translation>
     </message>

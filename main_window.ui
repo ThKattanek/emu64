@@ -611,7 +611,7 @@ background-position: center
    <property name="font">
     <font>
      <family>Arial</family>
-     <pointsize>8</pointsize>
+     <pointsize>9</pointsize>
      <weight>50</weight>
      <bold>false</bold>
     </font>

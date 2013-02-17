@@ -112,9 +112,21 @@ void MainWindow::OnInit()
     QString SystemLocale = QLocale::system().name();       // "de_DE"
     SystemLocale.truncate(SystemLocale.lastIndexOf('_'));  // "de"
 
+    /// INI Dateiverwaltung erstellen ///
+    splash->showStatusMessage(tr("INI Dateiverwaltung wird initialisiert."),Qt::darkBlue);
+    ini = new QSettings(appPath+"/emu64.ini",QSettings::IniFormat,this);
+    LogText(QString(">> INI System wurde erzeugt: " + appPath+"/emu64.ini\n").toLatin1().data());
+    LogText(QString(">> INI System was created: " + appPath+"/emu64.ini\n").toLatin1().data());
+
+    splash->showStatusMessage(tr("Sprachmenü wir erstellt."),Qt::darkBlue);
+    ini->beginGroup("MainWindow");
+    CreateLanguageMenu(ini->value("lang",SystemLocale).toString());
+    ini->endGroup();
+    LogText(QString(tr(">> Sprachmenü wurde erstellt.") + SystemLocale + "\n").toLatin1().data());
+
+
     splash->showStatusMessage(tr("Translator wurde installiert."),Qt::darkBlue);
     LogText(QString(tr(">> Translator wurde intsalliert: Systemsprache = ") + SystemLocale + "\n").toLatin1().data());
-
     setWindowIcon(QIcon(":/grafik/emu64.ico"));
 
     /// ScreenshotPath erstellen ///
@@ -156,11 +168,6 @@ void MainWindow::OnInit()
     videopal = new VideoPalClass();
     LogText(tr(">> VideoPal Klasse wurde installiert\n").toLatin1().data());
 
-    /// INI Dateiverwaltung erstellen ///
-    splash->showStatusMessage(tr("INI Dateiverwaltung wird initialisiert."),Qt::darkBlue);
-    ini = new QSettings(appPath+"/emu64.ini",QSettings::IniFormat,this);
-    LogText(QString(">> INI System wurde erzeugt: " + appPath+"/emu64.ini\n").toLatin1().data());
-
     /// Window Klassen erstellen ///
     /// Unter MAC sollte ohne übergabe des this Zeigers die Klasseb erstellt werden
 
@@ -196,10 +203,7 @@ void MainWindow::OnInit()
     speed_window = new C64SpeedWindow(this,ini);
     LogText(tr(">> C64SpeedWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(tr("Sprachmenü wir erstellt."),Qt::darkBlue);
     ini->beginGroup("MainWindow");
-    CreateLanguageMenu(ini->value("lang",SystemLocale).toString());
-
     splash->showStatusMessage(tr("Screenshotnummer wir geladen."),Qt::darkBlue);
     ScreenshotNumber = (int)ini->value("ScreenshotCounter",0).toInt();
     ini->endGroup();
@@ -375,7 +379,6 @@ void MainWindow::CreateLanguageMenu(QString defaultLocale)
 
       if(lang == "German") lang = "Deutsch";
 
-
       QAction *action = new QAction(lang, this);
       action->setCheckable(true);
       action->setData(locale);
@@ -397,7 +400,6 @@ void MainWindow::CreateLanguageMenu(QString defaultLocale)
          qtTranslator.load("qt_" + action->data().toString(), langPath);
          action->setChecked(true);
          ui->retranslateUi(this);
-         RetranslateUi();
       }
     }
 }
@@ -430,8 +432,6 @@ void MainWindow::RetranslateUi()
     debugger_window->RetranslateUi();
     setup_window->RetranslateUi();
     speed_window->RetranslateUi();
-
-
 
     SDL_WM_SetCaption(tr("C64 Bildschirm").toLatin1().data(),0);
 }
