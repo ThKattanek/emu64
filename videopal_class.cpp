@@ -118,7 +118,7 @@ void VideoPalClass::SetScanline(int wert)
 
 void VideoPalClass::SetSaturation(float wert)
 {
-    Saturation = wert;
+    Saturation = wert*1.2f;
 }
 
 void VideoPalClass::SetHelligkeit(float wert)
@@ -128,7 +128,7 @@ void VideoPalClass::SetHelligkeit(float wert)
 
 void VideoPalClass::SetKontrast(float wert)
 {
-    Kontrast = wert;
+    Kontrast = wert+0.5f;
 }
 
 void VideoPalClass::SetC64Palette(int palnr)
@@ -179,6 +179,8 @@ inline void VideoPalClass::YUV_To_RGB(float yuv[3], float rgb[3])
         rgb[1] = float(yuv[0]-0.396*yuv[1]-0.581*yuv[2]); // Grün
         rgb[2] = float(yuv[0]+2.029*yuv[1]+0.000*yuv[2]); // Blau
 }
+
+const float PI = 3.14159265358979323846264338327950288419716939937510;
 
 inline void VideoPalClass::CreateVicIIColors(void)
 {
@@ -256,8 +258,8 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 ColorIn = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
                                                 ChangeSaturation(&ColorIn,&ColorOut,Saturation);
 
-                                                //ColorIn = ColorOut;
-                                                //D3DXColorAdjustContrast(&ColorOut,&ColorIn,Kontrast);
+                                                ColorIn = ColorOut;
+                                                ChangeContrast(&ColorIn, &ColorOut,Kontrast);
 
                                                 RGB =  (unsigned long)ColorOut.r<<16; // Rot
                                                 RGB |= (unsigned long)ColorOut.g<<8;  // Grün
@@ -281,8 +283,8 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 ColorIn = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
                                                 ChangeSaturation(&ColorIn,&ColorOut,Saturation);
 
-                                                //ColorIn = ColorOut;
-                                                //D3DXColorAdjustContrast(&ColorOut,&ColorIn,Kontrast);
+                                                ColorIn = ColorOut;
+                                                ChangeContrast(&ColorIn, &ColorOut,Kontrast);
 
                                                 RGB =  (unsigned long)ColorOut.r<<16; // Rot
                                                 RGB |= (unsigned long)ColorOut.g<<8;  // Grün
@@ -325,8 +327,8 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 ColorIn = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
                                                 ChangeSaturation(&ColorIn,&ColorOut,Saturation);
 
-                                                //ColorIn = ColorOut;
-                                                //D3DXColorAdjustContrast(&ColorOut,&ColorIn,Kontrast);
+                                                ColorIn = ColorOut;
+                                                ChangeContrast(&ColorIn, &ColorOut,Kontrast);
 
                                                 RGB =  (unsigned long)ColorOut.r<<16; // Rot
                                                 RGB |= (unsigned long)ColorOut.g<<8;  // Grün
@@ -350,8 +352,8 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 ColorIn = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
                                                 ChangeSaturation(&ColorIn,&ColorOut,Saturation);
 
-                                                //ColorIn = ColorOut;
-                                                //D3DXColorAdjustContrast(&ColorOut,&ColorIn,Kontrast);
+                                                ColorIn = ColorOut;
+                                                ChangeContrast(&ColorIn, &ColorOut,Kontrast);
 
                                                 RGB =  (unsigned long)ColorOut.r<<16; // Rot
                                                 RGB |= (unsigned long)ColorOut.g<<8;  // Grün
@@ -633,19 +635,43 @@ void VideoPalClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
     }
 }
 
-#define Pr .299
-#define Pg .587
-#define Pb .114
-
 void VideoPalClass::ChangeSaturation(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float wert)
 {
     float R = col_in->r;
     float G = col_in->g;
     float B = col_in->b;
 
-    float p=sqrt((R*R*Pr)+(G*G*Pg)+(B*B*Pb));
+    float grey = R * 0.2125f + G * 0.7154f + B * 0.0721f;
+    col_out->r = grey + wert * (R - grey);
+    col_out->g = grey + wert * (G - grey);
+    col_out->b = grey + wert * (B - grey);
 
-    col_out->r = p+(R-p)*wert;
-    col_out->g = p+(G-p)*wert;
-    col_out->b = p+(B-p)*wert;
+    if(col_out->r > 255.0f) col_out->r = 255.0f;
+    else if(col_out->r < 0.0f) col_out->r = 0.0f;
+
+    if(col_out->g > 255.0f) col_out->g = 255.0f;
+    else if(col_out->g < 0.0f) col_out->g = 0.0f;
+
+    if(col_out->b > 255.0f) col_out->b = 255.0f;
+    else if(col_out->b < 0.0f) col_out->b = 0.0f;
+}
+
+void VideoPalClass::ChangeContrast(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float wert)
+{
+    float R = col_in->r;
+    float G = col_in->g;
+    float B = col_in->b;
+
+    col_out->r = 0.5f + wert * (R - 0.5f);
+    col_out->g = 0.5f + wert * (G - 0.5f);
+    col_out->b = 0.5f + wert * (B - 0.5f);
+
+    if(col_out->r > 255.0f) col_out->r = 255.0f;
+    else if(col_out->r < 0.0f) col_out->r = 0.0f;
+
+    if(col_out->g > 255.0f) col_out->g = 255.0f;
+    else if(col_out->g < 0.0f) col_out->g = 0.0f;
+
+    if(col_out->b > 255.0f) col_out->b = 255.0f;
+    else if(col_out->b < 0.0f) col_out->b = 0.0f;
 }

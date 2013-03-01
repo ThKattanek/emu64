@@ -273,7 +273,7 @@
   </widget>
   <widget class="QScrollBar" name="kontrast_scroll">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
@@ -285,6 +285,9 @@
    </property>
    <property name="focusPolicy">
     <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="minimum">
+    <number>0</number>
    </property>
    <property name="maximum">
     <number>100</number>

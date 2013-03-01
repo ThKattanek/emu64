@@ -65,6 +65,7 @@ public:
 
 private:
         void ChangeSaturation(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float wert);
+        void ChangeContrast(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float wert);
         //SDL_PixelFormat     *pixel_format;
 
         bool                Double2x;
