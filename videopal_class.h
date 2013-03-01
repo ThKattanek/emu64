@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: videopal_class.h                      //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 11.10.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 01.03.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef VIDEOPAL_CLASS_H
@@ -64,6 +64,7 @@ public:
         bool StartC64isPalmode;
 
 private:
+        void ChangeSaturation(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float wert);
         //SDL_PixelFormat     *pixel_format;
 
         bool                Double2x;

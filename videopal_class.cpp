@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: videopal_class.cpp                    //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 28.07.2012		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 01.03.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include "videopal_class.h"
@@ -253,12 +253,12 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 if(b < 0) b=0;
                                                 if(b > 255) b=255;
 
-                                                //ColorIn = COLOR_STRUCT::COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
-                                                ColorOut = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
+                                                ColorIn = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
+                                                ChangeSaturation(&ColorIn,&ColorOut,Saturation);
 
-                                                //D3DXColorAdjustSaturation(&ColorOut,&ColorIn,Saturation);
                                                 //ColorIn = ColorOut;
                                                 //D3DXColorAdjustContrast(&ColorOut,&ColorIn,Kontrast);
+
                                                 RGB =  (unsigned long)ColorOut.r<<16; // Rot
                                                 RGB |= (unsigned long)ColorOut.g<<8;  // Grün
                                                 RGB |= (unsigned long)ColorOut.b;     // Blau
@@ -278,12 +278,12 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 if(b < 0) b=0;
                                                 if(b > 255) b=255;
 
-                                                //ColorIn = COLOR_STRUCT::COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
-                                                ColorOut = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
+                                                ColorIn = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
+                                                ChangeSaturation(&ColorIn,&ColorOut,Saturation);
 
-                                                //D3DXColorAdjustSaturation(&ColorOut,&ColorIn,Saturation);
                                                 //ColorIn = ColorOut;
                                                 //D3DXColorAdjustContrast(&ColorOut,&ColorIn,Kontrast);
+
                                                 RGB =  (unsigned long)ColorOut.r<<16; // Rot
                                                 RGB |= (unsigned long)ColorOut.g<<8;  // Grün
                                                 RGB |= (unsigned long)ColorOut.b;     // Blau
@@ -322,12 +322,12 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 if(b < 0) b=0;
                                                 if(b > 255) b=255;
 
-                                                //ColorIn = COLOR_STRUCT::COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
-                                                ColorOut = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
+                                                ColorIn = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
+                                                ChangeSaturation(&ColorIn,&ColorOut,Saturation);
 
-                                                //D3DXColorAdjustSaturation(&ColorOut,&ColorIn,Saturation);
                                                 //ColorIn = ColorOut;
                                                 //D3DXColorAdjustContrast(&ColorOut,&ColorIn,Kontrast);
+
                                                 RGB =  (unsigned long)ColorOut.r<<16; // Rot
                                                 RGB |= (unsigned long)ColorOut.g<<8;  // Grün
                                                 RGB |= (unsigned long)ColorOut.b;     // Blau
@@ -347,12 +347,12 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 if(b < 0) b=0;
                                                 if(b > 255) b=255;
 
-                                                //ColorIn = COLOR_STRUCT::COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
-                                                ColorOut = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
+                                                ColorIn = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
+                                                ChangeSaturation(&ColorIn,&ColorOut,Saturation);
 
-                                                //D3DXColorAdjustSaturation(&ColorOut,&ColorIn,Saturation);
                                                 //ColorIn = ColorOut;
                                                 //D3DXColorAdjustContrast(&ColorOut,&ColorIn,Kontrast);
+
                                                 RGB =  (unsigned long)ColorOut.r<<16; // Rot
                                                 RGB |= (unsigned long)ColorOut.g<<8;  // Grün
                                                 RGB |= (unsigned long)ColorOut.b;     // Blau
@@ -631,4 +631,21 @@ void VideoPalClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
             break;
         }
     }
+}
+
+#define Pr .299
+#define Pg .587
+#define Pb .114
+
+void VideoPalClass::ChangeSaturation(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float wert)
+{
+    float R = col_in->r;
+    float G = col_in->g;
+    float B = col_in->b;
+
+    float p=sqrt((R*R*Pr)+(G*G*Pg)+(B*B*Pb));
+
+    col_out->r = p+(R-p)*wert;
+    col_out->g = p+(G-p)*wert;
+    col_out->b = p+(B-p)*wert;
 }
