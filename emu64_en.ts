@@ -110,12 +110,12 @@
         <location filename="c64_speed_window.ui" line="203"/>
         <location filename="c64_speed_window.cpp" line="123"/>
         <source>Pause</source>
-        <translation>Break</translation>
+        <translation>Pause</translation>
     </message>
     <message>
         <location filename="c64_speed_window.ui" line="216"/>
         <source>Stufenlos einstellbare Geschwindigkeit.</source>
-        <translation>Continuosly set the C64 speed.</translation>
+        <translation>Continuously set the C64 speed.</translation>
     </message>
     <message>
         <location filename="c64_speed_window.cpp" line="117"/>
@@ -231,7 +231,7 @@
     <message>
         <location filename="crt_window.ui" line="476"/>
         <source>C64 Normal starten</source>
-        <translation>Normally start C64</translation>
+        <translation>Start C64 normally </translation>
     </message>
     <message>
         <location filename="crt_window.ui" line="493"/>
@@ -369,27 +369,27 @@
     <message>
         <location filename="debugger_window.ui" line="99"/>
         <source>Zeigt den aktuellen Inhalt des Stackzeiger Registers + $100 an.</source>
-        <translation type="unfinished"></translation>
+        <translation>Shows the current content of the stack pointer register + $100.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="124"/>
         <source>Zeigt den aktuellen Inhalt des Accu Registers an.</source>
-        <translation type="unfinished"></translation>
+        <translation>Shows the current content of the Accu register.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="149"/>
         <source>Zeigt den aktuellen Inhalt des X Registers an.</source>
-        <translation type="unfinished"></translation>
+        <translation>Shows the current content of the X register.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="174"/>
         <source>Zeigt den aktuellen Inhalt des Y Registers an.</source>
-        <translation type="unfinished"></translation>
+        <translation>Shows the current content of the Y register.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="199"/>
         <source>Zeigt den aktuellen Inhalt des Status Registers an.</source>
-        <translation type="unfinished"></translation>
+        <translation>Shows the current content of the status register.</translation>
     </message>
     <message utf8="true">
         <location filename="debugger_window.ui" line="226"/>
@@ -402,27 +402,31 @@ Es können folgende Zahlenformate eingegeben werden.
 
 - ohne Vorzeichen Dezimalsystem (Bsp. 128)
 - $ Hexadezinal System (Bsp. $a7)</source>
-        <translation type="unfinished"></translation>
+        <translation>To change the value please click on it and acknowledge with Return.
+You can use the following number formats
+
+- decimal number without a leading sign (for example 128)
+- hexadecimal number with a $ at the start (for example $a7)</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="387"/>
         <source>Zeigt den Inhalt des IRQ Hardware Vektors $FFFE an.</source>
-        <translation type="unfinished"></translation>
+        <translation>Shows the current content of the IRQ hardware vector $FFFE.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="412"/>
         <source>Zeigt den Inhalt des IRQ Vektors $0314 an.</source>
-        <translation type="unfinished"></translation>
+        <translation>Shows the current content of the IRQ Vector $0314.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="437"/>
         <source>Zeigt den Inhalt des NMI Hardware Vektors $FFFA an.</source>
-        <translation type="unfinished"></translation>
+        <translation>Shows the current content of the NMI hardware vector $FFFA.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="462"/>
         <source>Zeigt den Inhalt des NMI Vektors $0318 an.</source>
-        <translation type="unfinished"></translation>
+        <translation>Shows the current content of the NMI vector $0318.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="644"/>
@@ -452,53 +456,54 @@ Es können folgende Zahlenformate eingegeben werden.
     <message utf8="true">
         <location filename="debugger_window.ui" line="698"/>
         <source>Hier steht was der nächste Micro Code macht.</source>
-        <translation type="unfinished"></translation>
+        <translation>Display of what the next micro code does.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="748"/>
         <source>Zeigt die Position, an welche sich der aktuelle Opcode befindet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Shows the position on which the current opcode is.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="773"/>
         <source>Adresse ist ein internes Hilfsregister.</source>
-        <translation type="unfinished"></translation>
+        <translation>Address is an internal help register.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="798"/>
         <source>Branch Adresse ist ein internes Hilfsregister.
 Hier wird die Sprungadresse der Brachbefehle gebildet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Branch Address is an internal help register.
+Builds the jump address of the branch commands.</translation>
     </message>
     <message utf8="true">
         <location filename="debugger_window.ui" line="824"/>
         <source>Zeigt an, welcher Micro Code als nächstes abgearbeitet wird.</source>
-        <translation type="unfinished"></translation>
+        <translation>Shows which micro code will be handled next.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="945"/>
         <source>Zeigt den aktuellen Opcode an der gerade abgearbeitet wird.</source>
-        <translation type="unfinished"></translation>
+        <translation>Shows the opcode currently handled.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="970"/>
         <source>Pointer ist ein internes Hilfsregister.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pointer is an internal help register.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="995"/>
         <source>Temp Byte ist ein internes Hilfsregister.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temp Byte is an internal help register.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="1092"/>
         <source>Zeigt den aktuellen Opcode als Menmonic an der gerade abgearbeitet wird.</source>
-        <translation type="unfinished"></translation>
+        <translation>Shows the currently handled opcode as mnemonic.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="1117"/>
         <source>Zeigt an ob die CPU gerade im &quot;Schlafmodus&quot; ist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Shows if the CPU is currently in sleep mode.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="1174"/>
@@ -508,12 +513,12 @@ Hier wird die Sprungadresse der Brachbefehle gebildet.</source>
     <message>
         <location filename="debugger_window.ui" line="1186"/>
         <source>Es wird genau ein C64 Zyklus abgearbeitet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Executes exactly one C64 cycle.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="1206"/>
         <source>Es wird genau ein Opcode abgearbeitet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Executes exactly one opcode.</translation>
     </message>
     <message utf8="true">
         <location filename="debugger_window.ui" line="1226"/>
@@ -531,7 +536,8 @@ The speed can be set.</translation>
         <location filename="debugger_window.ui" line="1267"/>
         <source>Hiermit stellen sie die Animationsgeschwindigkeit ein.
 In Zyklen pro Sekunde.</source>
-        <translation type="unfinished"></translation>
+        <translation>Here you set the speed of the animation.
+in cycles per second.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="1293"/>
@@ -584,7 +590,9 @@ In Zyklen pro Sekunde.</source>
 IRQ;NMI;RDY zu den Customchips getrennt. So hat man die
 möglichkeit die Leitungen manuell zu setzen. Dies dient nur zu
 Testzwecken.</source>
-        <translation type="unfinished"></translation>
+        <translation>If you put a check here all three circuits IRQ; NMI;RDY to
+the custom chips get cut. This enables you to set the circuits
+manually. Just for testing purposes.</translation>
     </message>
     <message>
         <location filename="debugger_window.ui" line="1726"/>
@@ -682,7 +690,7 @@ Testzwecken.</source>
         <location filename="debugger_window.cpp" line="238"/>
         <location filename="debugger_window.cpp" line="387"/>
         <source>Lesen von PC-Adresse und verwerfen // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Read from PC-Address and discard // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="239"/>
@@ -718,31 +726,31 @@ Testzwecken.</source>
         <location filename="debugger_window.cpp" line="244"/>
         <location filename="debugger_window.cpp" line="393"/>
         <source>Pointer von PC-Adresse holen // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Get pointer from PC-Address // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="245"/>
         <location filename="debugger_window.cpp" line="394"/>
         <source>Lesen von Pointer und verwerfen // Pointer+XR</source>
-        <translation type="unfinished"></translation>
+        <translation>Read from Pointer and discard // Pointer+XR</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="246"/>
         <location filename="debugger_window.cpp" line="395"/>
         <source>Adresse Lo von Pointer-Adresse holen // Pointer+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Get address Lo from pointer address // Pointer +1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="247"/>
         <location filename="debugger_window.cpp" line="396"/>
         <source>Adresse Hi von Pointer-Adresse holen</source>
-        <translation type="unfinished"></translation>
+        <translation>Get address Hi from pointer address</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="248"/>
         <location filename="debugger_window.cpp" line="397"/>
         <source>TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ)</source>
-        <translation>Get TMPByte from Address holen // AC or TMPByte // Set SR(NZ)</translation>
+        <translation>Get TMPByte from address // AC or TMPByte // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="249"/>
@@ -754,37 +762,37 @@ Testzwecken.</source>
         <location filename="debugger_window.cpp" line="250"/>
         <location filename="debugger_window.cpp" line="399"/>
         <source>TMPByte von Adresse holen</source>
-        <translation>Get TMPByte from Address</translation>
+        <translation>Get TMPByte from address</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="251"/>
         <location filename="debugger_window.cpp" line="400"/>
         <source>TMPByte nach Adresse schreiben // ASL MEMORY // ORA</source>
-        <translation type="unfinished"></translation>
+        <translation>Write TMPByte to address // ASL MEMORY // ORA</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="252"/>
         <location filename="debugger_window.cpp" line="401"/>
         <source>TMPByte nach Adresse schreiben</source>
-        <translation type="unfinished"></translation>
+        <translation>Write TMPByte to address</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="253"/>
         <location filename="debugger_window.cpp" line="402"/>
         <source>Adresse Hi = 0 // Adresse Lo von PC-Adresse holen // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Address Hi = 0 // Get addresse Lo from PC-address // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="254"/>
         <location filename="debugger_window.cpp" line="403"/>
         <source>TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ))</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from address // AC or TMPByte // Set SR(NZ))</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="255"/>
         <location filename="debugger_window.cpp" line="404"/>
         <source>TMPByte nach Adresse schreiben // TMPByte&lt;&lt;1 // Set SR(NZC)</source>
-        <translation type="unfinished"></translation>
+        <translation>Write TMPByte to address // TMPByte&lt;&lt;1 // Set SR(NZC)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="256"/>
@@ -796,37 +804,37 @@ Testzwecken.</source>
         <location filename="debugger_window.cpp" line="257"/>
         <location filename="debugger_window.cpp" line="406"/>
         <source>SR nach SP+0x0100 schreiben // SP-1</source>
-        <translation type="unfinished"></translation>
+        <translation>Write SR to SP+0x0100 // SP-1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="258"/>
         <location filename="debugger_window.cpp" line="407"/>
         <source>TMPByte von PC-Adresse holen // AC or TMPByte // Set SR(NZ) // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from PC adress // AC or TMPByte // Set SR(NZ) // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="259"/>
         <location filename="debugger_window.cpp" line="408"/>
         <source>TMPByte von PC-Adresse holen // AC&lt;&lt;1 // Set SR(NZC)</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from PC adress // AC&lt;&lt;1 // Set SR(NZC)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="260"/>
         <location filename="debugger_window.cpp" line="409"/>
         <source>TMPByte von PC-Adresse holen // AC and TMPByte // Set SR(NZC) // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from PC adress // AC and TMPByte // Set SR(NZC) // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="261"/>
         <location filename="debugger_window.cpp" line="410"/>
         <source>Adresse Lo von PC-Adresse holen // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Get address Lo from PC adress // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="262"/>
         <location filename="debugger_window.cpp" line="411"/>
         <source>Adresse Hi von PC-Adresse holen // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Get address Hi from PC adress // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="263"/>
@@ -1880,7 +1888,7 @@ Do you want to continue?</translation>
     <message>
         <location filename="info_window.ui" line="14"/>
         <source>Emu64 Information</source>
-        <translation>Emu64 about</translation>
+        <translation>about Emu64</translation>
     </message>
     <message>
         <location filename="info_window.ui" line="62"/>
@@ -2070,7 +2078,7 @@ Do you want to continue?</translation>
     <message>
         <location filename="main_window.ui" line="440"/>
         <source>C64 Programme direkt laden</source>
-        <translation>Directly load C64 file</translation>
+        <translation>Directly load a C64 program file</translation>
     </message>
     <message>
         <location filename="main_window.ui" line="443"/>
@@ -2152,7 +2160,7 @@ Do you want to continue?</translation>
     <message>
         <location filename="main_window.ui" line="631"/>
         <source>Schaltet in den SID Player Modus. Damit wird der Emu64 zu einem vollwertigen SID Player.</source>
-        <translation>Switch to SID Player mode. Turns Emu64 into a fully-fledged SID Player.</translation>
+        <translation>Switch to SID Player mode. Turns Emu64 into a full fledged SID Player.</translation>
     </message>
     <message>
         <location filename="main_window.ui" line="653"/>
@@ -2172,7 +2180,7 @@ Do you want to continue?</translation>
     <message utf8="true">
         <location filename="main_window.ui" line="681"/>
         <source>Hier können Sie die C64 Geschwindigkeit sufenlos von 5% bis 500% einstellen.</source>
-        <translation>Continuosly set the C64 speed from 5% to 500%.</translation>
+        <translation>Continuously set the C64 speed from 5% to 500%.</translation>
     </message>
     <message utf8="true">
         <source>Hier können Sie die C64 Geschwindigkeit von 10% bis 1000% einstellen.</source>
@@ -2297,7 +2305,7 @@ Do you want to continue?</translation>
     <message>
         <location filename="main_window.ui" line="936"/>
         <source>Funktionen die die Emu64 Fenster beeinflussen.</source>
-        <translation>Functions that influence the Emu64 windows.</translation>
+        <translation>Functions to change the Emu64 window displays.</translation>
     </message>
     <message>
         <location filename="main_window.ui" line="958"/>
@@ -2320,243 +2328,248 @@ Do you want to continue?</translation>
         <translation>Contact GameBase64 and instantly play every game in GameBase64.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="157"/>
+        <location filename="main_window.cpp" line="169"/>
         <source>&gt;&gt; VideoPal Klasse wurde installiert
 </source>
-        <translation>&gt;&gt; VideoPal class was installed
+        <translation>&gt;&gt; VideoPal class successfully installed
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="169"/>
+        <location filename="main_window.cpp" line="176"/>
         <source>&gt;&gt; InfoWindow wurde erzeugt
 </source>
-        <translation>&gt;&gt; AboutWindow was created
+        <translation>&gt;&gt; AboutWindow successfully created
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="173"/>
+        <location filename="main_window.cpp" line="180"/>
         <source>&gt;&gt; TVSetupWindow wurde erzeugt
 </source>
-        <translation>&gt;&gt; TVSetupWindow was created
+        <translation>&gt;&gt; TVSetupWindow successfully created
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="177"/>
+        <location filename="main_window.cpp" line="184"/>
         <source>&gt;&gt; FloppyWindow wurde erzeugt
 </source>
-        <translation>&gt;&gt; FloppyWindow was created
+        <translation>&gt;&gt; FloppyWindow successfully created
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="181"/>
+        <location filename="main_window.cpp" line="188"/>
         <source>&gt;&gt; C64KeyboardWindow wurde erzeugt
 </source>
-        <translation>&gt;&gt; C64KeyboardWindow was created
+        <translation>&gt;&gt; C64KeyboardWindow successfully created
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="185"/>
+        <location filename="main_window.cpp" line="192"/>
         <source>&gt;&gt; CrtWindow wurde erzeugt
 </source>
-        <translation>&gt;&gt; CrtWindow was created
+        <translation>&gt;&gt; CrtWindow successfully created
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="189"/>
+        <location filename="main_window.cpp" line="196"/>
         <source>&gt;&gt; DebuggerWindow wurde erzeugt
 </source>
-        <translation>&gt;&gt; DebuggerWindow was created
+        <translation>&gt;&gt; DebuggerWindow successfully created
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="193"/>
+        <location filename="main_window.cpp" line="200"/>
         <source>&gt;&gt; SetupWindow wurde erzeugt
 </source>
-        <translation>&gt;&gt; SetupWindow was created
+        <translation>&gt;&gt; SetupWindow successfully created
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="213"/>
+        <location filename="main_window.cpp" line="217"/>
         <source>Fehler beim Installieren der C64 Klasse</source>
         <translation>Error while installing C64 class</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="232"/>
+        <location filename="main_window.cpp" line="236"/>
         <source>CRT Window wird mit CRT Klasee verbunden.</source>
-        <translation>CRT Window gets connected to CRT Class.</translation>
+        <translation>CRT Window connecting to CRT Class.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="238"/>
+        <location filename="main_window.cpp" line="242"/>
         <source>C64 Systemroms werden geladen.</source>
         <translation>Loading C64 System ROMS.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="248"/>
+        <location filename="main_window.cpp" line="252"/>
         <source>C64 Key-Matrix wird mit Virtual Keyboard verbunden.</source>
-        <translation>C64 Key-Matrix connected to Virtual Keyboard.</translation>
+        <translation>C64 Key-Matrix connecting to Virtual Keyboard.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="253"/>
+        <location filename="main_window.cpp" line="257"/>
         <source>Tabelle für Floppy&apos;s wird erstellt.</source>
         <translation>Creating Floppy Table.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="259"/>
+        <location filename="main_window.cpp" line="263"/>
         <source>Floppy: </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="273"/>
+        <location filename="main_window.cpp" line="277"/>
         <source>Einstellungen werden von INI geladen und gesetzt.</source>
-        <translation>Loading Settings from INI and set&apos;em.</translation>
+        <translation>Loading settings from INI and set&apos;em.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="311"/>
+        <location filename="main_window.cpp" line="315"/>
         <source>C64 EMULATION WIRD NUN GESTARET.</source>
         <translation>C64 Emulation starts now.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="388"/>
+        <location filename="main_window.cpp" line="391"/>
         <source>Wechseln zur Sprache: </source>
         <translation>Change to language: </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="116"/>
+        <location filename="main_window.cpp" line="129"/>
         <source>&gt;&gt; Translator wurde intsalliert: Systemsprache = </source>
         <translation>&gt;&gt; Translator was installed: System language = </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="115"/>
+        <location filename="main_window.cpp" line="128"/>
         <source>Translator wurde installiert.</source>
         <translation>Translator installed.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="125"/>
+        <location filename="main_window.cpp" line="137"/>
         <source>Screenshotverzeichnis wird gesucht.</source>
-        <translation>Searching screenshot directory.</translation>
+        <translation>Searching for screenshot directory.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="128"/>
+        <location filename="main_window.cpp" line="140"/>
         <source>&gt;&gt; Ein Screenshot Verzeichnis ist vorhanden
 </source>
-        <translation>&gt;&gt; Screenshot Directory is available
+        <translation>&gt;&gt; Screenshot directory is available
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="133"/>
+        <location filename="main_window.cpp" line="145"/>
         <source>Screenshotverzeichnis wird erstellt.</source>
-        <translation>Creating Screenshot Directory.</translation>
+        <translation>Creating screenshot directory.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="134"/>
+        <location filename="main_window.cpp" line="146"/>
         <source>&lt;&lt; Ein Screenshot Verzeichnis ist nicht vorhanden
 </source>
-        <translation>&lt;&lt; No Screenshot Directory availabe</translation>
+        <translation>&lt;&lt; No screenshot directory availabe</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="137"/>
+        <location filename="main_window.cpp" line="149"/>
         <source>&gt;&gt; Ein neues Screenshot Verzeichnis wurde erstellt
 </source>
-        <translation>&gt;&gt; Created new Screenshot Directory
+        <translation>&gt;&gt; successfully created new screenshot directory
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="142"/>
+        <location filename="main_window.cpp" line="154"/>
         <source>&lt;&lt; Ein neues Screenshot Verzeichnis konnte nicht erstellt werden
 &lt;&lt; Keine Screenshots möglich !!</source>
-        <translation>&lt;&lt; Couldn&apos;t create new Screenshot Directory
+        <translation>&lt;&lt; Couldn&apos;t create new screenshot directory
 &lt;&lt; No screenshots possible !!</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="155"/>
-        <source>VideoPal Klasse wird initialisiert.</source>
-        <translation>Initializing Video Pal Class.</translation>
-    </message>
-    <message>
-        <location filename="main_window.cpp" line="160"/>
-        <source>INI Dateiverwaltung wird initialisiert.</source>
-        <translation>INI Filemanagement initialising.</translation>
-    </message>
-    <message>
         <location filename="main_window.cpp" line="167"/>
+        <source>VideoPal Klasse wird initialisiert.</source>
+        <translation>Initializing VideoPAL class.</translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="116"/>
+        <source>INI Dateiverwaltung wird initialisiert.</source>
+        <translation>initialising filemanagement INI.</translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="125"/>
+        <source>&gt;&gt; Sprachmenü wurde erstellt.</source>
+        <translation>&gt;&gt; Languagemenu successfully created.</translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="174"/>
         <source>InfoWindow wird erstellt.</source>
-        <translation>Creating Info Window.</translation>
+        <translation>Creating InfoWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="171"/>
+        <location filename="main_window.cpp" line="178"/>
         <source>TVSetupWindow wird erstellt.</source>
-        <translation>Creating TV Setup Window.</translation>
+        <translation>Creating TVSetupWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="175"/>
+        <location filename="main_window.cpp" line="182"/>
         <source>FloppyWindow wird erstellt.</source>
-        <translation>Creating Floppy window.</translation>
+        <translation>Creating FloppyWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="179"/>
+        <location filename="main_window.cpp" line="186"/>
         <source>C64KeyboardWindow wird erstellt.</source>
-        <translation>Creating C64 Keyboard window.</translation>
+        <translation>Creating C64KeyboardWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="183"/>
+        <location filename="main_window.cpp" line="190"/>
         <source>CRTWindow wird erstellt.</source>
-        <translation>Creating CRT window.</translation>
+        <translation>Creating CRTWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="187"/>
+        <location filename="main_window.cpp" line="194"/>
         <source>DebuggerWindow wird erstellt.</source>
-        <translation>Creating Debugger window.</translation>
+        <translation>Creating DebuggerWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="191"/>
+        <location filename="main_window.cpp" line="198"/>
         <source>SetupWindow wird erstellt.</source>
-        <translation>Creating Setup window.</translation>
+        <translation>Creating SetupWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="195"/>
+        <location filename="main_window.cpp" line="202"/>
         <source>C64SpeedWindow wird erstellt.</source>
-        <translation>Creating C64 Speed window.</translation>
+        <translation>Creating C64SpeedWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="197"/>
+        <location filename="main_window.cpp" line="204"/>
         <source>&gt;&gt; C64SpeedWindow wurde erzeugt
 </source>
-        <translation>&gt;&gt; C64 Speed Window created
+        <translation>&gt;&gt; C64SpeedWindow successfully created
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="199"/>
+        <location filename="main_window.cpp" line="121"/>
         <source>Sprachmenü wir erstellt.</source>
-        <translation>Creating Speech menu.</translation>
+        <translation>Creating language menu.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="203"/>
+        <location filename="main_window.cpp" line="207"/>
         <source>Screenshotnummer wir geladen.</source>
         <translation>Loading screenshot number.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="208"/>
+        <location filename="main_window.cpp" line="212"/>
         <source>C64 Klasse wird initialisiert.</source>
         <translation>Initializing C64 class.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="213"/>
+        <location filename="main_window.cpp" line="217"/>
         <location filename="main_window.cpp" line="588"/>
         <source>Emu64 Fehler ...</source>
         <translation>Emu64 Error ...</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="217"/>
+        <location filename="main_window.cpp" line="221"/>
         <source>SetupWindow wird mit INI abgeglichen.</source>
-        <translation>comparing Setup window with INI.</translation>
+        <translation>comparing SetupWindow with INI.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="220"/>
+        <location filename="main_window.cpp" line="224"/>
         <source>SDL Window Titelleiste wird benannt.</source>
         <translation>Naming SDL window titlebar.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="221"/>
+        <location filename="main_window.cpp" line="225"/>
         <location filename="main_window.cpp" line="436"/>
         <source>C64 Bildschirm</source>
         <translation>C64 Screen</translation>
@@ -2573,17 +2586,17 @@ Do you want to continue?</translation>
         <source>
 &gt;&gt; Emu64 wurde sauber beendet...</source>
         <translation>
-&gt;&gt; Emu64 shut down without errors...</translation>
-    </message>
-    <message>
-        <location filename="main_window.cpp" line="224"/>
-        <source>Debugger Window wird mit C64 Klasse verbunden.</source>
-        <translation>Debugger Window connected to C64 Class.</translation>
+&gt;&gt; Emu64 did shut down without errors...</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="228"/>
+        <source>Debugger Window wird mit C64 Klasse verbunden.</source>
+        <translation>Debugger window connected to C64 Class.</translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="232"/>
         <source>C64 Speed Window wird mit C64 Klasse verbunden.</source>
-        <translation>C64 Speed Window connected to C64 Class.</translation>
+        <translation>C64 speed window connected to C64 Class.</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="497"/>
@@ -2608,7 +2621,7 @@ Do you want to continue?</translation>
         <location filename="main_window.cpp" line="588"/>
         <source>Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.
 Überprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !</source>
-        <translation>No Screenshots possible as Emu64 couldn&apos;t create a screenshots directory.
+        <translation>No Screenshots possible as Emu64 couldn&apos;t create a screenshot directory.
 Please check the file access rights of the directory!</translation>
     </message>
 </context>
@@ -2703,7 +2716,7 @@ Please check the file access rights of the directory!</translation>
     <message>
         <location filename="setup_window.ui" line="125"/>
         <source>Schaltet die PAL Emulation der Grafikausgabe ein. (Sollte vorrangig benutzt werden)</source>
-        <translation>Enables PAL emulation for the Graficoutput. (preferred use)</translation>
+        <translation>Enables PAL emulation for the graphic display. (preferred use)</translation>
     </message>
     <message>
         <location filename="setup_window.ui" line="128"/>
@@ -2773,7 +2786,7 @@ Please check the file access rights of the directory!</translation>
     <message>
         <location filename="setup_window.ui" line="301"/>
         <source>Hier kann man das Screenshot Format einstellen.</source>
-        <translation>Set the format for screenshots.</translation>
+        <translation>Set the image format for screenshots.</translation>
     </message>
     <message>
         <location filename="setup_window.ui" line="305"/>
@@ -2783,12 +2796,12 @@ Please check the file access rights of the directory!</translation>
     <message utf8="true">
         <location filename="setup_window.ui" line="324"/>
         <source>Setzt den Zähler für die angehängte Zahl an der Screenshot Datei zurück.</source>
-        <translation>Resets the added number counter for screenshots.</translation>
+        <translation>Resets the increasing number added to screenshots.</translation>
     </message>
     <message utf8="true">
         <location filename="setup_window.ui" line="327"/>
         <source>Counter Zurücksetzen</source>
-        <translation>counter reset</translation>
+        <translation>Reset counter</translation>
     </message>
     <message>
         <source>PushButton</source>
@@ -2832,22 +2845,22 @@ Please check the file access rights of the directory!</translation>
     <message>
         <location filename="setup_window.cpp" line="310"/>
         <source>Verbindet diesen Slot mit dem C64 Gameport 1</source>
-        <translation>Connects this slot to C64 Gameport 1</translation>
+        <translation>Connects this virtual joystick slot to C64 Gameport 1</translation>
     </message>
     <message>
         <location filename="setup_window.cpp" line="312"/>
         <source>Verbindet diesen Slot mit dem C64 Gameport 2</source>
-        <translation>Connects this slot to C64 Gameport 2</translation>
+        <translation>Connects this virtual joystick  slot to C64 Gameport 2</translation>
     </message>
     <message>
         <location filename="setup_window.cpp" line="316"/>
         <source>Lernen</source>
-        <translation>learning</translation>
+        <translation>Learn</translation>
     </message>
     <message>
         <location filename="setup_window.cpp" line="318"/>
         <source>Löschen</source>
-        <translation>blanking</translation>
+        <translation>Delete</translation>
     </message>
 </context>
 <context>
@@ -2885,7 +2898,7 @@ Please check the file access rights of the directory!</translation>
     <message>
         <location filename="tv_setup_window.ui" line="207"/>
         <source>Phasen Verschiebung</source>
-        <translation>Phasen shift</translation>
+        <translation>Phase shift</translation>
     </message>
     <message>
         <location filename="tv_setup_window.ui" line="230"/>
@@ -2939,7 +2952,7 @@ Please check the file access rights of the directory!</translation>
     <message utf8="true">
         <location filename="widget_floppy_status.ui" line="91"/>
         <source>Floppy Geräteadresse</source>
-        <translation>Floppy Address</translation>
+        <translation>Floppy device address</translation>
     </message>
     <message utf8="true">
         <location filename="widget_floppy_status.ui" line="110"/>
