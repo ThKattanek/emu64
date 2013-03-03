@@ -1094,43 +1094,43 @@ Testzwecken.</translation>
         <location filename="debugger_window.cpp" line="306"/>
         <location filename="debugger_window.cpp" line="455"/>
         <source>TMPByte von Adresse lesen // CarrayFalg=0</source>
-        <translation></translation>
+        <translation>TMPByte von Adresse lesen // CarryFlag=0</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="307"/>
         <location filename="debugger_window.cpp" line="456"/>
         <source>TMPByte von Adresse lesen // DezimalFalg=0</source>
-        <translation></translation>
+        <translation>TMPByte von Adresse lesen // CarrayFlag=0</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="308"/>
         <location filename="debugger_window.cpp" line="457"/>
         <source>TMPByte von Adresse lesen // InterruptFalg=0</source>
-        <translation></translation>
+        <translation>TMPByte von Adresse lesen // InterruptFlag=0</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="309"/>
         <location filename="debugger_window.cpp" line="458"/>
         <source>TMPByte von Adresse lesen // OverflowFalg=0</source>
-        <translation></translation>
+        <translation>TMPByte von Adresse lesen // OverflowFlag=0</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="310"/>
         <location filename="debugger_window.cpp" line="459"/>
         <source>TMPByte von Adresse lesen // CarrayFalg=1	</source>
-        <translation></translation>
+        <translation>TMPByte von Adresse lesen // CarrayFlag=1	</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="311"/>
         <location filename="debugger_window.cpp" line="460"/>
         <source>TMPByte von Adresse lesen // DezimalFalg=1</source>
-        <translation></translation>
+        <translation>TMPByte von Adresse lesen // DezimalFlag=1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="312"/>
         <location filename="debugger_window.cpp" line="461"/>
         <source>TMPByte von Adresse lesen // InterruptFalg=1</source>
-        <translation></translation>
+        <translation>TMPByte von Adresse lesen // InterruptFlag=1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="313"/>

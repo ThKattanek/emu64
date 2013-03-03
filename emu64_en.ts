@@ -780,7 +780,7 @@ manually. Just for testing purposes.</translation>
         <location filename="debugger_window.cpp" line="253"/>
         <location filename="debugger_window.cpp" line="402"/>
         <source>Adresse Hi = 0 // Adresse Lo von PC-Adresse holen // PC+1</source>
-        <translation>Address Hi = 0 // Get addresse Lo from PC-address // PC+1</translation>
+        <translation>Address Hi = 0 // Get address Lo from PC-address // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="254"/>
@@ -840,55 +840,55 @@ manually. Just for testing purposes.</translation>
         <location filename="debugger_window.cpp" line="263"/>
         <location filename="debugger_window.cpp" line="412"/>
         <source>TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prüfen (BPL)</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from PC address // PC+1 // checking if SR(N) is FALSE (BPL)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="264"/>
         <location filename="debugger_window.cpp" line="413"/>
         <source>TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prüfen (BMI)</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from PC address // PC+1 // checking if SR(N) is TRUE (BMI)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="265"/>
         <location filename="debugger_window.cpp" line="414"/>
         <source>TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prüfen (BVC)</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from PC address // PC+1 // checking if SR(V) is FALSE (BVC)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="266"/>
         <location filename="debugger_window.cpp" line="415"/>
         <source>TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prüfen (BVS)</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from PC address // PC+1 // checking if SR(V) is TRUE (BVS)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="267"/>
         <location filename="debugger_window.cpp" line="416"/>
         <source>TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prüfen (BCC)</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from PC address // PC+1 // checking if SR(C) is FALSE (BCC)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="268"/>
         <location filename="debugger_window.cpp" line="417"/>
         <source>TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prüfen (BCS)</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from PC address // PC+1 // checking if SR(C) is TRUE (BCS)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="269"/>
         <location filename="debugger_window.cpp" line="418"/>
         <source>TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prüfen (BNE)</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from PC address // PC+1 // checking if SR(Z) is FALSE (BNE)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="270"/>
         <location filename="debugger_window.cpp" line="419"/>
         <source>TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prüfen (BEQ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from PC address // PC+1 // checking if SR(Z) is TRUE (BEQ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="271"/>
         <location filename="debugger_window.cpp" line="420"/>
         <source>Lesen von PC-Adresse und verwerfen // BranchAdresse=PC+TMPByte</source>
-        <translation type="unfinished"></translation>
+        <translation>Read from PC address and discard // BranchAddress=PC+TMPByte</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="272"/>
@@ -900,247 +900,247 @@ manually. Just for testing purposes.</translation>
         <location filename="debugger_window.cpp" line="273"/>
         <location filename="debugger_window.cpp" line="422"/>
         <source>Adresse Hi von Pointer-Adresse holen // Adresse+YR</source>
-        <translation type="unfinished"></translation>
+        <translation>Get address Hi from pointer address // Address+YR</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="274"/>
         <location filename="debugger_window.cpp" line="423"/>
         <source>TMPByte von Adresse holen // Fix Adresse Hi MCT+1 // AC or TMPByte</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from address // Fix Address Hi MCT+1 // AC or TMPByte</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="275"/>
         <location filename="debugger_window.cpp" line="424"/>
         <source>Adresse Hi von PC-Adresse holen // PC=Adresse</source>
-        <translation type="unfinished"></translation>
+        <translation>Get address Hi from PC address // PC=Address</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="276"/>
         <location filename="debugger_window.cpp" line="425"/>
         <source>Lesen von PC-Adresse und verwerfen // XR=AC // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read from PC address and discard // XR=AC // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="277"/>
         <location filename="debugger_window.cpp" line="426"/>
         <source>Lesen von PC-Adresse und verwerfen // YR=AC // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read from PC address and discard // YR=AC // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="278"/>
         <location filename="debugger_window.cpp" line="427"/>
         <source>Lesen von PC-Adresse und verwerfen // XR=SP // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read from PC address and discard // XR=SP // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="279"/>
         <location filename="debugger_window.cpp" line="428"/>
         <source>Lesen von PC-Adresse und verwerfen // AC=XR // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read from PC address and discard // AC=XR // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="280"/>
         <location filename="debugger_window.cpp" line="429"/>
         <source>Lesen von PC-Adresse und verwerfen // SP=XR</source>
-        <translation type="unfinished"></translation>
+        <translation>Read from PC address and discard // SP=XR</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="281"/>
         <location filename="debugger_window.cpp" line="430"/>
         <source>Lesen von PC-Adresse und verwerfen // AC=YR // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read from PC address and discard // AC=YR // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="282"/>
         <location filename="debugger_window.cpp" line="431"/>
         <source>AC nach SP+0x0100 schreiben // SP-1</source>
-        <translation type="unfinished"></translation>
+        <translation>Write AC to SP+0x0100 // SP-1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="283"/>
         <location filename="debugger_window.cpp" line="432"/>
         <source>AC von SP+0x0100 lesen // SP+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Read AC from SP+0x0100 // SP+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="284"/>
         <location filename="debugger_window.cpp" line="433"/>
         <source>AC von SP+0x0100 lesen // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read AC from SP+0x0100 // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="285"/>
         <location filename="debugger_window.cpp" line="434"/>
         <source>SR von SP+0x0100 lesen // SP+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Read SR from SP+0x0100 // SP+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="286"/>
         <location filename="debugger_window.cpp" line="435"/>
         <source>SR von SP+0x0100 lesen</source>
-        <translation type="unfinished"></translation>
+        <translation>Read SR from SP+0x0100</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="287"/>
         <location filename="debugger_window.cpp" line="436"/>
         <source>TMPByte von PC-Adresse lesen // AC + TMPByte + Carry // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from PC-address // AC + TMPByte + Carry // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="288"/>
         <location filename="debugger_window.cpp" line="437"/>
         <source>TMPByte von Adresse lesen // AC + TMPByte + Carry</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from address // AC + TMPByte + Carry</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="289"/>
         <location filename="debugger_window.cpp" line="438"/>
         <source>TMPByte von Adresse lesen // Adresse Lo + XR</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from address // Address Lo + XR</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="290"/>
         <location filename="debugger_window.cpp" line="439"/>
         <source>Adresse Hi von PC-Adresse holen // Adresse+XR  // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Get addresse Hi from PC-addresse // Address+XR // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="291"/>
         <location filename="debugger_window.cpp" line="440"/>
         <source>Adresse Hi von PC-Adresse holen // Adresse+YR  // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Get addresse Hi from PC-addresse // Address+YR // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="292"/>
         <location filename="debugger_window.cpp" line="441"/>
         <source>TMPByte von Adresse lesen // AC + TMPByte + Carry // if(idxReg&lt;Adresse Lo) MCT++</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from address // AC + TMPByte + Carry // if(idxReg&lt;address Lo) MCT++</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="293"/>
         <location filename="debugger_window.cpp" line="442"/>
         <source>TMPByte von PC-Adresse lesen // AC - TMPByte - Carry // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from PC-address // AC - TMPByte - Carry // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="294"/>
         <location filename="debugger_window.cpp" line="443"/>
         <source>TMPByte von Adresse lesen // AC - TMPByte - Carry</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from address // AC - TMPByte - Carry</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="295"/>
         <location filename="debugger_window.cpp" line="444"/>
         <source>TMPByte von Adresse lesen // AC - TMPByte - Carry // if(idxReg&lt;Adresse Lo) MCT++</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from address // AC - TMPByte - Carry // if(idxReg&lt;address Lo) MCT++</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="296"/>
         <location filename="debugger_window.cpp" line="445"/>
         <source>TMPByte von SP+0x0100 holen</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from SP+0x0100</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="297"/>
         <location filename="debugger_window.cpp" line="446"/>
         <source>PC-Adresse Hi nach SP+0x0100 schreiben // SP--</source>
-        <translation type="unfinished"></translation>
+        <translation>Write PC-Address Hi to SP+0x0100 // SP--</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="298"/>
         <location filename="debugger_window.cpp" line="447"/>
         <source>PC-Adresse Lo nach SP+0x0100 schreiben // SP--</source>
-        <translation type="unfinished"></translation>
+        <translation>Write PC-Address Lo to SP+0x0100 // SP--</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="299"/>
         <location filename="debugger_window.cpp" line="448"/>
         <source>TMPByte von SP+0x0100 holen // SP+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from SP+0x0100 // SP+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="300"/>
         <location filename="debugger_window.cpp" line="449"/>
         <source>PC-Adresse Lo von SP+0x0100 holen // SP+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Get PC-address Lo from SP+0x0100 // SP+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="301"/>
         <location filename="debugger_window.cpp" line="450"/>
         <source>PC-Adresse Hi von SP+0x0100 holen</source>
-        <translation type="unfinished"></translation>
+        <translation>Get PC-address Hi from SP+0x0100</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="302"/>
         <location filename="debugger_window.cpp" line="451"/>
         <source>TMPByte von PC-Adresse laden // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Load TMPByte from PC-address // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="303"/>
         <location filename="debugger_window.cpp" line="452"/>
         <source>TMPByte von PC-Adresse lesen // AC and TMPByte // Set SR(NZ) // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from PC-Address // AC and TMPByte // Set SR(NZ) // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="304"/>
         <location filename="debugger_window.cpp" line="453"/>
         <source>TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from address // AC and TMPByte // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="305"/>
         <location filename="debugger_window.cpp" line="454"/>
         <source>TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ) // if(idxReg&lt;Adresse Lo) MCT++</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from address // AC and TMPByte // Set SR(NZ) // if(idxReg&lt;address Lo) MCT++</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="306"/>
         <location filename="debugger_window.cpp" line="455"/>
         <source>TMPByte von Adresse lesen // CarrayFalg=0</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from adress // CarrayFlag=0</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="307"/>
         <location filename="debugger_window.cpp" line="456"/>
         <source>TMPByte von Adresse lesen // DezimalFalg=0</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from adress // DezimalFlag=0</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="308"/>
         <location filename="debugger_window.cpp" line="457"/>
         <source>TMPByte von Adresse lesen // InterruptFalg=0</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from adress // InterruptFlag=0</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="309"/>
         <location filename="debugger_window.cpp" line="458"/>
         <source>TMPByte von Adresse lesen // OverflowFalg=0</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from adress // OverflowFlag=0</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="310"/>
         <location filename="debugger_window.cpp" line="459"/>
         <source>TMPByte von Adresse lesen // CarrayFalg=1	</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from adressn // CarrayFlag=1	</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="311"/>
         <location filename="debugger_window.cpp" line="460"/>
         <source>TMPByte von Adresse lesen // DezimalFalg=1</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from adress // DezimalFlag=1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="312"/>
         <location filename="debugger_window.cpp" line="461"/>
         <source>TMPByte von Adresse lesen // InterruptFalg=1</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from adress // InterruptFlag=1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="313"/>
         <location filename="debugger_window.cpp" line="462"/>
         <source>TMPByte von Adresse lesen // BIT Operation</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from adress // BIT Operation</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="314"/>
@@ -1164,97 +1164,97 @@ manually. Just for testing purposes.</translation>
         <location filename="debugger_window.cpp" line="317"/>
         <location filename="debugger_window.cpp" line="466"/>
         <source>AC von PC-Adresse lesen // Set SR(NZ) // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Read AC from PC-adress // Set SR(NZ) // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="318"/>
         <location filename="debugger_window.cpp" line="467"/>
         <source>AC von PC-Adresse lesen // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read AC from PC-adress // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="319"/>
         <location filename="debugger_window.cpp" line="468"/>
         <source>AC von PC-Adresse lesen // Set SR(NZ) // if(idxReg&lt;Adresse Lo) MCT++</source>
-        <translation type="unfinished"></translation>
+        <translation>Read AC from PC-adress // Set SR(NZ) // if(idxReg&lt;address Lo) MCT++</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="320"/>
         <location filename="debugger_window.cpp" line="469"/>
         <source>XR von PC-Adresse lesen // Set SR(NZ) // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Read XR from PC-adress //  Set SR(NZ) // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="321"/>
         <location filename="debugger_window.cpp" line="470"/>
         <source>XR von Adresse lesen // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read XR from adress // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="322"/>
         <location filename="debugger_window.cpp" line="471"/>
         <source>XR von Adresse lesen // Set SR(NZ) // if(idxReg&lt;Adresse Lo) MCT++</source>
-        <translation type="unfinished"></translation>
+        <translation>Read XR from adress // Set SR(NZ) // if(idxReg&lt;address Lo) MCT++</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="323"/>
         <location filename="debugger_window.cpp" line="472"/>
         <source>YR von PC-Adresse lesen // Set SR(NZ) // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Read YR from PC-adress // Set SR(NZ) // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="324"/>
         <location filename="debugger_window.cpp" line="473"/>
         <source>YR von Adresse lesen // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read YR from adress // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="325"/>
         <location filename="debugger_window.cpp" line="474"/>
         <source>YR von Adresse lesen // Set SR(NZ) // if(idxReg&lt;Adresse Lo) MCT++</source>
-        <translation type="unfinished"></translation>
+        <translation>Read YR from adress // Set SR(NZ) // if(idxReg&lt;address Lo) MCT++</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="326"/>
         <location filename="debugger_window.cpp" line="475"/>
         <source>TMPByte von Adresse lesen // XR+1 // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from adress // XR+1 // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="327"/>
         <location filename="debugger_window.cpp" line="476"/>
         <source>TMPByte von Adresse lesen // YR+1 // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from adress //  YR+1 // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="328"/>
         <location filename="debugger_window.cpp" line="477"/>
         <source>TMPByte von Adresse lesen // XR-1 // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from adress // XR-1 // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="329"/>
         <location filename="debugger_window.cpp" line="478"/>
         <source>TMPByte von Adresse lesen // YR-1 // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from adress // YR-1 // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="330"/>
         <location filename="debugger_window.cpp" line="479"/>
         <source>Illegaler Opcode - wird noch nicht unterstützt // Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Illegal opcode - not supported yet // Reset</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="331"/>
         <location filename="debugger_window.cpp" line="480"/>
         <source>PC LO von Adresse lesen // Adresse+1 (Nur Low Wert)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read PC LO from address // Address+1 (only low value)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="332"/>
         <location filename="debugger_window.cpp" line="481"/>
         <source>PC HI von Adresse lesen</source>
-        <translation type="unfinished"></translation>
+        <translation>Read PC HI from address</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="333"/>
@@ -1272,169 +1272,169 @@ manually. Just for testing purposes.</translation>
         <location filename="debugger_window.cpp" line="335"/>
         <location filename="debugger_window.cpp" line="484"/>
         <source>TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC) // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from PC-address // AC - TMPByte ( is not changed) // Set SR(NZC) // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="336"/>
         <location filename="debugger_window.cpp" line="485"/>
         <source>TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from address // AC - TMPByte (AC is not changed) // Set SR(NZC)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="337"/>
         <location filename="debugger_window.cpp" line="486"/>
         <source>TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // if(idxReg&lt;Adresse Lo) MCT++</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from address // AC - TMPByte (AC is not changed) // if(idxReg&lt;Address Lo) MCT++</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="338"/>
         <location filename="debugger_window.cpp" line="487"/>
         <source>TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from PC-address // XR - TMPByte (XR is not changed) // Set SR(NZC) // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="339"/>
         <location filename="debugger_window.cpp" line="488"/>
         <source>TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from address // XR - TMPByte (XR is not changed) // Set SR(NZC)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="340"/>
         <location filename="debugger_window.cpp" line="489"/>
         <source>TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from PC-address // YR - TMPByte (XR is not changed) // Set SR(NZC) // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="341"/>
         <location filename="debugger_window.cpp" line="490"/>
         <source>TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from address // YR - TMPByte (XR is not changed) // Set SR(NZC)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="342"/>
         <location filename="debugger_window.cpp" line="491"/>
         <source>TMPByte von PC-Adresse lesen // AC XOR TMPByte // Set SR(NZC) // PC+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from PC-address // AC XOR TMPByte // Set SR(NZC) // PC+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="343"/>
         <location filename="debugger_window.cpp" line="492"/>
         <source>TMPByte von Adresse lesen // AC XOR TMPByte // Set SR(NZC)</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from address // AC XOR TMPByte // Set SR(NZC)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="344"/>
         <location filename="debugger_window.cpp" line="493"/>
         <source>TMPByte von Adresse lesen // AC XOR TMPByte // if(idxReg&lt;Adresse Lo) MCT++</source>
-        <translation type="unfinished"></translation>
+        <translation>Read TMPByte from address // AC XOR TMPByte // if(idxReg&lt;address Lo) MCT++</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="345"/>
         <location filename="debugger_window.cpp" line="494"/>
         <source>TMPByte von PC-Adresse holen // AC&gt;&gt;1 // Set SR(NZC)</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from PC-address // AC&gt;&gt;1 // Set SR(NZC)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="346"/>
         <location filename="debugger_window.cpp" line="495"/>
         <source>TMPByte nach Adresse schreiben // TMPByte&gt;&gt;1 // Set SR(NZC)</source>
-        <translation type="unfinished"></translation>
+        <translation>Write TMPByte to address // TMPByte&gt;&gt;1 // Set SR(NZC)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="347"/>
         <location filename="debugger_window.cpp" line="496"/>
         <source>TMPByte von PC-Adresse holen // C&lt;-AC&lt;&lt;1&lt;-C // Set SR(NZC)</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from PC-address // C&lt;-AC&lt;&lt;1&lt;-C // Set SR(NZC)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="348"/>
         <location filename="debugger_window.cpp" line="497"/>
         <source>TMPByte nach Adresse schreiben // C&lt;-TMPByte&lt;&lt;1&lt;-C // Set SR(NZC)</source>
-        <translation type="unfinished"></translation>
+        <translation>Write TMPByte to address //  C&lt;-TMPByte&lt;&lt;1&lt;-C // Set SR(NZC)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="349"/>
         <location filename="debugger_window.cpp" line="498"/>
         <source>TMPByte von PC-Adresse holen // C-&gt;AC&gt;&gt;1-&gt;C // Set SR(NZC)</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from PC-address //  C-&gt;AC&gt;&gt;1-&gt;C // Set SR(NZC)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="350"/>
         <location filename="debugger_window.cpp" line="499"/>
         <source>TMPByte nach Adresse schreiben // C-&gt;TMPByte&gt;&gt;1-&gt;C // Set SR(NZC)</source>
-        <translation type="unfinished"></translation>
+        <translation>Write TMPByte to address // C-&gt;TMPByte&gt;&gt;1-&gt;C // Set SR(NZC)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="351"/>
         <location filename="debugger_window.cpp" line="500"/>
         <source>TMPByte nach Adresse schreiben // TMPByte+1 // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Write TMPByte to address // TMPByte+1 // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="352"/>
         <location filename="debugger_window.cpp" line="501"/>
         <source>TMPByte nach Adresse schreiben // TMPByte-1 // Set SR(NZ)</source>
-        <translation type="unfinished"></translation>
+        <translation>Write TMPByte to address // TMPByte-1 // Set SR(NZ)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="353"/>
         <location filename="debugger_window.cpp" line="502"/>
         <source>SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag löschen</source>
-        <translation type="unfinished"></translation>
+        <translation>Write SR to 0x100+SP // SP-- // Set IFlag // delete BFlag</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="354"/>
         <location filename="debugger_window.cpp" line="503"/>
         <source>PC Lo von 0xFFFA holen</source>
-        <translation type="unfinished"></translation>
+        <translation>Get PC Lo from 0xFFFA</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="355"/>
         <location filename="debugger_window.cpp" line="504"/>
         <source>PC Hi von 0xFFFB holen</source>
-        <translation type="unfinished"></translation>
+        <translation>Get PC Hi from 0xFFFB</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="356"/>
         <location filename="debugger_window.cpp" line="505"/>
         <source>TMPByte von Adresse holen // Fix Adresse Hi MCT+1</source>
-        <translation type="unfinished"></translation>
+        <translation>Get TMPByte from address // Fix address Hi MCT+1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="357"/>
         <location filename="debugger_window.cpp" line="506"/>
         <source>TMPByte nach Adresse schreiben // Illegal [SLO]</source>
-        <translation type="unfinished"></translation>
+        <translation>Write TMPByte to address // Illegal [SLO]</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="358"/>
         <location filename="debugger_window.cpp" line="507"/>
         <source>TMPByte nach Adresse schreiben // Illegal [RLA]</source>
-        <translation type="unfinished"></translation>
+        <translation>Write TMPByte to address // Illegal [RLA]</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="359"/>
         <location filename="debugger_window.cpp" line="508"/>
         <source>TMPByte nach Adresse schreiben // Illegal [SRE]</source>
-        <translation type="unfinished"></translation>
+        <translation>Write TMPByte to address // Illegal [SRE]</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="360"/>
         <location filename="debugger_window.cpp" line="509"/>
         <source>TMPByte nach Adresse schreiben // Illegal [RRA]</source>
-        <translation type="unfinished"></translation>
+        <translation>Write TMPByte to address // Illegal [RRA]</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="361"/>
         <location filename="debugger_window.cpp" line="510"/>
         <source>TMPByte nach Adresse schreiben // Illegal [DCP]</source>
-        <translation type="unfinished"></translation>
+        <translation>Write TMPByte to address // Illegal [DCP]</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="362"/>
         <location filename="debugger_window.cpp" line="511"/>
         <source>TMPByte nach Adresse schreiben // Illegal [ISB]</source>
-        <translation type="unfinished"></translation>
+        <translation>Write TMPByte to address // Illegal [ISB]</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="363"/>
@@ -1442,13 +1442,13 @@ manually. Just for testing purposes.</translation>
         <location filename="debugger_window.cpp" line="512"/>
         <location filename="debugger_window.cpp" line="514"/>
         <source>AC von Adresse lesen // AC -&gt; XR // Set SR(NZ) // Illegal [LAX]</source>
-        <translation type="unfinished"></translation>
+        <translation>Read AC from address // AC -&gt; XR // Set SR(NZ) // Illegal [LAX]</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="364"/>
         <location filename="debugger_window.cpp" line="513"/>
         <source>AC von Adresse lesen // AC -&gt; XR // Set SR(NZ) // if(idxReg&lt;Adresse Lo) MCT++ // Illegal [LAX]</source>
-        <translation type="unfinished"></translation>
+        <translation>Read AC from address // AC -&gt; XR // Set SR(NZ) // if(idxReg&lt;address Lo) MCT++ // Illegal [LAX]</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="366"/>
@@ -1520,7 +1520,7 @@ manually. Just for testing purposes.</translation>
         <location filename="debugger_window.cpp" line="377"/>
         <location filename="debugger_window.cpp" line="526"/>
         <source>Illegal [LAE] // if(idxReg&lt;Adresse Lo) MCT++</source>
-        <translation></translation>
+        <translation>Illegal [LAE] // if(idxReg&lt;Address Lo) MCT++</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="709"/>
@@ -1627,52 +1627,52 @@ manually. Just for testing purposes.</translation>
     <message>
         <location filename="debugger_window.cpp" line="1737"/>
         <source>Wenn der Wert gleich dem Programm Counter (PC) ist.</source>
-        <translation type="unfinished"></translation>
+        <translation>If the value equals the program counter (PC).</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1738"/>
         <source>Wenn der Wert gleich dem Accu Register (AC) ist.</source>
-        <translation type="unfinished"></translation>
+        <translation>If the value equals the accu register (AC).</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1739"/>
         <source>Wenn der Wert gleich dem X Register (XR) ist.</source>
-        <translation type="unfinished"></translation>
+        <translation>If the value equals the X register (XR).</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1740"/>
         <source>Wenn der Wert gleich dem Y Register (YR) ist.</source>
-        <translation type="unfinished"></translation>
+        <translation>If the value equals the Y register (YR).</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1741"/>
         <source>Wenn ein Lesezugriff an dieser Adresse statt findet.</source>
-        <translation type="unfinished"></translation>
+        <translation>If there is a read operation happening at this address.</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1742"/>
         <source>Wenn ein Schreibzugriff an dieser Adresse statt findet.</source>
-        <translation type="unfinished"></translation>
+        <translation>If there is a write operation happening at this address.</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1743"/>
         <source>Wenn aus einer Adresse dieser Wert ausgelesen wird.</source>
-        <translation type="unfinished"></translation>
+        <translation>If this value is read from an address.</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1744"/>
         <source>Wenn in einer Adresse dieser Wert geschrieben wird.</source>
-        <translation type="unfinished"></translation>
+        <translation>If this value is written to an address.</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1747"/>
         <source>Wenn der Wert gleich der Aktuellen Rasterzeile ist.</source>
-        <translation type="unfinished"></translation>
+        <translation>If the value equals the current raster line.</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1748"/>
         <source>Wenn der Wert gleich dem Aktuellen Zyklus in einer Rasterzeile ist.</source>
-        <translation type="unfinished"></translation>
+        <translation>If the value equals the current cycle of the raster line.</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1764"/>
@@ -1713,26 +1713,26 @@ manually. Just for testing purposes.</translation>
     <message>
         <location filename="debugger_window.cpp" line="2154"/>
         <source>Haltepunkte laden...</source>
-        <translation>Load Breakpoints...</translation>
+        <translation>Load breakpoints...</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="2154"/>
         <location filename="debugger_window.cpp" line="2238"/>
         <source>Es werden alle Haltepunkte gelöscht !
 Möchten Sie fortfahren?</source>
-        <translation>delete all breakpoints!
+        <translation>This deletes all breakpoints!
 Do you want to continue?</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="2162"/>
         <source>Haltepunkte öffnen</source>
-        <translation>Open Breakpoints</translation>
+        <translation>Open breakpoints</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="2162"/>
         <location filename="debugger_window.cpp" line="2218"/>
         <source>Emu64 Haltepunkt Datei </source>
-        <translation>Emu64 Breakpoint file </translation>
+        <translation>Emu64 breakpoint file </translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="2174"/>
@@ -1751,7 +1751,7 @@ Do you want to continue?</translation>
     <message>
         <location filename="debugger_window.cpp" line="2177"/>
         <source>Es handelt sich nicht um eine Emu64 Datei.</source>
-        <translation>This is no Emu64 File.</translation>
+        <translation>This is no Emu64 file.</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="2180"/>
@@ -1771,12 +1771,12 @@ Do you want to continue?</translation>
     <message>
         <location filename="debugger_window.cpp" line="2263"/>
         <source>Es wurde kein gültiges Zahlenformat benutzt ! [Export Von:]</source>
-        <translation>Illegal Numberformat used ! [Export from:]</translation>
+        <translation>Illegal numberformat used ! [Export from:]</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="2273"/>
         <source>Es wurde kein gültiges Zahlenformat benutzt ! [Export Bis:]</source>
-        <translation>Illegal Numberformat used ! [Export to:]</translation>
+        <translation>Illegal numberformat used ! [Export to:]</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="2280"/>
@@ -1791,7 +1791,7 @@ Do you want to continue?</translation>
     <message>
         <location filename="debugger_window.cpp" line="2286"/>
         <source>Disassembler Listing</source>
-        <translation>Disassembler Listing</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="2286"/>
@@ -1801,12 +1801,12 @@ Do you want to continue?</translation>
     <message>
         <location filename="debugger_window.cpp" line="2295"/>
         <source>Fehler beim speichern der Disassembler Datei.</source>
-        <translation>Error saving the Disassembler File.</translation>
+        <translation>Error saving the disassembler File.</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="2302"/>
         <source>Floppy RAM geht nur von $0000 - $07FF (2KB).</source>
-        <translation>Floppy RAM range only reaches from $0000 - $07ff (2KB).</translation>
+        <translation>Floppy RAM range only reaches from $0000 - $07FF (2KB).</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="2306"/>
@@ -1816,7 +1816,7 @@ Do you want to continue?</translation>
     <message>
         <location filename="debugger_window.cpp" line="2330"/>
         <source>CPU 6502 Register</source>
-        <translation>CPU 6502 Register</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="2339"/>
@@ -1826,7 +1826,7 @@ Do you want to continue?</translation>
     <message>
         <location filename="debugger_window.cpp" line="2438"/>
         <source>CPU 6510 Register</source>
-        <translation>CPU 6510 Register</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="2447"/>
