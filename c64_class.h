@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.02.2013                //
+// Letzte Änderung am 23.03.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -41,6 +41,8 @@ using namespace std::tr1::placeholders;
 #define MAX_JOYSTICKS 16
 #define MAX_VJOYS 16
 
+#define SUBDIVS_SCREEN 10            // Für Screenverzerrungen (Kissen etc.)
+
 class C64Class
 {
 
@@ -60,6 +62,7 @@ public:
     unsigned char* GetRAMPointer(unsigned short adresse);
     void SetGrafikModi(bool colbits32, bool doublesize,bool enable_pal,bool filter_enable, int fullres_xw = 0, int fullres_yw = 0);
     void SetC64Speed(int speed);
+    void SetDistortion(float value);
 
     void SoftReset(void);
     void HardReset(void);
@@ -123,6 +126,13 @@ public:
     unsigned char   *C64ScreenBuffer;
     bool            DrawScreenBack;
     bool            OpenGLEnable;
+    bool            DistortionEnable;
+    float           Distortion;
+
+    /// Distortion (Verzzerung) ///
+    POINT_STRUCT    DistortionGridPoints[(SUBDIVS_SCREEN+1)*(SUBDIVS_SCREEN+1)];
+    POINT_STRUCT    DistortionGrid[(SUBDIVS_SCREEN)*(SUBDIVS_SCREEN)*4];
+    POINT_STRUCT    DistortionGridTex[(SUBDIVS_SCREEN)*(SUBDIVS_SCREEN)*4];
 
     int				FrameSkip;
     int				FrameSkipCounter;
@@ -188,6 +198,7 @@ public:
     char ScreenshotFilename[1024];
 
 private:
+    void CalcDistortionGrid();
     void VicRefresh(unsigned char *vic_puffer);
     void CheckKeys(void);
     int DisAss(FILE *file, int pc, bool line_draw, int source);

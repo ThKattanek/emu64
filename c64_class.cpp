@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.02.2013                //
+// Letzte Änderung am 23.03.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -59,6 +59,8 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     FrameSkipCounter=1;
 
     OpenGLEnable = OpenGLOn;
+    DistortionEnable = true;
+    SetDistortion(-0.05);
 
     /// SDL Installieren ///
 
@@ -1034,19 +1036,44 @@ int SDLThread(void *userdat)
 
                     /// OpenGL Version ///
 
-                    glBindTexture(GL_TEXTURE_2D,C64ScreenTexture);
-                    glTexSubImage2D(GL_TEXTURE_2D,0,0,0, c64->AktC64ScreenXW, c64->AktC64ScreenYW,GL_BGRA, GL_UNSIGNED_BYTE, c64->C64ScreenBuffer);
+                    if(!c64->DistortionEnable)
+                    {
+                        glBindTexture(GL_TEXTURE_2D,C64ScreenTexture);
+                        glTexSubImage2D(GL_TEXTURE_2D,0,0,0, c64->AktC64ScreenXW, c64->AktC64ScreenYW,GL_BGRA, GL_UNSIGNED_BYTE, c64->C64ScreenBuffer);
 
-                    glBegin(GL_QUADS);
-                    glTexCoord2i(0,1);
-                    glVertex3f(-1,-1,0.0);
-                    glTexCoord2i(1,1);
-                    glVertex3f(1,-1,0);
-                    glTexCoord2i(1,0);
-                    glVertex3f(1,1,0);
-                    glTexCoord2i(0,0);
-                    glVertex3f(-1,1,0);
-                    glEnd();
+                        glBegin(GL_QUADS);
+                        glTexCoord2i(0,1);
+                        glVertex3f(-1,-1,0.0);
+                        glTexCoord2i(1,1);
+                        glVertex3f(1,-1,0);
+                        glTexCoord2i(1,0);
+                        glVertex3f(1,1,0);
+                        glTexCoord2i(0,0);
+                        glVertex3f(-1,1,0);
+                        glEnd();
+                    }
+                    else
+                    {
+                        //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+
+                        glBindTexture(GL_TEXTURE_2D,C64ScreenTexture);
+                        glTexSubImage2D(GL_TEXTURE_2D,0,0,0, c64->AktC64ScreenXW, c64->AktC64ScreenYW,GL_BGRA, GL_UNSIGNED_BYTE, c64->C64ScreenBuffer);
+
+                        glBegin(GL_QUADS);
+                        for(int i=0; i < SUBDIVS_SCREEN*SUBDIVS_SCREEN; i++)
+                        {
+                            glTexCoord2f(c64->DistortionGridTex[i*4+0].x,c64->DistortionGridTex[i*4+0].y);
+                            glVertex3f(c64->DistortionGrid[i*4+0].x,c64->DistortionGrid[i*4+0].y,0.0);
+                            glTexCoord2f(c64->DistortionGridTex[i*4+1].x,c64->DistortionGridTex[i*4+1].y);
+                            glVertex3f(c64->DistortionGrid[i*4+1].x,c64->DistortionGrid[i*4+1].y,0.0);
+                            glTexCoord2f(c64->DistortionGridTex[i*4+2].x,c64->DistortionGridTex[i*4+2].y);
+                            glVertex3f(c64->DistortionGrid[i*4+2].x,c64->DistortionGrid[i*4+2].y,0.0);
+                            glTexCoord2f(c64->DistortionGridTex[i*4+3].x,c64->DistortionGridTex[i*4+3].y);
+                            glVertex3f(c64->DistortionGrid[i*4+3].x,c64->DistortionGrid[i*4+3].y,0.0);
+                        }
+                        glEnd();
+                    }
+
 
                     /// Die Pfeile werden nur beim lernen angezeigt ///
                     if(c64->RecJoyMapping)
@@ -1201,6 +1228,41 @@ int SDLThread(void *userdat)
     SDL_Quit();
 
     return 0;
+}
+
+void C64Class::CalcDistortionGrid()
+{
+    float div = 2.0f / SUBDIVS_SCREEN;
+    for(int y=0; y<SUBDIVS_SCREEN+1; y++)
+        for(int x=0; x<SUBDIVS_SCREEN+1; x++)
+        {
+            float X = x*div-1.0f;
+            float Y = y*div-1.0f;
+            DistortionGridPoints[y*(SUBDIVS_SCREEN+1)+x].y = X*X*(Distortion*Y)+Y;
+            DistortionGridPoints[y*(SUBDIVS_SCREEN+1)+x].x = Y*Y*(Distortion*X)+X;
+        }
+
+    div = 1.0f / SUBDIVS_SCREEN;
+    for(int y=0; y<SUBDIVS_SCREEN; y++)
+        for(int x=0; x<SUBDIVS_SCREEN; x++)
+        {
+            DistortionGrid[y*SUBDIVS_SCREEN*4+x*4+0] = DistortionGridPoints[(y)*(SUBDIVS_SCREEN+1)+x];
+            DistortionGrid[y*SUBDIVS_SCREEN*4+x*4+1] = DistortionGridPoints[(y)*(SUBDIVS_SCREEN+1)+x+1];
+            DistortionGrid[y*SUBDIVS_SCREEN*4+x*4+2] = DistortionGridPoints[(y+1)*(SUBDIVS_SCREEN+1)+x+1];
+            DistortionGrid[y*SUBDIVS_SCREEN*4+x*4+3] = DistortionGridPoints[(y+1)*(SUBDIVS_SCREEN+1)+x];
+
+            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+0].x = x*div;
+            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+0].y = (y+1)*div;
+
+            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+1].x = (x+1)*div;
+            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+1].y = (y+1)*div;
+
+            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+2].x = (x+1)*div;
+            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+2].y = (y)*div;
+
+            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+3].x = x*div;
+            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+3].y = y*div;
+        }
 }
 
 void C64Class::VicRefresh(unsigned char *vic_puffer)
@@ -1645,10 +1707,18 @@ void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool pal_enable,boo
     LogText(str00);
 }
 
+void C64Class::SetDistortion(float value)
+{
+    Distortion = value;
+    CalcDistortionGrid();
+}
+
 void C64Class::SetC64Speed(int speed)
 {
     sid1->SetC64Zyklen(985248.f*(float)speed/100.f);
 }
+
+
 
 int SDLThreadLoad(void *userdat)
 {

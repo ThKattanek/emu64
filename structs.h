@@ -331,4 +331,10 @@ struct VIRTUAL_JOY_STRUCT
     unsigned char AxisValue[5];             // 0 = Plus Richtung // 1 = Minus Richtung
 };
 
+struct POINT_STRUCT
+{
+    float x;
+    float y;
+};
+
 #endif // STRUCTS_H
