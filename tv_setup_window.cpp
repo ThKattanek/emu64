@@ -1,28 +1,29 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: tv_setup_window.cpp                   //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 28.08.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 23.03.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include "tv_setup_window.h"
 #include "ui_tv_setup_window.h"
 
-TVSetupWindow::TVSetupWindow(QWidget *parent, VideoPalClass *_videopal, QSettings *_ini) :
+TVSetupWindow::TVSetupWindow(QWidget *parent, C64Class *_c64, VideoPalClass *_videopal, QSettings *_ini) :
     QDialog(parent),
     ui(new Ui::TVSetupWindow),
     isOneShowed(false)
 {
     ini = _ini;
     ui->setupUi(this);
+    c64 = _c64;
     videopal = _videopal;
 
     ////////// Load from INI ///////////
@@ -52,6 +53,11 @@ TVSetupWindow::TVSetupWindow(QWidget *parent, VideoPalClass *_videopal, QSetting
         value = ini->value("Scanline",85).toInt();
         ui->scanline_scroll->setValue(value);
         if(ui->scanline_scroll->value() == value) on_scanline_scroll_valueChanged(value);
+
+        value = ini->value("Distortion",80).toInt();
+        ui->distortion_scroll->setValue(value);
+        if(ui->distortion_scroll->value() == value) on_distortion_scroll_valueChanged(value);
+
         ini->endGroup();
     }
     ////////////////////////////////////
@@ -72,6 +78,7 @@ TVSetupWindow::~TVSetupWindow()
         ini->setValue("HorBlurUV",ui->horblurUV_scroll->value());
         ini->setValue("PhaseLineOffset",ui->phase_scroll->value());
         ini->setValue("Scanline",ui->scanline_scroll->value());
+        ini->setValue("Distortion",ui->distortion_scroll->value());
         ini->endGroup();
     }
     ///////////////////////////////
@@ -137,6 +144,12 @@ void TVSetupWindow::on_scanline_scroll_valueChanged(int value)
     ui->scanline_out->setText((QVariant(value).toString() + " %"));
     videopal->SetScanline(value);
     videopal->UpdateParameter();
+}
+
+void TVSetupWindow::on_distortion_scroll_valueChanged(int value)
+{
+    ui->distortion_out->setText(QVariant(value-100).toString());
+    c64->SetDistortion((0.01f*(value-100))*MAX_DISTORTION);
 }
 
 void TVSetupWindow::on_Reset_clicked()

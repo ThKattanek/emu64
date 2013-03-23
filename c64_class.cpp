@@ -1036,8 +1036,13 @@ int SDLThread(void *userdat)
 
                     /// OpenGL Version ///
 
+                    glClearColor( 0.0, 0.0, 0.0, 0.0 ); // Farbe zum Löschen setzen
+                    glClear( GL_COLOR_BUFFER_BIT );     // Aktuellen Bildpuffer löschen
+
                     if(!c64->DistortionEnable)
                     {
+
+
                         glBindTexture(GL_TEXTURE_2D,C64ScreenTexture);
                         glTexSubImage2D(GL_TEXTURE_2D,0,0,0, c64->AktC64ScreenXW, c64->AktC64ScreenYW,GL_BGRA, GL_UNSIGNED_BYTE, c64->C64ScreenBuffer);
 

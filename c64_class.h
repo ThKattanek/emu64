@@ -41,7 +41,7 @@ using namespace std::tr1::placeholders;
 #define MAX_JOYSTICKS 16
 #define MAX_VJOYS 16
 
-#define SUBDIVS_SCREEN 10            // Für Screenverzerrungen (Kissen etc.)
+#define SUBDIVS_SCREEN 30            // Für Screenverzerrungen (Kissen etc.)
 
 class C64Class
 {

@@ -168,6 +168,16 @@ void MainWindow::OnInit()
     videopal = new VideoPalClass();
     LogText(tr(">> VideoPal Klasse wurde installiert\n").toLatin1().data());
 
+    /// C64 Klasse Installieren ... Das HERZ ///
+    splash->showStatusMessage(tr("C64 Klasse wird initialisiert."),Qt::darkBlue);
+    int ret_error;
+    c64 = new C64Class(&ret_error,videopal,true,bind(&MainWindow::LogText,this,_1),QString(appPath + "/gfx/").toLatin1().data());
+    if(ret_error != 0)
+    {
+        ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim Installieren der C64 Klasse"))
+        this->close();
+    }
+
     /// Window Klassen erstellen ///
     /// Unter MAC sollte ohne übergabe des this Zeigers die Klasseb erstellt werden
 
@@ -176,7 +186,7 @@ void MainWindow::OnInit()
     LogText(tr(">> InfoWindow wurde erzeugt\n").toLatin1().data());
 
     splash->showStatusMessage(tr("TVSetupWindow wird erstellt."),Qt::darkBlue);
-    tv_setup_window = new TVSetupWindow(this,videopal,ini);
+    tv_setup_window = new TVSetupWindow(this,c64,videopal,ini);
     LogText(tr(">> TVSetupWindow wurde erzeugt\n").toLatin1().data());
 
     splash->showStatusMessage(tr("FloppyWindow wird erstellt."),Qt::darkBlue);
@@ -208,15 +218,7 @@ void MainWindow::OnInit()
     ScreenshotNumber = (int)ini->value("ScreenshotCounter",0).toInt();
     ini->endGroup();
 
-    /// C64 Klasse Installieren ... Das HERZ ///
-    splash->showStatusMessage(tr("C64 Klasse wird initialisiert."),Qt::darkBlue);
-    int ret_error;
-    c64 = new C64Class(&ret_error,videopal,true,bind(&MainWindow::LogText,this,_1),QString(appPath + "/gfx/").toLatin1().data());
-    if(ret_error != 0)
-    {
-        ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim Installieren der C64 Klasse"))
-        this->close();
-    }
+
 
     splash->showStatusMessage(tr("SetupWindow wird mit INI abgeglichen."),Qt::darkBlue);
     setup_window->ReSetup();
