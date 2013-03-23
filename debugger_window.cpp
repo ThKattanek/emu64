@@ -31,6 +31,8 @@ DebuggerWindow::DebuggerWindow(QWidget *parent, QSettings *_ini) :
     ini = _ini;
     c64 = 0;
 
+    AktSource = 0;
+
     FillMicroCodeStringTable();
 
     TableBackColor = QColor(255,255,255);
@@ -2322,7 +2324,6 @@ void DebuggerWindow::RefreshGUI(void)
     if(AktSource > 0)
     {
         /// Floppy's ///
-
         FloppyCpuReg[AktFloppyNr].REG_MASK = REG_MASK_ALL;
         c64->floppy[AktFloppyNr]->GetCpuReg(&FloppyCpuReg[AktFloppyNr],&FloppyCpuIReg[AktFloppyNr]);
 
@@ -2374,6 +2375,7 @@ void DebuggerWindow::RefreshGUI(void)
 
             /// Alle Haltepunke ins TreeWidget einfügen ///
             FillDisassemblerList(FloppyCpuIReg[AktFloppyNr].AktOpcodePC,false);
+
         }
         else
         {
