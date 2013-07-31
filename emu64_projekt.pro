@@ -51,7 +51,9 @@ SOURCES += \
     single_application.cpp \
     button_mod.cpp \
     custom_splashscreen.cpp \
-    c64_speed_window.cpp
+    c64_speed_window.cpp \
+    hiddata.c \
+    c64keys2usb.cpp
 
 HEADERS  += \
     version.h \
@@ -102,7 +104,10 @@ HEADERS  += \
     single_application.h \
     button_mod.h \
     custom_splashscreen.h \
-    c64_speed_window.h
+    c64_speed_window.h \
+    hidsdi.h \
+    hiddata.h \
+    c64keys2usb.h
 
 FORMS    += \
     info_window.ui \
@@ -130,27 +135,27 @@ RESOURCES += \
 linux-g++-64{
 TARGET = emu64
 DESTDIR = "bin/linux_x86_64"
-LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU
+LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU -lusb
 }
 
 linux-g++-32{
 TARGET = emu64
 DESTDIR = "bin/linux_i686"
-LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU
+LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU -lusb
 }
 
 win32-g++-cross{
 TARGET = emu64
 RC_FILE = emu64.rc
 DESTDIR = "bin/win_x32"
-LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image
+LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image -lusb
 }
 
 win64-g++-cross{
 TARGET = emu64
 RC_FILE = emu64.rc
 DESTDIR = "bin/win_x64"
-LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image
+LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image -lusb
 }
 
 OTHER_FILES += \

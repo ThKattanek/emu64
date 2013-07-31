@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: widget_file_browse.cpp                //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 28.08.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 18.07.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include <QDebug>
@@ -115,10 +115,15 @@ void WidgetFileBrowse::SetAktDir(QString akt_dir)
 {
     if(akt_dir == "") return;
 
-    QModelIndex idx = dirmodel->index(akt_dir);
+    //QModelIndex idx = dirmodel->index(akt_dir);
+    QModelIndex idx = dirmodel->index("/user/");
 
-    ui->treeView_dir->setCurrentIndex(dirmodel->index(akt_dir));
-    ui->listView_files->setRootIndex(filemodel->setRootPath(akt_dir));
+    //ui->treeView_dir->setCurrentIndex(dirmodel->index(akt_dir));
+    //ui->listView_files->setRootIndex(filemodel->setRootPath(akt_dir));
+
+    ui->treeView_dir->setCurrentIndex(dirmodel->index("/user/"));
+    ui->listView_files->setRootIndex(filemodel->setRootPath("/user/"));
+
     ui->treeView_dir->scrollTo(ui->treeView_dir->currentIndex(),QAbstractItemView::PositionAtCenter);
 }
 
