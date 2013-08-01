@@ -1,3 +1,12 @@
+/* Name: c64keys2usb.cpp
+ * Projekt: c64keys2usb
+ * Author: Thorsten Kattanek
+ * Erstellt am: 30.07.2013
+ * Copyright: Thorsten Kattanek
+ * Vesrion: 0.1
+ * License: GNU GPL v2 (see License.txt), GNU GPL v3 or proprietary (CommercialLicense.txt)
+ */
+
 #include "c64keys2usb.h"
 
 C64Keys2USB::C64Keys2USB()
@@ -77,7 +86,7 @@ void C64Keys2USB::Update()
 {
     if(!readKeys())
     {
-        for(uint8_t i=0;i<10;i++)
+        for(uint8_t i=0;i<16;i++)
         {
             KeyBuffer[i] = 0x00;
         }

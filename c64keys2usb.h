@@ -1,3 +1,12 @@
+/* Name: c64keys2usb.h
+ * Projekt: c64keys2usb
+ * Author: Thorsten Kattanek
+ * Erstellt am: 30.07.2013
+ * Copyright: Thorsten Kattanek
+ * Vesrion: 0.1
+ * License: GNU GPL v2 (see License.txt), GNU GPL v3 or proprietary (CommercialLicense.txt)
+ */
+
 #ifndef C64KEYS2USB_H
 #define C64KEYS2USB_H
 
@@ -30,7 +39,7 @@ private:
     char *usbErrorMessage(int errCode);
     bool readKeys();
     bool isUSBOpen;
-    uint8_t KeyBuffer[11];
+    uint8_t KeyBuffer[17];  // Puffergröße + 1 [0] enthält normalerweise die Report ID (Beim auswerten berücksichtigen)
 };
 
 #endif // C64KEYS2USB_H
