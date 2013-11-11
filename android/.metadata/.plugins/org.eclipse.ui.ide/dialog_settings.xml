@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="ResourceNavigator">
+		<item value="Aggregate for window 1381053198608" key="ResourceWorkingSetFilter.STORE_WORKING_SET"/>
+		<item value="1" key="ResourceViewer.STORE_SORT_TYPE"/>
+	</section>
+	<section name="CleanDialogSettings">
+		<item value="490" key="DIALOG_WIDTH"/>
+		<item value="260" key="DIALOG_Y_ORIGIN"/>
+		<item value="372" key="DIALOG_HEIGHT"/>
+		<item value="1673" key="DIALOG_X_ORIGIN"/>
+		<item value="false" key="TOGGLE_SELECTED"/>
+	</section>
+</section>

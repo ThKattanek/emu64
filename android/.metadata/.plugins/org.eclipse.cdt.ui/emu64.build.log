@@ -1,0 +1,7 @@
+10:45:06 **** Incremental Build of configuration Default for project emu64 ****
+/mnt/Daten3/Programme/android_dev/android-ndk-r9/ndk-build all 
+Android NDK: WARNING: APP_PLATFORM android-18 is larger than android:minSdkVersion 9 in ./AndroidManifest.xml    
+Install        : libemu64.so => libs/armeabi/libemu64.so
+
+10:45:06 Build Finished (took 61ms)
+

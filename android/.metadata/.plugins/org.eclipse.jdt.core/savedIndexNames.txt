@@ -1,0 +1,3 @@
+INDEX VERSION 1.126+/home/thorsten/Programmierung/Projekte/Emu64_Projekt/emu64/android/.metadata/.plugins/org.eclipse.jdt.core
+3972925348.index
+1848132769.index
