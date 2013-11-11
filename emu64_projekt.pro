@@ -107,7 +107,8 @@ HEADERS  += \
     c64_speed_window.h \
     hidsdi.h \
     hiddata.h \
-    c64keys2usb.h
+    c64keys2usb.h \
+    firmware/usbconfig.h
 
 FORMS    += \
     info_window.ui \

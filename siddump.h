@@ -5,10 +5,10 @@
 //                                              //
 // #file: siddump.h                             //
 //						//
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschï¿½tzt!   //
 // Geistiges Eigentum von Th.Kattanek		//
 //						//
-// Letzte Änderung am 12.04.2011		//
+// Letzte ï¿½nderung am 12.04.2011		//
 // www.emu64.de					//
 //						//
 //////////////////////////////////////////////////
