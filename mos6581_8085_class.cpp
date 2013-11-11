@@ -54,8 +54,10 @@ MOS6581_8085::MOS6581_8085(int nummer,int samplerate,int puffersize,int *error)
 
     this->CycleExact=false;
 
+#ifndef ANDROID
     IoDump = new SIDDumpClass(IO);
     IoDump->WriteReg = &WriteReg;
+#endif
 
     Zyklencounter = 0;
     SoundBufferPos = 0;
@@ -80,7 +82,9 @@ MOS6581_8085::~MOS6581_8085()
     delete SoundBufferV0;
     delete SoundBufferV1;
     delete SoundBufferV2;
+#ifndef ANDROID
     delete IoDump;
+#endif
     delete Voice[2];
     delete Voice[1];
     delete Voice[0];
@@ -210,6 +214,7 @@ bool MOS6581_8085::OneZyklus(void)
         ret = true;
     }
 
+#ifndef ANDROID
     ///////// IO DUMP //////////
     ////////////////////////////
 
@@ -217,6 +222,7 @@ bool MOS6581_8085::OneZyklus(void)
     IoDump->CycleTickCapture();
     // Playing
     if(IoDump->CycleTickPlay())WriteIO(IoDump->RegOut,IoDump->RegWertOut);
+#endif
 
     //////// RECORD ////////
     if(Recording)
@@ -228,6 +234,7 @@ bool MOS6581_8085::OneZyklus(void)
     return ret;
 }
 
+#ifndef ANDROID
 bool MOS6581_8085::SaveFreez(FILE* File)
 {
     fwrite(IO,1,32,File);
@@ -247,6 +254,7 @@ bool MOS6581_8085::LoadFreez(FILE *File,unsigned short Version)
     }
     return true;
 }
+#endif
 
 unsigned char MOS6581_8085::ReadIO(unsigned short adresse)
 {

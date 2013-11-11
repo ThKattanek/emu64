@@ -38,10 +38,8 @@ static SLAndroidSimpleBufferQueueItf bqPlayerBufferQueue;
 static SLMuteSoloItf bqPlayerMuteSolo;
 static SLVolumeItf bqPlayerVolume;
 
-#define BUFFER_SIZE 882*2	// 2* wegen Stereo --> 50 mal in der SEK wird Callback aufgerufen
-
 // Double buffering.
-static short buffer[2][BUFFER_SIZE];
+static short buffer[2][SOUND_BUFFER_SIZE];
 static int curBuffer = 0;
 
 static AndroidAudioCallback audioCallback;
@@ -68,7 +66,7 @@ static void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
   curBuffer ^= 1;  // Switch buffer
   // Render to the fresh buffer
-  audioCallback(buffer[curBuffer], BUFFER_SIZE);
+  audioCallback(buffer[curBuffer], SOUND_BUFFER_SIZE);
 }
 
 // create the engine and output mix objects
@@ -129,7 +127,7 @@ bool OpenSLWrap_Init(AndroidAudioCallback cb)
 
   // Render and enqueue a first buffer. (or should we just play the buffer empty?)
   curBuffer = 0;
-  audioCallback(buffer[curBuffer], BUFFER_SIZE);
+  audioCallback(buffer[curBuffer], SOUND_BUFFER_SIZE);
 
   result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, buffer[curBuffer], sizeof(buffer[curBuffer]));
   if (SL_RESULT_SUCCESS != result) {

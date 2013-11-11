@@ -40,8 +40,10 @@ private:
 
 ///// Variable /////
 private:
+
     FILE* CaptureFile;
     FILE* PlayFile;
+
     bool  CaptureEnable;
     bool  PlayEnable;
     bool  DumpIsLoaded;

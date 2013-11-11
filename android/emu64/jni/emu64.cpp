@@ -3,16 +3,16 @@
 #include <GLES/glext.h>
 #include <android/log.h>
 
-
 #define  LOG_TAG    "NATIVE"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-#define printf(...) __android_log_print(ANDROID_LOG_DEBUG, "TAG", __VA_ARGS__);
+#define printf(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__);
 
 #include "asset_texture_class.h"
 #include "text_box_class.h"
 #include "dsp.h"
+#include "c64_class.h"
 
 /// Globale Variablen
 JavaVM *vm;
@@ -29,15 +29,12 @@ extern "C"
 
 unsigned short sample = 0;
 
+/// C64 Klasse
+C64Class *c64;
+
 void SoundCallback(short *buffer, int num_samples)
 {
-	printf("%d",num_samples);
-
-	for(int i=0;i<(num_samples/2);i++)
-	{
-		buffer[i*2] = sample;
-		buffer[i*2+1] = sample+=500;
-	}
+	c64->FillAudioBuffer(buffer,num_samples);
 }
 
 JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Init(JNIEnv*, jobject)
@@ -58,9 +55,15 @@ JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Init(JNIEnv*, jobject
     textBox01->SetPos(-1.0f,-1.0f);
     text_buffer = textBox01->GetTextBuffer();
 
-    textBox01->SetText(0,0,"Sound Test by Thorsten Kattanek");
+    textBox01->SetText(0,0,"Emu64 by Thorsten Kattanek");
 
+    int err;
+    c64 = new C64Class();
+    LOGD("C64 Klasse wurde ertsellt.");
+
+    /// Sound starten und somit auch die C64 Emulation
     OpenSLWrap_Init(SoundCallback);
+    LOGD("C64 Emulation wurde gestartet.");
 }
 
 JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Resize(JNIEnv*, jobject, jint xw, jint yw)
@@ -92,6 +95,13 @@ JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Destroy(JNIEnv*, jobj
 	LOGD("Destroy...");
 
 	OpenSLWrap_Shutdown();
+
+	if(c64 != NULL)
+	{
+		delete c64;
+		c64 = NULL;
+	}
+
 	if(textBox01 != NULL) delete textBox01;
 	if(texture != NULL) delete texture;
 }
