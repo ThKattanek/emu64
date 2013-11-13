@@ -64,11 +64,9 @@ JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Init(JNIEnv*, jobject
     int err;
     c64 = new C64Class(SOUND_BUFFER_SIZE/2);
     c64->sd_ext_path = sd_ext_path;
-    LOGD("C64 Klasse wurde ertsellt.");
 
     /// Sound starten und somit auch die C64 Emulation
     OpenSLWrap_Init(SoundCallback);
-    LOGD("C64 Emulation wurde gestartet.");
 }
 
 JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Resize(JNIEnv*, jobject, jint xw, jint yw)

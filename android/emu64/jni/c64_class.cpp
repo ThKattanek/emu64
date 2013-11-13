@@ -1,9 +1,17 @@
-/*
- * c64_class.cpp
- *
- *  Created on: 11.11.2013
- *      Author: thorsten
- */
+//////////////////////////////////////////////////
+//                                              //
+// Emu64                                        //
+// von Thorsten Kattanek                        //
+//                                              //
+// #file: c64_class.h                           //
+// ANDROID PORT                                 //
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 01.08.2013                //
+// www.emu64.de                                 //
+//                                              //
+//////////////////////////////////////////////////
 
 #include <c64_class.h>
 #include <stddef.h>
@@ -14,20 +22,63 @@
 
 C64Class::C64Class(int SoundBufferSize)
 {
-	int ret_error;
+	LOGD(">> C64 Klasse wird gestratet...");
 
-	counter = 0;
 
+    VPort1 = 0;
+    VPort2 = 1;
+
+    GamePort1 = 0;
+    GamePort2 = 0;
+
+    int ret_error;
+
+    /// Init Classes ///
+    mmu = new MMU();
+    cpu = new MOS6510();
+    vic = new VICII();
     sid1 = new MOS6581_8085(0,44100,SoundBufferSize,&ret_error);
-    sid1->RESET = &RESET;
+    sid2 = new MOS6581_8085(1,44100,SoundBufferSize,&ret_error);
+    cia1 = new MOS6526(0);
+    cia2 = new MOS6526(1);
+    crt = new CRTClass();
 
-    sid1->RESET = &RESET;
-    sid1->SetC64Zyklen(985248);
-    sid1->SetChipType(MOS_8580);
-    sid1->SoundOutputEnable = true;
-    sid1->CycleExact = false;
-    sid1->FilterOn = false;
-    sid1->Reset();
+    cia2->FloppyIEC = &FloppyIEC;
+    cia2->C64IEC = &C64IEC;
+
+    /// Floppy mit C64 verbinden ///
+
+    for(int i=0;i<FloppyAnzahl;i++)
+    {
+        floppy[i] = new Floppy1541(&RESET,44100,SoundBufferSize,NULL);
+        floppy[i]->SetResetReady(&FloppyResetReady[i],0xEBFF);
+        floppy[i]->SetC64IEC(&C64IEC);
+        floppy[i]->SetDeviceNummer(8+i);
+        floppy[i]->LoadDosRom((char*)"roms/1541.rom");
+        floppy[i]->LoadFloppySounds((char*)"floppy_sounds/motor.raw",(char*)"floppy_sounds/motor_on.raw",(char*)"floppy_sounds/motor_off.raw",(char*)"floppy_sounds/anschlag.raw",(char*)"floppy_sounds/stepper_inc.raw",(char*)"floppy_sounds/stepper_dec.raw");
+        floppy[i]->SetEnableFloppy(false);
+        floppy[i]->SetEnableFloppySound(true);
+    }
+
+    /// Init Vars ///
+    C64HistoryPointer = 0;
+    IOSource = 0;
+    ComandZeileSize = 0;
+    ComandZeileCount = 0;
+    ComandZeileStatus = false;
+    ComandZeileCountS = false;
+    DebugMode = OneZyk = OneOpc = false;
+    CycleCounter = 0;
+    DebugAnimation = false;
+    AnimationRefreshProc = NULL;
+    AnimationSpeedAdd = (double)SoundBufferSize/(double)44100;
+    AnimationSpeedCounter = 0;
+
+    for(int i=0;i<8;i++)
+    {
+        KeyboardMatrixToPAExt[i] = KeyboardMatrixToPA[i] = 0;
+        KeyboardMatrixToPBExt[i] = KeyboardMatrixToPB[i] = 0;
+    }
 
     RESET = true;
 }
