@@ -9,7 +9,10 @@ LOCAL_SRC_FILES += text_box_class.cpp
 LOCAL_SRC_FILES += dsp.cpp
 LOCAL_SRC_FILES += c64_class.cpp
 
+LOCAL_SRC_FILES += ../../../mmu_class.cpp
+LOCAL_SRC_FILES += ../../../mos6510_class.cpp
 LOCAL_SRC_FILES += ../../../mos6581_8085_class.cpp
+LOCAL_SRC_FILES += ../../../siddump.cpp
 
 LOCAL_LDLIBS := -llog -landroid -lGLESv1_CM -lOpenSLES
 

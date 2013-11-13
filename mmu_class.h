@@ -19,7 +19,7 @@
 #include "structs.h"
 #include "mos6510_class.h"
 
-#include "tr1/functional"
+#include <tr1/functional>
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
 

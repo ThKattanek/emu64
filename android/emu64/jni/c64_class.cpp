@@ -8,11 +8,17 @@
 #include <c64_class.h>
 #include <stddef.h>
 
-C64Class::C64Class()
+#include <android/log.h>
+#define  LOG_TAG    "NATIVE"
+#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+
+C64Class::C64Class(int SoundBufferSize)
 {
 	int ret_error;
 
-    sid1 = new MOS6581_8085(0,44100,882,&ret_error);
+	counter = 0;
+
+    sid1 = new MOS6581_8085(0,44100,SoundBufferSize,&ret_error);
     sid1->RESET = &RESET;
 
     sid1->RESET = &RESET;
@@ -37,8 +43,6 @@ C64Class::~C64Class()
 
 void C64Class::FillAudioBuffer(short *stream, int laenge)
 {
-	static int counter = 0;
-
 	static unsigned short *puffer_li;
 	static unsigned short *puffer_re;
 
@@ -60,14 +64,4 @@ void C64Class::FillAudioBuffer(short *stream, int laenge)
 		puffer_li += 2;
 		puffer_re += 2;
 	}
-
-	if(counter == 1)
-	{
-		sid1->WriteIO(24,15);
-		sid1->WriteIO(1,20);
-		sid1->WriteIO(5,0xc0);
-		sid1->WriteIO(6,0xfd);
-		sid1->WriteIO(4,0x11);
-	}
-	counter++;
 }

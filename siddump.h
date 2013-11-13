@@ -17,7 +17,7 @@
 #define SIDDUMP_H
 
 #include <cstring>
-#include <fstream>
+#include <stdio.h>
 
 using namespace std;
 

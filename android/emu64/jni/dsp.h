@@ -8,7 +8,7 @@
 #ifndef DSP_H_
 #define DSP_H_
 
-#define SOUND_BUFFER_SIZE 882*2	// 2* wegen Stereo --> 50 mal in der SEK wird Callback aufgerufen
+#define SOUND_BUFFER_SIZE 882*2
 
 typedef void (*AndroidAudioCallback)(short *buffer, int num_samples);
 bool OpenSLWrap_Init(AndroidAudioCallback cb);

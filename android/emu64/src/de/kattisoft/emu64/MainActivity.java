@@ -3,6 +3,7 @@ package de.kattisoft.emu64;
 import de.kattisoft.emu64.ImageManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Environment;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.view.Window;
@@ -18,6 +19,8 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		NativeClass.SetSDExtPath(Environment.getExternalStorageDirectory().getPath());
 		
 		// Vollbild
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);

@@ -2,6 +2,7 @@
 #include <GLES/gl.h>
 #include <GLES/glext.h>
 #include <android/log.h>
+#include <stdio.h>
 
 #define  LOG_TAG    "NATIVE"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
@@ -20,6 +21,7 @@ AssetTextureClass *texture = NULL;
 TextBoxClass *textBox01 = NULL;
 
 char* text_buffer;
+const char* sd_ext_path;
 unsigned char start_wert = 0;
 
 #ifdef __cplusplus
@@ -50,15 +52,18 @@ JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Init(JNIEnv*, jobject
     int ret = texture->AddTexture("images/ascii_font.png");
     if(ret == -1) LOGE("Fehler beim laden der Textur !");
 
-    textBox01 = new TextBoxClass(2.0f,2.0f,60,30);
+    textBox01 = new TextBoxClass(2.0f,2.0f,80,40);
     textBox01->SetFont(texture->GetTexturID(ret),16,16);
     textBox01->SetPos(-1.0f,-1.0f);
     text_buffer = textBox01->GetTextBuffer();
 
-    textBox01->SetText(0,0,"Emu64 by Thorsten Kattanek");
+    textBox01->SetText(0,0,"Emu64 von Thorsten Kattanek");
+    textBox01->SetText(0,1,"Version: ");
+    textBox01->SetText(9,1,str_emu64_version);
 
     int err;
-    c64 = new C64Class();
+    c64 = new C64Class(SOUND_BUFFER_SIZE/2);
+    c64->sd_ext_path = sd_ext_path;
     LOGD("C64 Klasse wurde ertsellt.");
 
     /// Sound starten und somit auch die C64 Emulation
@@ -104,6 +109,12 @@ JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Destroy(JNIEnv*, jobj
 
 	if(textBox01 != NULL) delete textBox01;
 	if(texture != NULL) delete texture;
+}
+
+JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_SetSDExtPath(JNIEnv* env, jobject, jstring string)
+{
+	sd_ext_path = env->GetStringUTFChars(string, JNI_FALSE);
+	LOGD("SD Karte Extern: %s",sd_ext_path);
 }
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* _vm, void* reserved)

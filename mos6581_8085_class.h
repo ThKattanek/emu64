@@ -16,10 +16,7 @@
 #ifndef MOS6581_8085_CLASS_H
 #define MOS6581_8085_CLASS_H
 
-#ifndef ANDROID
-    #include "siddump.h"
-#endif
-
+#include "siddump.h"
 #include "mos6581_8085_voice.h"
 
 //// Sid Typen ////
@@ -51,9 +48,7 @@ class MOS6581_8085
 
     unsigned char	WriteReg;
 
-#ifndef ANDROID
     SIDDumpClass	*IoDump;
-#endif
 
     bool		Mouse1351Enable;
     unsigned char	MouseX;
@@ -74,10 +69,8 @@ class MOS6581_8085
     void SetVoiceEnable(int nr, bool enable);
     bool OneZyklus(void);
 
-#ifndef ANDROID
     bool SaveFreez(FILE* File);
     bool LoadFreez(FILE *File,unsigned short Version);
-#endif
 
     void WriteIO(unsigned short adresse,unsigned char wert);
     unsigned char ReadIO(unsigned short adresse);
