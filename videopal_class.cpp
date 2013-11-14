@@ -15,8 +15,7 @@
 
 #include "videopal_class.h"
 #include "c64_colors.h"
-#include "math.h"
-//#include "SDL/SDL.h"
+#include <math.h>
 
 #define VIC_SATURATION	48.0f		//48.0f
 #define VIC_PHASE	-4.5f
@@ -145,11 +144,15 @@ void VideoPalClass::SetC64Palette(int palnr)
         for(int i=0;i<16;i++)
         {
             /// Für 32Bit Video Display ///
-
             Palette32Bit[ij] = 0xff000000 | COLOR_RGBA1[0]<<16 | COLOR_RGBA1[1]<<8 | COLOR_RGBA1[2];
 
             /// Für 16Bit Video Display ///
-            //Palette16Bit[ij] = (uint16_t)SDL_MapRGB(pixel_format,COLOR_RGBA1[0],COLOR_RGBA1[1],COLOR_RGBA1[2]);
+            /// RGB-565
+            unsigned char r = (COLOR_RGBA1[0] * 31) / 255;
+            unsigned char g = (COLOR_RGBA1[1] * 63) / 255;
+            unsigned char b = (COLOR_RGBA1[2] * 31) / 255;
+            Palette16Bit[ij] = r<<11 | g<<5 | b;
+
             COLOR_RGBA1+=4;
             ij++;
         }
@@ -609,6 +612,7 @@ void VideoPalClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
         switch(DestDisplayMode)
         {
         case 16: /// OK
+
             for(int y=0;y<(OutYW);y++)
             {
                 Outpuffer16 = ((uint16_t*)Outpuffer + (((y)+1)*Pitch/2));
@@ -616,9 +620,11 @@ void VideoPalClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
                 for(int x=0;x<(OutXW);x++)
                 {
                     *(Outpuffer16++) = Palette16Bit[VideoSource8[x] & 0x0F];
+                    //*(Outpuffer16++) = 0xf000;
                 }
                 VideoSource8 = VideoSource8+InXW;
             }
+
             break;
         case 32: /// OK
             for(int y=0;y<(OutYW);y++)

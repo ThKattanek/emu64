@@ -17,7 +17,7 @@
 #define VIDEOPAL_CLASS_H
 
 #include "structs.h"
-#include "SDL/SDL.h"
+#include <stdint.h>
 
 struct VIC_COLOR_STRUCT
 {

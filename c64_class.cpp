@@ -32,7 +32,8 @@ int SDLThreadLoad(void *userdat);
 C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(char*)> log_function, const char* gfx_path):
     SDLJoystickIsOpen(false),
     JoystickAnzahl(0),StopJoystickUpdate(true),JoyStickUdateIsStop(true),
-    RecJoyMapping(false)
+    RecJoyMapping(false),
+    mmu(NULL),cpu(NULL),vic(NULL),sid1(NULL),sid2(NULL),cia1(NULL),cia2(NULL),crt(NULL)
 {   
     VPort1 = 0;
     VPort2 = 1;
@@ -392,14 +393,19 @@ C64Class::~C64Class()
     SDL_VideoQuit();
     SDL_AudioQuit();
 
-    delete mmu;
-    delete cpu;
-    delete vic;
-    delete sid1;
-    delete sid2;
-    delete cia1;
-    delete cia2;
-    delete crt;
+    for(int i=0;i<FloppyAnzahl;i++)
+    {
+        if(floppy[i] != NULL) delete floppy[i];
+    }
+
+    if(mmu != NULL) delete mmu;
+    if(cpu != NULL) delete cpu;
+    if(vic != NULL) delete vic;
+    if(sid1 != NULL) delete sid1;
+    if(sid2 != NULL) delete sid2;
+    if(cia1 != NULL) delete cia1;
+    if(cia2 != NULL) delete cia2;
+    if(crt != NULL) delete crt;
 }
 
 void C64Class::StartEmulation()

@@ -22,7 +22,8 @@ public:
 	AssetTextureClass(JavaVM *vm);
 	virtual ~AssetTextureClass();
 	int AddTexture(const char* filename);
-	int GetTexturID(int number);
+	int AddTexture();
+	unsigned int GetTexturID(int number);
 
 private:
 	int LoadTexture(const char* filename, int number);

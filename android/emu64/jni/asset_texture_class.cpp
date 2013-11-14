@@ -53,6 +53,14 @@ int AssetTextureClass::AddTexture(const char* filename)
 	return (anz_texturen-1);
 }
 
+int AssetTextureClass::AddTexture()
+{
+	if(anz_texturen == MAX_TEXTUREN) return -1;
+
+	anz_texturen++;
+	return (anz_texturen-1);
+}
+
 int AssetTextureClass::LoadTexture(const char* filename, int number)// void* pixels, int* xw, int* yw)
 {
 	JNIEnv *env = NULL;
@@ -114,7 +122,7 @@ int AssetTextureClass::LoadTexture(const char* filename, int number)// void* pix
 	return 0;
 }
 
-int AssetTextureClass::GetTexturID(int number)
+unsigned int AssetTextureClass::GetTexturID(int number)
 {
 	return TexturIDs[number];
 }

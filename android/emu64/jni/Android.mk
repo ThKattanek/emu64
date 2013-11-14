@@ -21,6 +21,7 @@ LOCAL_SRC_FILES += ../../../floppy1541_class.cpp
 LOCAL_SRC_FILES += ../../../mos6502_class.cpp
 LOCAL_SRC_FILES += ../../../mos6522_class.cpp
 LOCAL_SRC_FILES += ../../../siddump.cpp
+LOCAL_SRC_FILES += ../../../videopal_class.cpp
 
 LOCAL_LDLIBS := -llog -landroid -lGLESv1_CM -lOpenSLES
 

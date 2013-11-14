@@ -218,8 +218,6 @@ void MainWindow::OnInit()
     ScreenshotNumber = (int)ini->value("ScreenshotCounter",0).toInt();
     ini->endGroup();
 
-
-
     splash->showStatusMessage(tr("SetupWindow wird mit INI abgeglichen."),Qt::darkBlue);
     setup_window->ReSetup();
 

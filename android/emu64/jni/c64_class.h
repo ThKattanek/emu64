@@ -24,8 +24,7 @@
 #include "../../../mos6526_class.h"
 #include "../../../crt_class.h"
 #include "../../../floppy1541_class.h"
-#include "../../../cpu_info.h"
-#include "../../../c64keys2usb.h"
+#include "../../../videopal_class.h"
 
 #include "tr1/functional"
 using namespace std::tr1;
@@ -38,9 +37,18 @@ using namespace std::tr1::placeholders;
 
 class C64Class {
 public:
-	C64Class(int SoundBufferSize);
+	C64Class(int SoundBufferSize,VideoPalClass *pal);
 	virtual ~C64Class();
 	void FillAudioBuffer(short *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
+    bool LoadC64Roms(char *kernalrom,char *basicrom,char *charrom);
+    bool LoadFloppyRom(int floppy_nr,char *dos1541rom);
+    void KillCommandLine(void);
+
+    void SoftReset(void);
+    void HardReset(void);
+    void SetReset(int status, int hard_reset);
+
+	void GetC64CpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg);
 
     const char* sd_ext_path;
 
@@ -49,6 +57,13 @@ public:
 
     unsigned char   GamePort1;
     unsigned char   GamePort2;
+
+    int             AktWindowColorBits;
+    int             AktC64ScreenXW;
+    int             AktC64ScreenYW;
+
+    VideoPalClass   *pal;
+    unsigned char   *C64ScreenBuffer;
 
     MMU             *mmu;
     MOS6510         *cpu;
@@ -62,6 +77,9 @@ public:
 
     bool RESET;     // Reset Leitung -> Für Alle Module mit Reset Eingang
 
+    bool            StereoEnable;
+    unsigned short  Sid2Adresse;
+
     unsigned char   KeyboardMatrixToPBExt[8];
     unsigned char   KeyboardMatrixToPAExt[8];
 
@@ -70,20 +88,71 @@ public:
 
     int             IOSource;
 
+    bool            WaitResetReady;
+
     function<void(void)> AnimationRefreshProc;
     function<void(void)> BreakpointProc;
 
 private:
+    void VicRefresh(unsigned char *vic_puffer);
+    void WriteSidIO(unsigned short adresse,unsigned char wert);
+    unsigned char ReadSidIO(unsigned short adresse);
+    void WriteIO1(unsigned short adresse,unsigned char wert);
+    void WriteIO2(unsigned short adresse,unsigned char wert);
+    unsigned char ReadIO1(unsigned short adresse);
+    unsigned char ReadIO2(unsigned short adresse);
+
+    function<unsigned char(unsigned short)> *ReadProcTbl;
+    function<void(unsigned short,unsigned char)> *WriteProcTbl;
+
+    bool RDY_BA;            // Leitung CPU <-- VIC
+    bool HRESET;            // Zusatz Anzeige für MMU Reset
+    bool GAME;              // Leitung Expansionsport --> MMU;
+    bool EXROM;             // Leitung Expansionsport --> MMU;
+    bool RAM_H;             // Leitung Expansionsport --> MMU;
+    bool RAM_L;             // Leitung Expansionsport --> MMU;
+    MOS6510_PORT CPU_PORT;  // Prozessor Port
+
+    bool EnableExtLines;
+    bool ExtRDY;
+
     unsigned char   C64IEC;     // Leitungen vom C64 zur Floppy Bit 0=ATN 1=CLK 2=DATA
     unsigned char   FloppyIEC;	// Leitungen von Floppy zur c64 Bit 0=ATN 1=CLK 2=DATA
+
+    /// Temporär ///
+    int             EasyFlashDirty;
+    unsigned char   EasyFlashByte;
+
+    PORT CIA1_PA;
+    PORT CIA1_PB;
+    PORT CIA2_PA;
+    PORT CIA2_PB;
 
     unsigned char   KeyboardMatrixToPB[8];
     unsigned char   KeyboardMatrixToPA[8];
 
+    /////////////////////// BREAKPOINTS ////////////////////////
+
+    // Bit 0 = PC Adresse
+    // Bit 1 = AC
+    // Bit 2 = XR
+    // Bit 3 = YR
+    // Bit 4 = Lesen von einer Adresse
+    // Bit 5 = Schreiben in einer Adresse
+    // Bit 6 = Lesen eines Wertes
+    // Bit 7 = Schreiben eines Wertes
+    // Bit 8 = Beim erreichen einer bestommten Raster Zeile
+    // Bit 9 = Beim erreichen eines Zyklus in einer Rasterzeile
+
+    unsigned short  Breakpoints[0x10000];
+    unsigned short  BreakWerte[16];
+    unsigned short  BreakStatus;
+    bool            FloppyFoundBreakpoint;
+
     ////////////////////////////////////////////////////////////
 
-    bool C64ResetReady;
-    bool FloppyResetReady[FloppyAnzahl];
+    bool 	C64ResetReady;
+    bool 	FloppyResetReady[FloppyAnzahl];
 
     char	ComandZeile[256];
     int		ComandZeileSize;
