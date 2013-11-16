@@ -199,6 +199,8 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     crt = new CRTClass();
     c64key2usb = new C64Keys2USB();
 
+    vic_puffer = vic->VideoPuffer;
+
     if(c64key2usb->Open())
     {
         C64Keys2USB_Enable = true;
@@ -1059,6 +1061,7 @@ int SDLThread(void *userdat)
 
 
                         glBindTexture(GL_TEXTURE_2D,C64ScreenTexture);
+                        c64->pal->ConvertVideo((void*)c64->C64ScreenBuffer,c64->AktC64ScreenXW*4,c64->vic_puffer,c64->AktC64ScreenXW,c64->AktC64ScreenYW,504,312,false);
                         glTexSubImage2D(GL_TEXTURE_2D,0,0,0, c64->AktC64ScreenXW, c64->AktC64ScreenYW,GL_BGRA, GL_UNSIGNED_BYTE, c64->C64ScreenBuffer);
 
                         glBegin(GL_QUADS);
@@ -1077,6 +1080,7 @@ int SDLThread(void *userdat)
                         //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 
                         glBindTexture(GL_TEXTURE_2D,C64ScreenTexture);
+                        c64->pal->ConvertVideo((void*)c64->C64ScreenBuffer,c64->AktC64ScreenXW*4,c64->vic_puffer,c64->AktC64ScreenXW,c64->AktC64ScreenYW,504,312,false);
                         glTexSubImage2D(GL_TEXTURE_2D,0,0,0, c64->AktC64ScreenXW, c64->AktC64ScreenYW,GL_BGRA, GL_UNSIGNED_BYTE, c64->C64ScreenBuffer);
 
                         glBegin(GL_QUADS);
@@ -1305,8 +1309,12 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
     if(OpenGLEnable)
     {
         /// OpenGL Version ///
+
         //if(DrawScreenBack) SDL_Delay(2);
-        pal->ConvertVideo((void*)C64ScreenBuffer,AktC64ScreenXW*4,vic_puffer,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
+        //pal->ConvertVideo((void*)C64ScreenBuffer,AktC64ScreenXW*4,vic_puffer,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
+        this->vic_puffer = vic_puffer;
+        vic->SwitchVideoPuffer();
+
         DrawScreenBack = true;
     }
     else
@@ -1315,7 +1323,10 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
         if(DrawScreenBack) SDL_Delay(2);
 
         SDL_LockSurface(C64ScreenBack);
-        pal->ConvertVideo((void*)C64ScreenBack->pixels,C64ScreenBack->pitch,vic_puffer,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
+        //pal->ConvertVideo((void*)C64ScreenBack->pixels,C64ScreenBack->pitch,vic_puffer,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
+        this->vic_puffer = vic_puffer;
+        vic->SwitchVideoPuffer();
+
         SDL_UnlockSurface(C64ScreenBack);
         DrawScreenBack = true;
     }

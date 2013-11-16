@@ -42,11 +42,19 @@ public:
 	void FillAudioBuffer(short *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
     bool LoadC64Roms(char *kernalrom,char *basicrom,char *charrom);
     bool LoadFloppyRom(int floppy_nr,char *dos1541rom);
+    bool LoadDiskImage(int floppy_nr,char *filename);
+    void SetCommandLine(char *c64_command);
     void KillCommandLine(void);
+    unsigned char ReadC64Byte(unsigned short adresse);
+    void WriteC64Byte(unsigned short adresse,unsigned char wert);
 
     void SoftReset(void);
     void HardReset(void);
     void SetReset(int status, int hard_reset);
+    int LoadAutoRun(int floppy_nr, char *filename);
+    int LoadPRG(char *filename, unsigned short* ret_startadresse);
+    int LoadCRT(char *filename);
+    void RemoveCRT(void);
 
 	void GetC64CpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg);
 
@@ -62,14 +70,15 @@ public:
     int             AktC64ScreenXW;
     int             AktC64ScreenYW;
 
+    unsigned char   *vic_puffer;
     VideoPalClass   *pal;
     unsigned char   *C64ScreenBuffer;
+    unsigned char 	*C64ScreenBackBuffer;
 
     MMU             *mmu;
     MOS6510         *cpu;
     VICII           *vic;
     MOS6581_8085    *sid1;
-    MOS6581_8085    *sid2;
     MOS6526         *cia1;
     MOS6526         *cia2;
     CRTClass        *crt;
@@ -89,6 +98,9 @@ public:
     int             IOSource;
 
     bool            WaitResetReady;
+    int             AutoLoadMode;
+    char            AutoLoadCommandLine[1024];
+    char            AutoLoadFilename[1024];
 
     function<void(void)> AnimationRefreshProc;
     function<void(void)> BreakpointProc;

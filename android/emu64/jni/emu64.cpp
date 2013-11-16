@@ -56,6 +56,8 @@ float screen_pos_x1,screen_pos_y1,screen_pos_x2,screen_pos_y2;
 
 unsigned int texID;
 
+int menue_case = 0;
+
 /// C64 Klasse
 C64Class *c64;
 
@@ -185,12 +187,14 @@ JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Renderer(JNIEnv*, job
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glBindTexture(GL_TEXTURE_2D, texID);
+	videopal->ConvertVideo((void*)c64->C64ScreenBuffer,c64->AktC64ScreenXW*2,c64->vic_puffer,c64->AktC64ScreenXW,c64->AktC64ScreenYW,504,312,false);
+	glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, c64->AktC64ScreenXW, c64->AktC64ScreenYW, 0,GL_RGB, GL_UNSIGNED_SHORT_5_6_5, c64->C64ScreenBuffer);
+
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, c64->AktC64ScreenXW, c64->AktC64ScreenYW, 0,GL_RGB, GL_UNSIGNED_SHORT_5_6_5, c64->C64ScreenBuffer);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -219,8 +223,6 @@ JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Renderer(JNIEnv*, job
 	sprintf(str01,"PC:$%4.4X AC:$%2.2X XR:$%2.2X YR:$%2.2X SR:$%2.2X SP:$%3.3X",cpu_reg.PC,(unsigned char)cpu_reg.AC & 0xff,(unsigned char)cpu_reg.XR & 0xff,(unsigned char)cpu_reg.YR & 0xff,(unsigned char)cpu_reg.SR & 0xff,(unsigned short)((cpu_reg.SP & 0xff)+0x100));
 	textBox01->SetText(0,2,str01);
 	textBox01->Renderer();
-
-
 }
 
 JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Pause(JNIEnv*, jobject)
@@ -245,6 +247,39 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* _vm, void* reserved)
 	LOGD("OnLoad...");
 
 	return JNI_VERSION_1_6;
+}
+
+JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Menue(JNIEnv*, jobject)
+{
+	LOGD("Menü...");
+	char str00[1024];
+
+	switch(menue_case)
+	{
+	case 0:
+		sprintf(str00,"%s/1_pixel_fld.prg",sd_ext_path);
+	    c64->LoadAutoRun(0,str00);
+		break;
+	case 1:
+		sprintf(str00,"%s/plexer_dycp.prg",sd_ext_path);
+	    c64->LoadAutoRun(0,str00);
+		break;
+	case 2:
+		sprintf(str00,"%s/flexgrid.prg",sd_ext_path);
+	    c64->LoadAutoRun(0,str00);
+		break;
+	case 3:
+		c64->HardReset();
+		break;
+	}
+
+	menue_case++;
+	if(menue_case == 4) menue_case = 0;
+}
+
+JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Home(JNIEnv*, jobject)
+{
+	c64->HardReset();
 }
 
 #ifdef __cplusplus

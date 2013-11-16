@@ -49,6 +49,9 @@
 
 VICII::VICII()
 {
+    AktVideoPuffer = 0;
+    VideoPuffer = VideoPufferBack[0];
+
 	for(int i=0;i<8;i++)
 	{
 		MX[i] = 0;
@@ -141,6 +144,12 @@ VICII::VICII()
 
 VICII::~VICII()
 {
+}
+
+void VICII::SwitchVideoPuffer()
+{
+    AktVideoPuffer++;
+    VideoPuffer = VideoPufferBack[AktVideoPuffer & 1];
 }
 
 void VICII::GetRegister(VIC_STRUCT *vic_reg)

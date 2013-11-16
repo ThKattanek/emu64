@@ -38,6 +38,7 @@ public:
 /// Funktionen ///
     VICII();
     ~VICII();
+    void SwitchVideoPuffer();
     void GetRegister(VIC_STRUCT *vic_reg);
     void SetVicType(int system);
     void EnableGreyDot(bool enabled);
@@ -66,6 +67,11 @@ public:
 
     bool            VicConfig[4];
 
+    unsigned char   *VideoPuffer;
+    int             AktVideoPuffer;
+    unsigned char   VideoPufferBack[2][VIDEO_PUFFER_SIZE];
+
+
 private:
     void Reset(void);
     void RasterIRQ(void);
@@ -83,7 +89,7 @@ private:
     void DrawBorder(void);
 
     /// Variablen ///
-    unsigned char   VideoPuffer[VIDEO_PUFFER_SIZE];
+
     unsigned char   *VideoPufferLine;
     int             DrawLineCounter;
     bool            DrawThisLine;

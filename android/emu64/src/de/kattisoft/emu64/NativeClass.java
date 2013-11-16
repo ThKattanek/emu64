@@ -12,4 +12,6 @@ public class NativeClass {
 	public static native void Resume();
 	public static native void SetSDExtPath(String path);
 	public static native void Destroy();
+	public static native void Menue();
+	public static native void Home();
 }

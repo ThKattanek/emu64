@@ -159,6 +159,7 @@ public:
     bool            sdl_thread_pause;
     bool            sdl_thread_is_paused;
 
+    unsigned char   *vic_puffer;
     VideoPalClass   *pal;
 
     MMU             *mmu;

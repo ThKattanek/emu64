@@ -21,7 +21,7 @@
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 
 C64Class::C64Class(int SoundBufferSize ,VideoPalClass *pal):
-	mmu(NULL),cpu(NULL),vic(NULL),sid1(NULL),sid2(NULL),cia1(NULL),cia2(NULL),crt(NULL)
+	mmu(NULL),cpu(NULL),vic(NULL),sid1(NULL),cia1(NULL),cia2(NULL),crt(NULL)
 {
 	LOGD(">> C64 Klasse wird gestratet...");
 
@@ -33,10 +33,19 @@ C64Class::C64Class(int SoundBufferSize ,VideoPalClass *pal):
 	AktWindowColorBits = 16;
 	C64ScreenBuffer = new unsigned char[AktC64ScreenXW*AktC64ScreenYW*2];
 
-	pal->SetDisplayMode(AktWindowColorBits);
 	pal->EnablePALOutput(false);
+	pal->SetDisplayMode(AktWindowColorBits);
 	pal->EnableVideoDoubleSize(false);
 	pal->SetC64Palette(0);
+
+	pal->SetHelligkeit(0.5f);
+	pal->SetHorizontalBlurUV(0);
+	pal->SetHorizontalBlurY(0);
+	pal->SetKontrast(0.5f);
+	pal->SetSaturation(0.5f);
+
+	pal->UpdateParameter();
+
 
     VPort1 = 0;
     VPort2 = 1;
@@ -51,10 +60,11 @@ C64Class::C64Class(int SoundBufferSize ,VideoPalClass *pal):
     cpu = new MOS6510();
     vic = new VICII();
     sid1 = new MOS6581_8085(0,44100,SoundBufferSize,&ret_error);
-    sid2 = new MOS6581_8085(1,44100,SoundBufferSize,&ret_error);
     cia1 = new MOS6526(0);
     cia2 = new MOS6526(1);
     crt = new CRTClass();
+
+    vic_puffer =  vic->VideoPuffer;
 
     cia2->FloppyIEC = &FloppyIEC;
     cia2->C64IEC = &C64IEC;
@@ -159,7 +169,6 @@ C64Class::C64Class(int SoundBufferSize ,VideoPalClass *pal):
       vic->FarbRam = mmu->GetFarbramPointer();
       vic->CIA2_PA = CIA2_PA.GetOutputBitsPointer();
       sid1->RESET = &RESET;
-      sid2->RESET = &RESET;
       //reu->BA = &RDY_BA;
       //reu->CpuTriggerInterrupt = (TRIGGER_INTERRUPT)cpu_TriggerInterrupt;
       //reu->CpuClearInterrupt = (CLEAR_INTERRUPT)cpu_ClearInterrupt;
@@ -197,16 +206,8 @@ C64Class::C64Class(int SoundBufferSize ,VideoPalClass *pal):
        sid1->SetChipType(MOS_8580);
        sid1->SoundOutputEnable = true;
        sid1->CycleExact = false;
-       sid1->FilterOn = false;
+       sid1->FilterOn = true;
        sid1->Reset();
-
-       sid2->RESET = &RESET;
-       sid2->SetC64Zyklen(985248);
-       sid2->SetChipType(MOS_8580);
-       sid2->SoundOutputEnable = false;
-       sid2->CycleExact = true;
-       sid2->FilterOn = true;
-       sid2->Reset();
 
        StereoEnable = false;
        Sid2Adresse = 0xD420;
@@ -244,7 +245,6 @@ C64Class::~C64Class()
     if(cpu != NULL) delete cpu;
     if(vic != NULL) delete vic;
     if(sid1 != NULL) delete sid1;
-    if(sid2 != NULL) delete sid2;
     if(cia1 != NULL) delete cia1;
     if(cia2 != NULL) delete cia2;
     if(crt != NULL) delete crt;
@@ -262,10 +262,11 @@ void C64Class::FillAudioBuffer(short *stream, int laenge)
 
 	while(sid1->SoundBufferPos < (laenge/2))
 	{
+		/*
         FloppyIEC = 0;
          for(int i=0; i<FloppyAnzahl; i++)
          {
-             //floppy[i]->OneZyklus();
+             floppy[i]->OneZyklus();
 
              #ifdef floppy_asyncron
              counter_plus++;
@@ -279,12 +280,114 @@ void C64Class::FillAudioBuffer(short *stream, int laenge)
              FloppyIEC |= ~floppy[i]->FloppyIECLocal;
          }
          FloppyIEC = ~FloppyIEC;
+         */
 
          vic->OneZyklus();
          cia1->OneZyklus();
          cia2->OneZyklus();
          sid1->OneZyklus();
          cpu->OneZyklus();
+
+
+         ////////////////////////// Testweise //////////////////////////
+
+                     static int zyklen_counter = 0;
+                     if(++zyklen_counter == 19656)
+                     {
+                         zyklen_counter = 0;
+
+                         if(WaitResetReady)
+                         {
+                             if(!floppy[0]->GetEnableFloppy())
+                             {
+                                 if(C64ResetReady)
+                                 {
+                                     //SDL_CreateThread(SDLThreadLoad,this);
+                                	 /// Was eigtl im Thread steht
+                                	    unsigned short PRGStartAdresse;
+
+
+                                	    switch(AutoLoadMode)
+                                	    {
+                                	    case 0:
+                                	        SetCommandLine(AutoLoadCommandLine);
+                                	        break;
+                                	    case 1:
+                                	        LoadPRG(AutoLoadFilename,&PRGStartAdresse);
+                                	        if(PRGStartAdresse <= 0x0801) sprintf(AutoLoadCommandLine,"RUN%c",13);
+                                	        else sprintf(AutoLoadCommandLine,"SYS %d%c",PRGStartAdresse,13);
+                                	        SetCommandLine(AutoLoadCommandLine);
+                                	        break;
+                                	    case 2:
+                                	        LoadPRG(AutoLoadFilename,&PRGStartAdresse);
+                                	        //if(LoadPRG(c64->AutoLoadFilename,&PRGStartAdresse) == 5) return 4; Behandlung wenn mehr als 1 File in T64
+                                	        if(PRGStartAdresse <= 0x0801) sprintf(AutoLoadCommandLine,"RUN%c",13);
+                                	        else sprintf(AutoLoadCommandLine,"SYS %d%c",PRGStartAdresse,13);
+                                	        SetCommandLine(AutoLoadCommandLine);
+                                	        break;
+                                	    }
+                                	 /////////////////////////////
+                                     WaitResetReady = false;
+                                 }
+                             }
+                             else
+                             {
+                                 if((C64ResetReady == true) && (FloppyResetReady[0] == true))
+                                 {
+                                     //SDL_CreateThread(SDLThreadLoad,this);
+                                	 /// Was eigtl im Thread steht
+                                	    unsigned short PRGStartAdresse;
+
+
+                                	    switch(AutoLoadMode)
+                                	    {
+                                	    case 0:
+                                	        SetCommandLine(AutoLoadCommandLine);
+                                	        break;
+                                	    case 1:
+                                	        LoadPRG(AutoLoadFilename,&PRGStartAdresse);
+                                	        if(PRGStartAdresse <= 0x0801) sprintf(AutoLoadCommandLine,"RUN%c",13);
+                                	        else sprintf(AutoLoadCommandLine,"SYS %d%c",PRGStartAdresse,13);
+                                	        SetCommandLine(AutoLoadCommandLine);
+                                	        break;
+                                	    case 2:
+                                	        LoadPRG(AutoLoadFilename,&PRGStartAdresse);
+                                	        //if(LoadPRG(c64->AutoLoadFilename,&PRGStartAdresse) == 5) return 4; Behandlung wenn mehr als 1 File in T64
+                                	        if(PRGStartAdresse <= 0x0801) sprintf(AutoLoadCommandLine,"RUN%c",13);
+                                	        else sprintf(AutoLoadCommandLine,"SYS %d%c",PRGStartAdresse,13);
+                                	        SetCommandLine(AutoLoadCommandLine);
+                                	        break;
+                                	    }
+                                	 /////////////////////////////
+                                     WaitResetReady = false;
+                                 }
+                             }
+                         }
+
+                         if(ComandZeileCountS)
+                         {
+                             ComandZeileCountS=false;
+                             if(ComandZeileStatus)
+                             {
+                                 if(ComandZeileCount==ComandZeileSize)
+                                 {
+                                     ComandZeileStatus=false;
+                                 }
+                                 else
+                                 {
+                                     WriteC64Byte(0xC6,1);
+                                     WriteC64Byte(0x277,ComandZeile[ComandZeileCount]);
+                                     ComandZeileCount++;
+                                 }
+                             }
+                         }
+                         if(ReadC64Byte(0xC6)==0)
+                         {
+                             ComandZeileCountS=true;
+                         }
+                     }
+                     //////////////////////////////////////////////////////////////////////////////
+
 	}
 
 	for(int i=0;i<(laenge/2);i++)
@@ -301,7 +404,7 @@ void C64Class::SoftReset()
 {
     WaitResetReady = false;
     SetReset(false,true);
-    //usleep(20);
+    usleep(20);
     SetReset(true,true);
 }
 
@@ -309,7 +412,7 @@ void C64Class::HardReset()
 {
     WaitResetReady = false;
     SetReset(false,false);
-    //usleep(20);
+    usleep(20);
     SetReset(true,true);
 }
 
@@ -325,6 +428,300 @@ inline void C64Class::SetReset(int status, int hard_reset)
     }
 }
 
+// ret 0=OK 1=nicht unterstütztes Format 2=D64 n.IO 3=G64 n.IO 4=OK nur es war ein CRT
+int C64Class::LoadAutoRun(int floppy_nr, char *filename)
+{
+    char EXT[4];
+
+    int len = (int)strlen(filename);
+    strcpy(EXT,filename+len-3);
+
+    EXT[0]=toupper(EXT[0]);
+    EXT[1]=toupper(EXT[1]);
+    EXT[2]=toupper(EXT[2]);
+
+    if(0==strcmp("D64",EXT))
+    {
+        if(!LoadDiskImage(floppy_nr,filename)) return 2;
+
+        KillCommandLine();
+        AutoLoadMode = 0;
+        sprintf(AutoLoadCommandLine,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
+        HardReset();
+        WaitResetReady = true;
+        C64ResetReady = false;
+        FloppyResetReady[0] = false;
+        return 0;
+    }
+
+    if(0==strcmp("G64",EXT))
+    {
+        if(!LoadDiskImage(floppy_nr,filename)) return 3;
+
+        KillCommandLine();
+        AutoLoadMode = 0;
+        sprintf(AutoLoadCommandLine,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
+        HardReset();
+        WaitResetReady = true;
+        C64ResetReady = false;
+        FloppyResetReady[0] = false;
+        return 0;
+    }
+
+    if(0==strcmp("PRG",EXT))
+    {
+        KillCommandLine();
+        AutoLoadMode = 1;
+        strcpy(AutoLoadFilename,filename);
+        HardReset();
+        WaitResetReady = true;
+        C64ResetReady = false;
+        FloppyResetReady[0] = false;
+        return 0;
+    }
+
+    if(0==strcmp("T64",EXT))
+    {
+        KillCommandLine();
+        AutoLoadMode = 2;
+        strcpy(AutoLoadFilename,filename);
+        HardReset();
+        WaitResetReady = true;
+        C64ResetReady = false;
+        FloppyResetReady[0] = false;
+        return 0;
+    }
+
+    if(0==strcmp("P00",EXT))
+    {
+        KillCommandLine();
+        AutoLoadMode = 1;
+        strcpy(AutoLoadFilename,filename);
+        HardReset();
+        WaitResetReady = true;
+        C64ResetReady = false;
+        FloppyResetReady[0] = false;
+        return 0;
+    }
+
+    if(0==strcmp("FRZ",EXT))
+    {
+        KillCommandLine();
+
+        //LoadFreez(filename,FreezReturn);
+        return 0;
+    }
+
+    if(0==strcmp("CRT",EXT))
+    {
+        KillCommandLine();
+
+        LoadCRT(filename);
+        return 4;
+    }
+    return 1;
+}
+
+int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
+{
+    unsigned char *RAM = mmu->GetRAMPointer();
+    FILE *file;
+    char EXT[4];
+
+    int len = (int)strlen(filename);
+    strcpy(EXT,filename+len-3);
+
+    EXT[0]=toupper(EXT[0]);
+    EXT[1]=toupper(EXT[1]);
+    EXT[2]=toupper(EXT[2]);
+
+    char str00[256];
+
+    if(0==strcmp("PRG",EXT))
+    {
+        //LogText((char*)">> PRG laden: ");
+        //LogText(filename);
+        //LogText((char*)"\n");
+
+        unsigned short StartAdresse;
+        int reading_bytes;
+        unsigned char temp[2];
+        file = fopen (filename, "rb");
+        if (file == NULL)
+        {
+            //LogText((char*)"<< ERROR: Datei konnte nicht geöffnet werden");
+            return 0x01;
+        }
+        reading_bytes = fread (&temp,1,2,file);
+        StartAdresse=temp[0]|(temp[1]<<8);
+        if(ret_startadresse != 0) *ret_startadresse = StartAdresse;
+
+        reading_bytes=fread (RAM+StartAdresse,1,0xFFFF,file);
+
+        RAM[0x2B] = 0x01;
+        RAM[0x2C] = 0x08;
+
+        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",StartAdresse,StartAdresse);
+        //LogText(str00);
+
+        StartAdresse+=(unsigned short)reading_bytes;
+        RAM[0x2D] = (unsigned char)StartAdresse;
+        RAM[0x2E] = (unsigned char)(StartAdresse>>8);
+        RAM[0xAE] = (unsigned char)StartAdresse;
+        RAM[0xAF] = (unsigned char)(StartAdresse>>8);
+
+        fclose(file);
+
+        sprintf(str00,"EndAdresse: $%4.4X(%d)\n",StartAdresse,StartAdresse);
+        //LogText(str00);
+
+        return 0x00;
+    }
+
+    if(0==strcmp("T64",EXT))
+    {
+        //LogText((char*)">> T64 laden: ");
+        //LogText(filename);
+        //LogText((char*)"\n");
+
+        char Kennung[32];
+        unsigned short T64Entries;
+        unsigned short StartAdresse;
+        unsigned short EndAdresse;
+        int FileStartOffset;
+
+        file = fopen (filename, "rb");
+        if (file == NULL)
+        {
+            //LogText((char*)"<< ERROR: Datei konnte nicht geöffnet werden");
+                return 0x01;
+        }
+
+        fread(Kennung,1,32,file);
+
+        fseek(file,4,SEEK_CUR);
+        fread(&T64Entries,1,2,file);
+
+        if(T64Entries==0)
+        {
+                fclose(file);
+                return 0x04;
+        }
+
+        /*
+        if(T64Entries>1)
+        {
+                fclose(file);
+                return 0x05;
+        }
+        */
+
+        fseek(file,0x42,SEEK_SET);
+        fread(&StartAdresse,1,2,file);
+        if(ret_startadresse != 0) *ret_startadresse = StartAdresse;
+        fread(&EndAdresse,1,2,file);
+        fseek(file,2,SEEK_CUR);
+        fread(&FileStartOffset,1,4,file);
+
+        fseek(file,FileStartOffset,SEEK_SET);
+        fread(RAM+StartAdresse,1,EndAdresse-StartAdresse,file);
+        fclose(file);
+
+        RAM[0x2B] = 0x01;
+        RAM[0x2C] = 0x08;
+
+        RAM[0x2D] = (unsigned char)EndAdresse;
+        RAM[0x2E] = (unsigned char)(EndAdresse>>8);
+        RAM[0xAE] = (unsigned char)EndAdresse;
+        RAM[0xAF] = (unsigned char)(EndAdresse>>8);
+
+        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",StartAdresse,StartAdresse);
+        //LogText(str00);
+        sprintf(str00,"EndAdresse: $%4.4X(%d)\n",EndAdresse,EndAdresse);
+        //LogText(str00);
+
+        return 0x00;
+    }
+
+    if(0==strcmp("P00",EXT))
+    {
+        //LogText((char*)">> P00 laden: ");
+        //LogText(filename);
+        //LogText((char*)"\n");
+
+        char Kennung[8];
+        unsigned short StartAdresse;
+        int reading_bytes;
+        unsigned char temp[2];
+        file = fopen (filename, "rb");
+        if (file == NULL)
+        {
+            //LogText((char*)"<< ERROR: Datei konnte nicht geöffnet werden");
+                return 0x01;
+        }
+
+        reading_bytes = fread(Kennung,1,7,file);
+        Kennung[7]=0;
+        if(0!=strcmp("C64File",Kennung))
+        {
+                fclose(file);
+                return 0x06;
+        }
+
+        fseek(file,0x1A,SEEK_SET);
+
+        reading_bytes = fread (&temp,1,2,file);
+        StartAdresse=temp[0]|(temp[1]<<8);
+        if(ret_startadresse != 0) *ret_startadresse = StartAdresse;
+
+        reading_bytes=fread (RAM+StartAdresse,1,0xFFFF,file);
+
+        RAM[0x2B] = 0x01;
+        RAM[0x2C] = 0x08;
+
+        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",StartAdresse,StartAdresse);
+        //LogText(str00);
+
+        StartAdresse+=(unsigned short)reading_bytes;
+        RAM[0x2D] = (unsigned char)StartAdresse;
+        RAM[0x2E] = (unsigned char)(StartAdresse>>8);
+        RAM[0xAE] = (unsigned char)StartAdresse;
+        RAM[0xAF] = (unsigned char)(StartAdresse>>8);
+
+        fclose(file);
+
+        sprintf(str00,"EndAdresse: $%4.4X(%d)\n",StartAdresse,StartAdresse);
+        //LogText(str00);
+
+        return 0x00;
+    }
+    return 0x02;
+}
+
+int C64Class::LoadCRT(char *filename)
+{
+    //reu->Remove();
+    //georam->Remove();
+
+    int ret = crt->LoadCRTImage(filename);
+    if(ret == 0)
+    {
+        IOSource = 1;
+
+        KillCommandLine();
+        HardReset();
+    }
+    return ret;
+}
+
+void C64Class::RemoveCRT(void)
+{
+    crt->RemoveCRTImage();
+    IOSource = 0;
+    KillCommandLine();
+    HardReset();
+}
+
 bool C64Class::LoadC64Roms(char *kernalrom,char *basicrom,char *charrom)
 {
     if(!mmu->LoadKernalRom(kernalrom)) return false;
@@ -334,6 +731,7 @@ bool C64Class::LoadC64Roms(char *kernalrom,char *basicrom,char *charrom)
 }
 
 bool C64Class::LoadFloppyRom(int floppy_nr,char *dos1541rom)
+
 {
     if(floppy_nr < FloppyAnzahl)
     {
@@ -343,11 +741,39 @@ bool C64Class::LoadFloppyRom(int floppy_nr,char *dos1541rom)
     return false;
 }
 
+bool C64Class::LoadDiskImage(int floppy_nr, char *filename)
+{
+    if(floppy_nr < FloppyAnzahl)
+    {
+        return floppy[floppy_nr]->LoadDiskImage(filename);
+    }
+    return false;
+}
+
+void C64Class::SetCommandLine(char* c64_command)
+{
+    strcpy(ComandZeile,c64_command);
+    ComandZeileSize=(int)strlen(ComandZeile);
+    ComandZeileCount=0;
+    ComandZeileStatus=true;
+    ComandZeileCountS=true;
+}
+
 void C64Class::KillCommandLine(void)
 {
     ComandZeileSize=0;
     ComandZeileStatus=false;
     ComandZeileCountS=false;
+}
+
+unsigned char C64Class::ReadC64Byte(unsigned short adresse)
+{
+    return ReadProcTbl[(adresse)>>8](adresse);
+}
+
+void C64Class::WriteC64Byte(unsigned short adresse,unsigned char wert)
+{
+    WriteProcTbl[(adresse)>>8](adresse,wert);
 }
 
 void C64Class::VicRefresh(unsigned char *vic_puffer)
@@ -362,8 +788,8 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
 
     if(pal == NULL) return;
 
-    /// OpenGL Version ///
-	pal->ConvertVideo((void*)C64ScreenBuffer,AktC64ScreenXW*2,vic_puffer,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
+    this->vic_puffer = vic_puffer;
+    vic->SwitchVideoPuffer();
 }
 
 void C64Class::GetC64CpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg)
@@ -377,15 +803,7 @@ void C64Class::GetC64CpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg)
 
 void C64Class::WriteSidIO(unsigned short adresse,unsigned char wert)
 {
-    if(StereoEnable)
-    {
-        if((adresse & 0xFFE0) == 0xD400) sid1->WriteIO(adresse,wert);
-        if((adresse & 0xFFE0) == Sid2Adresse) sid2->WriteIO(adresse,wert);
-    }
-    else
-    {
-        sid1->WriteIO(adresse,wert);
-    }
+		sid1->WriteIO(adresse,wert);
 }
 
 unsigned char C64Class::ReadSidIO(unsigned short)

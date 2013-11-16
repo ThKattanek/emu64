@@ -264,11 +264,23 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 ColorIn = ColorOut;
                                                 ChangeContrast(&ColorIn, &ColorOut,Kontrast);
 
-                                                RGB =  (unsigned long)ColorOut.r<<16; // Rot
-                                                RGB |= (unsigned long)ColorOut.g<<8;  // Grün
-                                                RGB |= (unsigned long)ColorOut.b;     // Blau
+                                                if(DestDisplayMode == 32)
+                                                {
+                                                    RGB =  (unsigned long)ColorOut.r<<16; // Rot
+                                                    RGB |= (unsigned long)ColorOut.g<<8;  // Grün
+                                                    RGB |= (unsigned long)ColorOut.b;     // Blau
 
-                                                BlurTable0[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
+                                                    BlurTable0[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
+                                                }
+
+                                                if(DestDisplayMode == 16)
+                                                {
+                                                    unsigned char r = ((unsigned char)ColorOut.r * 31) / 255;
+                                                    unsigned char g = ((unsigned char)ColorOut.g * 63) / 255;
+                                                    unsigned char b = ((unsigned char)ColorOut.b * 31) / 255;
+
+                                                    BlurTable0[x[0]][x[1]][x[2]][x[3]] = (unsigned long)(r<<11 | g<<5 | b);
+                                                }
 
                                                 /// Tabelle 1 für Gerade Zeile
                                                 _y *= Scanline;
@@ -289,11 +301,23 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 ColorIn = ColorOut;
                                                 ChangeContrast(&ColorIn, &ColorOut,Kontrast);
 
-                                                RGB =  (unsigned long)ColorOut.r<<16; // Rot
-                                                RGB |= (unsigned long)ColorOut.g<<8;  // Grün
-                                                RGB |= (unsigned long)ColorOut.b;     // Blau
+                                                if(DestDisplayMode == 32)
+                                                {
+                                                    RGB =  (unsigned long)ColorOut.r<<16; // Rot
+                                                    RGB |= (unsigned long)ColorOut.g<<8;  // Grün
+                                                    RGB |= (unsigned long)ColorOut.b;     // Blau
 
-                                                BlurTable0S[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
+                                                    BlurTable0S[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
+                                                }
+
+                                                if(DestDisplayMode == 16)
+                                                {
+                                                    unsigned char r = ((unsigned char)ColorOut.r * 31) / 255;
+                                                    unsigned char g = ((unsigned char)ColorOut.g * 63) / 255;
+                                                    unsigned char b = ((unsigned char)ColorOut.b * 31) / 255;
+
+                                                    BlurTable0S[x[0]][x[1]][x[2]][x[3]] = (unsigned long)(r<<11 | g<<5 | b);
+                                                }
 
                                                 /// Tabelle 1 für Ungerade Zeilen
                                                 _y = C64YUVPalette2[x[0]*3];
@@ -333,11 +357,24 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 ColorIn = ColorOut;
                                                 ChangeContrast(&ColorIn, &ColorOut,Kontrast);
 
-                                                RGB =  (unsigned long)ColorOut.r<<16; // Rot
-                                                RGB |= (unsigned long)ColorOut.g<<8;  // Grün
-                                                RGB |= (unsigned long)ColorOut.b;     // Blau
+                                                if(DestDisplayMode == 32)
+                                                {
+                                                    RGB =  (unsigned long)ColorOut.r<<16; // Rot
+                                                    RGB |= (unsigned long)ColorOut.g<<8;  // Grün
+                                                    RGB |= (unsigned long)ColorOut.b;     // Blau
 
-                                                BlurTable1[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
+                                                    BlurTable1[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
+
+                                                }
+
+                                                if(DestDisplayMode == 16)
+                                                {
+                                                    unsigned char r = ((unsigned char)ColorOut.r * 31) / 255;
+                                                    unsigned char g = ((unsigned char)ColorOut.g * 63) / 255;
+                                                    unsigned char b = ((unsigned char)ColorOut.b * 31) / 255;
+
+                                                    BlurTable1[x[0]][x[1]][x[2]][x[3]] = (unsigned long)(r<<11 | g<<5 | b);
+                                                }
 
                                                 _y *= Scanline;
 
@@ -358,44 +395,60 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 ColorIn = ColorOut;
                                                 ChangeContrast(&ColorIn, &ColorOut,Kontrast);
 
-                                                RGB =  (unsigned long)ColorOut.r<<16; // Rot
-                                                RGB |= (unsigned long)ColorOut.g<<8;  // Grün
-                                                RGB |= (unsigned long)ColorOut.b;     // Blau
+                                                if(DestDisplayMode == 32)
+                                                {
+                                                    RGB =  (unsigned long)ColorOut.r<<16; // Rot
+                                                    RGB |= (unsigned long)ColorOut.g<<8;  // Grün
+                                                    RGB |= (unsigned long)ColorOut.b;     // Blau
 
-                                                BlurTable1S[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
+                                                    BlurTable1S[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
+                                                }
 
                                                 if(DestDisplayMode == 16)
                                                 {
-                                                    /*
-                                                    if(pixel_format != 0)
-                                                    {
-                                                        unsigned long RGBTmp = BlurTable0[x[0]][x[1]][x[2]][x[3]];
-                                                        r=(((RGBTmp&0x00FF0000)>>16)&0xFF);	// ROT
-                                                        g=(((RGBTmp&0x0000FF00)>>8)&0xFF);	// GRUEN
-                                                        b=(((RGBTmp&0x000000FF))&0xFF);         // BLAU
-                                                        BlurTable0[x[0]][x[1]][x[2]][x[3]] = (unsigned long)SDL_MapRGB(pixel_format,r,g,b);
+                                                    unsigned char r = ((unsigned char)ColorOut.r * 31) / 255;
+                                                    unsigned char g = ((unsigned char)ColorOut.g * 63) / 255;
+                                                    unsigned char b = ((unsigned char)ColorOut.b * 31) / 255;
 
-
-                                                        RGBTmp = BlurTable1[x[0]][x[1]][x[2]][x[3]];
-                                                        r=(((RGBTmp&0x00FF0000)>>16)&0xFF);	// ROT
-                                                        g=(((RGBTmp&0x0000FF00)>>8)&0xFF);	// GRUEN
-                                                        b=(((RGBTmp&0x000000FF))&0xFF);         // BLAU
-                                                        BlurTable1[x[0]][x[1]][x[2]][x[3]] = (unsigned long)SDL_MapRGB(pixel_format,r,g,b);
-
-                                                        RGBTmp = BlurTable0S[x[0]][x[1]][x[2]][x[3]];
-                                                        r=(((RGBTmp&0x00FF0000)>>16)&0xFF);	// ROT
-                                                        g=(((RGBTmp&0x0000FF00)>>8)&0xFF);	// GRUEN
-                                                        b=(((RGBTmp&0x000000FF))&0xFF);         // BLAU
-                                                        BlurTable0S[x[0]][x[1]][x[2]][x[3]] = (unsigned long)SDL_MapRGB(pixel_format,r,g,b);
-
-                                                        RGBTmp = BlurTable1S[x[0]][x[1]][x[2]][x[3]];
-                                                        r=(((RGBTmp&0x00FF0000)>>16)&0xFF);	// ROT
-                                                        g=(((RGBTmp&0x0000FF00)>>8)&0xFF);	// GRUEN
-                                                        b=(((RGBTmp&0x000000FF))&0xFF);         // BLAU
-                                                        BlurTable1S[x[0]][x[1]][x[2]][x[3]] = (unsigned long)SDL_MapRGB(pixel_format,r,g,b);
-                                                    }
-                                                    */
+                                                    BlurTable1S[x[0]][x[1]][x[2]][x[3]] = (unsigned long)(r<<11 | g<<5 | b);
                                                 }
+
+                                                /*
+                                                if(DestDisplayMode == 16)
+                                                {
+                                                    unsigned short r;
+                                                    unsigned short g;
+                                                    unsigned short b;
+
+                                                    unsigned long RGBTmp = BlurTable0[x[0]][x[1]][x[2]][x[3]];
+                                                    r = ((((RGBTmp&0x00FF0000)>>16)&0xFF) * 31) / 255;
+                                                    g = ((((RGBTmp&0x0000FF00)>>8)&0xFF) * 63) / 255;
+                                                    b = ((((RGBTmp&0x000000FF))&0xFF) * 31) / 255;
+                                                    //BlurTable0[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
+                                                    BlurTable0[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
+
+                                                    RGBTmp = BlurTable1[x[0]][x[1]][x[2]][x[3]];
+                                                    r = ((((RGBTmp&0x00FF0000)>>16)&0xFF) * 31) / 255;
+                                                    g = ((((RGBTmp&0x0000FF00)>>8)&0xFF) * 63) / 255;
+                                                    b = ((((RGBTmp&0x000000FF))&0xFF) * 31) / 255;
+                                                    //BlurTable1[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
+                                                    BlurTable1[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
+
+                                                    RGBTmp = BlurTable0S[x[0]][x[1]][x[2]][x[3]];
+                                                    r = ((((RGBTmp&0x00FF0000)>>16)&0xFF) * 31) / 255;
+                                                    g = ((((RGBTmp&0x0000FF00)>>8)&0xFF) * 63) / 255;
+                                                    b = ((((RGBTmp&0x000000FF))&0xFF) * 31) / 255;
+                                                    //BlurTable0S[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
+                                                    BlurTable0S[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
+
+                                                    RGBTmp = BlurTable1S[x[0]][x[1]][x[2]][x[3]];
+                                                    r = ((((RGBTmp&0x00FF0000)>>16)&0xFF) * 31) / 255;
+                                                    g = ((((RGBTmp&0x0000FF00)>>8)&0xFF) * 63) / 255;
+                                                    b = ((((RGBTmp&0x000000FF))&0xFF) * 31) / 255;
+                                                    //BlurTable1S[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
+                                                    BlurTable1S[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
+                                                }
+                                                */
                                         }
 }
 
@@ -492,7 +545,7 @@ void VideoPalClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
             }
         }
         else
-        {
+        { 
             switch(DestDisplayMode)
             {
             case 16:
@@ -620,7 +673,6 @@ void VideoPalClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
                 for(int x=0;x<(OutXW);x++)
                 {
                     *(Outpuffer16++) = Palette16Bit[VideoSource8[x] & 0x0F];
-                    //*(Outpuffer16++) = 0xf000;
                 }
                 VideoSource8 = VideoSource8+InXW;
             }

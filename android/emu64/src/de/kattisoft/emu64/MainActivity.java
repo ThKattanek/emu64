@@ -10,10 +10,15 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -23,6 +28,8 @@ public class MainActivity extends Activity {
 	private OpenGLRenderer renderer;
 	private ImageManager imageMgr;
 	private boolean rendererSet = false;
+	
+	private Builder back;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +74,9 @@ public class MainActivity extends Activity {
 			CopyFileFromAssets("basic.rom",app_data_path);
 			CopyFileFromAssets("kernal.rom",app_data_path);
 			CopyFileFromAssets("char.rom",app_data_path);
+			CopyFileFromAssets("1_pixel_fld.prg",app_data_path);
+			CopyFileFromAssets("flexgrid.prg",app_data_path);
+			CopyFileFromAssets("plexer_dycp.prg",app_data_path);
 		}
 		
 		NativeClass.SetSDExtPath(app_data_path);
@@ -139,4 +149,64 @@ public class MainActivity extends Activity {
 		super.onDestroy();
 		NativeClass.Destroy();
 	}
+	
+	/*
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event){
+		super.onKeyDown(keyCode, event);
+	if (keyCode == KeyEvent.KEYCODE_MENU) {
+		NativeClass.Menue();
+	}
+	
+	if (keyCode == KeyEvent.KEYCODE_HOME) {
+		NativeClass.Home();
+		return false;
+	}
+	
+		return true;
+	}
+	*/
+	
+	@Override
+    public boolean onKeyDown(int keyCode, KeyEvent event){
+		super.onKeyDown(keyCode, event);
+
+		if (keyCode == KeyEvent.KEYCODE_MENU) {
+			NativeClass.Menue();
+		}	
+		
+    if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+
+//----------------------------------------------------------------
+// erstellt einen Alert Dialog
+//----------------------------------------------------------------        
+
+        back = new AlertDialog.Builder(this);
+        //back.setIcon(R.drawable.alert); //verlinkt Icon aus drawable Ordner
+        back.setTitle("Sie haben die Zurück Taste gedrückt");
+        back.setMessage("Möchten Sie das Programm wirklich beenden?");
+
+        back.setPositiveButton("Ja", new DialogInterface.OnClickListener() 
+        {
+
+            public void onClick(DialogInterface dialog, int whichButton) 
+            {
+            	finish();
+            }
+
+        });
+
+        back.setNegativeButton("Nein", new DialogInterface.OnClickListener() 
+        {
+            public void onClick(DialogInterface dialog, int whichButton) {
+            }
+
+        });
+
+        back.show();
+    }
+        return true;
+}
+
+	
 }
