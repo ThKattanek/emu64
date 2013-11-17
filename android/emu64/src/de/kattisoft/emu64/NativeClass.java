@@ -14,4 +14,6 @@ public class NativeClass {
 	public static native void Destroy();
 	public static native void Menue();
 	public static native void Home();
+	public static native void TouchDown(int idx,float x, float y);
+	public static native void TouchUp(int idx,float x, float y);
 }

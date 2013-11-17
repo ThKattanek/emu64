@@ -262,11 +262,12 @@ void C64Class::FillAudioBuffer(short *stream, int laenge)
 
 	while(sid1->SoundBufferPos < (laenge/2))
 	{
-		/*
+		CheckKeys();
+
         FloppyIEC = 0;
-         for(int i=0; i<FloppyAnzahl; i++)
+        for(int i=0; i<FloppyAnzahl; i++)
          {
-             floppy[i]->OneZyklus();
+             //floppy[i]->OneZyklus();
 
              #ifdef floppy_asyncron
              counter_plus++;
@@ -280,7 +281,6 @@ void C64Class::FillAudioBuffer(short *stream, int laenge)
              FloppyIEC |= ~floppy[i]->FloppyIECLocal;
          }
          FloppyIEC = ~FloppyIEC;
-         */
 
          vic->OneZyklus();
          cia1->OneZyklus();
@@ -790,6 +790,27 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
 
     this->vic_puffer = vic_puffer;
     vic->SwitchVideoPuffer();
+}
+
+inline void C64Class::CheckKeys(void)
+{
+    unsigned char OUT_PA, OUT_PB;
+    unsigned char IN_PA, IN_PB;
+
+    OUT_PA = ~CIA1_PA.GetOutput();
+    OUT_PB = ~CIA1_PB.GetOutput();
+
+    IN_PA = IN_PB = 0;
+
+    unsigned char cbit = 1;
+    for(int i=0;i<8;i++)
+    {
+        if(OUT_PA & cbit) IN_PB |= (KeyboardMatrixToPB[i]|KeyboardMatrixToPBExt[i]);
+        if(OUT_PB & cbit) IN_PA |= (KeyboardMatrixToPA[i]|KeyboardMatrixToPAExt[i]);
+        cbit <<= 1;
+    }
+    CIA1_PA.SetInput(~(IN_PA|GamePort2));
+    CIA1_PB.SetInput(~(IN_PB|GamePort1));
 }
 
 void C64Class::GetC64CpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg)

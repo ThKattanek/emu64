@@ -19,6 +19,8 @@ import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.MotionEvent.PointerCoords;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -30,6 +32,8 @@ public class MainActivity extends Activity {
 	private boolean rendererSet = false;
 	
 	private Builder back;
+	
+	private PointerCoords coord = new PointerCoords();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +89,11 @@ public class MainActivity extends Activity {
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		// Ständig Landscape
+		 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		
+		// Ständig Portrait
+		//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		
 		view = new GLSurfaceView(this);
 		renderer = new OpenGLRenderer();
@@ -208,5 +216,27 @@ public class MainActivity extends Activity {
         return true;
 }
 
+	public boolean onTouchEvent(MotionEvent event)
+	{
+		super.onTouchEvent(event);
+		
+		Integer idx = event.getActionIndex();
+		Integer id = event.getPointerId(idx);
+		Integer action = event.getAction();
+		
+		switch(action & MotionEvent.ACTION_MASK)
+		{
+		case MotionEvent.ACTION_DOWN:
+		case MotionEvent.ACTION_POINTER_DOWN:
+			event.getPointerCoords(idx, coord);
+			NativeClass.TouchDown(id, coord.x, coord.y);
+			break;
+		case MotionEvent.ACTION_UP:
+		case MotionEvent.ACTION_POINTER_UP:
+			NativeClass.TouchUp(id, coord.x, coord.y);
+			break;
+		}
+		return true;
+	}
 	
 }

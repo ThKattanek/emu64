@@ -107,6 +107,7 @@ public:
 
 private:
     void VicRefresh(unsigned char *vic_puffer);
+    void CheckKeys(void);
     void WriteSidIO(unsigned short adresse,unsigned char wert);
     unsigned char ReadSidIO(unsigned short adresse);
     void WriteIO1(unsigned short adresse,unsigned char wert);
