@@ -192,7 +192,7 @@ public class MainActivity extends Activity {
         back = new AlertDialog.Builder(this);
         //back.setIcon(R.drawable.alert); //verlinkt Icon aus drawable Ordner
         back.setTitle("Sie haben die Zurück Taste gedrückt");
-        back.setMessage("Möchten Sie das Programm wirklich beenden?");
+        back.setMessage("Möchten Sie Emu64 wirklich beenden?");
 
         back.setPositiveButton("Ja", new DialogInterface.OnClickListener() 
         {
