@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.08.2013                //
+// Letzte Änderung am 16.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -26,7 +26,6 @@
 #include "crt_class.h"
 #include "floppy1541_class.h"
 #include "cpu_info.h"
-#include "c64keys2usb.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
@@ -179,9 +178,6 @@ public:
 
     unsigned char   KeyboardMatrixToPBExt[8];
     unsigned char   KeyboardMatrixToPAExt[8];
-
-    C64Keys2USB     *c64key2usb;
-    bool            C64Keys2USB_Enable;
 
     int             IOSource;
 

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.08.2013                //
+// Letzte Änderung am 16.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -197,19 +197,8 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     cia1 = new MOS6526(0);
     cia2 = new MOS6526(1);
     crt = new CRTClass();
-    c64key2usb = new C64Keys2USB();
 
     vic_puffer = vic->VideoPuffer;
-
-    if(c64key2usb->Open())
-    {
-        C64Keys2USB_Enable = true;
-        LogText((char*)">> Es wurde ein C64Keys2USB Adapter gefunden\n");
-    }
-    else{
-        C64Keys2USB_Enable = false;
-        LogText((char*)"<< Es wurde kein C64Keys2USB Adapter gefunden\n");
-    }
 
     cia2->FloppyIEC = &FloppyIEC;
     cia2->C64IEC = &C64IEC;
@@ -1232,13 +1221,6 @@ int SDLThread(void *userdat)
                     else SDL_Delay(1);
                 }
             }
-
-            // C64Keys2USB Support
-            if(c64->C64Keys2USB_Enable)
-            {
-                c64->c64key2usb->Update();
-                c64->KeyEvent(0,KEY_DOWN,0);
-            }
         }
         else
         {
@@ -1593,36 +1575,24 @@ loop_wait_next_opc:
 
 void C64Class::KeyEvent(unsigned char matrix_code,KeyStatus key_status, bool isAutoShift)
 {
-    if(!C64Keys2USB_Enable)
+    const unsigned char AutoShift = 0x17; // C64 Shift Links
+
+    switch(key_status)
     {
-        const unsigned char AutoShift = 0x17; // C64 Shift Links
+    case KEY_DOWN:
+        KeyboardMatrixToPB[matrix_code>>4]|=1<<(matrix_code&0x07);
+        if(isAutoShift) KeyboardMatrixToPB[AutoShift>>4]|=1<<(AutoShift&0x07);
 
-        switch(key_status)
-        {
-        case KEY_DOWN:
-            KeyboardMatrixToPB[matrix_code>>4]|=1<<(matrix_code&0x07);
-            if(isAutoShift) KeyboardMatrixToPB[AutoShift>>4]|=1<<(AutoShift&0x07);
+        KeyboardMatrixToPA[matrix_code&0x07]|=(1<<(matrix_code>>4));
+        if(isAutoShift) KeyboardMatrixToPA[AutoShift&0x07]|=(1<<(AutoShift>>4));
+        break;
+    case KEY_UP:
+        KeyboardMatrixToPB[matrix_code>>4]&=~(1<<(matrix_code&0x07));
+        if(isAutoShift) KeyboardMatrixToPB[AutoShift>>4]&=~(1<<(AutoShift&0x07));
 
-            KeyboardMatrixToPA[matrix_code&0x07]|=(1<<(matrix_code>>4));
-            if(isAutoShift) KeyboardMatrixToPA[AutoShift&0x07]|=(1<<(AutoShift>>4));
-            break;
-        case KEY_UP:
-            KeyboardMatrixToPB[matrix_code>>4]&=~(1<<(matrix_code&0x07));
-            if(isAutoShift) KeyboardMatrixToPB[AutoShift>>4]&=~(1<<(AutoShift&0x07));
-
-            KeyboardMatrixToPA[matrix_code&0x07]&=~(1<<(matrix_code>>4));
-            if(isAutoShift) KeyboardMatrixToPA[AutoShift&0x07]&=~(1<<(AutoShift>>4));
-            break;
-        }
-    }
-    else
-    {
-        // C64Key2USB Support
-        for(int i=0;i<8;i++)
-        {
-            KeyboardMatrixToPB[i]=c64key2usb->GetKeysRow(i);
-            KeyboardMatrixToPA[i]=c64key2usb->GetKeysCol(i);
-        }
+        KeyboardMatrixToPA[matrix_code&0x07]&=~(1<<(matrix_code>>4));
+        if(isAutoShift) KeyboardMatrixToPA[AutoShift&0x07]&=~(1<<(AutoShift>>4));
+        break;
     }
 }
 
