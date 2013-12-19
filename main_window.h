@@ -61,7 +61,7 @@ public:
     customSplashScreen *splash;
 
     QTextStream *log;
-    void LogText(char*);
+    void LogText(const char*);
 
     /// C64 Klasse ///
     C64Class *c64;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.12.2013                //
+// Letzte Änderung am 19.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -30,11 +30,14 @@ int SDLThreadLoad(void *userdat);
 #define RecPollingWaitStart 20
 
 C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(char*)> log_function, const char* gfx_path):
-    SDLJoystickIsOpen(false),
-    JoystickAnzahl(0),StopJoystickUpdate(true),JoyStickUdateIsStop(true),
-    RecJoyMapping(false),
     mmu(NULL),cpu(NULL),vic(NULL),sid1(NULL),sid2(NULL),cia1(NULL),cia2(NULL),crt(NULL)
 {   
+    JoyStickUdateIsStop = true,
+    RecJoyMapping = false,
+    StopJoystickUpdate = true;
+    SDLJoystickIsOpen = false;
+    JoystickAnzahl = 0;
+
     VPort1 = 0;
     VPort2 = 1;
 
@@ -433,8 +436,6 @@ void C64Class::SDLThreadPauseEnd()
 
 int SDLThread(void *userdat)
 {
-    char str00[512];
-
     C64Class *c64 = (C64Class*)userdat;
     SDL_Event event;
     c64->LoopThreadEnd = false;
@@ -544,8 +545,8 @@ int SDLThread(void *userdat)
                 glTexImage2D( GL_TEXTURE_2D, 0, 4, c64->AktWindowXW, c64->AktWindowYW, 0,GL_BGRA, GL_UNSIGNED_BYTE, c64->C64ScreenBuffer );
                 //gluBuild2DMipmaps(GL_TEXTURE_2D, 4, c64->AktWindowXW, c64->AktWindowXW,GL_RGBA, GL_UNSIGNED_BYTE, c64->C64ScreenBuffer );
 
-                GLenum  TextureFormat;
-                GLint   NofColors;
+                GLenum  TextureFormat = 0;
+                GLint   NofColors = 0;
 
                 if(c64->Pfeil0 != NULL)
                 {
@@ -1203,7 +1204,7 @@ int SDLThread(void *userdat)
                     if(c64->DrawScreenBack)
                     {
                         SDL_Rect rec_src = {0,0,c64->AktC64ScreenXW,c64->AktC64ScreenYW};
-                        SDL_Rect rec_dst = {0,0,c64->C64Screen->w,c64->C64Screen->h};
+                        SDL_Rect rec_dst = {0,0,(unsigned short)c64->C64Screen->w,(unsigned short)c64->C64Screen->h};
 
                         /// Auf Screenshot Start prüfen ///
                         if(c64->StartScreenshot)
@@ -1710,8 +1711,7 @@ unsigned char* C64Class::GetRAMPointer(unsigned short adresse)
 
 void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool pal_enable,bool filter_enable, int fullres_xw, int fullres_yw)
 {
-    //ColBits32 = colbits32;
-    ColBits32 = true;
+    ColBits32 = colbits32;
     DoubleSize = doublesize;
     PalEnable =  pal_enable;
     FilterEnable = filter_enable;
@@ -2849,18 +2849,18 @@ void C64Class::OpenSDLJoystick()
     {
         SDLJoystickIsOpen = false;
         SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-        LogText(">> SDL Subsystem Joystick wurde geschlossen\n");
+        LogText((char*)">> SDL Subsystem Joystick wurde geschlossen\n");
     }
 
     if(SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
     {
         SDLJoystickIsOpen = false;
-        LogText("<< ERROR: SDL Subsystem Joystick konnte nicht geöffnet werden\n");
+        LogText((char*)"<< ERROR: SDL Subsystem Joystick konnte nicht geöffnet werden\n");
     }
     else
     {
         SDLJoystickIsOpen = true;
-        LogText(">> SDL Subsytem Joystick wurde erfolgreich geöffnet\n");
+        LogText((char*)">> SDL Subsytem Joystick wurde erfolgreich geöffnet\n");
         JoystickAnzahl = SDL_NumJoysticks();
         if(JoystickAnzahl > MAX_JOYSTICKS) JoystickAnzahl = MAX_JOYSTICKS;
 
@@ -2868,10 +2868,10 @@ void C64Class::OpenSDLJoystick()
         switch(JoystickAnzahl)
         {
         case 0:
-            LogText("<< SDL konnte keinen Joystick/Gamepad erkennen\n");
+            LogText((char*)"<< SDL konnte keinen Joystick/Gamepad erkennen\n");
             break;
         case 1:
-            LogText(">> SDL konnte 1 Joystick/Gamepad erkennen\n");
+            LogText((char*)">> SDL konnte 1 Joystick/Gamepad erkennen\n");
             break;
         default:
             sprintf(str00,">> SDL konnte %d Joysticks/Gamepads erkennen\n",JoystickAnzahl);
@@ -2907,7 +2907,7 @@ void C64Class::CloseSDLJoystick()
     {
         SDLJoystickIsOpen = false;
         SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-        LogText(">> SDL Subsystem Joystick wurde geschlossen\n");
+        LogText((char*)">> SDL Subsystem Joystick wurde geschlossen\n");
     }
     StopJoystickUpdate = true;
 }

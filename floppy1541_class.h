@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: floppy1541_class.h                    //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 28.08.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 19.12.2013        		//
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef FLOPPY1541_CLASS_H
@@ -31,7 +31,7 @@ static const int NUM_SECTORS[42] = {21,21,21,21,21,21,21,21,21,21,21,21,21,21,21
 
 #define D64 0
 #define G64 1
-#define MAX_BREAK_GROUPS 255
+#define MAX_BREAK_GROUPS 256
 
 class Floppy1541
 {    
@@ -153,7 +153,7 @@ private:
     bool                ImageWriteStatus;	// Sowie in Image geschrieben wird gehts auf true
     unsigned char       D64Image[174848];	// Aktuelles D64 Image
     unsigned char       GCRImage[665952];	// Aktuelles GCR Image
-    unsigned short      TrackSize[84];
+    unsigned short      TrackSize[256];
 
     /// Für Floppy Sound ///
 
@@ -207,7 +207,7 @@ private:
     unsigned short  BreakStatus;
     bool            *FoundBreakpoint;
 
-    unsigned char   BreakGroupAnz;
+    unsigned short  BreakGroupAnz;
     BREAK_GROUP     *BreakGroup[MAX_BREAK_GROUPS];
 
     ////////////////////////////////////////////////////////////

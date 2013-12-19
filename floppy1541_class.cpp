@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: floppy1541_class.cpp                  //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 02.08.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 19.12.2013        		//
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include "floppy1541_class.h"
@@ -136,7 +136,7 @@ void Floppy1541::SetEnableFloppy(bool status)
 
         AktHalbSpur = -1; //1
         GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
-        GCRSpurEnde = GCRSpurStart + TrackSize[(int)AktHalbSpur];
+        GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
     }
     else
     {

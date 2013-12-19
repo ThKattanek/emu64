@@ -1,15 +1,32 @@
+//////////////////////////////////////////////////
+//                                              //
+// Emu64                                        //
+// von Thorsten Kattanek                        //
+//                                              //
+// #file: c64_speed_window.cpp                  //
+//                                              //
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 19.12.2013                //
+// www.emu64.de                                 //
+//                                              //
+//////////////////////////////////////////////////
+
 #include "c64_speed_window.h"
 #include "ui_c64_speed_window.h"
 
 C64SpeedWindow::C64SpeedWindow(QWidget *parent, QSettings *_ini) :
     QDialog(parent),
-    ui(new Ui::C64SpeedWindow),
-    ini(NULL),c64(NULL),PauseStatus(false),isOneShowed(false)
+    ini(NULL),c64(NULL),PauseStatus(false)
 {
     ini = _ini;
 
+    ui = new Ui::C64SpeedWindow();
     ui->setupUi(this);
     ui->C64Speed->setValue(100);
+
+    isOneShowed = false;
 
     ////////// Load from INI ///////////
     if(ini != NULL)

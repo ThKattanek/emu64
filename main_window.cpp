@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.03.2013                //
+// Letzte Änderung am 19.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -325,7 +325,7 @@ void MainWindow::OnInit()
     this->show();
 }
 
-void MainWindow::OnMessage(QStringList msg)
+void MainWindow::OnMessage(QStringList)
 {
     /*
     for(int i=0;i<msg.length();i++)
@@ -333,7 +333,7 @@ void MainWindow::OnMessage(QStringList msg)
     */
 }
 
-void MainWindow::LogText(char *log_text)
+void MainWindow::LogText(const char *log_text)
 {
     if(log != NULL)
     {

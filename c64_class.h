@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.12.2013                //
+// Letzte Änderung am 19.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -106,8 +106,8 @@ public:
     int             AktWindowXW;
     int             AktWindowYW;
     int             AktWindowColorBits;
-    int             AktC64ScreenXW;
-    int             AktC64ScreenYW;
+    unsigned short  AktC64ScreenXW;
+    unsigned short  AktC64ScreenYW;
     bool            ColBits32;
     bool            DoubleSize;
     bool            PalEnable;
@@ -270,7 +270,7 @@ private:
     unsigned short  BreakStatus;
     bool            FloppyFoundBreakpoint;
 
-    unsigned char   BreakGroupAnz;
+    unsigned short   BreakGroupAnz;
     BREAK_GROUP     *BreakGroup[MAX_BREAK_GROUPS];
 
     ////////////////////////////////////////////////////////////

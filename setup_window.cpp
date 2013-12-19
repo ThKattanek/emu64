@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.02.2013                //
+// Letzte Änderung am 19.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -96,31 +96,31 @@ void SetupWindow::LoadINI(C64Class *_c64)
             ui->VJoySlots->setCellWidget(i,4,button);
 
             QByteArray array = ini->value("Type",0).toByteArray();
-            if (array != 0) for(int j=0;j<5;j++) c64->VJoys[i].Type[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].Type[j] = array[j];
 
             array = ini->value("JoyIndex",0).toByteArray();
-            if (array != 0) for(int j=0;j<5;j++) c64->VJoys[i].JoyIndex[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].JoyIndex[j] = array[j];
 
             array = ini->value("KeyDown",0).toByteArray();
-            if (array != 0) for(int j=0;j<5;j++) c64->VJoys[i].KeyDown[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].KeyDown[j] = array[j];
 
             array = ini->value("KeyUp",0).toByteArray();
-            if (array != 0) for(int j=0;j<5;j++) c64->VJoys[i].KeyUp[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].KeyUp[j] = array[j];
 
             array = ini->value("ButtonNr",0).toByteArray();
-            if (array != 0) for(int j=0;j<5;j++) c64->VJoys[i].ButtonNr[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].ButtonNr[j] = array[j];
 
             array = ini->value("HatNr",0).toByteArray();
-            if (array != 0) for(int j=0;j<5;j++) c64->VJoys[i].HatNr[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].HatNr[j] = array[j];
 
             array = ini->value("HatValue",0).toByteArray();
-            if (array != 0) for(int j=0;j<5;j++) c64->VJoys[i].HatValue[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].HatValue[j] = array[j];
 
             array = ini->value("AxisNr",0).toByteArray();
-            if (array != 0) for(int j=0;j<5;j++) c64->VJoys[i].AxisNr[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].AxisNr[j] = array[j];
 
             array = ini->value("AxisValue",0).toByteArray();
-            if (array != 0) for(int j=0;j<5;j++) c64->VJoys[i].AxisValue[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].AxisValue[j] = array[j];
 
             ini->endGroup();
         }

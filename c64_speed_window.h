@@ -1,3 +1,18 @@
+//////////////////////////////////////////////////
+//                                              //
+// Emu64                                        //
+// von Thorsten Kattanek                        //
+//                                              //
+// #file: c64_speed_window.h                    //
+//                                              //
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 19.12.2013                //
+// www.emu64.de                                 //
+//                                              //
+//////////////////////////////////////////////////
+
 #ifndef C64_SPEED_WINDOW_H
 #define C64_SPEED_WINDOW_H
 

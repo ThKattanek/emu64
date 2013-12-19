@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: mos6510_class.cpp                     //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 30.12.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 19.12.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include "mos6510_class.h"
@@ -32,6 +32,7 @@ MOS6510::MOS6510(void)
     JAMFlag = false;
     TMPByte = 0;
     CpuWait = false;
+    LastOPC_CLI = false;
 
     PC = 0;
     AC = 0;
@@ -447,7 +448,7 @@ bool MOS6510::OneZyklus(void)
     static bool RESET_OLD = false;
     static unsigned char   idxReg = 0;
     //static bool RDY_OLD = false;
-    static bool LastOPC_CLI = false;
+
 
     unsigned int    tmp;
     unsigned int    tmp1;

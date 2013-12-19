@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: mos6510_class.h                       //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 30.12.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 19.12.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef MOS_6510_CLASS_H
@@ -86,6 +86,7 @@ private:
     unsigned short  AktOpcodePC;
     bool            CpuWait;
     unsigned char   TMPByte;
+    bool            LastOPC_CLI;
     unsigned short  PC;
     unsigned char   AC;
     unsigned char   XR;
