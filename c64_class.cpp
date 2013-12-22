@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.12.2013                //
+// Letzte Änderung am 22.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -2686,7 +2686,7 @@ void C64Class::WriteSidIO(unsigned short adresse,unsigned char wert)
     }
 }
 
-unsigned char C64Class::ReadSidIO(unsigned short)
+unsigned char C64Class::ReadSidIO(unsigned short adresse)
 {
     /*
     if(StereoEnable)
@@ -2706,7 +2706,8 @@ unsigned char C64Class::ReadSidIO(unsigned short)
         return sid1_ReadIO(adresse);
     }
     */
-    return 0;
+
+    return sid1->ReadIO(adresse);
 }
 
 /// $DE00
