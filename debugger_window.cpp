@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.02.2013                //
+// Letzte Änderung am 21.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -896,7 +896,7 @@ bool DebuggerWindow::getSaveFileName(QWidget *parent, QString caption, QString f
    saveDialog.setWindowTitle(caption);
    saveDialog.setAcceptMode(QFileDialog::AcceptSave);
    saveDialog.setConfirmOverwrite(false);
-   //saveDialog.setFilter(filter);
+   saveDialog.setFilter(filter);
    saveDialog.selectFile(*fileName);
 
    *fileName = "";
@@ -914,12 +914,12 @@ bool DebuggerWindow::getSaveFileName(QWidget *parent, QString caption, QString f
    QFileInfo fileInfo(tmpFileName);
    if (fileInfo.suffix().isEmpty()) {
       // Add the suffix selected by the user
-      /*
+
       extension = saveDialog.selectedFilter();
       extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
       extension = extension.left(extension.indexOf(")"));
       extension = extension.simplified();
-      */
+
       // If the filter specifies more than one extension, choose the first one
       if (extension.indexOf(" ") != -1)
          extension = extension.left(extension.indexOf(" "));
@@ -930,12 +930,12 @@ bool DebuggerWindow::getSaveFileName(QWidget *parent, QString caption, QString f
 
    // Does the file already exist?
    if (QFile::exists(tmpFileName)) {
-       /*
+
        extension = saveDialog.selectedFilter();
        extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
        extension = extension.left(extension.indexOf(")"));
        extension = extension.simplified();
-       */
+
       int result = QMessageBox::question(parent, QObject::tr("Überschreiben?"),
          QObject::tr("Soll die Datei \"%1\" überschrieben werden?").arg(fileInfo.fileName()),
          QMessageBox::Yes,

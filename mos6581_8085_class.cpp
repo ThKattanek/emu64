@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: mos6581_8085class.cpp                 //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 22.07.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 22.12.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include "mos6581_8085_class.h"
@@ -31,7 +31,8 @@ MOS6581_8085::MOS6581_8085(int nummer,int samplerate,int puffersize,int *error)
     SidNummer = nummer;
     this->FilterFrequenz=0;
     Samplerate=(double)samplerate;
-    FreqConvAddWert=((double)1.0)/((double)985248.0/Samplerate);
+    C64ZyklenSek = 985248;
+    FreqConvAddWert=((double)1.0)/((double)C64ZyklenSek/Samplerate);
     FreqConvCounter=0.0;
 
     Voice[0]->OscEnable = true;
@@ -97,7 +98,7 @@ void MOS6581_8085::ChangeSampleRate(int samplerate,int puffersize)
     delete SoundBufferV2;
 
     Samplerate=(double)samplerate;
-    FreqConvAddWert=((double)1.0)/((double)985248.0/Samplerate);
+    FreqConvAddWert=((double)1.0)/((double)C64ZyklenSek/Samplerate);
     FreqConvCounter=0.0;
 
     SoundBufferPos = 0;
@@ -154,9 +155,10 @@ void MOS6581_8085::SetChipType(bool type)
     SetQ();
 }
 
-void MOS6581_8085::SetC64Zyklen(double ZyklenSek)
+void MOS6581_8085::SetC64Zyklen(double C64ZyklenSek)
 {
-    FreqConvAddWert=((double)1.0)/((double)ZyklenSek/Samplerate);
+    this->C64ZyklenSek = C64ZyklenSek;
+    FreqConvAddWert=((double)1.0)/((double)C64ZyklenSek/Samplerate);
 }
 
 void MOS6581_8085::SetVoiceEnable(int nr, bool status)

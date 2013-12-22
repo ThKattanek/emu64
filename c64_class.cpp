@@ -26,7 +26,7 @@ int SDLThread(void *userdat);
 int SDLThreadLoad(void *userdat);
 
 #define AudioSampleRate 44100
-#define AudioPufferSize 882*1
+#define AudioPufferSize 882    // 882 bei 44.100 Khz
 #define RecPollingWaitStart 20
 
 C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(char*)> log_function, const char* gfx_path):
@@ -340,7 +340,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     cia2->Reset();
 
     sid1->RESET = &RESET;
-    sid1->SetC64Zyklen(985248);
+    sid1->SetC64Zyklen(985248);     // 985248
     sid1->SetChipType(MOS_8580);
     sid1->SoundOutputEnable = true;
     sid1->CycleExact = true;
@@ -348,7 +348,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     sid1->Reset();
 
     sid2->RESET = &RESET;
-    sid2->SetC64Zyklen(985248);
+    sid2->SetC64Zyklen(985248);     // 985248
     sid2->SetChipType(MOS_8580);
     sid2->SoundOutputEnable = false;
     sid2->CycleExact = true;
@@ -1194,9 +1194,9 @@ int SDLThread(void *userdat)
                     }
 
                     SDL_GL_SwapBuffers();
-
-                    SDL_framerateDelay(&c64->fps_manager);
+                    //SDL_framerateDelay(&c64->fps_manager);
                     c64->DrawScreenBack = false;
+                    SDL_Delay(1);
                 }
                 else
                 {

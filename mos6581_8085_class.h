@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: mos6581_8085_class.h                  //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 18.07.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 22.12.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef MOS6581_8085_CLASS_H
@@ -50,14 +50,14 @@ class MOS6581_8085
 
     SIDDumpClass	*IoDump;
 
-    bool		Mouse1351Enable;
+    bool            Mouse1351Enable;
     unsigned char	MouseX;
     unsigned char	MouseY;
 
     /// Recording ///
-    bool		Recording;
-    int                 RecSampleCounter;
-    short		RecSampleBuffer[19656];
+    bool            Recording;
+    int             RecSampleCounter;
+    short           RecSampleBuffer[19656];
 
     /* Funktionen */
     MOS6581_8085(int nummer, int samplerate,int puffersize,int *error);
@@ -91,6 +91,7 @@ class MOS6581_8085
     int	SidNummer;
     bool                SidModel;
 
+    int                 C64ZyklenSek;
     double              FreqConvCounter;	// interner Counter für Fast Fast Fast Resampling ;-)
     double              FreqConvAddWert;
 
