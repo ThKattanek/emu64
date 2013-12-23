@@ -325,12 +325,15 @@ void MainWindow::OnInit()
     this->show();
 }
 
-void MainWindow::OnMessage(QStringList)
+void MainWindow::OnMessage(QStringList msg)
 {
-    /*
-    for(int i=0;i<msg.length();i++)
-        QMessageBox::information(this,"Komandozeile",msg[i]);
-    */
+    // Einfache Komandozeilenauswertung
+    // Autostart wird ausgeführt
+    if(msg.length() > 1)
+    {
+        c64->LoadAutoRun(0,msg[1].toLatin1().data());
+    }
+
 }
 
 void MainWindow::LogText(const char *log_text)
