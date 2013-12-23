@@ -333,7 +333,6 @@ void MainWindow::OnMessage(QStringList msg)
     {
         c64->LoadAutoRun(0,msg[1].toLatin1().data());
     }
-
 }
 
 void MainWindow::LogText(const char *log_text)

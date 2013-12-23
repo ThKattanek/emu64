@@ -1,19 +1,21 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: mos6569_class.cpp                     //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 30.12.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 23.12.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include "mos6569_class.h"
+#include <stdio.h>
+
 
 #ifdef NEW
 /////////////////////////// NEUE VERSION ////////////////////////////////
@@ -62,9 +64,9 @@ VICII::VICII()
 	MX8 = 0;
 	CTRL1 = 0;
 	CTRL2 = 0;
-        Y_SCROLL = 0;
-        X_SCROLL = 0;
-        VBASE = 0;
+    Y_SCROLL = 0;
+    X_SCROLL = 0;
+    VBASE = 0;
 	IRQ_RASTER = 0;
 	LPX = 0;
 	LPY = 0;
@@ -88,6 +90,20 @@ VICII::VICII()
 	GrafikMode = 0;
 	IRQFlag = 0;
 	IRQMask = 0;
+
+    unsigned short xwert = 0x0194;
+    for(int i=1;i<14;i++)
+    {
+        XKoordTbl[i] = xwert;
+        xwert += 8;
+    }
+
+    xwert = 0x0004;
+    for(int i=14;i<64;i++)
+    {
+        XKoordTbl[i] = xwert;
+        xwert += 8;
+    }
 
 	SetVicType(0);
 
@@ -127,6 +143,7 @@ VICII::VICII()
 	SpriteExpYFlipFlop = 0xFF;
 	SpriteDMA = 0;
 	SpriteView = 0;
+    SpriteCollisionEnable = true;
 
 	unsigned short spr_x_start = 0x194;
 	for(int x=0;x<0x200;x++)
@@ -199,6 +216,11 @@ void VICII::SetVicType(int system)
 		FIRST_DISP_LINE = FIRST_DISP_LINE_NTSC;
 		break;
 	}
+}
+
+void VICII::EnableSpriteCollision(bool enabled)
+{
+    SpriteCollisionEnable = enabled;
 }
 
 void VICII::EnableGreyDot(bool enabled)
@@ -530,10 +552,10 @@ inline void VICII::DrawGraphics(void)
 
 					for(int i=6;i>-1;i-=2)
 					{
-                                                *VideoPufferLine_XScroll = Colors[(GfxData>>(i))&3];
-                                                VideoPufferLine_XScroll++;
-                                                *VideoPufferLine_XScroll = VideoPufferLine_XScroll[-1];
-                                                VideoPufferLine_XScroll++;
+                        *VideoPufferLine_XScroll = Colors[(GfxData>>(i))&3];
+                        VideoPufferLine_XScroll++;
+                        *VideoPufferLine_XScroll = VideoPufferLine_XScroll[-1];
+                        VideoPufferLine_XScroll++;
 					}
 					VideoPufferLine += 8;
 				}
@@ -555,10 +577,10 @@ inline void VICII::DrawGraphics(void)
 				
 				for(int i=6;i>-1;i-=2)
 				{
-                                        *VideoPufferLine_XScroll = Colors[(GfxData>>(i))&3];
-                                        VideoPufferLine_XScroll++;
-                                        *VideoPufferLine_XScroll = VideoPufferLine_XScroll[-1];
-                                        VideoPufferLine_XScroll++;
+                    *VideoPufferLine_XScroll = Colors[(GfxData>>(i))&3];
+                    VideoPufferLine_XScroll++;
+                    *VideoPufferLine_XScroll = VideoPufferLine_XScroll[-1];
+                    VideoPufferLine_XScroll++;
 				}
 				VideoPufferLine += 8;
 				break;
@@ -697,17 +719,37 @@ inline void VICII::DrawGraphics(void)
 	CheckBorder();
 }
 
-inline void VICII::DrawSprites(void)
+inline void VICII::DrawSprites(unsigned short AktXKoordinate)
 {
-	if(!VicConfig[VIC_SPRITES_ON]) return;
+    unsigned char mask=1;
+    for(int SpriteNr=0;SpriteNr<8;SpriteNr++)
+    {
+        //if()
+        mask++;
+    }
+
+
+    return;
+
+
+    if(!VicConfig[VIC_SPRITES_ON]) return;
 	if(AktRZ < FIRST_DISP_LINE_PAL+1) return;
 
+    // Spritekollisionspuffer löschen
+    if(SpriteCollisionEnable)
+    {
+        unsigned int *lp = (unsigned int *)SpriteCollisionsPuffer - 1;
+        for (int i=0; i < TOTAL_X/4; i++) *++lp = 0;
+    }
+
 	bitc = 0x80;
-	for(int i=7;i>-1;i--)
-	{
-		if(((SpriteViewAktLine & bitc) == bitc) && (MX[i]<0x1F8))
+    int SpriteNr = 7;
+    while(SpriteNr >= 0)
+    {
+        // Ist Sprite Sichtbar ?
+        if(((SpriteViewAktLine & bitc) == bitc) && (MX[SpriteNr]<0x1F8))
 		{
-			SpritePufferLine = (VideoPufferLine - (60 * 8)) - 4 + SpriteXDisplayTbl[MX[i]];
+            SpritePufferLine = (VideoPufferLine - (60 * 8)) - 4 + SpriteXDisplayTbl[MX[SpriteNr]];
 			if((MDP & bitc) == 0)	/// Prüfen auf Sprite Hinter Vordergrund
 			{
 				/// Sprites vor der Vordergrundgrafik
@@ -715,9 +757,9 @@ inline void VICII::DrawSprites(void)
 				{
 					if((MMC & bitc) == bitc)
 					{
-						for(int ii=0;ii<12;ii++)
+                        for(int i=0;i<12;i++)
 						{
-							switch(SpriteSeqAktLine[i] & 0xC00000)
+                            switch(SpriteSeqAktLine[SpriteNr] & 0xC00000)
 							{
 							case 0x000000:
 								SpritePufferLine += 4;
@@ -729,10 +771,10 @@ inline void VICII::DrawSprites(void)
 								*SpritePufferLine++ = MM0;
 								break;
 							case 0x800000:
-								*SpritePufferLine++ = MCOLOR[i];
-								*SpritePufferLine++ = MCOLOR[i];
-								*SpritePufferLine++ = MCOLOR[i];
-								*SpritePufferLine++ = MCOLOR[i];
+                                *SpritePufferLine++ = MCOLOR[SpriteNr];
+                                *SpritePufferLine++ = MCOLOR[SpriteNr];
+                                *SpritePufferLine++ = MCOLOR[SpriteNr];
+                                *SpritePufferLine++ = MCOLOR[SpriteNr];
 								break;
 							case 0xC00000:
 								*SpritePufferLine++ = MM1;
@@ -741,20 +783,20 @@ inline void VICII::DrawSprites(void)
 								*SpritePufferLine++ = MM1;
 								break;
 							}
-							SpriteSeqAktLine[i] = SpriteSeqAktLine[i] << 2;
+                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 2;
 						}
 					}
 					else
 					{
-						for(int ii=0;ii<24;ii++)
+                        for(int i=0;i<24;i++)
 						{
-							if(SpriteSeqAktLine[i] & 0x800000)
+                            if(SpriteSeqAktLine[SpriteNr] & 0x800000)
 							{
-								*SpritePufferLine++ = MCOLOR[i];
-								*SpritePufferLine++ = MCOLOR[i];
+                                *SpritePufferLine++ = MCOLOR[SpriteNr];
+                                *SpritePufferLine++ = MCOLOR[SpriteNr];
 							}
 							else SpritePufferLine += 2;
-							SpriteSeqAktLine[i] = SpriteSeqAktLine[i] << 1;
+                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 1;
 						}
 					}
 				}
@@ -762,9 +804,9 @@ inline void VICII::DrawSprites(void)
 				{
 					if((MMC & bitc) == bitc)
 					{
-						for(int ii=0;ii<12;ii++)
+                        for(int i=0;i<12;i++)
 						{
-							switch(SpriteSeqAktLine[i] & 0xC00000)
+                            switch(SpriteSeqAktLine[SpriteNr] & 0xC00000)
 							{
 							case 0x000000:
 								SpritePufferLine += 2;
@@ -774,24 +816,24 @@ inline void VICII::DrawSprites(void)
 								*SpritePufferLine++ = MM0;
 								break;
 							case 0x800000:
-								*SpritePufferLine++ = MCOLOR[i];
-								*SpritePufferLine++ = MCOLOR[i];
+                                *SpritePufferLine++ = MCOLOR[SpriteNr];
+                                *SpritePufferLine++ = MCOLOR[SpriteNr];
 								break;
 							case 0xC00000:
 								*SpritePufferLine++ = MM1;
 								*SpritePufferLine++ = MM1;
 								break;
 							}
-							SpriteSeqAktLine[i] = SpriteSeqAktLine[i] << 2;
+                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 2;
 						}
 					}
 					else
 					{
-						for(int ii=0;ii<24;ii++)
+                        for(int i=0;i<24;i++)
 						{
-							if(SpriteSeqAktLine[i] & 0x800000) *SpritePufferLine++ = MCOLOR[i];
+                            if(SpriteSeqAktLine[SpriteNr] & 0x800000) *SpritePufferLine++ = MCOLOR[SpriteNr];
 							else SpritePufferLine++;
-							SpriteSeqAktLine[i] = SpriteSeqAktLine[i] << 1;
+                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 1;
 						}
 					}
 				}
@@ -803,9 +845,9 @@ inline void VICII::DrawSprites(void)
 				{
 					if((MMC & bitc) == bitc)
 					{
-						for(int ii=0;ii<12;ii++)
+                        for(int i=0;i<12;i++)
 						{
-							switch(SpriteSeqAktLine[i] & 0xC00000)
+                            switch(SpriteSeqAktLine[SpriteNr] & 0xC00000)
 							{
 							case 0x000000:
 								SpritePufferLine += 4;
@@ -821,13 +863,13 @@ inline void VICII::DrawSprites(void)
 								else SpritePufferLine++;
 								break;
 							case 0x800000:
-								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[i];
+                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
-								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[i];
+                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
-								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[i];
+                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
-								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[i];
+                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
 								break;
 							case 0xC00000:
@@ -841,22 +883,22 @@ inline void VICII::DrawSprites(void)
 								else SpritePufferLine++;
 								break;
 							}
-							SpriteSeqAktLine[i] = SpriteSeqAktLine[i] << 2;
+                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 2;
 						}
 					}
 					else
 					{
-						for(int ii=0;ii<24;ii++)
+                        for(int i=0;i<24;i++)
 						{
-							if(SpriteSeqAktLine[i] & 0x800000)
+                            if(SpriteSeqAktLine[SpriteNr] & 0x800000)
 							{
-								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[i];
+                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
-								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[i];
+                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
 							}
 							else SpritePufferLine += 2;
-							SpriteSeqAktLine[i] = SpriteSeqAktLine[i] << 1;
+                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 1;
 						}
 					}
 				}
@@ -864,9 +906,9 @@ inline void VICII::DrawSprites(void)
 				{
 					if((MMC & bitc) == bitc)
 					{
-						for(int ii=0;ii<12;ii++)
+                        for(int i=0;i<12;i++)
 						{
-							switch(SpriteSeqAktLine[i] & 0xC00000)
+                            switch(SpriteSeqAktLine[SpriteNr] & 0xC00000)
 							{
 							case 0x000000:
 								SpritePufferLine += 2;
@@ -878,9 +920,9 @@ inline void VICII::DrawSprites(void)
 								else SpritePufferLine++;
 								break;
 							case 0x800000:
-								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[i];
+                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
-								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[i];
+                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
 								break;
 							case 0xC00000:
@@ -890,25 +932,27 @@ inline void VICII::DrawSprites(void)
 								else SpritePufferLine++;
 								break;
 							}
-							SpriteSeqAktLine[i] = SpriteSeqAktLine[i] << 2;
+                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 2;
 						}
 					}
 					else
 					{
-						for(int ii=0;ii<24;ii++)
+                        for(int i=0;i<24;i++)
 						{
-							if(SpriteSeqAktLine[i] & 0x800000) 
+                            if(SpriteSeqAktLine[SpriteNr] & 0x800000)
 							{
-								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[i];
+                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
 							}
 							else SpritePufferLine++;
-							SpriteSeqAktLine[i] = SpriteSeqAktLine[i] << 1;
+                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 1;
 						}
 					}
 				}
 			}
 		}
+
+        SpriteNr--;
 		bitc = bitc >> 1;
 	}
 }
@@ -939,9 +983,12 @@ inline void VICII::Reset(void)
 }
 
 void VICII::OneZyklus(void)
-{	
-        static bool OLD_RESET = *RESET;
-        if(!*RESET)
+{
+    static bool OLD_RESET = *RESET;
+
+    AktXKoordinate = XKoordTbl[AktZyklus];
+
+    if(!*RESET)
 	{
 		CTRL2 = 5;
 		CSEL = false;
@@ -976,7 +1023,7 @@ void VICII::OneZyklus(void)
 		}
 		else 
 		{
-                        AktRZ++;
+            AktRZ++;
 			// Prüfen auf Raster IRQ
                         if (AktRZ == IRQ_RASTER) RasterIRQ();
 
@@ -1001,7 +1048,7 @@ void VICII::OneZyklus(void)
 
 		// Sprite 3 //
 		pZugriff(3);
-                if(!*BA) sZugriff(3);
+        if(!*BA) sZugriff(3);
 		break;
 	
         case 2:
@@ -1094,15 +1141,12 @@ void VICII::OneZyklus(void)
 		break;
 
 	case 13:	/// Erste Sichtbarer Zyklus im Emu64 ///
-                DrawGraphics();
-
+        DrawGraphics();
 		FetchIfBadLine();
-		AktXKoordinate = 0xFFFC;
 		break;
 
 	case 14:
 		DrawGraphics();
-
 		RCIfBadLine();
 		VC = VCBASE;
 		VMLI = 0;
@@ -1230,7 +1274,6 @@ void VICII::OneZyklus(void)
 	
 	case 57:
 		DrawGraphics();
-
 		DisplayIfBadLine();
 
 		/// Sprite 1 ///
@@ -1239,7 +1282,6 @@ void VICII::OneZyklus(void)
 
 	case 58:
 		DrawGraphics();
-		
 /*
 		if ((RC == 7) && (BadLineStatus == false)) 
 		{
@@ -1253,7 +1295,6 @@ void VICII::OneZyklus(void)
 			RC = (RC + 1) & 7;
 		}
 */
-
 		/// Sprite ///
 		// In der ersten Phase von Zyklus 58 wird für jedes Sprite MC mit MCBASE
 		// geladen (MCBASE->MC) und geprüft, ob der DMA für das Sprite angeschaltet
@@ -1270,12 +1311,11 @@ void VICII::OneZyklus(void)
 
 		// Sprite 0 //
 		pZugriff(0);
-                if(!*BA) sZugriff(0);
+        if(!*BA) sZugriff(0);
 		break;
 
 	case 59:
 		DrawGraphics();
-
 		DisplayIfBadLine();
 
 		/// Sprite 2 ///
@@ -1298,8 +1338,6 @@ void VICII::OneZyklus(void)
 			RC = (RC + 1) & 7;
 		}
 
-
-		DrawSprites();
 		DrawBorder();
 		DisplayIfBadLine();
 
@@ -1348,7 +1386,6 @@ void VICII::OneZyklus(void)
 		/// Sprite 4 ///
                 if(SpriteDMA & 0x10)  SetBALow();
                 if(TOTAL_ZYKLEN_LINE == 63) AktZyklus = 0;
-
                 break;
 
     case 64:
@@ -1359,6 +1396,12 @@ void VICII::OneZyklus(void)
             AktZyklus = 0;
             break;
 	}
+
+    // Ist ein Spritesequenzer aktiv ?
+    //DrawSprites(AktXKoordinate);
+
+    if(AktZyklus == 14) printf("XKoordinate:%X ",AktXKoordinate);
+
 	AktZyklus++;
 
         if(AktZyklus == 1)
@@ -1384,7 +1427,6 @@ void VICII::OneZyklus(void)
 		BreakWerte[9] = AktZyklus;
 	}
 
-	AktXKoordinate += 8;
 	isWriteColorReg20 = false;
 	isWriteColorReg21 = false;
 }

@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: mos6569_class.h                       //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 31.07.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 23.12.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef MOS_6569_CLASS_H
@@ -41,6 +41,7 @@ public:
     void SwitchVideoPuffer();
     void GetRegister(VIC_STRUCT *vic_reg);
     void SetVicType(int system);
+    void EnableSpriteCollision(bool enabled);
     void EnableGreyDot(bool enabled);
     void OneZyklus(void);
     //bool SaveFreez(FILE* File);
@@ -85,7 +86,7 @@ private:
     void sZugriff(unsigned char sp_nr);
     void CheckBorder(void);
     void DrawGraphics(void);
-    void DrawSprites(void);
+    void DrawSprites(unsigned short AktXKoordinate);
     void DrawBorder(void);
 
     /// Variablen ///
@@ -125,6 +126,7 @@ private:
 
     unsigned char   AktZyklus;
     unsigned short  AktRZ;
+    unsigned short  XKoordTbl[64];
     unsigned short  AktXKoordinate;
     unsigned char   GrafikMode;
     unsigned char   IRQFlag;
@@ -180,6 +182,8 @@ private:
     unsigned char   SpriteViewAktLine;
     unsigned long   SpriteSeq[8];
     unsigned long   SpriteSeqAktLine[8];
+    bool            SpriteCollisionEnable;
+    unsigned char	SpriteCollisionsPuffer[520];
 
     ///////////////////////////////////////////////////////////////////////////
 
