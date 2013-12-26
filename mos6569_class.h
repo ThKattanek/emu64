@@ -77,9 +77,6 @@ private:
     void Reset(void);
     void RasterIRQ(void);
     void SetBALow(void);
-    void DisplayIfBadLine(void);
-    void FetchIfBadLine(void);
-    void RCIfBadLine(void);
     void cZugriff(void);
     void gZugriff(void);
     void pZugriff(unsigned char sp_nr);
@@ -180,9 +177,9 @@ private:
     unsigned char   MCBase[8];
     unsigned char   SpriteDMA;
     unsigned char   SpriteView;
-    //unsigned char   SpriteViewAktLine;
+    unsigned char   SpriteViewAktLine;
     unsigned long   SpriteSeq[8];
-    //unsigned long   SpriteSeqAktLine[8];
+    unsigned long   SpriteSeqAktLine[8];
     bool            SpriteSeqOn[8];
     bool            SpriteCollisionEnable;
     unsigned char	SpriteCollisionsPuffer[520];

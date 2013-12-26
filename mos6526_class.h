@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: mos6526_class.h                       //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 09.07.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 27.12.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef MOS_6526_CLASS_H
@@ -95,8 +95,6 @@ private:
     bool            TimerB_CNT_PHI2;
     bool            TimerB_CNT_TimerA;
     bool            TimerB_CNT_CNTPin;
-    bool            TimerA_IRQ_NEXT_CYCLE;
-    bool            TimerB_IRQ_NEXT_CYCLE;
     char            TimerAStatus;
     char            TimerBStatus;
     unsigned short  TimerA;

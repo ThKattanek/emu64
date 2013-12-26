@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: mos6526_class.cpp                     //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 09.07.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 27.12.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include "mos6526_class.h"
@@ -67,7 +67,6 @@ void MOS6526::Reset(void)
 	
 	TimerAStatus = TimerBStatus = STOP;
 	TimerA_CNT_PHI2 = TimerB_CNT_PHI2 = TimerB_CNT_TimerA = TimerB_CNT_CNTPin = false;
-	TimerA_IRQ_NEXT_CYCLE = TimerB_IRQ_NEXT_CYCLE = false;
 
 	PrevLP = 0x10;
 
@@ -266,17 +265,6 @@ inline void MOS6526::TimerCount(void)
 {
 	bool TimerAUnterlauf = false;
 
-	if (TimerA_IRQ_NEXT_CYCLE)
-	{
-		TimerA_IRQ_NEXT_CYCLE = false;
-		TriggerInterrupt(1);
-	}
-	if (TimerB_IRQ_NEXT_CYCLE) 
-	{
-		TimerB_IRQ_NEXT_CYCLE = false;
-		TriggerInterrupt(2);
-	}
-
 	/// TimerA Status ///
 	switch (TimerAStatus) 
 	{
@@ -316,8 +304,7 @@ TimerA_Count:
 			{
 TimerA_Interrupt:
 				TimerA = TimerALatch;
-				TimerA_IRQ_NEXT_CYCLE = true;
-                                //TriggerInterrupt(1);
+                TriggerInterrupt(1);
 				ICR |= 1;
 				if (CRA & 8) 
 				{
@@ -420,8 +407,7 @@ TimerB_Count:
 			{
 TimerB_Interrupt:
 				TimerB = TimerBLatch;
-				TimerB_IRQ_NEXT_CYCLE = true;
-                                //TriggerInterrupt(2);
+                TriggerInterrupt(2);
 				ICR |= 2;
 				if (CRB & 8) 
 				{
