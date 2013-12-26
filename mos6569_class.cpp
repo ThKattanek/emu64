@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.12.2013                //
+// Letzte Änderung am 26.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -27,21 +27,32 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Rahmen Y Start und Stop
-#define RAHMEN25_YSTART		0x33
-#define RAHMEN25_YSTOP		0xfb
-#define RAHMEN24_YSTART		0x37
-#define RAHMEN24_YSTOP		0xf7
+//RSEL=0
+#define RAHMEN24_YSTART		55
+#define RAHMEN24_YSTOP		247
+
+// RSEL=1
+#define RAHMEN25_YSTART		51
+#define RAHMEN25_YSTOP		251
+
+// Rahmen X Start und Stop
+//CSEL=0
+#define RAHMEN38_LINKS		17  // Eigtl XKoordinate 0x01f
+#define RAHMEN38_RECHTS		55  // Eigtl XKoordinate 0x14f
+
+// CSEL=1
+#define RAHMEN40_LINKS		16  // Eigtl XKoordinate 0x018
+#define RAHMEN40_RECHTS		56  // Eigtl XKoordinate 0x158
 
 // erste und letzte Display Zeile
-#define FIRST_DISP_LINE_PAL		0x10
+#define FIRST_DISP_LINE_PAL	16
 #define FIRST_DISP_LINE_NTSC	0x10 + 14
 
-#define LAST_DISP_LINE		0x11F
+#define LAST_DISP_LINE	288
 
 // erste and letzte mögliche Rasterzeile für Bad Lines
 #define FIRST_DMA_LINE		0x30
 #define LAST_DMA_LINE		0xf7
-
 
 // länge der X Werte der Destination BitMap
 #define XMOD				504
@@ -59,6 +70,7 @@ VICII::VICII()
 		MX[i] = 0;
 		MY[i] = 0;
 		MCOLOR[i] = 0;
+        SpriteSeqOn[i] = false;
 	}
 
 	MX8 = 0;
@@ -91,6 +103,7 @@ VICII::VICII()
 	IRQFlag = 0;
 	IRQMask = 0;
 
+    // XKoordinaten in Tabelle schreiben
     unsigned short xwert = 0x0194;
     for(int i=1;i<14;i++)
     {
@@ -110,7 +123,7 @@ VICII::VICII()
 	DrawLineCounter = 0;
 	LPTriggered = DrawThisLine = VBlanking = false;
 
-        GreyDotEnable = false;
+    GreyDotEnable = false;
 	isWriteColorReg20 = false;
 	isWriteColorReg21 = false;
 
@@ -131,8 +144,8 @@ VICII::VICII()
 
 	for(int i=0;i<40;i++)
 	{
-                cDatenPuffer8Bit[i] = 0;
-                cDatenPuffer4Bit[i] = 0;
+            cDatenPuffer8Bit[i] = 0;
+            cDatenPuffer4Bit[i] = 0;
 	}
 
 	for(int i=0;i<8;i++)
@@ -155,8 +168,17 @@ VICII::VICII()
 	}
 
 	for(int i=0;i<VicConfigSizeof;i++) VicConfig[i] = true;
+    Write_xd011 = false;
 
-        Write_xd011 = false;
+    HoBorderCMP_L[0]=RAHMEN38_LINKS;
+    HoBorderCMP_R[0]=RAHMEN38_RECHTS;
+    VeBorderCMP_O[0]=RAHMEN24_YSTART;
+    VeBorderCMP_U[0]=RAHMEN24_YSTOP;
+
+    HoBorderCMP_L[1]=RAHMEN40_LINKS;
+    HoBorderCMP_R[1]=RAHMEN40_RECHTS;
+    VeBorderCMP_O[1]=RAHMEN25_YSTART;
+    VeBorderCMP_U[1]=RAHMEN25_YSTOP;
 }
 
 VICII::~VICII()
@@ -342,150 +364,74 @@ inline void VICII::sZugriff(unsigned char sp_nr)
 
 inline void VICII::CheckBorder(void)
 {
-	///////////////// Rahmen ///////////////
+    int i;
 
+	///////////////// Rahmen ///////////////
 	if(BorderFlipFlop0)
 	{
-		if(CSEL)
-		{
-			switch(AktZyklus)
-			{
-				//CSEL = 1
-				case 16:
-				if(isWriteColorReg20) BorderLine[BorderLinePos++] = 0x0F;
-				else BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				break;
-				
-				case 56:
-				if(!BorderFlipFlop1)
-				{
-					BorderLine[BorderLinePos++] = 128;
-					BorderLine[BorderLinePos++] = 128;
-					BorderLine[BorderLinePos++] = 128;
-					BorderLine[BorderLinePos++] = 128;
-					BorderLine[BorderLinePos++] = 128;
-					BorderLine[BorderLinePos++] = 128;
-					BorderLine[BorderLinePos++] = 128;
-					BorderLine[BorderLinePos++] = 128;
-				}
-				else
-				{
-					if(isWriteColorReg20) BorderLine[BorderLinePos++] = 0x0F;
-					else BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-				}
-				break;
-		
-				default:
-				if(isWriteColorReg20) BorderLine[BorderLinePos++] = 0x0F;
-				else BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				break;
-			}
-		}
-		else
-		{
-			switch(AktZyklus)
-			{
-				//CSEL = 0
-				case 17:
-				if(!BorderFlipFlop1)
-				{
-					if(isWriteColorReg20) BorderLine[BorderLinePos++] = 0x0F;
-					else BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					
-				}
-				else
-				{
-					//VideoPufferLine -= 8;
-					if(isWriteColorReg20) BorderLine[BorderLinePos++] = 0x0F;
-					else BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-				}
-				break;
-				
-				case 55:
-				if(!BorderFlipFlop1)
-				{
-					BorderLine[BorderLinePos++] = 128;
-					BorderLine[BorderLinePos++] = 128;
-					BorderLine[BorderLinePos++] = 128;
-					BorderLine[BorderLinePos++] = 128;
-					BorderLine[BorderLinePos++] = 128;
-					BorderLine[BorderLinePos++] = 128;
-					BorderLine[BorderLinePos++] = 128;
-					BorderLine[BorderLinePos++] = EC;
-				}
-				else
-				{
-					if(isWriteColorReg20) BorderLine[BorderLinePos++] = 0x0F;
-					else BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-					BorderLine[BorderLinePos++] = EC;
-				}
-				break;
-				
-				default:
-				if(isWriteColorReg20) BorderLine[BorderLinePos++] = 0x0F;
-				else BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				BorderLine[BorderLinePos++] = EC;
-				break;
-			}
-		}
+        if(CSEL==1 && AktZyklus == 56 && BorderFlipFlop1 == false)
+        {
+            BorderLine[BorderLinePos++] = 128;
+            BorderLine[BorderLinePos++] = 128;
+            BorderLine[BorderLinePos++] = 128;
+            BorderLine[BorderLinePos++] = 128;
+            BorderLine[BorderLinePos++] = EC;
+            BorderLine[BorderLinePos++] = EC;
+            BorderLine[BorderLinePos++] = EC;
+            BorderLine[BorderLinePos++] = EC;
+        }
+        else if(CSEL==0 && AktZyklus == 55 && BorderFlipFlop1 == false)
+        {
+            BorderLine[BorderLinePos++] = 128;
+            BorderLine[BorderLinePos++] = 128;
+            BorderLine[BorderLinePos++] = 128;
+            BorderLine[BorderLinePos++] = EC;
+            BorderLine[BorderLinePos++] = EC;
+            BorderLine[BorderLinePos++] = EC;
+            BorderLine[BorderLinePos++] = EC;
+            BorderLine[BorderLinePos++] = EC;
+        }
+        else
+        {
+            int i=8;
+            do{
+                BorderLine[BorderLinePos++] = EC;
+                i--;
+            } while(i>0);
+        }
 	}
 	else
 	{
-		BorderLine[BorderLinePos++] = 128;
-		BorderLine[BorderLinePos++] = 128;
-		BorderLine[BorderLinePos++] = 128;
-		BorderLine[BorderLinePos++] = 128;
-		BorderLine[BorderLinePos++] = 128;
-		BorderLine[BorderLinePos++] = 128;
-		BorderLine[BorderLinePos++] = 128;		
-		BorderLine[BorderLinePos++] = 128;
+        if(CSEL==1 && AktZyklus == 16 && BorderFlipFlop1 == false)
+        {
+            BorderLine[BorderLinePos++] = EC;
+            BorderLine[BorderLinePos++] = EC;
+            BorderLine[BorderLinePos++] = EC;
+            BorderLine[BorderLinePos++] = EC;
+            BorderLine[BorderLinePos++] = 128;
+            BorderLine[BorderLinePos++] = 128;
+            BorderLine[BorderLinePos++] = 128;
+            BorderLine[BorderLinePos++] = 128;
+        }
+        else if(CSEL==0 && AktZyklus == 17 && BorderFlipFlop1 == false)
+        {
+            BorderLine[BorderLinePos++] = EC;
+            BorderLine[BorderLinePos++] = EC;
+            BorderLine[BorderLinePos++] = EC;
+            BorderLine[BorderLinePos++] = 128;
+            BorderLine[BorderLinePos++] = 128;
+            BorderLine[BorderLinePos++] = 128;
+            BorderLine[BorderLinePos++] = 128;
+            BorderLine[BorderLinePos++] = 128;
+        }
+        else
+        {
+            int i=8;
+            do{
+                BorderLine[BorderLinePos++] = 128;
+                i--;
+            } while(i>0);
+        }
 	}
 }
 
@@ -493,9 +439,9 @@ inline void VICII::DrawGraphics(void)
 {
 	static unsigned short NEXT_X_SCROLL;
 
-	if (!DrawThisLine) return;
+    if (!DrawThisLine) return;
 
-	VideoPufferLine_XScroll = VideoPufferLine;
+    VideoPufferLine_XScroll = VideoPufferLine + 4; // Weil ErstesZeichen ab Hi Flanke innerhalb des Zyklus gezeichnet wird
 
 	if(AktZyklus == 13) 
 	{
@@ -507,19 +453,7 @@ inline void VICII::DrawGraphics(void)
 	
 	if(DisplayStatus)	// Display Mode
 	{
-                if((AktZyklus < 17) || (AktZyklus > 56)) // Außerhalb des Anzeigebereichs (40Zyklen)
-		{
-				*VideoPufferLine_XScroll++ = Colors[0];
-				*VideoPufferLine_XScroll++ = Colors[0];
-				*VideoPufferLine_XScroll++ = Colors[0];
-				*VideoPufferLine_XScroll++ = Colors[0];
-				*VideoPufferLine_XScroll++ = Colors[0];
-				*VideoPufferLine_XScroll++ = Colors[0];
-				*VideoPufferLine_XScroll++ = Colors[0];
-				*VideoPufferLine_XScroll++ = Colors[0];
-				VideoPufferLine += 8;
-		}
-		else
+        if((AktZyklus >= 16) && (AktZyklus <= 55))
 		{
 			switch(GrafikMode)
 			{
@@ -619,25 +553,25 @@ inline void VICII::DrawGraphics(void)
 				break;
 			}
 		}
+        else
+        {
+                *VideoPufferLine_XScroll++ = Colors[0];
+                *VideoPufferLine_XScroll++ = Colors[0];
+                *VideoPufferLine_XScroll++ = Colors[0];
+                *VideoPufferLine_XScroll++ = Colors[0];
+                *VideoPufferLine_XScroll++ = Colors[0];
+                *VideoPufferLine_XScroll++ = Colors[0];
+                *VideoPufferLine_XScroll++ = Colors[0];
+                *VideoPufferLine_XScroll++ = Colors[0];
+                VideoPufferLine += 8;
+        }
 	}
 	else	// Idle Mode
 	{
-                Colors[0] = B0C;
-                Colors[1] = 0 | 0x80;
+        Colors[0] = B0C;
+        Colors[1] = 0 | 0x80;
 
-                if((AktZyklus < 16) || (AktZyklus > 56)) // Außerhalb des Anzeigebereichs (40Zyklen)
-		{
-                                *VideoPufferLine_XScroll++ = Colors[0];
-                                *VideoPufferLine_XScroll++ = Colors[0];
-                                *VideoPufferLine_XScroll++ = Colors[0];
-                                *VideoPufferLine_XScroll++ = Colors[0];
-                                *VideoPufferLine_XScroll++ = Colors[0];
-                                *VideoPufferLine_XScroll++ = Colors[0];
-                                *VideoPufferLine_XScroll++ = Colors[0];
-                                *VideoPufferLine_XScroll++ = Colors[0];
-				VideoPufferLine += 8;
-		}
-		else
+        if((AktZyklus >= 16) && (AktZyklus <= 55))
 		{
 			switch(GrafikMode)
 			{
@@ -669,10 +603,10 @@ inline void VICII::DrawGraphics(void)
 
 					for(int i=6;i>-1;i-=2)
 					{
-                                                *VideoPufferLine_XScroll = Colors[(GfxData>>(i))&3];
-                                                VideoPufferLine_XScroll++;
-                                                *VideoPufferLine_XScroll = VideoPufferLine_XScroll[-1];
-                                                VideoPufferLine_XScroll++;
+                        *VideoPufferLine_XScroll = Colors[(GfxData>>(i))&3];
+                        VideoPufferLine_XScroll++;
+                        *VideoPufferLine_XScroll = VideoPufferLine_XScroll[-1];
+                        VideoPufferLine_XScroll++;
 					}
 					VideoPufferLine += 8;
 				}
@@ -694,10 +628,10 @@ inline void VICII::DrawGraphics(void)
 				
 				for(int i=6;i>-1;i-=2)
 				{
-                                        *VideoPufferLine_XScroll = Colors[(GfxData>>(i))&3];
-                                        VideoPufferLine_XScroll++;
-                                        *VideoPufferLine_XScroll = VideoPufferLine_XScroll[-1];
-                                        VideoPufferLine_XScroll++;
+                    *VideoPufferLine_XScroll = Colors[(GfxData>>(i))&3];
+                    VideoPufferLine_XScroll++;
+                    *VideoPufferLine_XScroll = VideoPufferLine_XScroll[-1];
+                    VideoPufferLine_XScroll++;
 				}
 				VideoPufferLine += 8;
 
@@ -715,23 +649,59 @@ inline void VICII::DrawGraphics(void)
 				break;
 			}
 		}
+        else
+        {
+                *VideoPufferLine_XScroll++ = Colors[0];
+                *VideoPufferLine_XScroll++ = Colors[0];
+                *VideoPufferLine_XScroll++ = Colors[0];
+                *VideoPufferLine_XScroll++ = Colors[0];
+                *VideoPufferLine_XScroll++ = Colors[0];
+                *VideoPufferLine_XScroll++ = Colors[0];
+                *VideoPufferLine_XScroll++ = Colors[0];
+                *VideoPufferLine_XScroll++ = Colors[0];
+                VideoPufferLine += 8;
+        }
 	}
-	CheckBorder();
+
+    ////////////////////////// Draw Border //////////////////////////
+
+    //VideoPufferLine -= 8;   //Zurück zum Zeichen Anfang
+    CheckBorder();
 }
 
-inline void VICII::DrawSprites(unsigned short AktXKoordinate)
+inline void VICII::DrawGraphicsPseudo()
 {
+    VideoPufferLine += 8;
+
+    //CheckBorder
+    BorderLinePos += 8;
+    return;
+}
+
+inline void VICII::DrawSprites()
+{
+    if(!VicConfig[VIC_SPRITES_ON]) return;
+
     unsigned char mask=1;
-    for(int SpriteNr=0;SpriteNr<8;SpriteNr++)
+
+    for(int SpriteNr=0; SpriteNr<8; SpriteNr++)
     {
-        //if()
-        mask++;
+        if(SpriteView & mask)
+        {
+            if((MX[SpriteNr] >= AktXKoordinate) && (MX[SpriteNr] < AktXKoordinate+8))
+            {
+                VideoPufferLine_XScroll = (VideoPufferLine-8) + (MX[SpriteNr]-AktXKoordinate);
+                *VideoPufferLine_XScroll++ = SpriteNr+1;
+            }
+        }
+        mask<<=1;
     }
-
-
     return;
 
+    /////////////////////////////////////////
+    /////////////////////////////////////////
 
+    /*
     if(!VicConfig[VIC_SPRITES_ON]) return;
 	if(AktRZ < FIRST_DISP_LINE_PAL+1) return;
 
@@ -955,25 +925,21 @@ inline void VICII::DrawSprites(unsigned short AktXKoordinate)
         SpriteNr--;
 		bitc = bitc >> 1;
 	}
+    */
 }
 
 inline void VICII::DrawBorder(void)
 {
 	if(!VicConfig[VIC_BORDER_ON]) return;
 	if(AktRZ < FIRST_DISP_LINE_PAL) return;
-	BorderPufferLine = VideoPufferLine - 384;	/// Erstes Sichtbares Pixel
+    BorderPufferLine = VideoPufferLine - 504;	/// Erstes Sichtbares Pixel
 
-        for(int x=0;x<384;x++)
+    for(int x=0;x<504;x++)
 	{
 		if(BorderLine[x] & 128) BorderPufferLine++;
 		else *BorderPufferLine++ = BorderLine[x];
 	}
 }
-
-int HoBorderCMP_L[2]={31,24};
-int HoBorderCMP_R[2]={335,344};
-int VeBorderCMP_O[2]={55,51};
-int VeBorderCMP_U[2]={247,251};
 
 inline void VICII::Reset(void)
 {
@@ -998,21 +964,23 @@ void VICII::OneZyklus(void)
 	else if(!OLD_RESET) Reset();
         OLD_RESET = *RESET;
 
-	// Rahmen
-	if(AktXKoordinate >= HoBorderCMP_R[CSEL] && (AktXKoordinate < HoBorderCMP_R[CSEL]+8))
-	{
-		BorderFlipFlop0 = true;
-	}
-	if(AktXKoordinate >= HoBorderCMP_L[CSEL] && (AktXKoordinate < HoBorderCMP_L[CSEL]+8))
-	{			
-		if(AktRZ == VeBorderCMP_U[RSEL]) BorderFlipFlop1 = true;
-		else if(AktRZ == VeBorderCMP_O[RSEL]  && (DEN == true)) BorderFlipFlop1 = false;
-		if(BorderFlipFlop1 == false) BorderFlipFlop0 = false;
+
+    // Rahmen
+    if(AktZyklus == HoBorderCMP_R[CSEL])
+    {
+        BorderFlipFlop0 = true;
+    }
+
+    if(AktZyklus == HoBorderCMP_L[CSEL])
+    {
+        if(AktRZ == VeBorderCMP_U[RSEL]) BorderFlipFlop1 = true;
+        if(AktRZ == VeBorderCMP_O[RSEL]  && (DEN == true)) BorderFlipFlop1 = false;
+        if(BorderFlipFlop1 == false) BorderFlipFlop0 = false;
 	}
 
 	switch (AktZyklus)
 	{
-	case 1:
+    case 1:
 		if (AktRZ == (TOTAL_RASTERS-1)) 
 		{
 			VBlanking = true;
@@ -1025,7 +993,7 @@ void VICII::OneZyklus(void)
 		{
             AktRZ++;
 			// Prüfen auf Raster IRQ
-                        if (AktRZ == IRQ_RASTER) RasterIRQ();
+            if (AktRZ == IRQ_RASTER) RasterIRQ();
 
 			// Prüfen ob Badlines zugelassen sind
 			if(AktRZ == 0x30) BadLineEnable = CTRL1 & 0x10;
@@ -1037,11 +1005,12 @@ void VICII::OneZyklus(void)
 			DrawThisLine = (AktRZ >= FIRST_DISP_LINE && AktRZ <= LAST_DISP_LINE);
 		}
 		DisplayIfBadLine();
-		if(DrawThisLine)
-		{
-			VideoPufferLine = &VideoPuffer[DrawLineCounter++*MAX_XW];		// Zeiger für Aktuelle Zeile setzen
-			BorderLinePos = 0;
-		}
+
+        if(DrawThisLine)
+        {
+            VideoPufferLine = &VideoPuffer[DrawLineCounter++*MAX_XW];		// Zeiger für Aktuelle Zeile setzen
+            BorderLinePos = 0;
+        }
 
 		// Sprite 2 //
                 if((SpriteDMA & 0x18) == 0) *BA = true;
@@ -1049,29 +1018,35 @@ void VICII::OneZyklus(void)
 		// Sprite 3 //
 		pZugriff(3);
         if(!*BA) sZugriff(3);
+
+        DrawGraphicsPseudo();
 		break;
 	
-        case 2:
-                if (VBlanking)
-                {
-                        LPTriggered = VBlanking = false;
-                        if (IRQ_RASTER == 0) RasterIRQ();
-                }
-                DisplayIfBadLine();
+    case 2:
+        if (VBlanking)
+        {
+            LPTriggered = VBlanking = false;
+            if (IRQ_RASTER == 0) RasterIRQ();
+        }
+        DisplayIfBadLine();
 
 		/// Sprite 5 ///
-                if(SpriteDMA & 0x20)  SetBALow();
+        if(SpriteDMA & 0x20)  SetBALow();
+
+        DrawGraphicsPseudo();
 		break;
 
 	case 3:
 		DisplayIfBadLine();
 
 		// Sprite 3 //
-                if((SpriteDMA & 0x30) == 0) *BA = true;
+        if((SpriteDMA & 0x30) == 0) *BA = true;
 
 		// Sprite 4 //
 		pZugriff(4);
-                if(!*BA) sZugriff(4);
+        if(!*BA) sZugriff(4);
+
+        DrawGraphicsPseudo();
 		break;
 
 	case 4:
@@ -1079,6 +1054,8 @@ void VICII::OneZyklus(void)
 
 		/// Sprite 6 ///
 		if(SpriteDMA & 0x40)  SetBALow();
+
+        DrawGraphicsPseudo();
 		break;
 
 	case 5:
@@ -1089,7 +1066,9 @@ void VICII::OneZyklus(void)
 
 		// Sprite 5 //
 		pZugriff(5);
-                if(!*BA) sZugriff(5);
+        if(!*BA) sZugriff(5);
+
+        DrawGraphicsPseudo();
 		break;
 
 	case 6:
@@ -1097,6 +1076,8 @@ void VICII::OneZyklus(void)
 
 		/// Sprite 7 ///
 		if(SpriteDMA & 0x80)  SetBALow();
+
+        DrawGraphicsPseudo();
 		break;
 
 	case 7:
@@ -1107,49 +1088,62 @@ void VICII::OneZyklus(void)
 
 		// Sprite 6 //
 		pZugriff(6);
-                if(!*BA) sZugriff(6);
+        if(!*BA) sZugriff(6);
+
+        DrawGraphicsPseudo();
 		break;
 
 	case 8:
 		DisplayIfBadLine();
+
+        DrawGraphicsPseudo();
 		break;
 
 	case 9:
 		DisplayIfBadLine();
 
 		// Sprite 6 //
-                if((SpriteDMA & 0x80) == 0) *BA = true;
+        if((SpriteDMA & 0x80) == 0) *BA = true;
 
 		// Sprite 7 //
 		pZugriff(7);
-                if(!*BA) sZugriff(7);
-		break;
+        if(!*BA) sZugriff(7);
+
+        DrawGraphicsPseudo();
+        break;
 
 	case 10:
 		DisplayIfBadLine();
 
+        DrawGraphics();
 		break;
 
 	case 11:
 		DisplayIfBadLine();
 		// Sprite 7 //
-                *BA = true;
-		break;
+        *BA = true;
+
+        DrawGraphics();
+        break;
 
 	case 12:
 		FetchIfBadLine();
-		break;
 
-	case 13:	/// Erste Sichtbarer Zyklus im Emu64 ///
         DrawGraphics();
+        break;
+
+    case 13:
 		FetchIfBadLine();
+
+        DrawGraphics();
 		break;
 
 	case 14:
-		DrawGraphics();
 		RCIfBadLine();
 		VC = VCBASE;
 		VMLI = 0;
+
+        DrawGraphics();
 		break;
 
 	case 15:
@@ -1159,15 +1153,17 @@ void VICII::OneZyklus(void)
 		{
 			if((SpriteExpYFlipFlop & bitc) == bitc) MCBase[i] += 2;
 		}
-		DrawGraphics();
 
 		FetchIfBadLine();
 		
 		cZugriff();
-		break;
+
+        DrawGraphics();
+        break;
 
 	case 16:
 
+        /*
 		SpriteViewAktLine = SpriteView;
 		SpriteSeqAktLine[0] = SpriteSeq[0];
 		SpriteSeqAktLine[1] = SpriteSeq[1];
@@ -1177,6 +1173,7 @@ void VICII::OneZyklus(void)
 		SpriteSeqAktLine[5] = SpriteSeq[5];
 		SpriteSeqAktLine[6] = SpriteSeq[6];
 		SpriteSeqAktLine[7] = SpriteSeq[7];
+        */
 
 		/// Sprite ///
 		bitc = 0x01;
@@ -1189,11 +1186,12 @@ void VICII::OneZyklus(void)
 				SpriteView &= ~bitc;
 			}
 		}
-		DrawGraphics();
 
 		gZugriff();
 		FetchIfBadLine();
 		cZugriff();
+
+        DrawGraphics();
 		break;
 
 	case 17: case 18:
@@ -1203,15 +1201,15 @@ void VICII::OneZyklus(void)
 	case 37: case 38: case 39: case 40: case 41: case 42: 
 	case 43: case 44: case 45: case 46: case 47: case 48: 
 	case 49: case 50: case 51: case 52: case 53: case 54:
-		DrawGraphics();
 		gZugriff();
 		FetchIfBadLine();
 		cZugriff();
+
+        DrawGraphics();
 		break;
 
 	case 55:
-                *BA = true;
-		DrawGraphics();
+        *BA = true;
 		gZugriff();
 		DisplayIfBadLine();
 
@@ -1243,11 +1241,11 @@ void VICII::OneZyklus(void)
 
 		/// Sprite 0 ///
 		if(SpriteDMA & 0x01)  SetBALow();
+
+        DrawGraphics();
 		break;
 	
 	case 56:
-
-		DrawGraphics();
 		DisplayIfBadLine();
 
 		/// Sprite ///
@@ -1270,18 +1268,20 @@ void VICII::OneZyklus(void)
 				}
 			}
 		}	
+
+        DrawGraphics();
 		break;
 	
 	case 57:
-		DrawGraphics();
 		DisplayIfBadLine();
 
 		/// Sprite 1 ///
 		if(SpriteDMA & 0x02)  SetBALow();
+
+        DrawGraphics();
 		break;
 
 	case 58:
-		DrawGraphics();
 /*
 		if ((RC == 7) && (BadLineStatus == false)) 
 		{
@@ -1312,20 +1312,20 @@ void VICII::OneZyklus(void)
 		// Sprite 0 //
 		pZugriff(0);
         if(!*BA) sZugriff(0);
+
+        DrawGraphics();
 		break;
 
 	case 59:
-		DrawGraphics();
 		DisplayIfBadLine();
 
 		/// Sprite 2 ///
 		if(SpriteDMA & 0x04)  SetBALow();
+
+        DrawGraphics();
 		break;
 	
 	case 60:
-		DrawGraphics();
-
-
 		if (RC == 7) 
 		{
 			VCBASE = VC;
@@ -1338,97 +1338,110 @@ void VICII::OneZyklus(void)
 			RC = (RC + 1) & 7;
 		}
 
-		DrawBorder();
 		DisplayIfBadLine();
 
 		// Sprite 0 //
-                if((SpriteDMA & 0x06) == 0) *BA = true;
+        if((SpriteDMA & 0x06) == 0) *BA = true;
 
 		// Sprite 1 //
 		pZugriff(1);
-                if(!*BA) sZugriff(1);
+        if(!*BA) sZugriff(1);
+
+        DrawGraphics();
 		break;
 
 	case 61:
 		DisplayIfBadLine();
 
 		/// Sprite 3 ///
-                if(SpriteDMA & 0x08)  SetBALow();
+        if(SpriteDMA & 0x08)  SetBALow();
+
+        DrawGraphicsPseudo();
 		break;
 
 	case 62:
 		DisplayIfBadLine();
 
 		// Sprite 1 //
-                if((SpriteDMA & 0x0C) == 0) *BA = true;
+        if((SpriteDMA & 0x0C) == 0) *BA = true;
 
 		// Sprite 2 //
 		pZugriff(2);
-                if(!*BA) sZugriff(2);
+        if(!*BA) sZugriff(2);
+
+        DrawGraphicsPseudo();
 		break;
 	
 	case 63:
 		/// Rahmen ///
-		if(RSEL)
+        if(RSEL == 0)
 		{
-			if(AktRZ == 251) BorderFlipFlop1 = true;
-			if((AktRZ == 51) && (DEN == true)) BorderFlipFlop1 = false;
+            if(AktRZ == RAHMEN24_YSTOP) BorderFlipFlop1 = true;
+            if((AktRZ == RAHMEN24_YSTART) && (DEN == true)) BorderFlipFlop1 = false;
 		}
 		else
 		{
-			if(AktRZ == 247) BorderFlipFlop1 = true;
-			if((AktRZ == 55) && (DEN == true)) BorderFlipFlop1 = false;
+            if(AktRZ == RAHMEN25_YSTOP) BorderFlipFlop1 = true;
+            if((AktRZ == RAHMEN25_YSTART) && (DEN == true)) BorderFlipFlop1 = false;
 		}
 
 		DisplayIfBadLine();
 
-
 		/// Sprite 4 ///
-                if(SpriteDMA & 0x10)  SetBALow();
-                if(TOTAL_ZYKLEN_LINE == 63) AktZyklus = 0;
-                break;
+        if(SpriteDMA & 0x10)  SetBALow();
+
+        DrawGraphicsPseudo();
+        DrawBorder();
+
+        if(TOTAL_ZYKLEN_LINE == 63) AktZyklus = 0;
+        break;
 
     case 64:
-            if(TOTAL_ZYKLEN_LINE == 64) AktZyklus = 0;
-            break;
+        if(TOTAL_ZYKLEN_LINE == 64) AktZyklus = 0;
+
+        DrawGraphics();
+        break;
 
     case 65:
-            AktZyklus = 0;
-            break;
+        AktZyklus = 0;
+
+        DrawGraphics();
+        break;
 	}
 
     // Ist ein Spritesequenzer aktiv ?
-    //DrawSprites(AktXKoordinate);
+    DrawSprites();
 
-    if(AktZyklus == 14) printf("XKoordinate:%X ",AktXKoordinate);
+    isWriteColorReg20 = false;
+    isWriteColorReg21 = false;
+
+    ///   Auf nächsten Zyklus stellen   ///
+    /// Aktueller Zyklus ist nun zuende ///
 
 	AktZyklus++;
 
-        if(AktZyklus == 1)
+    if(AktZyklus == 1)
+    {
+        if(Breakpoints[AktRZ+1] & 256)
         {
-            if(Breakpoints[AktRZ+1] & 256)
-            {
-                    *BreakStatus |= 256;
-                    BreakWerte[8] = AktRZ+1;
-            }
+                *BreakStatus |= 256;
+                BreakWerte[8] = AktRZ+1;
         }
-        else
+    }
+    else
+    {
+        if(Breakpoints[AktRZ] & 256)
         {
-            if(Breakpoints[AktRZ] & 256)
-            {
-                    *BreakStatus |= 256;
-                    BreakWerte[8] = AktRZ;
-            }
+                *BreakStatus |= 256;
+                BreakWerte[8] = AktRZ;
         }
+    }
 
 	if(Breakpoints[AktZyklus] & 512) 
 	{
 		*BreakStatus |= 512;
 		BreakWerte[9] = AktZyklus;
-	}
-
-	isWriteColorReg20 = false;
-	isWriteColorReg21 = false;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1679,24 +1692,14 @@ void VICII::WriteIO(unsigned short adresse,unsigned char wert)
 			{
                                 BadLineStatus = true;
 			}
-                        else BadLineStatus = false;
+            else BadLineStatus = false;
 
 			// RSEL
-                        RSEL = !!(wert & 0x08);
-                        if(RSEL)
-			{
-                                BorderCmpYo = 51;
-                                BorderCmpYu = 251;
-			}
-			else
-			{
-                                BorderCmpYo = 55;
-                                BorderCmpYu = 247;
-			}
+            RSEL = (wert & 0x08)>>3;
 
 			// DEN
-                        DEN = !!(wert & 0x10);
-                        Write_xd011 = true;
+            DEN = !!(wert & 0x10);
+            Write_xd011 = true;
 			break;
 
 		/// Rasterzähler
@@ -1710,17 +1713,17 @@ void VICII::WriteIO(unsigned short adresse,unsigned char wert)
 
 		/// Sprite Enable
 		case 0x15:
-                        ME = wert;
+            ME = wert;
 			break;
 
 		// Control Register 2
 		case 0x16:
-                        CTRL2 = wert;
-                        X_SCROLL = wert & 7;
-                        GrafikMode = ((CTRL1 & 0x60) | (CTRL2 & 0x10)) >> 4;
+            CTRL2 = wert;
+            X_SCROLL = wert & 7;
+            GrafikMode = ((CTRL1 & 0x60) | (CTRL2 & 0x10)) >> 4;
 			
 			// CSEL
-                        CSEL = !!(wert & 0x08);
+            CSEL = (wert & 0x08)>>3;
 			
 			break;
 

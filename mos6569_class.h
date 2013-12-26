@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.12.2013                //
+// Letzte Änderung am 26.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -86,7 +86,8 @@ private:
     void sZugriff(unsigned char sp_nr);
     void CheckBorder(void);
     void DrawGraphics(void);
-    void DrawSprites(unsigned short AktXKoordinate);
+    void DrawGraphicsPseudo(void);
+    void DrawSprites();
     void DrawBorder(void);
 
     /// Variablen ///
@@ -179,9 +180,10 @@ private:
     unsigned char   MCBase[8];
     unsigned char   SpriteDMA;
     unsigned char   SpriteView;
-    unsigned char   SpriteViewAktLine;
+    //unsigned char   SpriteViewAktLine;
     unsigned long   SpriteSeq[8];
-    unsigned long   SpriteSeqAktLine[8];
+    //unsigned long   SpriteSeqAktLine[8];
+    bool            SpriteSeqOn[8];
     bool            SpriteCollisionEnable;
     unsigned char	SpriteCollisionsPuffer[520];
 
@@ -189,16 +191,16 @@ private:
 
     ////////////////////////////// Rahmenstufe ////////////////////////////////
 
-    bool            CSEL;
-    bool            RSEL;
+    unsigned char   CSEL;
+    unsigned char   RSEL;
     int             BorderCmpYo;
     int             BorderCmpYu;
     bool            BorderFlipFlop0;	// Haupt Rahmen FlipFlop
     bool            BorderFlipFlop1;	// Vertikal Rahmen FlipFlop
-    unsigned short  BorderCMP_Re;	// Vergleichsert Abhängig von CSEL
-    unsigned short  BorderCMP_Li;	// Vergleichsert Abhängig von CSEL
-    unsigned short  BorderCMP_Ob;	// Vergleichsert Abhängig von RSEL
-    unsigned short  BorderCMP_Un;	// Vergleichsert Abhängig von RSEL
+    int             HoBorderCMP_L[2];
+    int             HoBorderCMP_R[2];
+    int             VeBorderCMP_O[2];
+    int             VeBorderCMP_U[2];
     unsigned char   BorderLine[63*8]; // Bit7 gesetzt kein Rahmenpixel
     int             BorderLinePos;
 

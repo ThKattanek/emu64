@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.12.2013                //
+// Letzte Änderung am 26.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -28,6 +28,10 @@ int SDLThreadLoad(void *userdat);
 #define AudioSampleRate 44100
 #define AudioPufferSize 882    // 882 bei 44.100 Khz
 #define RecPollingWaitStart 20
+
+#define C64ScreenXW 384
+#define C64ScreenYW 272
+#define C64FirstViewedPixel 88
 
 C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(char*)> log_function, const char* gfx_path):
     mmu(NULL),cpu(NULL),vic(NULL),sid1(NULL),sid2(NULL),cia1(NULL),cia2(NULL),crt(NULL)
@@ -471,8 +475,8 @@ int SDLThread(void *userdat)
                 c64->isFullscreen  = true;
             else c64->isFullscreen = false;
 
-            c64->AktWindowXW = 384; // 384;
-            c64->AktWindowYW = 272; // 272;
+            c64->AktWindowXW = C64ScreenXW;
+            c64->AktWindowYW = C64ScreenYW;
 
             if(c64->DoubleSize)
             {
@@ -1051,7 +1055,7 @@ int SDLThread(void *userdat)
 
 
                         glBindTexture(GL_TEXTURE_2D,C64ScreenTexture);
-                        c64->pal->ConvertVideo((void*)c64->C64ScreenBuffer,c64->AktC64ScreenXW*4,c64->vic_puffer,c64->AktC64ScreenXW,c64->AktC64ScreenYW,504,312,false);
+                        c64->pal->ConvertVideo((void*)c64->C64ScreenBuffer,c64->AktC64ScreenXW*4,c64->vic_puffer + C64FirstViewedPixel,c64->AktC64ScreenXW,c64->AktC64ScreenYW,504,311,false);
                         glTexSubImage2D(GL_TEXTURE_2D,0,0,0, c64->AktC64ScreenXW, c64->AktC64ScreenYW,GL_BGRA, GL_UNSIGNED_BYTE, c64->C64ScreenBuffer);
 
                         glBegin(GL_QUADS);
@@ -1070,7 +1074,7 @@ int SDLThread(void *userdat)
                         //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 
                         glBindTexture(GL_TEXTURE_2D,C64ScreenTexture);
-                        c64->pal->ConvertVideo((void*)c64->C64ScreenBuffer,c64->AktC64ScreenXW*4,c64->vic_puffer,c64->AktC64ScreenXW,c64->AktC64ScreenYW,504,312,false);
+                        c64->pal->ConvertVideo((void*)c64->C64ScreenBuffer,c64->AktC64ScreenXW*4,c64->vic_puffer + C64FirstViewedPixel,c64->AktC64ScreenXW,c64->AktC64ScreenYW,504,311,false);
                         glTexSubImage2D(GL_TEXTURE_2D,0,0,0, c64->AktC64ScreenXW, c64->AktC64ScreenYW,GL_BGRA, GL_UNSIGNED_BYTE, c64->C64ScreenBuffer);
 
                         glBegin(GL_QUADS);
