@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.12.2013                //
+// Letzte Änderung am 27.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -23,7 +23,8 @@
 MainWindow::MainWindow(QWidget *parent,customSplashScreen* _splash,QTextStream *_log) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    c64(0)
+    c64(NULL),
+    commandLine(NULL)
 {
     splash = _splash;
     log = _log;
@@ -323,16 +324,14 @@ void MainWindow::OnInit()
 
     splash->close();
     this->show();
+
+    ExecuteCommandLine();
 }
 
 void MainWindow::OnMessage(QStringList msg)
 {
-    // Einfache Komandozeilenauswertung
-    // Autostart wird ausgeführt
-    if(msg.length() > 1)
-    {
-        c64->LoadAutoRun(0,msg[1].toLatin1().data());
-    }
+    commandLine = msg;
+    if(c64 != NULL)  ExecuteCommandLine();
 }
 
 void MainWindow::LogText(const char *log_text)
@@ -436,6 +435,12 @@ void MainWindow::RetranslateUi()
     speed_window->RetranslateUi();
 
     SDL_WM_SetCaption(tr("C64 Bildschirm").toLatin1().data(),0);
+}
+
+void MainWindow::ExecuteCommandLine()
+{
+    if(commandLine.length() > 1)
+        c64->LoadAutoRun(0,commandLine[1].toLatin1().data());
 }
 
 void MainWindow::on_menu_main_info_triggered()

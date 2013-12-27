@@ -340,8 +340,6 @@ inline void VICII::sZugriff(unsigned char sp_nr)
 
 inline void VICII::CheckBorder(void)
 {
-    int i;
-
 	///////////////// Rahmen ///////////////
 	if(BorderFlipFlop0)
 	{
@@ -656,6 +654,7 @@ inline void VICII::DrawGraphicsPseudo()
 
 inline void VICII::DrawSprites()
 {
+    /*
     if(!VicConfig[VIC_SPRITES_ON]) return;
 
     unsigned char mask=1;
@@ -673,6 +672,7 @@ inline void VICII::DrawSprites()
         mask<<=1;
     }
     return;
+    */
 
     /////////////////////////////////////////
     /////////////////////////////////////////

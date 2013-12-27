@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.02.2013                //
+// Letzte Änderung am 27.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -89,9 +89,7 @@ private slots:
     void onChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode, bool filter);
     void OnChangeFloppyImage(int floppynr);
     void OnResetScreenshotCounter(void);
-
     void on_actionScreenshot_triggered();
-
     void on_actionC64_Geschwindigkeit_triggered();
 
 protected:
@@ -103,6 +101,7 @@ private:
     void changeEvent(QEvent *event);  
     void CreateLanguageMenu(QString defaultLocale);
     void RetranslateUi();
+    void ExecuteCommandLine();
 
     /// Varialen ///
     QTranslator appTranslator;   // Application Translator
@@ -124,6 +123,8 @@ private:
     DebuggerWindow *debugger_window;            // Debugger / Disassembler Fenster
     SetupWindow *setup_window;                  // Setup Fenster
     C64SpeedWindow *speed_window;               // C64 Speed Window
+
+    QStringList commandLine;                    // Enthält den an Emu64 übergebenen String
 };
 
 #endif // MAINWINDOW_H

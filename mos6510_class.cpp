@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.12.2013                //
+// Letzte Änderung am 26.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,7 +16,7 @@
 #include "mos6510_class.h"
 #include "micro_code_tbl_6510.h"
 
-#define CHK_RDY	if(!*RDY && !CpuWait){CpuWait=true;MCT--;IRQCounter++;NMICounter++;break;}
+#define CHK_RDY	if(!*RDY && !CpuWait){CpuWait=true;MCT--;break;}
 #define OLD_IRQHandling
 
 MOS6510::MOS6510(void)
@@ -70,36 +70,22 @@ void MOS6510::TriggerInterrupt(int typ)
     switch (typ)
     {
     case CIA_IRQ:
-            if (!(Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]))
-            {
-                    IRQCounter = 0;
-            }
             Interrupts[CIA_IRQ] = true;
             break;
     case CIA_NMI:
             if(Interrupts[CIA_NMI] == true) return;
             Interrupts[CIA_NMI] = true;
-            NMICounter = 0;
             if(Interrupts[CRT_NMI] == false) NMIState = true;
             break;
     case VIC_IRQ:
-            if (!(Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]))
-            {
-                    IRQCounter = 0;
-            }
             Interrupts[VIC_IRQ] = true;
             break;
     case REU_IRQ:
-            if (!(Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]))
-            {
-                    IRQCounter = 0;
-            }
             Interrupts[REU_IRQ] = true;
             break;
     case CRT_NMI:
             if(Interrupts[CRT_NMI] == true) return;
             Interrupts[CRT_NMI] = true;
-            NMICounter = 0;
             if(Interrupts[CIA_NMI] == false) NMIState = true;
             break;
     }
@@ -393,9 +379,6 @@ bool MOS6510::OneZyklus(void)
     }
     RESET_OLD = *RESET;
 
-    NMICounter++;
-    IRQCounter++;
-
     if(!CpuWait)
     {
         switch(*MCT)
@@ -405,7 +388,6 @@ bool MOS6510::OneZyklus(void)
             if(JAMFlag) return false;
             CHK_RDY
 
-            /// V4.40 ///
             if(isNMI)
             {
                 NMIState = false;
@@ -1628,12 +1610,12 @@ bool MOS6510::OneZyklus(void)
 
         if(*MCT == 0)
         {
-                if((NMIState == true) && (NMICounter > 0))
+                if(NMIState == true)
                 {
                     isNMI = true;
                     return false;
                 }
-                else if((Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]) && (IRQCounter > 0) && ((SR&4)==0))
+                else if((Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]) && ((SR&4)==0))
                 {
                     isIRQ = true;
                     return false;

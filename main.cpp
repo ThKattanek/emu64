@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.02.2013                //
+// Letzte Änderung am 27.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -66,11 +66,7 @@ int main(int argc, char *argv[])
     w.log = log;
 
     QStringList msg_list;
-    for(int i=0;i<argc;i++)
-    {
-        msg_list << argv[i];
-    }
-
+    for(int i=0;i<argc;i++) msg_list << argv[i];
     w.OnMessage(msg_list);
 
     QTimer::singleShot(500, &w, SLOT(OnInit()));

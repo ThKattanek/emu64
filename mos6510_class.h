@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.12.2013                //
+// Letzte Änderung am 26.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -93,8 +93,6 @@ private:
     unsigned char   YR;
     unsigned char   SP;
     unsigned char   SR;
-    int             IRQCounter;
-    int             NMICounter;
     bool            Interrupts[IntQuellenC64];
     bool            NMIState;
     bool            isIRQ;
