@@ -694,7 +694,7 @@ inline void VICII::DrawSprites()
         // Ist Sprite Sichtbar ?
         if(((SpriteViewAktLine & bitc) == bitc) && (MX[SpriteNr]<0x1F8))
 		{
-            SpritePufferLine = (VideoPufferLine - (80 * 8)) + SpriteXDisplayTbl[MX[SpriteNr]];
+            SpritePufferLine = (VideoPufferLine - (64 * 8)) + SpriteXDisplayTbl[MX[SpriteNr]];
 			if((MDP & bitc) == 0)	/// Prüfen auf Sprite Hinter Vordergrund
 			{
 				/// Sprites vor der Vordergrundgrafik
@@ -1328,6 +1328,7 @@ void VICII::OneZyklus(void)
         if(SpriteDMA & 0x10)  SetBALow();
 
         DrawGraphicsPseudo();
+        DrawSprites();
         DrawBorder();
 
         if(TOTAL_ZYKLEN_LINE == 63) AktZyklus = 0;
@@ -1347,7 +1348,7 @@ void VICII::OneZyklus(void)
 	}
 
     // Ist ein Spritesequenzer aktiv ?
-    DrawSprites();
+    //DrawSprites();
 
     isWriteColorReg20 = false;
     isWriteColorReg21 = false;
