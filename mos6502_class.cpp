@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 30.12.2011                //
+// Letzte Änderung am 29.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -27,14 +27,16 @@ MOS6502::MOS6502(void)
     BranchAdresse = 0x0000;
     AktOpcodePC = 0x0100;
     JAMFlag = false;
-    TMPByte = 0;
-    IRQCounter = 0;
+    TMPByte = 0;    
     PC = 0;
     AC = 0;
     XR = 0;
     YR = 0;
     SP = 0;
     SR = 32;
+
+    IRQLine = 0;
+    for(int i=0;i<5;i++) IRQLinePuffer[i] = 0;
 }
 
 MOS6502::~MOS6502(void)
@@ -50,6 +52,8 @@ void MOS6502::Reset(void)
     XR=0;
     YR=0;
 
+    IRQLine = 0;
+
     MCT = ((unsigned char*)MicroCodeTable6502 + (0x100*MCTItemSize));
     JAMFlag = false;
     AktOpcodePC = PC;
@@ -61,18 +65,10 @@ void MOS6502::TriggerInterrupt(int typ)
     switch (typ)
     {
     case VIA1_IRQ:
-        if (!(Interrupts[VIA1_IRQ] || Interrupts[VIA2_IRQ]))
-        {
-            IRQCounter = 0;
-        }
-        Interrupts[VIA1_IRQ] = true;
+        IRQLine |= 0x01;
         break;
     case VIA2_IRQ:
-        if (!(Interrupts[VIA1_IRQ] || Interrupts[VIA2_IRQ]))
-        {
-            IRQCounter = 0;
-        }
-        Interrupts[VIA2_IRQ] = true;
+        IRQLine |= 0x02;
         break;
     }
 }
@@ -82,10 +78,10 @@ void MOS6502::ClearInterrupt(int typ)
     switch (typ)
     {
     case VIA1_IRQ:
-        Interrupts[VIA1_IRQ] = false;
+        IRQLine &= ~0x01;
         break;
     case VIA2_IRQ:
-        Interrupts[VIA2_IRQ] = false;
+        IRQLine &= ~0x02;
         break;
     }
 }
@@ -163,7 +159,7 @@ void MOS6502::GetInterneRegister(IREG_STRUCT* ireg)
     ireg->BranchAdresse = BranchAdresse;
     ireg->TMPByte = TMPByte;
 
-    ireg->IRQ = Interrupts[VIA1_IRQ] || Interrupts[VIA2_IRQ];
+    ireg->IRQ = IRQLine;
     ireg->RESET = *RESET;
 }
 
@@ -251,8 +247,7 @@ bool MOS6502::OneZyklus(void)
 {
     if(!*RESET)
     {
-        Interrupts[VIA1_IRQ] = false;
-        Interrupts[VIA2_IRQ] = false;
+        IRQLine = 0;
         SR=0x24;
         JAMFlag = false;
         AktOpcodePC = PC;
@@ -261,14 +256,13 @@ bool MOS6502::OneZyklus(void)
         AktOpcode = 0x100;
     }
 
-    IRQCounter++;
-
     switch(*MCT)
     {
     //R // Feetch Opcode
     case 0:
         if(JAMFlag) return false;
-        if((Interrupts[VIA1_IRQ] || Interrupts[VIA2_IRQ]) && (IRQCounter >= 2) && ((SR&4)==0))
+
+        if(IRQLinePuffer[1] > 0 && ((SR&4)==0))
         {
             MCT = ((unsigned char*)MicroCodeTable6502 + (0x101*MCTItemSize));
             AktOpcode = 0x101;
@@ -1373,6 +1367,9 @@ bool MOS6502::OneZyklus(void)
     }
     MCT++;
 
+    for(int i=4;i>0;i--) IRQLinePuffer[i] = IRQLinePuffer[i-1];
+    IRQLinePuffer[0] = IRQLine;
+
     if(*MCT == 0)
     {
         AktOpcodePC = PC;
@@ -1404,7 +1401,6 @@ bool MOS6502::OneZyklus(void)
         {
             *ResetReady = true;
         }
-
         return true;
     }
     else return false;

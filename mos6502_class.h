@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: mos6502_class.h                       //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 30.12.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 29.12.2013                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef MOS6502_CLASS_H
@@ -89,8 +89,8 @@ private:
     unsigned char   YR;
     unsigned char   SP;
     unsigned char   SR;
-    int             IRQCounter;
-    bool            Interrupts[IntQuellenFloppy];
+    unsigned char   IRQLine;
+    unsigned char   IRQLinePuffer[5];
 
     /// Für OneZyklus ///
 
