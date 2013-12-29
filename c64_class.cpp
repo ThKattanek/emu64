@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.12.2013                //
+// Letzte Änderung am 29.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -29,9 +29,9 @@ int SDLThreadLoad(void *userdat);
 #define AudioPufferSize 882    // 882 bei 44.100 Khz
 #define RecPollingWaitStart 20
 
-#define C64ScreenXW 384
-#define C64ScreenYW 272
-#define C64FirstViewedPixel 88
+#define C64ScreenXW 504         //384
+#define C64ScreenYW 312         //272
+#define C64FirstViewedPixel 0   //88
 
 C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(char*)> log_function, const char* gfx_path):
     mmu(NULL),cpu(NULL),vic(NULL),sid1(NULL),sid2(NULL),cia1(NULL),cia2(NULL),crt(NULL)
@@ -1198,9 +1198,11 @@ int SDLThread(void *userdat)
                     }
 
                     SDL_GL_SwapBuffers();
+
                     //SDL_framerateDelay(&c64->fps_manager);
+                    SDL_Delay(5);
+
                     c64->DrawScreenBack = false;
-                    SDL_Delay(1);
                 }
                 else
                 {
@@ -1229,7 +1231,7 @@ int SDLThread(void *userdat)
         }
         else
         {
-            SDL_Delay(1);
+            SDL_Delay(10);
             c64->sdl_thread_is_paused = true;
         }
     }

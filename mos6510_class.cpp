@@ -43,6 +43,9 @@ MOS6510::MOS6510(void)
 
     EnableExtInterrupts = false;
     isIRQ = isNMI = false;
+
+    IRQLine = 0;
+    for(int i=0;i<5;i++) IRQLinePuffer[i] = 0;
 }
 
 MOS6510::~MOS6510(void)
@@ -70,7 +73,8 @@ void MOS6510::TriggerInterrupt(int typ)
     switch (typ)
     {
     case CIA_IRQ:
-            Interrupts[CIA_IRQ] = true;
+            //Interrupts[CIA_IRQ] = true;
+            IRQLine |= 0x01;
             break;
     case CIA_NMI:
             if(Interrupts[CIA_NMI] == true) return;
@@ -78,10 +82,12 @@ void MOS6510::TriggerInterrupt(int typ)
             if(Interrupts[CRT_NMI] == false) NMIState = true;
             break;
     case VIC_IRQ:
-            Interrupts[VIC_IRQ] = true;
+            //Interrupts[VIC_IRQ] = true;
+            IRQLine |= 0x02;
             break;
     case REU_IRQ:
-            Interrupts[REU_IRQ] = true;
+            //Interrupts[REU_IRQ] = true;
+            IRQLine |= 0x04;
             break;
     case CRT_NMI:
             if(Interrupts[CRT_NMI] == true) return;
@@ -112,17 +118,20 @@ void MOS6510::ClearInterrupt(int typ)
     switch (typ)
     {
     case CIA_IRQ:
-            Interrupts[CIA_IRQ] = false;
+            //Interrupts[CIA_IRQ] = false;
+            IRQLine &= 0xFE;
             break;
     case CIA_NMI:
             Interrupts[CIA_NMI] = false;
             if(Interrupts[CRT_NMI] == false) NMIState = false;
             break;
     case VIC_IRQ:
-            Interrupts[VIC_IRQ] = false;
+            //Interrupts[VIC_IRQ] = false;
+            IRQLine &= 0xFD;
             break;
     case REU_IRQ:
-            Interrupts[REU_IRQ] = false;
+            //Interrupts[REU_IRQ] = false;
+            IRQLine &= 0xFB;
             break;
     case CRT_NMI:
             Interrupts[CRT_NMI] = false;
@@ -366,11 +375,15 @@ bool MOS6510::OneZyklus(void)
     if((*RESET == true) && (RESET_OLD == false))
     {
         CpuWait=false;
-        Interrupts[CIA_IRQ] = false;
+        //Interrupts[CIA_IRQ] = false;
         Interrupts[CIA_NMI] = false;
-        Interrupts[VIC_IRQ] = false;
-        Interrupts[REU_IRQ] = false;
+        //Interrupts[VIC_IRQ] = false;
+        //Interrupts[REU_IRQ] = false;
         Interrupts[CRT_NMI] = false;
+
+        IRQLine = 0;
+        for(int i=0;i<5;i++) IRQLinePuffer[i] = 0;
+
         NMIState = false;
         JAMFlag = false;
         SR = 0x04;
@@ -386,19 +399,23 @@ bool MOS6510::OneZyklus(void)
         //R // Feetch Opcode
         case 0:
             if(JAMFlag) return false;
+
             CHK_RDY
 
             if(isNMI)
             {
                 NMIState = false;
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x102*MCTItemSize));
+                AktOpcode = 0x102;
                 isNMI = false;
                 return false;
             }
 
-            if(isIRQ)
+            // if(isIRQ)
+            if((IRQLinePuffer[1] > 0) && ((SR&4)==0))
             {
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
+                AktOpcode = 0x101;
                 isIRQ = false;
                 return false;
             }
@@ -1608,47 +1625,51 @@ bool MOS6510::OneZyklus(void)
         }
         MCT++;
 
+        for(int i=4;i>0;i--) IRQLinePuffer[i] = IRQLinePuffer[i-1];
+        IRQLinePuffer[0] = IRQLine;
+
         if(*MCT == 0)
         {
-                if(NMIState == true)
-                {
-                    isNMI = true;
-                    return false;
-                }
-                else if((Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]) && ((SR&4)==0))
-                {
-                    isIRQ = true;
-                    return false;
-                }
+            if(NMIState == true)
+            {
+                isNMI = true;
+                return false;
+            }
+            /*
+            else if((Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]) && ((SR&4)==0))
+            {
+                isIRQ = true;
+                return false;
+            }
+            */
 
-                AktOpcodePC = PC;
-                if(Breakpoints[PC] & 1)
-                {
-                        *BreakStatus |=1;
-                        BreakWerte[0] = PC;
-                }
-                if(Breakpoints[AC] & 2)
-                {
-                        *BreakStatus |=2;
-                        BreakWerte[1] = AC;
-                }
-                if(Breakpoints[XR] & 4)
-                {
-                        *BreakStatus |=4;
-                        BreakWerte[2] = XR;
-                }
-                if(Breakpoints[YR] & 8)
-                {
-                        *BreakStatus |=8;
-                        BreakWerte[3] = YR;
-                }
+            AktOpcodePC = PC;
+            if(Breakpoints[PC] & 1)
+            {
+                    *BreakStatus |=1;
+                    BreakWerte[0] = PC;
+            }
+            if(Breakpoints[AC] & 2)
+            {
+                    *BreakStatus |=2;
+                    BreakWerte[1] = AC;
+            }
+            if(Breakpoints[XR] & 4)
+            {
+                    *BreakStatus |=4;
+                    BreakWerte[2] = XR;
+            }
+            if(Breakpoints[YR] & 8)
+            {
+                    *BreakStatus |=8;
+                    BreakWerte[3] = YR;
+            }
 
-                if(ResetReadyAdr == PC)
-                {
-                    *ResetReady = true;
-                }
-
-                return true;
+            if(ResetReadyAdr == PC)
+            {
+                *ResetReady = true;
+            }
+            return true;
         }
         else return false;
     }
