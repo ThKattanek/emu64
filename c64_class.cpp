@@ -29,9 +29,9 @@ int SDLThreadLoad(void *userdat);
 #define AudioPufferSize 882    // 882 bei 44.100 Khz
 #define RecPollingWaitStart 20
 
-#define C64ScreenXW 504         //384
-#define C64ScreenYW 312         //272
-#define C64FirstViewedPixel 0   //88
+#define C64ScreenXW 384         //384
+#define C64ScreenYW 272         //272
+#define C64FirstViewedPixel 104 //104
 
 C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(char*)> log_function, const char* gfx_path):
     mmu(NULL),cpu(NULL),vic(NULL),sid1(NULL),sid2(NULL),cia1(NULL),cia2(NULL),crt(NULL)

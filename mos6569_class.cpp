@@ -45,10 +45,10 @@
 #define RAHMEN40_RECHTS		57  // Eigtl XKoordinate 0x158
 
 // erste und letzte Display Zeile
-#define FIRST_DISP_LINE_PAL	0              //16
+#define FIRST_DISP_LINE_PAL	16              //16
 #define FIRST_DISP_LINE_NTSC	0x10 + 14
 
-#define LAST_DISP_LINE	312                 //288
+#define LAST_DISP_LINE	288                 //288
 
 // erste and letzte mögliche Rasterzeile für Bad Lines
 #define FIRST_DMA_LINE		0x30
@@ -282,7 +282,7 @@ inline void VICII::cZugriff(void)
         }
         else
         {
-            //cDatenPuffer8Bit[VMLI] = cDatenPuffer4Bit[VMLI] = 0xFF;
+            cDatenPuffer8Bit[VMLI] = cDatenPuffer4Bit[VMLI] = 0xFF;
         }
 	}
 }
@@ -416,13 +416,14 @@ inline void VICII::DrawGraphics(void)
 
     VideoPufferLine_XScroll = VideoPufferLine + 16;
 
-	if(AktZyklus == 13) 
+    if(AktZyklus == 14)
 	{
-		for(int i=0;i<8;i++) VideoPufferLine_XScroll[i] = B0C;
+        for(int i=0;i<8;i++) VideoPufferLine_XScroll[i] = B0C | 0x40;
 		NEXT_X_SCROLL = X_SCROLL;
 	}
 
 	VideoPufferLine_XScroll += NEXT_X_SCROLL;
+
     if(DisplayStatus)	// Display Mode
     {
         if((AktZyklus >= 16) && (AktZyklus <= 55)) // Grafiksequenzer --> muss um 16 Pixel verzögert werden
@@ -431,7 +432,7 @@ inline void VICII::DrawGraphics(void)
 			{
 			case 0:
 				/// Standard Text Modus (ECM/BMM/MCM = 0/0/0) ///
-				Colors[0] = B0C;
+                Colors[0] = B0C | 0x40;
 				Colors[1] = ColorData | 0x80;
 					
 				for(int i=7;i>-1;i--) *VideoPufferLine_XScroll++ = Colors[(GfxData>>(i))&1];
@@ -442,7 +443,7 @@ inline void VICII::DrawGraphics(void)
 				if(!(ColorData&8))
 				{
 					/// MC-Flag = 0 ///
-					Colors[0] = B0C;
+                    Colors[0] = B0C | 0x40;
 					Colors[1] = (ColorData&7) | 0x80;
 
 					for(int i=7;i>-1;i--) *VideoPufferLine_XScroll++ = Colors[(GfxData>>(i))&1];
@@ -451,7 +452,7 @@ inline void VICII::DrawGraphics(void)
 				else
 				{
 					/// MC-Flag = 1 ///
-					Colors[0] = B0C;
+                    Colors[0] = B0C | 0x40;
 					Colors[1] = B1C;
 					Colors[2] = B2C | 0x80;
 					Colors[3] = (ColorData&7) | 0x80;
@@ -476,7 +477,7 @@ inline void VICII::DrawGraphics(void)
 				break;
 			case 3:
 				/// Multicolor Bitmap Modus (ECM/BMM/MCM = 0/1/1) ///
-				Colors[0] = B0C;
+                Colors[0] = B0C | 0x40;
 				Colors[1] = CharData>>4;
 				Colors[2] = (CharData&0x0F) | 0x80;
 				Colors[3] = ColorData | 0x80;
@@ -495,7 +496,7 @@ inline void VICII::DrawGraphics(void)
 				switch((CharData >> 6) & 0x03)
 				{
 				case 0:
-					Colors[0] = B0C;
+                    Colors[0] = B0C | 0x40;
 					break;
 				case 1:
 					Colors[0] = B1C;
@@ -540,7 +541,7 @@ inline void VICII::DrawGraphics(void)
 	}
 	else	// Idle Mode
 	{
-        Colors[0] = B0C;
+        Colors[0] = B0C | 0x40;
         Colors[1] = 0 | 0x80;
 
         if((AktZyklus >= 16) && (AktZyklus <= 55)) // Grafiksequenzer --> muss um 16 Pixel verzögert werden
@@ -550,9 +551,7 @@ inline void VICII::DrawGraphics(void)
 			{
 			case 0:
 				/// Standard Text Modus (ECM/BMM/MCM = 0/0/0) ///
-
-					
-                                for(int i=7;i>-1;i--) *VideoPufferLine_XScroll++ = Colors[(GfxData>>(i))&1];
+                for(int i=7;i>-1;i--) *VideoPufferLine_XScroll++ = Colors[(GfxData>>(i))&1];
 				VideoPufferLine += 8;
 				break;
 			case 1:
@@ -560,7 +559,7 @@ inline void VICII::DrawGraphics(void)
 				if(!(ColorData&8))
 				{
 					/// MC-Flag = 0 ///
-					Colors[0] = B0C;
+                    Colors[0] = B0C | 0x40;
 					Colors[1] = 0 | 0x80;
 
 					for(int i=7;i>-1;i--) *VideoPufferLine_XScroll++ = Colors[(GfxData>>(i))&1];
@@ -569,7 +568,7 @@ inline void VICII::DrawGraphics(void)
 				else
 				{
 					/// MC-Flag = 1 ///
-					Colors[0] = B0C;
+                    Colors[0] = B0C | 0x40;
 					Colors[1] = 0;
 					Colors[2] = 0 | 0x80;
 					Colors[3] = 0 | 0x80;
@@ -594,7 +593,7 @@ inline void VICII::DrawGraphics(void)
 				break;
 			case 3:
 				/// Multicolor Bitmap Modus (ECM/BMM/MCM = 1/0/0) ///	
-				Colors[0] = B0C;
+                Colors[0] = B0C | 0x40;
 				Colors[1] = 0;
 				Colors[2] = 0 | 0x80;
 				Colors[3] = 0 | 0x80;
@@ -636,18 +635,21 @@ inline void VICII::DrawGraphics(void)
         }
 	}
 
-    ////////////////////////// Draw Border //////////////////////////
+    /// Im Aktuellen Zyklus Prüfen ob B0C Color verwendet wurde (16 Pixel vorlauf)
+    /// Wenn ja mit aktuellen B0C überschreiben
+    VideoPufferLine_XScroll = VideoPufferLine - 8;
+    for(int i=0;i<8;i++)
+    {
+        if(VideoPufferLine_XScroll[i] & 0x40) VideoPufferLine_XScroll[i] = B0C;
+    }
 
-    //VideoPufferLine -= 8;   //Zurück zum Zeichen Anfang
+    ////////////////////////// Draw Border //////////////////////////
     CheckBorder();
 }
 
 inline void VICII::DrawGraphicsPseudo()
 {
     /// Für Anzeige Aller Zyklen
-    DrawGraphics();
-    return;
-
     VideoPufferLine += 8;
 
     //CheckBorder
@@ -1098,7 +1100,7 @@ void VICII::OneZyklus(void)
     case 10:
         VMLI = 0;
 
-        DrawGraphics();
+        DrawGraphicsPseudo();
 		break;
 
 	case 11:
@@ -1109,21 +1111,21 @@ void VICII::OneZyklus(void)
 
         VC = VCBASE;
 
-        DrawGraphics();
+        DrawGraphicsPseudo();
         break;
 
     case 12:
         VC = VCBASE;
 
         if(BadLineStatus) SetBALow();
-        DrawGraphics();
+        DrawGraphicsPseudo();
         break;
 
     case 13:
         VC = VCBASE;
 
         if(BadLineStatus) SetBALow();
-        DrawGraphics();
+        DrawGraphicsPseudo();
 		break;
 
 	case 14:
@@ -1336,7 +1338,7 @@ void VICII::OneZyklus(void)
         if(SpriteDMA & 0x08)  SetBALow();
         //*/
 
-        DrawGraphicsPseudo();
+        DrawGraphics();
 		break;
 
 	case 62:
