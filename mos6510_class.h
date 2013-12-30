@@ -98,6 +98,7 @@ private:
     unsigned char   IRQLinePuffer[5];
 
     bool            NMIState;
+    bool            isIRQ;
     bool            isNMI;
 };
 

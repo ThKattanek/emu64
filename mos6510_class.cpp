@@ -39,12 +39,13 @@ MOS6510::MOS6510(void)
     XR = 0;
     YR = 0;
     SP = 0;
-    SR = 0x04;
+    SR = 32;
 
     EnableExtInterrupts = false;
+    isIRQ = isNMI = false;
 
     IRQLine = 0;
-    for(int i=0;i<5;i++) IRQLinePuffer[i] = IRQLine;
+    for(int i=0;i<5;i++) IRQLinePuffer[i] = 0;
 }
 
 MOS6510::~MOS6510(void)
@@ -72,6 +73,7 @@ void MOS6510::TriggerInterrupt(int typ)
     switch (typ)
     {
     case CIA_IRQ:
+            //Interrupts[CIA_IRQ] = true;
             IRQLine |= 0x01;
             break;
     case CIA_NMI:
@@ -80,9 +82,11 @@ void MOS6510::TriggerInterrupt(int typ)
             if(Interrupts[CRT_NMI] == false) NMIState = true;
             break;
     case VIC_IRQ:
+            //Interrupts[VIC_IRQ] = true;
             IRQLine |= 0x02;
             break;
     case REU_IRQ:
+            //Interrupts[REU_IRQ] = true;
             IRQLine |= 0x04;
             break;
     case CRT_NMI:
@@ -114,6 +118,7 @@ void MOS6510::ClearInterrupt(int typ)
     switch (typ)
     {
     case CIA_IRQ:
+            //Interrupts[CIA_IRQ] = false;
             IRQLine &= 0xFE;
             break;
     case CIA_NMI:
@@ -121,9 +126,11 @@ void MOS6510::ClearInterrupt(int typ)
             if(Interrupts[CRT_NMI] == false) NMIState = false;
             break;
     case VIC_IRQ:
+            //Interrupts[VIC_IRQ] = false;
             IRQLine &= 0xFD;
             break;
     case REU_IRQ:
+            //Interrupts[REU_IRQ] = false;
             IRQLine &= 0xFB;
             break;
     case CRT_NMI:
@@ -211,7 +218,7 @@ void MOS6510::GetInterneRegister(IREG_STRUCT* ireg)
     ireg->Adresse = Adresse;
     ireg->BranchAdresse = BranchAdresse;
     ireg->TMPByte = TMPByte;
-    ireg->IRQ = IRQLine;
+    ireg->IRQ = Interrupts[CIA_IRQ] | Interrupts[VIC_IRQ];
     ireg->NMI = Interrupts[CIA_NMI];
     ireg->RDY = *RDY;
     ireg->RESET = *RESET;
@@ -368,11 +375,14 @@ bool MOS6510::OneZyklus(void)
     if((*RESET == true) && (RESET_OLD == false))
     {
         CpuWait=false;
+        //Interrupts[CIA_IRQ] = false;
         Interrupts[CIA_NMI] = false;
+        //Interrupts[VIC_IRQ] = false;
+        //Interrupts[REU_IRQ] = false;
         Interrupts[CRT_NMI] = false;
 
         IRQLine = 0;
-        for(int i=0;i<5;i++) IRQLinePuffer[i] = IRQLine;
+        for(int i=0;i<5;i++) IRQLinePuffer[i] = 0;
 
         NMIState = false;
         JAMFlag = false;
@@ -389,6 +399,7 @@ bool MOS6510::OneZyklus(void)
         //R // Feetch Opcode
         case 0:
             if(JAMFlag) return false;
+
             CHK_RDY
 
             if(isNMI)
@@ -398,15 +409,20 @@ bool MOS6510::OneZyklus(void)
                 AktOpcode = 0x102;
                 isNMI = false;
                 return false;
-            }else if((IRQLinePuffer[1] > 0) && ((SR&4)==0))
+            }
+
+            // if(isIRQ)
+            if((IRQLinePuffer[1] > 0) && ((SR&4)==0))
             {
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
                 AktOpcode = 0x101;
+                isIRQ = false;
                 return false;
             }
 
             MCT = ((unsigned char*)MicroCodeTable6510 + (Read(PC)*MCTItemSize));
             AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
+
 
             *HistoryPointer = *HistoryPointer+1;
             History[*HistoryPointer] = AktOpcodePC;
@@ -1619,6 +1635,13 @@ bool MOS6510::OneZyklus(void)
                 isNMI = true;
                 return false;
             }
+            /*
+            else if((Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]) && ((SR&4)==0))
+            {
+                isIRQ = true;
+                return false;
+            }
+            */
 
             AktOpcodePC = PC;
             if(Breakpoints[PC] & 1)
