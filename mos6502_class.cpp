@@ -36,7 +36,7 @@ MOS6502::MOS6502(void)
     SR = 32;
 
     IRQLine = 0;
-    for(int i=0;i<5;i++) IRQLinePuffer[i] = 0;
+    for(int i=0;i<5;i++) IRQLinePuffer[i] = IRQLine;
 }
 
 MOS6502::~MOS6502(void)
@@ -45,7 +45,7 @@ MOS6502::~MOS6502(void)
 
 void MOS6502::Reset(void)
 {
-    SR=0x24;
+    SR=0x04;
     SP=0;
     PC=0;
     AC=0;
@@ -53,6 +53,7 @@ void MOS6502::Reset(void)
     YR=0;
 
     IRQLine = 0;
+    for(int i=0;i<5;i++) IRQLinePuffer[i] = IRQLine;
 
     MCT = ((unsigned char*)MicroCodeTable6502 + (0x100*MCTItemSize));
     JAMFlag = false;
@@ -248,7 +249,9 @@ bool MOS6502::OneZyklus(void)
     if(!*RESET)
     {
         IRQLine = 0;
-        SR=0x24;
+        for(int i=0;i<5;i++) IRQLinePuffer[i] = IRQLine;
+
+        SR=0x04;
         JAMFlag = false;
         AktOpcodePC = PC;
         PC++;
