@@ -280,10 +280,6 @@ inline void VICII::cZugriff(void)
             cDatenPuffer8Bit[VMLI] = Read(cAdresse);
             cDatenPuffer4Bit[VMLI] = FarbRam[(VC&0x3FF)]&0x0F;
         }
-        else
-        {
-            cDatenPuffer8Bit[VMLI] = cDatenPuffer4Bit[VMLI] = 0xFF;
-        }
 	}
 }
 
@@ -334,7 +330,6 @@ inline void VICII::sZugriff(unsigned char sp_nr)
 	SpriteSeq[sp_nr] = (Read(sAdresse))<<16;sAdresse++;
 	SpriteSeq[sp_nr] |= (Read(sAdresse))<<8;sAdresse++;
 	SpriteSeq[sp_nr] |= Read(sAdresse);
-	MC[sp_nr] += 3;
 }
 
 inline void VICII::CheckBorder(void)
@@ -994,14 +989,12 @@ void VICII::OneZyklus(void)
             BorderLinePos = 0;
         }
 
-        //*
 		// Sprite 2 //
         if((SpriteDMA & 0x18) == 0) *BA = true;
 
 		// Sprite 3 //
 		pZugriff(3);
         if(!*BA) sZugriff(3);
-        //*/
 
         DrawGraphicsPseudo();
 		break;
@@ -1013,67 +1006,55 @@ void VICII::OneZyklus(void)
             if (IRQ_RASTER == 0) RasterIRQ();
         }
 
-        //*
 		/// Sprite 5 ///
         if(SpriteDMA & 0x20)  SetBALow();
-        //*/
 
         DrawGraphicsPseudo();
 		break;
 
 	case 3:
-        //*
 		// Sprite 3 //
         if((SpriteDMA & 0x30) == 0) *BA = true;
 
 		// Sprite 4 //
 		pZugriff(4);
         if(!*BA) sZugriff(4);
-        //*/
 
         DrawGraphicsPseudo();
 		break;
 
 	case 4:
-        //*
 		/// Sprite 6 ///
 		if(SpriteDMA & 0x40)  SetBALow();
-        //*/
 
         DrawGraphicsPseudo();
 		break;
 
 	case 5:
-        //*
         // Sprite 4 //
         if((SpriteDMA & 0x60) == 0) *BA = true;
 
 		// Sprite 5 //
 		pZugriff(5);
         if(!*BA) sZugriff(5);
-        //*/
 
         DrawGraphicsPseudo();
 		break;
 
 	case 6:
-        //*
 		/// Sprite 7 ///
 		if(SpriteDMA & 0x80)  SetBALow();
-        //*/
 
         DrawGraphicsPseudo();
 		break;
 
 	case 7:
-        //*
         // Sprite 5 //
         if((SpriteDMA & 0xC0) == 0) *BA = true;
 
 		// Sprite 6 //
 		pZugriff(6);
         if(!*BA) sZugriff(6);
-        //*/
 
         DrawGraphicsPseudo();
 		break;
@@ -1083,14 +1064,12 @@ void VICII::OneZyklus(void)
 		break;
 
 	case 9:
-        //*
 		// Sprite 6 //
         if((SpriteDMA & 0x80) == 0) *BA = true;
 
 		// Sprite 7 //
 		pZugriff(7);
         if(!*BA) sZugriff(7);
-        //*/
 
         VMLI = 0;
 
@@ -1104,52 +1083,48 @@ void VICII::OneZyklus(void)
 		break;
 
 	case 11:
-        //*
 		// Sprite 7 //
         *BA = true;
-        //*/
 
         VC = VCBASE;
 
-        DrawGraphicsPseudo();
+        DrawGraphics();
         break;
 
     case 12:
         VC = VCBASE;
 
         if(BadLineStatus) SetBALow();
-        DrawGraphicsPseudo();
+        DrawGraphics();
         break;
 
     case 13:
         VC = VCBASE;
 
         if(BadLineStatus) SetBALow();
-        DrawGraphicsPseudo();
+        DrawGraphics();
 		break;
 
 	case 14:
         if(BadLineStatus) SetBALow();
         if((BadLineStatus == true) && (DisplayStatus == true)) RC = 0;
+
+        /// Sprite MC + 3
+        bitc = 1;
+        for(int i=0;i<8;i++,bitc<<=1)
+        {
+            if(SpriteDMA & bitc) MC[i] += 3;
+        }
+
         DrawGraphics();
 		break;
 
     case 15:
-        //*
-		/// Sprite ///
-		bitc = 0x01;
-		for(int i=0;i<8;i++,bitc<<=1)
-		{
-			if((SpriteExpYFlipFlop & bitc) == bitc) MCBase[i] += 2;
-		}
-        //*/
-
         if (BadLineStatus) SetBALow();
         DrawGraphics();
         break;
 
 	case 16:
-        //*
 		SpriteViewAktLine = SpriteView;
 		SpriteSeqAktLine[0] = SpriteSeq[0];
 		SpriteSeqAktLine[1] = SpriteSeq[1];
@@ -1160,18 +1135,12 @@ void VICII::OneZyklus(void)
 		SpriteSeqAktLine[6] = SpriteSeq[6];
 		SpriteSeqAktLine[7] = SpriteSeq[7];
 
-		/// Sprite ///
-		bitc = 0x01;
-		for(int i=0;i<8;i++,bitc<<=1)
-		{
-			if((SpriteExpYFlipFlop & bitc) == bitc) MCBase[i] ++;
-			if(MCBase[i] >= 63)
-			{
-				SpriteDMA  &= ~bitc;
-				SpriteView &= ~bitc;
-			}
-		}
-        //*/
+        /// Sprite ///
+        bitc = 0x01;
+        for(int i=0;i<8;i++,bitc<<=1)
+        {
+            if((SpriteExpYFlipFlop & bitc) == bitc) MCBase[i] += 2;
+        }
 
         gZugriff();
         if (BadLineStatus) SetBALow();
@@ -1179,7 +1148,27 @@ void VICII::OneZyklus(void)
         DrawGraphics();
 		break;
 
-    case 17: case 18:
+    case 17:
+
+        /// Sprite ///
+        bitc = 0x01;
+        for(int i=0;i<8;i++,bitc<<=1)
+        {
+            if((SpriteExpYFlipFlop & bitc) == bitc) MCBase[i] ++;
+            if(MCBase[i] >= 63)
+            {
+                SpriteDMA  &= ~bitc;
+                SpriteView &= ~bitc;
+            }
+        }
+
+        gZugriff();
+        if (BadLineStatus) SetBALow();
+
+        DrawGraphics();
+        break;
+
+    case 18:
     case 19: case 20: case 21: case 22: case 23: case 24:
     case 25: case 26: case 27: case 28: case 29: case 30:
     case 31: case 32: case 33: case 34: case 35: case 36:
@@ -1196,7 +1185,6 @@ void VICII::OneZyklus(void)
     case 55:
         *BA = true;
 
-        //*
 		/// Sprite ///
 		// In der ersten Phase von Zyklus 55 wird das Expansions-Flipflop
 		// invertiert, wenn das MxYE-Bit gesetzt ist.
@@ -1225,14 +1213,12 @@ void VICII::OneZyklus(void)
 
 		/// Sprite 0 ///
 		if(SpriteDMA & 0x01)  SetBALow();
-        //*/
 
         gZugriff();
         DrawGraphics();
 		break;
 	
 	case 56:
-        //*
 		/// Sprite ///
 		// In der ersten Phasen von Zyklus 56 wird für Sprite 4-7 geprüft, 
 		// ob das entsprechende MxE-Bit in Register $d015 gesetzt und die Y-Koordinate 
@@ -1253,16 +1239,13 @@ void VICII::OneZyklus(void)
 				}
 			}
 		}	
-        //*/
 
         DrawGraphics();
 		break;
 	
 	case 57:
-        //*
 		/// Sprite 1 ///
 		if(SpriteDMA & 0x02)  SetBALow();
-        //*/
 
         DrawGraphics();
 		break;
@@ -1287,7 +1270,6 @@ void VICII::OneZyklus(void)
             if(RC < 7) RC = (RC + 1) & 7;
         }
 
-        //*
         /// Sprite ///
 		// In der ersten Phase von Zyklus 58 wird für jedes Sprite MC mit MCBASE
 		// geladen (MCBASE->MC) und geprüft, ob der DMA für das Sprite angeschaltet
@@ -1305,51 +1287,42 @@ void VICII::OneZyklus(void)
 		// Sprite 0 //
 		pZugriff(0);
         if(!*BA) sZugriff(0);
-        //*/
 
         DrawGraphics();
 		break;
 
 	case 59:
-        //*
 		/// Sprite 2 ///
 		if(SpriteDMA & 0x04)  SetBALow();
-        //*/
 
         DrawGraphics();
 		break;
 	
 	case 60:
-        //*
 		// Sprite 0 //
         if((SpriteDMA & 0x06) == 0) *BA = true;
 
 		// Sprite 1 //
 		pZugriff(1);
         if(!*BA) sZugriff(1);
-        //*/
 
         DrawGraphics();
 		break;
 
 	case 61:
-        //*
 		/// Sprite 3 ///
         if(SpriteDMA & 0x08)  SetBALow();
-        //*/
 
         DrawGraphics();
 		break;
 
 	case 62:
-        //*
 		// Sprite 1 //
         if((SpriteDMA & 0x0C) == 0) *BA = true;
 
 		// Sprite 2 //
 		pZugriff(2);
         if(!*BA) sZugriff(2);
-        //*/
 
         DrawGraphicsPseudo();
 		break;
@@ -1367,10 +1340,9 @@ void VICII::OneZyklus(void)
             if((AktRZ == RAHMEN25_YSTART) && (DEN == true)) BorderFlipFlop1 = false;
 		}
 
-        //*
 		/// Sprite 4 ///
         if(SpriteDMA & 0x10)  SetBALow();
-        //*/
+
 
         DrawGraphicsPseudo();
         DrawSprites();
