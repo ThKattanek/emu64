@@ -370,18 +370,7 @@ inline void VICII::CheckBorder(void)
 	}
 	else
 	{
-        if(CSEL==1 && AktZyklus == RAHMEN40_LINKS && BorderFlipFlop1 == true)
-        {
-            BorderLine[BorderLinePos++] = EC+1;
-            BorderLine[BorderLinePos++] = EC;
-            BorderLine[BorderLinePos++] = EC;
-            BorderLine[BorderLinePos++] = EC;
-            BorderLine[BorderLinePos++] = EC;
-            BorderLine[BorderLinePos++] = EC;
-            BorderLine[BorderLinePos++] = EC;
-            BorderLine[BorderLinePos++] = EC;
-        }
-        else if(CSEL==0 && AktZyklus == RAHMEN38_LINKS && BorderFlipFlop1 == true)
+        if(CSEL==0 && AktZyklus == RAHMEN38_LINKS && BorderFlipFlop1 == true)
         {
             BorderLine[BorderLinePos++] = EC;
             BorderLine[BorderLinePos++] = EC;
@@ -535,9 +524,8 @@ inline void VICII::DrawGraphics(void)
         }
 	}
 	else	// Idle Mode
-	{
-        Colors[0] = B0C | 0x40;
-        Colors[1] = 0 | 0x80;
+    {
+        Colors[0] = 0 | 0x40;
 
         if((AktZyklus >= 16) && (AktZyklus <= 55)) // Grafiksequenzer --> muss um 16 Pixel verzögert werden
 		{
@@ -545,7 +533,8 @@ inline void VICII::DrawGraphics(void)
 			switch(GrafikMode)
 			{
 			case 0:
-				/// Standard Text Modus (ECM/BMM/MCM = 0/0/0) ///
+                /// Standard Text Modus (ECM/BMM/MCM = 0/0/0) ///
+                Colors[1] = 0 | 0x80;
                 for(int i=7;i>-1;i--) *VideoPufferLine_XScroll++ = Colors[(GfxData>>(i))&1];
 				VideoPufferLine += 8;
 				break;
@@ -553,8 +542,7 @@ inline void VICII::DrawGraphics(void)
 				/// Multicolor Text Modus (ECM/BMM/MCM = 0/0/1) ///
 				if(!(ColorData&8))
 				{
-					/// MC-Flag = 0 ///
-                    Colors[0] = B0C | 0x40;
+                    /// MC-Flag = 0 ///
 					Colors[1] = 0 | 0x80;
 
 					for(int i=7;i>-1;i--) *VideoPufferLine_XScroll++ = Colors[(GfxData>>(i))&1];
@@ -562,8 +550,7 @@ inline void VICII::DrawGraphics(void)
 				}
 				else
 				{
-					/// MC-Flag = 1 ///
-                    Colors[0] = B0C | 0x40;
+                    /// MC-Flag = 1 ///
 					Colors[1] = 0;
 					Colors[2] = 0 | 0x80;
 					Colors[3] = 0 | 0x80;
@@ -580,16 +567,14 @@ inline void VICII::DrawGraphics(void)
 				break;
 			case 2:
 				/// Standard Bitmap Modus (ECM/BMM/MCM = 0/1/0) ///
-				Colors[0] = 0;
 				Colors[1] = 0 | 0x80;
 				
 				for(int i=7;i>-1;i--) *VideoPufferLine_XScroll++ = Colors[(GfxData>>(i))&1];			
 				VideoPufferLine += 8;
 				break;
 			case 3:
-				/// Multicolor Bitmap Modus (ECM/BMM/MCM = 1/0/0) ///	
-                Colors[0] = B0C | 0x40;
-				Colors[1] = 0;
+                /// Multicolor Bitmap Modus (ECM/BMM/MCM = 1/0/0) ///
+                Colors[1] = 0;
 				Colors[2] = 0 | 0x80;
 				Colors[3] = 0 | 0x80;
 				
@@ -632,11 +617,12 @@ inline void VICII::DrawGraphics(void)
 
     /// Im Aktuellen Zyklus Prüfen ob B0C Color verwendet wurde (16 Pixel vorlauf)
     /// Wenn ja mit aktuellen B0C überschreiben
-    VideoPufferLine_XScroll = VideoPufferLine - 8;
-    for(int i=0;i<8;i++)
-    {
-        if(VideoPufferLine_XScroll[i] & 0x40) VideoPufferLine_XScroll[i] = B0C;
-    }
+
+        VideoPufferLine_XScroll = VideoPufferLine - 8;
+        for(int i=0;i<8;i++)
+        {
+            if(VideoPufferLine_XScroll[i] & 0x40) VideoPufferLine_XScroll[i] =  B0C;
+        }
 
     ////////////////////////// Draw Border //////////////////////////
     CheckBorder();
