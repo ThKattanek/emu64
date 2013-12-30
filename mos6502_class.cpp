@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.12.2013                //
+// Letzte Änderung am 30.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -262,7 +262,7 @@ bool MOS6502::OneZyklus(void)
     case 0:
         if(JAMFlag) return false;
 
-        if(IRQLinePuffer[1] > 0 && ((SR&4)==0))
+        if(IRQLinePuffer[0] > 0 && ((SR&4)==0))
         {
             MCT = ((unsigned char*)MicroCodeTable6502 + (0x101*MCTItemSize));
             AktOpcode = 0x101;

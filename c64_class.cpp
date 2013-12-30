@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.12.2013                //
+// Letzte Änderung am 30.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -345,7 +345,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
 
     sid1->RESET = &RESET;
     sid1->SetC64Zyklen(985248);     // 985248
-    sid1->SetChipType(MOS_8580);
+    sid1->SetChipType(MOS_6581);
     sid1->SoundOutputEnable = true;
     sid1->CycleExact = true;
     sid1->FilterOn = true;
