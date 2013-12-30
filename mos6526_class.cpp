@@ -146,7 +146,7 @@ inline void MOS6526::TriggerInterrupt(int bit)
 
 inline void MOS6526::CheckLP(void)
 {
-        if(((PBLatch | ~DDRB) & 0x10) != PrevLP) VicTriggerLP();
+    if(((PBLatch | ~DDRB) & 0x10) != PrevLP) VicTriggerLP();
 	PrevLP = (PBLatch | ~DDRB) & 0x10;
 }
 
@@ -475,7 +475,7 @@ void MOS6526::WriteIO(unsigned short adresse,unsigned char wert)
 {
 	adresse &= 0x0F;
 	
-        switch(adresse)
+    switch(adresse)
 	{
 	case 0:
                 IO[adresse]=wert;
@@ -551,7 +551,7 @@ void MOS6526::WriteIO(unsigned short adresse,unsigned char wert)
                 SDR = wert;
                 if((CRA & 0x40))
 		{
-                        TriggerInterrupt(8);	// Fake SDR interrupt for programs that need it
+                TriggerInterrupt(8);	// Fake SDR interrupt for programs that need it
 		}
 		break;
 
@@ -628,14 +628,14 @@ unsigned char MOS6526::ReadIO(unsigned short adresse)
                 if(EnablePB6)
 		{
 			ret &= 0xBF;
-                        ret |= (PB6 & 0x01) << 6;
+            ret |= (PB6 & 0x01) << 6;
 		}
 
 		// Unterlauf Timer B an PIN PB7 anzeigen //
                 if(EnablePB7)
 		{
 			ret &= 0x7F;
-                        ret |= (PB7 & 0x01) << 7;
+            ret |= (PB7 & 0x01) << 7;
 		}
 		return ret;
 		break;

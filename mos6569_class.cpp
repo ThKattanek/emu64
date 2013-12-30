@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.12.2013                //
+// Letzte Änderung am 30.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -597,7 +597,7 @@ inline void VICII::DrawGraphics(void)
 				*VideoPufferLine_XScroll++ = 0;
 				*VideoPufferLine_XScroll++ = 0;
 				*VideoPufferLine_XScroll++ = 0;
-                VideoPufferLine += 8ii;
+                VideoPufferLine += 8;
 				break;
 			}
 		}
@@ -938,6 +938,7 @@ void VICII::OneZyklus(void)
 	switch (AktZyklus)
 	{
     case 1:
+
 		if (AktRZ == (TOTAL_RASTERS-1)) 
 		{
 			VBlanking = true;
@@ -948,10 +949,11 @@ void VICII::OneZyklus(void)
 		}
 		else 
 		{
-            AktRZ++;
-			// Prüfen auf Raster IRQ
-            if (AktRZ == IRQ_RASTER) RasterIRQ();
 
+            AktRZ++;
+
+			// Prüfen auf Raster IRQ
+            //if (AktRZ == IRQ_RASTER) RasterIRQ();
 			DrawThisLine = (AktRZ >= FIRST_DISP_LINE && AktRZ <= LAST_DISP_LINE);
 		}
 
@@ -975,8 +977,11 @@ void VICII::OneZyklus(void)
         if (VBlanking)
         {
             LPTriggered = VBlanking = false;
-            if (IRQ_RASTER == 0) RasterIRQ();
+            //if (IRQ_RASTER == 0) RasterIRQ();
         }
+
+        // Prüfen auf Raster IRQ
+        if (AktRZ == IRQ_RASTER) RasterIRQ();
 
 		/// Sprite 5 ///
         if(SpriteDMA & 0x20)  SetBALow();
@@ -1321,6 +1326,7 @@ void VICII::OneZyklus(void)
         DrawBorder();
 
         if(TOTAL_ZYKLEN_LINE == 63) AktZyklus = 0;
+
         break;
 
     case 64:

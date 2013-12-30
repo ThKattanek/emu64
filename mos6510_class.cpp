@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.12.2013                //
+// Letzte Änderung am 30.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -42,8 +42,8 @@ MOS6510::MOS6510(void)
     SR = 32;
 
     EnableExtInterrupts = false;
-    isIRQ = isNMI = false;
 
+    isNMI = false;
     IRQLine = 0;
     for(int i=0;i<5;i++) IRQLinePuffer[i] = 0;
 }
@@ -375,10 +375,7 @@ bool MOS6510::OneZyklus(void)
     if((*RESET == true) && (RESET_OLD == false))
     {
         CpuWait=false;
-        //Interrupts[CIA_IRQ] = false;
         Interrupts[CIA_NMI] = false;
-        //Interrupts[VIC_IRQ] = false;
-        //Interrupts[REU_IRQ] = false;
         Interrupts[CRT_NMI] = false;
 
         IRQLine = 0;
@@ -409,20 +406,15 @@ bool MOS6510::OneZyklus(void)
                 AktOpcode = 0x102;
                 isNMI = false;
                 return false;
-            }
-
-            // if(isIRQ)
-            if((IRQLinePuffer[1] > 0) && ((SR&4)==0))
+            }else if((IRQLinePuffer[0] > 0) && ((SR&4)==0))
             {
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
                 AktOpcode = 0x101;
-                isIRQ = false;
                 return false;
             }
 
             MCT = ((unsigned char*)MicroCodeTable6510 + (Read(PC)*MCTItemSize));
             AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
-
 
             *HistoryPointer = *HistoryPointer+1;
             History[*HistoryPointer] = AktOpcodePC;
