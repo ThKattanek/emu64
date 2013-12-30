@@ -597,7 +597,7 @@ inline void VICII::DrawGraphics(void)
 				*VideoPufferLine_XScroll++ = 0;
 				*VideoPufferLine_XScroll++ = 0;
 				*VideoPufferLine_XScroll++ = 0;
-				VideoPufferLine += 8;
+                VideoPufferLine += 8ii;
 				break;
 			}
 		}
