@@ -37,12 +37,12 @@
 
 // Rahmen X Start und Stop
 //CSEL=0
-#define RAHMEN38_LINKS		18  // Eigtl XKoordinate 0x01f
-#define RAHMEN38_RECHTS		56  // Eigtl XKoordinate 0x14f
+#define RAHMEN38_LINKS		18  // Eigtl XKoordinate 0x01f  (18)
+#define RAHMEN38_RECHTS		56  // Eigtl XKoordinate 0x14f  (56)
 
 // CSEL=1
-#define RAHMEN40_LINKS		17  // Eigtl XKoordinate 0x018
-#define RAHMEN40_RECHTS		57  // Eigtl XKoordinate 0x158
+#define RAHMEN40_LINKS		17  // Eigtl XKoordinate 0x018  (17)
+#define RAHMEN40_RECHTS		57  // Eigtl XKoordinate 0x158  (57)
 
 // erste und letzte Display Zeile
 #define FIRST_DISP_LINE_PAL	16              //16
@@ -337,7 +337,7 @@ inline void VICII::CheckBorder(void)
 	///////////////// Rahmen ///////////////
 	if(BorderFlipFlop0)
 	{
-        if(CSEL==1 && AktZyklus == 57 && BorderFlipFlop1 == false)
+        if(CSEL==1 && AktZyklus == RAHMEN40_RECHTS && BorderFlipFlop1 == false)
         {
             BorderLine[BorderLinePos++] = 128;
             BorderLine[BorderLinePos++] = 128;
@@ -348,7 +348,7 @@ inline void VICII::CheckBorder(void)
             BorderLine[BorderLinePos++] = 128;
             BorderLine[BorderLinePos++] = 128;
         }
-        else if(CSEL==0 && AktZyklus == 56 && BorderFlipFlop1 == false)
+        else if(CSEL==0 && AktZyklus == RAHMEN38_RECHTS && BorderFlipFlop1 == false)
         {
             BorderLine[BorderLinePos++] = 128;
             BorderLine[BorderLinePos++] = 128;
@@ -370,9 +370,9 @@ inline void VICII::CheckBorder(void)
 	}
 	else
 	{
-        if(CSEL==1 && AktZyklus == 17 && BorderFlipFlop1 == false)
+        if(CSEL==1 && AktZyklus == RAHMEN40_LINKS && BorderFlipFlop1 == true)
         {
-            BorderLine[BorderLinePos++] = EC;
+            BorderLine[BorderLinePos++] = EC+1;
             BorderLine[BorderLinePos++] = EC;
             BorderLine[BorderLinePos++] = EC;
             BorderLine[BorderLinePos++] = EC;
@@ -381,7 +381,7 @@ inline void VICII::CheckBorder(void)
             BorderLine[BorderLinePos++] = EC;
             BorderLine[BorderLinePos++] = EC;
         }
-        else if(CSEL==0 && AktZyklus == 18 && BorderFlipFlop1 == false)
+        else if(CSEL==0 && AktZyklus == RAHMEN38_LINKS && BorderFlipFlop1 == true)
         {
             BorderLine[BorderLinePos++] = EC;
             BorderLine[BorderLinePos++] = EC;
@@ -938,20 +938,6 @@ void VICII::OneZyklus(void)
 	else if(!OLD_RESET) Reset();
         OLD_RESET = *RESET;
 
-
-    // Rahmen
-    if(AktZyklus == HoBorderCMP_R[CSEL])
-    {
-        BorderFlipFlop0 = true;
-    }
-
-    if(AktZyklus == HoBorderCMP_L[CSEL])
-    {
-        if(AktRZ == VeBorderCMP_U[RSEL]) BorderFlipFlop1 = true;
-        if(AktRZ == VeBorderCMP_O[RSEL]  && (DEN == true)) BorderFlipFlop1 = false;
-        if(BorderFlipFlop1 == false) BorderFlipFlop0 = false;
-	}
-
     // Prüfen ob Badlines zugelassen sind
     if(AktRZ == 0x30) BadLineEnable = DEN;
 
@@ -1365,6 +1351,19 @@ void VICII::OneZyklus(void)
 	}
 
     cZugriff();     // cZugriffe immer im 2.Teil eines Zyklus wenn BA Low ist
+
+    // Rahmen
+    if(AktZyklus == HoBorderCMP_R[CSEL])
+    {
+        BorderFlipFlop0 = true;
+    }
+
+    if(AktZyklus == HoBorderCMP_L[CSEL])
+    {
+        if(AktRZ == VeBorderCMP_U[RSEL]) BorderFlipFlop1 = true;
+        if(AktRZ == VeBorderCMP_O[RSEL]  && (DEN == true)) BorderFlipFlop1 = false;
+        if(BorderFlipFlop1 == false) BorderFlipFlop0 = false;
+    }
 
     // Ist ein Spritesequenzer aktiv ?
     // NEU
