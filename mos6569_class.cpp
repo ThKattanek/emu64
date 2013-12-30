@@ -1193,7 +1193,9 @@ void VICII::OneZyklus(void)
         DrawGraphics();
 		break;
 
-	case 55:
+    case 55:
+        *BA = true;
+
         //*
 		/// Sprite ///
 		// In der ersten Phase von Zyklus 55 wird das Expansions-Flipflop
@@ -1225,9 +1227,7 @@ void VICII::OneZyklus(void)
 		if(SpriteDMA & 0x01)  SetBALow();
         //*/
 
-        *BA = true;
         gZugriff();
-
         DrawGraphics();
 		break;
 	
