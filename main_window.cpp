@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.12.2013                //
+// Letzte Änderung am 31.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -599,4 +599,14 @@ void MainWindow::on_actionC64_Geschwindigkeit_triggered()
 {
     if(speed_window->isHidden()) speed_window->show();
     else speed_window->hide();
+}
+
+void MainWindow::on_actionREU_einstecken_triggered()
+{
+    c64->InsertREU();
+}
+
+void MainWindow::on_actionREU_entfernen_triggered()
+{
+    c64->RemoveREU();
 }

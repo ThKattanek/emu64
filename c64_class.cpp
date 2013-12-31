@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 30.12.2013                //
+// Letzte Änderung am 31.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -204,6 +204,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     cia1 = new MOS6526(0);
     cia2 = new MOS6526(1);
     crt = new CRTClass();
+    reu = new REUClass();
 
     vic_puffer = vic->VideoPuffer;
 
@@ -251,9 +252,8 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     cpu->WriteProcTbl = mmu->CPUWriteProcTbl;
     vic->ReadProcTbl = mmu->VICReadProcTbl;
     vic->RefreshProc = bind(&C64Class::VicRefresh,this,_1);
-
-    //reu->SetReadProcTable( mmu_GetCPUReadProcTable());
-    //reu->SetWriteProcTable(mmu_GetCPUWriteProcTable());
+    reu->ReadProcTbl = mmu->CPUReadProcTbl;
+    reu->WriteProcTbl = mmu->CPUWriteProcTbl;
 
     mmu->VicIOWriteProc = bind(&VICII::WriteIO,vic,_1,_2);
     mmu->VicIOReadProc = bind(&VICII::ReadIO,vic,_1);
@@ -311,11 +311,13 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     vic->CIA2_PA = CIA2_PA.GetOutputBitsPointer();
     sid1->RESET = &RESET;
     sid2->RESET = &RESET;
-    //reu->BA = &RDY_BA;
-    //reu->CpuTriggerInterrupt = (TRIGGER_INTERRUPT)cpu_TriggerInterrupt;
-    //reu->CpuClearInterrupt = (CLEAR_INTERRUPT)cpu_ClearInterrupt;
-    //reu->RESET = &RESET;
-    //reu->WRITE_FF00 = &cpu_WRITE_FF00;
+    reu->BA = &RDY_BA;
+    reu->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
+    reu->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
+    reu->RESET = &RESET;
+    reu->WRITE_FF00 = &cpu->WRITE_FF00;
+
+    ReuIsInsert = false;
 
     /// Datasette mit C64 verbinden ///
     //tape->CPU_PORT = &CPU_PORT;
@@ -345,7 +347,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
 
     sid1->RESET = &RESET;
     sid1->SetC64Zyklen(985248);     // 985248
-    sid1->SetChipType(MOS_6581);
+    sid1->SetChipType(MOS_8580);
     sid1->SoundOutputEnable = true;
     sid1->CycleExact = true;
     sid1->FilterOn = true;
@@ -404,6 +406,7 @@ C64Class::~C64Class()
     if(cia1 != NULL) delete cia1;
     if(cia2 != NULL) delete cia2;
     if(crt != NULL) delete crt;
+    if(reu != NULL) delete reu;
 }
 
 void C64Class::StartEmulation()
@@ -1364,6 +1367,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
             cia2->OneZyklus();
             sid1->OneZyklus();
             //sid2->OneZyklus();
+            reu->OneZyklus();
 
             if(EnableExtLines) RDY_BA = ExtRDY;
             cpu->OneZyklus();
@@ -1467,6 +1471,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                     cia2->OneZyklus();
                     sid1->OneZyklus();
                     //sid2->OneZyklus();
+                    reu->OneZyklus();
 
                     if(EnableExtLines) RDY_BA = ExtRDY;
                     cpu->OneZyklus();
@@ -1512,6 +1517,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                 cia2->OneZyklus();
                 sid1->OneZyklus();
                 //sid2->OneZyklus();
+                reu->OneZyklus();
 
                 if(EnableExtLines) RDY_BA = ExtRDY;
                 cpu->OneZyklus();
@@ -1538,6 +1544,7 @@ loop_wait_next_opc:
                 cia2->OneZyklus();
                 sid1->OneZyklus();
                 //sid2->OneZyklus();
+                reu->OneZyklus();
 
                 if(OneOpcSource > 0)
                 {
@@ -2065,6 +2072,36 @@ void C64Class::RemoveCRT(void)
     IOSource = 0;
     KillCommandLine();
     HardReset();
+}
+
+void C64Class::InsertREU(void)
+{
+    IOSource = 2;
+
+    crt->RemoveCRTImage();
+    //georam->Remove();
+
+    reu->Insert();
+    ReuIsInsert = true;
+
+    KillCommandLine();
+    HardReset();
+}
+
+void C64Class::RemoveREU(void)
+{
+    reu->Remove();
+    IOSource = 0;
+
+    ReuIsInsert = false;
+
+    KillCommandLine();
+    HardReset();
+}
+
+int C64Class::LoadREUImage(char *filename)
+{
+    return reu->LoadRAM(filename);
 }
 
 void C64Class::SetDebugMode(bool status)
@@ -2727,7 +2764,7 @@ void C64Class::WriteIO1(unsigned short adresse,unsigned char wert)
         crt->WriteIO1(adresse,wert);
         break;
     case 2:	// REU
-        //reu->WriteIO1(adresse,wert);
+        reu->WriteIO1(adresse,wert);
         break;
     case 3:	// GEORAM
         //georam->WriteIO1(adresse,wert);
@@ -2749,7 +2786,7 @@ void C64Class::WriteIO2(unsigned short adresse,unsigned char wert)
         crt->WriteIO2(adresse,wert);
         break;
     case 2: // REU
-        //reu->WriteIO2(adresse,wert);
+        reu->WriteIO2(adresse,wert);
         break;
     case 3: // GEORAM
         //georam->WriteIO2(adresse,wert);
@@ -2771,7 +2808,7 @@ unsigned char C64Class::ReadIO1(unsigned short adresse)
         return crt->ReadIO1(adresse);
         break;
     case 2: // REU
-        //return reu->ReadIO1(adresse);
+        return reu->ReadIO1(adresse);
         break;
     case 3: // GEORAM
         //return georam->ReadIO1(adresse);
@@ -2796,7 +2833,7 @@ unsigned char C64Class::ReadIO2(unsigned short adresse)
         return crt->ReadIO2(adresse);
         break;
     case 2: // REU
-        // return reu->ReadIO2(adresse);
+         return reu->ReadIO2(adresse);
         break;
     case 3: // GEORAM
         //return georam->ReadIO2(adresse);

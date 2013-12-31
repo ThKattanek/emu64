@@ -1,8 +1,17 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2011-03-20T09:30:27
-# Emu64 by Thorsten Kattanek
-#-------------------------------------------------
+#////////////////////////////////////////////////
+#                                              //
+# Emu64                                        //
+# von Thorsten Kattanek                        //
+#                                              //
+# #file: emu64_projekt.pro                     //
+#                                              //
+# Dieser Sourcecode ist Copyright geschützt!   //
+# Geistiges Eigentum von Th.Kattanek           //
+#                                              //
+# Letzte Änderung am 31.12.2013                //
+# www.emu64.de                                 //
+#                                              //
+#////////////////////////////////////////////////
 
 TRANSLATIONS = emu64_de.ts
 TRANSLATIONS = emu64_en.ts
@@ -51,7 +60,8 @@ SOURCES += \
     single_application.cpp \
     button_mod.cpp \
     custom_splashscreen.cpp \
-    c64_speed_window.cpp
+    c64_speed_window.cpp \
+    reu_class.cpp
 
 HEADERS  += \
     version.h \
@@ -103,7 +113,8 @@ HEADERS  += \
     button_mod.h \
     custom_splashscreen.h \
     c64_speed_window.h \
-    firmware/usbconfig.h
+    firmware/usbconfig.h \
+    reu_class.h
 
 FORMS    += \
     info_window.ui \

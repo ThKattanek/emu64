@@ -224,6 +224,13 @@ background-position: center
     <property name="title">
      <string>Tools</string>
     </property>
+    <widget class="QMenu" name="menuREU_1764_16MB">
+     <property name="title">
+      <string>REU 1764 (16MB)</string>
+     </property>
+     <addaction name="actionREU_einstecken"/>
+     <addaction name="actionREU_entfernen"/>
+    </widget>
     <addaction name="actionQuick_C64_Snapshot"/>
     <addaction name="actionScreenshot"/>
     <addaction name="actionSID_Dump"/>
@@ -234,7 +241,7 @@ background-position: center
     <addaction name="actionLan64"/>
     <addaction name="actionVirtuelle_C64_Tastatur"/>
     <addaction name="actionGameBase64"/>
-    <addaction name="actionREU_1764_16MB"/>
+    <addaction name="menuREU_1764_16MB"/>
     <addaction name="actionGEO_NEO_RAM_2MB"/>
     <addaction name="actionAudio_und_Video_Aufnahme"/>
    </widget>
@@ -754,27 +761,6 @@ background-position: center
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionREU_1764_16MB">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>REU 1764 (16MB)</string>
-   </property>
-   <property name="statusTip">
-    <string>Es wird eine Komplette REU 1764 mit 16 MB emuliert.</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>true</bool>
-   </property>
-  </action>
   <action name="actionGEO_NEO_RAM_2MB">
    <property name="enabled">
     <bool>false</bool>
@@ -990,6 +976,16 @@ background-position: center
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionREU_einstecken">
+   <property name="text">
+    <string>REU einstecken</string>
+   </property>
+  </action>
+  <action name="actionREU_entfernen">
+   <property name="text">
+    <string>REU entfernen</string>
    </property>
   </action>
  </widget>

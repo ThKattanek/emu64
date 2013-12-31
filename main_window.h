@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.12.2013                //
+// Letzte Änderung am 31.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -91,6 +91,10 @@ private slots:
     void OnResetScreenshotCounter(void);
     void on_actionScreenshot_triggered();
     void on_actionC64_Geschwindigkeit_triggered();
+
+    void on_actionREU_einstecken_triggered();
+
+    void on_actionREU_entfernen_triggered();
 
 protected:
     void keyPressEvent(QKeyEvent *event);

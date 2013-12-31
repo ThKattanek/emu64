@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.12.2013                //
+// Letzte Änderung am 31.12.2013                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -24,6 +24,7 @@
 #include "mos6581_8085_class.h"
 #include "mos6526_class.h"
 #include "crt_class.h"
+#include "reu_class.h"
 #include "floppy1541_class.h"
 #include "cpu_info.h"
 
@@ -71,6 +72,10 @@ public:
     int LoadPRG(char *filename, unsigned short* ret_startadresse);
     int LoadCRT(char *filename);
     void RemoveCRT(void);
+
+    void InsertREU(void);
+    void RemoveREU(void);
+    int LoadREUImage(char* filename);
 
     void ResetC64CycleCounter(void);
     void SetDebugMode(bool status);
@@ -169,6 +174,7 @@ public:
     MOS6526         *cia1;
     MOS6526         *cia2;
     CRTClass        *crt;
+    REUClass        *reu;
     Floppy1541      *floppy[FloppyAnzahl];
 
     bool RESET;     // Reset Leitung -> Für Alle Module mit Reset Eingang
@@ -251,6 +257,8 @@ private:
 
     unsigned char   KeyboardMatrixToPB[8];
     unsigned char   KeyboardMatrixToPA[8];
+
+    bool ReuIsInsert;
 
     /////////////////////// BREAKPOINTS ////////////////////////
 
