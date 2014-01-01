@@ -91,10 +91,11 @@ private slots:
     void OnResetScreenshotCounter(void);
     void on_actionScreenshot_triggered();
     void on_actionC64_Geschwindigkeit_triggered();
-
     void on_actionREU_einstecken_triggered();
-
     void on_actionREU_entfernen_triggered();
+    void on_actionREU_laden_triggered();
+    void on_actionREU_speichern_triggered();
+    void on_actionREU_loeschen_triggered();
 
 protected:
     void keyPressEvent(QKeyEvent *event);
@@ -105,6 +106,7 @@ private:
     void changeEvent(QEvent *event);  
     void CreateLanguageMenu(QString defaultLocale);
     void RetranslateUi();
+    bool getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt);
     void ExecuteCommandLine();
 
     /// Varialen ///

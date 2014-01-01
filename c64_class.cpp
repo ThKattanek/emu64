@@ -2104,6 +2104,16 @@ int C64Class::LoadREUImage(char *filename)
     return reu->LoadRAM(filename);
 }
 
+int C64Class::SaveREUImage(char *filename)
+{
+    return reu->SaveRAM(filename);
+}
+
+void C64Class::ClearREURam()
+{
+    reu->ClearRAM();
+}
+
 void C64Class::SetDebugMode(bool status)
 {
     DebugMode = status;

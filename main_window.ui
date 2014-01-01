@@ -225,11 +225,21 @@ background-position: center
      <string>Tools</string>
     </property>
     <widget class="QMenu" name="menuREU_1764_16MB">
+     <property name="statusTip">
+      <string>Emuliert eine komplette REU mit 16 MB</string>
+     </property>
+     <property name="tearOffEnabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>REU 1764 (16MB)</string>
      </property>
      <addaction name="actionREU_einstecken"/>
      <addaction name="actionREU_entfernen"/>
+     <addaction name="separator"/>
+     <addaction name="actionREU_laden"/>
+     <addaction name="actionREU_speichern"/>
+     <addaction name="actionREU_loeschen"/>
     </widget>
     <addaction name="actionQuick_C64_Snapshot"/>
     <addaction name="actionScreenshot"/>
@@ -779,7 +789,7 @@ background-position: center
     </font>
    </property>
    <property name="iconVisibleInMenu">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionAudio_und_Video_Aufnahme">
@@ -982,10 +992,40 @@ background-position: center
    <property name="text">
     <string>REU einstecken</string>
    </property>
+   <property name="statusTip">
+    <string>Die REU wird in den C64 gesteckt.</string>
+   </property>
   </action>
   <action name="actionREU_entfernen">
    <property name="text">
     <string>REU entfernen</string>
+   </property>
+   <property name="statusTip">
+    <string>Die REU wird aus dem C64 rausgezogen.</string>
+   </property>
+  </action>
+  <action name="actionREU_laden">
+   <property name="text">
+    <string>Inhalt aus einer Datei laden</string>
+   </property>
+   <property name="statusTip">
+    <string>Der Inhalt der REU wird aus einer externen Datei geladen.</string>
+   </property>
+  </action>
+  <action name="actionREU_speichern">
+   <property name="text">
+    <string>Inhalt in eine Datei speichern</string>
+   </property>
+   <property name="statusTip">
+    <string>Der Inhalt der REU wird in eine externen Datei gespeichert.</string>
+   </property>
+  </action>
+  <action name="actionREU_loeschen">
+   <property name="text">
+    <string>Inhalt löschen</string>
+   </property>
+   <property name="statusTip">
+    <string>Der Inhalt der REU wird gelöscht.</string>
    </property>
   </action>
  </widget>

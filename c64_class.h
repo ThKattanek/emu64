@@ -76,6 +76,8 @@ public:
     void InsertREU(void);
     void RemoveREU(void);
     int LoadREUImage(char* filename);
+    int SaveREUImage(char* filename);
+    void ClearREURam(void);
 
     void ResetC64CycleCounter(void);
     void SetDebugMode(bool status);

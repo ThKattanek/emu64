@@ -437,6 +437,77 @@ void MainWindow::RetranslateUi()
     SDL_WM_SetCaption(tr("C64 Bildschirm").toLatin1().data(),0);
 }
 
+bool MainWindow::getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt)
+{
+   if (fileName == NULL)      // "parent" is allowed to be NULL!
+      return false;
+
+   QFileDialog saveDialog(parent);
+   saveDialog.setWindowTitle(caption);
+   saveDialog.setAcceptMode(QFileDialog::AcceptSave);
+   saveDialog.setConfirmOverwrite(false);
+   saveDialog.setFilter(filter);
+   saveDialog.selectFile(*fileName);
+
+   *fileName = "";
+
+   if (!saveDialog.exec())
+      return false;      // User pressed "Cancel"
+
+   QStringList fileList = saveDialog.selectedFiles();
+   if (fileList.count() != 1)
+      return false;      // Should not happen, just to be sure
+
+   QString tmpFileName = fileList.at(0);
+   QString extension;
+
+   QFileInfo fileInfo(tmpFileName);
+   if (fileInfo.suffix().isEmpty()) {
+      // Add the suffix selected by the user
+
+      extension = saveDialog.selectedFilter();
+      extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
+      extension = extension.left(extension.indexOf(")"));
+      extension = extension.simplified();
+
+      // If the filter specifies more than one extension, choose the first one
+      if (extension.indexOf(" ") != -1)
+         extension = extension.left(extension.indexOf(" "));
+
+      tmpFileName = tmpFileName + QString(".") + extension;
+      fileInfo.setFile(tmpFileName);
+   }
+
+   // Does the file already exist?
+   if (QFile::exists(tmpFileName)) {
+
+       extension = saveDialog.selectedFilter();
+       extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
+       extension = extension.left(extension.indexOf(")"));
+       extension = extension.simplified();
+
+      int result = QMessageBox::question(parent, QObject::tr("Überschreiben?"),
+         QObject::tr("Soll die Datei \"%1\" überschrieben werden?").arg(fileInfo.fileName()),
+         QMessageBox::Yes,
+         QMessageBox::No | QMessageBox::Default,
+         QMessageBox::Cancel | QMessageBox::Escape);
+      if (result == QMessageBox::Cancel)
+         return false;
+      else if (result == QMessageBox::No) {
+         // Next chance for the user to select a filename
+         if (!getSaveFileName(parent, caption, filter, &tmpFileName, &extension))
+            // User decided to cancel, exit function here
+            return false;
+      // User clicked "Yes", so process the execution
+      fileInfo.setFile(tmpFileName);
+      }
+   }
+
+   *fileName = tmpFileName;
+   *fileExt = extension;
+   return true;
+}
+
 void MainWindow::ExecuteCommandLine()
 {
     if(commandLine.length() > 1)
@@ -609,4 +680,35 @@ void MainWindow::on_actionREU_einstecken_triggered()
 void MainWindow::on_actionREU_entfernen_triggered()
 {
     c64->RemoveREU();
+}
+
+void MainWindow::on_actionREU_laden_triggered()
+{
+    QString filename = QFileDialog::getOpenFileName(this,tr("REU Inhalt laden"),"",tr("REU Image Dateien") + "(*.reu);;" + tr("Alle Dateien") + "(*.*)");
+    if(filename != "")
+    {
+        if(c64->LoadREUImage(filename.toLatin1().data()) != 0)
+            QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des REU Images trat ein Fehler auf!"));
+    }
+    qDebug() << filename;
+}
+
+void MainWindow::on_actionREU_speichern_triggered()
+{
+    QString filename;
+    QString fileext;
+
+    if(!getSaveFileName(this,tr("REU Inhalt speichern"),tr("REU Image Dateien") + "(*.reu);;" + tr("Alle Dateien") + "(*.*)",&filename,&fileext))
+        return;
+
+    if(c64->SaveREUImage(filename.toLatin1().data()) != 0)
+        QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des REU Images trat ein Fehler auf!"));
+}
+
+void MainWindow::on_actionREU_loeschen_triggered()
+{
+    if(QMessageBox::Yes == QMessageBox::question(this,tr("REU Speicher löschen ..."),tr("Möchten Sie den Inhalt des REU Speichers wirklisch löschen?"),QMessageBox::Yes | QMessageBox::No))
+    {
+        c64->ClearREURam();
+    }
 }
