@@ -97,6 +97,16 @@ private slots:
     void on_actionREU_speichern_triggered();
     void on_actionREU_loeschen_triggered();
 
+    void on_actionGEO_einstecken_triggered();
+
+    void on_actionGEO_entfernen_triggered();
+
+    void on_actionGEO_laden_triggered();
+
+    void on_actionGEO_speichern_triggered();
+
+    void on_actionGEO_loeschen_triggered();
+
 protected:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);

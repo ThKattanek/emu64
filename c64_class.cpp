@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.12.2013                //
+// Letzte Änderung am 01.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -205,6 +205,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     cia2 = new MOS6526(1);
     crt = new CRTClass();
     reu = new REUClass();
+    geo = new GEORAMClass();
 
     vic_puffer = vic->VideoPuffer;
 
@@ -407,6 +408,7 @@ C64Class::~C64Class()
     if(cia2 != NULL) delete cia2;
     if(crt != NULL) delete crt;
     if(reu != NULL) delete reu;
+    if(geo != NULL) delete geo;
 }
 
 void C64Class::StartEmulation()
@@ -2052,8 +2054,8 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
 
 int C64Class::LoadCRT(char *filename)
 {
-    //reu->Remove();
-    //georam->Remove();
+    reu->Remove();
+    geo->Remove();
 
     int ret = crt->LoadCRTImage(filename);
     if(ret == 0)
@@ -2079,7 +2081,7 @@ void C64Class::InsertREU(void)
     IOSource = 2;
 
     crt->RemoveCRTImage();
-    //georam->Remove();
+    geo->Remove();
 
     reu->Insert();
     ReuIsInsert = true;
@@ -2112,6 +2114,44 @@ int C64Class::SaveREUImage(char *filename)
 void C64Class::ClearREURam()
 {
     reu->ClearRAM();
+}
+
+void C64Class::InsertGEORAM(void)
+{
+    IOSource = 3;
+
+    crt->RemoveCRTImage();
+    reu->Remove();
+    ReuIsInsert = false;
+
+    geo->Insert();
+
+    KillCommandLine();
+    HardReset();
+}
+
+void C64Class::RemoveGEORAM(void)
+{
+    geo->Remove();
+    IOSource = 0;
+
+    KillCommandLine();
+    HardReset();
+}
+
+int C64Class::LoadGEORAMImage(char* filename)
+{
+    return geo->LoadRAM(filename);
+}
+
+int C64Class::SaveGEORAMImage(char* filename)
+{
+    return geo->SaveRAM(filename);
+}
+
+void C64Class::ClearGEORAMRam(void)
+{
+    geo->ClearRAM();
 }
 
 void C64Class::SetDebugMode(bool status)
@@ -2777,7 +2817,7 @@ void C64Class::WriteIO1(unsigned short adresse,unsigned char wert)
         reu->WriteIO1(adresse,wert);
         break;
     case 3:	// GEORAM
-        //georam->WriteIO1(adresse,wert);
+        geo->WriteIO1(adresse,wert);
         break;
 
     default:
@@ -2799,7 +2839,7 @@ void C64Class::WriteIO2(unsigned short adresse,unsigned char wert)
         reu->WriteIO2(adresse,wert);
         break;
     case 3: // GEORAM
-        //georam->WriteIO2(adresse,wert);
+        geo->WriteIO2(adresse,wert);
         break;
     default:
         break;
@@ -2821,7 +2861,7 @@ unsigned char C64Class::ReadIO1(unsigned short adresse)
         return reu->ReadIO1(adresse);
         break;
     case 3: // GEORAM
-        //return georam->ReadIO1(adresse);
+        return geo->ReadIO1(adresse);
         break;
     default:
         return 0;
@@ -2843,10 +2883,10 @@ unsigned char C64Class::ReadIO2(unsigned short adresse)
         return crt->ReadIO2(adresse);
         break;
     case 2: // REU
-         return reu->ReadIO2(adresse);
+        return reu->ReadIO2(adresse);
         break;
     case 3: // GEORAM
-        //return georam->ReadIO2(adresse);
+        return geo->ReadIO2(adresse);
         break;
     default:
         return 0;

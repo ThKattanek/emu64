@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.12.2013                //
+// Letzte Änderung am 01.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -672,6 +672,8 @@ void MainWindow::on_actionC64_Geschwindigkeit_triggered()
     else speed_window->hide();
 }
 
+/// REU Tools ///
+
 void MainWindow::on_actionREU_einstecken_triggered()
 {
     c64->InsertREU();
@@ -690,7 +692,6 @@ void MainWindow::on_actionREU_laden_triggered()
         if(c64->LoadREUImage(filename.toLatin1().data()) != 0)
             QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des REU Images trat ein Fehler auf!"));
     }
-    qDebug() << filename;
 }
 
 void MainWindow::on_actionREU_speichern_triggered()
@@ -710,5 +711,47 @@ void MainWindow::on_actionREU_loeschen_triggered()
     if(QMessageBox::Yes == QMessageBox::question(this,tr("REU Speicher löschen ..."),tr("Möchten Sie den Inhalt des REU Speichers wirklisch löschen?"),QMessageBox::Yes | QMessageBox::No))
     {
         c64->ClearREURam();
+    }
+}
+
+/// GEO-RAM Tools ///
+
+void MainWindow::on_actionGEO_einstecken_triggered()
+{
+    c64->InsertGEORAM();
+}
+
+void MainWindow::on_actionGEO_entfernen_triggered()
+{
+    c64->RemoveGEORAM();
+}
+
+void MainWindow::on_actionGEO_laden_triggered()
+{
+    QString filename = QFileDialog::getOpenFileName(this,tr("GEORAM Inhalt laden"),"",tr("GEORAM Image Dateien") + "(*.img);;" + tr("Alle Dateien") + "(*.*)");
+    if(filename != "")
+    {
+        if(c64->LoadGEORAMImage(filename.toLatin1().data()) != 0)
+            QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des GEORAM Images trat ein Fehler auf!"));
+    }
+}
+
+void MainWindow::on_actionGEO_speichern_triggered()
+{
+    QString filename;
+    QString fileext;
+
+    if(!getSaveFileName(this,tr("GEORAM Inhalt speichern"),tr("GEORAM Image Dateien") + "(*.img);;" + tr("Alle Dateien") + "(*.*)",&filename,&fileext))
+        return;
+
+    if(c64->SaveGEORAMImage(filename.toLatin1().data()) != 0)
+        QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des GEORAM Images trat ein Fehler auf!"));
+}
+
+void MainWindow::on_actionGEO_loeschen_triggered()
+{
+    if(QMessageBox::Yes == QMessageBox::question(this,tr("GEORAM Speicher löschen ..."),tr("Möchten Sie den Inhalt des GEORAM Speichers wirklisch löschen?"),QMessageBox::Yes | QMessageBox::No))
+    {
+        c64->ClearGEORAMRam();
     }
 }

@@ -1,17 +1,4 @@
-#////////////////////////////////////////////////
-#                                              //
-# Emu64                                        //
-# von Thorsten Kattanek                        //
-#                                              //
-# #file: emu64_projekt.pro                     //
-#                                              //
-# Dieser Sourcecode ist Copyright geschützt!   //
-# Geistiges Eigentum von Th.Kattanek           //
-#                                              //
-# Letzte Änderung am 31.12.2013                //
-# www.emu64.de                                 //
-#                                              //
-#////////////////////////////////////////////////
+# Emu64 by Thorsten Kattanek
 
 TRANSLATIONS = emu64_de.ts
 TRANSLATIONS = emu64_en.ts
@@ -61,7 +48,8 @@ SOURCES += \
     button_mod.cpp \
     custom_splashscreen.cpp \
     c64_speed_window.cpp \
-    reu_class.cpp
+    reu_class.cpp \
+    georam_class.cpp
 
 HEADERS  += \
     version.h \
@@ -114,7 +102,8 @@ HEADERS  += \
     custom_splashscreen.h \
     c64_speed_window.h \
     firmware/usbconfig.h \
-    reu_class.h
+    reu_class.h \
+    georam_class.h
 
 FORMS    += \
     info_window.ui \

@@ -241,6 +241,20 @@ background-position: center
      <addaction name="actionREU_speichern"/>
      <addaction name="actionREU_loeschen"/>
     </widget>
+    <widget class="QMenu" name="menuGEO_NEO_RAM_2MB">
+     <property name="statusTip">
+      <string>Emuliert eine komplette GEO- bzw NEO-RAM mit 2 MB</string>
+     </property>
+     <property name="title">
+      <string>GEO- / NEO-RAM (2MB)</string>
+     </property>
+     <addaction name="actionGEO_einstecken"/>
+     <addaction name="actionGEO_entfernen"/>
+     <addaction name="separator"/>
+     <addaction name="actionGEO_laden"/>
+     <addaction name="actionGEO_speichern"/>
+     <addaction name="actionGEO_loeschen"/>
+    </widget>
     <addaction name="actionQuick_C64_Snapshot"/>
     <addaction name="actionScreenshot"/>
     <addaction name="actionSID_Dump"/>
@@ -252,7 +266,7 @@ background-position: center
     <addaction name="actionVirtuelle_C64_Tastatur"/>
     <addaction name="actionGameBase64"/>
     <addaction name="menuREU_1764_16MB"/>
-    <addaction name="actionGEO_NEO_RAM_2MB"/>
+    <addaction name="menuGEO_NEO_RAM_2MB"/>
     <addaction name="actionAudio_und_Video_Aufnahme"/>
    </widget>
    <widget class="QMenu" name="menuEinstellungen">
@@ -771,27 +785,6 @@ background-position: center
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionGEO_NEO_RAM_2MB">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>GEO- / NEO-RAM (2MB)</string>
-   </property>
-   <property name="statusTip">
-    <string>Es wird eine komplette Geo- /NeoRam mit 2 MB emuliert.</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
-   </property>
-  </action>
   <action name="actionAudio_und_Video_Aufnahme">
    <property name="enabled">
     <bool>false</bool>
@@ -1026,6 +1019,46 @@ background-position: center
    </property>
    <property name="statusTip">
     <string>Der Inhalt der REU wird gelöscht.</string>
+   </property>
+  </action>
+  <action name="actionGEO_einstecken">
+   <property name="text">
+    <string>GEO-RAM einstecken</string>
+   </property>
+   <property name="statusTip">
+    <string>Die GEO-RAM wird in den C64 gesteckt.</string>
+   </property>
+  </action>
+  <action name="actionGEO_entfernen">
+   <property name="text">
+    <string>GEO-RAM entfernen</string>
+   </property>
+   <property name="statusTip">
+    <string>Die GEO-RAM wird aus dem C64 rausgezogen.</string>
+   </property>
+  </action>
+  <action name="actionGEO_laden">
+   <property name="text">
+    <string>Inhalt aus einer Datei laden</string>
+   </property>
+   <property name="statusTip">
+    <string>Der Inhalt der GEO-RAM wird aus einer externen Datei geladen.</string>
+   </property>
+  </action>
+  <action name="actionGEO_speichern">
+   <property name="text">
+    <string>Inhalt in eine Datei speichern</string>
+   </property>
+   <property name="statusTip">
+    <string>Der Inhalt der GEO-RAM wird in eine externen Datei gespeichert.</string>
+   </property>
+  </action>
+  <action name="actionGEO_loeschen">
+   <property name="text">
+    <string>Inhalt löschen</string>
+   </property>
+   <property name="statusTip">
+    <string>Der Inhalt der GEO-RAM wird gelöscht.</string>
    </property>
   </action>
  </widget>

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.12.2013                //
+// Letzte Änderung am 01.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -25,6 +25,7 @@
 #include "mos6526_class.h"
 #include "crt_class.h"
 #include "reu_class.h"
+#include "georam_class.h"
 #include "floppy1541_class.h"
 #include "cpu_info.h"
 
@@ -78,6 +79,12 @@ public:
     int LoadREUImage(char* filename);
     int SaveREUImage(char* filename);
     void ClearREURam(void);
+
+    void InsertGEORAM(void);
+    void RemoveGEORAM(void);
+    int LoadGEORAMImage(char* filename);
+    int SaveGEORAMImage(char* filename);
+    void ClearGEORAMRam(void);
 
     void ResetC64CycleCounter(void);
     void SetDebugMode(bool status);
@@ -177,6 +184,7 @@ public:
     MOS6526         *cia2;
     CRTClass        *crt;
     REUClass        *reu;
+    GEORAMClass     *geo;
     Floppy1541      *floppy[FloppyAnzahl];
 
     bool RESET;     // Reset Leitung -> Für Alle Module mit Reset Eingang
