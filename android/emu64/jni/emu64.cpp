@@ -385,7 +385,7 @@ JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Renderer(JNIEnv*, job
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glBindTexture(GL_TEXTURE_2D, ScreenTextureID);
-	videopal->ConvertVideo((void*)c64->C64ScreenBuffer,c64->AktC64ScreenXW*2,c64->vic_puffer,c64->AktC64ScreenXW,c64->AktC64ScreenYW,504,312,false);
+	videopal->ConvertVideo((void*)c64->C64ScreenBuffer,c64->AktC64ScreenXW*2,c64->vic_puffer + 8*13,c64->AktC64ScreenXW,c64->AktC64ScreenYW,504,312,false);
 	glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, c64->AktC64ScreenXW, c64->AktC64ScreenYW, 0,GL_RGB, GL_UNSIGNED_SHORT_5_6_5, c64->C64ScreenBuffer);
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -435,7 +435,7 @@ JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Renderer(JNIEnv*, job
 	}
 
 	/// Debug INFOS anzeigen ///
-	/*
+
 	REG_STRUCT cpu_reg;
 	IREG_STRUCT cpu_ireg;
 	cpu_reg.REG_MASK = REG_MASK_ALL;
@@ -445,7 +445,7 @@ JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Renderer(JNIEnv*, job
 	sprintf(str01,"PC:$%4.4X AC:$%2.2X XR:$%2.2X YR:$%2.2X SR:$%2.2X SP:$%3.3X",cpu_reg.PC,(unsigned char)cpu_reg.AC & 0xff,(unsigned char)cpu_reg.XR & 0xff,(unsigned char)cpu_reg.YR & 0xff,(unsigned char)cpu_reg.SR & 0xff,(unsigned short)((cpu_reg.SP & 0xff)+0x100));
 	textBox01->SetText(0,2,str01);
 	textBox01->Renderer();
-	*/
+
 }
 
 JNIEXPORT void JNICALL Java_de_kattisoft_emu64_NativeClass_Pause(JNIEnv*, jobject)
