@@ -7,7 +7,8 @@
 
 #include <text_box_class.h>
 
-TextBoxClass::TextBoxClass(float xw, float yw, int text_xw, int text_yw)
+TextBoxClass::TextBoxClass(float xw, float yw, int text_xw, int text_yw):
+texture_id(0)
 {
 	int i;
 	float x_div, y_div;

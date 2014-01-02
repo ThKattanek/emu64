@@ -23,6 +23,8 @@
 #include "../../../mos6581_8085_class.h"
 #include "../../../mos6526_class.h"
 #include "../../../crt_class.h"
+#include "../../../reu_class.h"
+#include "../../../georam_class.h"
 #include "../../../floppy1541_class.h"
 #include "../../../videopal_class.h"
 
@@ -82,6 +84,8 @@ public:
     MOS6526         *cia1;
     MOS6526         *cia2;
     CRTClass        *crt;
+    REUClass		*reu;
+    GEORAMClass		*geo;
     Floppy1541      *floppy[FloppyAnzahl];
 
     bool RESET;     // Reset Leitung -> Für Alle Module mit Reset Eingang
@@ -131,6 +135,8 @@ private:
 
     unsigned char   C64IEC;     // Leitungen vom C64 zur Floppy Bit 0=ATN 1=CLK 2=DATA
     unsigned char   FloppyIEC;	// Leitungen von Floppy zur c64 Bit 0=ATN 1=CLK 2=DATA
+
+    bool			ReuIsInsert;
 
     /// Temporär ///
     int             EasyFlashDirty;

@@ -63,6 +63,8 @@ C64Class::C64Class(int SoundBufferSize ,VideoPalClass *pal):
     cia1 = new MOS6526(0);
     cia2 = new MOS6526(1);
     crt = new CRTClass();
+    reu = new REUClass();
+    geo = new GEORAMClass();
 
     vic_puffer =  vic->VideoPuffer;
 
@@ -110,9 +112,8 @@ C64Class::C64Class(int SoundBufferSize ,VideoPalClass *pal):
      cpu->WriteProcTbl = mmu->CPUWriteProcTbl;
      vic->ReadProcTbl = mmu->VICReadProcTbl;
      vic->RefreshProc = bind(&C64Class::VicRefresh,this,_1);
-
-     //reu->SetReadProcTable( mmu_GetCPUReadProcTable());
-     //reu->SetWriteProcTable(mmu_GetCPUWriteProcTable());
+     reu->ReadProcTbl = mmu->CPUReadProcTbl;
+     reu->WriteProcTbl = mmu->CPUWriteProcTbl;
 
      mmu->VicIOWriteProc = bind(&VICII::WriteIO,vic,_1,_2);
      mmu->VicIOReadProc = bind(&VICII::ReadIO,vic,_1);
@@ -169,11 +170,14 @@ C64Class::C64Class(int SoundBufferSize ,VideoPalClass *pal):
       vic->FarbRam = mmu->GetFarbramPointer();
       vic->CIA2_PA = CIA2_PA.GetOutputBitsPointer();
       sid1->RESET = &RESET;
-      //reu->BA = &RDY_BA;
-      //reu->CpuTriggerInterrupt = (TRIGGER_INTERRUPT)cpu_TriggerInterrupt;
-      //reu->CpuClearInterrupt = (CLEAR_INTERRUPT)cpu_ClearInterrupt;
-      //reu->RESET = &RESET;
-      //reu->WRITE_FF00 = &cpu_WRITE_FF00;
+
+      reu->BA = &RDY_BA;
+      reu->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
+      reu->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
+      reu->RESET = &RESET;
+      reu->WRITE_FF00 = &cpu->WRITE_FF00;
+
+      ReuIsInsert = false;
 
       /// Datasette mit C64 verbinden ///
       //tape->CPU_PORT = &CPU_PORT;
@@ -192,44 +196,44 @@ C64Class::C64Class(int SoundBufferSize ,VideoPalClass *pal):
       mmu->EasyFlashByte2 = &EasyFlashByte;
 
       RDY_BA = true;
-       GAME = true;
-       EXROM = true;
+		GAME = true;
+		EXROM = true;
 
-       WaitResetReady = false;
+		WaitResetReady = false;
 
-       mmu->Reset();
-       cia1->Reset();
-       cia2->Reset();
+		mmu->Reset();
+		cia1->Reset();
+		cia2->Reset();
 
-       sid1->RESET = &RESET;
-       sid1->SetC64Zyklen(985248);
-       sid1->SetChipType(MOS_8580);
-       sid1->SoundOutputEnable = true;
-       sid1->CycleExact = false;
-       sid1->FilterOn = true;
-       sid1->Reset();
+		sid1->RESET = &RESET;
+		sid1->SetC64Zyklen(985248);
+		sid1->SetChipType(MOS_8580);
+		sid1->SoundOutputEnable = false;
+		sid1->CycleExact = false;
+		sid1->FilterOn = false;
+		sid1->Reset();
 
-       StereoEnable = false;
-       Sid2Adresse = 0xD420;
+		StereoEnable = false;
+		Sid2Adresse = 0xD420;
 
-       vic->RESET = &RESET;
-       vic->BA = &RDY_BA;
-       vic->CIA2_PA = cia2->PA->GetOutputBitsPointer();
+		vic->RESET = &RESET;
+		vic->BA = &RDY_BA;
+		vic->CIA2_PA = cia2->PA->GetOutputBitsPointer();
 
-       /// Breakpoints ///
-       BreakpointProc = 0;
-       cpu->BreakStatus = &BreakStatus;
-       cpu->BreakWerte = BreakWerte;
-       cpu->Breakpoints = Breakpoints;
+		/// Breakpoints ///
+		BreakpointProc = 0;
+		cpu->BreakStatus = &BreakStatus;
+		cpu->BreakWerte = BreakWerte;
+		cpu->Breakpoints = Breakpoints;
 
-       vic->BreakStatus = &BreakStatus;
-       vic->BreakWerte = BreakWerte;
-       vic->Breakpoints = Breakpoints;
+		vic->BreakStatus = &BreakStatus;
+		vic->BreakWerte = BreakWerte;
+		vic->Breakpoints = Breakpoints;
 
-       cpu->History = C64History;
-       cpu->HistoryPointer = &C64HistoryPointer;
+		cpu->History = C64History;
+		cpu->HistoryPointer = &C64HistoryPointer;
 
-       for(int i=0;i<0x10000;i++) Breakpoints[i] = 0;
+		for(int i=0;i<0x10000;i++) Breakpoints[i] = 0;
 }
 
 C64Class::~C64Class()
@@ -264,10 +268,11 @@ void C64Class::FillAudioBuffer(short *stream, int laenge)
 	{
 		CheckKeys();
 
+		/*
         FloppyIEC = 0;
         for(int i=0; i<FloppyAnzahl; i++)
          {
-             //floppy[i]->OneZyklus();
+             floppy[i]->OneZyklus();
 
              #ifdef floppy_asyncron
              counter_plus++;
@@ -281,11 +286,14 @@ void C64Class::FillAudioBuffer(short *stream, int laenge)
              FloppyIEC |= ~floppy[i]->FloppyIECLocal;
          }
          FloppyIEC = ~FloppyIEC;
+		 */
 
          vic->OneZyklus();
          cia1->OneZyklus();
          cia2->OneZyklus();
          sid1->OneZyklus();
+         //reu->OneZyklus();
+
          cpu->OneZyklus();
 
 
@@ -861,10 +869,10 @@ void C64Class::WriteIO1(unsigned short adresse,unsigned char wert)
         crt->WriteIO1(adresse,wert);
         break;
     case 2:	// REU
-        //reu->WriteIO1(adresse,wert);
+        reu->WriteIO1(adresse,wert);
         break;
     case 3:	// GEORAM
-        //georam->WriteIO1(adresse,wert);
+        geo->WriteIO1(adresse,wert);
         break;
 
     default:
@@ -883,10 +891,10 @@ void C64Class::WriteIO2(unsigned short adresse,unsigned char wert)
         crt->WriteIO2(adresse,wert);
         break;
     case 2: // REU
-        //reu->WriteIO2(adresse,wert);
+        reu->WriteIO2(adresse,wert);
         break;
     case 3: // GEORAM
-        //georam->WriteIO2(adresse,wert);
+        geo->WriteIO2(adresse,wert);
         break;
     default:
         break;
@@ -905,10 +913,10 @@ unsigned char C64Class::ReadIO1(unsigned short adresse)
         return crt->ReadIO1(adresse);
         break;
     case 2: // REU
-        //return reu->ReadIO1(adresse);
+        return reu->ReadIO1(adresse);
         break;
     case 3: // GEORAM
-        //return georam->ReadIO1(adresse);
+        return geo->ReadIO1(adresse);
         break;
     default:
         return 0;
@@ -930,10 +938,10 @@ unsigned char C64Class::ReadIO2(unsigned short adresse)
         return crt->ReadIO2(adresse);
         break;
     case 2: // REU
-        // return reu->ReadIO2(adresse);
+        return reu->ReadIO2(adresse);
         break;
     case 3: // GEORAM
-        //return georam->ReadIO2(adresse);
+        return geo->ReadIO2(adresse);
         break;
     default:
         return 0;

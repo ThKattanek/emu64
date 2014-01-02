@@ -14,7 +14,6 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
 import android.util.Log;
@@ -47,7 +46,7 @@ public class MainActivity extends Activity {
 		File appFiles = new File(app_data_path);
 		
 		boolean isCreatet = false;
-		
+				
 		if (!(appFiles.exists() && appFiles.isDirectory())) 
         {
             if (!appFiles.mkdir())
@@ -174,12 +173,13 @@ public class MainActivity extends Activity {
 		return true;
 	}
 	*/
-	
+		
 	@Override
     public boolean onKeyDown(int keyCode, KeyEvent event){
 		super.onKeyDown(keyCode, event);
 
-		if (keyCode == KeyEvent.KEYCODE_MENU) {
+		if (keyCode == KeyEvent.KEYCODE_MENU) 
+		{
 			NativeClass.Menue();
 		}	
 		

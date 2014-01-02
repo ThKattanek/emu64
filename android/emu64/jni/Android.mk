@@ -11,6 +11,8 @@ LOCAL_SRC_FILES += c64_class.cpp
 
 LOCAL_SRC_FILES += ../../../mmu_class.cpp
 LOCAL_SRC_FILES += ../../../crt_class.cpp
+LOCAL_SRC_FILES += ../../../reu_class.cpp
+LOCAL_SRC_FILES += ../../../georam_class.cpp
 LOCAL_SRC_FILES += ../../../am29f040_class.cpp
 LOCAL_SRC_FILES += ../../../mos6510_class.cpp
 LOCAL_SRC_FILES += ../../../mos6569_class.cpp
