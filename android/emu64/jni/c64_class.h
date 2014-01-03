@@ -32,7 +32,7 @@
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
 
-#define FloppyAnzahl 1
+#define FloppyAnzahl 0
 #define MAX_BREAK_GROUPS 256
 #define MAX_JOYSTICKS 16
 #define MAX_VJOYS 16

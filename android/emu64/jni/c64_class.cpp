@@ -252,6 +252,8 @@ C64Class::~C64Class()
     if(cia1 != NULL) delete cia1;
     if(cia2 != NULL) delete cia2;
     if(crt != NULL) delete crt;
+    if(reu != NULL) delete reu;
+    if(geo != NULL) delete geo;
 }
 
 void C64Class::FillAudioBuffer(short *stream, int laenge)
@@ -266,9 +268,8 @@ void C64Class::FillAudioBuffer(short *stream, int laenge)
 
 	while(sid1->SoundBufferPos < (laenge/2))
 	{
-		CheckKeys();
 
-		/*
+		CheckKeys();
         FloppyIEC = 0;
         for(int i=0; i<FloppyAnzahl; i++)
          {
@@ -286,16 +287,15 @@ void C64Class::FillAudioBuffer(short *stream, int laenge)
              FloppyIEC |= ~floppy[i]->FloppyIECLocal;
          }
          FloppyIEC = ~FloppyIEC;
-		 */
 
          vic->OneZyklus();
+
          cia1->OneZyklus();
          cia2->OneZyklus();
          sid1->OneZyklus();
          //reu->OneZyklus();
 
          cpu->OneZyklus();
-
 
          ////////////////////////// Testweise //////////////////////////
 
@@ -395,8 +395,8 @@ void C64Class::FillAudioBuffer(short *stream, int laenge)
                          }
                      }
                      //////////////////////////////////////////////////////////////////////////////
-
 	}
+
 
 	for(int i=0;i<(laenge/2);i++)
 	{
@@ -708,8 +708,8 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
 
 int C64Class::LoadCRT(char *filename)
 {
-    //reu->Remove();
-    //georam->Remove();
+    reu->Remove();
+    geo->Remove();
 
     int ret = crt->LoadCRTImage(filename);
     if(ret == 0)
