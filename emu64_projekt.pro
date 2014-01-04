@@ -49,7 +49,8 @@ SOURCES += \
     custom_splashscreen.cpp \
     c64_speed_window.cpp \
     reu_class.cpp \
-    georam_class.cpp
+    georam_class.cpp \
+    video_capture_class.cpp
 
 HEADERS  += \
     version.h \
@@ -103,7 +104,8 @@ HEADERS  += \
     c64_speed_window.h \
     firmware/usbconfig.h \
     reu_class.h \
-    georam_class.h
+    georam_class.h \
+    video_capture_class.h
 
 FORMS    += \
     info_window.ui \
@@ -131,27 +133,27 @@ RESOURCES += \
 linux-g++-64{
 TARGET = emu64
 DESTDIR = "bin/linux_x86_64"
-LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU
+LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU -lavcodec
 }
 
 linux-g++-32{
 TARGET = emu64
 DESTDIR = "bin/linux_i686"
-LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU
+LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU -lavcodec
 }
 
 win32-g++-cross{
 TARGET = emu64
 RC_FILE = emu64.rc
 DESTDIR = "bin/win_x32"
-LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image
+LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image -lavcodec
 }
 
 win64-g++-cross{
 TARGET = emu64
 RC_FILE = emu64.rc
 DESTDIR = "bin/win_x64"
-LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image
+LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image -lavcodec
 }
 
 OTHER_FILES += \

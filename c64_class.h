@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.01.2014                //
+// Letzte Änderung am 03.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -28,6 +28,7 @@
 #include "georam_class.h"
 #include "floppy1541_class.h"
 #include "cpu_info.h"
+#include "video_capture_class.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
@@ -230,6 +231,8 @@ private:
     void SDLThreadPauseEnd(void);
     void OpenSDLJoystick(void);
     void CloseSDLJoystick(void);
+    int InitVideoCaptureSystem(void);
+    void CloseVideoCaptureSystem(void);
 
     function<unsigned char(unsigned short)> *ReadProcTbl;
     function<void(unsigned short,unsigned char)> *WriteProcTbl;
@@ -292,6 +295,8 @@ private:
     BREAK_GROUP     *BreakGroup[MAX_BREAK_GROUPS];
 
     ////////////////////////////////////////////////////////////
+
+    VideoCaptureClass *video_cap;
 
     bool C64ResetReady;
     bool FloppyResetReady[FloppyAnzahl];

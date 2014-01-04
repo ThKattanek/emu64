@@ -219,6 +219,7 @@ void MOS6510::GetInterneRegister(IREG_STRUCT* ireg)
     ireg->BranchAdresse = BranchAdresse;
     ireg->TMPByte = TMPByte;
     ireg->IRQ = Interrupts[CIA_IRQ] | Interrupts[VIC_IRQ];
+    ireg->IRQ = IRQLine;
     ireg->NMI = Interrupts[CIA_NMI];
     ireg->RDY = *RDY;
     ireg->RESET = *RESET;

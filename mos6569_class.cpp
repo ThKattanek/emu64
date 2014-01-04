@@ -200,8 +200,9 @@ void VICII::GetRegister(VIC_STRUCT *vic_reg)
 	vic_reg->DisplayStatus = DisplayStatus;
 	vic_reg->GrafikMode = GrafikMode;
 	vic_reg->VicBank = *CIA2_PA & 3;
-        vic_reg->MatrixBase = MatrixBase;
-        vic_reg->CharBase = CharBase;
+    vic_reg->MatrixBase = MatrixBase;
+    vic_reg->CharBase = CharBase;
+    vic_reg->IRQ = IRQFlag & 0x80;
 
 	for(int i=0;i<8;i++)
 	{

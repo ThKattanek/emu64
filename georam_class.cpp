@@ -92,7 +92,7 @@ unsigned char GEORAMClass::ReadIO1(unsigned short adresse)
     return RAM[MemFrame + (adresse-0xde00)];
 }
 
-unsigned char GEORAMClass::ReadIO2(unsigned short adresse)
+unsigned char GEORAMClass::ReadIO2(unsigned short)
 {
     return 0;
 }

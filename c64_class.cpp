@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.01.2014                //
+// Letzte Änderung am 03.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -383,10 +383,14 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     cpu->HistoryPointer = &C64HistoryPointer;
 
     for(int i=0;i<0x10000;i++) Breakpoints[i] = 0;
+
+    video_cap = new VideoCaptureClass();
 }
 
 C64Class::~C64Class()
 {
+    if(video_cap != NULL) delete video_cap;
+
     LoopThreadEnd = true;
     SDL_WaitThread(sdl_thread,0);
 

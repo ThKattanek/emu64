@@ -158,7 +158,6 @@ void MOS6502::GetInterneRegister(IREG_STRUCT* ireg)
     ireg->Adresse = Adresse;
     ireg->BranchAdresse = BranchAdresse;
     ireg->TMPByte = TMPByte;
-
     ireg->IRQ = IRQLine;
     ireg->RESET = *RESET;
 }
