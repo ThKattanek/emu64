@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.12.2013                //
+// Letzte Änderung am 08.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -29,7 +29,7 @@ class C64SpeedWindow : public QDialog
     Q_OBJECT
     
 public:
-    explicit C64SpeedWindow(QWidget *parent = 0, QSettings *_ini = 0);
+    explicit C64SpeedWindow(QWidget *parent = NULL, QSettings *ini = NULL);
     ~C64SpeedWindow();
     void RetranslateUi();
     void SetC64Pointer(C64Class *_c64);

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.12.2013                //
+// Letzte Änderung am 08.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -39,6 +39,7 @@
 #include "debugger_window.h"
 #include "setup_window.h"
 #include "c64_speed_window.h"
+#include "capture_window.h"
 
 #include "c64_class.h"
 
@@ -96,16 +97,13 @@ private slots:
     void on_actionREU_laden_triggered();
     void on_actionREU_speichern_triggered();
     void on_actionREU_loeschen_triggered();
-
     void on_actionGEO_einstecken_triggered();
-
     void on_actionGEO_entfernen_triggered();
-
     void on_actionGEO_laden_triggered();
-
     void on_actionGEO_speichern_triggered();
-
     void on_actionGEO_loeschen_triggered();
+
+    void on_actionVideo_Capture_triggered();
 
 protected:
     void keyPressEvent(QKeyEvent *event);
@@ -139,6 +137,7 @@ private:
     DebuggerWindow *debugger_window;            // Debugger / Disassembler Fenster
     SetupWindow *setup_window;                  // Setup Fenster
     C64SpeedWindow *speed_window;               // C64 Speed Window
+    CaptureWindow * capture_window;             // Video und Sound Aufnahme Window
 
     QStringList commandLine;                    // Enthält den an Emu64 übergebenen String
 };

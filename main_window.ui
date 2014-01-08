@@ -267,7 +267,7 @@ background-position: center
     <addaction name="actionGameBase64"/>
     <addaction name="menuREU_1764_16MB"/>
     <addaction name="menuGEO_NEO_RAM_2MB"/>
-    <addaction name="actionAudio_und_Video_Aufnahme"/>
+    <addaction name="actionVideo_Capture"/>
    </widget>
    <widget class="QMenu" name="menuEinstellungen">
     <property name="title">
@@ -785,9 +785,9 @@ background-position: center
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionAudio_und_Video_Aufnahme">
+  <action name="actionVideo_Capture">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Audio und Video Aufnahme</string>

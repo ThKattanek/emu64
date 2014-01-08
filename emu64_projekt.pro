@@ -50,7 +50,8 @@ SOURCES += \
     c64_speed_window.cpp \
     reu_class.cpp \
     georam_class.cpp \
-    video_capture_class.cpp
+    video_capture_class.cpp \
+    capture_window.cpp
 
 HEADERS  += \
     version.h \
@@ -105,7 +106,8 @@ HEADERS  += \
     firmware/usbconfig.h \
     reu_class.h \
     georam_class.h \
-    video_capture_class.h
+    video_capture_class.h \
+    capture_window.h
 
 FORMS    += \
     info_window.ui \
@@ -125,7 +127,8 @@ FORMS    += \
     setup_window.ui \
     widget_d64_file.ui \
     debugger_vic_window.ui \
-    c64_speed_window.ui
+    c64_speed_window.ui \
+    capture_window.ui
 
 RESOURCES += \
     emu64.qrc

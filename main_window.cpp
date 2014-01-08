@@ -82,6 +82,7 @@ MainWindow::~MainWindow()
     delete crt_window;
     delete debugger_window;
     delete speed_window;
+    delete capture_window;
 
     delete ui;
     delete ini;
@@ -213,6 +214,10 @@ void MainWindow::OnInit()
     splash->showStatusMessage(tr("C64SpeedWindow wird erstellt."),Qt::darkBlue);
     speed_window = new C64SpeedWindow(this,ini);
     LogText(tr(">> C64SpeedWindow wurde erzeugt\n").toLatin1().data());
+
+    splash->showStatusMessage(tr("CaptureWindow wird erstellt."),Qt::darkBlue);
+    capture_window = new CaptureWindow(this,c64,ini);
+    LogText(tr(">> CaptureWindow wurde erzeugt\n").toLatin1().data());
 
     ini->beginGroup("MainWindow");
     splash->showStatusMessage(tr("Screenshotnummer wir geladen."),Qt::darkBlue);
@@ -433,6 +438,7 @@ void MainWindow::RetranslateUi()
     debugger_window->RetranslateUi();
     setup_window->RetranslateUi();
     speed_window->RetranslateUi();
+    capture_window->RetranslateUi();
 
     SDL_WM_SetCaption(tr("C64 Bildschirm").toLatin1().data(),0);
 }
@@ -587,7 +593,6 @@ void MainWindow::on_actionC64_Programme_direkt_laden_triggered()
         c64->LoadPRG(filename.toLatin1().data(),0);
     }
 }
-
 
 void MainWindow::on_actionTV_Video_Einstellungen_triggered()
 {
@@ -754,4 +759,9 @@ void MainWindow::on_actionGEO_loeschen_triggered()
     {
         c64->ClearGEORAMRam();
     }
+}
+
+void MainWindow::on_actionVideo_Capture_triggered()
+{
+    capture_window->show();
 }
