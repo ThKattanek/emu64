@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.01.2014                //
+// Letzte Änderung am 09.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -97,6 +97,7 @@ public:
     void SetDebugAnimationSpeed(int cycle_sek);
     void GetC64CpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg);
     void GetVicReg(VIC_STRUCT *vic_reg);
+    void GetIECStatus(IEC_STRUCT *iec);
 
     int AddBreakGroup(void);
     void DelBreakGroup(int index);

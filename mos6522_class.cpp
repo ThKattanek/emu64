@@ -120,7 +120,7 @@ void MOS6522::WriteIO(unsigned short adresse, unsigned char wert)
 
     switch(VIANummer)
     {
-    case 0: // VIA 1 // Schreib/Lese Einheit FloppyDisk
+    case 0: // VIA 1 // Komunitkation via IEC BUS
     {
         switch (adresse & 0xF)
         {
@@ -191,7 +191,7 @@ void MOS6522::WriteIO(unsigned short adresse, unsigned char wert)
         }
         break;
     }
-    case 1: // VIA 2 // Komunitkation via IEC BUS
+    case 1: // VIA 2 // Schreib/Lese Einheit FloppyDisk
     {
         switch (adresse & 0xF)
         {

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.12.2013                //
+// Letzte Änderung am 09.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -25,6 +25,7 @@
 #include "cpu_info.h"
 #include "memory_window.h"
 #include "debugger_vic_window.h"
+#include "debugger_iec_window.h"
 
 #define DisAssZeilen 20
 #define HistoryZeilen 7
@@ -43,7 +44,7 @@ public:
     void showEvent(QShowEvent *event);
     void hideEvent(QHideEvent *event);
     void RetranslateUi();
-    void SetC64Pointer(C64Class *_c64);
+    void SetC64Pointer(C64Class *c64);
     void AnimationRefreshProc(void);
     void BreakpointProc(void);
 
@@ -82,6 +83,7 @@ private slots:
     void onChangeFloppyStatus(void);
     void on_MemEdit_clicked();
     void on_VIC_clicked();
+    void on_IEC_clicked();
     void on_man_lines_clicked(bool checked);
     void on_rdy_led_clicked(bool checked);
     void on_irq_led_clicked(bool checked);
@@ -106,6 +108,7 @@ private:
     Ui::DebuggerWindow *ui;
     MemoryWindow *memory_window;
     DebuggerVicWindow *vic_window;
+    DebuggerIECWindow *iec_window;
     QSettings *ini;
     QStringList MicroCodeStringTable6510;
     QStringList RWString;

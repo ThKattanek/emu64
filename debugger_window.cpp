@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.12.2013                //
+// Letzte Änderung am 09.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -26,7 +26,10 @@
 
 DebuggerWindow::DebuggerWindow(QWidget *parent, QSettings *_ini) :
     QDialog(parent),
-    ui(new Ui::DebuggerWindow)
+    ui(new Ui::DebuggerWindow),
+    memory_window(NULL),
+    vic_window(NULL),
+    iec_window(NULL)
 {    
     ini = _ini;
     c64 = 0;
@@ -47,6 +50,7 @@ DebuggerWindow::DebuggerWindow(QWidget *parent, QSettings *_ini) :
     memory_window->ChangeSource(0);
 
     vic_window = new DebuggerVicWindow(this);
+    iec_window = new DebuggerIECWindow(this);
 
     NewRefresh = false;
     timer1 = new QTimer(this);
@@ -151,8 +155,9 @@ DebuggerWindow::~DebuggerWindow()
     delete timer1;
     delete ui;
 
-    delete memory_window;
-    delete vic_window;
+    if(memory_window != NULL) delete memory_window;
+    if(vic_window != NULL) delete vic_window;
+    if(iec_window != NULL) delete iec_window;
 }
 
 void DebuggerWindow::AnimationRefreshProc()
@@ -187,6 +192,7 @@ void DebuggerWindow::onTimerAnimationRefresh(void)
         FillHistoryList(ui->HistoryScroll->value());
         memory_window->UpdateMemoryList();
         vic_window->UpdateOutputList();
+        iec_window->UpdateSignals();
     }
 
     if(NewBreakpointfound)
@@ -532,15 +538,17 @@ void DebuggerWindow::RetranslateUi()
 
     vic_window->RetranslateUi();
     memory_window->RetranslateUi();
+    iec_window->RetranslateUi();
 }
 
-void DebuggerWindow::SetC64Pointer(C64Class *_c64)
+void DebuggerWindow::SetC64Pointer(C64Class *c64)
 {
-    c64 = _c64;
-    memory_window->SetC64Pointer(_c64);
-    vic_window->SetC64Pointer(_c64);
-    c64->AnimationRefreshProc = bind(&DebuggerWindow::AnimationRefreshProc,this);
-    c64->BreakpointProc = bind(&DebuggerWindow::BreakpointProc,this);
+    this->c64 = c64;
+    memory_window->SetC64Pointer(c64);
+    vic_window->SetC64Pointer(c64);
+    iec_window->SetC64Pointer(c64);
+    this->c64->AnimationRefreshProc = bind(&DebuggerWindow::AnimationRefreshProc,this);
+    this->c64->BreakpointProc = bind(&DebuggerWindow::BreakpointProc,this);
 }
 
 void DebuggerWindow::showEvent(QShowEvent*)
@@ -556,6 +564,7 @@ void DebuggerWindow::hideEvent(QHideEvent*)
 
     memory_window->hide();
     vic_window->hide();
+    iec_window->hide();
 
     c64->SetDebugMode(false);
     c64->SetDebugAnimation(false);
@@ -2508,6 +2517,16 @@ void DebuggerWindow::on_VIC_clicked()
         vic_window->UpdateOutputList();
     }
     else vic_window->hide();
+}
+
+void DebuggerWindow::on_IEC_clicked()
+{
+    if(iec_window->isHidden())
+    {
+        iec_window->show();
+        iec_window->UpdateSignals();
+    }
+    else iec_window->hide();
 }
 
 void DebuggerWindow::on_man_lines_clicked(bool checked)

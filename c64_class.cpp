@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.01.2014                //
+// Letzte Änderung am 09.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -2235,6 +2235,15 @@ void C64Class::GetVicReg(VIC_STRUCT *vic_reg)
 {
     vic->GetRegister(vic_reg);
     vic_reg->IRQ = cpu->GetInterrupts(VIC_IRQ);
+}
+
+void C64Class::GetIECStatus(IEC_STRUCT *iec)
+{
+    iec->ATN_OUT = (bool)!!(C64IEC & 16);
+    iec->CLOCK_OUT = (bool)!!(C64IEC & 64);
+    iec->DATA_OUT = (bool)!!(C64IEC & 128);
+    iec->CLOCK_IN = (bool)!!(FloppyIEC & 64);
+    iec->DATA_IN = (bool)!!(FloppyIEC & 128);
 }
 
 int C64Class::AddBreakGroup(void)

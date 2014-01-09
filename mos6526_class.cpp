@@ -482,7 +482,7 @@ void MOS6526::WriteIO(unsigned short adresse,unsigned char wert)
                 PALatch = wert;
                 PA->SetOutput(PALatch | ~DDRA);
 
-                if(CiaNr == 1)	/// Nur bei CIA2
+        if(CiaNr == 1)	/// Nur bei CIA2
 		{
                         wert = ~PALatch & DDRA;
                         //unsigned char  OLD_LINES = *C64IEC;
@@ -614,9 +614,9 @@ unsigned char MOS6526::ReadIO(unsigned short adresse)
 	switch(adresse)
 	{
 	case 0:
-                if(CiaNr == 1)	/// Nur bei CIA2
+        if(CiaNr == 1)	/// Nur bei CIA2
 		{
-                        return ((PALatch | ~DDRA) & 0x3F) | (*C64IEC & *FloppyIEC);
+                return ((PALatch | ~DDRA) & 0x3F) | (*C64IEC & *FloppyIEC);
 		}
                 return (0xFF & (PALatch | (~(DDRA))) & PA->GetInput());
 		break;
