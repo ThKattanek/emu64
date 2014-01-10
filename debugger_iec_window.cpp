@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.01.2014                //
+// Letzte Änderung am 10.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -23,8 +23,8 @@ DebuggerIECWindow::DebuggerIECWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    iOff = new QIcon(":/grafik/blue_led_off.png");
-    iOn = new QIcon(":/grafik/blue_led_on.png");
+    iOff = new QIcon(":/grafik/green_led_off.png");
+    iOn = new QIcon(":/grafik/green_led_on.png");
 }
 
 DebuggerIECWindow::~DebuggerIECWindow()

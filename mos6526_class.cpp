@@ -618,7 +618,7 @@ unsigned char MOS6526::ReadIO(unsigned short adresse)
 		{
                 return ((PALatch | ~DDRA) & 0x3F) | (*C64IEC & *FloppyIEC);
 		}
-                return (0xFF & (PALatch | (~(DDRA))) & PA->GetInput());
+                return (0xFF & (PALatch | ~(DDRA)) & PA->GetInput());
 		break;
 
 	case 1:

@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: mos6522_class.cpp                     //
-//						//
+//                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 20.07.2011		//
-// www.emu64.de					//
-//						//
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 10.01.2014                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include "mos6522_class.h"
@@ -131,8 +131,8 @@ void MOS6522::WriteIO(unsigned short adresse, unsigned char wert)
                 *FloppyIEC = ((wert << 6) & ((~wert ^ *C64IEC) << 3) & 0x80) | ((wert << 3) & 0x40);
                 break;
             }
-            case 1:
-            case 15:
+            case 0x01:
+            case 0x0F:
             {
                 PA = wert;
                 break;
@@ -140,7 +140,7 @@ void MOS6522::WriteIO(unsigned short adresse, unsigned char wert)
             case 0x02:
             {
                 DDRB = wert;
-                wert &= ~PB;
+                wert = ~PB & DDRB;
                 *FloppyIEC = ((wert << 6) & ((~wert ^ *C64IEC) << 3) & 0x80) | ((wert << 3) & 0x40);
                 break;
             }
