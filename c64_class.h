@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.01.2014                //
+// Letzte Änderung am 12.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -118,6 +118,8 @@ public:
     unsigned char GetMapWriteDestination(unsigned char page);
 
     void SaveScreenshot(char *filename);
+    int StartVideoCapture(char *filename);
+    void StopVideoCapture();
 
     int             AktWindowXW;
     int             AktWindowYW;
@@ -134,6 +136,7 @@ public:
     bool            ChangeGrafikModi;
     bool            HoldVicRefresh;
     bool            VicRefreshIsHold;
+    bool            NewVicRefresh;
 
     FPSmanager      fps_manager;
     SDL_Surface     *C64Screen;
@@ -216,6 +219,8 @@ public:
     bool StartScreenshot;
     char ScreenshotFilename[1024];
 
+    VideoCaptureClass *video_cap;
+
 private:
     void CalcDistortionGrid();
     void VicRefresh(unsigned char *vic_puffer);
@@ -296,8 +301,6 @@ private:
     BREAK_GROUP     *BreakGroup[MAX_BREAK_GROUPS];
 
     ////////////////////////////////////////////////////////////
-
-    VideoCaptureClass *video_cap;
 
     bool C64ResetReady;
     bool FloppyResetReady[FloppyAnzahl];

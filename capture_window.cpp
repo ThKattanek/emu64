@@ -1,3 +1,18 @@
+//////////////////////////////////////////////////
+//                                              //
+// Emu64                                        //
+// von Thorsten Kattanek                        //
+//                                              //
+// #file: capture_window.cpp                    //
+//                                              //
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 12.01.2014                //
+// www.emu64.de                                 //
+//                                              //
+//////////////////////////////////////////////////
+
 #include "capture_window.h"
 #include "ui_capture_window.h"
 
@@ -20,4 +35,18 @@ void CaptureWindow::RetranslateUi()
 {
     ui->retranslateUi(this);
     this->update();
+}
+
+void CaptureWindow::on_pushVideoCaptureStart_clicked()
+{
+    int ret = c64->StartVideoCapture((char*)"emu64.mpg");
+    if(ret != 0)
+    {
+        QMessageBox::critical(this,"Ein Fehler ist aufgetreten...","-- VideoCaptureClass --\nFehlerCode: " + QVariant(ret).toString());
+    }
+}
+
+void CaptureWindow::on_pushVideoCaptureStop_clicked()
+{
+    c64->StopVideoCapture();
 }

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.03.2013                //
+// Letzte Änderung am 12.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -167,6 +167,11 @@ void VideoPalClass::EnableVideoDoubleSize(bool enabled)
 void VideoPalClass::EnablePALOutput(bool enabled)
 {
         PALOutput = enabled;
+}
+
+float *VideoPalClass::GetC64YUVPalette()
+{
+    return C64YUVPalette1;
 }
 
 inline void VideoPalClass::RGB_To_YUV(float rgb[3], float yuv[3])

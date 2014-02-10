@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.03.2013                //
+// Letzte Änderung am 12.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -57,6 +57,7 @@ public:
         void SetC64Palette(int palnr);
         void EnableVideoDoubleSize(bool enabled);
         void EnablePALOutput(bool enabled);
+        float *GetC64YUVPalette();
         unsigned long YHistogramm[256];
 
         bool StartC64isColorBit32;

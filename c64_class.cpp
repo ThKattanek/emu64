@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.01.2014                //
+// Letzte Änderung am 12.01.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -63,6 +63,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     DrawScreenBack = false;
     StartScreenshot = false;
     FrameSkipCounter=1;
+    NewVicRefresh = false;
 
     OpenGLEnable = OpenGLOn;
     DistortionEnable = true;
@@ -1061,8 +1062,6 @@ int SDLThread(void *userdat)
 
                     if(!c64->DistortionEnable)
                     {
-
-
                         glBindTexture(GL_TEXTURE_2D,C64ScreenTexture);
                         c64->pal->ConvertVideo((void*)c64->C64ScreenBuffer,c64->AktC64ScreenXW*4,c64->vic_puffer + C64FirstViewedPixel,c64->AktC64ScreenXW,c64->AktC64ScreenYW,504,311,false);
                         glTexSubImage2D(GL_TEXTURE_2D,0,0,0, c64->AktC64ScreenXW, c64->AktC64ScreenYW,GL_BGRA, GL_UNSIGNED_BYTE, c64->C64ScreenBuffer);
@@ -1101,6 +1100,12 @@ int SDLThread(void *userdat)
                         glEnd();
                     }
 
+                    // Video Capture //
+                    if(c64->NewVicRefresh)
+                    {
+                        c64->NewVicRefresh = false;
+                        c64->video_cap->AddFrame(c64->vic_puffer,504,311);
+                    }
 
                     /// Die Pfeile werden nur beim lernen angezeigt ///
                     if(c64->RecJoyMapping)
@@ -1328,6 +1333,8 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
         SDL_UnlockSurface(C64ScreenBack);
         DrawScreenBack = true;
     }
+
+    NewVicRefresh = true;
 }
 
 void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
@@ -2542,6 +2549,16 @@ void C64Class::SaveScreenshot(char *filename)
 {
     strcpy(ScreenshotFilename,filename);
     StartScreenshot = true;
+}
+
+int C64Class::StartVideoCapture(char *filename)
+{
+    return video_cap->Start(filename,4000000,504,312,50);
+}
+
+void C64Class::StopVideoCapture()
+{
+    video_cap->Stop();
 }
 
 int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)
