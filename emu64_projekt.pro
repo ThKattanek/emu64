@@ -136,15 +136,15 @@ FORMS    += \
 RESOURCES += \
     emu64.qrc
 
-linux-g++{
+linux-g++32{
 TARGET = emu64
-DESTDIR = "bin/linux_x86_64"
+DESTDIR = "bin/linux_32bit"
 LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU -lavcodec -lavutil
 }
 
-linux-g++-32{
+linux-g++-64{
 TARGET = emu64
-DESTDIR = "bin/linux_i686"
+DESTDIR = "bin/linux_64bit"
 LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU -lavcodec -lavutil
 }
 
@@ -190,7 +190,9 @@ OTHER_FILES += \
     floppy_sounds/anschlag.raw \
     lizenz.pdf \
     license.pdf \
-    qt_de.qm
+    qt_de.qm \
+    build_linux32.sh \
+    build_linux64.sh
 
 
 
