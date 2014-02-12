@@ -136,7 +136,7 @@ FORMS    += \
 RESOURCES += \
     emu64.qrc
 
-linux-g++32{
+linux-g++-32{
 TARGET = emu64
 DESTDIR = "bin/linux_32bit"
 LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU -lavcodec -lavutil
