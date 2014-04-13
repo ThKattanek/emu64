@@ -190,9 +190,7 @@ OTHER_FILES += \
     floppy_sounds/anschlag.raw \
     lizenz.pdf \
     license.pdf \
-    qt_de.qm \
-    build_linux32.sh \
-    build_linux64.sh
+    qt_de.qm
 
 
 
