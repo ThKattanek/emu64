@@ -148,17 +148,10 @@ DESTDIR = "bin/linux_64bit"
 LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU -lavcodec -lavutil
 }
 
-win32-g++-cross{
+win32-g++{
 TARGET = emu64
 RC_FILE = emu64.rc
 DESTDIR = "bin/win_x32"
-LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image -lavcodec -lavutil
-}
-
-win64-g++-cross{
-TARGET = emu64
-RC_FILE = emu64.rc
-DESTDIR = "bin/win_x64"
 LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image -lavcodec -lavutil
 }
 

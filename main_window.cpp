@@ -578,7 +578,7 @@ void MainWindow::on_actionHardreset_triggered()
 
 void MainWindow::on_actionAutostart_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),"",tr("C64 Programm Dateien") + "(*.prg *.p00 *.t64 *.d64 *.g64 *.frz);;" + tr("Alle Dateien") + "(*.*)");
+    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),"",tr("C64 Programm Dateien") + "(*.prg *.c64 *.p00 *.t64 *.d64 *.g64 *.frz);;" + tr("Alle Dateien") + "(*.*)");
     if(filename != "")
     {
         c64->LoadAutoRun(0,filename.toLatin1().data());
@@ -587,7 +587,7 @@ void MainWindow::on_actionAutostart_triggered()
 
 void MainWindow::on_actionC64_Programme_direkt_laden_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),"",tr("C64 Programm Dateien") + "(*.prg *.p00 *.t64 *.frz);;" + tr("Alle Dateien") + "(*.*)");
+    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),"",tr("C64 Programm Dateien") + "(*.prg *.c64 *.p00 *.t64 *.frz);;" + tr("Alle Dateien") + "(*.*)");
     if(filename != "")
     {
         c64->LoadPRG(filename.toLatin1().data(),0);

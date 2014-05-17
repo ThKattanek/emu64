@@ -1833,7 +1833,7 @@ int C64Class::LoadAutoRun(int floppy_nr, char *filename)
         return 0;
     }
 
-    if(0==strcmp("PRG",EXT))
+    if(0==strcmp("PRG",EXT) || 0==strcmp("C64",EXT))
     {
         KillCommandLine();
         AutoLoadMode = 1;
@@ -1902,7 +1902,7 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
 
     char str00[256];
 
-    if(0==strcmp("PRG",EXT))
+    if(0==strcmp("PRG",EXT) || 0==strcmp("C64",EXT))
     {
         LogText((char*)">> PRG laden: ");
         LogText(filename);
