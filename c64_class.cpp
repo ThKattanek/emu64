@@ -5,10 +5,10 @@
 //                                              //
 // #file: c64_class.cpp                         //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.01.2014                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,7 +19,7 @@
 #include <QDebug>
 
 #define floppy_asyncron                  // Schaltet die Floppy Asyncron
-#define more_one_floppy_cylce_count 66   // alle "more_one_floppy_cycle_counts" wird 1 FloppyZyklus doppelt ausgeführt
+#define more_one_floppy_cylce_count 66   // alle "more_one_floppy_cycle_counts" wird 1 FloppyZyklus doppelt ausgefÃ¼hrt
 
 void AudioMix(void *nichtVerwendet, Uint8 *stream, int laenge);
 int SDLThread(void *userdat);
@@ -97,7 +97,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
         LogText((char*)"\n");
 
         if ( (Pfeil0->w & (Pfeil0->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-        if ( (Pfeil0->h & (Pfeil0->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
+        if ( (Pfeil0->h & (Pfeil0->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die HÃ¶he ist keine Potenz von 2^n\n");
     }
 
     sprintf(filename,"%spfeil1.png",GfxPath);
@@ -117,7 +117,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
         LogText((char*)"\n");
 
         if ( (Pfeil1->w & (Pfeil1->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-        if ( (Pfeil1->h & (Pfeil1->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
+        if ( (Pfeil1->h & (Pfeil1->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die HÃ¶he ist keine Potenz von 2^n\n");
     }
 
     sprintf(filename,"%skreis0.png",GfxPath);
@@ -137,7 +137,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
         LogText((char*)"\n");
 
         if ( (Kreis0->w & (Kreis0->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-        if ( (Kreis0->h & (Kreis0->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
+        if ( (Kreis0->h & (Kreis0->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die HÃ¶he ist keine Potenz von 2^n\n");
     }
 
     sprintf(filename,"%skreis1.png",GfxPath);
@@ -157,7 +157,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
         LogText((char*)"\n");
 
         if ( (Kreis1->w & (Kreis1->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-        if ( (Kreis1->h & (Kreis1->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
+        if ( (Kreis1->h & (Kreis1->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die HÃ¶he ist keine Potenz von 2^n\n");
     }
 
     /// SLD Audio Installieren (C64 Emulation) ///
@@ -466,7 +466,7 @@ int SDLThread(void *userdat)
 
     while (!c64->LoopThreadEnd)
     {
-        /// Wird immer ausgeführt wenn die Funktion SetGrafikModi ausgefürt wurde ///
+        /// Wird immer ausgefÃ¼hrt wenn die Funktion SetGrafikModi ausgefÃ¼rt wurde ///
         if(c64->ChangeGrafikModi)
         {
             c64->ChangeGrafikModi = false;
@@ -1057,8 +1057,8 @@ int SDLThread(void *userdat)
 
                     /// OpenGL Version ///
 
-                    glClearColor( 0.0, 0.0, 0.0, 0.0 ); // Farbe zum Löschen setzen
-                    glClear( GL_COLOR_BUFFER_BIT );     // Aktuellen Bildpuffer löschen
+                    glClearColor( 0.0, 0.0, 0.0, 0.0 ); // Farbe zum LÃ¶schen setzen
+                    glClear( GL_COLOR_BUFFER_BIT );     // Aktuellen Bildpuffer lÃ¶schen
 
                     if(!c64->DistortionEnable)
                     {
@@ -1226,7 +1226,7 @@ int SDLThread(void *userdat)
                         SDL_Rect rec_src = {0,0,c64->AktC64ScreenXW,c64->AktC64ScreenYW};
                         SDL_Rect rec_dst = {0,0,(unsigned short)c64->C64Screen->w,(unsigned short)c64->C64Screen->h};
 
-                        /// Auf Screenshot Start prüfen ///
+                        /// Auf Screenshot Start prÃ¼fen ///
                         if(c64->StartScreenshot)
                         {
                             c64->StartScreenshot = false;
@@ -1354,7 +1354,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
             CheckKeys();
             CycleCounter++;
 
-            /// Für Externe Erweiterungen ///
+            /// FÃ¼r Externe Erweiterungen ///
             //if(ExtZyklus) ZyklusProcExt();
 
             FloppyIEC = 0;
@@ -1457,7 +1457,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                     CheckKeys();
                     CycleCounter++;
 
-                    /// Für Externe Erweiterungen ///
+                    /// FÃ¼r Externe Erweiterungen ///
                     //if(ExtZyklus) ZyklusProcExt();
 
                     FloppyIEC = 0;
@@ -1504,7 +1504,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                 CheckKeys();
                 CycleCounter++;
 
-                /// Für Externe Erweiterungen ///
+                /// FÃ¼r Externe Erweiterungen ///
                 //if(ExtZyklus) ZyklusProcExt();
 
                 FloppyIEC = 0;
@@ -1549,7 +1549,7 @@ loop_wait_next_opc:
                 CheckKeys();
                 CycleCounter++;
 
-                /// Für Externe Erweiterungen ///
+                /// FÃ¼r Externe Erweiterungen ///
                 //if(ExtZyklus) ZyklusProcExt();
 
                 vic->OneZyklus();
@@ -1793,7 +1793,7 @@ int SDLThreadLoad(void *userdat)
     return 0;
 }
 
-// ret 0=OK 1=nicht unterstütztes Format 2=D64 n.IO 3=G64 n.IO 4=OK nur es war ein CRT
+// ret 0=OK 1=nicht unterstÃ¼tztes Format 2=D64 n.IO 3=G64 n.IO 4=OK nur es war ein CRT
 int C64Class::LoadAutoRun(int floppy_nr, char *filename)
 {
     char EXT[4];
@@ -1914,7 +1914,7 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         file = fopen (filename, "rb");
         if (file == NULL)
         {
-            LogText((char*)"<< ERROR: Datei konnte nicht geöffnet werden");
+            LogText((char*)"<< ERROR: Datei konnte nicht geÃ¶ffnet werden");
             return 0x01;
         }
         reading_bytes = fread (&temp,1,2,file);
@@ -1958,7 +1958,7 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         file = fopen (filename, "rb");
         if (file == NULL)
         {
-            LogText((char*)"<< ERROR: Datei konnte nicht geöffnet werden");
+            LogText((char*)"<< ERROR: Datei konnte nicht geÃ¶ffnet werden");
                 return 0x01;
         }
 
@@ -2021,7 +2021,7 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         file = fopen (filename, "rb");
         if (file == NULL)
         {
-            LogText((char*)"<< ERROR: Datei konnte nicht geöffnet werden");
+            LogText((char*)"<< ERROR: Datei konnte nicht geÃ¶ffnet werden");
                 return 0x01;
         }
 
@@ -2336,7 +2336,7 @@ int C64Class::LoadBreakGroups(char *filename)
     file = fopen (filename, "rb");
     if (file == NULL)
     {
-            /// Datei konnte nicht geöffnet werden ///
+            /// Datei konnte nicht geÃ¶ffnet werden ///
             return -1;
     }
 
@@ -2979,12 +2979,12 @@ void C64Class::OpenSDLJoystick()
     if(SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
     {
         SDLJoystickIsOpen = false;
-        LogText((char*)"<< ERROR: SDL Subsystem Joystick konnte nicht geöffnet werden\n");
+        LogText((char*)"<< ERROR: SDL Subsystem Joystick konnte nicht geÃ¶ffnet werden\n");
     }
     else
     {
         SDLJoystickIsOpen = true;
-        LogText((char*)">> SDL Subsytem Joystick wurde erfolgreich geöffnet\n");
+        LogText((char*)">> SDL Subsytem Joystick wurde erfolgreich geÃ¶ffnet\n");
         JoystickAnzahl = SDL_NumJoysticks();
         if(JoystickAnzahl > MAX_JOYSTICKS) JoystickAnzahl = MAX_JOYSTICKS;
 

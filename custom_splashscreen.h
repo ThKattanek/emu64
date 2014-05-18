@@ -1,3 +1,18 @@
+//////////////////////////////////////////////////
+//                                              //
+// Emu64                                        //
+// von Thorsten Kattanek                        //
+//                                              //
+// #file: custom_splashscreen.h                 //
+//                                              //
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 18.05.2014                //
+// www.emu64.de                                 //
+//                                              //
+//////////////////////////////////////////////////
+
 #ifndef CUSTOM_SPLASHSCREEN_H
 #define CUSTOM_SPLASHSCREEN_H
 

@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: mos6581_8085_wellenformen.h           //
-//						//
-// Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 12.04.2011		//
-// www.emu64.de					//
-//						//
+//                                              //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Ã„nderung am 18.05.2014                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef MOS6581_8085_WELLENFORMEN_H
@@ -22,7 +22,7 @@
 
 /////////////////////////////////// MOS6581 ///////////////////////////////////
 
-///// Sägezahn/Dreieck (__ST)/////
+///// SÃ¤gezahn/Dreieck (__ST)/////
 
 unsigned int Wave6581_0[] =
 {
@@ -1057,7 +1057,7 @@ unsigned int Wave6581_1[] =
 /* 0xff8: */  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-///// Rechteck/Sägezahn (_PS_)/////
+///// Rechteck/SÃ¤gezahn (_PS_)/////
 unsigned int Wave6581_2[] =
 {
 /* 0x000: */  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1574,7 +1574,7 @@ unsigned int Wave6581_2[] =
 /* 0xff8: */  0x7e, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
 };
 
-///// Rechteck/Sägezahn/Dreieck (_PST)/////
+///// Rechteck/SÃ¤gezahn/Dreieck (_PST)/////
 unsigned int Wave6581_3[] =
 {
 /* 0x000: */  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -2093,7 +2093,7 @@ unsigned int Wave6581_3[] =
 
 /////////////////////////////////// MOS8580 ///////////////////////////////////
 
-///// Sägezahn/Dreieck (__ST)/////
+///// SÃ¤gezahn/Dreieck (__ST)/////
 unsigned int Wave8580_0[] =
 {
 /* 0x000: */  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -3127,7 +3127,7 @@ unsigned int Wave8580_1[] =
 /* 0xff8: */  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-///// Rechteck/Sägezahn (_PS_)/////
+///// Rechteck/SÃ¤gezahn (_PS_)/////
 unsigned int Wave8580_2[] =
 {
 /* 0x000: */  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -3644,7 +3644,7 @@ unsigned int Wave8580_2[] =
 /* 0xff8: */  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 };
 
-///// Rechteck/Sägezahn/Dreieck (_PST)/////
+///// Rechteck/SÃ¤gezahn/Dreieck (_PST)/////
 unsigned int Wave8580_3[] =
 {
 /* 0x000: */  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

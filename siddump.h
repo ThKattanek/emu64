@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: siddump.h                             //
-//						//
-// Dieser Sourcecode ist Copyright gesch�tzt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte �nderung am 12.04.2011		//
-// www.emu64.de					//
-//						//
+//                                              //
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte ï¿œnderung am 18.05.2014              //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef SIDDUMP_H

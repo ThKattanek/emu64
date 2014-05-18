@@ -5,10 +5,10 @@
 //                                              //
 // #file: mos6581_8085class.cpp                 //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.12.2013                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -290,23 +290,23 @@ void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)
     
     switch(adresse&0x1F)
     {
-    case 0: // FrequenzLO für Stimme 0
+    case 0: // FrequenzLO fÃ¼r Stimme 0
         Voice[0]->Frequenz=(Voice[0]->Frequenz & 0xFF00) | (wert & 0x00FF);
         break;
 
-    case 1: // FrequenzHI für Stimme 0
+    case 1: // FrequenzHI fÃ¼r Stimme 0
         Voice[0]->Frequenz=((wert<<8) & 0xFF00) | (Voice[0]->Frequenz & 0x00FF);
         break;
 
-    case 2: // PulsweiteLO für Stimme 0
+    case 2: // PulsweiteLO fÃ¼r Stimme 0
         Voice[0]->Pulsweite=(Voice[0]->Pulsweite & 0xF00) | (wert & 0x0FF);
         break;
 
-    case 3: // PulsweiteHI für Stimme 0
+    case 3: // PulsweiteHI fÃ¼r Stimme 0
         Voice[0]->Pulsweite=((wert<<8) & 0xF00) | (Voice[0]->Pulsweite & 0x0FF);
         break;
 
-    case 4: // Kontrol Register für Stimme 0
+    case 4: // Kontrol Register fÃ¼r Stimme 0
         Voice[0]->Waveform=(wert>>4) & 0x0F;
         Voice[0]->RingBit = !(~wert & 0x04);
         Voice[0]->SyncBit = !(~wert & 0x02);
@@ -333,14 +333,14 @@ void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)
         Voice[0]->KeyBit=KeyNext;
         break;
 
-    case 5: // Attack-Decay für Stimme 0
+    case 5: // Attack-Decay fÃ¼r Stimme 0
         Voice[0]->Attack=(wert>>4)&0x0F;
         Voice[0]->Decay=wert&0x0F;
         if(Voice[0]->State==ATTACK) Voice[0]->RatePeriod=RateCounterPeriod[Voice[0]->Attack];
         else if (Voice[0]->State==DECAY_SUSTAIN) Voice[0]->RatePeriod=RateCounterPeriod[Voice[0]->Decay];
         break;
 
-    case 6:		// Sustain-Release für Stimme 0
+    case 6:		// Sustain-Release fÃ¼r Stimme 0
         Voice[0]->Sustain=(wert>>4)&0x0F;
         Voice[0]->Release=wert&0x0F;
         if (Voice[0]->State==RELEASE) Voice[0]->RatePeriod=RateCounterPeriod[Voice[0]->Release];
@@ -348,23 +348,23 @@ void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)
         
         /////////////////////////////////////////////////////////////
 
-    case 7: // FrequenzLO für Stimme 1
+    case 7: // FrequenzLO fÃ¼r Stimme 1
         Voice[1]->Frequenz=(Voice[1]->Frequenz & 0xFF00) | (wert & 0x00FF);
         break;
 
-    case 8: // FrequenzHI für Stimme 1
+    case 8: // FrequenzHI fÃ¼r Stimme 1
         Voice[1]->Frequenz=((wert<<8) & 0xFF00) | (Voice[1]->Frequenz & 0x00FF);
         break;
 
-    case 9: // PulsweiteLO für Stimme 1
+    case 9: // PulsweiteLO fÃ¼r Stimme 1
         Voice[1]->Pulsweite=(Voice[1]->Pulsweite & 0xF00) | (wert & 0x0FF);
         break;
 
-    case 10: // PulsweiteHI für Stimme 1
+    case 10: // PulsweiteHI fÃ¼r Stimme 1
         Voice[1]->Pulsweite=((wert<<8) & 0xF00) | (Voice[1]->Pulsweite & 0x0FF);
         break;
 
-    case 11: // Kontrol Register für Stimme 1
+    case 11: // Kontrol Register fÃ¼r Stimme 1
         Voice[1]->Waveform=(wert>>4)&0x0F;
         Voice[1]->RingBit = !(~wert&0x04);
         Voice[1]->SyncBit = !(~wert&0x02);
@@ -391,14 +391,14 @@ void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)
         Voice[1]->KeyBit=KeyNext;
         break;
 
-    case 12: // Attack-Decay für Stimme 1
+    case 12: // Attack-Decay fÃ¼r Stimme 1
         Voice[1]->Attack=(wert>>4)&0x0F;
         Voice[1]->Decay=wert&0x0F;
         if(Voice[1]->State==ATTACK) Voice[1]->RatePeriod=RateCounterPeriod[Voice[1]->Attack];
         else if (Voice[1]->State==DECAY_SUSTAIN) Voice[1]->RatePeriod=RateCounterPeriod[Voice[1]->Decay];
         break;
 
-    case 13: // Sustain-Release für Stimme 1
+    case 13: // Sustain-Release fÃ¼r Stimme 1
         Voice[1]->Sustain=(wert>>4)&0x0F;
         Voice[1]->Release=wert&0x0F;
         if (Voice[1]->State==RELEASE) Voice[1]->RatePeriod=RateCounterPeriod[Voice[1]->Release];
@@ -406,23 +406,23 @@ void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)
         
         /////////////////////////////////////////////////////////////
 
-    case 14: // FrequenzLO für Stimme 2
+    case 14: // FrequenzLO fÃ¼r Stimme 2
         Voice[2]->Frequenz=(Voice[2]->Frequenz & 0xFF00) | (wert & 0x00FF);
         break;
 
-    case 15: // FrequenzHI für Stimme 2
+    case 15: // FrequenzHI fÃ¼r Stimme 2
         Voice[2]->Frequenz=((wert<<8) & 0xFF00) | (Voice[2]->Frequenz & 0x00FF);
         break;
 
-    case 16: // PulsweiteLO für Stimme 2
+    case 16: // PulsweiteLO fÃ¼r Stimme 2
         Voice[2]->Pulsweite=(Voice[2]->Pulsweite & 0xF00) | (wert & 0x0FF);
         break;
 
-    case 17: // PulsweiteHI für Stimme 2
+    case 17: // PulsweiteHI fÃ¼r Stimme 2
         Voice[2]->Pulsweite=((wert<<8) & 0xF00) | (Voice[2]->Pulsweite & 0x0FF);
         break;
 
-    case 18: // Kontrol Register für Stimme 2
+    case 18: // Kontrol Register fÃ¼r Stimme 2
         Voice[2]->Waveform=(wert>>4)&0x0F;
         Voice[2]->RingBit = !(~wert&0x04);
         Voice[2]->SyncBit = !(~wert&0x02);
@@ -449,14 +449,14 @@ void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)
         Voice[2]->KeyBit=KeyNext;
         break;
 
-    case 19: // Attack-Decay für Stimme 2
+    case 19: // Attack-Decay fÃ¼r Stimme 2
         Voice[2]->Attack=(wert>>4)&0x0F;
         Voice[2]->Decay=wert&0x0F;
         if(Voice[2]->State==ATTACK) Voice[2]->RatePeriod=RateCounterPeriod[Voice[2]->Attack];
         else if (Voice[2]->State==DECAY_SUSTAIN) Voice[2]->RatePeriod=RateCounterPeriod[Voice[2]->Decay];
         break;
 
-    case 20: // Sustain-Release für Stimme 2
+    case 20: // Sustain-Release fÃ¼r Stimme 2
         Voice[2]->Sustain=(wert>>4)&0x0F;
         Voice[2]->Release=wert&0x0F;
         if (Voice[2]->State==RELEASE) Voice[2]->RatePeriod=RateCounterPeriod[Voice[2]->Release];
@@ -478,7 +478,7 @@ void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)
         FilterKey=wert&0x0F;
         break;
 
-    case 24: // Filterkontrol_2 und Lautstärke
+    case 24: // Filterkontrol_2 und LautstÃ¤rke
         Voice3Off=wert&0x80;
         HpBpLp=(wert>>4)&0x07;
         Volume=wert&0x0F;

@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: widget_d64_file.h                     //
-//						//
-// Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 13.10.2011		//
-// www.emu64.de					//
-//						//
+//                                              //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Ã„nderung am 18.05.2014                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef WIDGET_D64_FILE_H

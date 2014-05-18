@@ -5,10 +5,10 @@
 //                                              //
 // #file: widget_file_browse.cpp                //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.07.2013                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -96,7 +96,7 @@ void WidgetFileBrowse::SetFileFilter(const QStringList &filters)
     ZIPExt = QStringList(filters);
 
     QStringList filters1(filters);
-    filters1 << "*.zip";                        // ZIP Anhängen (Für Zip Unterstützung)
+    filters1 << "*.zip";                        // ZIP AnhÃ¤ngen (FÃ¼r Zip UnterstÃ¼tzung)
     filemodel->setNameFilterDisables(false);
     filemodel->setNameFilters(filters1);
 }
@@ -153,7 +153,7 @@ void WidgetFileBrowse::on_listWidget_zip_itemSelectionChanged()
         }
         if(!zf.open(QIODevice::ReadOnly))
         {
-            qDebug() << "Fehler beim Öffnen des ZIPFiles: " << ZIPInFile;
+            qDebug() << "Fehler beim Ã–ffnen des ZIPFiles: " << ZIPInFile;
         }
 
         QFile outfile(OutFileName);

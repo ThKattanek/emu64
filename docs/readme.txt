@@ -1,7 +1,7 @@
 Emu64 Linux Version i586 / x86_64
 ---------------------------------
 
-Abh‰ngigkeiten:
+Abh√§ngigkeiten:
 ---------------
 
 - Qt 4.7
@@ -13,4 +13,4 @@ Abh‰ngigkeiten:
 Emu64 Windows Version 32Bit
 ---------------------------
 
-- l‰uft problemlos unter x64 Systemen da alle DLL mitgeliefert werden
+- l√§uft problemlos unter x64 Systemen da alle DLL mitgeliefert werden

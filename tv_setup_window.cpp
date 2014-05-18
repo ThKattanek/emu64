@@ -5,10 +5,10 @@
 //                                              //
 // #file: tv_setup_window.cpp                   //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.03.2013                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -134,7 +134,7 @@ void TVSetupWindow::on_horblurUV_scroll_valueChanged(int value)
 void TVSetupWindow::on_phase_scroll_valueChanged(int value)
 {
     float winkel = (value - 1000) * 0.045f;
-    ui->phase_out->setText(QVariant(winkel).toString() + "°");
+    ui->phase_out->setText(QVariant(winkel).toString() + "Â°");
     videopal->SetPhaseAltLineOffset(value);
     videopal->UpdateParameter();
 }

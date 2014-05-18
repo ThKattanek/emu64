@@ -5,10 +5,10 @@
 //                                              //
 // #file: floppy1541_class.h                    //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.12.2013        		//
+// Letzte Ã„nderung am 18.05.2014        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -136,7 +136,7 @@ private:
     MOS6522 *via1;
     MOS6522 *via2;
 
-    ////////// Fürs Disk Image //////////
+    ////////// FÃ¼rs Disk Image //////////
 
     #define             FileNameSize 1024
 
@@ -155,7 +155,7 @@ private:
     unsigned char       GCRImage[665952];	// Aktuelles GCR Image
     unsigned short      TrackSize[256];
 
-    /// Für Floppy Sound ///
+    /// FÃ¼r Floppy Sound ///
 
     double              Volume;
     bool                StepperIncWait;

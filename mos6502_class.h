@@ -5,10 +5,10 @@
 //                                              //
 // #file: mos6502_class.h                       //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.12.2013                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -47,7 +47,7 @@ public:
 
     /// Variablen ///
 
-    // Signale von Außen
+    // Signale von AuÃŸen
 
     bool *RESET;
     bool *ResetReady;               // Wird bei einem Reset False und beim erreichen einer
@@ -92,7 +92,7 @@ private:
     unsigned char   IRQLine;
     unsigned char   IRQLinePuffer[5];
 
-    /// Für OneZyklus ///
+    /// FÃ¼r OneZyklus ///
 
     unsigned int tmp,tmp1;
     unsigned short tmp2;

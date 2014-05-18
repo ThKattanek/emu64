@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: crt_window.cpp                        //
-//						//
-// Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 28.08.2011		//
-// www.emu64.de					//
-//						//
+//                                              //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Ã„nderung am 28.08.2011                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #include <QMessageBox>
@@ -251,7 +251,7 @@ void CrtWindow::onSelectFile(QString filename)
         break;
     case 1:
         CRTIsSelected = false;
-        /* Fehler beim öffnene */
+        /* Fehler beim Ã¶ffnene */
         break;
     case 2:
         CRTIsSelected = false;
@@ -314,7 +314,7 @@ void CrtWindow::on_InsertCRT_clicked()
                 break;
             }
         }
-        else QMessageBox::warning(this,tr("CRT Fehler"),tr("Fehler beim Laden des ausgewählten CRT Files"));
+        else QMessageBox::warning(this,tr("CRT Fehler"),tr("Fehler beim Laden des ausgewÃ¤hlten CRT Files"));
     }
 }
 

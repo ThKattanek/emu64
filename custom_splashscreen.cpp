@@ -1,3 +1,18 @@
+//////////////////////////////////////////////////
+//                                              //
+// Emu64                                        //
+// von Thorsten Kattanek                        //
+//                                              //
+// #file: custom_splashscreen.cpp               //
+//                                              //
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 28.08.2011                //
+// www.emu64.de                                 //
+//                                              //
+//////////////////////////////////////////////////
+
 #include "custom_splashscreen.h"
 
 customSplashScreen::customSplashScreen(const QPixmap& pixmap)

@@ -5,10 +5,10 @@
 //                                              //
 // #file: c64_class.h                           //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.01.2014                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -44,7 +44,7 @@ using namespace std::tr1::placeholders;
 #define MAX_JOYSTICKS 16
 #define MAX_VJOYS 16
 
-#define SUBDIVS_SCREEN 30            // Für Screenverzerrungen (Kissen etc.)
+#define SUBDIVS_SCREEN 30            // FÃ¼r Screenverzerrungen (Kissen etc.)
 
 class C64Class
 {
@@ -53,7 +53,7 @@ public:
     C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(char*)> log_function, const char* gfx_path);
     ~C64Class();
     void StartEmulation(void);
-    void FillAudioBuffer(unsigned char *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
+    void FillAudioBuffer(unsigned char *stream, int laenge); // Ãœber diese Funktion wird der C64 Takt erzeugt !! //
     void KeyEvent(unsigned char  matrix_code,KeyStatus status, bool isAutoShift);
     bool LoadC64Roms(char *kernalrom,char *basicrom,char *charrom);
     bool LoadFloppyRom(int floppy_nr,char *dos1541rom);
@@ -192,7 +192,7 @@ public:
     GEORAMClass     *geo;
     Floppy1541      *floppy[FloppyAnzahl];
 
-    bool RESET;     // Reset Leitung -> Für Alle Module mit Reset Eingang
+    bool RESET;     // Reset Leitung -> FÃ¼r Alle Module mit Reset Eingang
 
     bool            StereoEnable;
     unsigned short  Sid2Adresse;
@@ -252,7 +252,7 @@ private:
     bool JoyStickUdateIsStop;
 
     bool RDY_BA;            // Leitung CPU <-- VIC
-    bool HRESET;            // Zusatz Anzeige für MMU Reset
+    bool HRESET;            // Zusatz Anzeige fÃ¼r MMU Reset
     bool GAME;              // Leitung Expansionsport --> MMU;
     bool EXROM;             // Leitung Expansionsport --> MMU;
     bool RAM_H;             // Leitung Expansionsport --> MMU;
@@ -265,7 +265,7 @@ private:
     unsigned char   C64IEC;     // Leitungen vom C64 zur Floppy Bit 0=ATN 1=CLK 2=DATA
     unsigned char   FloppyIEC;	// Leitungen von Floppy zur c64 Bit 0=ATN 1=CLK 2=DATA
 
-    /// Temporär ///
+    /// TemporÃ¤r ///
     int             EasyFlashDirty;
     unsigned char   EasyFlashByte;
 

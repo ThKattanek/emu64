@@ -5,10 +5,10 @@
 //                                              //
 // #file: c64_speed_window.cpp                  //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.12.2013                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -147,10 +147,10 @@ void C64SpeedWindow::SetPauseTooltip()
 {
     if(PauseStatus)
     {
-        ui->Pause->setToolTip(tr("Lässt den C64, mit der eingestellten Geschwindigkeit, weiterlaufen."));
+        ui->Pause->setToolTip(tr("LÃ¤sst den C64, mit der eingestellten Geschwindigkeit, weiterlaufen."));
     }
     else
     {
-        ui->Pause->setToolTip(tr("Hält den C64 komplett an."));
+        ui->Pause->setToolTip(tr("HÃ¤lt den C64 komplett an."));
     }
 }

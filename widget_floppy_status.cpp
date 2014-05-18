@@ -5,10 +5,10 @@
 //                                              //
 // #file: widget_floppy_status.cpp              //
 //                                              //
-// Dieser Sourcecode ist Copyright gesch¸tzt!   //
+// Dieser Sourcecode ist Copyright gesch√ºtzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte ƒnderung am 16.02.2013                //
+// Letzte √Ñnderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -197,25 +197,25 @@ void WidgetFloppyStatus::SetFloppyVolume(int mode)
         ui->Volume->setIcon(*iVol_mute);
         floppy->SetFloppySoundVolume(0.0);
         floppy->SetEnableFloppySound(false);
-        ui->Volume->setToolTip(tr("Floppyger‰usche sind ausgeschaltet."));
+        ui->Volume->setToolTip(tr("Floppyger√§usche sind ausgeschaltet."));
         break;
     case 1:
         ui->Volume->setIcon(*iVol_low);
         floppy->SetFloppySoundVolume(0.3);
         floppy->SetEnableFloppySound(true);
-        ui->Volume->setToolTip(tr("Floppyger‰usche sind auf 30% gestellt."));
+        ui->Volume->setToolTip(tr("Floppyger√§usche sind auf 30% gestellt."));
         break;
     case 2:
         ui->Volume->setIcon(*iVol_medium);
         floppy->SetFloppySoundVolume(0.7);
         floppy->SetEnableFloppySound(true);
-        ui->Volume->setToolTip(tr("Floppyger‰usche sind auf 70% gestellt."));
+        ui->Volume->setToolTip(tr("Floppyger√§usche sind auf 70% gestellt."));
         break;
     case 3:
         ui->Volume->setIcon(*iVol_high);
         floppy->SetFloppySoundVolume(1.0);
         floppy->SetEnableFloppySound(true);
-        ui->Volume->setToolTip(tr("Floppyger‰usche sind auf 100% gestellt."));
+        ui->Volume->setToolTip(tr("Floppyger√§usche sind auf 100% gestellt."));
         break;
     default:
         break;

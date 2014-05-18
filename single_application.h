@@ -1,6 +1,17 @@
-// "single_application.h"
-
-// Original Quellcode von http://berenger.eu/blog/2010/11/22/c-qt-singleapplication-single-app-instance/
+//////////////////////////////////////////////////
+//                                              //
+// Emu64                                        //
+// von Thorsten Kattanek                        //
+//                                              //
+// #file: single_application.h                  //
+//                                              //
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 18.05.2014                //
+// www.emu64.de                                 //
+//                                              //
+//////////////////////////////////////////////////
 
 #ifndef SINGLE_APPLICATION_H
 #define SINGLE_APPLICATION_H

@@ -5,10 +5,10 @@
 //                                              //
 // #file: reu_class.cpp                         //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.12.2013                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -91,7 +91,7 @@ void REUClass::OneZyklus(void)
         if(REUWait_FF00)
         {
             BA_STATUS = false;		// CPU anhalten
-            CPUWaitCounter = 3;		// 3 Zyklen Warten bis CPU anhält
+            CPUWaitCounter = 3;		// 3 Zyklen Warten bis CPU anhÃ¤lt
             TransferStart = true;
             switch(TransferTyp)
             {
@@ -294,12 +294,12 @@ void REUClass::WriteIO2(unsigned short adresse,unsigned char wert)
         AdresseREU = IO[4] | (IO[5]<<8);
         Counter = IO[7] | (IO[8]<<8);
         TransferTyp = wert & 3;
-        if((wert & 128) == 128)	// Befehl ausführen
+        if((wert & 128) == 128)	// Befehl ausfÃ¼hren
         {
             if((IO[1] & 0x10) == 0x10)
             {
                 BA_STATUS = false;		// CPU anhalten
-                CPUWaitCounter = 3;		// 3 Zyklen Warten bis CPU anhält
+                CPUWaitCounter = 3;		// 3 Zyklen Warten bis CPU anhÃ¤lt
                 TransferStart = true;
                 switch(TransferTyp)
                 {
@@ -369,7 +369,7 @@ unsigned char REUClass::ReadIO2(unsigned short adresse)
     {
     case 0xdf00:
         ret = IO[0];
-        IO[0] &= 31; // BIT 5/6/7 löschen
+        IO[0] &= 31; // BIT 5/6/7 lÃ¶schen
         return ret;
         break;
     case 0xdf01:

@@ -5,10 +5,10 @@
 //                                              //
 // #file: mos6569_class.h                       //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.12.2013                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -333,12 +333,12 @@ private:
 /// VIC IO Register ///
     unsigned short      MX[8];			// X-Koordinate Sprite
     unsigned char       MY[8];			// Y-Koordinate Sprite
-    unsigned char       MX8;				// 8te BIT für X-Koordinate Sprite
+    unsigned char       MX8;				// 8te BIT fÃ¼r X-Koordinate Sprite
     unsigned char       CTRL1;			// Steuerregister 1
     unsigned char       ME;				// Sprite Anschalten
     unsigned char       MXE;			// Sprite X Expansion
     unsigned char       MYE;			// Sprite Y Expansion
-    unsigned char       MDP;			// Sprite-Daten Priorität
+    unsigned char       MDP;			// Sprite-Daten PrioritÃ¤t
     unsigned char       MMC;			// Sprite Multicolor Modus
     unsigned char       LPX;			// Ligthpen X
     unsigned char       LPY;			// Lightpen Y

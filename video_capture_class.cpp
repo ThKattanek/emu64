@@ -5,10 +5,10 @@
 //                                              //
 // #file: video_capture_class.cpp               //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.01.2014                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -46,7 +46,7 @@ VideoCaptureClass::VideoCaptureClass()
 
 VideoCaptureClass::~VideoCaptureClass()
 {
-    // Wenn eine Aufzeichnung noch läuft dann erst beenden
+    // Wenn eine Aufzeichnung noch lÃ¤uft dann erst beenden
     if(CaptureIsRunning)
     {
         Stop();
@@ -55,9 +55,9 @@ VideoCaptureClass::~VideoCaptureClass()
 
 int VideoCaptureClass::Start(char *filename, int video_bit_rate, int xw, int yw, int fps)
 {
-    if(CaptureIsRunning) return -1;     // Es läuft gerade eine Aufzeichnung
-    if(filename == NULL) return -2;     // Es wurde kein Dateiname übergeben
-    if(xw & 1 || yw & 1) return -3;     // Auflösung muss ein vielfaches von 2 sein
+    if(CaptureIsRunning) return -1;     // Es lÃ¤uft gerade eine Aufzeichnung
+    if(filename == NULL) return -2;     // Es wurde kein Dateiname Ã¼bergeben
+    if(xw & 1 || yw & 1) return -3;     // AuflÃ¶sung muss ein vielfaches von 2 sein
 
     cout << "CapureFilename: " << filename;
 
@@ -79,13 +79,13 @@ int VideoCaptureClass::Start(char *filename, int video_bit_rate, int xw, int yw,
 
     //if(codec_id == CODEC_ID_H264) av_opt_set(c->priv_data, "preset", "slow", 0);
 
-    //Codec öffnen
+    //Codec Ã¶ffnen
     if (avcodec_open2(codec_context, codec, NULL) < 0)
     {
         av_free(codec_context);
         av_free(picture->data[0]);
         av_free(picture);
-        return -5;                      // Der Codec konnte nicht geöffnet werden
+        return -5;                      // Der Codec konnte nicht geÃ¶ffnet werden
     }
 
     /* alloc image and output buffer */
@@ -103,7 +103,7 @@ int VideoCaptureClass::Start(char *filename, int video_bit_rate, int xw, int yw,
         av_free(codec_context);
         av_free(picture->data[0]);
         av_free(picture);
-        return -6;                      // Die Datei konnte nicht geöffnet werden
+        return -6;                      // Die Datei konnte nicht geÃ¶ffnet werden
     }
 
     CaptureIsRunning = true;
@@ -141,7 +141,7 @@ void VideoCaptureClass::Stop()
     av_free(picture);
 }
 
-void VideoCaptureClass::AddFrame(void *puffer, int xw, int yw)
+void VideoCaptureClass::AddFrame(void *puffer, int xw, int )
 {
     if(!CaptureIsRunning) return;
 

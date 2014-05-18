@@ -5,10 +5,10 @@
 //                                              //
 // #file: debugger_window.cpp                   //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.01.2014                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -210,7 +210,7 @@ void DebuggerWindow::onTimerAnimationRefresh(void)
                 {
                     ui->BreakpointTree->topLevelItem(i)->setBackgroundColor(0,QColor(0,255,0));
                     ui->BreakpointTree->topLevelItem(i)->setBackgroundColor(1,QColor(1,255,0));
-                    ui->BreakpointTree->topLevelItem(i)->setText(1,tr("ERFÜLLT !"));
+                    ui->BreakpointTree->topLevelItem(i)->setText(1,tr("ERFÃœLLT !"));
                 }
             }
         }
@@ -229,7 +229,7 @@ void DebuggerWindow::onTimerAnimationRefresh(void)
                         {
                             ui->BreakpointTree->topLevelItem(ii)->setBackgroundColor(0,QColor(0,255,0));
                             ui->BreakpointTree->topLevelItem(ii)->setBackgroundColor(1,QColor(1,255,0));
-                            ui->BreakpointTree->topLevelItem(ii)->setText(1,tr("ERFÜLLT !"));
+                            ui->BreakpointTree->topLevelItem(ii)->setText(1,tr("ERFÃœLLT !"));
                         }
                     }
                 }
@@ -268,14 +268,14 @@ void DebuggerWindow::FillMicroCodeStringTable()
     /*023*/ << tr("TMPByte von PC-Adresse holen // AC and TMPByte // Set SR(NZC) // PC+1")
     /*024*/ << tr("Adresse Lo von PC-Adresse holen // PC+1")
     /*025*/ << tr("Adresse Hi von PC-Adresse holen // PC+1")
-    /*026*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prüfen (BPL)")
-    /*027*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prüfen (BMI)")
-    /*028*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prüfen (BVC)")
-    /*029*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prüfen (BVS)")
-    /*030*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prüfen (BCC)")
-    /*031*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prüfen (BCS)")
-    /*032*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prüfen (BNE)")
-    /*033*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prüfen (BEQ)")
+    /*026*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prÃ¼fen (BPL)")
+    /*027*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prÃ¼fen (BMI)")
+    /*028*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prÃ¼fen (BVC)")
+    /*029*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prÃ¼fen (BVS)")
+    /*030*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prÃ¼fen (BCC)")
+    /*031*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prÃ¼fen (BCS)")
+    /*032*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prÃ¼fen (BNE)")
+    /*033*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prÃ¼fen (BEQ)")
     /*034*/ << tr("Lesen von PC-Adresse und verwerfen // BranchAdresse=PC+TMPByte")
     /*035*/ << tr("FIX PC Hi Adresse")
     /*036*/ << tr("Adresse Hi von Pointer-Adresse holen // Adresse+YR")
@@ -335,18 +335,18 @@ void DebuggerWindow::FillMicroCodeStringTable()
     /*090*/ << tr("TMPByte von Adresse lesen // YR+1 // Set SR(NZ)")
     /*091*/ << tr("TMPByte von Adresse lesen // XR-1 // Set SR(NZ)")
     /*092*/ << tr("TMPByte von Adresse lesen // YR-1 // Set SR(NZ)")
-    /*093*/ << tr("Illegaler Opcode - wird noch nicht unterstützt // Reset")
+    /*093*/ << tr("Illegaler Opcode - wird noch nicht unterstÃ¼tzt // Reset")
     /*094*/ << tr("PC LO von Adresse lesen // Adresse+1 (Nur Low Wert)")
     /*095*/ << tr("PC HI von Adresse lesen")
     /*096*/ << tr("PC LO von $FFFC lesen")
     /*097*/ << tr("PC HI von $FFFD lesen")
-    /*098*/ << tr("TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*099*/ << tr("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC)")
-    /*100*/ << tr("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // if(idxReg<Adresse Lo) MCT++")
-    /*101*/ << tr("TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*102*/ << tr("TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
-    /*103*/ << tr("TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*104*/ << tr("TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
+    /*098*/ << tr("TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verÃ¤ndert) // Set SR(NZC) // PC+1")
+    /*099*/ << tr("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verÃ¤ndert) // Set SR(NZC)")
+    /*100*/ << tr("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verÃ¤ndert) // if(idxReg<Adresse Lo) MCT++")
+    /*101*/ << tr("TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC) // PC+1")
+    /*102*/ << tr("TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC)")
+    /*103*/ << tr("TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC) // PC+1")
+    /*104*/ << tr("TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC)")
     /*105*/ << tr("TMPByte von PC-Adresse lesen // AC XOR TMPByte // Set SR(NZC) // PC+1")
     /*106*/ << tr("TMPByte von Adresse lesen // AC XOR TMPByte // Set SR(NZC)")
     /*107*/ << tr("TMPByte von Adresse lesen // AC XOR TMPByte // if(idxReg<Adresse Lo) MCT++")
@@ -358,7 +358,7 @@ void DebuggerWindow::FillMicroCodeStringTable()
     /*113*/ << tr("TMPByte nach Adresse schreiben // C->TMPByte>>1->C // Set SR(NZC)")
     /*114*/ << tr("TMPByte nach Adresse schreiben // TMPByte+1 // Set SR(NZ)")
     /*115*/ << tr("TMPByte nach Adresse schreiben // TMPByte-1 // Set SR(NZ)")
-    /*116*/ << tr("SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag löschen")
+    /*116*/ << tr("SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag lÃ¶schen")
     /*117*/ << tr("PC Lo von 0xFFFA holen")
     /*118*/ << tr("PC Hi von 0xFFFB holen")
     /*119*/ << tr("TMPByte von Adresse holen // Fix Adresse Hi MCT+1")
@@ -417,14 +417,14 @@ void DebuggerWindow::RetranslateUi()
     /*023*/ << tr("TMPByte von PC-Adresse holen // AC and TMPByte // Set SR(NZC) // PC+1")
     /*024*/ << tr("Adresse Lo von PC-Adresse holen // PC+1")
     /*025*/ << tr("Adresse Hi von PC-Adresse holen // PC+1")
-    /*026*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prüfen (BPL)")
-    /*027*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prüfen (BMI)")
-    /*028*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prüfen (BVC)")
-    /*029*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prüfen (BVS)")
-    /*030*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prüfen (BCC)")
-    /*031*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prüfen (BCS)")
-    /*032*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prüfen (BNE)")
-    /*033*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prüfen (BEQ)")
+    /*026*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prÃ¼fen (BPL)")
+    /*027*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prÃ¼fen (BMI)")
+    /*028*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prÃ¼fen (BVC)")
+    /*029*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prÃ¼fen (BVS)")
+    /*030*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prÃ¼fen (BCC)")
+    /*031*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prÃ¼fen (BCS)")
+    /*032*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prÃ¼fen (BNE)")
+    /*033*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prÃ¼fen (BEQ)")
     /*034*/ << tr("Lesen von PC-Adresse und verwerfen // BranchAdresse=PC+TMPByte")
     /*035*/ << tr("FIX PC Hi Adresse")
     /*036*/ << tr("Adresse Hi von Pointer-Adresse holen // Adresse+YR")
@@ -484,18 +484,18 @@ void DebuggerWindow::RetranslateUi()
     /*090*/ << tr("TMPByte von Adresse lesen // YR+1 // Set SR(NZ)")
     /*091*/ << tr("TMPByte von Adresse lesen // XR-1 // Set SR(NZ)")
     /*092*/ << tr("TMPByte von Adresse lesen // YR-1 // Set SR(NZ)")
-    /*093*/ << tr("Illegaler Opcode - wird noch nicht unterstützt // Reset")
+    /*093*/ << tr("Illegaler Opcode - wird noch nicht unterstÃ¼tzt // Reset")
     /*094*/ << tr("PC LO von Adresse lesen // Adresse+1 (Nur Low Wert)")
     /*095*/ << tr("PC HI von Adresse lesen")
     /*096*/ << tr("PC LO von $FFFC lesen")
     /*097*/ << tr("PC HI von $FFFD lesen")
-    /*098*/ << tr("TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*099*/ << tr("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC)")
-    /*100*/ << tr("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // if(idxReg<Adresse Lo) MCT++")
-    /*101*/ << tr("TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*102*/ << tr("TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
-    /*103*/ << tr("TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*104*/ << tr("TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
+    /*098*/ << tr("TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verÃ¤ndert) // Set SR(NZC) // PC+1")
+    /*099*/ << tr("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verÃ¤ndert) // Set SR(NZC)")
+    /*100*/ << tr("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verÃ¤ndert) // if(idxReg<Adresse Lo) MCT++")
+    /*101*/ << tr("TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC) // PC+1")
+    /*102*/ << tr("TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC)")
+    /*103*/ << tr("TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC) // PC+1")
+    /*104*/ << tr("TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC)")
     /*105*/ << tr("TMPByte von PC-Adresse lesen // AC XOR TMPByte // Set SR(NZC) // PC+1")
     /*106*/ << tr("TMPByte von Adresse lesen // AC XOR TMPByte // Set SR(NZC)")
     /*107*/ << tr("TMPByte von Adresse lesen // AC XOR TMPByte // if(idxReg<Adresse Lo) MCT++")
@@ -507,7 +507,7 @@ void DebuggerWindow::RetranslateUi()
     /*113*/ << tr("TMPByte nach Adresse schreiben // C->TMPByte>>1->C // Set SR(NZC)")
     /*114*/ << tr("TMPByte nach Adresse schreiben // TMPByte+1 // Set SR(NZ)")
     /*115*/ << tr("TMPByte nach Adresse schreiben // TMPByte-1 // Set SR(NZ)")
-    /*116*/ << tr("SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag löschen")
+    /*116*/ << tr("SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag lÃ¶schen")
     /*117*/ << tr("PC Lo von 0xFFFA holen")
     /*118*/ << tr("PC Hi von 0xFFFB holen")
     /*119*/ << tr("TMPByte von Adresse holen // Fix Adresse Hi MCT+1")
@@ -792,7 +792,7 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
     value = in_str.toUShort(&ok,0);                //
     if(!ok)
     {
-        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gültiges Zahlenformat benutzt !"));
+        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gÃ¼ltiges Zahlenformat benutzt !"));
         return;
     }
 
@@ -945,8 +945,8 @@ bool DebuggerWindow::getSaveFileName(QWidget *parent, QString caption, QString f
        extension = extension.left(extension.indexOf(")"));
        extension = extension.simplified();
 
-      int result = QMessageBox::question(parent, QObject::tr("Überschreiben?"),
-         QObject::tr("Soll die Datei \"%1\" überschrieben werden?").arg(fileInfo.fileName()),
+      int result = QMessageBox::question(parent, QObject::tr("Ãœberschreiben?"),
+         QObject::tr("Soll die Datei \"%1\" Ã¼berschrieben werden?").arg(fileInfo.fileName()),
          QMessageBox::Yes,
          QMessageBox::No | QMessageBox::Default,
          QMessageBox::Cancel | QMessageBox::Escape);
@@ -1221,7 +1221,7 @@ void DebuggerWindow::on_ChangeSource_currentIndexChanged(int index)
     }
     else
     {
-        /// Alle Haltepunke ins TreeWidget einfügen ///
+        /// Alle Haltepunke ins TreeWidget einfÃ¼gen ///
 
         ui->BreakpointTree->clear();
 
@@ -1253,7 +1253,7 @@ void DebuggerWindow::on_AssAdresseIn_returnPressed()
     value = in_str.toUShort(&ok,0);                //
     if(!ok)
     {
-        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gültiges Zahlenformat benutzt !"));
+        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gÃ¼ltiges Zahlenformat benutzt !"));
         return;
     }
 
@@ -1500,12 +1500,12 @@ void DebuggerWindow::on_AssAdressierungIn_returnPressed()
             ui->AssAdressierungIn->setFocus();
             break;
         case 3:
-            QMessageBox::warning(this,tr("Fehler...!"),tr("Spungweite für Branchbefehl ist zu groß."));
+            QMessageBox::warning(this,tr("Fehler...!"),tr("Spungweite fÃ¼r Branchbefehl ist zu groÃŸ."));
             ui->AssAdressierungIn->selectAll();
             ui->AssAdressierungIn->setFocus();
             break;
         case 4:
-            QMessageBox::warning(this,tr("Fehler...!"),tr("Dieser Opcode unterstützt nicht diese Adressierung."));
+            QMessageBox::warning(this,tr("Fehler...!"),tr("Dieser Opcode unterstÃ¼tzt nicht diese Adressierung."));
             ui->AssAdressierungIn->selectAll();
             ui->AssAdressierungIn->setFocus();
             break;
@@ -1724,7 +1724,7 @@ void DebuggerWindow::on_DelBreakpoint_clicked()
             Name = item->parent()->text(0);
         }
 
-        if(QMessageBox::Yes == QMessageBox::question(this,tr("Haltepunkt löschen..."),tr("Möchten Sie den folgenden Haltepunkt löschen?\n") + ">> " + Name + " <<",QMessageBox::Yes | QMessageBox::No))
+        if(QMessageBox::Yes == QMessageBox::question(this,tr("Haltepunkt lÃ¶schen..."),tr("MÃ¶chten Sie den folgenden Haltepunkt lÃ¶schen?\n") + ">> " + Name + " <<",QMessageBox::Yes | QMessageBox::No))
         {
             ui->BreakpointTree->takeTopLevelItem(bg_index);
             if(AktSource > 0) c64->floppy[AktFloppyNr]->DelBreakGroup(bg_index);
@@ -1741,7 +1741,7 @@ void DebuggerWindow::AddBreakpointTreeRoot(QString name,BREAK_GROUP *bg)
     item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEditable);
     item->setCheckState(0,Qt::Checked);
     item->setDisabled(false);
-    item->setToolTip(0,tr("Der Name des Haltepunkts kann frei gewählt werden."));
+    item->setToolTip(0,tr("Der Name des Haltepunkts kann frei gewÃ¤hlt werden."));
     ui->BreakpointTree->addTopLevelItem(item);
 
     BreakPointUpdateEnable = false;
@@ -1772,7 +1772,7 @@ void DebuggerWindow::AddBreakpointTreeChild(QTreeWidgetItem *parent, unsigned sh
     else item->setCheckState(0,Qt::Unchecked);
     item->setDisabled(false);
     item->setToolTip(0,tooltip);
-    item->setToolTip(1,tr("Doppelklick um Werte zu verändern."));
+    item->setToolTip(1,tr("Doppelklick um Werte zu verÃ¤ndern."));
     item->setBackgroundColor(1,QColor(200,200,255));
     item->setForeground(1,QColor(200,0,0));
     parent->addChild(item);
@@ -2162,7 +2162,7 @@ void DebuggerWindow::BreakpointProc()
 void DebuggerWindow::on_LoadBreakpoints_clicked()
 {
     if(ui->BreakpointTree->topLevelItemCount() > 0)
-        if(QMessageBox::No == QMessageBox::question(this,tr("Haltepunkte laden..."),tr("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
+        if(QMessageBox::No == QMessageBox::question(this,tr("Haltepunkte laden..."),tr("Es werden alle Haltepunkte gelÃ¶scht !\nMÃ¶chten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
             return;
 
     ui->BreakpointTree->clear();
@@ -2170,7 +2170,7 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
     if(AktSource > 0) c64->floppy[AktFloppyNr]->DeleteAllBreakGroups();
     else c64->DeleteAllBreakGroups();
 
-    QString filename = QFileDialog::getOpenFileName(this,tr("Haltepunkte öffnen"),"",tr("Emu64 Haltepunkt Datei ") + "(*.bpt)");
+    QString filename = QFileDialog::getOpenFileName(this,tr("Haltepunkte Ã¶ffnen"),"",tr("Emu64 Haltepunkt Datei ") + "(*.bpt)");
     if(filename != "")
     {
        int ret;
@@ -2182,7 +2182,7 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
             switch(ret)
             {
             case -1:
-                QMessageBox::warning(this,tr("Fehler..."),tr("Die Datei konnte nicht geöffnet werden."));
+                QMessageBox::warning(this,tr("Fehler..."),tr("Die Datei konnte nicht geÃ¶ffnet werden."));
                 break;
             case -2:
                 QMessageBox::warning(this,tr("Fehler..."),tr("Es handelt sich nicht um eine Emu64 Datei."));
@@ -2191,13 +2191,13 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
                 QMessageBox::warning(this,tr("Fehler..."),tr("Diese Datei wurde mit einer neueren Emu64 Version erstellt."));
                 break;
             case -4:
-                QMessageBox::warning(this,tr("Fehler..."),tr("Diese Datei enthält keine Haltepunkte."));
+                QMessageBox::warning(this,tr("Fehler..."),tr("Diese Datei enthÃ¤lt keine Haltepunkte."));
                 break;
             }
        }
        else
        {
-           /// Alle Haltepunke ins TreeWidget einfügen ///
+           /// Alle Haltepunke ins TreeWidget einfÃ¼gen ///
            if(AktSource > 0)
            {
                int anz = c64->floppy[AktFloppyNr]->GetBreakGroupAnz();
@@ -2246,7 +2246,7 @@ void DebuggerWindow::on_SaveBreakpoints_clicked()
 void DebuggerWindow::on_DelAllBreakpoints_clicked()
 {
     if(ui->BreakpointTree->topLevelItemCount() > 0)
-        if(QMessageBox::Yes == QMessageBox::question(this,tr("Achtung..."),tr("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
+        if(QMessageBox::Yes == QMessageBox::question(this,tr("Achtung..."),tr("Es werden alle Haltepunkte gelÃ¶scht !\nMÃ¶chten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
         {
             if(AktSource > 0) c64->floppy[AktFloppyNr]->DeleteAllBreakGroups();
             else c64->DeleteAllBreakGroups();
@@ -2271,7 +2271,7 @@ void DebuggerWindow::on_ExportDisAss_clicked()
     value = in_str.toUShort(&ok,0);
     if(!ok)
     {
-        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gültiges Zahlenformat benutzt ! [Export Von:]"));
+        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gÃ¼ltiges Zahlenformat benutzt ! [Export Von:]"));
         return;
     }
     start = value;
@@ -2281,7 +2281,7 @@ void DebuggerWindow::on_ExportDisAss_clicked()
     value = in_str.toUShort(&ok,0);
     if(!ok)
     {
-        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gültiges Zahlenformat benutzt ! [Export Bis:]"));
+        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gÃ¼ltiges Zahlenformat benutzt ! [Export Bis:]"));
         return;
     }
     end = value;
@@ -2382,7 +2382,7 @@ void DebuggerWindow::RefreshGUI(void)
             ui->ExportGroup->setEnabled(true);
             ui->BreakGroup->setEnabled(true);
 
-            /// Alle Haltepunke ins TreeWidget einfügen ///
+            /// Alle Haltepunke ins TreeWidget einfÃ¼gen ///
             FillDisassemblerList(FloppyCpuIReg[AktFloppyNr].AktOpcodePC,false);
 
         }

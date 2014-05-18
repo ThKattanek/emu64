@@ -5,10 +5,10 @@
 //                                              //
 // #file: button_mod.h                          //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.02.2013                //
+// Letzte Ã„nderung am 18.08.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////

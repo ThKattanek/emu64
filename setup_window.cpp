@@ -5,10 +5,10 @@
 //                                              //
 // #file: setup_window.cpp                      //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.12.2013                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -28,7 +28,7 @@ SetupWindow::SetupWindow(QWidget *parent,const char *member,VideoPalClass *_vide
 
     ui->setupUi(this);
 
-    ui->C64Farbmodus->addItems(QStringList()<<"Emu64"<<"Emu64 (bis 4.00)"<<"CCS64"<<"PC64"<<"C64S"<<"VICE"<<"FRODO"<<tr("Schwarz / Weiß"));
+    ui->C64Farbmodus->addItems(QStringList()<<"Emu64"<<"Emu64 (bis 4.00)"<<"CCS64"<<"PC64"<<"C64S"<<"VICE"<<"FRODO"<<tr("Schwarz / WeiÃŸ"));
 }
 
 SetupWindow::~SetupWindow()
@@ -70,7 +70,7 @@ void SetupWindow::LoadINI(C64Class *_c64)
             ini->beginGroup(group_name);
 
             QTableWidgetItem *item = new QTableWidgetItem(ini->value("Name","Slot " + QVariant(i+1).toString()).toString());
-            //item->setToolTip(tr("Mit einem doppelklick kann man den Namen ändern."));
+            //item->setToolTip(tr("Mit einem doppelklick kann man den Namen Ã¤ndern."));
             ui->VJoySlots->setItem(i,0,item);
             ui->VJoySlots->setRowHeight(i,18);
 
@@ -91,7 +91,7 @@ void SetupWindow::LoadINI(C64Class *_c64)
             ui->VJoySlots->setCellWidget(i,3,button);
 
             button = new ButtonMod(1,i);
-            //button->setText("Löschen");
+            //button->setText("LÃ¶schen");
             connect(button,SIGNAL(Clicked(int,int)),this,SLOT(onClickButton(int,int)));
             ui->VJoySlots->setCellWidget(i,4,button);
 
@@ -249,7 +249,7 @@ void SetupWindow::onClickButton(int idx, int idy)
 
     if(idx == 1)
     {
-        /// Löschen ///
+        /// LÃ¶schen ///
         c64->ClearJoystickMapping(idy);
         ui->VJoySlots->item(idy,0)->setText(c64->VJoys[idy].Name);
     }
@@ -305,7 +305,7 @@ void SetupWindow::UpdateToolTips()
     for(int i=0; i<MAX_VJOYS; i++)
     {
         item = ui->VJoySlots->item(i,0);
-        if(item != NULL) item->setToolTip(tr("Mit einem doppelklick kann man den Namen ändern."));
+        if(item != NULL) item->setToolTip(tr("Mit einem doppelklick kann man den Namen Ã¤ndern."));
         item = ui->VJoySlots->item(i,1);
         if(item != NULL) item->setToolTip(tr("Verbindet diesen Slot mit dem C64 Gameport 1"));
         item = ui->VJoySlots->item(i,2);
@@ -315,6 +315,6 @@ void SetupWindow::UpdateToolTips()
         button = (ButtonMod*)ui->VJoySlots->cellWidget(i,3);
         if(button != NULL) button->setText(tr("Lernen"));
         button = (ButtonMod*)ui->VJoySlots->cellWidget(i,4);
-        if(button != NULL) button->setText(tr("Löschen"));
+        if(button != NULL) button->setText(tr("LÃ¶schen"));
     }
 }

@@ -5,10 +5,10 @@
 //                                              //
 // #file: main_window.cpp                       //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.01.2014                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -69,7 +69,7 @@ MainWindow::~MainWindow()
     }
     /////////////////////////////////////
 
-    /// WindowKlassen schließen ///
+    /// WindowKlassen schlieÃŸen ///
 
     delete setup_window;
     delete c64;
@@ -120,11 +120,11 @@ void MainWindow::OnInit()
     LogText(QString(">> INI System wurde erzeugt: " + appPath+"/emu64.ini\n").toLatin1().data());
     LogText(QString(">> INI System was created: " + appPath+"/emu64.ini\n").toLatin1().data());
 
-    splash->showStatusMessage(tr("Sprachmenü wir erstellt."),Qt::darkBlue);
+    splash->showStatusMessage(tr("SprachmenÃ¼ wir erstellt."),Qt::darkBlue);
     ini->beginGroup("MainWindow");
     CreateLanguageMenu(ini->value("lang",SystemLocale).toString());
     ini->endGroup();
-    LogText(QString(tr(">> Sprachmenü wurde erstellt.") + SystemLocale + "\n").toLatin1().data());
+    LogText(QString(tr(">> SprachmenÃ¼ wurde erstellt.") + SystemLocale + "\n").toLatin1().data());
 
 
     splash->showStatusMessage(tr("Translator wurde installiert."),Qt::darkBlue);
@@ -153,7 +153,7 @@ void MainWindow::OnInit()
         }
         else
         {
-            LogText(tr("<< Ein neues Screenshot Verzeichnis konnte nicht erstellt werden\n<< Keine Screenshots möglich !!").toLatin1().data());
+            LogText(tr("<< Ein neues Screenshot Verzeichnis konnte nicht erstellt werden\n<< Keine Screenshots mÃ¶glich !!").toLatin1().data());
             ScreenshotsEnable = false;
         }
     }
@@ -181,7 +181,7 @@ void MainWindow::OnInit()
     }
 
     /// Window Klassen erstellen ///
-    /// Unter MAC sollte ohne übergabe des this Zeigers die Klasseb erstellt werden
+    /// Unter MAC sollte ohne Ã¼bergabe des this Zeigers die Klasseb erstellt werden
 
     splash->showStatusMessage(tr("InfoWindow wird erstellt."),Qt::darkBlue);
     info_window = new InfoWindow(this);
@@ -259,14 +259,14 @@ void MainWindow::OnInit()
     c64_keyboard_window->KeyMatrixToPA = c64->KeyboardMatrixToPAExt;
     c64_keyboard_window->KeyMatrixToPB = c64->KeyboardMatrixToPBExt;
 
-    /// Tabelle für Floppy's Ertsellen ///
-    splash->showStatusMessage(tr("Tabelle für Floppy's wird erstellt."),Qt::darkBlue);
+    /// Tabelle fÃ¼r Floppy's Ertsellen ///
+    splash->showStatusMessage(tr("Tabelle fÃ¼r Floppy's wird erstellt."),Qt::darkBlue);
     ui->FloppyTabel->setRowCount(FloppyAnzahl);
     ui->FloppyTabel->setColumnCount(1);
 
     for(int i=0; i<FloppyAnzahl; i++)
     {
-        splash->showStatusMessage(tr("Floppy: ") + QVariant(i).toString() + "wird in Tabelle eingefügt",Qt::darkBlue);
+        splash->showStatusMessage(tr("Floppy: ") + QVariant(i).toString() + "wird in Tabelle eingefÃ¼gt",Qt::darkBlue);
         ui->FloppyTabel->setRowHeight(i,24);
         WidgetFloppyStatus *w = new WidgetFloppyStatus(this,i,c64->floppy[i]);
         w->SetGeraeteID(i+8);
@@ -492,8 +492,8 @@ bool MainWindow::getSaveFileName(QWidget *parent, QString caption, QString filte
        extension = extension.left(extension.indexOf(")"));
        extension = extension.simplified();
 
-      int result = QMessageBox::question(parent, QObject::tr("Überschreiben?"),
-         QObject::tr("Soll die Datei \"%1\" überschrieben werden?").arg(fileInfo.fileName()),
+      int result = QMessageBox::question(parent, QObject::tr("Ãœberschreiben?"),
+         QObject::tr("Soll die Datei \"%1\" Ã¼berschrieben werden?").arg(fileInfo.fileName()),
          QMessageBox::Yes,
          QMessageBox::No | QMessageBox::Default,
          QMessageBox::Cancel | QMessageBox::Escape);
@@ -578,7 +578,7 @@ void MainWindow::on_actionHardreset_triggered()
 
 void MainWindow::on_actionAutostart_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),"",tr("C64 Programm Dateien") + "(*.prg *.c64 *.p00 *.t64 *.d64 *.g64 *.frz);;" + tr("Alle Dateien") + "(*.*)");
+    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien Ã¶ffnen "),"",tr("C64 Programm Dateien") + "(*.prg *.c64 *.p00 *.t64 *.d64 *.g64 *.frz);;" + tr("Alle Dateien") + "(*.*)");
     if(filename != "")
     {
         c64->LoadAutoRun(0,filename.toLatin1().data());
@@ -587,7 +587,7 @@ void MainWindow::on_actionAutostart_triggered()
 
 void MainWindow::on_actionC64_Programme_direkt_laden_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),"",tr("C64 Programm Dateien") + "(*.prg *.c64 *.p00 *.t64 *.frz);;" + tr("Alle Dateien") + "(*.*)");
+    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien Ã¶ffnen "),"",tr("C64 Programm Dateien") + "(*.prg *.c64 *.p00 *.t64 *.frz);;" + tr("Alle Dateien") + "(*.*)");
     if(filename != "")
     {
         c64->LoadPRG(filename.toLatin1().data(),0);
@@ -668,7 +668,7 @@ void MainWindow::on_actionScreenshot_triggered()
         c64->SaveScreenshot(QString(screenshotPath + "emu64_" + QVariant(ScreenshotNumber).toString() + ".bmp").toLatin1().data());
         ScreenshotNumber++;
     }
-    else QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.\nÜberprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !"));
+    else QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Es sind keine Screenshots mÃ¶glich da Emu64 kein Screenshot Verzeichnis anlegen konnte.\nÃœberprÃ¼fen Sie bitte die Rechte des Emu64 Verzeichnisses !"));
 }
 
 void MainWindow::on_actionC64_Geschwindigkeit_triggered()
@@ -713,7 +713,7 @@ void MainWindow::on_actionREU_speichern_triggered()
 
 void MainWindow::on_actionREU_loeschen_triggered()
 {
-    if(QMessageBox::Yes == QMessageBox::question(this,tr("REU Speicher löschen ..."),tr("Möchten Sie den Inhalt des REU Speichers wirklisch löschen?"),QMessageBox::Yes | QMessageBox::No))
+    if(QMessageBox::Yes == QMessageBox::question(this,tr("REU Speicher lÃ¶schen ..."),tr("MÃ¶chten Sie den Inhalt des REU Speichers wirklisch lÃ¶schen?"),QMessageBox::Yes | QMessageBox::No))
     {
         c64->ClearREURam();
     }
@@ -755,7 +755,7 @@ void MainWindow::on_actionGEO_speichern_triggered()
 
 void MainWindow::on_actionGEO_loeschen_triggered()
 {
-    if(QMessageBox::Yes == QMessageBox::question(this,tr("GEORAM Speicher löschen ..."),tr("Möchten Sie den Inhalt des GEORAM Speichers wirklisch löschen?"),QMessageBox::Yes | QMessageBox::No))
+    if(QMessageBox::Yes == QMessageBox::question(this,tr("GEORAM Speicher lÃ¶schen ..."),tr("MÃ¶chten Sie den Inhalt des GEORAM Speichers wirklisch lÃ¶schen?"),QMessageBox::Yes | QMessageBox::No))
     {
         c64->ClearGEORAMRam();
     }

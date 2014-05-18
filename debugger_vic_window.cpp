@@ -5,10 +5,10 @@
 //                                              //
 // #file: debugger_vic_window.cpp               //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.01.2014                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -26,7 +26,7 @@ DebuggerVicWindow::DebuggerVicWindow(QWidget *parent) :
     ui->OutputList->setColumnWidth(0,110);
     ui->OutputList->setColumnWidth(1,90);
 
-    GrafikModi = QStringList() << "Standard Text" << "Multicolor Text" << "Standard Bitmap" << "Multicolor Bitmap" << "ECM Text" << "Ungültiger Textmodus" << "Ungültiger Bitmapmodus 1" << "Ungültiger Bitmapmodus 2";
+    GrafikModi = QStringList() << "Standard Text" << "Multicolor Text" << "Standard Bitmap" << "Multicolor Bitmap" << "ECM Text" << "UngÃ¼ltiger Textmodus" << "UngÃ¼ltiger Bitmapmodus 1" << "UngÃ¼ltiger Bitmapmodus 2";
 }
 
 DebuggerVicWindow::~DebuggerVicWindow()

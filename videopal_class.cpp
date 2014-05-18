@@ -5,10 +5,10 @@
 //                                              //
 // #file: videopal_class.cpp                    //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.01.2014                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -143,10 +143,10 @@ void VideoPalClass::SetC64Palette(int palnr)
 
         for(int i=0;i<16;i++)
         {
-            /// Für 32Bit Video Display ///
+            /// FÃ¼r 32Bit Video Display ///
             Palette32Bit[ij] = 0xff000000 | COLOR_RGBA1[0]<<16 | COLOR_RGBA1[1]<<8 | COLOR_RGBA1[2];
 
-            /// Für 16Bit Video Display ///
+            /// FÃ¼r 16Bit Video Display ///
             /// RGB-565
             unsigned char r = (COLOR_RGBA1[0] * 31) / 255;
             unsigned char g = (COLOR_RGBA1[1] * 63) / 255;
@@ -184,7 +184,7 @@ inline void VideoPalClass::RGB_To_YUV(float rgb[3], float yuv[3])
 inline void VideoPalClass::YUV_To_RGB(float yuv[3], float rgb[3])
 {
         rgb[0] = float(yuv[0]+0.000*yuv[1]+1.140*yuv[2]); // Rot
-        rgb[1] = float(yuv[0]-0.396*yuv[1]-0.581*yuv[2]); // Grün
+        rgb[1] = float(yuv[0]-0.396*yuv[1]-0.581*yuv[2]); // GrÃ¼n
         rgb[2] = float(yuv[0]+2.029*yuv[1]+0.000*yuv[2]); // Blau
 }
 
@@ -195,7 +195,7 @@ inline void VideoPalClass::CreateVicIIColors(void)
         COLOR_STRUCT ColorOut;
         COLOR_STRUCT ColorIn;
 
-        /// Für Phase Alternating Line
+        /// FÃ¼r Phase Alternating Line
         float Offs=(((float)(PhaseAlternatingLine)) / (2000.0f / 90.0f))+(180.0f-45.0f);
 
         for(int i=0;i<16;i++)
@@ -230,7 +230,7 @@ inline void VideoPalClass::CreateVicIIColors(void)
                         for(x[2]=0;x[2]<16;x[2]++)
                                 for(x[3]=0;x[3]<16;x[3]++)
                                         {
-                                                /// Tabelle 0 für Gerade Zeile
+                                                /// Tabelle 0 fÃ¼r Gerade Zeile
                                                 _y = C64YUVPalette1[x[0]*3];
                                                 _u = C64YUVPalette1[x[0]*3+1];
                                                 _v = C64YUVPalette1[x[0]*3+2];
@@ -272,7 +272,7 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 if(DestDisplayMode == 32)
                                                 {
                                                     RGB =  (unsigned long)ColorOut.r<<16; // Rot
-                                                    RGB |= (unsigned long)ColorOut.g<<8;  // Grün
+                                                    RGB |= (unsigned long)ColorOut.g<<8;  // GrÃ¼n
                                                     RGB |= (unsigned long)ColorOut.b;     // Blau
 
                                                     BlurTable0[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
@@ -287,7 +287,7 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                     BlurTable0[x[0]][x[1]][x[2]][x[3]] = (unsigned long)(r<<11 | g<<5 | b);
                                                 }
 
-                                                /// Tabelle 1 für Gerade Zeile
+                                                /// Tabelle 1 fÃ¼r Gerade Zeile
                                                 _y *= Scanline;
                                                 r = (short)(_y+0.000*_u+1.140*_v);
                                                 g = (short)(_y-0.396*_u-0.581*_v);
@@ -309,7 +309,7 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 if(DestDisplayMode == 32)
                                                 {
                                                     RGB =  (unsigned long)ColorOut.r<<16; // Rot
-                                                    RGB |= (unsigned long)ColorOut.g<<8;  // Grün
+                                                    RGB |= (unsigned long)ColorOut.g<<8;  // GrÃ¼n
                                                     RGB |= (unsigned long)ColorOut.b;     // Blau
 
                                                     BlurTable0S[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
@@ -324,7 +324,7 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                     BlurTable0S[x[0]][x[1]][x[2]][x[3]] = (unsigned long)(r<<11 | g<<5 | b);
                                                 }
 
-                                                /// Tabelle 1 für Ungerade Zeilen
+                                                /// Tabelle 1 fÃ¼r Ungerade Zeilen
                                                 _y = C64YUVPalette2[x[0]*3];
                                                 _u = C64YUVPalette2[x[0]*3+1];
                                                 _v = C64YUVPalette2[x[0]*3+2];
@@ -365,7 +365,7 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 if(DestDisplayMode == 32)
                                                 {
                                                     RGB =  (unsigned long)ColorOut.r<<16; // Rot
-                                                    RGB |= (unsigned long)ColorOut.g<<8;  // Grün
+                                                    RGB |= (unsigned long)ColorOut.g<<8;  // GrÃ¼n
                                                     RGB |= (unsigned long)ColorOut.b;     // Blau
 
                                                     BlurTable1[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
@@ -403,7 +403,7 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 if(DestDisplayMode == 32)
                                                 {
                                                     RGB =  (unsigned long)ColorOut.r<<16; // Rot
-                                                    RGB |= (unsigned long)ColorOut.g<<8;  // Grün
+                                                    RGB |= (unsigned long)ColorOut.g<<8;  // GrÃ¼n
                                                     RGB |= (unsigned long)ColorOut.b;     // Blau
 
                                                     BlurTable1S[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
@@ -626,7 +626,7 @@ void VideoPalClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
         }
     }
     //////////////////////////////////////////////////////////////////////////
-    ///////////////////// AUSGABE ÜBER NORMALE FARBPALETTE ///////////////////
+    ///////////////////// AUSGABE ÃœBER NORMALE FARBPALETTE ///////////////////
     else
     if(Double2x)
     {

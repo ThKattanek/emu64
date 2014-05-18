@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
-// Emu64                                        //
-// von Thorsten Kattanek			//
 //                                              //
-// #file: crt_class.h                            //
-//						//
-// Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 09.07.2011		//
-// www.emu64.de					//
-//						//
+// Emu64                                        //
+// von Thorsten Kattanek                        //
+//                                              //
+// #file: crt_class.h                           //
+//                                              //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Ã„nderung am 18.05.2014                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef CRT_CLASS_H
@@ -65,11 +65,11 @@ public:
     unsigned char   *ROM_LO;		// 0x8000
     unsigned char   *ROM_HI;		// 0xA000 oder 0xE000
 
-    unsigned char   CRT_ROM_BANK1[64*0x2000];		// Alle ChipRoms für 0x8000	(max 64 x 0x2000)
-    unsigned char   CRT_ROM_BANK2[64*0x2000];		// Alle ChipRoms für 0xA000 oder 0xE000 (max 64 x 0x2000)
+    unsigned char   CRT_ROM_BANK1[64*0x2000];		// Alle ChipRoms fÃ¼r 0x8000	(max 64 x 0x2000)
+    unsigned char   CRT_ROM_BANK2[64*0x2000];		// Alle ChipRoms fÃ¼r 0xA000 oder 0xE000 (max 64 x 0x2000)
 
-    unsigned char   CRT_ROM_BANK1_TMP[64*0x2000];	// Alle ChipRoms für 0x8000	(max 64 x 0x2000)
-    unsigned char   CRT_ROM_BANK2_TMP[64*0x2000];	// Alle ChipRoms für 0xA000 oder 0xE000 (max 64 x 0x2000)
+    unsigned char   CRT_ROM_BANK1_TMP[64*0x2000];	// Alle ChipRoms fÃ¼r 0x8000	(max 64 x 0x2000)
+    unsigned char   CRT_ROM_BANK2_TMP[64*0x2000];	// Alle ChipRoms fÃ¼r 0xA000 oder 0xE000 (max 64 x 0x2000)
 
     unsigned char   *RAM_C64;	// Kompletter C64 RAM
 
@@ -89,7 +89,7 @@ public:
 
     //// EASY FLASH (32)
     bool            EasyFlashJumper;
-    unsigned char   EasyFlashRam[256];		// Speziller Speicher für das EasyFlash Cartridge
+    unsigned char   EasyFlashRam[256];		// Speziller Speicher fÃ¼r das EasyFlash Cartridge
     unsigned char   EasyFlashBankReg;		// Bank Register
     AM29F040Class   *am29f040Hi;
     AM29F040Class   *am29f040Lo;

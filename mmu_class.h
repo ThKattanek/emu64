@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: mmu_class.h                           //
-//						//
-// Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 28.08.2011		//
-// www.emu64.de					//
-//						//
+//                                              //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Ã„nderung am 18.05.2014                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef MMU_CLASS_H
@@ -45,9 +45,9 @@ public:
 
     MOS6510_PORT *CPU_PORT;
 
-    // Zeiger für Read / Write Funktionen ///
+    // Zeiger fÃ¼r Read / Write Funktionen ///
     // Diese werden Teilweise Intern und Extern gesetzt ///
-    // Ein Aufruf erfolg immer ohne Überprüfung auf gültigen Zeiger !!! //
+    // Ein Aufruf erfolg immer ohne ÃœberprÃ¼fung auf gÃ¼ltigen Zeiger !!! //
 
     function<unsigned char(unsigned short)> CPUReadProcTbl[0x100];
     function<void(unsigned short,unsigned char)> CPUWriteProcTbl[0x100];

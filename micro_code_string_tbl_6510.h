@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////
-//						//
+//                                              //
 // Emu64                                        //
-// von Thorsten Kattanek			//
+// von Thorsten Kattanek                        //
 //                                              //
 // #file: micro_code_string_tbl_6510.h          //
-//						//
-// Dieser Sourcecode ist Copyright geschützt!   //
-// Geistiges Eigentum von Th.Kattanek		//
-//						//
-// Letzte Änderung am 29.05.2011		//
-// www.emu64.de					//
-//						//
+//                                              //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Ã„nderung am 18.05.2014                //
+// www.emu64.de                                 //
+//                                              //
 //////////////////////////////////////////////////
 
 #ifndef MICRO_CODE_STRING_TBL_6510_H
@@ -44,14 +44,14 @@ const char* MicroCodeStringTable6510[]=
     /*023*/ "TMPByte von PC-Adresse holen // AC and TMPByte // Set SR(NZC) // PC+1",
     /*024*/ "Adresse Lo von PC-Adresse holen // PC+1",
     /*025*/ "Adresse Hi von PC-Adresse holen // PC+1",
-    /*026*/ "TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prüfen (BPL)",
-    /*027*/ "TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prüfen (BMI)",
-    /*028*/ "TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prüfen (BVC)",
-    /*029*/ "TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prüfen (BVS)",
-    /*030*/ "TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prüfen (BCC)",
-    /*031*/ "TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prüfen (BCS)",
-    /*032*/ "TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prüfen (BNE)",
-    /*033*/ "TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prüfen (BEQ)",
+    /*026*/ "TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prÃ¼fen (BPL)",
+    /*027*/ "TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prÃ¼fen (BMI)",
+    /*028*/ "TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prÃ¼fen (BVC)",
+    /*029*/ "TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prÃ¼fen (BVS)",
+    /*030*/ "TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prÃ¼fen (BCC)",
+    /*031*/ "TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prÃ¼fen (BCS)",
+    /*032*/ "TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prÃ¼fen (BNE)",
+    /*033*/ "TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prÃ¼fen (BEQ)",
     /*034*/ "Lesen von PC-Adresse und verwerfen // BranchAdresse=PC+TMPByte",
     /*035*/ "FIX PC Hi Adresse",
     /*036*/ "Adresse Hi von Pointer-Adresse holen // Adresse+YR",
@@ -111,18 +111,18 @@ const char* MicroCodeStringTable6510[]=
     /*090*/ "TMPByte von Adresse lesen // YR+1 // Set SR(NZ)",
     /*091*/ "TMPByte von Adresse lesen // XR-1 // Set SR(NZ)",
     /*092*/ "TMPByte von Adresse lesen // YR-1 // Set SR(NZ)",
-    /*093*/ "Illegaler Opcode - wird noch nicht unterstützt // Reset",
+    /*093*/ "Illegaler Opcode - wird noch nicht unterstÃ¼tzt // Reset",
     /*094*/ "PC LO von Adresse lesen // Adresse+1 (Nur Low Wert)",
     /*095*/ "PC HI von Adresse lesen",
     /*096*/ "PC LO von $FFFC lesen",
     /*097*/ "PC HI von $FFFD lesen",
-    /*098*/ "TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC) // PC+1",
-    /*099*/ "TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC)",
-    /*100*/ "TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // if(idxReg<Adresse Lo) MCT++",
-    /*101*/ "TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1",
-    /*102*/ "TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC)",
-    /*103*/ "TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1",
-    /*104*/ "TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC)",
+    /*098*/ "TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verÃ¤ndert) // Set SR(NZC) // PC+1",
+    /*099*/ "TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verÃ¤ndert) // Set SR(NZC)",
+    /*100*/ "TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verÃ¤ndert) // if(idxReg<Adresse Lo) MCT++",
+    /*101*/ "TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC) // PC+1",
+    /*102*/ "TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC)",
+    /*103*/ "TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC) // PC+1",
+    /*104*/ "TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC)",
     /*105*/ "TMPByte von PC-Adresse lesen // AC XOR TMPByte // Set SR(NZC) // PC+1",
     /*106*/ "TMPByte von Adresse lesen // AC XOR TMPByte // Set SR(NZC)",
     /*107*/ "TMPByte von Adresse lesen // AC XOR TMPByte // if(idxReg<Adresse Lo) MCT++",
@@ -134,7 +134,7 @@ const char* MicroCodeStringTable6510[]=
     /*113*/ "TMPByte nach Adresse schreiben // C->TMPByte>>1->C // Set SR(NZC)",
     /*114*/ "TMPByte nach Adresse schreiben // TMPByte+1 // Set SR(NZ)",
     /*115*/ "TMPByte nach Adresse schreiben // TMPByte-1 // Set SR(NZ)",
-    /*116*/ "SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag löschen",
+    /*116*/ "SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag lÃ¶schen",
     /*117*/ "PC Lo von 0xFFFA holen",
     /*118*/ "PC Hi von 0xFFFB holen",
     /*119*/ "TMPByte von Adresse holen // Fix Adresse Hi MCT+1",

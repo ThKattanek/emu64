@@ -5,10 +5,10 @@
 //                                              //
 // #file: mos6526_class.cpp                     //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.12.2013                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -54,7 +54,7 @@ void MOS6526::Reset(void)
 	if(IO[14] & 0x80) UhrCounter = UhrCounterLatch = UhrCounterPAL; // PAL
 	else UhrCounter = UhrCounterLatch = UhrCounterNTSC; // NTSC
 
-	/////// Für REG 14 und 15 //////
+	/////// FÃ¼r REG 14 und 15 //////
 	EnablePB6	= false;
 	EnablePB7	= false;
 	PB6Mode		= 0;
@@ -118,7 +118,7 @@ void MOS6526::OneZyklus(void)
 					}
 				}
 			}
-			/// Auf Alarm rpüfen ///
+			/// Auf Alarm rpÃ¼fen ///
 			if(!memcmp(UhrAlarm,IO+8,4)) TriggerInterrupt(4);
 		}
 	}
@@ -295,7 +295,7 @@ inline void MOS6526::TimerCount(void)
 			goto TimerA_Count;
 	}
 
-	/// Timer A runterzählen ///
+	/// Timer A runterzÃ¤hlen ///
 TimerA_Count:
 	if (TimerA_CNT_PHI2)
 		if (!TimerA || !--TimerA) 
@@ -398,7 +398,7 @@ TimerA_Idle:
 			goto TimerB_Count;
 	}
 
-	/// Timer B runterzählen ///
+	/// Timer B runterzÃ¤hlen ///
 TimerB_Count:
 	if (TimerB_CNT_PHI2 || (TimerB_CNT_TimerA && TimerAUnterlauf) || (TimerB_CNT_CNTPin && TimerAUnterlauf && CNT_PIN))
 		if (!TimerB || !--TimerB) 

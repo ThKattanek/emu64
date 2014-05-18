@@ -5,10 +5,10 @@
 //                                              //
 // #file: videopal_class.h                      //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.01.2014                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -119,9 +119,9 @@ private:
         float   Scanline;
 
         // NEU //
-        uint32_t BlurTable0[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
-        uint32_t BlurTable1[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
-        uint32_t BlurTable0S[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
-        uint32_t BlurTable1S[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
+        uint32_t BlurTable0[16][16][16][16];	// 16 ^ 4 (FÃ¼r Maximal 4 Pixel Blur)
+        uint32_t BlurTable1[16][16][16][16];	// 16 ^ 4 (FÃ¼r Maximal 4 Pixel Blur)
+        uint32_t BlurTable0S[16][16][16][16];	// 16 ^ 4 (FÃ¼r Maximal 4 Pixel Blur)
+        uint32_t BlurTable1S[16][16][16][16];	// 16 ^ 4 (FÃ¼r Maximal 4 Pixel Blur)
 };
 #endif // VIDEOPAL_CLASS_H

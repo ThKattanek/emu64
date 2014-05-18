@@ -5,10 +5,10 @@
 //                                              //
 // #file: floppy1541_class.cpp                  //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.12.2013        		//
+// Letzte Ã„nderung am 18.05.2014        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -93,7 +93,7 @@ Floppy1541::Floppy1541(bool *reset, int samplerate,int puffersize, bool *floppy_
 
     AktHalbSpur = 1;
 
-    /// Für Floppysound ///
+    /// FÃ¼r Floppysound ///
 
     Volume = 0.3f;
 
@@ -270,20 +270,20 @@ bool Floppy1541::LoadDiskImage(char* filename)
         fread (&version,1,1,file);
         if(version != 0)
         {
-            //MessageBox(0,"Dies Version unterstützt nur G64 Images Version 1","Error!",0);
+            //MessageBox(0,"Dies Version unterstÃ¼tzt nur G64 Images Version 1","Error!",0);
             return false;
         }
 
         fread (&trackanzahl,1,1,file);
         if(trackanzahl > 84)
         {
-            //MessageBox(0,"Das Image enthält zuviele Tracks!","Error!",0);
+            //MessageBox(0,"Das Image enthÃ¤lt zuviele Tracks!","Error!",0);
         }
 
         fread (&tracksize,1,2,file);
         if(tracksize != 7928)
         {
-            //MessageBox(0,"Unbekannte Trackgröße","Error!",0);
+            //MessageBox(0,"Unbekannte TrackgrÃ¶ÃŸe","Error!",0);
         }
 
         fread (&trackpos,4,84,file);
@@ -1025,7 +1025,7 @@ int Floppy1541::LoadBreakGroups(char *filename)
     file = fopen (filename, "rb");
     if (file == NULL)
     {
-            /// Datei konnte nicht geöffnet werden ///
+            /// Datei konnte nicht geÃ¶ffnet werden ///
             return -1;
     }
 

@@ -5,10 +5,10 @@
 //                                              //
 // #file: mos6510_class.cpp                     //
 //                                              //
-// Dieser Sourcecode ist Copyright gesch¸tzt!   //
+// Dieser Sourcecode ist Copyright gesch√ºtzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte ƒnderung am 31.12.2013                //
+// Letzte √Ñnderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -588,56 +588,56 @@ bool MOS6510::OneZyklus(void)
                 SetAdresseHi(Read(PC));
                 PC++;
                 break;
-        //R // TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE pr¸fen (BPL)
+        //R // TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE pr√É≈ífen (BPL)
         case 26:
                 CHK_RDY
                 TMPByte = Read(PC);
                 PC++;
                 if((SR&0x80)!=0x00) MCT+=2;
                 break;
-        //R // TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE pr¸fen (BMI)
+        //R // TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE pr√É≈ífen (BMI)
         case 27:
                 CHK_RDY
                 TMPByte = Read(PC);
                 PC++;
                 if((SR&0x80)!=0x80) MCT+=2;
                 break;
-        //R // TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE pr¸fen (BVC)
+        //R // TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE pr√É≈ífen (BVC)
         case 28:
                 CHK_RDY
                 TMPByte = Read(PC);
                 PC++;
                 if((SR&0x40)!=0x00) MCT+=2;
                 break;
-        //R // TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE pr¸fen (BVS)
+        //R // TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE pr√É≈ífen (BVS)
         case 29:
                 CHK_RDY
                 TMPByte = Read(PC);
                 PC++;
                 if((SR&0x40)!=0x40) MCT+=2;
                 break;
-        //R // TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE pr¸fen (BCC)
+        //R // TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE pr√É≈ífen (BCC)
         case 30:
                 CHK_RDY
                 TMPByte = Read(PC);
                 PC++;
                 if((SR&0x01)!=0x00) MCT+=2;
                 break;
-        //R // TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE pr¸fen (BCS)
+        //R // TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE pr√É≈ífen (BCS)
         case 31:
                 CHK_RDY
                 TMPByte = Read(PC);
                 PC++;
                 if((SR&0x01)!=0x01) MCT+=2;
                 break;
-        //R // TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE pr¸fen (BNE)
+        //R // TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE pr√É≈ífen (BNE)
         case 32:
                 CHK_RDY
                 TMPByte = Read(PC);
                 PC++;
                 if((SR&0x02)!=0x00) MCT+=2;
                 break;
-        //R // TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE pr¸fen (BEQ)
+        //R // TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE pr√É≈ífen (BEQ)
         case 33:
                 CHK_RDY
                 TMPByte = Read(PC);
@@ -1196,7 +1196,7 @@ bool MOS6510::OneZyklus(void)
                 CHK_RDY
                 SetPCHi(Read(0xFFFD));
                 break;
-        //R // TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht ver‰ndert) // Set SR(NZC) // PC+1
+        //R // TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht ver√É‚Ç¨ndert) // Set SR(NZC) // PC+1
         case 98:
                 CHK_RDY
                 TMPByte=Read(PC);
@@ -1206,7 +1206,7 @@ bool MOS6510::OneZyklus(void)
                 SET_ZERO(tmp &= 0xFF);
                 PC++;
                 break;
-        //R // TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht ver‰ndert) // Set SR(NZC)
+        //R // TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht ver√É‚Ç¨ndert) // Set SR(NZC)
         case 99:
                 CHK_RDY
                 TMPByte=Read(Adresse);
@@ -1215,7 +1215,7 @@ bool MOS6510::OneZyklus(void)
                 SET_SIGN(tmp);
                 SET_ZERO(tmp &= 0xFF);
                 break;
-        //R // TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht ver‰ndert) // if(idxReg<Adresse Lo) MCT++
+        //R // TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht ver√É‚Ç¨ndert) // if(idxReg<Adresse Lo) MCT++
         case 100:
                 CHK_RDY
                 if((Adresse&0xFF)>=(idxReg))
@@ -1228,7 +1228,7 @@ bool MOS6510::OneZyklus(void)
                         MCT++;
                 }
                 break;
-        //R // TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht ver‰ndert) // Set SR(NZC) // PC+1
+        //R // TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht ver√É‚Ç¨ndert) // Set SR(NZC) // PC+1
         case 101:
                 CHK_RDY
                 TMPByte=Read(PC);
@@ -1238,7 +1238,7 @@ bool MOS6510::OneZyklus(void)
                 SET_ZERO(tmp &= 0xFF);
                 PC++;
                 break;
-        //R // TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht ver‰ndert) // Set SR(NZC)
+        //R // TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht ver√É‚Ç¨ndert) // Set SR(NZC)
         case 102:
                 CHK_RDY
                 TMPByte=Read(Adresse);
@@ -1247,7 +1247,7 @@ bool MOS6510::OneZyklus(void)
                 SET_SIGN(tmp);
                 SET_ZERO(tmp &= 0xFF);
                 break;
-        //R // TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht ver‰ndert) // Set SR(NZC) // PC+1
+        //R // TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht ver√É‚Ç¨ndert) // Set SR(NZC) // PC+1
         case 103:
                 CHK_RDY
                 TMPByte=Read(PC);
@@ -1257,7 +1257,7 @@ bool MOS6510::OneZyklus(void)
                 SET_ZERO(tmp &= 0xFF);
                 PC++;
                 break;
-        //R // TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht ver‰ndert) // Set SR(NZC)
+        //R // TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht ver√É‚Ç¨ndert) // Set SR(NZC)
         case 104:
                 CHK_RDY
                 TMPByte=Read(Adresse);
@@ -1367,7 +1367,7 @@ bool MOS6510::OneZyklus(void)
                 TMPByte--;
                 SET_SR_NZ(TMPByte);
                 break;
-        //W // SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag lˆschen
+        //W // SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag l√É¬∂schen
         case 116:
                 SR&=239;
                 Write(0x0100+SP,SR);

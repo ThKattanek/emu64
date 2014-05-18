@@ -5,10 +5,10 @@
 //                                              //
 // #file: mos6522_class.cpp                     //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.01.2014                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -280,7 +280,7 @@ unsigned char MOS6522::ReadIO(unsigned short adresse)
                     | ((*FloppyIEC & *C64IEC) >> 7)             // DATA
                     | (((*FloppyIEC & *C64IEC) >> 4) & 0x04)	// CLK
                     | ((*C64IEC << 3) & 0x80)) ^ 0x85)          // ATN
-                    | ((*Jumper<<5)&64)                         // Schalter S1 für Geräte Adresse
+                    | ((*Jumper<<5)&64)                         // Schalter S1 fÃ¼r GerÃ¤te Adresse
                     | ((*Jumper<<5)&32);                        // Schalter S2
                     break;
                 }

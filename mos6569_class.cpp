@@ -5,10 +5,10 @@
 //                                              //
 // #file: mos6569_class.cpp                     //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 30.12.2013                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -50,11 +50,11 @@
 
 #define LAST_DISP_LINE	288                 //288
 
-// erste and letzte mögliche Rasterzeile für Bad Lines
+// erste and letzte mÃ¶gliche Rasterzeile fÃ¼r Bad Lines
 #define FIRST_DMA_LINE		0x30
 #define LAST_DMA_LINE		0xf7
 
-// länge der X Werte der Destination BitMap
+// lÃ¤nge der X Werte der Destination BitMap
 #define XMOD				504
 #define YMOD                312
 
@@ -411,7 +411,7 @@ inline void VICII::DrawGraphics(void)
 
     if(DisplayStatus)	// Display Mode
     {
-        if((AktZyklus >= 16) && (AktZyklus <= 55)) // Grafiksequenzer --> muss um 16 Pixel verzögert werden
+        if((AktZyklus >= 16) && (AktZyklus <= 55)) // Grafiksequenzer --> muss um 16 Pixel verzÃ¶gert werden
         {
 			switch(GrafikMode)
 			{
@@ -528,9 +528,9 @@ inline void VICII::DrawGraphics(void)
     {
         Colors[0] = 0 | 0x40;
 
-        if((AktZyklus >= 16) && (AktZyklus <= 55)) // Grafiksequenzer --> muss um 16 Pixel verzögert werden
+        if((AktZyklus >= 16) && (AktZyklus <= 55)) // Grafiksequenzer --> muss um 16 Pixel verzÃ¶gert werden
 		{
-            // Grafiksequenzer --> muss um 16 Pixel verzögert werden
+            // Grafiksequenzer --> muss um 16 Pixel verzÃ¶gert werden
 			switch(GrafikMode)
 			{
 			case 0:
@@ -616,8 +616,8 @@ inline void VICII::DrawGraphics(void)
         }
 	}
 
-    /// Im Aktuellen Zyklus Prüfen ob B0C Color verwendet wurde (16 Pixel vorlauf)
-    /// Wenn ja mit aktuellen B0C überschreiben
+    /// Im Aktuellen Zyklus PrÃ¼fen ob B0C Color verwendet wurde (16 Pixel vorlauf)
+    /// Wenn ja mit aktuellen B0C Ã¼berschreiben
 
         VideoPufferLine_XScroll = VideoPufferLine - 8;
         for(int i=0;i<8;i++)
@@ -631,7 +631,7 @@ inline void VICII::DrawGraphics(void)
 
 inline void VICII::DrawGraphicsPseudo()
 {
-    /// Für Anzeige Aller Zyklen
+    /// FÃ¼r Anzeige Aller Zyklen
     VideoPufferLine += 8;
 
     //CheckBorder
@@ -667,7 +667,7 @@ inline void VICII::DrawSprites()
     if(!VicConfig[VIC_SPRITES_ON]) return;
 	if(AktRZ < FIRST_DISP_LINE_PAL+1) return;
 
-    // Spritekollisionspuffer löschen
+    // Spritekollisionspuffer lÃ¶schen
     if(SpriteCollisionEnable)
     {
         unsigned int *lp = (unsigned int *)SpriteCollisionsPuffer - 1;
@@ -682,7 +682,7 @@ inline void VICII::DrawSprites()
         if(((SpriteViewAktLine & bitc) == bitc) && (MX[SpriteNr]<0x1F8))
 		{
             SpritePufferLine = (VideoPufferLine - (62 * 8)) -4 + SpriteXDisplayTbl[MX[SpriteNr]];
-			if((MDP & bitc) == 0)	/// Prüfen auf Sprite Hinter Vordergrund
+			if((MDP & bitc) == 0)	/// PrÃ¼fen auf Sprite Hinter Vordergrund
 			{
 				/// Sprites vor der Vordergrundgrafik
 				if((MXE & bitc) == bitc)
@@ -925,10 +925,10 @@ void VICII::OneZyklus(void)
 	else if(!OLD_RESET) Reset();
         OLD_RESET = *RESET;
 
-    // Prüfen ob Badlines zugelassen sind
+    // PrÃ¼fen ob Badlines zugelassen sind
     if(AktRZ == 0x30) BadLineEnable = DEN;
 
-    // Prüfen auf Badline zustand
+    // PrÃ¼fen auf Badline zustand
     if((AktRZ>=0x30) && (AktRZ<=0xF7) && (Y_SCROLL == (AktRZ&7)) && (BadLineEnable == true))
     {
         BadLineStatus = true;
@@ -953,14 +953,14 @@ void VICII::OneZyklus(void)
 
             AktRZ++;
 
-			// Prüfen auf Raster IRQ
+			// PrÃ¼fen auf Raster IRQ
             //if (AktRZ == IRQ_RASTER) RasterIRQ();
 			DrawThisLine = (AktRZ >= FIRST_DISP_LINE && AktRZ <= LAST_DISP_LINE);
 		}
 
         if(DrawThisLine)
         {
-            VideoPufferLine = &VideoPuffer[DrawLineCounter++*MAX_XW];		// Zeiger für Aktuelle Zeile setzen
+            VideoPufferLine = &VideoPuffer[DrawLineCounter++*MAX_XW];		// Zeiger fÃ¼r Aktuelle Zeile setzen
             BorderLinePos = 0;
         }
 
@@ -981,7 +981,7 @@ void VICII::OneZyklus(void)
             //if (IRQ_RASTER == 0) RasterIRQ();
         }
 
-        // Prüfen auf Raster IRQ
+        // PrÃ¼fen auf Raster IRQ
         if (AktRZ == IRQ_RASTER) RasterIRQ();
 
 		/// Sprite 5 ///
@@ -1169,12 +1169,12 @@ void VICII::OneZyklus(void)
 		bitc = 0x01;
 		for (int i=0; i<8; i++, bitc<<=1) if (MYE & bitc) SpriteExpYFlipFlop ^= bitc;
 
-		// In der ersten Phasen von Zyklus 55 wird für Sprite 0-3 geprüft, 
+		// In der ersten Phasen von Zyklus 55 wird fÃ¼r Sprite 0-3 geprÃ¼ft, 
 		// ob das entsprechende MxE-Bit in Register $d015 gesetzt und die Y-Koordinate 
 		// des Sprites (ungerade Register $d001-$d00f) gleich den unteren 8 Bits 
-		// von RASTER ist. Ist dies der Fall und der DMA für das Sprite noch 
-		// ausgeschaltet, wird der DMA angeschaltet, MCBASE gelöscht und, 
-		// wenn das MxYE-Bit gesetzt ist, das Expansions-Flipflop gelöscht.
+		// von RASTER ist. Ist dies der Fall und der DMA fÃ¼r das Sprite noch 
+		// ausgeschaltet, wird der DMA angeschaltet, MCBASE gelÃ¶scht und, 
+		// wenn das MxYE-Bit gesetzt ist, das Expansions-Flipflop gelÃ¶scht.
 		bitc = 0x01;
 		for (int i=0; i<4; i++, bitc<<=1)
 		{
@@ -1198,12 +1198,12 @@ void VICII::OneZyklus(void)
 	
 	case 56:
 		/// Sprite ///
-		// In der ersten Phasen von Zyklus 56 wird für Sprite 4-7 geprüft, 
+		// In der ersten Phasen von Zyklus 56 wird fÃ¼r Sprite 4-7 geprÃ¼ft, 
 		// ob das entsprechende MxE-Bit in Register $d015 gesetzt und die Y-Koordinate 
 		// des Sprites (ungerade Register $d001-$d00f) gleich den unteren 8 Bits 
-		// von RASTER ist. Ist dies der Fall und der DMA für das Sprite noch 
-		// ausgeschaltet, wird der DMA angeschaltet, MCBASE gelöscht und, 
-		// wenn das MxYE-Bit gesetzt ist, das Expansions-Flipflop gelöscht.
+		// von RASTER ist. Ist dies der Fall und der DMA fÃ¼r das Sprite noch 
+		// ausgeschaltet, wird der DMA angeschaltet, MCBASE gelÃ¶scht und, 
+		// wenn das MxYE-Bit gesetzt ist, das Expansions-Flipflop gelÃ¶scht.
 		bitc = 0x10;
 		for (int i=4; i<8; i++, bitc<<=1)
 		{
@@ -1249,8 +1249,8 @@ void VICII::OneZyklus(void)
         }
 
         /// Sprite ///
-		// In der ersten Phase von Zyklus 58 wird für jedes Sprite MC mit MCBASE
-		// geladen (MCBASE->MC) und geprüft, ob der DMA für das Sprite angeschaltet
+		// In der ersten Phase von Zyklus 58 wird fÃ¼r jedes Sprite MC mit MCBASE
+		// geladen (MCBASE->MC) und geprÃ¼ft, ob der DMA fÃ¼r das Sprite angeschaltet
 		// und die Y-Koordinate des Sprites gleich den unteren 8 Bits von RASTER ist.
 		// Ist dies der Fall, wird die Darstellung des Sprites angeschaltet.
 		bitc = 0x01;
@@ -1365,7 +1365,7 @@ void VICII::OneZyklus(void)
     isWriteColorReg20 = false;
     isWriteColorReg21 = false;
 
-    ///   Auf nächsten Zyklus stellen   ///
+    ///   Auf nÃ¤chsten Zyklus stellen   ///
     /// Aktueller Zyklus ist nun zuende ///
 
 	AktZyklus++;
@@ -1634,10 +1634,10 @@ void VICII::WriteIO(unsigned short adresse,unsigned char wert)
 			
                         GrafikMode = ((CTRL1 & 0x60) | (CTRL2 & 0x10)) >> 4;
 		
-			// Prüfen ob Badlines zugelassen sind
+			// PrÃ¼fen ob Badlines zugelassen sind
                         if ((AktRZ == 0x30) && (wert & 0x10)) BadLineEnable = true;
 
-			// Prüfen auf Badline zustand
+			// PrÃ¼fen auf Badline zustand
                         if((AktRZ>=0x30) && (AktRZ<=0xF7) && (Y_SCROLL == (AktRZ&7)) && (BadLineEnable == true))
 			{
                                 BadLineStatus = true;
@@ -1652,7 +1652,7 @@ void VICII::WriteIO(unsigned short adresse,unsigned char wert)
             Write_xd011 = true;
 			break;
 
-		/// Rasterzähler
+		/// RasterzÃ¤hler
 		case 0x12:
                         //IRQ_RASTER = (IRQ_RASTER & 0xFF00) | wert;
 
@@ -1711,7 +1711,7 @@ void VICII::WriteIO(unsigned short adresse,unsigned char wert)
 			}
 			break;
 
-		/// Sprite Daten Priorität
+		/// Sprite Daten PrioritÃ¤t
 		case 0x1B:
                         MDP = wert;
 			break;
@@ -1788,7 +1788,7 @@ unsigned char VICII::ReadIO(unsigned short adresse)
                     if(Write_xd011) return (CTRL1 & 0x7F) | ((AktRZ & 0x100) >> 1);
                     else return 0;
 
-		/// Rasterzähler
+		/// RasterzÃ¤hler
 		case 0x12:
                         return (unsigned char)AktRZ;
 
@@ -1823,7 +1823,7 @@ unsigned char VICII::ReadIO(unsigned short adresse)
 		case 0x1A:
                         return IRQMask | 0xF0;
 
-		/// Sprite Daten Priorität
+		/// Sprite Daten PrioritÃ¤t
 		case 0x1B:
                         return MDP;
 
@@ -1898,12 +1898,12 @@ void VICII::TriggerLightpen(void)
 
 #define LAST_DISP_LINE		0x11F
 
-// erste and letzte mögliche Rasterzeile für Bad Lines
+// erste and letzte mÃ¶gliche Rasterzeile fÃ¼r Bad Lines
 #define FIRST_DMA_LINE		0x30
 #define LAST_DMA_LINE		0xf7
 
 
-// länge der X Werte der Destination BitMap
+// lÃ¤nge der X Werte der Destination BitMap
 #define XMOD				504
 #define YMOD                312
 
@@ -2136,13 +2136,13 @@ void VICII::OneZyklus(void)
 			{
 				RASTER_Y++;
 	
-				// Raster IRQ setzen wenn Rasterzeile mit Rasterlatch(IRQ_RASTER) übereinstimmt
+				// Raster IRQ setzen wenn Rasterzeile mit Rasterlatch(IRQ_RASTER) Ã¼bereinstimmt
 				if (RASTER_Y == IRQ_RASTER) RasterIRQ();
 
-				// Prüfen ob DEN Bit gesetzt ist ---> Badline zulassen
+				// PrÃ¼fen ob DEN Bit gesetzt ist ---> Badline zulassen
 				if (RASTER_Y == 0x30)BadLinesEnabled = !(~CTRL1 & 0x10);
 
-				// Prüfen auf Badline
+				// PrÃ¼fen auf Badline
 				IsBadLine = (RASTER_Y >= FIRST_DMA_LINE && RASTER_Y <= LAST_DMA_LINE && ((RASTER_Y & 7) == Y_SCROLL) && BadLinesEnabled);
 
 				DrawThisLine = (RASTER_Y >= FIRST_DISP_LINE && RASTER_Y <= LAST_DISP_LINE);
@@ -2169,7 +2169,7 @@ void VICII::OneZyklus(void)
 
 				RefreshProc(VideoPuffer);
 
-				/// Nur für Double Buffer !! ///
+				/// Nur fÃ¼r Double Buffer !! ///
 				/*
 				if(AktVideoPuffer == 0)
 				{
@@ -3460,7 +3460,7 @@ inline void VICII::DrawSprites(void)
 
 	if(ClxSpr == 0)
 	{
-		// IRQ kann ausgelöst werden
+		// IRQ kann ausgelÃ¶st werden
 		ClxSpr |= spr_coll;
 		if(ClxSpr != 0)
 		{
@@ -3474,13 +3474,13 @@ inline void VICII::DrawSprites(void)
 	}
 	else
 	{
-		// kein IRQ auslösen
+		// kein IRQ auslÃ¶sen
 		ClxSpr |= spr_coll;
 	}
 
 	if(ClxBgr == 0)
 	{
-		// IRQ kann ausgelöst werden
+		// IRQ kann ausgelÃ¶st werden
 		ClxBgr |= gfx_coll;
 		if(ClxBgr != 0)
 		{
@@ -3494,7 +3494,7 @@ inline void VICII::DrawSprites(void)
 	}
 	else
 	{
-		// kein IRQ auslösen
+		// kein IRQ auslÃ¶sen
 		ClxBgr |= gfx_coll;
 	}
 }

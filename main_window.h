@@ -5,10 +5,10 @@
 //                                              //
 // #file: main_window.h                         //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.01.2014                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -121,13 +121,13 @@ private:
     QTranslator appTranslator;   // Application Translator
     QTranslator qtTranslator;    // Qt library Translator
     QString appPath;             // Pfad der emu64 Datei
-    QString langPath;            // Pfad für alle Sprachfiles
-    QString tmpPath;             // Pfad für alle Temporären Dateien die Emu64 erzeugt (Wird beim Start und Ende geleert)
-    QString screenshotPath;       // Pfad für alle Emu64 Screenshots (nicht änderbar)
+    QString langPath;            // Pfad fÃ¼r alle Sprachfiles
+    QString tmpPath;             // Pfad fÃ¼r alle TemporÃ¤ren Dateien die Emu64 erzeugt (Wird beim Start und Ende geleert)
+    QString screenshotPath;       // Pfad fÃ¼r alle Emu64 Screenshots (nicht Ã¤nderbar)
     QSettings *ini;
 
     bool ScreenshotsEnable;       // Konnte kein Screenshot Verzeichnis gefunden werden und auch nicht erstellt werden so ist es false
-    int ScreenshotNumber;         // Nummer des nächsten Screenshots
+    int ScreenshotNumber;         // Nummer des nÃ¤chsten Screenshots
 
     InfoWindow *info_window;                    // Info Fenster Klasse (wird vom MainWindow als Modal gestartet)
     TVSetupWindow *tv_setup_window;             // TV Einstellungsfenster
@@ -139,7 +139,7 @@ private:
     C64SpeedWindow *speed_window;               // C64 Speed Window
     CaptureWindow * capture_window;             // Video und Sound Aufnahme Window
 
-    QStringList commandLine;                    // Enthält den an Emu64 übergebenen String
+    QStringList commandLine;                    // EnthÃ¤lt den an Emu64 Ã¼bergebenen String
 };
 
 #endif // MAINWINDOW_H

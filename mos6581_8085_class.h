@@ -5,10 +5,10 @@
 //                                              //
 // #file: mos6581_8085_class.h                  //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.12.2013                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -84,15 +84,15 @@ class MOS6581_8085
     VOICEClass          *Voice[3];
     unsigned char       IO[32];
 
-    VOICEClass          *v;     // Für Temporären zugriff auf die Voices
-    VOICEClass          *vs;    // Für Temporären zugriff auf die Voices (Source Voice)
-    VOICEClass          *vd;    // Für Temporären zugriff auf die Voices (Destination Voice)
+    VOICEClass          *v;     // FÃ¼r TemporÃ¤ren zugriff auf die Voices
+    VOICEClass          *vs;    // FÃ¼r TemporÃ¤ren zugriff auf die Voices (Source Voice)
+    VOICEClass          *vd;    // FÃ¼r TemporÃ¤ren zugriff auf die Voices (Destination Voice)
 
     int	SidNummer;
     bool                SidModel;
 
     int                 C64ZyklenSek;
-    double              FreqConvCounter;	// interner Counter für Fast Fast Fast Resampling ;-)
+    double              FreqConvCounter;	// interner Counter fÃ¼r Fast Fast Fast Resampling ;-)
     double              FreqConvAddWert;
 
     /// Zeiger auf Sonder Wellen (Mischformen) ///

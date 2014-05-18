@@ -5,10 +5,10 @@
 //                                              //
 // #file: mos6510_class.h                       //
 //                                              //
-// Dieser Sourcecode ist Copyright geschützt!   //
+// Dieser Sourcecode ist Copyright geschÃ¼tzt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.12.2013                //
+// Letzte Ã„nderung am 18.05.2014                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -47,7 +47,7 @@ public:
 
     /// Variablen ///
 
-    // Signale von Außen
+    // Signale von AuÃŸen
     bool *RDY;
     bool *RESET;
     bool WRITE_FF00;
