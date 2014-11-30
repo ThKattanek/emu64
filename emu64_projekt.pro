@@ -4,6 +4,7 @@ TRANSLATIONS = emu64_de.ts
 TRANSLATIONS = emu64_en.ts
 
 QT += core gui
+CONFIG += rtti
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -149,6 +150,13 @@ LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU -lavcodec -lavutil
 }
 
 win32-g++{
+TARGET = emu64
+RC_FILE = emu64.rc
+DESTDIR = "bin/win_x32"
+LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image -lavcodec -lavutil
+}
+
+win32-x-g++{
 TARGET = emu64
 RC_FILE = emu64.rc
 DESTDIR = "bin/win_x32"
