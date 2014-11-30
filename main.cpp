@@ -21,11 +21,8 @@
 #include <QBitmap>
 #include <QTimer>
 
-#ifdef _WIN32
-int qMain(int argc, char *argv[])
-#else
+#undef main
 int main(int argc, char *argv[])
-#endif
 {
     QTextStream *log = 0;
     QFile LogFile("emu64.log");
