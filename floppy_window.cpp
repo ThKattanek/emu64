@@ -244,5 +244,6 @@ void FloppyWindow::RefreshD64Table(void)
 
 void FloppyWindow::on_D64Table_cellDoubleClicked(int row, int column)
 {
-    qDebug() << "Row: " << row << " -- Column:" << column;
+    d64[0].ExportPrg(row,"/home/thorsten/test.prg");
+   // qDebug() << "Row: " << row << " -- Column:" << column;
 }

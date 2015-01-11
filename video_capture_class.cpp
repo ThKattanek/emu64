@@ -62,8 +62,10 @@ int VideoCaptureClass::Start(char *filename, int video_bit_rate, int xw, int yw,
     cout << "CapureFilename: " << filename;
 
     // MPPEG1 Videoencoder finden
-    //codec = avcodec_find_encoder((AVCodecID)CODEC_ID_MPEG1VIDEO);
+    codec = avcodec_find_encoder(CODEC_ID_MPEG1VIDEO);
     if (!codec) return -4;              // Es wurde kein MPEG1 Videoencoder gefunden
+
+    vic = new unsigned char[xw * yw];
 
     codec_context = avcodec_alloc_context3(codec);
     picture = avcodec_alloc_frame();
@@ -139,23 +141,31 @@ void VideoCaptureClass::Stop()
     av_free(codec_context);
     av_free(picture->data[0]);
     av_free(picture);
+
+    delete vic;
 }
 
-void VideoCaptureClass::AddFrame(void *puffer, int xw, int )
+void VideoCaptureClass::AddFrame(void *puffer, int xw, int yw)
 {
     if(!CaptureIsRunning) return;
 
     AddFrameIsActive = true;
-    unsigned char *vic = (unsigned char*)puffer;
+    unsigned char *vic_src = (unsigned char*)puffer;
+
+    for(int i=0; i<(xw * yw);i++)
+    {
+        vic[i] = vic_src[i];
+    }
 
     /*
     fflush(stdout);
       // prepare a dummy image //
-
+         int i=0;
       // Y //
       for(int y=0;y<codec_context->height;y++) {
           for(int x=0;x<codec_context->width;x++) {
               picture->data[0][y * picture->linesize[0] + x] = x + y + i * 3;
+              i++;
           }
       }
 
@@ -164,12 +174,12 @@ void VideoCaptureClass::AddFrame(void *puffer, int xw, int )
           for(int x=0;x<codec_context->width/2;x++) {
               picture->data[1][y * picture->linesize[1] + x] = 128 + y + i * 2;
               picture->data[2][y * picture->linesize[2] + x] = 64 + x + i * 5;
+              i++;
           }
       }
-      */
+    */
 
     fflush(stdout);
-
     int i=0;
     for(int y=0;y<codec_context->height;y++)
     {

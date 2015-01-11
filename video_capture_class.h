@@ -48,6 +48,7 @@ private:
     int outbuf_size;
     unsigned char *outbuf;
     int out_size;
+    unsigned char *vic;
     bool AddFrameIsActive;
 
     unsigned char YUV_COLORS[16*4];

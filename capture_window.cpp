@@ -39,7 +39,7 @@ void CaptureWindow::RetranslateUi()
 
 void CaptureWindow::on_pushVideoCaptureStart_clicked()
 {
-    int ret = c64->StartVideoCapture((char*)"emu64.mpg");
+    int ret = c64->StartVideoCapture((char*)"/home/thorsten/emu64.mpg");
     if(ret != 0)
     {
         QMessageBox::critical(this,"Ein Fehler ist aufgetreten...","-- VideoCaptureClass --\nFehlerCode: " + QVariant(ret).toString());
