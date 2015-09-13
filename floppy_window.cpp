@@ -15,6 +15,7 @@
 
 #include <QFontDatabase>
 #include <QDebug>
+#include <QMenu>
 
 #include "floppy_window.h"
 #include "ui_floppy_window.h"
@@ -35,6 +36,10 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini) :
 
     connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(OnSelectFile(QString)));
     ui->FileBrowser->SetFileFilter(QStringList()<<"*.d64"<<"*.g64");
+
+    // Kontextmenü erstellen
+    ui->D64Table->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->D64Table, SIGNAL(customContextMenuRequested(QPoint)),SLOT(OnCustomMenuRequested(QPoint)));
 
     ui->D64Table->setRowCount(MAX_D64_FILES);
     ui->D64Table->setColumnCount(1);
@@ -162,6 +167,24 @@ void FloppyWindow::on_FloppySelect_currentIndexChanged(int index)
     }
 }
 
+void FloppyWindow::OnCustomMenuRequested(QPoint pos)
+{
+    QModelIndex index= ui->D64Table->indexAt(pos);
+
+    QMenu *menu=new QMenu(this);
+    menu->addAction(new QAction("Export --> PRG", this));
+    menu->popup(ui->D64Table->viewport()->mapToGlobal(pos));
+    connect(menu,SIGNAL(triggered(QAction*)),this,SLOT(OnD64KontexMenu(QAction*)));
+}
+
+void FloppyWindow::OnD64KontexMenu(QAction *actions)
+{
+    if(actions->text() == "Export --> PRG")
+    {
+        d64[0].ExportPrg(ui->D64Table->currentRow(),"/home/thorsten/test.prg");
+    }
+}
+
 QString FloppyWindow::GetAktFilename(int floppynr)
 {
     return AktFileName[floppynr];
@@ -240,10 +263,4 @@ void FloppyWindow::RefreshD64Table(void)
         w->SetLabels(filename,spur,sektor,adresse,size,typ);
         ui->D64Table->setRowHidden(i,false);
     }
-}
-
-void FloppyWindow::on_D64Table_cellDoubleClicked(int row, int column)
-{
-    d64[0].ExportPrg(row,"/home/thorsten/test.prg");
-   // qDebug() << "Row: " << row << " -- Column:" << column;
 }

@@ -45,11 +45,13 @@ signals:
     void ChangeFloppyImage(int floppynr);
 
 private slots:
+    void on_FloppySelect_currentIndexChanged(int index);
+
     void OnSelectFile(QString filename);
     void OnChangeFloppyNummer(int floppynr);
     void OnRemoveImage(int floppynr);
-    void on_FloppySelect_currentIndexChanged(int index);
-    void on_D64Table_cellDoubleClicked(int row, int column);
+    void OnCustomMenuRequested(QPoint pos);
+    void OnD64KontexMenu(QAction *actions);
 
 private:
     Ui::FloppyWindow *ui;
