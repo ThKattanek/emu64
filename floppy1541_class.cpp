@@ -15,10 +15,14 @@
 
 #include "floppy1541_class.h"
 
+#include <QDebug>
+
 Floppy1541::Floppy1541(bool *reset, int samplerate,int puffersize, bool *floppy_found_breakpoint):
     FloppyEnabled(false)
 
 {
+    zyklen = zyklen_old = 0;
+
     RESET = reset;
     GCR_PTR = 0;
     BreakGroupAnz = 0;
@@ -691,6 +695,7 @@ unsigned char* Floppy1541::GetRamPointer(void)
 
 bool Floppy1541::OneZyklus(void)
 {
+    zyklen++;
     if(FloppySoundEnabled)
     {
         if(DiskMotorOn != MotorStatusOld)
@@ -840,6 +845,9 @@ L1:
 
 unsigned char Floppy1541::ReadGCRByte(void)
 {
+    qDebug() << "Zyklen zwisch GCR Bytes:" << zyklen - zyklen_old;
+    zyklen_old = zyklen;
+
     AktGCRWert = *GCR_PTR++;	// Rotate disk
     if (GCR_PTR >= GCRSpurEnde) GCR_PTR = GCRSpurStart;
     return	AktGCRWert;

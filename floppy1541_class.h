@@ -116,6 +116,9 @@ private:
 
     /// Variablen ///
 
+    int     zyklen;
+    int     zyklen_old;
+
     bool                FloppyEnabled;
 
     REG_STRUCT rs;
