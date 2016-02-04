@@ -73,6 +73,7 @@ public:
     int LoadBreakGroups(char *filename);
     bool SaveBreakGroups(char *filename);
     bool CheckBreakpoints(void);
+    bool ExportGCRTrack(const char *filename, int spur);
 
     /// Wird mit den einzelnen Chips verbunden via "bind" ///
 

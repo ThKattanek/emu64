@@ -39,7 +39,6 @@
 #include "debugger_window.h"
 #include "setup_window.h"
 #include "c64_speed_window.h"
-#include "capture_window.h"
 
 #include "c64_class.h"
 
@@ -103,8 +102,6 @@ private slots:
     void on_actionGEO_speichern_triggered();
     void on_actionGEO_loeschen_triggered();
 
-    void on_actionVideo_Capture_triggered();
-
 protected:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
@@ -137,7 +134,6 @@ private:
     DebuggerWindow *debugger_window;            // Debugger / Disassembler Fenster
     SetupWindow *setup_window;                  // Setup Fenster
     C64SpeedWindow *speed_window;               // C64 Speed Window
-    CaptureWindow * capture_window;             // Video und Sound Aufnahme Window
 
     QStringList commandLine;                    // Enthält den an Emu64 übergebenen String
 };

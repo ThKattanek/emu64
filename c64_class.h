@@ -28,7 +28,6 @@
 #include "georam_class.h"
 #include "floppy1541_class.h"
 #include "cpu_info.h"
-#include "video_capture_class.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
@@ -118,8 +117,6 @@ public:
     unsigned char GetMapWriteDestination(unsigned char page);
 
     void SaveScreenshot(char *filename);
-    int StartVideoCapture(char *filename);
-    void StopVideoCapture();
 
     int             AktWindowXW;
     int             AktWindowYW;
@@ -218,8 +215,6 @@ public:
 
     bool StartScreenshot;
     char ScreenshotFilename[1024];
-
-    VideoCaptureClass *video_cap;
 
 private:
     void CalcDistortionGrid();

@@ -239,6 +239,8 @@ bool Floppy1541::LoadDiskImage(char* filename)
         WriteProtected = !WriteProtected;
         */
 
+        //ExportGCRTrack("/home/thorsten/test.trk",18);
+
         return true;
     }
 
@@ -390,11 +392,12 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
     for (int z=0;z<256;z++) block[z]=D64Image[TEMP+z];
 
     // Create GCR header (15 Bytes)
+    // SYNC
     *P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
     buffer[0] = 0x08;							// Header mark
     buffer[1] = sektor ^ spur ^ id2 ^ id1;		// Checksum
     buffer[2] = sektor;
@@ -405,22 +408,23 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
     buffer[2] = 0x0F;
     buffer[3] = 0x0F;
     ConvertToGCR(buffer, P+5);
-    P += 9;
+    P += 10;
 
     // Create GCR data (338 Bytes)
     unsigned char SUM;
-    *P++ = 0xFF;
     // SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
     buffer[0] = 0x07;							// Data mark
     SUM = buffer[1] = block[0];
     SUM ^= buffer[2] = block[1];
     SUM ^= buffer[3] = block[2];
     ConvertToGCR(buffer, P);
     P += 5;
+
     for (int i=3; i<255; i+=4)
     {
         SUM ^= buffer[0] = block[i];
@@ -430,12 +434,14 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
         ConvertToGCR(buffer, P);
         P += 5;
     }
+
     SUM ^= buffer[0] = block[255];
     buffer[1] = SUM;							// Checksum
     buffer[2] = 0;
     buffer[3] = 0;
     ConvertToGCR(buffer, P);
     P += 5;
+
     memset(P, 0x55, 8);							// Gap
 }
 
@@ -1203,4 +1209,28 @@ bool Floppy1541::CheckBreakpoints(void)
         return true;
     }
     else return false;
+}
+
+bool Floppy1541::ExportGCRTrack(const char *filename, int spur)
+{
+    if(spur < 1 || spur > 35) return false;
+
+    FILE *file;
+
+    file = fopen (filename, "wb");
+    if (file == NULL)
+    {
+            return false;
+    }
+
+    // SektorSize 353*
+
+    unsigned char *P = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE;
+    unsigned short size = NUM_SECTORS[spur-1] * GCR_SECTOR_SIZE;
+
+    fwrite(P,size,1,file);
+
+    fclose(file);
+
+    return true;
 }

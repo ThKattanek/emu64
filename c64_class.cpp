@@ -385,13 +385,10 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
 
     for(int i=0;i<0x10000;i++) Breakpoints[i] = 0;
 
-    video_cap = new VideoCaptureClass();
 }
 
 C64Class::~C64Class()
 {
-    if(video_cap != NULL) delete video_cap;
-
     LoopThreadEnd = true;
     SDL_WaitThread(sdl_thread,0);
 
@@ -1098,13 +1095,6 @@ int SDLThread(void *userdat)
                             glVertex3f(c64->DistortionGrid[i*4+3].x,c64->DistortionGrid[i*4+3].y,0.0);
                         }
                         glEnd();
-                    }
-
-                    // Video Capture //
-                    if(c64->NewVicRefresh)
-                    {
-                        c64->NewVicRefresh = false;
-                        c64->video_cap->AddFrame(c64->vic_puffer,504,311);
                     }
 
                     /// Die Pfeile werden nur beim lernen angezeigt ///
@@ -2549,16 +2539,6 @@ void C64Class::SaveScreenshot(char *filename)
 {
     strcpy(ScreenshotFilename,filename);
     StartScreenshot = true;
-}
-
-int C64Class::StartVideoCapture(char *filename)
-{
-    return video_cap->Start(filename,4000000,504,312,50);
-}
-
-void C64Class::StopVideoCapture()
-{
-    video_cap->Stop();
 }
 
 int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)
