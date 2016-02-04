@@ -135,27 +135,27 @@ RESOURCES += \
 linux-g++-32{
 TARGET = emu64
 DESTDIR = "bin/linux_32bit"
-LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU -lavcodec -lavutil
+LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU
 }
 
 linux-g++-64{
 TARGET = emu64
 DESTDIR = "bin/linux_64bit"
-LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU -lavcodec -lavutil
+LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU
 }
 
 win32-g++{
 TARGET = emu64
 RC_FILE = emu64.rc
 DESTDIR = "bin/win_x32"
-LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image -lavcodec -lavutil
+LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image
 }
 
 win32-x-g++{
 TARGET = emu64
 RC_FILE = emu64.rc
 DESTDIR = "bin/win_x32"
-LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image -lavcodec -lavutil
+LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image
 }
 
 OTHER_FILES += \

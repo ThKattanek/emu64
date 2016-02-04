@@ -181,7 +181,7 @@ void FloppyWindow::OnD64KontexMenu(QAction *actions)
 {
     if(actions->text() == "Export --> PRG")
     {
-        d64[0].ExportPrg(ui->D64Table->currentRow(),"/home/thorsten/test.prg");
+        //d64[0].ExportPrg(ui->D64Table->currentRow(),"/home/thorsten/test.prg");
     }
 }
 
