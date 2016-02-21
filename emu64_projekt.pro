@@ -144,11 +144,12 @@ DESTDIR = "bin/linux_64bit"
 LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU
 }
 
-win32-g++{
+win32{
+DEFINES += QUAZIP_STATIC
 TARGET = emu64
 RC_FILE = emu64.rc
 DESTDIR = "bin/win_x32"
-LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image
+LIBS += $$system(i686-w64-mingw32.static-sdl-config --libs) $$system(i686-w64-mingw32.static-pkg-config SDL_image SDL_gfx glew --libs) -lquazip -lSDL_gfx -lSDL_image
 }
 
 win32-x-g++{
