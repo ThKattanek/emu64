@@ -1,5 +1,9 @@
 # Emu64 by Thorsten Kattanek
 
+# Versionsnummer ermitteln aus Git Tag Nummer
+GIT_VERSION = $$system(git --git-dir \"$$PWD/.git\" describe --always --tags)
+DEFINES += str_emu64_version=\\\"$$GIT_VERSION\\\"
+
 TRANSLATIONS = emu64_de.ts
 TRANSLATIONS = emu64_en.ts
 
@@ -54,7 +58,6 @@ SOURCES += \
     debugger_iec_window.cpp
 
 HEADERS  += \
-    version.h \
     info_window.h \
     main_window.h \
     mos6581_8085_wellenformen.h \

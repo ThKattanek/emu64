@@ -15,7 +15,6 @@
 
 #include "main_window.h"
 #include "ui_main_window.h"
-#include "version.h"
 
 #include <QDebug>
 #include <QDir>

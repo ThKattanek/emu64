@@ -65,15 +65,15 @@
   <widget class="QLabel" name="Emu64Version">
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>130</x>
      <y>4</y>
-     <width>201</width>
+     <width>211</width>
      <height>25</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>13</pointsize>
+     <pointsize>10</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>

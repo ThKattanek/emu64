@@ -16,7 +16,6 @@
 #ifndef C64CLASS_H
 #define C64CLASS_H
 
-#include "version.h"
 #include "videopal_class.h"
 #include "mmu_class.h"
 #include "mos6510_class.h"

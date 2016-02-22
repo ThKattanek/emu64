@@ -15,7 +15,6 @@
 
 #include "single_application.h"
 #include "main_window.h"
-#include "version.h"
 
 #include "custom_splashscreen.h"
 #include <QBitmap>
