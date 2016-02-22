@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////
 //                                              //
 // Emu64                                        //
 // von Thorsten Kattanek                        //
@@ -134,7 +134,7 @@ void TVSetupWindow::on_horblurUV_scroll_valueChanged(int value)
 void TVSetupWindow::on_phase_scroll_valueChanged(int value)
 {
     float winkel = (value - 1000) * 0.045f;
-    ui->phase_out->setText(QVariant(winkel).toString() + "°");
+    ui->phase_out->setText(QVariant(winkel).toString() + trUtf8("°"));
     videopal->SetPhaseAltLineOffset(value);
     videopal->UpdateParameter();
 }
