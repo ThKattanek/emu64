@@ -134,29 +134,31 @@ RESOURCES += \
 
 linux-g++-32{
 TARGET = emu64
-DESTDIR = "bin/linux_32bit"
+DESTDIR = "32Bit"
 LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU
 }
 
 linux-g++-64{
 TARGET = emu64
-DESTDIR = "bin/linux_64bit"
+DESTDIR = "64Bit"
 LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU
 }
 
+# Windows Crossbuild with MXE
 win32{
-DEFINES += QUAZIP_STATIC
-TARGET = emu64
-RC_FILE = emu64.rc
-DESTDIR = "bin/win_x32"
-LIBS += $$system(i686-w64-mingw32.static-sdl-config --libs) $$system(i686-w64-mingw32.static-pkg-config SDL_image SDL_gfx glew --libs) -lquazip -lSDL_gfx -lSDL_image
+
+win32:contains(ARCH, x86_64):{
+    DESTDIR = "bin"
+    TARGET = emu64_x64
+}else{
+    DESTDIR = "bin"
+    TARGET = emu64_x86
 }
 
-win32-x-g++{
-TARGET = emu64
+DEFINES += QUAZIP_STATIC
 RC_FILE = emu64.rc
-DESTDIR = "bin/win_x32"
-LIBS += -lSDL -lquazip -lopengl32 -lglu32 -lSDL_gfx -lSDL_image
+LIBS += $$system($$ARCH-w64-mingw32.$$LINKTYP-sdl-config --libs) $$system($$ARCH-w64-mingw32.$$LINKTYP-pkg-config SDL_image SDL_gfx glew --libs) -lquazip -lSDL_gfx -lSDL_image
+
 }
 
 OTHER_FILES += \
