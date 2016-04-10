@@ -73,7 +73,6 @@ public:
     int LoadBreakGroups(char *filename);
     bool SaveBreakGroups(char *filename);
     bool CheckBreakpoints(void);
-    bool ExportGCRTrack(const char *filename, int spur);
 
     /// Wird mit den einzelnen Chips verbunden via "bind" ///
 
@@ -117,10 +116,7 @@ private:
 
     /// Variablen ///
 
-    int     zyklen;
-    int     zyklen_old;
-
-    bool                FloppyEnabled;
+    bool    FloppyEnabled;
 
     REG_STRUCT rs;
 

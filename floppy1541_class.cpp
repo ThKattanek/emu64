@@ -21,8 +21,6 @@ Floppy1541::Floppy1541(bool *reset, int samplerate,int puffersize, bool *floppy_
     FloppyEnabled(false)
 
 {
-    zyklen = zyklen_old = 0;
-
     RESET = reset;
     GCR_PTR = 0;
     BreakGroupAnz = 0;
@@ -701,7 +699,6 @@ unsigned char* Floppy1541::GetRamPointer(void)
 
 bool Floppy1541::OneZyklus(void)
 {
-    zyklen++;
     if(FloppySoundEnabled)
     {
         if(DiskMotorOn != MotorStatusOld)
@@ -851,9 +848,6 @@ L1:
 
 unsigned char Floppy1541::ReadGCRByte(void)
 {
-    qDebug() << "Zyklen zwisch GCR Bytes:" << zyklen - zyklen_old;
-    zyklen_old = zyklen;
-
     AktGCRWert = *GCR_PTR++;	// Rotate disk
     if (GCR_PTR >= GCRSpurEnde) GCR_PTR = GCRSpurStart;
     return	AktGCRWert;
@@ -1209,28 +1203,4 @@ bool Floppy1541::CheckBreakpoints(void)
         return true;
     }
     else return false;
-}
-
-bool Floppy1541::ExportGCRTrack(const char *filename, int spur)
-{
-    if(spur < 1 || spur > 35) return false;
-
-    FILE *file;
-
-    file = fopen (filename, "wb");
-    if (file == NULL)
-    {
-            return false;
-    }
-
-    // SektorSize 353*
-
-    unsigned char *P = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE;
-    unsigned short size = NUM_SECTORS[spur-1] * GCR_SECTOR_SIZE;
-
-    fwrite(P,size,1,file);
-
-    fclose(file);
-
-    return true;
 }
