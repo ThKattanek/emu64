@@ -122,15 +122,17 @@
         <source>Weiter</source>
         <translation></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="c64_speed_window.cpp" line="150"/>
         <source>Lässt den C64, mit der eingestellten Geschwindigkeit, weiterlaufen.</source>
-        <translation>Lässt den C64 mit der eingestellten Geschwindigkeit weiterlaufen.</translation>
+        <oldsource>LÃ¤sst den C64, mit der eingestellten Geschwindigkeit, weiterlaufen.</oldsource>
+        <translation type="unfinished">Lässt den C64 mit der eingestellten Geschwindigkeit weiterlaufen.</translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="c64_speed_window.cpp" line="154"/>
         <source>Hält den C64 komplett an.</source>
-        <translation></translation>
+        <oldsource>HÃ¤lt den C64 komplett an.</oldsource>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -276,10 +278,45 @@
         <source>CRT Fehler</source>
         <translation></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="crt_window.cpp" line="317"/>
         <source>Fehler beim Laden des ausgewählten CRT Files</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DebuggerIECWindow</name>
+    <message>
+        <location filename="debugger_iec_window.ui" line="14"/>
+        <source>IEC BUS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="debugger_iec_window.ui" line="46"/>
+        <source>C64 Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="debugger_iec_window.ui" line="71"/>
+        <source>Floppy Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="debugger_iec_window.ui" line="98"/>
+        <location filename="debugger_iec_window.ui" line="260"/>
+        <source>DATA:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="debugger_iec_window.ui" line="156"/>
+        <location filename="debugger_iec_window.ui" line="312"/>
+        <source>CLK:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="debugger_iec_window.ui" line="208"/>
+        <source>ATN:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -670,1178 +707,1198 @@ Testzwecken.</translation>
         <source>Liste aller Haltepunkte.</source>
         <translation></translation>
     </message>
-    <message>
-        <location filename="debugger_window.cpp" line="207"/>
-        <location filename="debugger_window.cpp" line="226"/>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="213"/>
+        <location filename="debugger_window.cpp" line="232"/>
         <source>ERFÜLLT !</source>
-        <translation>ERFÜLLT!</translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="239"/>
-        <location filename="debugger_window.cpp" line="388"/>
-        <source>Opcode von PC-Adresse holen // PC+1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="240"/>
-        <location filename="debugger_window.cpp" line="389"/>
-        <source>Lesen von PC-Adresse und verwerfen // PC+1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="241"/>
-        <location filename="debugger_window.cpp" line="390"/>
-        <source>PC Hi -&gt; Stack // SR|16 // SP-1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="242"/>
-        <location filename="debugger_window.cpp" line="391"/>
-        <source>PC Lo -&gt; Stack // SP-1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="243"/>
-        <location filename="debugger_window.cpp" line="392"/>
-        <source>SR -&gt; Stack // SR|4 // SP-1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="244"/>
-        <location filename="debugger_window.cpp" line="393"/>
-        <source>PC Lo von 0xFFFE holen</source>
-        <translation></translation>
+        <translation type="unfinished">ERFÜLLT!</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="245"/>
         <location filename="debugger_window.cpp" line="394"/>
-        <source>PC Hi von 0xFFFF holen</source>
+        <source>Opcode von PC-Adresse holen // PC+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="246"/>
         <location filename="debugger_window.cpp" line="395"/>
-        <source>Pointer von PC-Adresse holen // PC+1</source>
+        <source>Lesen von PC-Adresse und verwerfen // PC+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="247"/>
         <location filename="debugger_window.cpp" line="396"/>
-        <source>Lesen von Pointer und verwerfen // Pointer+XR</source>
+        <source>PC Hi -&gt; Stack // SR|16 // SP-1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="248"/>
         <location filename="debugger_window.cpp" line="397"/>
-        <source>Adresse Lo von Pointer-Adresse holen // Pointer+1</source>
+        <source>PC Lo -&gt; Stack // SP-1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="249"/>
         <location filename="debugger_window.cpp" line="398"/>
-        <source>Adresse Hi von Pointer-Adresse holen</source>
+        <source>SR -&gt; Stack // SR|4 // SP-1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="250"/>
         <location filename="debugger_window.cpp" line="399"/>
-        <source>TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ)</source>
+        <source>PC Lo von 0xFFFE holen</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="251"/>
         <location filename="debugger_window.cpp" line="400"/>
-        <source>JAM</source>
+        <source>PC Hi von 0xFFFF holen</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="252"/>
         <location filename="debugger_window.cpp" line="401"/>
-        <source>TMPByte von Adresse holen</source>
+        <source>Pointer von PC-Adresse holen // PC+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="253"/>
         <location filename="debugger_window.cpp" line="402"/>
-        <source>TMPByte nach Adresse schreiben // ASL MEMORY // ORA</source>
+        <source>Lesen von Pointer und verwerfen // Pointer+XR</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="254"/>
         <location filename="debugger_window.cpp" line="403"/>
-        <source>TMPByte nach Adresse schreiben</source>
+        <source>Adresse Lo von Pointer-Adresse holen // Pointer+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="255"/>
         <location filename="debugger_window.cpp" line="404"/>
-        <source>Adresse Hi = 0 // Adresse Lo von PC-Adresse holen // PC+1</source>
+        <source>Adresse Hi von Pointer-Adresse holen</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="256"/>
         <location filename="debugger_window.cpp" line="405"/>
-        <source>TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ))</source>
+        <source>TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="257"/>
         <location filename="debugger_window.cpp" line="406"/>
-        <source>TMPByte nach Adresse schreiben // TMPByte&lt;&lt;1 // Set SR(NZC)</source>
+        <source>JAM</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="258"/>
         <location filename="debugger_window.cpp" line="407"/>
-        <source>TMPByte von PC-Adresse holen</source>
+        <source>TMPByte von Adresse holen</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="259"/>
         <location filename="debugger_window.cpp" line="408"/>
-        <source>SR nach SP+0x0100 schreiben // SP-1</source>
+        <source>TMPByte nach Adresse schreiben // ASL MEMORY // ORA</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="260"/>
         <location filename="debugger_window.cpp" line="409"/>
-        <source>TMPByte von PC-Adresse holen // AC or TMPByte // Set SR(NZ) // PC+1</source>
+        <source>TMPByte nach Adresse schreiben</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="261"/>
         <location filename="debugger_window.cpp" line="410"/>
-        <source>TMPByte von PC-Adresse holen // AC&lt;&lt;1 // Set SR(NZC)</source>
+        <source>Adresse Hi = 0 // Adresse Lo von PC-Adresse holen // PC+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="262"/>
         <location filename="debugger_window.cpp" line="411"/>
-        <source>TMPByte von PC-Adresse holen // AC and TMPByte // Set SR(NZC) // PC+1</source>
+        <source>TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ))</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="263"/>
         <location filename="debugger_window.cpp" line="412"/>
-        <source>Adresse Lo von PC-Adresse holen // PC+1</source>
+        <source>TMPByte nach Adresse schreiben // TMPByte&lt;&lt;1 // Set SR(NZC)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="264"/>
         <location filename="debugger_window.cpp" line="413"/>
-        <source>Adresse Hi von PC-Adresse holen // PC+1</source>
+        <source>TMPByte von PC-Adresse holen</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="265"/>
         <location filename="debugger_window.cpp" line="414"/>
-        <source>TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prüfen (BPL)</source>
+        <source>SR nach SP+0x0100 schreiben // SP-1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="266"/>
         <location filename="debugger_window.cpp" line="415"/>
-        <source>TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prüfen (BMI)</source>
+        <source>TMPByte von PC-Adresse holen // AC or TMPByte // Set SR(NZ) // PC+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="267"/>
         <location filename="debugger_window.cpp" line="416"/>
-        <source>TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prüfen (BVC)</source>
+        <source>TMPByte von PC-Adresse holen // AC&lt;&lt;1 // Set SR(NZC)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="268"/>
         <location filename="debugger_window.cpp" line="417"/>
-        <source>TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prüfen (BVS)</source>
+        <source>TMPByte von PC-Adresse holen // AC and TMPByte // Set SR(NZC) // PC+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="269"/>
         <location filename="debugger_window.cpp" line="418"/>
-        <source>TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prüfen (BCC)</source>
+        <source>Adresse Lo von PC-Adresse holen // PC+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="270"/>
         <location filename="debugger_window.cpp" line="419"/>
-        <source>TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prüfen (BCS)</source>
+        <source>Adresse Hi von PC-Adresse holen // PC+1</source>
         <translation></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="debugger_window.cpp" line="271"/>
         <location filename="debugger_window.cpp" line="420"/>
-        <source>TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prüfen (BNE)</source>
-        <translation></translation>
+        <source>TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prüfen (BPL)</source>
+        <oldsource>TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prÃ¼fen (BPL)</oldsource>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="debugger_window.cpp" line="272"/>
         <location filename="debugger_window.cpp" line="421"/>
-        <source>TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prüfen (BEQ)</source>
-        <translation></translation>
+        <source>TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prüfen (BMI)</source>
+        <oldsource>TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prÃ¼fen (BMI)</oldsource>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="debugger_window.cpp" line="273"/>
         <location filename="debugger_window.cpp" line="422"/>
-        <source>Lesen von PC-Adresse und verwerfen // BranchAdresse=PC+TMPByte</source>
-        <translation></translation>
+        <source>TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prüfen (BVC)</source>
+        <oldsource>TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prÃ¼fen (BVC)</oldsource>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="debugger_window.cpp" line="274"/>
         <location filename="debugger_window.cpp" line="423"/>
-        <source>FIX PC Hi Adresse</source>
-        <translation></translation>
+        <source>TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prüfen (BVS)</source>
+        <oldsource>TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prÃ¼fen (BVS)</oldsource>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="debugger_window.cpp" line="275"/>
         <location filename="debugger_window.cpp" line="424"/>
-        <source>Adresse Hi von Pointer-Adresse holen // Adresse+YR</source>
-        <translation></translation>
+        <source>TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prüfen (BCC)</source>
+        <oldsource>TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prÃ¼fen (BCC)</oldsource>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="debugger_window.cpp" line="276"/>
         <location filename="debugger_window.cpp" line="425"/>
-        <source>TMPByte von Adresse holen // Fix Adresse Hi MCT+1 // AC or TMPByte</source>
-        <translation></translation>
+        <source>TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prüfen (BCS)</source>
+        <oldsource>TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prÃ¼fen (BCS)</oldsource>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="debugger_window.cpp" line="277"/>
         <location filename="debugger_window.cpp" line="426"/>
-        <source>Adresse Hi von PC-Adresse holen // PC=Adresse</source>
-        <translation></translation>
+        <source>TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prüfen (BNE)</source>
+        <oldsource>TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prÃ¼fen (BNE)</oldsource>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="debugger_window.cpp" line="278"/>
         <location filename="debugger_window.cpp" line="427"/>
-        <source>Lesen von PC-Adresse und verwerfen // XR=AC // Set SR(NZ)</source>
-        <translation></translation>
+        <source>TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prüfen (BEQ)</source>
+        <oldsource>TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prÃ¼fen (BEQ)</oldsource>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="279"/>
         <location filename="debugger_window.cpp" line="428"/>
-        <source>Lesen von PC-Adresse und verwerfen // YR=AC // Set SR(NZ)</source>
+        <source>Lesen von PC-Adresse und verwerfen // BranchAdresse=PC+TMPByte</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="280"/>
         <location filename="debugger_window.cpp" line="429"/>
-        <source>Lesen von PC-Adresse und verwerfen // XR=SP // Set SR(NZ)</source>
+        <source>FIX PC Hi Adresse</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="281"/>
         <location filename="debugger_window.cpp" line="430"/>
-        <source>Lesen von PC-Adresse und verwerfen // AC=XR // Set SR(NZ)</source>
+        <source>Adresse Hi von Pointer-Adresse holen // Adresse+YR</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="282"/>
         <location filename="debugger_window.cpp" line="431"/>
-        <source>Lesen von PC-Adresse und verwerfen // SP=XR</source>
+        <source>TMPByte von Adresse holen // Fix Adresse Hi MCT+1 // AC or TMPByte</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="283"/>
         <location filename="debugger_window.cpp" line="432"/>
-        <source>Lesen von PC-Adresse und verwerfen // AC=YR // Set SR(NZ)</source>
+        <source>Adresse Hi von PC-Adresse holen // PC=Adresse</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="284"/>
         <location filename="debugger_window.cpp" line="433"/>
-        <source>AC nach SP+0x0100 schreiben // SP-1</source>
+        <source>Lesen von PC-Adresse und verwerfen // XR=AC // Set SR(NZ)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="285"/>
         <location filename="debugger_window.cpp" line="434"/>
-        <source>AC von SP+0x0100 lesen // SP+1</source>
+        <source>Lesen von PC-Adresse und verwerfen // YR=AC // Set SR(NZ)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="286"/>
         <location filename="debugger_window.cpp" line="435"/>
-        <source>AC von SP+0x0100 lesen // Set SR(NZ)</source>
+        <source>Lesen von PC-Adresse und verwerfen // XR=SP // Set SR(NZ)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="287"/>
         <location filename="debugger_window.cpp" line="436"/>
-        <source>SR von SP+0x0100 lesen // SP+1</source>
+        <source>Lesen von PC-Adresse und verwerfen // AC=XR // Set SR(NZ)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="288"/>
         <location filename="debugger_window.cpp" line="437"/>
-        <source>SR von SP+0x0100 lesen</source>
+        <source>Lesen von PC-Adresse und verwerfen // SP=XR</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="289"/>
         <location filename="debugger_window.cpp" line="438"/>
-        <source>TMPByte von PC-Adresse lesen // AC + TMPByte + Carry // PC+1</source>
+        <source>Lesen von PC-Adresse und verwerfen // AC=YR // Set SR(NZ)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="290"/>
         <location filename="debugger_window.cpp" line="439"/>
-        <source>TMPByte von Adresse lesen // AC + TMPByte + Carry</source>
+        <source>AC nach SP+0x0100 schreiben // SP-1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="291"/>
         <location filename="debugger_window.cpp" line="440"/>
-        <source>TMPByte von Adresse lesen // Adresse Lo + XR</source>
+        <source>AC von SP+0x0100 lesen // SP+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="292"/>
         <location filename="debugger_window.cpp" line="441"/>
-        <source>Adresse Hi von PC-Adresse holen // Adresse+XR  // PC+1</source>
+        <source>AC von SP+0x0100 lesen // Set SR(NZ)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="293"/>
         <location filename="debugger_window.cpp" line="442"/>
-        <source>Adresse Hi von PC-Adresse holen // Adresse+YR  // PC+1</source>
+        <source>SR von SP+0x0100 lesen // SP+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="294"/>
         <location filename="debugger_window.cpp" line="443"/>
-        <source>TMPByte von Adresse lesen // AC + TMPByte + Carry // if(idxReg&lt;Adresse Lo) MCT++</source>
+        <source>SR von SP+0x0100 lesen</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="295"/>
         <location filename="debugger_window.cpp" line="444"/>
-        <source>TMPByte von PC-Adresse lesen // AC - TMPByte - Carry // PC+1</source>
+        <source>TMPByte von PC-Adresse lesen // AC + TMPByte + Carry // PC+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="296"/>
         <location filename="debugger_window.cpp" line="445"/>
-        <source>TMPByte von Adresse lesen // AC - TMPByte - Carry</source>
+        <source>TMPByte von Adresse lesen // AC + TMPByte + Carry</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="297"/>
         <location filename="debugger_window.cpp" line="446"/>
-        <source>TMPByte von Adresse lesen // AC - TMPByte - Carry // if(idxReg&lt;Adresse Lo) MCT++</source>
+        <source>TMPByte von Adresse lesen // Adresse Lo + XR</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="298"/>
         <location filename="debugger_window.cpp" line="447"/>
-        <source>TMPByte von SP+0x0100 holen</source>
+        <source>Adresse Hi von PC-Adresse holen // Adresse+XR  // PC+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="299"/>
         <location filename="debugger_window.cpp" line="448"/>
-        <source>PC-Adresse Hi nach SP+0x0100 schreiben // SP--</source>
+        <source>Adresse Hi von PC-Adresse holen // Adresse+YR  // PC+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="300"/>
         <location filename="debugger_window.cpp" line="449"/>
-        <source>PC-Adresse Lo nach SP+0x0100 schreiben // SP--</source>
+        <source>TMPByte von Adresse lesen // AC + TMPByte + Carry // if(idxReg&lt;Adresse Lo) MCT++</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="301"/>
         <location filename="debugger_window.cpp" line="450"/>
-        <source>TMPByte von SP+0x0100 holen // SP+1</source>
+        <source>TMPByte von PC-Adresse lesen // AC - TMPByte - Carry // PC+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="302"/>
         <location filename="debugger_window.cpp" line="451"/>
-        <source>PC-Adresse Lo von SP+0x0100 holen // SP+1</source>
+        <source>TMPByte von Adresse lesen // AC - TMPByte - Carry</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="303"/>
         <location filename="debugger_window.cpp" line="452"/>
-        <source>PC-Adresse Hi von SP+0x0100 holen</source>
+        <source>TMPByte von Adresse lesen // AC - TMPByte - Carry // if(idxReg&lt;Adresse Lo) MCT++</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="304"/>
         <location filename="debugger_window.cpp" line="453"/>
-        <source>TMPByte von PC-Adresse laden // PC+1</source>
+        <source>TMPByte von SP+0x0100 holen</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="305"/>
         <location filename="debugger_window.cpp" line="454"/>
-        <source>TMPByte von PC-Adresse lesen // AC and TMPByte // Set SR(NZ) // PC+1</source>
+        <source>PC-Adresse Hi nach SP+0x0100 schreiben // SP--</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="306"/>
         <location filename="debugger_window.cpp" line="455"/>
-        <source>TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ)</source>
+        <source>PC-Adresse Lo nach SP+0x0100 schreiben // SP--</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="307"/>
         <location filename="debugger_window.cpp" line="456"/>
-        <source>TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ) // if(idxReg&lt;Adresse Lo) MCT++</source>
+        <source>TMPByte von SP+0x0100 holen // SP+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="308"/>
         <location filename="debugger_window.cpp" line="457"/>
-        <source>TMPByte von Adresse lesen // CarrayFalg=0</source>
-        <translation>TMPByte von Adresse lesen // CarryFlag=0</translation>
+        <source>PC-Adresse Lo von SP+0x0100 holen // SP+1</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="309"/>
         <location filename="debugger_window.cpp" line="458"/>
-        <source>TMPByte von Adresse lesen // DezimalFalg=0</source>
-        <translation>TMPByte von Adresse lesen // CarrayFlag=0</translation>
+        <source>PC-Adresse Hi von SP+0x0100 holen</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="310"/>
         <location filename="debugger_window.cpp" line="459"/>
-        <source>TMPByte von Adresse lesen // InterruptFalg=0</source>
-        <translation>TMPByte von Adresse lesen // InterruptFlag=0</translation>
+        <source>TMPByte von PC-Adresse laden // PC+1</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="311"/>
         <location filename="debugger_window.cpp" line="460"/>
-        <source>TMPByte von Adresse lesen // OverflowFalg=0</source>
-        <translation>TMPByte von Adresse lesen // OverflowFlag=0</translation>
+        <source>TMPByte von PC-Adresse lesen // AC and TMPByte // Set SR(NZ) // PC+1</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="312"/>
         <location filename="debugger_window.cpp" line="461"/>
-        <source>TMPByte von Adresse lesen // CarrayFalg=1	</source>
-        <translation>TMPByte von Adresse lesen // CarrayFlag=1	</translation>
+        <source>TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ)</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="313"/>
         <location filename="debugger_window.cpp" line="462"/>
-        <source>TMPByte von Adresse lesen // DezimalFalg=1</source>
-        <translation>TMPByte von Adresse lesen // DezimalFlag=1</translation>
+        <source>TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ) // if(idxReg&lt;Adresse Lo) MCT++</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="314"/>
         <location filename="debugger_window.cpp" line="463"/>
-        <source>TMPByte von Adresse lesen // InterruptFalg=1</source>
-        <translation>TMPByte von Adresse lesen // InterruptFlag=1</translation>
+        <source>TMPByte von Adresse lesen // CarrayFalg=0</source>
+        <translation>TMPByte von Adresse lesen // CarryFlag=0</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="315"/>
         <location filename="debugger_window.cpp" line="464"/>
-        <source>TMPByte von Adresse lesen // BIT Operation</source>
-        <translation></translation>
+        <source>TMPByte von Adresse lesen // DezimalFalg=0</source>
+        <translation>TMPByte von Adresse lesen // CarrayFlag=0</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="316"/>
         <location filename="debugger_window.cpp" line="465"/>
-        <source>AC nach Adresse schreiben</source>
-        <translation></translation>
+        <source>TMPByte von Adresse lesen // InterruptFalg=0</source>
+        <translation>TMPByte von Adresse lesen // InterruptFlag=0</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="317"/>
         <location filename="debugger_window.cpp" line="466"/>
-        <source>XR nach Adresse schreiben</source>
-        <translation></translation>
+        <source>TMPByte von Adresse lesen // OverflowFalg=0</source>
+        <translation>TMPByte von Adresse lesen // OverflowFlag=0</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="318"/>
         <location filename="debugger_window.cpp" line="467"/>
-        <source>YR nach Adresse schreiben</source>
-        <translation></translation>
+        <source>TMPByte von Adresse lesen // CarrayFalg=1	</source>
+        <translation>TMPByte von Adresse lesen // CarrayFlag=1	</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="319"/>
         <location filename="debugger_window.cpp" line="468"/>
-        <source>AC von PC-Adresse lesen // Set SR(NZ) // PC+1</source>
-        <translation></translation>
+        <source>TMPByte von Adresse lesen // DezimalFalg=1</source>
+        <translation>TMPByte von Adresse lesen // DezimalFlag=1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="320"/>
         <location filename="debugger_window.cpp" line="469"/>
-        <source>AC von PC-Adresse lesen // Set SR(NZ)</source>
-        <translation></translation>
+        <source>TMPByte von Adresse lesen // InterruptFalg=1</source>
+        <translation>TMPByte von Adresse lesen // InterruptFlag=1</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="321"/>
         <location filename="debugger_window.cpp" line="470"/>
-        <source>AC von PC-Adresse lesen // Set SR(NZ) // if(idxReg&lt;Adresse Lo) MCT++</source>
+        <source>TMPByte von Adresse lesen // BIT Operation</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="322"/>
         <location filename="debugger_window.cpp" line="471"/>
-        <source>XR von PC-Adresse lesen // Set SR(NZ) // PC+1</source>
+        <source>AC nach Adresse schreiben</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="323"/>
         <location filename="debugger_window.cpp" line="472"/>
-        <source>XR von Adresse lesen // Set SR(NZ)</source>
+        <source>XR nach Adresse schreiben</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="324"/>
         <location filename="debugger_window.cpp" line="473"/>
-        <source>XR von Adresse lesen // Set SR(NZ) // if(idxReg&lt;Adresse Lo) MCT++</source>
+        <source>YR nach Adresse schreiben</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="325"/>
         <location filename="debugger_window.cpp" line="474"/>
-        <source>YR von PC-Adresse lesen // Set SR(NZ) // PC+1</source>
+        <source>AC von PC-Adresse lesen // Set SR(NZ) // PC+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="326"/>
         <location filename="debugger_window.cpp" line="475"/>
-        <source>YR von Adresse lesen // Set SR(NZ)</source>
+        <source>AC von PC-Adresse lesen // Set SR(NZ)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="327"/>
         <location filename="debugger_window.cpp" line="476"/>
-        <source>YR von Adresse lesen // Set SR(NZ) // if(idxReg&lt;Adresse Lo) MCT++</source>
+        <source>AC von PC-Adresse lesen // Set SR(NZ) // if(idxReg&lt;Adresse Lo) MCT++</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="328"/>
         <location filename="debugger_window.cpp" line="477"/>
-        <source>TMPByte von Adresse lesen // XR+1 // Set SR(NZ)</source>
+        <source>XR von PC-Adresse lesen // Set SR(NZ) // PC+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="329"/>
         <location filename="debugger_window.cpp" line="478"/>
-        <source>TMPByte von Adresse lesen // YR+1 // Set SR(NZ)</source>
+        <source>XR von Adresse lesen // Set SR(NZ)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="330"/>
         <location filename="debugger_window.cpp" line="479"/>
-        <source>TMPByte von Adresse lesen // XR-1 // Set SR(NZ)</source>
+        <source>XR von Adresse lesen // Set SR(NZ) // if(idxReg&lt;Adresse Lo) MCT++</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="331"/>
         <location filename="debugger_window.cpp" line="480"/>
-        <source>TMPByte von Adresse lesen // YR-1 // Set SR(NZ)</source>
+        <source>YR von PC-Adresse lesen // Set SR(NZ) // PC+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="332"/>
         <location filename="debugger_window.cpp" line="481"/>
-        <source>Illegaler Opcode - wird noch nicht unterstützt // Reset</source>
+        <source>YR von Adresse lesen // Set SR(NZ)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="333"/>
         <location filename="debugger_window.cpp" line="482"/>
-        <source>PC LO von Adresse lesen // Adresse+1 (Nur Low Wert)</source>
+        <source>YR von Adresse lesen // Set SR(NZ) // if(idxReg&lt;Adresse Lo) MCT++</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="334"/>
         <location filename="debugger_window.cpp" line="483"/>
-        <source>PC HI von Adresse lesen</source>
+        <source>TMPByte von Adresse lesen // XR+1 // Set SR(NZ)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="335"/>
         <location filename="debugger_window.cpp" line="484"/>
-        <source>PC LO von $FFFC lesen</source>
+        <source>TMPByte von Adresse lesen // YR+1 // Set SR(NZ)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="336"/>
         <location filename="debugger_window.cpp" line="485"/>
-        <source>PC HI von $FFFD lesen</source>
+        <source>TMPByte von Adresse lesen // XR-1 // Set SR(NZ)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="337"/>
         <location filename="debugger_window.cpp" line="486"/>
-        <source>TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC) // PC+1</source>
+        <source>TMPByte von Adresse lesen // YR-1 // Set SR(NZ)</source>
         <translation></translation>
     </message>
-    <message>
-        <location filename="debugger_window.cpp" line="338"/>
-        <location filename="debugger_window.cpp" line="487"/>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="344"/>
+        <location filename="debugger_window.cpp" line="493"/>
         <source>TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC)</source>
-        <translation></translation>
+        <oldsource>TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verÃ¤ndert) // Set SR(NZC)</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="346"/>
+        <location filename="debugger_window.cpp" line="495"/>
+        <source>TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1</source>
+        <oldsource>TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC) // PC+1</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="347"/>
+        <location filename="debugger_window.cpp" line="496"/>
+        <source>TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC)</source>
+        <oldsource>TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC)</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="348"/>
+        <location filename="debugger_window.cpp" line="497"/>
+        <source>TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1</source>
+        <oldsource>TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC) // PC+1</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="349"/>
+        <location filename="debugger_window.cpp" line="498"/>
+        <source>TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC)</source>
+        <oldsource>TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verÃ¤ndert) // Set SR(NZC)</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="361"/>
+        <location filename="debugger_window.cpp" line="510"/>
+        <source>SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag löschen</source>
+        <oldsource>SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag lÃ¶schen</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="1503"/>
+        <source>Spungweite für Branchbefehl ist zu groß.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="1727"/>
+        <source>Haltepunkt löschen...</source>
+        <oldsource>Haltepunkt lÃ¶schen...</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="1744"/>
+        <source>Der Name des Haltepunkts kann frei gewählt werden.</source>
+        <oldsource>Der Name des Haltepunkts kann frei gewÃ¤hlt werden.</oldsource>
+        <translation type="unfinished">Du kannst den Namen des Haltepunktsfrei wählen.</translation>
+    </message>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="1775"/>
+        <source>Doppelklick um Werte zu verändern.</source>
+        <oldsource>Doppelklick um Werte zu verÃ¤ndern.</oldsource>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="339"/>
         <location filename="debugger_window.cpp" line="488"/>
-        <source>TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // if(idxReg&lt;Adresse Lo) MCT++</source>
+        <source>PC LO von Adresse lesen // Adresse+1 (Nur Low Wert)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="340"/>
         <location filename="debugger_window.cpp" line="489"/>
-        <source>TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1</source>
+        <source>PC HI von Adresse lesen</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="341"/>
         <location filename="debugger_window.cpp" line="490"/>
-        <source>TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC)</source>
+        <source>PC LO von $FFFC lesen</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="342"/>
         <location filename="debugger_window.cpp" line="491"/>
-        <source>TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1</source>
+        <source>PC HI von $FFFD lesen</source>
         <translation></translation>
     </message>
-    <message>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="338"/>
+        <location filename="debugger_window.cpp" line="487"/>
+        <source>Illegaler Opcode - wird noch nicht unterstützt // Reset</source>
+        <oldsource>Illegaler Opcode - wird noch nicht unterstÃ¼tzt // Reset</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
         <location filename="debugger_window.cpp" line="343"/>
         <location filename="debugger_window.cpp" line="492"/>
-        <source>TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC)</source>
-        <translation></translation>
+        <source>TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC) // PC+1</source>
+        <oldsource>TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verÃ¤ndert) // Set SR(NZC) // PC+1</oldsource>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="debugger_window.cpp" line="344"/>
-        <location filename="debugger_window.cpp" line="493"/>
-        <source>TMPByte von PC-Adresse lesen // AC XOR TMPByte // Set SR(NZC) // PC+1</source>
-        <translation></translation>
-    </message>
-    <message>
+    <message utf8="true">
         <location filename="debugger_window.cpp" line="345"/>
         <location filename="debugger_window.cpp" line="494"/>
-        <source>TMPByte von Adresse lesen // AC XOR TMPByte // Set SR(NZC)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="346"/>
-        <location filename="debugger_window.cpp" line="495"/>
-        <source>TMPByte von Adresse lesen // AC XOR TMPByte // if(idxReg&lt;Adresse Lo) MCT++</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="347"/>
-        <location filename="debugger_window.cpp" line="496"/>
-        <source>TMPByte von PC-Adresse holen // AC&gt;&gt;1 // Set SR(NZC)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="348"/>
-        <location filename="debugger_window.cpp" line="497"/>
-        <source>TMPByte nach Adresse schreiben // TMPByte&gt;&gt;1 // Set SR(NZC)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="349"/>
-        <location filename="debugger_window.cpp" line="498"/>
-        <source>TMPByte von PC-Adresse holen // C&lt;-AC&lt;&lt;1&lt;-C // Set SR(NZC)</source>
-        <translation></translation>
+        <source>TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // if(idxReg&lt;Adresse Lo) MCT++</source>
+        <oldsource>TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verÃ¤ndert) // if(idxReg&lt;Adresse Lo) MCT++</oldsource>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="350"/>
         <location filename="debugger_window.cpp" line="499"/>
-        <source>TMPByte nach Adresse schreiben // C&lt;-TMPByte&lt;&lt;1&lt;-C // Set SR(NZC)</source>
+        <source>TMPByte von PC-Adresse lesen // AC XOR TMPByte // Set SR(NZC) // PC+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="351"/>
         <location filename="debugger_window.cpp" line="500"/>
-        <source>TMPByte von PC-Adresse holen // C-&gt;AC&gt;&gt;1-&gt;C // Set SR(NZC)</source>
+        <source>TMPByte von Adresse lesen // AC XOR TMPByte // Set SR(NZC)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="352"/>
         <location filename="debugger_window.cpp" line="501"/>
-        <source>TMPByte nach Adresse schreiben // C-&gt;TMPByte&gt;&gt;1-&gt;C // Set SR(NZC)</source>
+        <source>TMPByte von Adresse lesen // AC XOR TMPByte // if(idxReg&lt;Adresse Lo) MCT++</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="353"/>
         <location filename="debugger_window.cpp" line="502"/>
-        <source>TMPByte nach Adresse schreiben // TMPByte+1 // Set SR(NZ)</source>
+        <source>TMPByte von PC-Adresse holen // AC&gt;&gt;1 // Set SR(NZC)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="354"/>
         <location filename="debugger_window.cpp" line="503"/>
-        <source>TMPByte nach Adresse schreiben // TMPByte-1 // Set SR(NZ)</source>
+        <source>TMPByte nach Adresse schreiben // TMPByte&gt;&gt;1 // Set SR(NZC)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="355"/>
         <location filename="debugger_window.cpp" line="504"/>
-        <source>SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag löschen</source>
+        <source>TMPByte von PC-Adresse holen // C&lt;-AC&lt;&lt;1&lt;-C // Set SR(NZC)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="356"/>
         <location filename="debugger_window.cpp" line="505"/>
-        <source>PC Lo von 0xFFFA holen</source>
+        <source>TMPByte nach Adresse schreiben // C&lt;-TMPByte&lt;&lt;1&lt;-C // Set SR(NZC)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="357"/>
         <location filename="debugger_window.cpp" line="506"/>
-        <source>PC Hi von 0xFFFB holen</source>
+        <source>TMPByte von PC-Adresse holen // C-&gt;AC&gt;&gt;1-&gt;C // Set SR(NZC)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="358"/>
         <location filename="debugger_window.cpp" line="507"/>
-        <source>TMPByte von Adresse holen // Fix Adresse Hi MCT+1</source>
+        <source>TMPByte nach Adresse schreiben // C-&gt;TMPByte&gt;&gt;1-&gt;C // Set SR(NZC)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="359"/>
         <location filename="debugger_window.cpp" line="508"/>
-        <source>TMPByte nach Adresse schreiben // Illegal [SLO]</source>
+        <source>TMPByte nach Adresse schreiben // TMPByte+1 // Set SR(NZ)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="360"/>
         <location filename="debugger_window.cpp" line="509"/>
-        <source>TMPByte nach Adresse schreiben // Illegal [RLA]</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="361"/>
-        <location filename="debugger_window.cpp" line="510"/>
-        <source>TMPByte nach Adresse schreiben // Illegal [SRE]</source>
+        <source>TMPByte nach Adresse schreiben // TMPByte-1 // Set SR(NZ)</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="362"/>
         <location filename="debugger_window.cpp" line="511"/>
-        <source>TMPByte nach Adresse schreiben // Illegal [RRA]</source>
+        <source>PC Lo von 0xFFFA holen</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="363"/>
         <location filename="debugger_window.cpp" line="512"/>
-        <source>TMPByte nach Adresse schreiben // Illegal [DCP]</source>
+        <source>PC Hi von 0xFFFB holen</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="364"/>
         <location filename="debugger_window.cpp" line="513"/>
-        <source>TMPByte nach Adresse schreiben // Illegal [ISB]</source>
+        <source>TMPByte von Adresse holen // Fix Adresse Hi MCT+1</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="365"/>
-        <location filename="debugger_window.cpp" line="367"/>
         <location filename="debugger_window.cpp" line="514"/>
-        <location filename="debugger_window.cpp" line="516"/>
-        <source>AC von Adresse lesen // AC -&gt; XR // Set SR(NZ) // Illegal [LAX]</source>
+        <source>TMPByte nach Adresse schreiben // Illegal [SLO]</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="366"/>
         <location filename="debugger_window.cpp" line="515"/>
-        <source>AC von Adresse lesen // AC -&gt; XR // Set SR(NZ) // if(idxReg&lt;Adresse Lo) MCT++ // Illegal [LAX]</source>
+        <source>TMPByte nach Adresse schreiben // Illegal [RLA]</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="debugger_window.cpp" line="367"/>
+        <location filename="debugger_window.cpp" line="516"/>
+        <source>TMPByte nach Adresse schreiben // Illegal [SRE]</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="368"/>
         <location filename="debugger_window.cpp" line="517"/>
-        <source>Illegal [ASR]</source>
+        <source>TMPByte nach Adresse schreiben // Illegal [RRA]</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="369"/>
         <location filename="debugger_window.cpp" line="518"/>
-        <source>Illegal [ARR]</source>
+        <source>TMPByte nach Adresse schreiben // Illegal [DCP]</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="370"/>
         <location filename="debugger_window.cpp" line="519"/>
-        <source>Illegal [ANE]</source>
+        <source>TMPByte nach Adresse schreiben // Illegal [ISB]</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="371"/>
+        <location filename="debugger_window.cpp" line="373"/>
         <location filename="debugger_window.cpp" line="520"/>
-        <source>Illegal [LXA]</source>
+        <location filename="debugger_window.cpp" line="522"/>
+        <source>AC von Adresse lesen // AC -&gt; XR // Set SR(NZ) // Illegal [LAX]</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="372"/>
         <location filename="debugger_window.cpp" line="521"/>
-        <source>Illegal [SBX]</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="373"/>
-        <location filename="debugger_window.cpp" line="522"/>
-        <source>Illegal [SHY]</source>
+        <source>AC von Adresse lesen // AC -&gt; XR // Set SR(NZ) // if(idxReg&lt;Adresse Lo) MCT++ // Illegal [LAX]</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="374"/>
         <location filename="debugger_window.cpp" line="523"/>
-        <source>Illegal [SHX]</source>
+        <source>Illegal [ASR]</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="375"/>
         <location filename="debugger_window.cpp" line="524"/>
-        <source>Illegal [SHA]</source>
+        <source>Illegal [ARR]</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="376"/>
         <location filename="debugger_window.cpp" line="525"/>
-        <source>Illegal [SHS]</source>
+        <source>Illegal [ANE]</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="377"/>
         <location filename="debugger_window.cpp" line="526"/>
-        <source>Illegal [ANC]</source>
+        <source>Illegal [LXA]</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="378"/>
         <location filename="debugger_window.cpp" line="527"/>
-        <source>Illegal [LAE]</source>
+        <source>Illegal [SBX]</source>
         <translation></translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="379"/>
         <location filename="debugger_window.cpp" line="528"/>
+        <source>Illegal [SHY]</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="debugger_window.cpp" line="380"/>
+        <location filename="debugger_window.cpp" line="529"/>
+        <source>Illegal [SHX]</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="debugger_window.cpp" line="381"/>
+        <location filename="debugger_window.cpp" line="530"/>
+        <source>Illegal [SHA]</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="debugger_window.cpp" line="382"/>
+        <location filename="debugger_window.cpp" line="531"/>
+        <source>Illegal [SHS]</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="debugger_window.cpp" line="383"/>
+        <location filename="debugger_window.cpp" line="532"/>
+        <source>Illegal [ANC]</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="debugger_window.cpp" line="384"/>
+        <location filename="debugger_window.cpp" line="533"/>
+        <source>Illegal [LAE]</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="debugger_window.cpp" line="385"/>
+        <location filename="debugger_window.cpp" line="534"/>
         <source>Illegal [LAE] // if(idxReg&lt;Adresse Lo) MCT++</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="711"/>
+        <location filename="debugger_window.cpp" line="720"/>
         <source>Test1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="786"/>
-        <location filename="debugger_window.cpp" line="802"/>
+        <location filename="debugger_window.cpp" line="795"/>
         <location filename="debugger_window.cpp" line="811"/>
         <location filename="debugger_window.cpp" line="820"/>
         <location filename="debugger_window.cpp" line="829"/>
         <location filename="debugger_window.cpp" line="838"/>
-        <location filename="debugger_window.cpp" line="1247"/>
-        <location filename="debugger_window.cpp" line="2265"/>
-        <location filename="debugger_window.cpp" line="2275"/>
+        <location filename="debugger_window.cpp" line="847"/>
+        <location filename="debugger_window.cpp" line="1256"/>
+        <location filename="debugger_window.cpp" line="2274"/>
+        <location filename="debugger_window.cpp" line="2284"/>
         <source>Eingabefehler...</source>
         <translation></translation>
     </message>
-    <message>
-        <location filename="debugger_window.cpp" line="786"/>
-        <location filename="debugger_window.cpp" line="1247"/>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="795"/>
+        <location filename="debugger_window.cpp" line="1256"/>
         <source>Es wurde kein gültiges Zahlenformat benutzt !</source>
-        <translation>Zahlenformat ungültig!</translation>
+        <translation type="unfinished">Zahlenformat ungültig!</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="802"/>
+        <location filename="debugger_window.cpp" line="811"/>
         <source>Der Wert muss zwischen 0 und 511 liegen !</source>
         <translation>Der Wert muss zwischen 0 und 511 liegen!</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="811"/>
         <location filename="debugger_window.cpp" line="820"/>
         <location filename="debugger_window.cpp" line="829"/>
         <location filename="debugger_window.cpp" line="838"/>
+        <location filename="debugger_window.cpp" line="847"/>
         <source>Der Wert muss zwischen 0 und 255 liegen !</source>
         <translation>Der Wert muss zwischen 0 und 255 liegen!</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1479"/>
-        <location filename="debugger_window.cpp" line="1484"/>
-        <location filename="debugger_window.cpp" line="1489"/>
-        <location filename="debugger_window.cpp" line="1494"/>
-        <location filename="debugger_window.cpp" line="1499"/>
+        <location filename="debugger_window.cpp" line="1488"/>
+        <location filename="debugger_window.cpp" line="1493"/>
+        <location filename="debugger_window.cpp" line="1498"/>
+        <location filename="debugger_window.cpp" line="1503"/>
+        <location filename="debugger_window.cpp" line="1508"/>
         <source>Fehler...!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1479"/>
+        <location filename="debugger_window.cpp" line="1488"/>
         <source>Fehlerhafte Adresse.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1484"/>
+        <location filename="debugger_window.cpp" line="1493"/>
         <source>Unbekanntes Mnemonic.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1489"/>
+        <location filename="debugger_window.cpp" line="1498"/>
         <source>Unbekannte Adressierung.</source>
         <translation></translation>
     </message>
-    <message>
-        <location filename="debugger_window.cpp" line="1494"/>
-        <source>Spungweite für Branchbefehl ist zu groß.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="1499"/>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="1508"/>
         <source>Dieser Opcode unterstützt nicht diese Adressierung.</source>
-        <translation>Dieser Opcode unterstützt diese Adressierung nicht. Da hättest du ja auch selbst drauf kommen können.</translation>
+        <translation type="unfinished">Dieser Opcode unterstützt diese Adressierung nicht. Da hättest du ja auch selbst drauf kommen können.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1656"/>
+        <location filename="debugger_window.cpp" line="1665"/>
         <source> Zyklus/Sek</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1657"/>
+        <location filename="debugger_window.cpp" line="1666"/>
         <source> Zyklen/Sek</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1690"/>
+        <location filename="debugger_window.cpp" line="1699"/>
         <source>Haltepunkt (</source>
         <translation></translation>
     </message>
-    <message>
-        <location filename="debugger_window.cpp" line="1718"/>
-        <source>Haltepunkt löschen...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="1718"/>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="1727"/>
         <source>Möchten Sie den folgenden Haltepunkt löschen?
 </source>
-        <translation>Möchtest du den folgenden Haltepunkt löschen?</translation>
+        <translation type="unfinished">Möchtest du den folgenden Haltepunkt löschen?</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1735"/>
-        <source>Der Name des Haltepunkts kann frei gewählt werden.</source>
-        <translation>Du kannst den Namen des Haltepunktsfrei wählen.</translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="1739"/>
+        <location filename="debugger_window.cpp" line="1748"/>
         <source>Wenn der Wert gleich dem Programm Counter (PC) ist.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1740"/>
+        <location filename="debugger_window.cpp" line="1749"/>
         <source>Wenn der Wert gleich dem Accu Register (AC) ist.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1741"/>
+        <location filename="debugger_window.cpp" line="1750"/>
         <source>Wenn der Wert gleich dem X Register (XR) ist.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1742"/>
+        <location filename="debugger_window.cpp" line="1751"/>
         <source>Wenn der Wert gleich dem Y Register (YR) ist.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1743"/>
+        <location filename="debugger_window.cpp" line="1752"/>
         <source>Wenn ein Lesezugriff an dieser Adresse statt findet.</source>
         <translation>Wenn ein Lesezugriff an dieser Adresse stattfindet.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1744"/>
+        <location filename="debugger_window.cpp" line="1753"/>
         <source>Wenn ein Schreibzugriff an dieser Adresse statt findet.</source>
         <translation>Wenn ein Schreibzugriff an dieser Adresse stattfindet.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1745"/>
+        <location filename="debugger_window.cpp" line="1754"/>
         <source>Wenn aus einer Adresse dieser Wert ausgelesen wird.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1746"/>
+        <location filename="debugger_window.cpp" line="1755"/>
         <source>Wenn in einer Adresse dieser Wert geschrieben wird.</source>
         <translation>Wenn dieser Wert in eine Adresse geschrieben wird.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1749"/>
+        <location filename="debugger_window.cpp" line="1758"/>
         <source>Wenn der Wert gleich der Aktuellen Rasterzeile ist.</source>
         <translation>Wenn der Wert gleich der aktuellen Rasterzeile ist.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1750"/>
+        <location filename="debugger_window.cpp" line="1759"/>
         <source>Wenn der Wert gleich dem Aktuellen Zyklus in einer Rasterzeile ist.</source>
         <translation>Wenn der Wert gleich dem aktuellen Zyklus in einer Rasterzeile ist.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1766"/>
-        <source>Doppelklick um Werte zu verändern.</source>
-        <oldsource>Doppeltklick um Werte zu verändern.</oldsource>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="1944"/>
+        <location filename="debugger_window.cpp" line="1953"/>
         <source>Lesen von Adresse:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1969"/>
+        <location filename="debugger_window.cpp" line="1978"/>
         <source>Schreiben in Adresse:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="1994"/>
+        <location filename="debugger_window.cpp" line="2003"/>
         <source>Lesen von Wert:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2028"/>
+        <location filename="debugger_window.cpp" line="2037"/>
         <source>Schreiben von Wert:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2062"/>
+        <location filename="debugger_window.cpp" line="2071"/>
         <source>Rasterzeile:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2096"/>
+        <location filename="debugger_window.cpp" line="2105"/>
         <source>Zyklus:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2156"/>
+        <location filename="debugger_window.cpp" line="2165"/>
         <source>Haltepunkte laden...</source>
         <translation></translation>
     </message>
-    <message>
-        <location filename="debugger_window.cpp" line="2156"/>
-        <location filename="debugger_window.cpp" line="2240"/>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="2165"/>
+        <location filename="debugger_window.cpp" line="2249"/>
         <source>Es werden alle Haltepunkte gelöscht !
 Möchten Sie fortfahren?</source>
-        <translation>Es werden alle Haltepunkte gelöscht !
+        <translation type="unfinished">Es werden alle Haltepunkte gelöscht !
 Möchtest du fortfahren?</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2164"/>
-        <source>Haltepunkte öffnen</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="debugger_window.cpp" line="2164"/>
-        <location filename="debugger_window.cpp" line="2220"/>
+        <location filename="debugger_window.cpp" line="2173"/>
+        <location filename="debugger_window.cpp" line="2229"/>
         <source>Emu64 Haltepunkt Datei </source>
         <translation></translation>
     </message>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="2173"/>
+        <source>Haltepunkte öffnen</source>
+        <oldsource>Haltepunkte Ã¶ffnen</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
-        <location filename="debugger_window.cpp" line="2176"/>
-        <location filename="debugger_window.cpp" line="2179"/>
-        <location filename="debugger_window.cpp" line="2182"/>
         <location filename="debugger_window.cpp" line="2185"/>
-        <location filename="debugger_window.cpp" line="2228"/>
-        <location filename="debugger_window.cpp" line="2233"/>
-        <location filename="debugger_window.cpp" line="2282"/>
-        <location filename="debugger_window.cpp" line="2297"/>
-        <location filename="debugger_window.cpp" line="2304"/>
-        <location filename="debugger_window.cpp" line="2308"/>
+        <location filename="debugger_window.cpp" line="2188"/>
+        <location filename="debugger_window.cpp" line="2191"/>
+        <location filename="debugger_window.cpp" line="2194"/>
+        <location filename="debugger_window.cpp" line="2237"/>
+        <location filename="debugger_window.cpp" line="2242"/>
+        <location filename="debugger_window.cpp" line="2291"/>
+        <location filename="debugger_window.cpp" line="2306"/>
+        <location filename="debugger_window.cpp" line="2313"/>
+        <location filename="debugger_window.cpp" line="2317"/>
         <source>Fehler...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2179"/>
+        <location filename="debugger_window.cpp" line="2188"/>
         <source>Es handelt sich nicht um eine Emu64 Datei.</source>
         <translation>Das ist aber keine Emu64 Datei.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2182"/>
+        <location filename="debugger_window.cpp" line="2191"/>
         <source>Diese Datei wurde mit einer neueren Emu64 Version erstellt.</source>
         <translation></translation>
     </message>
-    <message>
-        <location filename="debugger_window.cpp" line="2185"/>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="2194"/>
         <source>Diese Datei enthält keine Haltepunkte.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2240"/>
+        <location filename="debugger_window.cpp" line="2249"/>
         <source>Achtung...</source>
         <translation></translation>
     </message>
-    <message>
-        <location filename="debugger_window.cpp" line="2265"/>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="2274"/>
         <source>Es wurde kein gültiges Zahlenformat benutzt ! [Export Von:]</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="debugger_window.cpp" line="2275"/>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="2284"/>
         <source>Es wurde kein gültiges Zahlenformat benutzt ! [Export Bis:]</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2282"/>
+        <location filename="debugger_window.cpp" line="2291"/>
         <source>Startadresse muss kleiner sein als Endadresse.</source>
         <translation>Startadresse muss kleiner als die Endadresse sein.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2288"/>
+        <location filename="debugger_window.cpp" line="2297"/>
         <source>Export...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2288"/>
+        <location filename="debugger_window.cpp" line="2297"/>
         <source>Disassembler Listing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2288"/>
+        <location filename="debugger_window.cpp" line="2297"/>
         <source>C64 Programm Datei</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2297"/>
+        <location filename="debugger_window.cpp" line="2306"/>
         <source>Fehler beim speichern der Disassembler Datei.</source>
         <translation>Fehler beim Speichern der Disassembler Datei.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2304"/>
+        <location filename="debugger_window.cpp" line="2313"/>
         <source>Floppy RAM geht nur von $0000 - $07FF (2KB).</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2308"/>
+        <location filename="debugger_window.cpp" line="2317"/>
         <source>Fehler beim speichern der Programm Datei.</source>
         <translation>Fehler beim Speichern der Programm Datei.</translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2331"/>
+        <location filename="debugger_window.cpp" line="2340"/>
         <source>CPU 6502 Register</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2340"/>
+        <location filename="debugger_window.cpp" line="2349"/>
         <source>CPU 6502 Interne Register (Emu64 Modell)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2440"/>
+        <location filename="debugger_window.cpp" line="2449"/>
         <source>CPU 6510 Register</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2449"/>
+        <location filename="debugger_window.cpp" line="2458"/>
         <source>CPU 6510 Interne Register (Emu64 Modell)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2220"/>
+        <location filename="debugger_window.cpp" line="2229"/>
         <source>Haltepunkte speichern</source>
         <translation>Haltepunkte Speichern</translation>
     </message>
-    <message>
-        <location filename="debugger_window.cpp" line="2176"/>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="2185"/>
         <source>Die Datei konnte nicht geöffnet werden.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="debugger_window.cpp" line="2228"/>
-        <location filename="debugger_window.cpp" line="2233"/>
+        <location filename="debugger_window.cpp" line="2237"/>
+        <location filename="debugger_window.cpp" line="2242"/>
         <source>Die Haltepunkte konnten nicht gespeichert werden.</source>
         <translation></translation>
     </message>
@@ -2407,359 +2464,358 @@ Möchtest du fortfahren?</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="170"/>
+        <location filename="main_window.cpp" line="169"/>
         <source>&gt;&gt; VideoPal Klasse wurde installiert
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="187"/>
+        <location filename="main_window.cpp" line="186"/>
         <source>&gt;&gt; InfoWindow wurde erzeugt
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="191"/>
+        <location filename="main_window.cpp" line="190"/>
         <source>&gt;&gt; TVSetupWindow wurde erzeugt
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="195"/>
+        <location filename="main_window.cpp" line="194"/>
         <source>&gt;&gt; FloppyWindow wurde erzeugt
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="199"/>
+        <location filename="main_window.cpp" line="198"/>
         <source>&gt;&gt; C64KeyboardWindow wurde erzeugt
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="203"/>
+        <location filename="main_window.cpp" line="202"/>
         <source>&gt;&gt; CrtWindow wurde erzeugt
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="207"/>
+        <location filename="main_window.cpp" line="206"/>
         <source>&gt;&gt; DebuggerWindow wurde erzeugt
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="211"/>
+        <location filename="main_window.cpp" line="210"/>
         <source>&gt;&gt; SetupWindow wurde erzeugt
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="178"/>
+        <location filename="main_window.cpp" line="177"/>
         <source>Fehler beim Installieren der C64 Klasse</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="237"/>
+        <location filename="main_window.cpp" line="236"/>
         <source>CRT Window wird mit CRT Klasee verbunden.</source>
         <translation>CRT Window wird mit CRT Klasse verbunden.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="243"/>
+        <location filename="main_window.cpp" line="242"/>
         <source>C64 Systemroms werden geladen.</source>
         <translation>C64 SystemROMs werden geladen.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="253"/>
+        <location filename="main_window.cpp" line="252"/>
         <source>C64 Key-Matrix wird mit Virtual Keyboard verbunden.</source>
         <translation></translation>
     </message>
-    <message>
-        <location filename="main_window.cpp" line="258"/>
+    <message utf8="true">
+        <location filename="main_window.cpp" line="257"/>
         <source>Tabelle für Floppy&apos;s wird erstellt.</source>
-        <translation>Tabelle für Floppys wird erstellt.</translation>
+        <translation type="unfinished">Tabelle für Floppys wird erstellt.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="264"/>
+        <location filename="main_window.cpp" line="263"/>
         <source>Floppy: </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="278"/>
+        <location filename="main_window.cpp" line="277"/>
         <source>Einstellungen werden von INI geladen und gesetzt.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="316"/>
+        <location filename="main_window.cpp" line="315"/>
         <source>C64 EMULATION WIRD NUN GESTARET.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="392"/>
+        <location filename="main_window.cpp" line="391"/>
         <source>Wechseln zur Sprache: </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="130"/>
+        <location filename="main_window.cpp" line="129"/>
         <source>&gt;&gt; Translator wurde intsalliert: Systemsprache = </source>
         <translation>&gt;&gt; Translator wurde installiert: Systemsprache = </translation>
     </message>
+    <message utf8="true">
+        <location filename="main_window.cpp" line="121"/>
+        <source>Sprachmenü wir erstellt.</source>
+        <oldsource>SprachmenÃ¼ wir erstellt.</oldsource>
+        <translation type="unfinished">Sprachmenü wird erstellt.</translation>
+    </message>
+    <message utf8="true">
+        <location filename="main_window.cpp" line="125"/>
+        <source>&gt;&gt; Sprachmenü wurde erstellt.</source>
+        <oldsource>&gt;&gt; SprachmenÃ¼ wurde erstellt.</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
-        <location filename="main_window.cpp" line="129"/>
+        <location filename="main_window.cpp" line="128"/>
         <source>Translator wurde installiert.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="138"/>
+        <location filename="main_window.cpp" line="137"/>
         <source>Screenshotverzeichnis wird gesucht.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="141"/>
+        <location filename="main_window.cpp" line="140"/>
         <source>&gt;&gt; Ein Screenshot Verzeichnis ist vorhanden
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="146"/>
+        <location filename="main_window.cpp" line="145"/>
         <source>Screenshotverzeichnis wird erstellt.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="147"/>
+        <location filename="main_window.cpp" line="146"/>
         <source>&lt;&lt; Ein Screenshot Verzeichnis ist nicht vorhanden
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="150"/>
+        <location filename="main_window.cpp" line="149"/>
         <source>&gt;&gt; Ein neues Screenshot Verzeichnis wurde erstellt
 </source>
         <translation></translation>
     </message>
-    <message>
-        <location filename="main_window.cpp" line="155"/>
+    <message utf8="true">
+        <location filename="main_window.cpp" line="154"/>
         <source>&lt;&lt; Ein neues Screenshot Verzeichnis konnte nicht erstellt werden
 &lt;&lt; Keine Screenshots möglich !!</source>
-        <translation>&lt;&lt; Ein neues Screenshot Verzeichnis konnte nicht erstellt werden
+        <translation type="unfinished">&lt;&lt; Ein neues Screenshot Verzeichnis konnte nicht erstellt werden
 &lt;&lt; Keine Screenshots möglich!!</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="168"/>
+        <location filename="main_window.cpp" line="167"/>
         <source>VideoPal Klasse wird initialisiert.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="117"/>
+        <location filename="main_window.cpp" line="116"/>
         <source>INI Dateiverwaltung wird initialisiert.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="126"/>
-        <source>&gt;&gt; Sprachmenü wurde erstellt.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="main_window.cpp" line="185"/>
+        <location filename="main_window.cpp" line="184"/>
         <source>InfoWindow wird erstellt.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="189"/>
+        <location filename="main_window.cpp" line="188"/>
         <source>TVSetupWindow wird erstellt.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="193"/>
+        <location filename="main_window.cpp" line="192"/>
         <source>FloppyWindow wird erstellt.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="197"/>
+        <location filename="main_window.cpp" line="196"/>
         <source>C64KeyboardWindow wird erstellt.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="201"/>
+        <location filename="main_window.cpp" line="200"/>
         <source>CRTWindow wird erstellt.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="205"/>
+        <location filename="main_window.cpp" line="204"/>
         <source>DebuggerWindow wird erstellt.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="209"/>
+        <location filename="main_window.cpp" line="208"/>
         <source>SetupWindow wird erstellt.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="213"/>
+        <location filename="main_window.cpp" line="212"/>
         <source>C64SpeedWindow wird erstellt.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="215"/>
+        <location filename="main_window.cpp" line="214"/>
         <source>&gt;&gt; C64SpeedWindow wurde erzeugt
 </source>
         <translation></translation>
     </message>
+    <message utf8="true">
+        <location filename="main_window.cpp" line="574"/>
+        <location filename="main_window.cpp" line="583"/>
+        <source>C64 Dateien öffnen </source>
+        <oldsource>C64 Dateien Ã¶ffnen </oldsource>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
-        <location filename="main_window.cpp" line="689"/>
+        <location filename="main_window.cpp" line="687"/>
         <source>REU Inhalt laden</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="689"/>
-        <location filename="main_window.cpp" line="702"/>
+        <location filename="main_window.cpp" line="687"/>
+        <location filename="main_window.cpp" line="700"/>
         <source>REU Image Dateien</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="693"/>
-        <location filename="main_window.cpp" line="706"/>
+        <location filename="main_window.cpp" line="691"/>
+        <location filename="main_window.cpp" line="704"/>
         <source>Beim laden des REU Images trat ein Fehler auf!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="702"/>
+        <location filename="main_window.cpp" line="700"/>
         <source>REU Inhalt speichern</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="main_window.cpp" line="711"/>
+    <message utf8="true">
+        <location filename="main_window.cpp" line="709"/>
         <source>REU Speicher löschen ...</source>
+        <oldsource>REU Speicher lÃ¶schen ...</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="main_window.cpp" line="709"/>
+        <source>Möchten Sie den Inhalt des REU Speichers wirklich löschen?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="main_window.cpp" line="751"/>
+        <source>GEORAM Speicher löschen ...</source>
+        <oldsource>GEORAM Speicher lÃ¶schen ...</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="711"/>
-        <source>Möchten Sie den Inhalt des REU Speichers wirklisch löschen?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="main_window.cpp" line="731"/>
+        <location filename="main_window.cpp" line="729"/>
         <source>GEORAM Inhalt laden</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="731"/>
-        <location filename="main_window.cpp" line="744"/>
+        <location filename="main_window.cpp" line="729"/>
+        <location filename="main_window.cpp" line="742"/>
         <source>GEORAM Image Dateien</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="735"/>
-        <location filename="main_window.cpp" line="748"/>
+        <location filename="main_window.cpp" line="733"/>
+        <location filename="main_window.cpp" line="746"/>
         <source>Beim laden des GEORAM Images trat ein Fehler auf!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="744"/>
+        <location filename="main_window.cpp" line="742"/>
         <source>GEORAM Inhalt speichern</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="753"/>
-        <source>GEORAM Speicher löschen ...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="main_window.cpp" line="753"/>
-        <source>Möchten Sie den Inhalt des GEORAM Speichers wirklisch löschen?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="main_window.cpp" line="122"/>
-        <source>Sprachmenü wir erstellt.</source>
-        <translation>Sprachmenü wird erstellt.</translation>
-    </message>
-    <message>
-        <location filename="main_window.cpp" line="218"/>
+        <location filename="main_window.cpp" line="217"/>
         <source>Screenshotnummer wir geladen.</source>
         <translation>Screenshotnummer wird geladen.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="173"/>
+        <location filename="main_window.cpp" line="172"/>
         <source>C64 Klasse wird initialisiert.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="178"/>
-        <location filename="main_window.cpp" line="666"/>
-        <location filename="main_window.cpp" line="693"/>
-        <location filename="main_window.cpp" line="706"/>
-        <location filename="main_window.cpp" line="735"/>
-        <location filename="main_window.cpp" line="748"/>
+        <location filename="main_window.cpp" line="177"/>
+        <location filename="main_window.cpp" line="664"/>
+        <location filename="main_window.cpp" line="691"/>
+        <location filename="main_window.cpp" line="704"/>
+        <location filename="main_window.cpp" line="733"/>
+        <location filename="main_window.cpp" line="746"/>
         <source>Emu64 Fehler ...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="222"/>
+        <location filename="main_window.cpp" line="221"/>
         <source>SetupWindow wird mit INI abgeglichen.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="225"/>
+        <location filename="main_window.cpp" line="224"/>
         <source>SDL Window Titelleiste wird benannt.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="226"/>
-        <location filename="main_window.cpp" line="437"/>
+        <location filename="main_window.cpp" line="225"/>
+        <location filename="main_window.cpp" line="436"/>
         <source>C64 Bildschirm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="88"/>
+        <location filename="main_window.cpp" line="87"/>
         <source>&gt;&gt; Es wurden alle Klassen wieder entfernt
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="90"/>
+        <location filename="main_window.cpp" line="89"/>
         <source>
 &gt;&gt; Emu64 wurde sauber beendet...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="229"/>
+        <location filename="main_window.cpp" line="228"/>
         <source>Debugger Window wird mit C64 Klasse verbunden.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="233"/>
+        <location filename="main_window.cpp" line="232"/>
         <source>C64 Speed Window wird mit C64 Klasse verbunden.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="575"/>
-        <location filename="main_window.cpp" line="584"/>
-        <source>C64 Dateien öffnen </source>
-        <oldsource>C64 Dateien öffnen</oldsource>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="main_window.cpp" line="575"/>
-        <location filename="main_window.cpp" line="584"/>
+        <location filename="main_window.cpp" line="574"/>
+        <location filename="main_window.cpp" line="583"/>
         <source>C64 Programm Dateien</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="575"/>
-        <location filename="main_window.cpp" line="584"/>
-        <location filename="main_window.cpp" line="689"/>
-        <location filename="main_window.cpp" line="702"/>
-        <location filename="main_window.cpp" line="731"/>
-        <location filename="main_window.cpp" line="744"/>
+        <location filename="main_window.cpp" line="574"/>
+        <location filename="main_window.cpp" line="583"/>
+        <location filename="main_window.cpp" line="687"/>
+        <location filename="main_window.cpp" line="700"/>
+        <location filename="main_window.cpp" line="729"/>
+        <location filename="main_window.cpp" line="742"/>
         <source>Alle Dateien</source>
         <translation></translation>
     </message>
-    <message>
-        <location filename="main_window.cpp" line="666"/>
+    <message utf8="true">
+        <location filename="main_window.cpp" line="664"/>
         <source>Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.
 Überprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !</source>
-        <translation>Es sind keine Screenshots möglich, da Emu64 kein Screenshot Verzeichnis anlegen konnte.
+        <translation type="unfinished">Es sind keine Screenshots möglich, da Emu64 kein Screenshot Verzeichnis anlegen konnte.
 Überprüfe bitte die Rechte des Emu64 Verzeichnisses !</translation>
     </message>
 </context>
@@ -2803,17 +2859,19 @@ Möchtest du fortfahren?</translation>
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <location filename="debugger_window.cpp" line="939"/>
-        <location filename="main_window.cpp" line="489"/>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="948"/>
+        <location filename="main_window.cpp" line="488"/>
         <source>Überschreiben?</source>
-        <translation></translation>
+        <oldsource>Ãberschreiben?</oldsource>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="debugger_window.cpp" line="940"/>
-        <location filename="main_window.cpp" line="490"/>
+    <message utf8="true">
+        <location filename="debugger_window.cpp" line="949"/>
+        <location filename="main_window.cpp" line="489"/>
         <source>Soll die Datei &quot;%1&quot; überschrieben werden?</source>
-        <translation></translation>
+        <oldsource>Soll die Datei &quot;%1&quot; Ã¼berschrieben werden?</oldsource>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2963,20 +3021,22 @@ Möchtest du fortfahren?</translation>
         <source>GameBase64</source>
         <translation></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="setup_window.cpp" line="31"/>
         <source>Schwarz / Weiß</source>
-        <translation></translation>
+        <oldsource>Schwarz / WeiÃ</oldsource>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="setup_window.cpp" line="302"/>
         <source>Bezeichnung</source>
         <translation></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="setup_window.cpp" line="308"/>
         <source>Mit einem doppelklick kann man den Namen ändern.</source>
-        <translation>Mit einem Doppelklick kannst du den Namen ändern.</translation>
+        <oldsource>Mit einem doppelklick kann man den Namen Ã¤ndern.</oldsource>
+        <translation type="unfinished">Mit einem Doppelklick kannst du den Namen ändern.</translation>
     </message>
     <message>
         <location filename="setup_window.cpp" line="310"/>
@@ -2993,10 +3053,11 @@ Möchtest du fortfahren?</translation>
         <source>Lernen</source>
         <translation></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="setup_window.cpp" line="318"/>
         <source>Löschen</source>
-        <translation></translation>
+        <oldsource>LÃ¶schen</oldsource>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3130,25 +3191,29 @@ Möchtest du fortfahren?</translation>
         <source>Lautstärke der Floppygeräusche.</source>
         <translation></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="widget_floppy_status.cpp" line="200"/>
         <source>Floppygeräusche sind ausgeschaltet.</source>
-        <translation></translation>
+        <oldsource>FloppygerÃ¤usche sind ausgeschaltet.</oldsource>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="widget_floppy_status.cpp" line="206"/>
         <source>Floppygeräusche sind auf 30% gestellt.</source>
-        <translation></translation>
+        <oldsource>FloppygerÃ¤usche sind auf 30% gestellt.</oldsource>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="widget_floppy_status.cpp" line="212"/>
         <source>Floppygeräusche sind auf 70% gestellt.</source>
-        <translation></translation>
+        <oldsource>FloppygerÃ¤usche sind auf 70% gestellt.</oldsource>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="widget_floppy_status.cpp" line="218"/>
         <source>Floppygeräusche sind auf 100% gestellt.</source>
-        <translation></translation>
+        <oldsource>FloppygerÃ¤usche sind auf 100% gestellt.</oldsource>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

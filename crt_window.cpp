@@ -314,7 +314,7 @@ void CrtWindow::on_InsertCRT_clicked()
                 break;
             }
         }
-        else QMessageBox::warning(this,tr("CRT Fehler"),tr("Fehler beim Laden des ausgewählten CRT Files"));
+        else QMessageBox::warning(this,trUtf8("CRT Fehler"),trUtf8("Fehler beim Laden des ausgewählten CRT Files"));
     }
 }
 
