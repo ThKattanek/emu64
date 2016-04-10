@@ -197,25 +197,25 @@ void WidgetFloppyStatus::SetFloppyVolume(int mode)
         ui->Volume->setIcon(*iVol_mute);
         floppy->SetFloppySoundVolume(0.0);
         floppy->SetEnableFloppySound(false);
-        ui->Volume->setToolTip(tr("Floppygeräusche sind ausgeschaltet."));
+        ui->Volume->setToolTip(trUtf8("Floppygeräusche sind ausgeschaltet."));
         break;
     case 1:
         ui->Volume->setIcon(*iVol_low);
         floppy->SetFloppySoundVolume(0.3);
         floppy->SetEnableFloppySound(true);
-        ui->Volume->setToolTip(tr("Floppygeräusche sind auf 30% gestellt."));
+        ui->Volume->setToolTip(trUtf8("Floppygeräusche sind auf 30% gestellt."));
         break;
     case 2:
         ui->Volume->setIcon(*iVol_medium);
         floppy->SetFloppySoundVolume(0.7);
         floppy->SetEnableFloppySound(true);
-        ui->Volume->setToolTip(tr("Floppygeräusche sind auf 70% gestellt."));
+        ui->Volume->setToolTip(trUtf8("Floppygeräusche sind auf 70% gestellt."));
         break;
     case 3:
         ui->Volume->setIcon(*iVol_high);
         floppy->SetFloppySoundVolume(1.0);
         floppy->SetEnableFloppySound(true);
-        ui->Volume->setToolTip(tr("Floppygeräusche sind auf 100% gestellt."));
+        ui->Volume->setToolTip(trUtf8("Floppygeräusche sind auf 100% gestellt."));
         break;
     default:
         break;

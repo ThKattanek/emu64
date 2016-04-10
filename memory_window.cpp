@@ -98,19 +98,19 @@ void MemoryWindow::ChangeSource(int source)
     switch(AktSource)
     {
     case 0:
-        setWindowTitle(QString(tr("C64 Speicher")));
+        setWindowTitle(QString(trUtf8("C64 Speicher")));
         break;
     case 1:
-        setWindowTitle(QString(tr("Floppy #08 Speicher")));
+        setWindowTitle(QString(trUtf8("Floppy #08 Speicher")));
         break;
     case 2:
-        setWindowTitle(QString(tr("Floppy #09Speicher")));
+        setWindowTitle(QString(trUtf8("Floppy #09Speicher")));
         break;
     case 3:
-        setWindowTitle(QString(tr("Floppy #10 Speicher")));
+        setWindowTitle(QString(trUtf8("Floppy #10 Speicher")));
         break;
     case 4:
-        setWindowTitle(QString(tr("Floppy #11 Speicher")));
+        setWindowTitle(QString(trUtf8("Floppy #11 Speicher")));
         break;
     }
 }

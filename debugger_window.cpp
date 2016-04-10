@@ -210,7 +210,7 @@ void DebuggerWindow::onTimerAnimationRefresh(void)
                 {
                     ui->BreakpointTree->topLevelItem(i)->setBackgroundColor(0,QColor(0,255,0));
                     ui->BreakpointTree->topLevelItem(i)->setBackgroundColor(1,QColor(1,255,0));
-                    ui->BreakpointTree->topLevelItem(i)->setText(1,tr("ERFÜLLT !"));
+                    ui->BreakpointTree->topLevelItem(i)->setText(1,trUtf8("ERFÜLLT !"));
                 }
             }
         }
@@ -229,7 +229,7 @@ void DebuggerWindow::onTimerAnimationRefresh(void)
                         {
                             ui->BreakpointTree->topLevelItem(ii)->setBackgroundColor(0,QColor(0,255,0));
                             ui->BreakpointTree->topLevelItem(ii)->setBackgroundColor(1,QColor(1,255,0));
-                            ui->BreakpointTree->topLevelItem(ii)->setText(1,tr("ERFÜLLT !"));
+                            ui->BreakpointTree->topLevelItem(ii)->setText(1,trUtf8("ERFÜLLT !"));
                         }
                     }
                 }
@@ -242,147 +242,147 @@ void DebuggerWindow::onTimerAnimationRefresh(void)
 void DebuggerWindow::FillMicroCodeStringTable()
 {
     MicroCodeStringTable6510 = QStringList()
-    /*000*/ << tr("Opcode von PC-Adresse holen // PC+1")
-    /*001*/ << tr("Lesen von PC-Adresse und verwerfen // PC+1")
-    /*002*/ << tr("PC Hi -> Stack // SR|16 // SP-1")
-    /*003*/ << tr("PC Lo -> Stack // SP-1")
-    /*004*/ << tr("SR -> Stack // SR|4 // SP-1")
-    /*005*/ << tr("PC Lo von 0xFFFE holen")
-    /*006*/ << tr("PC Hi von 0xFFFF holen")
-    /*007*/ << tr("Pointer von PC-Adresse holen // PC+1")
-    /*008*/ << tr("Lesen von Pointer und verwerfen // Pointer+XR")
-    /*009*/ << tr("Adresse Lo von Pointer-Adresse holen // Pointer+1")
-    /*010*/ << tr("Adresse Hi von Pointer-Adresse holen")
-    /*011*/ << tr("TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ)")
-    /*012*/ << tr("JAM")
-    /*013*/ << tr("TMPByte von Adresse holen")
-    /*014*/ << tr("TMPByte nach Adresse schreiben // ASL MEMORY // ORA")
-    /*015*/ << tr("TMPByte nach Adresse schreiben")
-    /*016*/ << tr("Adresse Hi = 0 // Adresse Lo von PC-Adresse holen // PC+1")
-    /*017*/ << tr("TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ))")
-    /*018*/ << tr("TMPByte nach Adresse schreiben // TMPByte<<1 // Set SR(NZC)")
-    /*019*/ << tr("TMPByte von PC-Adresse holen")
-    /*020*/ << tr("SR nach SP+0x0100 schreiben // SP-1")
-    /*021*/ << tr("TMPByte von PC-Adresse holen // AC or TMPByte // Set SR(NZ) // PC+1")
-    /*022*/ << tr("TMPByte von PC-Adresse holen // AC<<1 // Set SR(NZC)")
-    /*023*/ << tr("TMPByte von PC-Adresse holen // AC and TMPByte // Set SR(NZC) // PC+1")
-    /*024*/ << tr("Adresse Lo von PC-Adresse holen // PC+1")
-    /*025*/ << tr("Adresse Hi von PC-Adresse holen // PC+1")
-    /*026*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prüfen (BPL)")
-    /*027*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prüfen (BMI)")
-    /*028*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prüfen (BVC)")
-    /*029*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prüfen (BVS)")
-    /*030*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prüfen (BCC)")
-    /*031*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prüfen (BCS)")
-    /*032*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prüfen (BNE)")
-    /*033*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prüfen (BEQ)")
-    /*034*/ << tr("Lesen von PC-Adresse und verwerfen // BranchAdresse=PC+TMPByte")
-    /*035*/ << tr("FIX PC Hi Adresse")
-    /*036*/ << tr("Adresse Hi von Pointer-Adresse holen // Adresse+YR")
-    /*037*/ << tr("TMPByte von Adresse holen // Fix Adresse Hi MCT+1 // AC or TMPByte")
-    /*038*/ << tr("Adresse Hi von PC-Adresse holen // PC=Adresse")
-    /*039*/ << tr("Lesen von PC-Adresse und verwerfen // XR=AC // Set SR(NZ)")
-    /*040*/ << tr("Lesen von PC-Adresse und verwerfen // YR=AC // Set SR(NZ)")
-    /*041*/ << tr("Lesen von PC-Adresse und verwerfen // XR=SP // Set SR(NZ)")
-    /*042*/ << tr("Lesen von PC-Adresse und verwerfen // AC=XR // Set SR(NZ)")
-    /*043*/ << tr("Lesen von PC-Adresse und verwerfen // SP=XR")
-    /*044*/ << tr("Lesen von PC-Adresse und verwerfen // AC=YR // Set SR(NZ)")
-    /*045*/ << tr("AC nach SP+0x0100 schreiben // SP-1")
-    /*046*/ << tr("AC von SP+0x0100 lesen // SP+1")
-    /*047*/ << tr("AC von SP+0x0100 lesen // Set SR(NZ)")
-    /*048*/ << tr("SR von SP+0x0100 lesen // SP+1")
-    /*049*/ << tr("SR von SP+0x0100 lesen")
-    /*050*/ << tr("TMPByte von PC-Adresse lesen // AC + TMPByte + Carry // PC+1")
-    /*051*/ << tr("TMPByte von Adresse lesen // AC + TMPByte + Carry")
-    /*052*/ << tr("TMPByte von Adresse lesen // Adresse Lo + XR")
-    /*053*/ << tr("Adresse Hi von PC-Adresse holen // Adresse+XR  // PC+1")
-    /*054*/ << tr("Adresse Hi von PC-Adresse holen // Adresse+YR  // PC+1")
-    /*055*/ << tr("TMPByte von Adresse lesen // AC + TMPByte + Carry // if(idxReg<Adresse Lo) MCT++")
-    /*056*/ << tr("TMPByte von PC-Adresse lesen // AC - TMPByte - Carry // PC+1")
-    /*057*/ << tr("TMPByte von Adresse lesen // AC - TMPByte - Carry")
-    /*058*/ << tr("TMPByte von Adresse lesen // AC - TMPByte - Carry // if(idxReg<Adresse Lo) MCT++")
-    /*059*/ << tr("TMPByte von SP+0x0100 holen")
-    /*060*/ << tr("PC-Adresse Hi nach SP+0x0100 schreiben // SP--")
-    /*061*/ << tr("PC-Adresse Lo nach SP+0x0100 schreiben // SP--")
-    /*062*/ << tr("TMPByte von SP+0x0100 holen // SP+1")
-    /*063*/ << tr("PC-Adresse Lo von SP+0x0100 holen // SP+1")
-    /*064*/ << tr("PC-Adresse Hi von SP+0x0100 holen")
-    /*065*/ << tr("TMPByte von PC-Adresse laden // PC+1")
-    /*066*/ << tr("TMPByte von PC-Adresse lesen // AC and TMPByte // Set SR(NZ) // PC+1")
-    /*067*/ << tr("TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ)")
-    /*068*/ << tr("TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*069*/ << tr("TMPByte von Adresse lesen // CarrayFalg=0")
-    /*070*/ << tr("TMPByte von Adresse lesen // DezimalFalg=0")
-    /*071*/ << tr("TMPByte von Adresse lesen // InterruptFalg=0")
-    /*072*/ << tr("TMPByte von Adresse lesen // OverflowFalg=0")
-    /*073*/ << tr("TMPByte von Adresse lesen // CarrayFalg=1	")
-    /*074*/ << tr("TMPByte von Adresse lesen // DezimalFalg=1")
-    /*075*/ << tr("TMPByte von Adresse lesen // InterruptFalg=1")
-    /*076*/ << tr("TMPByte von Adresse lesen // BIT Operation")
-    /*077*/ << tr("AC nach Adresse schreiben")
-    /*078*/ << tr("XR nach Adresse schreiben")
-    /*079*/ << tr("YR nach Adresse schreiben")
-    /*080*/ << tr("AC von PC-Adresse lesen // Set SR(NZ) // PC+1")
-    /*081*/ << tr("AC von PC-Adresse lesen // Set SR(NZ)")
-    /*082*/ << tr("AC von PC-Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*083*/ << tr("XR von PC-Adresse lesen // Set SR(NZ) // PC+1")
-    /*084*/ << tr("XR von Adresse lesen // Set SR(NZ)")
-    /*085*/ << tr("XR von Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*086*/ << tr("YR von PC-Adresse lesen // Set SR(NZ) // PC+1")
-    /*087*/ << tr("YR von Adresse lesen // Set SR(NZ)")
-    /*088*/ << tr("YR von Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*089*/ << tr("TMPByte von Adresse lesen // XR+1 // Set SR(NZ)")
-    /*090*/ << tr("TMPByte von Adresse lesen // YR+1 // Set SR(NZ)")
-    /*091*/ << tr("TMPByte von Adresse lesen // XR-1 // Set SR(NZ)")
-    /*092*/ << tr("TMPByte von Adresse lesen // YR-1 // Set SR(NZ)")
-    /*093*/ << tr("Illegaler Opcode - wird noch nicht unterstützt // Reset")
-    /*094*/ << tr("PC LO von Adresse lesen // Adresse+1 (Nur Low Wert)")
-    /*095*/ << tr("PC HI von Adresse lesen")
-    /*096*/ << tr("PC LO von $FFFC lesen")
-    /*097*/ << tr("PC HI von $FFFD lesen")
-    /*098*/ << tr("TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*099*/ << tr("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC)")
-    /*100*/ << tr("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // if(idxReg<Adresse Lo) MCT++")
-    /*101*/ << tr("TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*102*/ << tr("TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
-    /*103*/ << tr("TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*104*/ << tr("TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
-    /*105*/ << tr("TMPByte von PC-Adresse lesen // AC XOR TMPByte // Set SR(NZC) // PC+1")
-    /*106*/ << tr("TMPByte von Adresse lesen // AC XOR TMPByte // Set SR(NZC)")
-    /*107*/ << tr("TMPByte von Adresse lesen // AC XOR TMPByte // if(idxReg<Adresse Lo) MCT++")
-    /*108*/ << tr("TMPByte von PC-Adresse holen // AC>>1 // Set SR(NZC)")
-    /*109*/ << tr("TMPByte nach Adresse schreiben // TMPByte>>1 // Set SR(NZC)")
-    /*110*/ << tr("TMPByte von PC-Adresse holen // C<-AC<<1<-C // Set SR(NZC)")
-    /*111*/ << tr("TMPByte nach Adresse schreiben // C<-TMPByte<<1<-C // Set SR(NZC)")
-    /*112*/ << tr("TMPByte von PC-Adresse holen // C->AC>>1->C // Set SR(NZC)")
-    /*113*/ << tr("TMPByte nach Adresse schreiben // C->TMPByte>>1->C // Set SR(NZC)")
-    /*114*/ << tr("TMPByte nach Adresse schreiben // TMPByte+1 // Set SR(NZ)")
-    /*115*/ << tr("TMPByte nach Adresse schreiben // TMPByte-1 // Set SR(NZ)")
-    /*116*/ << tr("SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag löschen")
-    /*117*/ << tr("PC Lo von 0xFFFA holen")
-    /*118*/ << tr("PC Hi von 0xFFFB holen")
-    /*119*/ << tr("TMPByte von Adresse holen // Fix Adresse Hi MCT+1")
-    /*120*/ << tr("TMPByte nach Adresse schreiben // Illegal [SLO]")
-    /*121*/ << tr("TMPByte nach Adresse schreiben // Illegal [RLA]")
-    /*122*/ << tr("TMPByte nach Adresse schreiben // Illegal [SRE]")
-    /*123*/ << tr("TMPByte nach Adresse schreiben // Illegal [RRA]")
-    /*124*/ << tr("TMPByte nach Adresse schreiben // Illegal [DCP]")
-    /*125*/ << tr("TMPByte nach Adresse schreiben // Illegal [ISB]")
-    /*126*/ << tr("AC von Adresse lesen // AC -> XR // Set SR(NZ) // Illegal [LAX]")
-    /*127*/ << tr("AC von Adresse lesen // AC -> XR // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++ // Illegal [LAX]")
-    /*128*/ << tr("AC von Adresse lesen // AC -> XR // Set SR(NZ) // Illegal [LAX]")
-    /*129*/ << tr("Illegal [ASR]")
-    /*130*/ << tr("Illegal [ARR]")
-    /*131*/ << tr("Illegal [ANE]")
-    /*132*/ << tr("Illegal [LXA]")
-    /*133*/ << tr("Illegal [SBX]")
-    /*134*/ << tr("Illegal [SHY]")
-    /*135*/ << tr("Illegal [SHX]")
-    /*136*/ << tr("Illegal [SHA]")
-    /*137*/ << tr("Illegal [SHS]")
-    /*138*/ << tr("Illegal [ANC]")
-    /*139*/ << tr("Illegal [LAE]")
-    /*140*/ << tr("Illegal [LAE] // if(idxReg<Adresse Lo) MCT++");
+    /*000*/ << trUtf8("Opcode von PC-Adresse holen // PC+1")
+    /*001*/ << trUtf8("Lesen von PC-Adresse und verwerfen // PC+1")
+    /*002*/ << trUtf8("PC Hi -> Stack // SR|16 // SP-1")
+    /*003*/ << trUtf8("PC Lo -> Stack // SP-1")
+    /*004*/ << trUtf8("SR -> Stack // SR|4 // SP-1")
+    /*005*/ << trUtf8("PC Lo von 0xFFFE holen")
+    /*006*/ << trUtf8("PC Hi von 0xFFFF holen")
+    /*007*/ << trUtf8("Pointer von PC-Adresse holen // PC+1")
+    /*008*/ << trUtf8("Lesen von Pointer und verwerfen // Pointer+XR")
+    /*009*/ << trUtf8("Adresse Lo von Pointer-Adresse holen // Pointer+1")
+    /*010*/ << trUtf8("Adresse Hi von Pointer-Adresse holen")
+    /*011*/ << trUtf8("TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ)")
+    /*012*/ << trUtf8("JAM")
+    /*013*/ << trUtf8("TMPByte von Adresse holen")
+    /*014*/ << trUtf8("TMPByte nach Adresse schreiben // ASL MEMORY // ORA")
+    /*015*/ << trUtf8("TMPByte nach Adresse schreiben")
+    /*016*/ << trUtf8("Adresse Hi = 0 // Adresse Lo von PC-Adresse holen // PC+1")
+    /*017*/ << trUtf8("TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ))")
+    /*018*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte<<1 // Set SR(NZC)")
+    /*019*/ << trUtf8("TMPByte von PC-Adresse holen")
+    /*020*/ << trUtf8("SR nach SP+0x0100 schreiben // SP-1")
+    /*021*/ << trUtf8("TMPByte von PC-Adresse holen // AC or TMPByte // Set SR(NZ) // PC+1")
+    /*022*/ << trUtf8("TMPByte von PC-Adresse holen // AC<<1 // Set SR(NZC)")
+    /*023*/ << trUtf8("TMPByte von PC-Adresse holen // AC and TMPByte // Set SR(NZC) // PC+1")
+    /*024*/ << trUtf8("Adresse Lo von PC-Adresse holen // PC+1")
+    /*025*/ << trUtf8("Adresse Hi von PC-Adresse holen // PC+1")
+    /*026*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prüfen (BPL)")
+    /*027*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prüfen (BMI)")
+    /*028*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prüfen (BVC)")
+    /*029*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prüfen (BVS)")
+    /*030*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prüfen (BCC)")
+    /*031*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prüfen (BCS)")
+    /*032*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prüfen (BNE)")
+    /*033*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prüfen (BEQ)")
+    /*034*/ << trUtf8("Lesen von PC-Adresse und verwerfen // BranchAdresse=PC+TMPByte")
+    /*035*/ << trUtf8("FIX PC Hi Adresse")
+    /*036*/ << trUtf8("Adresse Hi von Pointer-Adresse holen // Adresse+YR")
+    /*037*/ << trUtf8("TMPByte von Adresse holen // Fix Adresse Hi MCT+1 // AC or TMPByte")
+    /*038*/ << trUtf8("Adresse Hi von PC-Adresse holen // PC=Adresse")
+    /*039*/ << trUtf8("Lesen von PC-Adresse und verwerfen // XR=AC // Set SR(NZ)")
+    /*040*/ << trUtf8("Lesen von PC-Adresse und verwerfen // YR=AC // Set SR(NZ)")
+    /*041*/ << trUtf8("Lesen von PC-Adresse und verwerfen // XR=SP // Set SR(NZ)")
+    /*042*/ << trUtf8("Lesen von PC-Adresse und verwerfen // AC=XR // Set SR(NZ)")
+    /*043*/ << trUtf8("Lesen von PC-Adresse und verwerfen // SP=XR")
+    /*044*/ << trUtf8("Lesen von PC-Adresse und verwerfen // AC=YR // Set SR(NZ)")
+    /*045*/ << trUtf8("AC nach SP+0x0100 schreiben // SP-1")
+    /*046*/ << trUtf8("AC von SP+0x0100 lesen // SP+1")
+    /*047*/ << trUtf8("AC von SP+0x0100 lesen // Set SR(NZ)")
+    /*048*/ << trUtf8("SR von SP+0x0100 lesen // SP+1")
+    /*049*/ << trUtf8("SR von SP+0x0100 lesen")
+    /*050*/ << trUtf8("TMPByte von PC-Adresse lesen // AC + TMPByte + Carry // PC+1")
+    /*051*/ << trUtf8("TMPByte von Adresse lesen // AC + TMPByte + Carry")
+    /*052*/ << trUtf8("TMPByte von Adresse lesen // Adresse Lo + XR")
+    /*053*/ << trUtf8("Adresse Hi von PC-Adresse holen // Adresse+XR  // PC+1")
+    /*054*/ << trUtf8("Adresse Hi von PC-Adresse holen // Adresse+YR  // PC+1")
+    /*055*/ << trUtf8("TMPByte von Adresse lesen // AC + TMPByte + Carry // if(idxReg<Adresse Lo) MCT++")
+    /*056*/ << trUtf8("TMPByte von PC-Adresse lesen // AC - TMPByte - Carry // PC+1")
+    /*057*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte - Carry")
+    /*058*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte - Carry // if(idxReg<Adresse Lo) MCT++")
+    /*059*/ << trUtf8("TMPByte von SP+0x0100 holen")
+    /*060*/ << trUtf8("PC-Adresse Hi nach SP+0x0100 schreiben // SP--")
+    /*061*/ << trUtf8("PC-Adresse Lo nach SP+0x0100 schreiben // SP--")
+    /*062*/ << trUtf8("TMPByte von SP+0x0100 holen // SP+1")
+    /*063*/ << trUtf8("PC-Adresse Lo von SP+0x0100 holen // SP+1")
+    /*064*/ << trUtf8("PC-Adresse Hi von SP+0x0100 holen")
+    /*065*/ << trUtf8("TMPByte von PC-Adresse laden // PC+1")
+    /*066*/ << trUtf8("TMPByte von PC-Adresse lesen // AC and TMPByte // Set SR(NZ) // PC+1")
+    /*067*/ << trUtf8("TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ)")
+    /*068*/ << trUtf8("TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
+    /*069*/ << trUtf8("TMPByte von Adresse lesen // CarrayFalg=0")
+    /*070*/ << trUtf8("TMPByte von Adresse lesen // DezimalFalg=0")
+    /*071*/ << trUtf8("TMPByte von Adresse lesen // InterruptFalg=0")
+    /*072*/ << trUtf8("TMPByte von Adresse lesen // OverflowFalg=0")
+    /*073*/ << trUtf8("TMPByte von Adresse lesen // CarrayFalg=1	")
+    /*074*/ << trUtf8("TMPByte von Adresse lesen // DezimalFalg=1")
+    /*075*/ << trUtf8("TMPByte von Adresse lesen // InterruptFalg=1")
+    /*076*/ << trUtf8("TMPByte von Adresse lesen // BIT Operation")
+    /*077*/ << trUtf8("AC nach Adresse schreiben")
+    /*078*/ << trUtf8("XR nach Adresse schreiben")
+    /*079*/ << trUtf8("YR nach Adresse schreiben")
+    /*080*/ << trUtf8("AC von PC-Adresse lesen // Set SR(NZ) // PC+1")
+    /*081*/ << trUtf8("AC von PC-Adresse lesen // Set SR(NZ)")
+    /*082*/ << trUtf8("AC von PC-Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
+    /*083*/ << trUtf8("XR von PC-Adresse lesen // Set SR(NZ) // PC+1")
+    /*084*/ << trUtf8("XR von Adresse lesen // Set SR(NZ)")
+    /*085*/ << trUtf8("XR von Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
+    /*086*/ << trUtf8("YR von PC-Adresse lesen // Set SR(NZ) // PC+1")
+    /*087*/ << trUtf8("YR von Adresse lesen // Set SR(NZ)")
+    /*088*/ << trUtf8("YR von Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
+    /*089*/ << trUtf8("TMPByte von Adresse lesen // XR+1 // Set SR(NZ)")
+    /*090*/ << trUtf8("TMPByte von Adresse lesen // YR+1 // Set SR(NZ)")
+    /*091*/ << trUtf8("TMPByte von Adresse lesen // XR-1 // Set SR(NZ)")
+    /*092*/ << trUtf8("TMPByte von Adresse lesen // YR-1 // Set SR(NZ)")
+    /*093*/ << trUtf8("Illegaler Opcode - wird noch nicht unterstützt // Reset")
+    /*094*/ << trUtf8("PC LO von Adresse lesen // Adresse+1 (Nur Low Wert)")
+    /*095*/ << trUtf8("PC HI von Adresse lesen")
+    /*096*/ << trUtf8("PC LO von $FFFC lesen")
+    /*097*/ << trUtf8("PC HI von $FFFD lesen")
+    /*098*/ << trUtf8("TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC) // PC+1")
+    /*099*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC)")
+    /*100*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // if(idxReg<Adresse Lo) MCT++")
+    /*101*/ << trUtf8("TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
+    /*102*/ << trUtf8("TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
+    /*103*/ << trUtf8("TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
+    /*104*/ << trUtf8("TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
+    /*105*/ << trUtf8("TMPByte von PC-Adresse lesen // AC XOR TMPByte // Set SR(NZC) // PC+1")
+    /*106*/ << trUtf8("TMPByte von Adresse lesen // AC XOR TMPByte // Set SR(NZC)")
+    /*107*/ << trUtf8("TMPByte von Adresse lesen // AC XOR TMPByte // if(idxReg<Adresse Lo) MCT++")
+    /*108*/ << trUtf8("TMPByte von PC-Adresse holen // AC>>1 // Set SR(NZC)")
+    /*109*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte>>1 // Set SR(NZC)")
+    /*110*/ << trUtf8("TMPByte von PC-Adresse holen // C<-AC<<1<-C // Set SR(NZC)")
+    /*111*/ << trUtf8("TMPByte nach Adresse schreiben // C<-TMPByte<<1<-C // Set SR(NZC)")
+    /*112*/ << trUtf8("TMPByte von PC-Adresse holen // C->AC>>1->C // Set SR(NZC)")
+    /*113*/ << trUtf8("TMPByte nach Adresse schreiben // C->TMPByte>>1->C // Set SR(NZC)")
+    /*114*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte+1 // Set SR(NZ)")
+    /*115*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte-1 // Set SR(NZ)")
+    /*116*/ << trUtf8("SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag löschen")
+    /*117*/ << trUtf8("PC Lo von 0xFFFA holen")
+    /*118*/ << trUtf8("PC Hi von 0xFFFB holen")
+    /*119*/ << trUtf8("TMPByte von Adresse holen // Fix Adresse Hi MCT+1")
+    /*120*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [SLO]")
+    /*121*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [RLA]")
+    /*122*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [SRE]")
+    /*123*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [RRA]")
+    /*124*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [DCP]")
+    /*125*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [ISB]")
+    /*126*/ << trUtf8("AC von Adresse lesen // AC -> XR // Set SR(NZ) // Illegal [LAX]")
+    /*127*/ << trUtf8("AC von Adresse lesen // AC -> XR // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++ // Illegal [LAX]")
+    /*128*/ << trUtf8("AC von Adresse lesen // AC -> XR // Set SR(NZ) // Illegal [LAX]")
+    /*129*/ << trUtf8("Illegal [ASR]")
+    /*130*/ << trUtf8("Illegal [ARR]")
+    /*131*/ << trUtf8("Illegal [ANE]")
+    /*132*/ << trUtf8("Illegal [LXA]")
+    /*133*/ << trUtf8("Illegal [SBX]")
+    /*134*/ << trUtf8("Illegal [SHY]")
+    /*135*/ << trUtf8("Illegal [SHX]")
+    /*136*/ << trUtf8("Illegal [SHA]")
+    /*137*/ << trUtf8("Illegal [SHS]")
+    /*138*/ << trUtf8("Illegal [ANC]")
+    /*139*/ << trUtf8("Illegal [LAE]")
+    /*140*/ << trUtf8("Illegal [LAE] // if(idxReg<Adresse Lo) MCT++");
 }
 
 void DebuggerWindow::RetranslateUi()
@@ -391,147 +391,147 @@ void DebuggerWindow::RetranslateUi()
     ui->sr_widget->RetranslateUi();
 
     MicroCodeStringTable6510 = QStringList()
-    /*000*/ << tr("Opcode von PC-Adresse holen // PC+1")
-    /*001*/ << tr("Lesen von PC-Adresse und verwerfen // PC+1")
-    /*002*/ << tr("PC Hi -> Stack // SR|16 // SP-1")
-    /*003*/ << tr("PC Lo -> Stack // SP-1")
-    /*004*/ << tr("SR -> Stack // SR|4 // SP-1")
-    /*005*/ << tr("PC Lo von 0xFFFE holen")
-    /*006*/ << tr("PC Hi von 0xFFFF holen")
-    /*007*/ << tr("Pointer von PC-Adresse holen // PC+1")
-    /*008*/ << tr("Lesen von Pointer und verwerfen // Pointer+XR")
-    /*009*/ << tr("Adresse Lo von Pointer-Adresse holen // Pointer+1")
-    /*010*/ << tr("Adresse Hi von Pointer-Adresse holen")
-    /*011*/ << tr("TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ)")
-    /*012*/ << tr("JAM")
-    /*013*/ << tr("TMPByte von Adresse holen")
-    /*014*/ << tr("TMPByte nach Adresse schreiben // ASL MEMORY // ORA")
-    /*015*/ << tr("TMPByte nach Adresse schreiben")
-    /*016*/ << tr("Adresse Hi = 0 // Adresse Lo von PC-Adresse holen // PC+1")
-    /*017*/ << tr("TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ))")
-    /*018*/ << tr("TMPByte nach Adresse schreiben // TMPByte<<1 // Set SR(NZC)")
-    /*019*/ << tr("TMPByte von PC-Adresse holen")
-    /*020*/ << tr("SR nach SP+0x0100 schreiben // SP-1")
-    /*021*/ << tr("TMPByte von PC-Adresse holen // AC or TMPByte // Set SR(NZ) // PC+1")
-    /*022*/ << tr("TMPByte von PC-Adresse holen // AC<<1 // Set SR(NZC)")
-    /*023*/ << tr("TMPByte von PC-Adresse holen // AC and TMPByte // Set SR(NZC) // PC+1")
-    /*024*/ << tr("Adresse Lo von PC-Adresse holen // PC+1")
-    /*025*/ << tr("Adresse Hi von PC-Adresse holen // PC+1")
-    /*026*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prüfen (BPL)")
-    /*027*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prüfen (BMI)")
-    /*028*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prüfen (BVC)")
-    /*029*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prüfen (BVS)")
-    /*030*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prüfen (BCC)")
-    /*031*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prüfen (BCS)")
-    /*032*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prüfen (BNE)")
-    /*033*/ << tr("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prüfen (BEQ)")
-    /*034*/ << tr("Lesen von PC-Adresse und verwerfen // BranchAdresse=PC+TMPByte")
-    /*035*/ << tr("FIX PC Hi Adresse")
-    /*036*/ << tr("Adresse Hi von Pointer-Adresse holen // Adresse+YR")
-    /*037*/ << tr("TMPByte von Adresse holen // Fix Adresse Hi MCT+1 // AC or TMPByte")
-    /*038*/ << tr("Adresse Hi von PC-Adresse holen // PC=Adresse")
-    /*039*/ << tr("Lesen von PC-Adresse und verwerfen // XR=AC // Set SR(NZ)")
-    /*040*/ << tr("Lesen von PC-Adresse und verwerfen // YR=AC // Set SR(NZ)")
-    /*041*/ << tr("Lesen von PC-Adresse und verwerfen // XR=SP // Set SR(NZ)")
-    /*042*/ << tr("Lesen von PC-Adresse und verwerfen // AC=XR // Set SR(NZ)")
-    /*043*/ << tr("Lesen von PC-Adresse und verwerfen // SP=XR")
-    /*044*/ << tr("Lesen von PC-Adresse und verwerfen // AC=YR // Set SR(NZ)")
-    /*045*/ << tr("AC nach SP+0x0100 schreiben // SP-1")
-    /*046*/ << tr("AC von SP+0x0100 lesen // SP+1")
-    /*047*/ << tr("AC von SP+0x0100 lesen // Set SR(NZ)")
-    /*048*/ << tr("SR von SP+0x0100 lesen // SP+1")
-    /*049*/ << tr("SR von SP+0x0100 lesen")
-    /*050*/ << tr("TMPByte von PC-Adresse lesen // AC + TMPByte + Carry // PC+1")
-    /*051*/ << tr("TMPByte von Adresse lesen // AC + TMPByte + Carry")
-    /*052*/ << tr("TMPByte von Adresse lesen // Adresse Lo + XR")
-    /*053*/ << tr("Adresse Hi von PC-Adresse holen // Adresse+XR  // PC+1")
-    /*054*/ << tr("Adresse Hi von PC-Adresse holen // Adresse+YR  // PC+1")
-    /*055*/ << tr("TMPByte von Adresse lesen // AC + TMPByte + Carry // if(idxReg<Adresse Lo) MCT++")
-    /*056*/ << tr("TMPByte von PC-Adresse lesen // AC - TMPByte - Carry // PC+1")
-    /*057*/ << tr("TMPByte von Adresse lesen // AC - TMPByte - Carry")
-    /*058*/ << tr("TMPByte von Adresse lesen // AC - TMPByte - Carry // if(idxReg<Adresse Lo) MCT++")
-    /*059*/ << tr("TMPByte von SP+0x0100 holen")
-    /*060*/ << tr("PC-Adresse Hi nach SP+0x0100 schreiben // SP--")
-    /*061*/ << tr("PC-Adresse Lo nach SP+0x0100 schreiben // SP--")
-    /*062*/ << tr("TMPByte von SP+0x0100 holen // SP+1")
-    /*063*/ << tr("PC-Adresse Lo von SP+0x0100 holen // SP+1")
-    /*064*/ << tr("PC-Adresse Hi von SP+0x0100 holen")
-    /*065*/ << tr("TMPByte von PC-Adresse laden // PC+1")
-    /*066*/ << tr("TMPByte von PC-Adresse lesen // AC and TMPByte // Set SR(NZ) // PC+1")
-    /*067*/ << tr("TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ)")
-    /*068*/ << tr("TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*069*/ << tr("TMPByte von Adresse lesen // CarrayFalg=0")
-    /*070*/ << tr("TMPByte von Adresse lesen // DezimalFalg=0")
-    /*071*/ << tr("TMPByte von Adresse lesen // InterruptFalg=0")
-    /*072*/ << tr("TMPByte von Adresse lesen // OverflowFalg=0")
-    /*073*/ << tr("TMPByte von Adresse lesen // CarrayFalg=1	")
-    /*074*/ << tr("TMPByte von Adresse lesen // DezimalFalg=1")
-    /*075*/ << tr("TMPByte von Adresse lesen // InterruptFalg=1")
-    /*076*/ << tr("TMPByte von Adresse lesen // BIT Operation")
-    /*077*/ << tr("AC nach Adresse schreiben")
-    /*078*/ << tr("XR nach Adresse schreiben")
-    /*079*/ << tr("YR nach Adresse schreiben")
-    /*080*/ << tr("AC von PC-Adresse lesen // Set SR(NZ) // PC+1")
-    /*081*/ << tr("AC von PC-Adresse lesen // Set SR(NZ)")
-    /*082*/ << tr("AC von PC-Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*083*/ << tr("XR von PC-Adresse lesen // Set SR(NZ) // PC+1")
-    /*084*/ << tr("XR von Adresse lesen // Set SR(NZ)")
-    /*085*/ << tr("XR von Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*086*/ << tr("YR von PC-Adresse lesen // Set SR(NZ) // PC+1")
-    /*087*/ << tr("YR von Adresse lesen // Set SR(NZ)")
-    /*088*/ << tr("YR von Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*089*/ << tr("TMPByte von Adresse lesen // XR+1 // Set SR(NZ)")
-    /*090*/ << tr("TMPByte von Adresse lesen // YR+1 // Set SR(NZ)")
-    /*091*/ << tr("TMPByte von Adresse lesen // XR-1 // Set SR(NZ)")
-    /*092*/ << tr("TMPByte von Adresse lesen // YR-1 // Set SR(NZ)")
-    /*093*/ << tr("Illegaler Opcode - wird noch nicht unterstützt // Reset")
-    /*094*/ << tr("PC LO von Adresse lesen // Adresse+1 (Nur Low Wert)")
-    /*095*/ << tr("PC HI von Adresse lesen")
-    /*096*/ << tr("PC LO von $FFFC lesen")
-    /*097*/ << tr("PC HI von $FFFD lesen")
-    /*098*/ << tr("TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*099*/ << tr("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC)")
-    /*100*/ << tr("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // if(idxReg<Adresse Lo) MCT++")
-    /*101*/ << tr("TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*102*/ << tr("TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
-    /*103*/ << tr("TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*104*/ << tr("TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
-    /*105*/ << tr("TMPByte von PC-Adresse lesen // AC XOR TMPByte // Set SR(NZC) // PC+1")
-    /*106*/ << tr("TMPByte von Adresse lesen // AC XOR TMPByte // Set SR(NZC)")
-    /*107*/ << tr("TMPByte von Adresse lesen // AC XOR TMPByte // if(idxReg<Adresse Lo) MCT++")
-    /*108*/ << tr("TMPByte von PC-Adresse holen // AC>>1 // Set SR(NZC)")
-    /*109*/ << tr("TMPByte nach Adresse schreiben // TMPByte>>1 // Set SR(NZC)")
-    /*110*/ << tr("TMPByte von PC-Adresse holen // C<-AC<<1<-C // Set SR(NZC)")
-    /*111*/ << tr("TMPByte nach Adresse schreiben // C<-TMPByte<<1<-C // Set SR(NZC)")
-    /*112*/ << tr("TMPByte von PC-Adresse holen // C->AC>>1->C // Set SR(NZC)")
-    /*113*/ << tr("TMPByte nach Adresse schreiben // C->TMPByte>>1->C // Set SR(NZC)")
-    /*114*/ << tr("TMPByte nach Adresse schreiben // TMPByte+1 // Set SR(NZ)")
-    /*115*/ << tr("TMPByte nach Adresse schreiben // TMPByte-1 // Set SR(NZ)")
-    /*116*/ << tr("SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag löschen")
-    /*117*/ << tr("PC Lo von 0xFFFA holen")
-    /*118*/ << tr("PC Hi von 0xFFFB holen")
-    /*119*/ << tr("TMPByte von Adresse holen // Fix Adresse Hi MCT+1")
-    /*120*/ << tr("TMPByte nach Adresse schreiben // Illegal [SLO]")
-    /*121*/ << tr("TMPByte nach Adresse schreiben // Illegal [RLA]")
-    /*122*/ << tr("TMPByte nach Adresse schreiben // Illegal [SRE]")
-    /*123*/ << tr("TMPByte nach Adresse schreiben // Illegal [RRA]")
-    /*124*/ << tr("TMPByte nach Adresse schreiben // Illegal [DCP]")
-    /*125*/ << tr("TMPByte nach Adresse schreiben // Illegal [ISB]")
-    /*126*/ << tr("AC von Adresse lesen // AC -> XR // Set SR(NZ) // Illegal [LAX]")
-    /*127*/ << tr("AC von Adresse lesen // AC -> XR // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++ // Illegal [LAX]")
-    /*128*/ << tr("AC von Adresse lesen // AC -> XR // Set SR(NZ) // Illegal [LAX]")
-    /*129*/ << tr("Illegal [ASR]")
-    /*130*/ << tr("Illegal [ARR]")
-    /*131*/ << tr("Illegal [ANE]")
-    /*132*/ << tr("Illegal [LXA]")
-    /*133*/ << tr("Illegal [SBX]")
-    /*134*/ << tr("Illegal [SHY]")
-    /*135*/ << tr("Illegal [SHX]")
-    /*136*/ << tr("Illegal [SHA]")
-    /*137*/ << tr("Illegal [SHS]")
-    /*138*/ << tr("Illegal [ANC]")
-    /*139*/ << tr("Illegal [LAE]")
-    /*140*/ << tr("Illegal [LAE] // if(idxReg<Adresse Lo) MCT++");
+    /*000*/ << trUtf8("Opcode von PC-Adresse holen // PC+1")
+    /*001*/ << trUtf8("Lesen von PC-Adresse und verwerfen // PC+1")
+    /*002*/ << trUtf8("PC Hi -> Stack // SR|16 // SP-1")
+    /*003*/ << trUtf8("PC Lo -> Stack // SP-1")
+    /*004*/ << trUtf8("SR -> Stack // SR|4 // SP-1")
+    /*005*/ << trUtf8("PC Lo von 0xFFFE holen")
+    /*006*/ << trUtf8("PC Hi von 0xFFFF holen")
+    /*007*/ << trUtf8("Pointer von PC-Adresse holen // PC+1")
+    /*008*/ << trUtf8("Lesen von Pointer und verwerfen // Pointer+XR")
+    /*009*/ << trUtf8("Adresse Lo von Pointer-Adresse holen // Pointer+1")
+    /*010*/ << trUtf8("Adresse Hi von Pointer-Adresse holen")
+    /*011*/ << trUtf8("TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ)")
+    /*012*/ << trUtf8("JAM")
+    /*013*/ << trUtf8("TMPByte von Adresse holen")
+    /*014*/ << trUtf8("TMPByte nach Adresse schreiben // ASL MEMORY // ORA")
+    /*015*/ << trUtf8("TMPByte nach Adresse schreiben")
+    /*016*/ << trUtf8("Adresse Hi = 0 // Adresse Lo von PC-Adresse holen // PC+1")
+    /*017*/ << trUtf8("TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ))")
+    /*018*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte<<1 // Set SR(NZC)")
+    /*019*/ << trUtf8("TMPByte von PC-Adresse holen")
+    /*020*/ << trUtf8("SR nach SP+0x0100 schreiben // SP-1")
+    /*021*/ << trUtf8("TMPByte von PC-Adresse holen // AC or TMPByte // Set SR(NZ) // PC+1")
+    /*022*/ << trUtf8("TMPByte von PC-Adresse holen // AC<<1 // Set SR(NZC)")
+    /*023*/ << trUtf8("TMPByte von PC-Adresse holen // AC and TMPByte // Set SR(NZC) // PC+1")
+    /*024*/ << trUtf8("Adresse Lo von PC-Adresse holen // PC+1")
+    /*025*/ << trUtf8("Adresse Hi von PC-Adresse holen // PC+1")
+    /*026*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prüfen (BPL)")
+    /*027*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prüfen (BMI)")
+    /*028*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prüfen (BVC)")
+    /*029*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prüfen (BVS)")
+    /*030*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prüfen (BCC)")
+    /*031*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prüfen (BCS)")
+    /*032*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prüfen (BNE)")
+    /*033*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prüfen (BEQ)")
+    /*034*/ << trUtf8("Lesen von PC-Adresse und verwerfen // BranchAdresse=PC+TMPByte")
+    /*035*/ << trUtf8("FIX PC Hi Adresse")
+    /*036*/ << trUtf8("Adresse Hi von Pointer-Adresse holen // Adresse+YR")
+    /*037*/ << trUtf8("TMPByte von Adresse holen // Fix Adresse Hi MCT+1 // AC or TMPByte")
+    /*038*/ << trUtf8("Adresse Hi von PC-Adresse holen // PC=Adresse")
+    /*039*/ << trUtf8("Lesen von PC-Adresse und verwerfen // XR=AC // Set SR(NZ)")
+    /*040*/ << trUtf8("Lesen von PC-Adresse und verwerfen // YR=AC // Set SR(NZ)")
+    /*041*/ << trUtf8("Lesen von PC-Adresse und verwerfen // XR=SP // Set SR(NZ)")
+    /*042*/ << trUtf8("Lesen von PC-Adresse und verwerfen // AC=XR // Set SR(NZ)")
+    /*043*/ << trUtf8("Lesen von PC-Adresse und verwerfen // SP=XR")
+    /*044*/ << trUtf8("Lesen von PC-Adresse und verwerfen // AC=YR // Set SR(NZ)")
+    /*045*/ << trUtf8("AC nach SP+0x0100 schreiben // SP-1")
+    /*046*/ << trUtf8("AC von SP+0x0100 lesen // SP+1")
+    /*047*/ << trUtf8("AC von SP+0x0100 lesen // Set SR(NZ)")
+    /*048*/ << trUtf8("SR von SP+0x0100 lesen // SP+1")
+    /*049*/ << trUtf8("SR von SP+0x0100 lesen")
+    /*050*/ << trUtf8("TMPByte von PC-Adresse lesen // AC + TMPByte + Carry // PC+1")
+    /*051*/ << trUtf8("TMPByte von Adresse lesen // AC + TMPByte + Carry")
+    /*052*/ << trUtf8("TMPByte von Adresse lesen // Adresse Lo + XR")
+    /*053*/ << trUtf8("Adresse Hi von PC-Adresse holen // Adresse+XR  // PC+1")
+    /*054*/ << trUtf8("Adresse Hi von PC-Adresse holen // Adresse+YR  // PC+1")
+    /*055*/ << trUtf8("TMPByte von Adresse lesen // AC + TMPByte + Carry // if(idxReg<Adresse Lo) MCT++")
+    /*056*/ << trUtf8("TMPByte von PC-Adresse lesen // AC - TMPByte - Carry // PC+1")
+    /*057*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte - Carry")
+    /*058*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte - Carry // if(idxReg<Adresse Lo) MCT++")
+    /*059*/ << trUtf8("TMPByte von SP+0x0100 holen")
+    /*060*/ << trUtf8("PC-Adresse Hi nach SP+0x0100 schreiben // SP--")
+    /*061*/ << trUtf8("PC-Adresse Lo nach SP+0x0100 schreiben // SP--")
+    /*062*/ << trUtf8("TMPByte von SP+0x0100 holen // SP+1")
+    /*063*/ << trUtf8("PC-Adresse Lo von SP+0x0100 holen // SP+1")
+    /*064*/ << trUtf8("PC-Adresse Hi von SP+0x0100 holen")
+    /*065*/ << trUtf8("TMPByte von PC-Adresse laden // PC+1")
+    /*066*/ << trUtf8("TMPByte von PC-Adresse lesen // AC and TMPByte // Set SR(NZ) // PC+1")
+    /*067*/ << trUtf8("TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ)")
+    /*068*/ << trUtf8("TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
+    /*069*/ << trUtf8("TMPByte von Adresse lesen // CarrayFalg=0")
+    /*070*/ << trUtf8("TMPByte von Adresse lesen // DezimalFalg=0")
+    /*071*/ << trUtf8("TMPByte von Adresse lesen // InterruptFalg=0")
+    /*072*/ << trUtf8("TMPByte von Adresse lesen // OverflowFalg=0")
+    /*073*/ << trUtf8("TMPByte von Adresse lesen // CarrayFalg=1	")
+    /*074*/ << trUtf8("TMPByte von Adresse lesen // DezimalFalg=1")
+    /*075*/ << trUtf8("TMPByte von Adresse lesen // InterruptFalg=1")
+    /*076*/ << trUtf8("TMPByte von Adresse lesen // BIT Operation")
+    /*077*/ << trUtf8("AC nach Adresse schreiben")
+    /*078*/ << trUtf8("XR nach Adresse schreiben")
+    /*079*/ << trUtf8("YR nach Adresse schreiben")
+    /*080*/ << trUtf8("AC von PC-Adresse lesen // Set SR(NZ) // PC+1")
+    /*081*/ << trUtf8("AC von PC-Adresse lesen // Set SR(NZ)")
+    /*082*/ << trUtf8("AC von PC-Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
+    /*083*/ << trUtf8("XR von PC-Adresse lesen // Set SR(NZ) // PC+1")
+    /*084*/ << trUtf8("XR von Adresse lesen // Set SR(NZ)")
+    /*085*/ << trUtf8("XR von Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
+    /*086*/ << trUtf8("YR von PC-Adresse lesen // Set SR(NZ) // PC+1")
+    /*087*/ << trUtf8("YR von Adresse lesen // Set SR(NZ)")
+    /*088*/ << trUtf8("YR von Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
+    /*089*/ << trUtf8("TMPByte von Adresse lesen // XR+1 // Set SR(NZ)")
+    /*090*/ << trUtf8("TMPByte von Adresse lesen // YR+1 // Set SR(NZ)")
+    /*091*/ << trUtf8("TMPByte von Adresse lesen // XR-1 // Set SR(NZ)")
+    /*092*/ << trUtf8("TMPByte von Adresse lesen // YR-1 // Set SR(NZ)")
+    /*093*/ << trUtf8("Illegaler Opcode - wird noch nicht unterstützt // Reset")
+    /*094*/ << trUtf8("PC LO von Adresse lesen // Adresse+1 (Nur Low Wert)")
+    /*095*/ << trUtf8("PC HI von Adresse lesen")
+    /*096*/ << trUtf8("PC LO von $FFFC lesen")
+    /*097*/ << trUtf8("PC HI von $FFFD lesen")
+    /*098*/ << trUtf8("TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC) // PC+1")
+    /*099*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC)")
+    /*100*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // if(idxReg<Adresse Lo) MCT++")
+    /*101*/ << trUtf8("TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
+    /*102*/ << trUtf8("TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
+    /*103*/ << trUtf8("TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
+    /*104*/ << trUtf8("TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
+    /*105*/ << trUtf8("TMPByte von PC-Adresse lesen // AC XOR TMPByte // Set SR(NZC) // PC+1")
+    /*106*/ << trUtf8("TMPByte von Adresse lesen // AC XOR TMPByte // Set SR(NZC)")
+    /*107*/ << trUtf8("TMPByte von Adresse lesen // AC XOR TMPByte // if(idxReg<Adresse Lo) MCT++")
+    /*108*/ << trUtf8("TMPByte von PC-Adresse holen // AC>>1 // Set SR(NZC)")
+    /*109*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte>>1 // Set SR(NZC)")
+    /*110*/ << trUtf8("TMPByte von PC-Adresse holen // C<-AC<<1<-C // Set SR(NZC)")
+    /*111*/ << trUtf8("TMPByte nach Adresse schreiben // C<-TMPByte<<1<-C // Set SR(NZC)")
+    /*112*/ << trUtf8("TMPByte von PC-Adresse holen // C->AC>>1->C // Set SR(NZC)")
+    /*113*/ << trUtf8("TMPByte nach Adresse schreiben // C->TMPByte>>1->C // Set SR(NZC)")
+    /*114*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte+1 // Set SR(NZ)")
+    /*115*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte-1 // Set SR(NZ)")
+    /*116*/ << trUtf8("SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag löschen")
+    /*117*/ << trUtf8("PC Lo von 0xFFFA holen")
+    /*118*/ << trUtf8("PC Hi von 0xFFFB holen")
+    /*119*/ << trUtf8("TMPByte von Adresse holen // Fix Adresse Hi MCT+1")
+    /*120*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [SLO]")
+    /*121*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [RLA]")
+    /*122*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [SRE]")
+    /*123*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [RRA]")
+    /*124*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [DCP]")
+    /*125*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [ISB]")
+    /*126*/ << trUtf8("AC von Adresse lesen // AC -> XR // Set SR(NZ) // Illegal [LAX]")
+    /*127*/ << trUtf8("AC von Adresse lesen // AC -> XR // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++ // Illegal [LAX]")
+    /*128*/ << trUtf8("AC von Adresse lesen // AC -> XR // Set SR(NZ) // Illegal [LAX]")
+    /*129*/ << trUtf8("Illegal [ASR]")
+    /*130*/ << trUtf8("Illegal [ARR]")
+    /*131*/ << trUtf8("Illegal [ANE]")
+    /*132*/ << trUtf8("Illegal [LXA]")
+    /*133*/ << trUtf8("Illegal [SBX]")
+    /*134*/ << trUtf8("Illegal [SHY]")
+    /*135*/ << trUtf8("Illegal [SHX]")
+    /*136*/ << trUtf8("Illegal [SHA]")
+    /*137*/ << trUtf8("Illegal [SHS]")
+    /*138*/ << trUtf8("Illegal [ANC]")
+    /*139*/ << trUtf8("Illegal [LAE]")
+    /*140*/ << trUtf8("Illegal [LAE] // if(idxReg<Adresse Lo) MCT++");
 
     this->update();
     this->UpdateRegister();
@@ -717,7 +717,7 @@ void DebuggerWindow::onShowContextMenu(const QPoint& pos)
     // QPoint globalPos = myWidget->viewport()->mapToGlobal(pos);
 
     QMenu myMenu;
-    myMenu.addAction(tr("Test1"));
+    myMenu.addAction(trUtf8("Test1"));
     // ...
 
     QAction* selectedItem = myMenu.exec(globalPos);
@@ -792,7 +792,7 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
     value = in_str.toUShort(&ok,0);                //
     if(!ok)
     {
-        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gültiges Zahlenformat benutzt !"));
+        QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Es wurde kein gültiges Zahlenformat benutzt !"));
         return;
     }
 
@@ -808,7 +808,7 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
         if(value > 0x100) value -= 0x100;
         if(value > 0xFF)
         {
-            QMessageBox::warning(this,tr("Eingabefehler..."),tr("Der Wert muss zwischen 0 und 511 liegen !"));
+            QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Der Wert muss zwischen 0 und 511 liegen !"));
             return;
         }
         CpuReg.REG_MASK = REG_MASK_SP;
@@ -817,7 +817,7 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
     case 2:
         if(value > 0xFF)
         {
-            QMessageBox::warning(this,tr("Eingabefehler..."),tr("Der Wert muss zwischen 0 und 255 liegen !"));
+            QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
         CpuReg.REG_MASK = REG_MASK_AC;
@@ -826,7 +826,7 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
     case 3:
         if(value > 0xFF)
         {
-            QMessageBox::warning(this,tr("Eingabefehler..."),tr("Der Wert muss zwischen 0 und 255 liegen !"));
+            QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
         CpuReg.REG_MASK = REG_MASK_XR;
@@ -835,7 +835,7 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
     case 4:
         if(value > 0xFF)
         {
-            QMessageBox::warning(this,tr("Eingabefehler..."),tr("Der Wert muss zwischen 0 und 255 liegen !"));
+            QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
         CpuReg.REG_MASK = REG_MASK_YR;
@@ -844,7 +844,7 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
     case 5:
         if(value > 0xFF)
         {
-            QMessageBox::warning(this,tr("Eingabefehler..."),tr("Der Wert muss zwischen 0 und 255 liegen !"));
+            QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
         CpuReg.REG_MASK = REG_MASK_SR;
@@ -945,8 +945,8 @@ bool DebuggerWindow::getSaveFileName(QWidget *parent, QString caption, QString f
        extension = extension.left(extension.indexOf(")"));
        extension = extension.simplified();
 
-      int result = QMessageBox::question(parent, QObject::tr("Überschreiben?"),
-         QObject::tr("Soll die Datei \"%1\" überschrieben werden?").arg(fileInfo.fileName()),
+      int result = QMessageBox::question(parent, QObject::trUtf8("Überschreiben?"),
+         QObject::trUtf8("Soll die Datei \"%1\" überschrieben werden?").arg(fileInfo.fileName()),
          QMessageBox::Yes,
          QMessageBox::No | QMessageBox::Default,
          QMessageBox::Cancel | QMessageBox::Escape);
@@ -1253,7 +1253,7 @@ void DebuggerWindow::on_AssAdresseIn_returnPressed()
     value = in_str.toUShort(&ok,0);                //
     if(!ok)
     {
-        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gültiges Zahlenformat benutzt !"));
+        QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Es wurde kein gültiges Zahlenformat benutzt !"));
         return;
     }
 
@@ -1485,27 +1485,27 @@ void DebuggerWindow::on_AssAdressierungIn_returnPressed()
         switch(new_adress)
         {
         case 0:
-            QMessageBox::warning(this,tr("Fehler...!"),tr("Fehlerhafte Adresse."));
+            QMessageBox::warning(this,trUtf8("Fehler...!"),trUtf8("Fehlerhafte Adresse."));
             ui->AssAdresseIn->selectAll();
             ui->AssAdresseIn->setFocus();
             break;
         case 1:
-            QMessageBox::warning(this,tr("Fehler...!"),tr("Unbekanntes Mnemonic."));
+            QMessageBox::warning(this,trUtf8("Fehler...!"),trUtf8("Unbekanntes Mnemonic."));
             ui->AssMnemonicIn->selectAll();
             ui->AssMnemonicIn->setFocus();
             break;
         case 2:
-            QMessageBox::warning(this,tr("Fehler...!"),tr("Unbekannte Adressierung."));
+            QMessageBox::warning(this,trUtf8("Fehler...!"),trUtf8("Unbekannte Adressierung."));
             ui->AssAdressierungIn->selectAll();
             ui->AssAdressierungIn->setFocus();
             break;
         case 3:
-            QMessageBox::warning(this,tr("Fehler...!"),tr("Spungweite für Branchbefehl ist zu groß."));
+            QMessageBox::warning(this,trUtf8("Fehler...!"),trUtf8("Spungweite für Branchbefehl ist zu groß."));
             ui->AssAdressierungIn->selectAll();
             ui->AssAdressierungIn->setFocus();
             break;
         case 4:
-            QMessageBox::warning(this,tr("Fehler...!"),tr("Dieser Opcode unterstützt nicht diese Adressierung."));
+            QMessageBox::warning(this,trUtf8("Fehler...!"),trUtf8("Dieser Opcode unterstützt nicht diese Adressierung."));
             ui->AssAdressierungIn->selectAll();
             ui->AssAdressierungIn->setFocus();
             break;
@@ -1662,8 +1662,8 @@ void DebuggerWindow::on_AnimationStop_clicked()
 
 void DebuggerWindow::on_AnimationSpeed_valueChanged(int value)
 {
-    if(value == 1) ui->anispeed_out->setText(QVariant(value).toString() + tr(" Zyklus/Sek"));
-    else ui->anispeed_out->setText(QVariant(value).toString() + tr(" Zyklen/Sek"));
+    if(value == 1) ui->anispeed_out->setText(QVariant(value).toString() + trUtf8(" Zyklus/Sek"));
+    else ui->anispeed_out->setText(QVariant(value).toString() + trUtf8(" Zyklen/Sek"));
     c64->SetDebugAnimationSpeed(value);
 }
 
@@ -1696,7 +1696,7 @@ void DebuggerWindow::on_AddBreakpoint_clicked()
         if(AktSource > 0) bg = c64->floppy[AktFloppyNr]->GetBreakGroup(index);
         else bg = c64->GetBreakGroup(index);
 
-        QString Name = tr("Haltepunkt (") + QVariant(auto_num[AktSource]++).toString() + ")";
+        QString Name = trUtf8("Haltepunkt (") + QVariant(auto_num[AktSource]++).toString() + ")";
         strcpy(bg->Name,Name.toLocal8Bit().constData());
         bg->Enable = true;
 
@@ -1724,7 +1724,7 @@ void DebuggerWindow::on_DelBreakpoint_clicked()
             Name = item->parent()->text(0);
         }
 
-        if(QMessageBox::Yes == QMessageBox::question(this,tr("Haltepunkt löschen..."),tr("Möchten Sie den folgenden Haltepunkt löschen?\n") + ">> " + Name + " <<",QMessageBox::Yes | QMessageBox::No))
+        if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Haltepunkt löschen..."),trUtf8("Möchten Sie den folgenden Haltepunkt löschen?\n") + ">> " + Name + " <<",QMessageBox::Yes | QMessageBox::No))
         {
             ui->BreakpointTree->takeTopLevelItem(bg_index);
             if(AktSource > 0) c64->floppy[AktFloppyNr]->DelBreakGroup(bg_index);
@@ -1741,22 +1741,22 @@ void DebuggerWindow::AddBreakpointTreeRoot(QString name,BREAK_GROUP *bg)
     item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEditable);
     item->setCheckState(0,Qt::Checked);
     item->setDisabled(false);
-    item->setToolTip(0,tr("Der Name des Haltepunkts kann frei gewählt werden."));
+    item->setToolTip(0,trUtf8("Der Name des Haltepunkts kann frei gewählt werden."));
     ui->BreakpointTree->addTopLevelItem(item);
 
     BreakPointUpdateEnable = false;
-    AddBreakpointTreeChild(item,bg->iPC,bg->bPC,tr("Wenn der Wert gleich dem Programm Counter (PC) ist."));
-    AddBreakpointTreeChild(item,bg->iAC,bg->bAC,tr("Wenn der Wert gleich dem Accu Register (AC) ist."));
-    AddBreakpointTreeChild(item,bg->iXR,bg->bXR,tr("Wenn der Wert gleich dem X Register (XR) ist."));
-    AddBreakpointTreeChild(item,bg->iYR,bg->bYR,tr("Wenn der Wert gleich dem Y Register (YR) ist."));
-    AddBreakpointTreeChild(item,bg->iRAdresse,bg->bRAdresse,tr("Wenn ein Lesezugriff an dieser Adresse statt findet."));
-    AddBreakpointTreeChild(item,bg->iWAdresse,bg->bWAdresse,tr("Wenn ein Schreibzugriff an dieser Adresse statt findet."));
-    AddBreakpointTreeChild(item,bg->iRWert,bg->bRWert,tr("Wenn aus einer Adresse dieser Wert ausgelesen wird."));
-    AddBreakpointTreeChild(item,bg->iWWert,bg->bWWert,tr("Wenn in einer Adresse dieser Wert geschrieben wird."));
+    AddBreakpointTreeChild(item,bg->iPC,bg->bPC,trUtf8("Wenn der Wert gleich dem Programm Counter (PC) ist."));
+    AddBreakpointTreeChild(item,bg->iAC,bg->bAC,trUtf8("Wenn der Wert gleich dem Accu Register (AC) ist."));
+    AddBreakpointTreeChild(item,bg->iXR,bg->bXR,trUtf8("Wenn der Wert gleich dem X Register (XR) ist."));
+    AddBreakpointTreeChild(item,bg->iYR,bg->bYR,trUtf8("Wenn der Wert gleich dem Y Register (YR) ist."));
+    AddBreakpointTreeChild(item,bg->iRAdresse,bg->bRAdresse,trUtf8("Wenn ein Lesezugriff an dieser Adresse statt findet."));
+    AddBreakpointTreeChild(item,bg->iWAdresse,bg->bWAdresse,trUtf8("Wenn ein Schreibzugriff an dieser Adresse statt findet."));
+    AddBreakpointTreeChild(item,bg->iRWert,bg->bRWert,trUtf8("Wenn aus einer Adresse dieser Wert ausgelesen wird."));
+    AddBreakpointTreeChild(item,bg->iWWert,bg->bWWert,trUtf8("Wenn in einer Adresse dieser Wert geschrieben wird."));
     if(AktSource == 0)
     {
-        AddBreakpointTreeChild(item,bg->iRZ,bg->bRZ,tr("Wenn der Wert gleich der Aktuellen Rasterzeile ist."));
-        AddBreakpointTreeChild(item,bg->iRZZyklus,bg->bRZZyklus,tr("Wenn der Wert gleich dem Aktuellen Zyklus in einer Rasterzeile ist."));
+        AddBreakpointTreeChild(item,bg->iRZ,bg->bRZ,trUtf8("Wenn der Wert gleich der Aktuellen Rasterzeile ist."));
+        AddBreakpointTreeChild(item,bg->iRZZyklus,bg->bRZZyklus,trUtf8("Wenn der Wert gleich dem Aktuellen Zyklus in einer Rasterzeile ist."));
     }
     BreakPointUpdateEnable = true;
     c64->UpdateBreakGroup();
@@ -1772,7 +1772,7 @@ void DebuggerWindow::AddBreakpointTreeChild(QTreeWidgetItem *parent, unsigned sh
     else item->setCheckState(0,Qt::Unchecked);
     item->setDisabled(false);
     item->setToolTip(0,tooltip);
-    item->setToolTip(1,tr("Doppelklick um Werte zu verändern."));
+    item->setToolTip(1,trUtf8("Doppelklick um Werte zu verändern."));
     item->setBackgroundColor(1,QColor(200,200,255));
     item->setForeground(1,QColor(200,0,0));
     parent->addChild(item);
@@ -1950,7 +1950,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 bg->bYR = item->checkState(0);
                 break;
             case 4:
-                item->setText(0,tr("Lesen von Adresse:"));
+                item->setText(0,trUtf8("Lesen von Adresse:"));
 
                 if(tmp_str != "")
                 {
@@ -1975,7 +1975,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 bg->bRAdresse = item->checkState(0);
                 break;
             case 5:
-                item->setText(0,tr("Schreiben in Adresse:"));
+                item->setText(0,trUtf8("Schreiben in Adresse:"));
 
                 if(tmp_str != "")
                 {
@@ -2000,7 +2000,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 bg->bWAdresse = item->checkState(0);
                 break;
             case 6:
-                item->setText(0,tr("Lesen von Wert:"));
+                item->setText(0,trUtf8("Lesen von Wert:"));
 
                 if(tmp_str != "")
                 {
@@ -2034,7 +2034,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 bg->bRWert = item->checkState(0);
                 break;
             case 7:
-                item->setText(0,tr("Schreiben von Wert:"));
+                item->setText(0,trUtf8("Schreiben von Wert:"));
 
                 if(tmp_str != "")
                 {
@@ -2068,7 +2068,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 bg->bWWert = item->checkState(0);
                 break;
             case 8:
-                item->setText(0,tr("Rasterzeile:"));
+                item->setText(0,trUtf8("Rasterzeile:"));
 
                 if(tmp_str != "")
                 {
@@ -2102,7 +2102,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 bg->bRZ = item->checkState(0);
                 break;
             case 9:
-                item->setText(0,tr("Zyklus:"));
+                item->setText(0,trUtf8("Zyklus:"));
 
                 if(tmp_str != "")
                 {
@@ -2162,7 +2162,7 @@ void DebuggerWindow::BreakpointProc()
 void DebuggerWindow::on_LoadBreakpoints_clicked()
 {
     if(ui->BreakpointTree->topLevelItemCount() > 0)
-        if(QMessageBox::No == QMessageBox::question(this,tr("Haltepunkte laden..."),tr("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
+        if(QMessageBox::No == QMessageBox::question(this,trUtf8("Haltepunkte laden..."),trUtf8("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
             return;
 
     ui->BreakpointTree->clear();
@@ -2170,7 +2170,7 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
     if(AktSource > 0) c64->floppy[AktFloppyNr]->DeleteAllBreakGroups();
     else c64->DeleteAllBreakGroups();
 
-    QString filename = QFileDialog::getOpenFileName(this,tr("Haltepunkte öffnen"),"",tr("Emu64 Haltepunkt Datei ") + "(*.bpt)");
+    QString filename = QFileDialog::getOpenFileName(this,trUtf8("Haltepunkte öffnen"),"",trUtf8("Emu64 Haltepunkt Datei ") + "(*.bpt)");
     if(filename != "")
     {
        int ret;
@@ -2182,16 +2182,16 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
             switch(ret)
             {
             case -1:
-                QMessageBox::warning(this,tr("Fehler..."),tr("Die Datei konnte nicht geöffnet werden."));
+                QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Die Datei konnte nicht geöffnet werden."));
                 break;
             case -2:
-                QMessageBox::warning(this,tr("Fehler..."),tr("Es handelt sich nicht um eine Emu64 Datei."));
+                QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Es handelt sich nicht um eine Emu64 Datei."));
                 break;
             case -3:
-                QMessageBox::warning(this,tr("Fehler..."),tr("Diese Datei wurde mit einer neueren Emu64 Version erstellt."));
+                QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Diese Datei wurde mit einer neueren Emu64 Version erstellt."));
                 break;
             case -4:
-                QMessageBox::warning(this,tr("Fehler..."),tr("Diese Datei enthält keine Haltepunkte."));
+                QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Diese Datei enthält keine Haltepunkte."));
                 break;
             }
        }
@@ -2226,7 +2226,7 @@ void DebuggerWindow::on_SaveBreakpoints_clicked()
 
     QString filename;
     QString fileext;
-    if(!getSaveFileName(this,tr("Haltepunkte speichern"),tr("Emu64 Haltepunkt Datei ") + "(*.bpt)",&filename,&fileext))
+    if(!getSaveFileName(this,trUtf8("Haltepunkte speichern"),trUtf8("Emu64 Haltepunkt Datei ") + "(*.bpt)",&filename,&fileext))
     {
         return;
     }
@@ -2234,19 +2234,19 @@ void DebuggerWindow::on_SaveBreakpoints_clicked()
     if(AktSource > 0)
     {
         if(!c64->floppy[AktFloppyNr]->SaveBreakGroups(filename.toLatin1().data()))
-            QMessageBox::warning(this,tr("Fehler..."),tr("Die Haltepunkte konnten nicht gespeichert werden."));
+            QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Die Haltepunkte konnten nicht gespeichert werden."));
     }
     else
     {
         if(!c64->SaveBreakGroups(filename.toLatin1().data()))
-          QMessageBox::warning(this,tr("Fehler..."),tr("Die Haltepunkte konnten nicht gespeichert werden."));
+          QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Die Haltepunkte konnten nicht gespeichert werden."));
     }
 }
 
 void DebuggerWindow::on_DelAllBreakpoints_clicked()
 {
     if(ui->BreakpointTree->topLevelItemCount() > 0)
-        if(QMessageBox::Yes == QMessageBox::question(this,tr("Achtung..."),tr("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
+        if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Achtung..."),trUtf8("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
         {
             if(AktSource > 0) c64->floppy[AktFloppyNr]->DeleteAllBreakGroups();
             else c64->DeleteAllBreakGroups();
@@ -2271,7 +2271,7 @@ void DebuggerWindow::on_ExportDisAss_clicked()
     value = in_str.toUShort(&ok,0);
     if(!ok)
     {
-        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gültiges Zahlenformat benutzt ! [Export Von:]"));
+        QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Es wurde kein gültiges Zahlenformat benutzt ! [Export Von:]"));
         return;
     }
     start = value;
@@ -2281,20 +2281,20 @@ void DebuggerWindow::on_ExportDisAss_clicked()
     value = in_str.toUShort(&ok,0);
     if(!ok)
     {
-        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gültiges Zahlenformat benutzt ! [Export Bis:]"));
+        QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Es wurde kein gültiges Zahlenformat benutzt ! [Export Bis:]"));
         return;
     }
     end = value;
 
     if(start >= end)
     {
-        QMessageBox::warning(this,tr("Fehler..."),tr("Startadresse muss kleiner sein als Endadresse."));
+        QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Startadresse muss kleiner sein als Endadresse."));
         return;
     }
 
     QString filename;
     QString fileext;
-    if(!getSaveFileName(this,tr("Export..."),tr("Disassembler Listing") + "(*.txt);;" + tr("C64 Programm Datei") + "(*.prg)",&filename,&fileext))
+    if(!getSaveFileName(this,trUtf8("Export..."),trUtf8("Disassembler Listing") + "(*.txt);;" + trUtf8("C64 Programm Datei") + "(*.prg)",&filename,&fileext))
     {
         return;
     }
@@ -2303,18 +2303,18 @@ void DebuggerWindow::on_ExportDisAss_clicked()
     if(fileext == "TXT")
     {
         if(!c64->ExportASM(filename.toLatin1().data(),start,end,AktSource))
-            QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der Disassembler Datei."));
+            QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Fehler beim speichern der Disassembler Datei."));
     }
 
     if(fileext == "PRG")
     {
         if((AktSource > 0) && (end > 0x07FF))
         {
-            QMessageBox::warning(this,tr("Fehler..."),tr("Floppy RAM geht nur von $0000 - $07FF (2KB)."));
+            QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Floppy RAM geht nur von $0000 - $07FF (2KB)."));
             return;
         }
         if(!c64->ExportPRG(filename.toLatin1().data(),start,end,AktSource))
-            QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der Programm Datei."));
+            QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Fehler beim speichern der Programm Datei."));
     }
 }
 
@@ -2337,7 +2337,7 @@ void DebuggerWindow::RefreshGUI(void)
         c64->floppy[AktFloppyNr]->GetCpuReg(&FloppyCpuReg[AktFloppyNr],&FloppyCpuIReg[AktFloppyNr]);
 
         /// Register Group ///
-        ui->RegisterGroup->setTitle(tr("CPU 6502 Register"));
+        ui->RegisterGroup->setTitle(trUtf8("CPU 6502 Register"));
         ui->label_nmi->setVisible(false);
         ui->label_0314->setVisible(false);
         ui->label_0318->setVisible(false);
@@ -2346,7 +2346,7 @@ void DebuggerWindow::RefreshGUI(void)
         ui->_0318_out->setVisible(false);
 
         /// IRegister Group ///
-        ui->IRegisterGroup->setTitle(tr("CPU 6502 Interne Register (Emu64 Modell)"));
+        ui->IRegisterGroup->setTitle(trUtf8("CPU 6502 Interne Register (Emu64 Modell)"));
         ui->label_cpu_wait->setVisible(false);
         ui->wait_led->setVisible(false);
 
@@ -2446,7 +2446,7 @@ void DebuggerWindow::RefreshGUI(void)
         /// C64 ///
 
         /// Register Group ///
-        ui->RegisterGroup->setTitle(tr("CPU 6510 Register"));
+        ui->RegisterGroup->setTitle(trUtf8("CPU 6510 Register"));
         ui->label_nmi->setVisible(true);
         ui->label_0314->setVisible(true);
         ui->label_0318->setVisible(true);
@@ -2455,7 +2455,7 @@ void DebuggerWindow::RefreshGUI(void)
         ui->_0318_out->setVisible(true);
 
         /// IRegister Group ///
-        ui->IRegisterGroup->setTitle(tr("CPU 6510 Interne Register (Emu64 Modell)"));
+        ui->IRegisterGroup->setTitle(trUtf8("CPU 6510 Interne Register (Emu64 Modell)"));
         ui->label_cpu_wait->setVisible(true);
         ui->wait_led->setVisible(true);
 

@@ -84,9 +84,9 @@ MainWindow::~MainWindow()
 
     delete ui;
     delete ini;
-    LogText(tr(">> Es wurden alle Klassen wieder entfernt\n").toLatin1().data());
+    LogText(trUtf8(">> Es wurden alle Klassen wieder entfernt\n").toLatin1().data());
 
-    LogText(tr("\n>> Emu64 wurde sauber beendet...").toLatin1().data());
+    LogText(trUtf8("\n>> Emu64 wurde sauber beendet...").toLatin1().data());
     delete log;
 }
 
@@ -113,20 +113,20 @@ void MainWindow::OnInit()
     SystemLocale.truncate(SystemLocale.lastIndexOf('_'));  // "de"
 
     /// INI Dateiverwaltung erstellen ///
-    splash->showStatusMessage(tr("INI Dateiverwaltung wird initialisiert."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("INI Dateiverwaltung wird initialisiert."),Qt::darkBlue);
     ini = new QSettings(appPath+"/emu64.ini",QSettings::IniFormat,this);
     LogText(QString(">> INI System wurde erzeugt: " + appPath+"/emu64.ini\n").toLatin1().data());
     LogText(QString(">> INI System was created: " + appPath+"/emu64.ini\n").toLatin1().data());
 
-    splash->showStatusMessage(tr("Sprachmenü wir erstellt."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("Sprachmenü wir erstellt."),Qt::darkBlue);
     ini->beginGroup("MainWindow");
     CreateLanguageMenu(ini->value("lang",SystemLocale).toString());
     ini->endGroup();
-    LogText(QString(tr(">> Sprachmenü wurde erstellt.") + SystemLocale + "\n").toLatin1().data());
+    LogText(QString(trUtf8(">> Sprachmenü wurde erstellt.") + SystemLocale + "\n").toLatin1().data());
 
 
-    splash->showStatusMessage(tr("Translator wurde installiert."),Qt::darkBlue);
-    LogText(QString(tr(">> Translator wurde intsalliert: Systemsprache = ") + SystemLocale + "\n").toLatin1().data());
+    splash->showStatusMessage(trUtf8("Translator wurde installiert."),Qt::darkBlue);
+    LogText(QString(trUtf8(">> Translator wurde intsalliert: Systemsprache = ") + SystemLocale + "\n").toLatin1().data());
     setWindowIcon(QIcon(":/grafik/emu64.ico"));
 
     /// ScreenshotPath erstellen ///
@@ -134,24 +134,24 @@ void MainWindow::OnInit()
 
     QDir* dir = new QDir(screenshotPath);
 
-    splash->showStatusMessage(tr("Screenshotverzeichnis wird gesucht."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("Screenshotverzeichnis wird gesucht."),Qt::darkBlue);
     if(dir->exists())
     {
-        LogText(tr(">> Ein Screenshot Verzeichnis ist vorhanden\n").toLatin1().data());
+        LogText(trUtf8(">> Ein Screenshot Verzeichnis ist vorhanden\n").toLatin1().data());
         ScreenshotsEnable = true;
     }
     else
     {
-        splash->showStatusMessage(tr("Screenshotverzeichnis wird erstellt."),Qt::darkBlue);
-        LogText(tr("<< Ein Screenshot Verzeichnis ist nicht vorhanden\n").toLatin1().data());
+        splash->showStatusMessage(trUtf8("Screenshotverzeichnis wird erstellt."),Qt::darkBlue);
+        LogText(trUtf8("<< Ein Screenshot Verzeichnis ist nicht vorhanden\n").toLatin1().data());
         if(dir->mkdir(screenshotPath))
         {
-            LogText(tr(">> Ein neues Screenshot Verzeichnis wurde erstellt\n").toLatin1().data());
+            LogText(trUtf8(">> Ein neues Screenshot Verzeichnis wurde erstellt\n").toLatin1().data());
             ScreenshotsEnable = true;
         }
         else
         {
-            LogText(tr("<< Ein neues Screenshot Verzeichnis konnte nicht erstellt werden\n<< Keine Screenshots möglich !!").toLatin1().data());
+            LogText(trUtf8("<< Ein neues Screenshot Verzeichnis konnte nicht erstellt werden\n<< Keine Screenshots möglich !!").toLatin1().data());
             ScreenshotsEnable = false;
         }
     }
@@ -164,82 +164,82 @@ void MainWindow::OnInit()
     }
 
     /// Klassen installieren ///
-    splash->showStatusMessage(tr("VideoPal Klasse wird initialisiert."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("VideoPal Klasse wird initialisiert."),Qt::darkBlue);
     videopal = new VideoPalClass();
-    LogText(tr(">> VideoPal Klasse wurde installiert\n").toLatin1().data());
+    LogText(trUtf8(">> VideoPal Klasse wurde installiert\n").toLatin1().data());
 
     /// C64 Klasse Installieren ... Das HERZ ///
-    splash->showStatusMessage(tr("C64 Klasse wird initialisiert."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("C64 Klasse wird initialisiert."),Qt::darkBlue);
     int ret_error;
     c64 = new C64Class(&ret_error,videopal,true,bind(&MainWindow::LogText,this,_1),QString(appPath + "/gfx/").toLatin1().data());
     if(ret_error != 0)
     {
-        ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim Installieren der C64 Klasse"))
+        ErrorMsg(trUtf8("Emu64 Fehler ..."),trUtf8("Fehler beim Installieren der C64 Klasse"))
         this->close();
     }
 
     /// Window Klassen erstellen ///
     /// Unter MAC sollte ohne übergabe des this Zeigers die Klasseb erstellt werden
 
-    splash->showStatusMessage(tr("InfoWindow wird erstellt."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("InfoWindow wird erstellt."),Qt::darkBlue);
     info_window = new InfoWindow(this);
-    LogText(tr(">> InfoWindow wurde erzeugt\n").toLatin1().data());
+    LogText(trUtf8(">> InfoWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(tr("TVSetupWindow wird erstellt."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("TVSetupWindow wird erstellt."),Qt::darkBlue);
     tv_setup_window = new TVSetupWindow(this,c64,videopal,ini);
-    LogText(tr(">> TVSetupWindow wurde erzeugt\n").toLatin1().data());
+    LogText(trUtf8(">> TVSetupWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(tr("FloppyWindow wird erstellt."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("FloppyWindow wird erstellt."),Qt::darkBlue);
     floppy_window = new FloppyWindow(this,ini);
-    LogText(tr(">> FloppyWindow wurde erzeugt\n").toLatin1().data());
+    LogText(trUtf8(">> FloppyWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(tr("C64KeyboardWindow wird erstellt."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("C64KeyboardWindow wird erstellt."),Qt::darkBlue);
     c64_keyboard_window = new C64KeyboardWindow(this,ini);
-    LogText(tr(">> C64KeyboardWindow wurde erzeugt\n").toLatin1().data());
+    LogText(trUtf8(">> C64KeyboardWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(tr("CRTWindow wird erstellt."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("CRTWindow wird erstellt."),Qt::darkBlue);
     crt_window = new CrtWindow(this,ini);
-    LogText(tr(">> CrtWindow wurde erzeugt\n").toLatin1().data());
+    LogText(trUtf8(">> CrtWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(tr("DebuggerWindow wird erstellt."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("DebuggerWindow wird erstellt."),Qt::darkBlue);
     debugger_window = new DebuggerWindow(this,ini);
-    LogText(tr(">> DebuggerWindow wurde erzeugt\n").toLatin1().data());
+    LogText(trUtf8(">> DebuggerWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(tr("SetupWindow wird erstellt."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("SetupWindow wird erstellt."),Qt::darkBlue);
     setup_window = new SetupWindow(this,SLOT(onChangeGrafikModi(bool,bool,bool,bool,bool)),videopal,ini);
-    LogText(tr(">> SetupWindow wurde erzeugt\n").toLatin1().data());
+    LogText(trUtf8(">> SetupWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(tr("C64SpeedWindow wird erstellt."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("C64SpeedWindow wird erstellt."),Qt::darkBlue);
     speed_window = new C64SpeedWindow(this,ini);
-    LogText(tr(">> C64SpeedWindow wurde erzeugt\n").toLatin1().data());
+    LogText(trUtf8(">> C64SpeedWindow wurde erzeugt\n").toLatin1().data());
 
     ini->beginGroup("MainWindow");
-    splash->showStatusMessage(tr("Screenshotnummer wir geladen."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("Screenshotnummer wir geladen."),Qt::darkBlue);
     ScreenshotNumber = (int)ini->value("ScreenshotCounter",0).toInt();
     ini->endGroup();
 
-    splash->showStatusMessage(tr("SetupWindow wird mit INI abgeglichen."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("SetupWindow wird mit INI abgeglichen."),Qt::darkBlue);
     setup_window->ReSetup();
 
-    splash->showStatusMessage(tr("SDL Window Titelleiste wird benannt."),Qt::darkBlue);
-    SDL_WM_SetCaption((const char*)tr("C64 Bildschirm").toLatin1().data(),0);
+    splash->showStatusMessage(trUtf8("SDL Window Titelleiste wird benannt."),Qt::darkBlue);
+    SDL_WM_SetCaption((const char*)trUtf8("C64 Bildschirm").toLatin1().data(),0);
 
     /// Debugger Window mit C64 verbinden ///
-    splash->showStatusMessage(tr("Debugger Window wird mit C64 Klasse verbunden."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("Debugger Window wird mit C64 Klasse verbunden."),Qt::darkBlue);
     debugger_window->SetC64Pointer(c64);
 
     /// C64 Speed Window mit C64 verbinden ///
-    splash->showStatusMessage(tr("C64 Speed Window wird mit C64 Klasse verbunden."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("C64 Speed Window wird mit C64 Klasse verbunden."),Qt::darkBlue);
     speed_window->SetC64Pointer(c64);
 
     /// CRT Klasse mit CRT Window verbinden ///
-    splash->showStatusMessage(tr("CRT Window wird mit CRT Klasee verbunden."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("CRT Window wird mit CRT Klasee verbunden."),Qt::darkBlue);
     crt_window->crt = c64->crt;
     crt_window->c64 = c64;
     c64->crt->ChangeLED = bind(&CrtWindow::ChangeLED,crt_window,_1,_2);
 
     /// C64 Systemroms laden ///
-    splash->showStatusMessage(tr("C64 Systemroms werden geladen."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("C64 Systemroms werden geladen."),Qt::darkBlue);
     if(!c64->LoadC64Roms((char*)QString(appPath+"/roms/kernal.rom").toLatin1().data(),(char*)QString(appPath+"/roms/basic.rom").toLatin1().data(),(char*)QString(appPath+"/roms/char.rom").toLatin1().data()))
     {
         LogText((char*)"<< ERROR: Fehler beim laden der C64 Roms\n\t");
@@ -249,18 +249,18 @@ void MainWindow::OnInit()
     }
 
     /// C64 Keyboard Matrix mit dem Virtual Keyboard verbinden ///
-    splash->showStatusMessage(tr("C64 Key-Matrix wird mit Virtual Keyboard verbunden."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("C64 Key-Matrix wird mit Virtual Keyboard verbunden."),Qt::darkBlue);
     c64_keyboard_window->KeyMatrixToPA = c64->KeyboardMatrixToPAExt;
     c64_keyboard_window->KeyMatrixToPB = c64->KeyboardMatrixToPBExt;
 
     /// Tabelle für Floppy's Ertsellen ///
-    splash->showStatusMessage(tr("Tabelle für Floppy's wird erstellt."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("Tabelle für Floppy's wird erstellt."),Qt::darkBlue);
     ui->FloppyTabel->setRowCount(FloppyAnzahl);
     ui->FloppyTabel->setColumnCount(1);
 
     for(int i=0; i<FloppyAnzahl; i++)
     {
-        splash->showStatusMessage(tr("Floppy: ") + QVariant(i).toString() + "wird in Tabelle eingefügt",Qt::darkBlue);
+        splash->showStatusMessage(trUtf8("Floppy: ") + QVariant(i).toString() + "wird in Tabelle eingefügt",Qt::darkBlue);
         ui->FloppyTabel->setRowHeight(i,24);
         WidgetFloppyStatus *w = new WidgetFloppyStatus(this,i,c64->floppy[i]);
         w->SetGeraeteID(i+8);
@@ -274,7 +274,7 @@ void MainWindow::OnInit()
     connect(floppy_window,SIGNAL(ChangeFloppyImage(int)),this,SLOT(OnChangeFloppyImage(int)));
 
     ////////// Load from INI ///////////
-    splash->showStatusMessage(tr("Einstellungen werden von INI geladen und gesetzt."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("Einstellungen werden von INI geladen und gesetzt."),Qt::darkBlue);
     if(ini != NULL)
     {
         floppy_window->LoadIni();
@@ -312,7 +312,7 @@ void MainWindow::OnInit()
     connect(setup_window,SIGNAL(ResetSreenshotCounter()),this,SLOT(OnResetScreenshotCounter()));
 
     /////////////////////////////////////
-    splash->showStatusMessage(tr("C64 EMULATION WIRD NUN GESTARET."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("C64 EMULATION WIRD NUN GESTARET."),Qt::darkBlue);
     if(ret_error == 0) c64->StartEmulation();
     else
     {
@@ -388,7 +388,7 @@ void MainWindow::CreateLanguageMenu(QString defaultLocale)
       iconfile = dir.filePath(iconfile + ".png");
       action->setIcon(QIcon(iconfile));
       action->setIconVisibleInMenu(true);
-      action->setStatusTip(tr("Wechseln zur Sprache: ") + lang);
+      action->setStatusTip(trUtf8("Wechseln zur Sprache: ") + lang);
 
       ui->menuSprache->addAction(action);
       langGroup->addAction(action);
@@ -433,7 +433,7 @@ void MainWindow::RetranslateUi()
     setup_window->RetranslateUi();
     speed_window->RetranslateUi();
 
-    SDL_WM_SetCaption(tr("C64 Bildschirm").toLatin1().data(),0);
+    SDL_WM_SetCaption(trUtf8("C64 Bildschirm").toLatin1().data(),0);
 }
 
 bool MainWindow::getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt)
@@ -485,8 +485,8 @@ bool MainWindow::getSaveFileName(QWidget *parent, QString caption, QString filte
        extension = extension.left(extension.indexOf(")"));
        extension = extension.simplified();
 
-      int result = QMessageBox::question(parent, QObject::tr("Überschreiben?"),
-         QObject::tr("Soll die Datei \"%1\" überschrieben werden?").arg(fileInfo.fileName()),
+      int result = QMessageBox::question(parent, QObject::trUtf8("Überschreiben?"),
+         QObject::trUtf8("Soll die Datei \"%1\" überschrieben werden?").arg(fileInfo.fileName()),
          QMessageBox::Yes,
          QMessageBox::No | QMessageBox::Default,
          QMessageBox::Cancel | QMessageBox::Escape);
@@ -571,7 +571,7 @@ void MainWindow::on_actionHardreset_triggered()
 
 void MainWindow::on_actionAutostart_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),"",tr("C64 Programm Dateien") + "(*.prg *.c64 *.p00 *.t64 *.d64 *.g64 *.frz);;" + tr("Alle Dateien") + "(*.*)");
+    QString filename = QFileDialog::getOpenFileName(this,trUtf8("C64 Dateien öffnen "),"",trUtf8("C64 Programm Dateien") + "(*.prg *.c64 *.p00 *.t64 *.d64 *.g64 *.frz);;" + trUtf8("Alle Dateien") + "(*.*)");
     if(filename != "")
     {
         c64->LoadAutoRun(0,filename.toLatin1().data());
@@ -580,7 +580,7 @@ void MainWindow::on_actionAutostart_triggered()
 
 void MainWindow::on_actionC64_Programme_direkt_laden_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),"",tr("C64 Programm Dateien") + "(*.prg *.c64 *.p00 *.t64 *.frz);;" + tr("Alle Dateien") + "(*.*)");
+    QString filename = QFileDialog::getOpenFileName(this,trUtf8("C64 Dateien öffnen "),"",trUtf8("C64 Programm Dateien") + "(*.prg *.c64 *.p00 *.t64 *.frz);;" + trUtf8("Alle Dateien") + "(*.*)");
     if(filename != "")
     {
         c64->LoadPRG(filename.toLatin1().data(),0);
@@ -661,7 +661,7 @@ void MainWindow::on_actionScreenshot_triggered()
         c64->SaveScreenshot(QString(screenshotPath + "emu64_" + QVariant(ScreenshotNumber).toString() + ".bmp").toLatin1().data());
         ScreenshotNumber++;
     }
-    else QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.\nÜberprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !"));
+    else QMessageBox::critical(this,trUtf8("Emu64 Fehler ..."),trUtf8("Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.\nÜberprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !"));
 }
 
 void MainWindow::on_actionC64_Geschwindigkeit_triggered()
@@ -684,11 +684,11 @@ void MainWindow::on_actionREU_entfernen_triggered()
 
 void MainWindow::on_actionREU_laden_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this,tr("REU Inhalt laden"),"",tr("REU Image Dateien") + "(*.reu);;" + tr("Alle Dateien") + "(*.*)");
+    QString filename = QFileDialog::getOpenFileName(this,trUtf8("REU Inhalt laden"),"",trUtf8("REU Image Dateien") + "(*.reu);;" + trUtf8("Alle Dateien") + "(*.*)");
     if(filename != "")
     {
         if(c64->LoadREUImage(filename.toLatin1().data()) != 0)
-            QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des REU Images trat ein Fehler auf!"));
+            QMessageBox::critical(this,trUtf8("Emu64 Fehler ..."),trUtf8("Beim laden des REU Images trat ein Fehler auf!"));
     }
 }
 
@@ -697,16 +697,16 @@ void MainWindow::on_actionREU_speichern_triggered()
     QString filename;
     QString fileext;
 
-    if(!getSaveFileName(this,tr("REU Inhalt speichern"),tr("REU Image Dateien") + "(*.reu);;" + tr("Alle Dateien") + "(*.*)",&filename,&fileext))
+    if(!getSaveFileName(this,trUtf8("REU Inhalt speichern"),trUtf8("REU Image Dateien") + "(*.reu);;" + trUtf8("Alle Dateien") + "(*.*)",&filename,&fileext))
         return;
 
     if(c64->SaveREUImage(filename.toLatin1().data()) != 0)
-        QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des REU Images trat ein Fehler auf!"));
+        QMessageBox::critical(this,trUtf8("Emu64 Fehler ..."),trUtf8("Beim laden des REU Images trat ein Fehler auf!"));
 }
 
 void MainWindow::on_actionREU_loeschen_triggered()
 {
-    if(QMessageBox::Yes == QMessageBox::question(this,tr("REU Speicher löschen ..."),tr("Möchten Sie den Inhalt des REU Speichers wirklisch löschen?"),QMessageBox::Yes | QMessageBox::No))
+    if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("REU Speicher löschen ..."),trUtf8("Möchten Sie den Inhalt des REU Speichers wirklich löschen?"),QMessageBox::Yes | QMessageBox::No))
     {
         c64->ClearREURam();
     }
@@ -726,11 +726,11 @@ void MainWindow::on_actionGEO_entfernen_triggered()
 
 void MainWindow::on_actionGEO_laden_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this,tr("GEORAM Inhalt laden"),"",tr("GEORAM Image Dateien") + "(*.img);;" + tr("Alle Dateien") + "(*.*)");
+    QString filename = QFileDialog::getOpenFileName(this,trUtf8("GEORAM Inhalt laden"),"",trUtf8("GEORAM Image Dateien") + "(*.img);;" + trUtf8("Alle Dateien") + "(*.*)");
     if(filename != "")
     {
         if(c64->LoadGEORAMImage(filename.toLatin1().data()) != 0)
-            QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des GEORAM Images trat ein Fehler auf!"));
+            QMessageBox::critical(this,trUtf8("Emu64 Fehler ..."),trUtf8("Beim laden des GEORAM Images trat ein Fehler auf!"));
     }
 }
 
@@ -739,16 +739,16 @@ void MainWindow::on_actionGEO_speichern_triggered()
     QString filename;
     QString fileext;
 
-    if(!getSaveFileName(this,tr("GEORAM Inhalt speichern"),tr("GEORAM Image Dateien") + "(*.img);;" + tr("Alle Dateien") + "(*.*)",&filename,&fileext))
+    if(!getSaveFileName(this,trUtf8("GEORAM Inhalt speichern"),trUtf8("GEORAM Image Dateien") + "(*.img);;" + trUtf8("Alle Dateien") + "(*.*)",&filename,&fileext))
         return;
 
     if(c64->SaveGEORAMImage(filename.toLatin1().data()) != 0)
-        QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des GEORAM Images trat ein Fehler auf!"));
+        QMessageBox::critical(this,trUtf8("Emu64 Fehler ..."),trUtf8("Beim laden des GEORAM Images trat ein Fehler auf!"));
 }
 
 void MainWindow::on_actionGEO_loeschen_triggered()
 {
-    if(QMessageBox::Yes == QMessageBox::question(this,tr("GEORAM Speicher löschen ..."),tr("Möchten Sie den Inhalt des GEORAM Speichers wirklisch löschen?"),QMessageBox::Yes | QMessageBox::No))
+    if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("GEORAM Speicher löschen ..."),trUtf8("Möchten Sie den Inhalt des GEORAM Speichers wirklich löschen?"),QMessageBox::Yes | QMessageBox::No))
     {
         c64->ClearGEORAMRam();
     }

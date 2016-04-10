@@ -131,13 +131,13 @@ void C64SpeedWindow::on_Pause_clicked()
     if(!PauseStatus)
     {
         PauseStatus = true;
-        ui->Pause->setText(tr("Weiter"));
+        ui->Pause->setText(trUtf8("Weiter"));
         c64->SetDebugMode(true);
     }
     else
     {
         PauseStatus = false;
-        ui->Pause->setText(tr("Pause"));
+        ui->Pause->setText(trUtf8("Pause"));
         c64->SetDebugMode(false);
     }
     SetPauseTooltip();
@@ -147,10 +147,10 @@ void C64SpeedWindow::SetPauseTooltip()
 {
     if(PauseStatus)
     {
-        ui->Pause->setToolTip(tr("Lässt den C64, mit der eingestellten Geschwindigkeit, weiterlaufen."));
+        ui->Pause->setToolTip(trUtf8("Lässt den C64, mit der eingestellten Geschwindigkeit, weiterlaufen."));
     }
     else
     {
-        ui->Pause->setToolTip(tr("Hält den C64 komplett an."));
+        ui->Pause->setToolTip(trUtf8("Hält den C64 komplett an."));
     }
 }
