@@ -44,7 +44,7 @@ public:
         VideoPalClass(void);
         ~VideoPalClass(void);
         //void SetPixelFormat(SDL_PixelFormat *format);
-        void ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOutPuffer,int OutXW,int OutYW,int InXW,int InYW,bool FlipTex);
+        void ConvertVideo(void* Outpuffer, long Pitch, unsigned char* VICOutPuffer, int VICOutPufferOffset, int OutXW, int OutYW, int InXW, int InYW, bool FlipTex);
         void SetDisplayMode(int DisplayMode);
         void UpdateParameter(void);
         void SetPhaseAltLineOffset(int offset);

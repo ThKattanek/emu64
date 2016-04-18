@@ -7,7 +7,7 @@ DEFINES += str_emu64_version=\\\"$$GIT_VERSION\\\"
 TRANSLATIONS = emu64_de.ts
 TRANSLATIONS = emu64_en.ts
 
-QT += core gui
+QT += core gui opengl
 CONFIG += rtti
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -136,31 +136,35 @@ RESOURCES += \
     emu64.qrc
 
 linux-g++-32{
+DEFINES += str_system_arch=\\\"32Bit\\\"
 TARGET = emu64
 DESTDIR = "32Bit"
-LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU
+LIBS += -lSDL2 -lSDL2_image -lquazip -lGL -lGLU
 }
 
 linux-g++-64{
+DEFINES += str_system_arch=\\\"64Bit\\\"
 TARGET = emu64
 DESTDIR = "64Bit"
-LIBS += -lSDL -lSDL_gfx -lSDL_image -lquazip -lGL -lGLU
+LIBS += -lSDL2 -lSDL2_image -lquazip -lGL -lGLU
 }
 
 # Windows Crossbuild with MXE
 win32{
 
 win32:contains(ARCH, x86_64):{
+    DEFINES += str_system_arch=\\\"64Bit\\\"
     DESTDIR = "bin"
-    TARGET = emu64_x64
+    TARGET = emu64
 }else{
+    DEFINES += str_system_arch=\\\"32Bit\\\"
     DESTDIR = "bin"
-    TARGET = emu64_x86
+    TARGET = emu64
 }
 
 DEFINES += QUAZIP_STATIC
 RC_FILE = emu64.rc
-LIBS += $$system($$ARCH-w64-mingw32.$$LINKTYP-sdl-config --libs) $$system($$ARCH-w64-mingw32.$$LINKTYP-pkg-config SDL_image SDL_gfx glew --libs) -lquazip -lSDL_gfx -lSDL_image
+LIBS += $$system($$ARCH-w64-mingw32.$$LINKTYP-sdl2-config --libs) $$system($$ARCH-w64-mingw32.$$LINKTYP-pkg-config SDL2_image --libs) -lquazip -lSDL2_image
 
 }
 

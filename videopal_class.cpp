@@ -457,10 +457,11 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                         }
 }
 
-void VideoPalClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOutPuffer,int OutXW,int OutYW,int InXW,int,bool)
+void VideoPalClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOutPuffer,int VICOutPufferOffset,int OutXW,int OutYW,int InXW,int,bool)
 {
     static uint8_t w0,w1,w2,w3;
     VideoSource8 = (uint8_t*)VICOutPuffer;
+    VideoSource8 += VICOutPufferOffset;
 
     if(PALOutput)
     {

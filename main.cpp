@@ -67,5 +67,7 @@ int main(int argc, char *argv[])
 
     QTimer::singleShot(500, &w, SLOT(OnInit()));
 
-    return app.exec();
+    int ret = app.exec();
+
+    return ret;
 };

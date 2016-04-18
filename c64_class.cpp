@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 17.04.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -33,7 +33,7 @@ int SDLThreadLoad(void *userdat);
 #define C64ScreenYW 272         //272
 #define C64FirstViewedPixel 104 //104
 
-C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(char*)> log_function, const char* gfx_path):
+C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> log_function, const char* gfx_path):
     mmu(NULL),cpu(NULL),vic(NULL),sid1(NULL),sid2(NULL),cia1(NULL),cia2(NULL),crt(NULL)
 {   
     JoyStickUdateIsStop = true,
@@ -58,26 +58,30 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     FloppyFoundBreakpoint = false;
     EnableExtLines = false;
 
-    C64Screen = 0;
-    C64ScreenBack = 0;
-    DrawScreenBack = false;
+    AktC64ScreenXW = AktWindowXW = AktC64ScreenYW = AktWindowYW = 0;
+
+    C64Window = NULL;
+    C64Screen = NULL;
+    C64ScreenTexture = 0;
+    C64ScreenAspectRatio = SCREEN_RATIO_4_3;
+    EnableWindowAspectRatio = true;
+    EnableFullscreenAspectRatio = true;
+    IsC64ScreenObsolete = false;
     StartScreenshot = false;
     FrameSkipCounter=1;
-    NewVicRefresh = false;
 
-    OpenGLEnable = OpenGLOn;
     DistortionEnable = true;
     SetDistortion(-0.05);
 
     /// SDL Installieren ///
 
-    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
+    if(SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
-         LogText((char*)"<< ERROR: Fehler beim installieren von SDL\n");
+         LogText((char*)"<< ERROR: Fehler beim installieren von SDL2\n");
         *ret_error = -1;
     }
     else
-        LogText((char*)">> SDL wurde installiert\n");
+        LogText((char*)">> SDL2 wurde installiert\n");
 
     char filename[FILENAME_MAX];
     sprintf(filename,"%spfeil0.png",GfxPath);
@@ -157,24 +161,31 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
         LogText((char*)"\n");
 
         if ( (Kreis1->w & (Kreis1->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-        if ( (Kreis1->h & (Kreis1->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
+        if ( (Kreis1->h & (Kreis1->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Hoehe ist keine Potenz von 2^n\n");
     }
 
     /// SLD Audio Installieren (C64 Emulation) ///
-    SDL_AudioSpec format;
-    format.freq = AudioSampleRate;
-    format.format = AUDIO_S16;
-    format.channels = 1;
-    format.samples = AudioPufferSize;
-    format.callback = AudioMix;
-    format.userdata = this;
 
-    if(SDL_OpenAudio(&format,NULL) < 0)
+    SDL_memset(&want, 0, sizeof(want));
+    want.freq = AudioSampleRate;
+    want.format = AUDIO_S16;
+    want.channels = 1;
+    want.samples = AudioPufferSize;
+    want.callback = AudioMix;
+    want.userdata = this;
+
+    if(SDL_OpenAudio(&want,&have) < 0)
     {
         LogText((char*)"<< ERROR: Fehler beim installieren von SDL_Audio\n");
         *ret_error = -6;
     }
     LogText((char*)">> SDL_Audio wurde installiert\n");
+
+    if (want.format != have.format)
+    {
+        printf("Audio Format \"AUDIO_S16 wird nicht unterstuetzt.\n");
+        *ret_error = -6;
+    }
 
     OpenSDLJoystick();
 
@@ -184,14 +195,10 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     C64ScreenIcon = IMG_Load(filename);
     if(C64ScreenIcon != NULL)
     {
-        SDL_SetColorKey(C64ScreenIcon,SDL_SRCCOLORKEY,SDL_MapRGB(C64ScreenIcon->format,0,0,0));
-        SDL_WM_SetIcon(C64ScreenIcon,NULL);
+        SDL_SetColorKey(C64ScreenIcon,SDL_TRUE,SDL_MapRGB(C64ScreenIcon->format,0,0,0));
     }
     else
         LogText((char*)"<< ERROR: Fehler beim laden des SLDFenster Icons\n");
-
-    SDL_initFramerate(&fps_manager);
-    SDL_setFramerate(&fps_manager,50);
 
     GamePort1 = 0;
     GamePort2 = 0;
@@ -200,8 +207,8 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     mmu = new MMU();
     cpu = new MOS6510();
     vic = new VICII();
-    sid1 = new MOS6581_8085(0,format.freq,format.samples,ret_error);
-    sid2 = new MOS6581_8085(1,format.freq,format.samples,ret_error);
+    sid1 = new MOS6581_8085(0,have.freq,have.samples,ret_error);
+    sid2 = new MOS6581_8085(1,have.freq,have.samples,ret_error);
     cia1 = new MOS6526(0);
     cia2 = new MOS6526(1);
     crt = new CRTClass();
@@ -217,7 +224,7 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
 
     for(int i=0;i<FloppyAnzahl;i++)
     {
-        floppy[i] = new Floppy1541(&RESET,format.freq,format.samples,&FloppyFoundBreakpoint);
+        floppy[i] = new Floppy1541(&RESET,have.freq,have.samples,&FloppyFoundBreakpoint);
         floppy[i]->SetResetReady(&FloppyResetReady[i],0xEBFF);
         floppy[i]->SetC64IEC(&C64IEC);
         floppy[i]->SetDeviceNummer(8+i);
@@ -384,17 +391,11 @@ C64Class::C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<vo
     cpu->HistoryPointer = &C64HistoryPointer;
 
     for(int i=0;i<0x10000;i++) Breakpoints[i] = 0;
-
 }
 
 C64Class::~C64Class()
 {
-    LoopThreadEnd = true;
-    SDL_WaitThread(sdl_thread,0);
-
-    CloseSDLJoystick();
-    SDL_VideoQuit();
-    SDL_AudioQuit();
+    EndEmulation();
 
     for(int i=0;i<FloppyAnzahl;i++)
     {
@@ -416,13 +417,30 @@ C64Class::~C64Class()
 void C64Class::StartEmulation()
 {
     /// SLD Thread starten (ab hier startet auch die C64 Emulation ///
-    sdl_thread = SDL_CreateThread(SDLThread, this);
+    sdl_thread = SDL_CreateThread(SDLThread, "C64Thread", this);
     SDL_PauseAudio(0);
+}
+
+void C64Class::EndEmulation()
+{
+    /// Loop Thread beenden ///
+    LoopThreadEnd = true;
+    while (!LoopThreadIsEnd)
+        SDL_Delay(1);
+
+    SDL_DetachThread(sdl_thread);
+
+    SDL_PauseAudio(1);
+    SDL_CloseAudio();
+
+    CloseSDLJoystick();
+    SDL_Quit();
 }
 
 void AudioMix(void *userdat, Uint8 *stream, int laenge)
 {
     C64Class *c64 = (C64Class*)userdat;
+
 
     if(c64->RecPollingWait)
     {
@@ -450,16 +468,10 @@ int SDLThread(void *userdat)
     C64Class *c64 = (C64Class*)userdat;
     SDL_Event event;
     c64->LoopThreadEnd = false;
+    c64->LoopThreadIsEnd = false;
     c64->sdl_thread_pause = false;
 
-    GLuint  Pfeil0Texture;
-    GLuint  Pfeil1Texture;
-    GLuint  Kreis0Texture;
-    GLuint  Kreis1Texture;
-
-    GLuint  C64ScreenTexture;
-
-    c64->C64ScreenBuffer = 0;
+    c64->C64ScreenBuffer = NULL;
 
     while (!c64->LoopThreadEnd)
     {
@@ -467,789 +479,39 @@ int SDLThread(void *userdat)
         if(c64->ChangeGrafikModi)
         {
             c64->ChangeGrafikModi = false;
-
-            /// VicRefresh stoppen und solange warten bis wirklich Stop ist ///
-            c64->HoldVicRefresh = true;
-            c64->VicRefreshIsHold = false;
-            while(!c64->VicRefreshIsHold)
-            {
-                  SDL_Delay(1);
-            }
-
-            /// Allegmeine Einstellungen ///
-
-            if((c64->FullResXW != 0) && (c64->FullResYW != 0))
-                c64->isFullscreen  = true;
-            else c64->isFullscreen = false;
-
-            c64->AktWindowXW = C64ScreenXW;
-            c64->AktWindowYW = C64ScreenYW;
-
-            if(c64->DoubleSize)
-            {
-                c64->AktWindowXW *=2;
-                c64->AktWindowYW *=2;
-            }
-
-            c64->AktC64ScreenXW = c64->AktWindowXW;
-            c64->AktC64ScreenYW = c64->AktWindowYW;
-
-            if(c64->ColBits32)
-            {
-                c64->AktWindowColorBits = 32;
-                if(c64->C64ScreenBuffer != 0)
-                {
-                    delete[] c64->C64ScreenBuffer;
-                }
-                c64->C64ScreenBuffer = new unsigned char[c64->AktC64ScreenXW*c64->AktC64ScreenYW*4];
-            }
-            else
-            {
-                c64->AktWindowColorBits = 16;
-                if(c64->C64ScreenBuffer != 0)
-                {
-                    delete[] c64->C64ScreenBuffer;
-                }
-                c64->C64ScreenBuffer = new unsigned char[c64->AktC64ScreenXW*c64->AktC64ScreenYW*2];
-            }
-
-            c64->pal->SetDisplayMode(c64->AktWindowColorBits);
-            c64->pal->EnablePALOutput(c64->PalEnable);
-            c64->pal->EnableVideoDoubleSize(c64->DoubleSize);
-
-            if(c64->OpenGLEnable)
-            {
-                /// OpenGL Version ///
-                c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_OPENGL);
-
-                SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,1);
-                SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL,0);
-
-                glShadeModel(GL_SMOOTH);
-                glEnable(GL_TEXTURE_2D);
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-                glViewport(0,0,c64->AktWindowXW,c64->AktWindowYW);
-                glMatrixMode(GL_PROJECTION);
-                glOrtho(0,c64->AktWindowXW,c64->AktWindowYW,0,-1,1);
-                glLoadIdentity();
-
-                glGenTextures(1,&C64ScreenTexture);
-                glBindTexture( GL_TEXTURE_2D, C64ScreenTexture);
-
-                // Set the texture's stretching properties
-                if(c64->FilterEnable)
-                {
-                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-                }
-                else
-                {
-                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-                }
-
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-                glTexImage2D( GL_TEXTURE_2D, 0, 4, c64->AktWindowXW, c64->AktWindowYW, 0,GL_BGRA, GL_UNSIGNED_BYTE, c64->C64ScreenBuffer );
-                //gluBuild2DMipmaps(GL_TEXTURE_2D, 4, c64->AktWindowXW, c64->AktWindowXW,GL_RGBA, GL_UNSIGNED_BYTE, c64->C64ScreenBuffer );
-
-                GLenum  TextureFormat = 0;
-                GLint   NofColors = 0;
-
-                if(c64->Pfeil0 != NULL)
-                {
-                    NofColors = c64->Pfeil0->format->BytesPerPixel;
-
-                    if(NofColors == 4)
-                    {
-                        if(c64->Pfeil0->format->Rmask==0x000000ff)
-                            TextureFormat=GL_RGBA;
-                        else
-                            TextureFormat=GL_BGRA;
-                    }
-                    else if(NofColors == 3) //no alpha channel
-                    {
-                        if(c64->Pfeil0->format->Rmask==0x000000ff)
-                            TextureFormat=GL_RGB;
-                        else
-                            TextureFormat=GL_BGR;
-                    }
-                }
-
-                // Ich setze mal vorraus das alle 4 Images das selbe Format haben !! //
-
-                if(c64->Pfeil0 != NULL)
-                {
-                    glGenTextures(1,&Pfeil0Texture);
-                    glBindTexture( GL_TEXTURE_2D, Pfeil0Texture );
-                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-                    //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, c64->Pfeil0->w, c64->Pfeil0->h, 0,TextureFormat, GL_UNSIGNED_BYTE, c64->Pfeil0->pixels );
-                    gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, c64->Pfeil0->w, c64->Pfeil0->h,TextureFormat, GL_UNSIGNED_BYTE, c64->Pfeil0->pixels );
-                }
-
-                if(c64->Pfeil1 != NULL)
-                {
-                    glGenTextures(1,&Pfeil1Texture);
-                    glBindTexture( GL_TEXTURE_2D, Pfeil1Texture );
-                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-                    //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, c64->Pfeil1->w, c64->Pfeil1->h, 0,TextureFormat, GL_UNSIGNED_BYTE, c64->Pfeil1->pixels );
-                    gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, c64->Pfeil1->w, c64->Pfeil1->h,TextureFormat, GL_UNSIGNED_BYTE, c64->Pfeil1->pixels );
-                }
-
-                if(c64->Kreis0 != NULL)
-                {
-                    glGenTextures(1,&Kreis0Texture);
-                    glBindTexture( GL_TEXTURE_2D, Kreis0Texture );
-                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-                    //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, c64->Kreis0->w, c64->Kreis0->h, 0,TextureFormat, GL_UNSIGNED_BYTE, c64->Kreis0->pixels );
-                    gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, c64->Kreis0->w, c64->Kreis0->h,TextureFormat, GL_UNSIGNED_BYTE, c64->Kreis0->pixels );
-                }
-
-                if(c64->Kreis1 != NULL)
-                {
-                    glGenTextures(1,&Kreis1Texture);
-                    glBindTexture( GL_TEXTURE_2D, Kreis1Texture );
-                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-                    //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, c64->Kreis1->w, c64->Kreis1->h, 0,TextureFormat, GL_UNSIGNED_BYTE, c64->Kreis1->pixels );
-                    gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, c64->Kreis1->w, c64->Kreis1->h,TextureFormat, GL_UNSIGNED_BYTE, c64->Kreis1->pixels );
-                }
-            }
-            else
-            {
-                /// SDL Version ///
-                c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
-                c64->C64ScreenBack = SDL_CreateRGBSurface(0,c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,0,0,0,0);
-            }
-
-            /// VicRefresh wieder zulassen ///
-            c64->HoldVicRefresh = false;
+            c64->InitGrafik();
         }
 
+        /// Wird ausgeführt wenn Keine Thread Pause anliegt ///
         if(!c64->sdl_thread_pause)
         {
             while (SDL_PollEvent (&event))
             {
-                switch (event.type)
-                {
-                    case SDL_VIDEORESIZE:
-                    {
-                        if(!c64->isFullscreen)
-                        {
-                            c64->AktWindowXW = event.resize.w;
-                            c64->AktWindowYW = event.resize.h;
-
-                            if(c64->OpenGLEnable)
-                            {
-                                /// OpenGL Version ///
-                                c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_OPENGL);
-                                glViewport(0,0,c64->AktWindowXW,c64->AktWindowYW);
-                                glMatrixMode(GL_PROJECTION);
-                                glLoadIdentity();
-
-                                glOrtho(0,c64->AktWindowXW,c64->AktWindowYW,0,-1,1);
-                                glLoadIdentity();
-                            }
-                            else
-                            {
-                                /// SDL Version ///
-                                c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
-                            }
-                        }
-                    break;
-                    }
-
-                    case SDL_JOYBUTTONDOWN:
-                    case SDL_JOYBUTTONUP:
-                    {
-                        if((c64->RecJoyMapping == true) && (event.jbutton.type == SDL_JOYBUTTONDOWN))
-                        {
-                            c64->VJoys[c64->RecJoySlotNr].Type[c64->RecJoyMappingPos] = VJOY_TYPE_BUTTON;
-                            c64->VJoys[c64->RecJoySlotNr].JoyIndex[c64->RecJoyMappingPos] = event.jbutton.which;
-                            c64->VJoys[c64->RecJoySlotNr].ButtonNr[c64->RecJoyMappingPos] = event.jbutton.button;
-                        }
-                        else if((c64->RecJoyMapping == true) && (event.jbutton.type == SDL_JOYBUTTONUP) && (c64->RecPollingWait == false))
-                        {
-                            c64->RecJoyMappingPos++;
-                            if(c64->RecJoyMappingPos == 5)
-                            {
-                                /// Rec Mapping ist fertig ///
-                                c64->RecJoyMapping = false;
-                            }
-                            else
-                            {
-                                c64->RecPollingWait = true;
-                                c64->RecPollingWaitCounter = RecPollingWaitStart;
-                            }
-                        }
-                        else
-                        {
-                            /// VJoyStick abfrage ///
-                            /// Port1
-                            if((c64->VPort1 >= 0) && (c64->VPort1 < MAX_VJOYS))
-                            {
-                                for(int i=0;i<5;i++)
-                                {
-                                    if((c64->VJoys[c64->VPort1].ButtonNr[i] == event.jbutton.button) &&
-                                            (c64->VJoys[c64->VPort1].Type[i] == VJOY_TYPE_BUTTON) &&
-                                            (c64->VJoys[c64->VPort1].JoyIndex[i] == event.jbutton.which))
-                                    {
-                                        if(event.jbutton.state == 1) c64->GamePort1 |= 1<<i;
-                                        else c64->GamePort1 &= ~(1<<i);
-                                    }
-                                }
-                            }
-
-                            /// Port2
-                            if((c64->VPort2 >= 0) && (c64->VPort2 < MAX_VJOYS))
-                            {
-                                for(int i=0;i<5;i++)
-                                {
-                                    if((c64->VJoys[c64->VPort2].ButtonNr[i] == event.jbutton.button) &&
-                                            (c64->VJoys[c64->VPort2].Type[i] == VJOY_TYPE_BUTTON) &&
-                                            (c64->VJoys[c64->VPort2].JoyIndex[i] == event.jbutton.which))
-                                    {
-                                        if(event.jbutton.state == 1) c64->GamePort2 |= 1<<i;
-                                        else c64->GamePort2 &= ~(1<<i);
-                                    }
-                                }
-                            }
-                        }
-                        break;
-                    }
-
-                    case SDL_JOYHATMOTION:
-                    {
-                        if((c64->RecJoyMapping == true) && (c64->RecPollingWait == false))
-                        {
-                            if(event.jhat.value > 0)
-                            {
-                                c64->VJoys[c64->RecJoySlotNr].Type[c64->RecJoyMappingPos] = VJOY_TYPE_HAT;
-                                c64->VJoys[c64->RecJoySlotNr].JoyIndex[c64->RecJoyMappingPos] = event.jhat.which;
-                                c64->VJoys[c64->RecJoySlotNr].HatNr[c64->RecJoyMappingPos] = event.jhat.hat;
-                                c64->VJoys[c64->RecJoySlotNr].HatValue[c64->RecJoyMappingPos] = event.jhat.value;
-                            }
-                            else
-                            {
-                                c64->RecJoyMappingPos++;
-                                if(c64->RecJoyMappingPos == 5)
-                                {
-                                    /// Rec Mapping ist fertig ///
-                                    c64->RecJoyMapping = false;
-                                }
-                                else
-                                {
-                                    c64->RecPollingWait = true;
-                                    c64->RecPollingWaitCounter = RecPollingWaitStart;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            /// VJoyStick abfrage ///
-                            /// Port1
-                            if((c64->VPort1 >= 0) && (c64->VPort1 < MAX_VJOYS))
-                            {
-                                for(int i=0;i<5;i++)
-                                {
-                                    if((c64->VJoys[c64->VPort1].HatNr[i] == event.jhat.hat) &&
-                                            (c64->VJoys[c64->VPort1].Type[i] == VJOY_TYPE_HAT) &&
-                                            (c64->VJoys[c64->VPort1].JoyIndex[i] == event.jhat.which))
-                                    {
-                                        if((event.jhat.value & c64->VJoys[c64->VPort1].HatValue[i]) == c64->VJoys[c64->VPort1].HatValue[i]) c64->GamePort1 |= 1<<i;
-                                        else c64->GamePort1 &= ~(1<<i);
-                                    }
-                                }
-                            }
-
-                            /// VJoyStick abfrage ///
-                            /// Port2
-                            if((c64->VPort2 >= 0) && (c64->VPort2 < MAX_VJOYS))
-                            {
-                                for(int i=0;i<5;i++)
-                                {
-                                    if((c64->VJoys[c64->VPort2].HatNr[i] == event.jhat.hat) &&
-                                            (c64->VJoys[c64->VPort2].Type[i] == VJOY_TYPE_HAT) &&
-                                            (c64->VJoys[c64->VPort2].JoyIndex[i] == event.jhat.which))
-                                    {
-                                        if((event.jhat.value & c64->VJoys[c64->VPort2].HatValue[i]) == c64->VJoys[c64->VPort2].HatValue[i]) c64->GamePort2 |= 1<<i;
-                                        else c64->GamePort2 &= ~(1<<i);
-                                    }
-                                }
-                            }
-
-                        }
-                      break;
-                    }
-
-                    case SDL_JOYAXISMOTION:
-                    {
-                        if((c64->RecJoyMapping == true) && (c64->RecPollingWait == false))
-                        {
-                            if(!((event.jaxis.value >= -10) && (event.jaxis.value <= 10)))
-                            {
-                                c64->VJoys[c64->RecJoySlotNr].Type[c64->RecJoyMappingPos] = VJOY_TYPE_AXIS;
-                                c64->VJoys[c64->RecJoySlotNr].JoyIndex[c64->RecJoyMappingPos] = event.jaxis.which;
-                                c64->VJoys[c64->RecJoySlotNr].AxisNr[c64->RecJoyMappingPos] = event.jaxis.axis;
-                                if(event.jaxis.value > 0) c64->VJoys[c64->RecJoySlotNr].AxisValue[c64->RecJoyMappingPos] = 0;
-                                else c64->VJoys[c64->RecJoySlotNr].AxisValue[c64->RecJoyMappingPos] = 1;
-                            }
-                            else
-                            {
-                                c64->RecJoyMappingPos++;
-                                if(c64->RecJoyMappingPos == 5)
-                                {
-                                    /// Rec Mapping ist fertig ///
-                                    c64->RecJoyMapping = false;
-                                }
-                                else
-                                {
-                                    c64->RecPollingWait = true;
-                                    c64->RecPollingWaitCounter = RecPollingWaitStart;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            /// VJoyStick abfrage ///
-                            /// Port1
-                            if((c64->VPort1 >= 0) && (c64->VPort1 < MAX_VJOYS))
-                            {
-                                for(int i=0;i<5;i++)
-                                {
-                                    if((c64->VJoys[c64->VPort1].AxisNr[i] == event.jaxis.axis) &&
-                                            (c64->VJoys[c64->VPort1].Type[i] == VJOY_TYPE_AXIS) &&
-                                            (c64->VJoys[c64->VPort1].JoyIndex[i] == event.jaxis.which))
-                                    {
-                                        if(!((event.jaxis.value >= -10) && (event.jaxis.value <= 10)))
-                                        {
-                                            if(event.jaxis.value > 16000)
-                                            {
-                                                if(c64->VJoys[c64->VPort1].AxisValue[i] == 0) c64->GamePort1 |= 1<<i;
-                                            }
-                                            else if(event.jaxis.value < -16000)
-                                            {
-                                                if(c64->VJoys[c64->VPort1].AxisValue[i] == 1) c64->GamePort1 |= 1<<i;
-                                            }
-                                        }
-                                        else c64->GamePort1 &= ~(1<<i);
-                                    }
-                                }
-                            }
-
-                            /// VJoyStick abfrage ///
-                            /// Port2
-                            if((c64->VPort2 >= 0) && (c64->VPort2 < MAX_VJOYS))
-                            {
-                                for(int i=0;i<5;i++)
-                                {
-                                    if((c64->VJoys[c64->VPort2].AxisNr[i] == event.jaxis.axis) &&
-                                            (c64->VJoys[c64->VPort2].Type[i] == VJOY_TYPE_AXIS) &&
-                                            (c64->VJoys[c64->VPort2].JoyIndex[i] == event.jaxis.which))
-                                    {
-                                        if(!((event.jaxis.value >= -10) && (event.jaxis.value <= 10)))
-                                        {
-                                            if(event.jaxis.value > 16000)
-                                            {
-                                                if(c64->VJoys[c64->VPort2].AxisValue[i] == 0) c64->GamePort2 |= 1<<i;
-                                            }
-                                            else if(event.jaxis.value < -16000)
-                                            {
-                                                if(c64->VJoys[c64->VPort2].AxisValue[i] == 1) c64->GamePort2 |= 1<<i;
-                                            }
-                                        }
-                                        else c64->GamePort2 &= ~(1<<i);
-                                    }
-                                }
-                            }
-                        }
-                      break;
-                    }
-
-                    case SDL_KEYDOWN:
-                    {
-                        switch(event.key.keysym.sym)
-                        {
-                        case SDLK_ESCAPE:
-                            if(c64->RecJoyMapping)
-                            {
-                                c64->RecJoyMapping = false;
-                            }
-                            else
-                            {
-                                c64->WaitResetReady = false;
-                                c64->RESET = false;
-                            }
-                            break;
-
-                        case SDLK_F12:
-                            c64->isFullscreen = !c64->isFullscreen;
-
-                            if(c64->OpenGLEnable)
-                            {
-                                /// OpenGL Version ///
-                            }
-                            else
-                            {
-                                /// SDL Version ///
-                                if(c64->isFullscreen)
-                                {
-                                    SDL_ShowCursor(false);
-                                    c64->C64Screen = SDL_SetVideoMode(1280,1024,c64->AktWindowColorBits,SDL_FULLSCREEN | SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
-                                }
-                                else
-                                {
-                                    SDL_ShowCursor(true);
-                                    c64->C64Screen = SDL_SetVideoMode(c64->AktWindowXW,c64->AktWindowYW,c64->AktWindowColorBits,SDL_VIDEORESIZE | SDL_SWSURFACE | SDL_DOUBLEBUF);
-                                }
-                            }
-                            break;
-
-                        default:
-                            break;
-                        }
-
-                        if(c64->RecJoyMapping == true)
-                        {
-                            c64->VJoys[c64->RecJoySlotNr].Type[c64->RecJoyMappingPos] = VJOY_TYPE_KEY;
-                            c64->VJoys[c64->RecJoySlotNr].KeyDown[c64->RecJoyMappingPos] = event.key.keysym.scancode;
-                        }
-                        else
-                        {
-                            for(int i=0;i<C64KeyNum;i++)
-                            {
-                                if(C64KeyTable[i].SDLKeyCode == event.key.keysym.sym)
-                                {
-                                    c64->KeyEvent(C64KeyTable[i].MatrixCode,KEY_DOWN,C64KeyTable[i].Shift);
-                                }
-                            }
-                        }
-
-                        /// VJoyStick abfrage ///
-                        /// Port1
-                        if((c64->VPort1 >= 0) && (c64->VPort1 < MAX_VJOYS))
-                        {
-                            for(int i=0;i<5;i++)
-                            {
-                                if((c64->VJoys[c64->VPort1].KeyDown[i] == event.key.keysym.scancode) &&
-                                        (c64->VJoys[c64->VPort1].Type[i] == VJOY_TYPE_KEY))
-                                    c64->GamePort1 |= 1<<i;
-                            }
-                        }
-
-                        /// Port2
-                        if((c64->VPort2 >= 0) && (c64->VPort2 < MAX_VJOYS))
-                        {
-                            for(int i=0;i<5;i++)
-                            {
-                                if((c64->VJoys[c64->VPort2].KeyDown[i] == event.key.keysym.scancode) &&
-                                        (c64->VJoys[c64->VPort2].Type[i] == VJOY_TYPE_KEY))
-                                    c64->GamePort2 |= 1<<i;
-                            }
-                        }
-                        break;
-                    }
-
-                    case SDL_KEYUP:
-                    {
-                        switch(event.key.keysym.sym)
-                        {
-                        case SDLK_ESCAPE:
-                            c64->RESET = true;
-                        case SDLK_F12:
-
-                            break;
-                        default:
-                            break;
-                        }
-
-                        if(c64->RecJoyMapping == true)
-                        {
-                            c64->VJoys[c64->RecJoySlotNr].Type[c64->RecJoyMappingPos] = VJOY_TYPE_KEY;
-                            c64->VJoys[c64->RecJoySlotNr].KeyUp[c64->RecJoyMappingPos] = event.key.keysym.scancode;
-
-                            c64->RecJoyMappingPos++;
-                            if(c64->RecJoyMappingPos == 5)
-                            {
-                                /// Rec Mapping ist fertig ///
-                                c64->RecJoyMapping = false;
-                            }
-                        }
-                        else
-                        {
-                            for(int i=0;i<C64KeyNum;i++)
-                            {
-                                if(C64KeyTable[i].SDLKeyCode == event.key.keysym.sym)
-                                {
-                                    c64->KeyEvent(C64KeyTable[i].MatrixCode,KEY_UP,C64KeyTable[i].Shift);
-                                }
-                            }
-                        }
-
-                        /// VJoyStick abfrage ///
-                        /// Port1
-                        if((c64->VPort1 >= 0) && (c64->VPort1 < MAX_VJOYS))
-                        {
-                            for(int i=0;i<5;i++)
-                            {
-                                if((c64->VJoys[c64->VPort1].KeyUp[i] == event.key.keysym.scancode) &&
-                                        (c64->VJoys[c64->VPort1].Type[i] == VJOY_TYPE_KEY))
-                                    c64->GamePort1 &= ~(1<<i);
-                            }
-                        }
-
-                        /// Port2
-                        if((c64->VPort2 >= 0) && (c64->VPort2 < MAX_VJOYS))
-                        {
-                            for(int i=0;i<5;i++)
-                            {
-                                if((c64->VJoys[c64->VPort2].KeyUp[i] == event.key.keysym.scancode) &&
-                                        (c64->VJoys[c64->VPort2].Type[i] == VJOY_TYPE_KEY))
-                                    c64->GamePort2 &= ~(1<<i);
-                            }
-                        }
-                        break;
-                    }
-
-                    case SDL_MOUSEMOTION:
-                        break;
-
-                    case SDL_QUIT:
-    #ifdef _WIN32
-                    c64->LoopThreadEnd = true;
-    #endif
-                    break;
-
-                    default:
-                        break;
-                }
+                /// Es ist ein neues SDL Event vorhanden ///
+                /// Event auswerten und verarbeiten ///
+                c64->AnalyzeSDLEvent(&event);
             }
+
+            /// Wenn der Thread noch nicht beendet wurde ///
             if(!c64->LoopThreadEnd)
             {
-                if(c64->OpenGLEnable)
+                if(c64->IsC64ScreenObsolete)
                 {
-                    static int counter = 0;
-                    static unsigned char test = 1;
-                    counter++;
-                    if(counter == 5)
-                    {
-                        counter = 0;
-                        test *= 2;
-                        if(test == 16) test = 1;
-                    }
-
-                    /// OpenGL Version ///
-
-                    glClearColor( 0.0, 0.0, 0.0, 0.0 ); // Farbe zum Löschen setzen
-                    glClear( GL_COLOR_BUFFER_BIT );     // Aktuellen Bildpuffer löschen
-
-                    if(!c64->DistortionEnable)
-                    {
-                        glBindTexture(GL_TEXTURE_2D,C64ScreenTexture);
-                        c64->pal->ConvertVideo((void*)c64->C64ScreenBuffer,c64->AktC64ScreenXW*4,c64->vic_puffer + C64FirstViewedPixel,c64->AktC64ScreenXW,c64->AktC64ScreenYW,504,311,false);
-                        glTexSubImage2D(GL_TEXTURE_2D,0,0,0, c64->AktC64ScreenXW, c64->AktC64ScreenYW,GL_BGRA, GL_UNSIGNED_BYTE, c64->C64ScreenBuffer);
-
-                        glBegin(GL_QUADS);
-                        glTexCoord2i(0,1);
-                        glVertex3f(-1,-1,0.0);
-                        glTexCoord2i(1,1);
-                        glVertex3f(1,-1,0);
-                        glTexCoord2i(1,0);
-                        glVertex3f(1,1,0);
-                        glTexCoord2i(0,0);
-                        glVertex3f(-1,1,0);
-                        glEnd();
-                    }
-                    else
-                    {
-                        //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-
-                        glBindTexture(GL_TEXTURE_2D,C64ScreenTexture);
-                        c64->pal->ConvertVideo((void*)c64->C64ScreenBuffer,c64->AktC64ScreenXW*4,c64->vic_puffer + C64FirstViewedPixel,c64->AktC64ScreenXW,c64->AktC64ScreenYW,504,311,false);
-                        glTexSubImage2D(GL_TEXTURE_2D,0,0,0, c64->AktC64ScreenXW, c64->AktC64ScreenYW,GL_BGRA, GL_UNSIGNED_BYTE, c64->C64ScreenBuffer);
-
-                        glBegin(GL_QUADS);
-                        for(int i=0; i < SUBDIVS_SCREEN*SUBDIVS_SCREEN; i++)
-                        {
-                            glTexCoord2f(c64->DistortionGridTex[i*4+0].x,c64->DistortionGridTex[i*4+0].y);
-                            glVertex3f(c64->DistortionGrid[i*4+0].x,c64->DistortionGrid[i*4+0].y,0.0);
-                            glTexCoord2f(c64->DistortionGridTex[i*4+1].x,c64->DistortionGridTex[i*4+1].y);
-                            glVertex3f(c64->DistortionGrid[i*4+1].x,c64->DistortionGrid[i*4+1].y,0.0);
-                            glTexCoord2f(c64->DistortionGridTex[i*4+2].x,c64->DistortionGridTex[i*4+2].y);
-                            glVertex3f(c64->DistortionGrid[i*4+2].x,c64->DistortionGrid[i*4+2].y,0.0);
-                            glTexCoord2f(c64->DistortionGridTex[i*4+3].x,c64->DistortionGridTex[i*4+3].y);
-                            glVertex3f(c64->DistortionGrid[i*4+3].x,c64->DistortionGrid[i*4+3].y,0.0);
-                        }
-                        glEnd();
-                    }
-
-                    /// Die Pfeile werden nur beim lernen angezeigt ///
-                    if(c64->RecJoyMapping)
-                    {
-                        /// Nach Oben ///
-                        if(c64->RecJoyMappingPos == 0) glBindTexture(GL_TEXTURE_2D,Pfeil1Texture);
-                        else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
-                        glBegin(GL_QUADS);
-                        glTexCoord2i(1,0);
-                        glVertex3f(0.3,1,0.0);
-                        glTexCoord2i(1,1);
-                        glVertex3f(0.3,0.1,0);
-                        glTexCoord2i(0,1);
-                        glVertex3f(-0.3,0.1,0);
-                        glTexCoord2i(0,0);
-                        glVertex3f(-0.3,1,0);
-                        glEnd();
-
-                        /// Nach Unten ///
-                        if(c64->RecJoyMappingPos == 1) glBindTexture(GL_TEXTURE_2D,Pfeil1Texture);
-                        else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
-                        glBegin(GL_QUADS);
-                        glTexCoord2i(1,0);
-                        glVertex3f(0.3,-1,0.0);
-                        glTexCoord2i(1,1);
-                        glVertex3f(0.3,-0.1,0);
-                        glTexCoord2i(0,1);
-                        glVertex3f(-0.3,-0.1,0);
-                        glTexCoord2i(0,0);
-                        glVertex3f(-0.3,-1,0);
-                        glEnd();
-
-                        /// Nach Links ///
-                        if(c64->RecJoyMappingPos == 2) glBindTexture(GL_TEXTURE_2D,Pfeil1Texture);
-                        else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
-                        glBegin(GL_QUADS);
-                        glTexCoord2i(1,0);
-                        glVertex3f(-0.75,-0.4,0);
-                        glTexCoord2i(1,1);
-                        glVertex3f(-0.08,-0.4,0.0);
-                        glTexCoord2i(0,1);
-                        glVertex3f(-0.08,0.4,0);
-                        glTexCoord2i(0,0);
-                        glVertex3f(-0.75,0.4,0);
-                        glEnd();
-
-                        /// Nach Rechts ///
-                        if(c64->RecJoyMappingPos == 3) glBindTexture(GL_TEXTURE_2D,Pfeil1Texture);
-                        else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
-                        glBegin(GL_QUADS);
-                        glTexCoord2i(1,0);
-                        glVertex3f(0.75,-0.4,0);
-                        glTexCoord2i(1,1);
-                        glVertex3f(0.08,-0.4,0.0);
-                        glTexCoord2i(0,1);
-                        glVertex3f(0.08,0.4,0);
-                        glTexCoord2i(0,0);
-                        glVertex3f(0.75,0.4,0);
-                        glEnd();
-
-                        /// Fire ///
-                        if(c64->RecJoyMappingPos == 4) glBindTexture(GL_TEXTURE_2D,Kreis1Texture);
-                        else glBindTexture(GL_TEXTURE_2D,Kreis0Texture);
-                        glBegin(GL_QUADS);
-                        glTexCoord2i(1,0);
-                        glVertex3f(0.07,-0.09,0);
-                        glTexCoord2i(1,1);
-                        glVertex3f(0.07,0.09,0.0);
-                        glTexCoord2i(0,1);
-                        glVertex3f(-0.07,0.09,0);
-                        glTexCoord2i(0,0);
-                        glVertex3f(-0.07,-0.09,0);
-                        glEnd();
-                    }
-
-                    if(c64->StartScreenshot)
-                    {
-                        c64->StartScreenshot = false;
-                        SDL_Surface * temp = SDL_CreateRGBSurface(SDL_SWSURFACE, c64->AktC64ScreenXW, c64->AktC64ScreenYW, 24,
-                        #if SDL_BYTEORDER == SDL_LIL_ENDIAN
-                        0x000000FF, 0x0000FF00, 0x00FF0000, 0
-                        #else
-                        0x00FF0000, 0x0000FF00, 0x000000FF, 0
-                        #endif
-                        );
-                        if (temp == NULL)
-                        return -1;
-
-                        unsigned char* pixels = new unsigned char[3 * c64->AktC64ScreenXW * c64->AktC64ScreenYW];
-                        if (pixels == NULL)
-                        {
-                        SDL_FreeSurface(temp);
-                        return -1;
-                        }
-
-                        glReadPixels(0, 0, c64->AktC64ScreenXW, c64->AktC64ScreenYW, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-
-                        for (int i=0; i<c64->AktC64ScreenYW; i++)
-                        memcpy(((char *) temp->pixels) + temp->pitch * i, pixels + 3*c64->AktC64ScreenXW * (c64->AktC64ScreenYW-i-1), c64->AktC64ScreenXW*3);
-                        delete pixels;
-
-                        SDL_SaveBMP(temp, c64->ScreenshotFilename);
-                        SDL_FreeSurface(temp);
-                    }
-
-                    SDL_GL_SwapBuffers();
-
-                    //SDL_framerateDelay(&c64->fps_manager);
-                    SDL_Delay(5);
-
-                    c64->DrawScreenBack = false;
+                    c64->DrawC64Screen();
+                    c64->IsC64ScreenObsolete = false;
                 }
-                else
-                {
-                    /// SDL Version ///
-                    if(c64->DrawScreenBack)
-                    {
-                        SDL_Rect rec_src = {0,0,c64->AktC64ScreenXW,c64->AktC64ScreenYW};
-                        SDL_Rect rec_dst = {0,0,(unsigned short)c64->C64Screen->w,(unsigned short)c64->C64Screen->h};
-
-                        /// Auf Screenshot Start prüfen ///
-                        if(c64->StartScreenshot)
-                        {
-                            c64->StartScreenshot = false;
-                            SDL_SaveBMP(c64->C64ScreenBack,c64->ScreenshotFilename);
-                        }
-
-                        SDL_SoftStretch(c64->C64ScreenBack,&rec_src,c64->C64Screen,&rec_dst);
-                        SDL_Flip(c64->C64Screen);
-
-                        SDL_framerateDelay(&c64->fps_manager);
-                        c64->DrawScreenBack = false;
-                    }
-                    else SDL_Delay(1);
-                }
+                else SDL_Delay(1);
             }
         }
         else
         {
-            SDL_Delay(10);
-            c64->sdl_thread_is_paused = true;
+            SDL_Delay(1);
+            if(!c64->sdl_thread_is_paused) c64->sdl_thread_is_paused = true;
         }
     }
 
-    c64->ChangeGrafikModi = false;
-
-    /// VicRefresh stoppen und solange warten bis wirklich Stop ist ///
-    c64->HoldVicRefresh = true;
-    c64->VicRefreshIsHold = false;
-
-    if(c64->C64ScreenBuffer != 0)
-        delete[] c64->C64ScreenBuffer;
-
-    SDL_Quit();
+    c64->ReleaseGrafik();
+    c64->LoopThreadIsEnd = true;
 
     return 0;
 }
@@ -1299,32 +561,13 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
 
     if((pal == 0) || (sdl_thread_pause == true)) return;
 
-    if(OpenGLEnable)
-    {
-        /// OpenGL Version ///
+    SDL_LockSurface(C64Screen);
+    pal->ConvertVideo((void*)C64Screen->pixels,C64Screen->pitch,vic_puffer,104,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
+    this->vic_puffer = vic_puffer;
+    vic->SwitchVideoPuffer();
+    SDL_UnlockSurface(C64Screen);
 
-        //if(DrawScreenBack) SDL_Delay(2);
-        //pal->ConvertVideo((void*)C64ScreenBuffer,AktC64ScreenXW*4,vic_puffer,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
-        this->vic_puffer = vic_puffer;
-        vic->SwitchVideoPuffer();
-
-        DrawScreenBack = true;
-    }
-    else
-    {
-        /// SDL Version ///
-        if(DrawScreenBack) SDL_Delay(2);
-
-        SDL_LockSurface(C64ScreenBack);
-        //pal->ConvertVideo((void*)C64ScreenBack->pixels,C64ScreenBack->pitch,vic_puffer,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
-        this->vic_puffer = vic_puffer;
-        vic->SwitchVideoPuffer();
-
-        SDL_UnlockSurface(C64ScreenBack);
-        DrawScreenBack = true;
-    }
-
-    NewVicRefresh = true;
+    IsC64ScreenObsolete = true;
 }
 
 void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
@@ -1390,7 +633,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                     {
                         if(C64ResetReady)
                         {
-                            SDL_CreateThread(SDLThreadLoad,this);
+                            SDL_CreateThread(SDLThreadLoad ,"C64Thread",this);
                             WaitResetReady = false;
                         }
                     }
@@ -1398,7 +641,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                     {
                         if((C64ResetReady == true) && (FloppyResetReady[0] == true))
                         {
-                            SDL_CreateThread(SDLThreadLoad,this);
+                            SDL_CreateThread(SDLThreadLoad ,"C64Thread" ,this);
                             WaitResetReady = false;
                         }
                     }
@@ -1428,8 +671,16 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
             }
             //////////////////////////////////////////////////////////////////////////////
         }
-        SDL_MixAudio((unsigned char*)puffer,(unsigned char*)sid1->SoundBuffer,laenge,100);
+
+        for(int i=0; i<(laenge/2); i++)
+        {
+            puffer[i] = sid1->SoundBuffer[i];
+        }
+
+        SDL_MixAudioFormat((unsigned char*)puffer,(unsigned char*)sid1->SoundBuffer,have.format,laenge,100);
         //SDL_MixAudio((unsigned char*)puffer,(unsigned char*)sid2->SoundBuffer,laenge,100);
+
+        /// Floppysound dazu mixen ///
         for(int i=0; i< FloppyAnzahl; i++)
         {
             if(floppy[i]->GetEnableFloppySound()) SDL_MixAudio((unsigned char*)puffer,(unsigned char*)floppy[i]->GetSoundBuffer(),laenge,255);
@@ -1741,6 +992,746 @@ void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool pal_enable,boo
 
     LogText((char*)">> Grafikmodus wurde gesetzt:\n");
     LogText(str00);
+}
+
+void C64Class::InitGrafik()
+{
+    /// VicRefresh stoppen und solange warten bis wirklich Stop ist ///
+    HoldVicRefresh = true;
+    VicRefreshIsHold = false;
+    while(!VicRefreshIsHold)
+    {
+          SDL_Delay(1);
+    }
+
+    /// Allegmeine Einstellungen ///
+
+    if((FullResXW != 0) && (FullResYW != 0))
+        isFullscreen  = true;
+    else isFullscreen = false;
+
+    AktWindowXW = AktC64ScreenXW = C64ScreenXW;
+    AktWindowYW = AktC64ScreenYW = C64ScreenYW;
+
+    if(DoubleSize)
+    {
+        AktWindowXW *=2;
+        AktWindowYW *=2;
+
+        AktC64ScreenXW *=2;
+        AktC64ScreenYW *=2;
+    }
+
+    if(ColBits32)
+    {
+        AktWindowColorBits = 32;
+        if(C64ScreenBuffer != 0)
+        {
+            delete[] C64ScreenBuffer;
+        }
+        C64ScreenBuffer = new unsigned char[AktC64ScreenXW*AktC64ScreenYW*4];
+    }
+    else
+    {
+        AktWindowColorBits = 16;
+        if(C64ScreenBuffer != 0)
+        {
+            delete[] C64ScreenBuffer;
+        }
+        C64ScreenBuffer = new unsigned char[AktC64ScreenXW*AktC64ScreenYW*2];
+    }
+
+    pal->SetDisplayMode(AktWindowColorBits);
+    pal->EnablePALOutput(PalEnable);
+    pal->EnableVideoDoubleSize(DoubleSize);
+
+    if(C64Window == NULL)
+    {
+        C64Window = SDL_CreateWindow("C64 Screen",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,AktWindowXW,AktWindowYW,SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+        SDL_SetWindowIcon(C64Window,C64ScreenIcon);
+    }
+    else SDL_SetWindowSize(C64Window,AktWindowXW,AktWindowYW);
+
+    GLContext = SDL_GL_CreateContext(C64Window);
+
+    // OpenGL Initialisieren //
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,1);
+
+    glShadeModel(GL_SMOOTH);
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glViewport(0,0,AktWindowXW,AktWindowYW);
+    glMatrixMode(GL_PROJECTION);
+    glOrtho(0,AktWindowXW,AktWindowYW,0,-1,1);
+    glLoadIdentity();
+
+    glGenTextures(1,&C64ScreenTexture);
+    glBindTexture( GL_TEXTURE_2D, C64ScreenTexture);
+
+    // Textur Stretching Parameter setzen
+    if(FilterEnable)
+    {
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    }
+    else
+    {
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    }
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+    if(C64Screen != NULL)
+       SDL_FreeSurface(C64Screen);
+    C64Screen = SDL_CreateRGBSurface(0,AktC64ScreenXW,AktC64ScreenYW,AktWindowColorBits,0,0,0,0);
+
+    glTexImage2D( GL_TEXTURE_2D, 0, 4, AktC64ScreenXW,AktC64ScreenYW, 0,GL_BGRA, GL_UNSIGNED_BYTE, C64ScreenBuffer );
+
+    GLenum  TextureFormat = 0;
+    GLint   NofColors = 0;
+
+    if(Pfeil0 != NULL)
+    {
+        NofColors = Pfeil0->format->BytesPerPixel;
+
+        if(NofColors == 4)
+        {
+            if(Pfeil0->format->Rmask==0x000000ff)
+                TextureFormat=GL_RGBA;
+            else
+                TextureFormat=GL_BGRA;
+        }
+        else if(NofColors == 3) //no alpha channel
+        {
+            if(Pfeil0->format->Rmask==0x000000ff)
+                TextureFormat=GL_RGB;
+            else
+                TextureFormat=GL_BGR;
+        }
+    }
+
+    // Ich setze mal vorraus das alle 4 Images das selbe Format haben !! //
+
+    if(Pfeil0 != NULL)
+    {
+        glGenTextures(1,&Pfeil0Texture);
+        glBindTexture( GL_TEXTURE_2D, Pfeil0Texture );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, Pfeil0->w, Pfeil0->h, 0,TextureFormat, GL_UNSIGNED_BYTE, Pfeil0->pixels );
+        gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, Pfeil0->w, Pfeil0->h,TextureFormat, GL_UNSIGNED_BYTE, Pfeil0->pixels );
+    }
+
+    if(Pfeil1 != NULL)
+    {
+        glGenTextures(1,&Pfeil1Texture);
+        glBindTexture( GL_TEXTURE_2D, Pfeil1Texture );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, Pfeil1->w, Pfeil1->h, 0,TextureFormat, GL_UNSIGNED_BYTE, Pfeil1->pixels );
+        gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, Pfeil1->w, Pfeil1->h,TextureFormat, GL_UNSIGNED_BYTE, Pfeil1->pixels );
+    }
+
+    if(Kreis0 != NULL)
+    {
+        glGenTextures(1,&Kreis0Texture);
+        glBindTexture( GL_TEXTURE_2D, Kreis0Texture );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, Kreis0->w, Kreis0->h, 0,TextureFormat, GL_UNSIGNED_BYTE, Kreis0->pixels );
+        gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, Kreis0->w, Kreis0->h,TextureFormat, GL_UNSIGNED_BYTE, Kreis0->pixels );
+    }
+
+    if(Kreis1 != NULL)
+    {
+        glGenTextures(1,&Kreis1Texture);
+        glBindTexture( GL_TEXTURE_2D, Kreis1Texture );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, Kreis1->w, Kreis1->h, 0,TextureFormat, GL_UNSIGNED_BYTE, Kreis1->pixels );
+        gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, Kreis1->w, Kreis1->h,TextureFormat, GL_UNSIGNED_BYTE, Kreis1->pixels );
+    }
+
+    /// VicRefresh wieder zulassen ///
+    HoldVicRefresh = false;
+}
+
+void C64Class::ReleaseGrafik()
+{
+    ChangeGrafikModi = false;
+
+    /// VicRefresh stoppen und solange warten bis wirklich Stop ist ///
+    HoldVicRefresh = true;
+    VicRefreshIsHold = false;
+    while(!VicRefreshIsHold)
+    {
+          SDL_Delay(1);
+    }
+
+    if(C64Screen != NULL)
+    {
+       SDL_FreeSurface(C64Screen);
+       C64Screen = NULL;
+    }
+
+    if(C64Window != NULL)
+    {
+        SDL_DestroyWindow(C64Window);
+        C64Window = NULL;
+    }
+
+    if(C64ScreenBuffer != NULL)
+    {
+        delete[] C64ScreenBuffer;
+        C64ScreenBuffer = NULL;
+    }
+}
+
+void C64Class::DrawC64Screen()
+{   
+    /// Auf Screenshot Start prüfen ///
+    if(StartScreenshot)
+    {
+        StartScreenshot = false;
+        SDL_SaveBMP(C64Screen,ScreenshotFilename);
+    }
+
+    /// Fensterinhalt löschen
+    glClearColor(0.0f, 0.0f, 0.0f, 1.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    /// Texture auswählen und mit aktuellen C64 Bilddaten füllen
+    glBindTexture(GL_TEXTURE_2D,C64ScreenTexture);
+    glTexSubImage2D(GL_TEXTURE_2D,0,0,0, AktC64ScreenXW, AktC64ScreenYW,GL_BGRA, GL_UNSIGNED_BYTE, C64Screen->pixels);
+
+    /// Aspect Ratio berechnen
+    float scale_x;
+    float scale_y;
+
+    if((EnableWindowAspectRatio == false && isFullscreen == false) || (EnableFullscreenAspectRatio == false && isFullscreen == true))
+    {
+        scale_x = 1.0f;
+        scale_y = 1.0f;
+    }
+    else
+    {
+        if(((float)AktWindowXW / (float)AktWindowYW) >= C64ScreenAspectRatio)
+        {
+            scale_y = 1.0f;
+            int xw = int(AktWindowYW * C64ScreenAspectRatio);
+            scale_x = (1.0f * xw) / AktWindowXW;
+        }
+        else
+        {
+            scale_x = 1.0f;
+            int yw = int(AktWindowXW / C64ScreenAspectRatio);
+            scale_y = (1.0f * yw) / AktWindowYW;
+        }
+    }
+
+    /// C64 Screen darstellen
+    glBegin(GL_QUADS);
+    for(int i=0; i < SUBDIVS_SCREEN*SUBDIVS_SCREEN*4; i+=4)
+    {
+        glTexCoord2f(DistortionGridTex[i+0].x,DistortionGridTex[i+0].y);
+        glVertex3f(DistortionGrid[i+0].x*scale_x,DistortionGrid[i+0].y*scale_y,0.0);
+
+        glTexCoord2f(DistortionGridTex[i+1].x,DistortionGridTex[i+1].y);
+        glVertex3f(DistortionGrid[i+1].x*scale_x,DistortionGrid[i+1].y*scale_y,0.0);
+
+        glTexCoord2f(DistortionGridTex[i+2].x,DistortionGridTex[i+2].y);
+        glVertex3f(DistortionGrid[i+2].x*scale_x,DistortionGrid[i+2].y*scale_y,0.0);
+
+        glTexCoord2f(DistortionGridTex[i+3].x,DistortionGridTex[i+3].y);
+        glVertex3f(DistortionGrid[i+3].x*scale_x,DistortionGrid[i+3].y*scale_y,0.0);
+    }
+    glEnd();
+
+    /// Pfeile für Joymapping darstenn
+    if(RecJoyMapping)
+    {
+        /// Nach Oben ///
+        if(RecJoyMappingPos == 0) glBindTexture(GL_TEXTURE_2D,Pfeil1Texture);
+        else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
+        glBegin(GL_QUADS);
+        glTexCoord2i(1,0);
+        glVertex3f(0.3,1,0.0);
+        glTexCoord2i(1,1);
+        glVertex3f(0.3,0.1,0);
+        glTexCoord2i(0,1);
+        glVertex3f(-0.3,0.1,0);
+        glTexCoord2i(0,0);
+        glVertex3f(-0.3,1,0);
+        glEnd();
+
+        /// Nach Unten ///
+        if(RecJoyMappingPos == 1) glBindTexture(GL_TEXTURE_2D,Pfeil1Texture);
+        else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
+        glBegin(GL_QUADS);
+        glTexCoord2i(1,0);
+        glVertex3f(0.3,-1,0.0);
+        glTexCoord2i(1,1);
+        glVertex3f(0.3,-0.1,0);
+        glTexCoord2i(0,1);
+        glVertex3f(-0.3,-0.1,0);
+        glTexCoord2i(0,0);
+        glVertex3f(-0.3,-1,0);
+        glEnd();
+
+        /// Nach Links ///
+        if(RecJoyMappingPos == 2) glBindTexture(GL_TEXTURE_2D,Pfeil1Texture);
+        else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
+        glBegin(GL_QUADS);
+        glTexCoord2i(1,0);
+        glVertex3f(-0.75,-0.4,0);
+        glTexCoord2i(1,1);
+        glVertex3f(-0.08,-0.4,0.0);
+        glTexCoord2i(0,1);
+        glVertex3f(-0.08,0.4,0);
+        glTexCoord2i(0,0);
+        glVertex3f(-0.75,0.4,0);
+        glEnd();
+
+        /// Nach Rechts ///
+        if(RecJoyMappingPos == 3) glBindTexture(GL_TEXTURE_2D,Pfeil1Texture);
+        else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
+        glBegin(GL_QUADS);
+        glTexCoord2i(1,0);
+        glVertex3f(0.75,-0.4,0);
+        glTexCoord2i(1,1);
+        glVertex3f(0.08,-0.4,0.0);
+        glTexCoord2i(0,1);
+        glVertex3f(0.08,0.4,0);
+        glTexCoord2i(0,0);
+        glVertex3f(0.75,0.4,0);
+        glEnd();
+
+        /// Fire ///
+        if(RecJoyMappingPos == 4) glBindTexture(GL_TEXTURE_2D,Kreis1Texture);
+        else glBindTexture(GL_TEXTURE_2D,Kreis0Texture);
+        glBegin(GL_QUADS);
+        glTexCoord2i(1,0);
+        glVertex3f(0.07,-0.09,0);
+        glTexCoord2i(1,1);
+        glVertex3f(0.07,0.09,0.0);
+        glTexCoord2i(0,1);
+        glVertex3f(-0.07,0.09,0);
+        glTexCoord2i(0,0);
+        glVertex3f(-0.07,-0.09,0);
+        glEnd();
+    }
+
+    SDL_GL_SwapWindow(C64Window);
+}
+
+void C64Class::SetFocusToC64Window()
+{
+    SDL_RaiseWindow(C64Window);
+}
+
+void C64Class::SetWindowAspectRatio(bool enabled)
+{
+    EnableWindowAspectRatio = enabled;
+}
+
+void C64Class::SetFullscreenAspectRatio(bool enabled)
+{
+    EnableFullscreenAspectRatio = enabled;
+}
+
+void C64Class::AnalyzeSDLEvent(SDL_Event *event)
+{
+    switch (event->type)
+    {
+        case SDL_WINDOWEVENT:
+
+        switch (event->window.event)
+        {
+            case SDL_WINDOWEVENT_RESIZED:
+
+                AktWindowXW = event->window.data1;
+                AktWindowYW = event->window.data2;
+                glViewport(0,0,AktWindowXW,AktWindowYW);
+                glMatrixMode(GL_PROJECTION);
+                glOrtho(0,AktWindowXW,AktWindowYW,0,-1,1);
+                glLoadIdentity();
+                break;
+
+            default:
+                break;
+        }
+        break;
+
+        case SDL_JOYBUTTONDOWN:
+        case SDL_JOYBUTTONUP:
+        {
+            if((RecJoyMapping == true) && (event->jbutton.type == SDL_JOYBUTTONDOWN))
+            {
+                VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_BUTTON;
+                VJoys[RecJoySlotNr].JoyIndex[RecJoyMappingPos] = event->jbutton.which;
+                VJoys[RecJoySlotNr].ButtonNr[RecJoyMappingPos] = event->jbutton.button;
+            }
+            else if((RecJoyMapping == true) && (event->jbutton.type == SDL_JOYBUTTONUP) && (RecPollingWait == false))
+            {
+                RecJoyMappingPos++;
+                if(RecJoyMappingPos == 5)
+                {
+                    /// Rec Mapping ist fertig ///
+                    RecJoyMapping = false;
+                }
+                else
+                {
+                    RecPollingWait = true;
+                    RecPollingWaitCounter = RecPollingWaitStart;
+                }
+            }
+            else
+            {
+                /// VJoyStick abfrage ///
+                /// Port1
+                if((VPort1 >= 0) && (VPort1 < MAX_VJOYS))
+                {
+                    for(int i=0;i<5;i++)
+                    {
+                        if((VJoys[VPort1].ButtonNr[i] == event->jbutton.button) &&
+                                (VJoys[VPort1].Type[i] == VJOY_TYPE_BUTTON) &&
+                                (VJoys[VPort1].JoyIndex[i] == event->jbutton.which))
+                        {
+                            if(event->jbutton.state == 1) GamePort1 |= 1<<i;
+                            else GamePort1 &= ~(1<<i);
+                        }
+                    }
+                }
+
+                /// Port2
+                if((VPort2 >= 0) && (VPort2 < MAX_VJOYS))
+                {
+                    for(int i=0;i<5;i++)
+                    {
+                        if((VJoys[VPort2].ButtonNr[i] == event->jbutton.button) &&
+                                (VJoys[VPort2].Type[i] == VJOY_TYPE_BUTTON) &&
+                                (VJoys[VPort2].JoyIndex[i] == event->jbutton.which))
+                        {
+                            if(event->jbutton.state == 1) GamePort2 |= 1<<i;
+                            else GamePort2 &= ~(1<<i);
+                        }
+                    }
+                }
+            }
+            break;
+        }
+
+        case SDL_JOYHATMOTION:
+        {
+            if((RecJoyMapping == true) && (RecPollingWait == false))
+            {
+                if(event->jhat.value > 0)
+                {
+                    VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_HAT;
+                    VJoys[RecJoySlotNr].JoyIndex[RecJoyMappingPos] = event->jhat.which;
+                    VJoys[RecJoySlotNr].HatNr[RecJoyMappingPos] = event->jhat.hat;
+                    VJoys[RecJoySlotNr].HatValue[RecJoyMappingPos] = event->jhat.value;
+                }
+                else
+                {
+                    RecJoyMappingPos++;
+                    if(RecJoyMappingPos == 5)
+                    {
+                        /// Rec Mapping ist fertig ///
+                        RecJoyMapping = false;
+                    }
+                    else
+                    {
+                        RecPollingWait = true;
+                        RecPollingWaitCounter = RecPollingWaitStart;
+                    }
+                }
+            }
+            else
+            {
+                /// VJoyStick abfrage ///
+                /// Port1
+                if((VPort1 >= 0) && (VPort1 < MAX_VJOYS))
+                {
+                    for(int i=0;i<5;i++)
+                    {
+                        if((VJoys[VPort1].HatNr[i] == event->jhat.hat) &&
+                                (VJoys[VPort1].Type[i] == VJOY_TYPE_HAT) &&
+                                (VJoys[VPort1].JoyIndex[i] == event->jhat.which))
+                        {
+                            if((event->jhat.value & VJoys[VPort1].HatValue[i]) == VJoys[VPort1].HatValue[i]) GamePort1 |= 1<<i;
+                            else GamePort1 &= ~(1<<i);
+                        }
+                    }
+                }
+
+                /// VJoyStick abfrage ///
+                /// Port2
+                if((VPort2 >= 0) && (VPort2 < MAX_VJOYS))
+                {
+                    for(int i=0;i<5;i++)
+                    {
+                        if((VJoys[VPort2].HatNr[i] == event->jhat.hat) &&
+                                (VJoys[VPort2].Type[i] == VJOY_TYPE_HAT) &&
+                                (VJoys[VPort2].JoyIndex[i] == event->jhat.which))
+                        {
+                            if((event->jhat.value & VJoys[VPort2].HatValue[i]) == VJoys[VPort2].HatValue[i]) GamePort2 |= 1<<i;
+                            else GamePort2 &= ~(1<<i);
+                        }
+                    }
+                }
+
+            }
+          break;
+        }
+
+        case SDL_JOYAXISMOTION:
+        {
+            if((RecJoyMapping == true) && (RecPollingWait == false))
+            {
+                if(!((event->jaxis.value >= -10) && (event->jaxis.value <= 10)))
+                {
+                    VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_AXIS;
+                    VJoys[RecJoySlotNr].JoyIndex[RecJoyMappingPos] = event->jaxis.which;
+                    VJoys[RecJoySlotNr].AxisNr[RecJoyMappingPos] = event->jaxis.axis;
+                    if(event->jaxis.value > 0) VJoys[RecJoySlotNr].AxisValue[RecJoyMappingPos] = 0;
+                    else VJoys[RecJoySlotNr].AxisValue[RecJoyMappingPos] = 1;
+                }
+                else
+                {
+                    RecJoyMappingPos++;
+                    if(RecJoyMappingPos == 5)
+                    {
+                        /// Rec Mapping ist fertig ///
+                        RecJoyMapping = false;
+                    }
+                    else
+                    {
+                        RecPollingWait = true;
+                        RecPollingWaitCounter = RecPollingWaitStart;
+                    }
+                }
+            }
+            else
+            {
+                /// VJoyStick abfrage ///
+                /// Port1
+                if((VPort1 >= 0) && (VPort1 < MAX_VJOYS))
+                {
+                    for(int i=0;i<5;i++)
+                    {
+                        if((VJoys[VPort1].AxisNr[i] == event->jaxis.axis) &&
+                                (VJoys[VPort1].Type[i] == VJOY_TYPE_AXIS) &&
+                                (VJoys[VPort1].JoyIndex[i] == event->jaxis.which))
+                        {
+                            if(!((event->jaxis.value >= -10) && (event->jaxis.value <= 10)))
+                            {
+                                if(event->jaxis.value > 16000)
+                                {
+                                    if(VJoys[VPort1].AxisValue[i] == 0) GamePort1 |= 1<<i;
+                                }
+                                else if(event->jaxis.value < -16000)
+                                {
+                                    if(VJoys[VPort1].AxisValue[i] == 1) GamePort1 |= 1<<i;
+                                }
+                            }
+                            else GamePort1 &= ~(1<<i);
+                        }
+                    }
+                }
+
+                /// VJoyStick abfrage ///
+                /// Port2
+                if((VPort2 >= 0) && (VPort2 < MAX_VJOYS))
+                {
+                    for(int i=0;i<5;i++)
+                    {
+                        if((VJoys[VPort2].AxisNr[i] == event->jaxis.axis) &&
+                                (VJoys[VPort2].Type[i] == VJOY_TYPE_AXIS) &&
+                                (VJoys[VPort2].JoyIndex[i] == event->jaxis.which))
+                        {
+                            if(!((event->jaxis.value >= -10) && (event->jaxis.value <= 10)))
+                            {
+                                if(event->jaxis.value > 16000)
+                                {
+                                    if(VJoys[VPort2].AxisValue[i] == 0) GamePort2 |= 1<<i;
+                                }
+                                else if(event->jaxis.value < -16000)
+                                {
+                                    if(VJoys[VPort2].AxisValue[i] == 1) GamePort2 |= 1<<i;
+                                }
+                            }
+                            else GamePort2 &= ~(1<<i);
+                        }
+                    }
+                }
+            }
+          break;
+        }
+
+        case SDL_KEYDOWN:
+        {
+            switch(event->key.keysym.sym)
+            {
+            case SDLK_ESCAPE:
+                if(RecJoyMapping)
+                {
+                    RecJoyMapping = false;
+                }
+                else
+                {
+                    WaitResetReady = false;
+                    RESET = false;
+                }
+                break;
+
+            case SDLK_F12:
+
+                isFullscreen = !isFullscreen;
+
+                if(isFullscreen)
+                {
+                    SDL_ShowCursor(false);
+                    SDL_SetWindowFullscreen(C64Window,SDL_WINDOW_FULLSCREEN_DESKTOP);
+                }
+                else
+                {
+                    SDL_ShowCursor(true);
+                    SDL_SetWindowFullscreen(C64Window,0);
+                }
+                break;
+
+            default:
+                break;
+            }
+
+            if(RecJoyMapping == true)
+            {
+                VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_KEY;
+                VJoys[RecJoySlotNr].KeyDown[RecJoyMappingPos] = event->key.keysym.scancode;
+            }
+            else
+            {
+                for(int i=0;i<C64KeyNum;i++)
+                {
+                    if(C64KeyTable[i].SDLKeyCode == event->key.keysym.sym)
+                    {
+                        KeyEvent(C64KeyTable[i].MatrixCode,KEY_DOWN,C64KeyTable[i].Shift);
+                    }
+                }
+            }
+
+            /// VJoyStick abfrage ///
+            /// Port1
+            if((VPort1 >= 0) && (VPort1 < MAX_VJOYS))
+            {
+                for(int i=0;i<5;i++)
+                {
+                    if((VJoys[VPort1].KeyDown[i] == event->key.keysym.scancode) &&
+                            (VJoys[VPort1].Type[i] == VJOY_TYPE_KEY))
+                        GamePort1 |= 1<<i;
+                }
+            }
+
+            /// Port2
+            if((VPort2 >= 0) && (VPort2 < MAX_VJOYS))
+            {
+                for(int i=0;i<5;i++)
+                {
+                    if((VJoys[VPort2].KeyDown[i] == event->key.keysym.scancode) &&
+                            (VJoys[VPort2].Type[i] == VJOY_TYPE_KEY))
+                        GamePort2 |= 1<<i;
+                }
+            }
+            break;
+        }
+
+        case SDL_KEYUP:
+        {
+            switch(event->key.keysym.sym)
+            {
+            case SDLK_ESCAPE:
+                RESET = true;
+            case SDLK_F12:
+
+                break;
+            default:
+                break;
+            }
+
+            if(RecJoyMapping == true)
+            {
+                VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_KEY;
+                VJoys[RecJoySlotNr].KeyUp[RecJoyMappingPos] = event->key.keysym.scancode;
+
+                RecJoyMappingPos++;
+                if(RecJoyMappingPos == 5)
+                {
+                    /// Rec Mapping ist fertig ///
+                    RecJoyMapping = false;
+                }
+            }
+            else
+            {
+                for(int i=0;i<C64KeyNum;i++)
+                {
+                    if(C64KeyTable[i].SDLKeyCode == event->key.keysym.sym)
+                    {
+                        KeyEvent(C64KeyTable[i].MatrixCode,KEY_UP,C64KeyTable[i].Shift);
+                    }
+                }
+            }
+
+            /// VJoyStick abfrage ///
+            /// Port1
+            if((VPort1 >= 0) && (VPort1 < MAX_VJOYS))
+            {
+                for(int i=0;i<5;i++)
+                {
+                    if((VJoys[VPort1].KeyUp[i] == event->key.keysym.scancode) &&
+                            (VJoys[VPort1].Type[i] == VJOY_TYPE_KEY))
+                        GamePort1 &= ~(1<<i);
+                }
+            }
+
+            /// Port2
+            if((VPort2 >= 0) && (VPort2 < MAX_VJOYS))
+            {
+                for(int i=0;i<5;i++)
+                {
+                    if((VJoys[VPort2].KeyUp[i] == event->key.keysym.scancode) &&
+                            (VJoys[VPort2].Type[i] == VJOY_TYPE_KEY))
+                        GamePort2 &= ~(1<<i);
+                }
+            }
+            break;
+        }
+
+        case SDL_MOUSEMOTION:
+            break;
+
+        case SDL_QUIT:
+
+#ifdef _WIN32
+        //LoopThreadEnd = true;
+#endif
+        break;
+
+        default:
+            break;
+    }
 }
 
 void C64Class::SetDistortion(float value)
@@ -2987,7 +2978,9 @@ void C64Class::OpenSDLJoystick()
         {
             for(int i=0; i<JoystickAnzahl;i++)
             {
-                JoystickNamen[i] = SDL_JoystickName(i);
+                /// FIX ME ///
+                //JoystickNamen[i] = SDL_JoystickName(i);
+
                 sprintf(str00,">>   [%2.2d] %s\n",i,JoystickNamen[i]);
                 LogText(str00);
                 SDL_JoystickOpen(i);
