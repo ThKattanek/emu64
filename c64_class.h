@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 17.04.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -28,10 +28,11 @@
 #include "floppy1541_class.h"
 #include "cpu_info.h"
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_opengl.h>
-#include <SDL/SDL_framerate.h>
-#include <SDL/SDL_image.h>
+#include <GL/glu.h>
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
+#include <SDL2/SDL_image.h>
 
 #include "tr1/functional"
 using namespace std::tr1;
@@ -42,15 +43,20 @@ using namespace std::tr1::placeholders;
 #define MAX_JOYSTICKS 16
 #define MAX_VJOYS 16
 
-#define SUBDIVS_SCREEN 30            // Für Screenverzerrungen (Kissen etc.)
+#define SUBDIVS_SCREEN 20            // Für Screenverzerrungen (Kissen etc.)
+
+#define SCREEN_RATIO_4_3 1.34        // Screenratio 4:3 (1,33333)
+#define SCREEN_RATIO_5_4 1.25        // Screenratio 5:4 (1,25)
+#define SCREEN_RATIO_16_9 1.777      // Screenratio 16:9 (1,777)
 
 class C64Class
 {
 
 public:
-    C64Class(int *ret_error,VideoPalClass *_pal,bool OpenGLOn, function<void(char*)> log_function, const char* gfx_path);
+    C64Class(int *ret_error,VideoPalClass *_pal, function<void(char*)> log_function, const char* gfx_path);
     ~C64Class();
     void StartEmulation(void);
+    void EndEmulation(void);
     void FillAudioBuffer(unsigned char *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
     void KeyEvent(unsigned char  matrix_code,KeyStatus status, bool isAutoShift);
     bool LoadC64Roms(char *kernalrom,char *basicrom,char *charrom);
@@ -62,6 +68,13 @@ public:
     void WriteC64Byte(unsigned short adresse,unsigned char wert);
     unsigned char* GetRAMPointer(unsigned short adresse);
     void SetGrafikModi(bool colbits32, bool doublesize,bool enable_pal,bool filter_enable, int fullres_xw = 0, int fullres_yw = 0);
+    void InitGrafik(void);
+    void ReleaseGrafik(void);
+    void DrawC64Screen(void);
+    void SetFocusToC64Window(void);
+    void SetWindowAspectRatio(bool enabled);
+    void SetFullscreenAspectRatio(bool enabled);
+    void AnalyzeSDLEvent(SDL_Event *event);
     void SetC64Speed(int speed);
     void SetDistortion(float value);
 
@@ -132,15 +145,21 @@ public:
     bool            ChangeGrafikModi;
     bool            HoldVicRefresh;
     bool            VicRefreshIsHold;
-    bool            NewVicRefresh;
 
-    FPSmanager      fps_manager;
+    float           C64ScreenAspectRatio;
+    bool            EnableWindowAspectRatio;
+    bool            EnableFullscreenAspectRatio;
+
+    SDL_Window      *C64Window;
+    SDL_GLContext   GLContext;
+
+    SDL_AudioSpec want,have;
+
     SDL_Surface     *C64Screen;
-    SDL_Surface     *C64ScreenBack;
     SDL_Surface     *C64ScreenIcon;
+    GLuint          C64ScreenTexture;
     unsigned char   *C64ScreenBuffer;
-    bool            DrawScreenBack;
-    bool            OpenGLEnable;
+    bool            IsC64ScreenObsolete;
     bool            DistortionEnable;
     float           Distortion;
 
@@ -156,6 +175,12 @@ public:
     SDL_Surface     *Pfeil1;
     SDL_Surface     *Kreis0;
     SDL_Surface     *Kreis1;
+
+    GLuint          Pfeil0Texture;
+    GLuint          Pfeil1Texture;
+    GLuint          Kreis0Texture;
+    GLuint          Kreis1Texture;
+
     bool            RecJoyMapping;
     int             RecJoyMappingPos;          // 0-4 // Hoch - Runter - Links - Rechts - Feuer
     int             RecJoySlotNr;              // 0 - (MAX_VJOYS-1)
@@ -204,6 +229,7 @@ public:
     char            AutoLoadFilename[1024];
 
     bool            LoopThreadEnd;
+    bool            LoopThreadIsEnd;
 
     function<void(void)> AnimationRefreshProc;
     function<void(void)> BreakpointProc;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 16.04.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -25,6 +25,8 @@ class SingleApplication : public QApplication
         Q_OBJECT
 public:
         SingleApplication(int &argc, char *argv[], const QString uniqueKey);
+
+        ~SingleApplication(){}
 
         bool alreadyExists() const{
             return bAlreadyExists;

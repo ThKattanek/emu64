@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 17.04.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -32,11 +32,11 @@ MainWindow::MainWindow(QWidget *parent,customSplashScreen* _splash,QTextStream *
     ui->setupUi(this);
 
 #ifdef _WIN32
-    setWindowTitle("Emu64 Version " + QString(str_emu64_version) + " --- [Windows]");
+    setWindowTitle("Emu64 Version " + QString(str_emu64_version) + " --- [Windows " + QString(str_system_arch) + "]");
 #endif
 
 #ifdef __linux__
-    setWindowTitle("Emu64 Version " + QString(str_emu64_version) + " --- [Linux]");
+    setWindowTitle("Emu64 Version " + QString(str_emu64_version) + " --- [Linux " + QString(str_system_arch) + "]");
 #endif
 }
 
@@ -171,7 +171,7 @@ void MainWindow::OnInit()
     /// C64 Klasse Installieren ... Das HERZ ///
     splash->showStatusMessage(trUtf8("C64 Klasse wird initialisiert."),Qt::darkBlue);
     int ret_error;
-    c64 = new C64Class(&ret_error,videopal,true,bind(&MainWindow::LogText,this,_1),QString(appPath + "/gfx/").toLatin1().data());
+    c64 = new C64Class(&ret_error,videopal,bind(&MainWindow::LogText,this,_1),QString(appPath + "/gfx/").toLatin1().data());
     if(ret_error != 0)
     {
         ErrorMsg(trUtf8("Emu64 Fehler ..."),trUtf8("Fehler beim Installieren der C64 Klasse"))
@@ -222,7 +222,7 @@ void MainWindow::OnInit()
     setup_window->ReSetup();
 
     splash->showStatusMessage(trUtf8("SDL Window Titelleiste wird benannt."),Qt::darkBlue);
-    SDL_WM_SetCaption((const char*)trUtf8("C64 Bildschirm").toLatin1().data(),0);
+    //SDL_WM_SetCaption((const char*)trUtf8("C64 Bildschirm").toLatin1().data(),0);
 
     /// Debugger Window mit C64 verbinden ///
     splash->showStatusMessage(trUtf8("Debugger Window wird mit C64 Klasse verbunden."),Qt::darkBlue);
@@ -433,7 +433,8 @@ void MainWindow::RetranslateUi()
     setup_window->RetranslateUi();
     speed_window->RetranslateUi();
 
-    SDL_WM_SetCaption(trUtf8("C64 Bildschirm").toLatin1().data(),0);
+    //SDL_WM_SetCaption(trUtf8("C64 Bildschirm").toLatin1().data(),0);
+
 }
 
 bool MainWindow::getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt)
