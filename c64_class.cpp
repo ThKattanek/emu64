@@ -678,7 +678,6 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
         }
 
         SDL_MixAudioFormat((unsigned char*)puffer,(unsigned char*)sid1->SoundBuffer,have.format,laenge,100);
-        //SDL_MixAudio((unsigned char*)puffer,(unsigned char*)sid2->SoundBuffer,laenge,100);
 
         /// Floppysound dazu mixen ///
         for(int i=0; i< FloppyAnzahl; i++)
@@ -838,6 +837,9 @@ loop_wait_next_opc:
                 if(AnimationRefreshProc != 0) AnimationRefreshProc();
             }
         }
+
+        // Audiopuffer mit 0 füllen ();
+        //memset(puffer,0,laenge);
     }
 }
 
