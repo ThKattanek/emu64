@@ -839,7 +839,7 @@ loop_wait_next_opc:
         }
 
         // Audiopuffer mit 0 füllen ();
-        //memset(puffer,0,laenge);
+        memset(puffer,0,laenge);
     }
 }
 
