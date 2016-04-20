@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 20.04.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -55,6 +55,10 @@ private slots:
     void on_VJoySlots_cellChanged(int row, int column);
     void on_VJoySlots_cellClicked(int row, int column);
     void onClickButton(int idx, int idy);
+
+    void on_WAspectRatio_clicked(bool checked);
+
+    void on_FAspectRatio_clicked(bool checked);
 
 private:
     void UpdateToolTips();

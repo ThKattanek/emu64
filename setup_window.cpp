@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 20.04.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -148,6 +148,10 @@ void SetupWindow::LoadINI(C64Class *_c64)
         ui->WFilter->setChecked(bvalue);
         on_WFilter_toggled(bvalue);
 
+        bvalue = ini->value("WindowAspectRatio",0).toBool();
+        ui->WAspectRatio->setChecked(bvalue);
+        c64->SetWindowAspectRatio(bvalue);
+
         value = ini->value("Port1",0).toInt();
         ui->VJoySlots->item(value,1)->setBackground(QBrush(QColor(50,255,50)));
         ui->VJoySlots->item(value,1)->setText("Port 1");
@@ -157,6 +161,15 @@ void SetupWindow::LoadINI(C64Class *_c64)
         ui->VJoySlots->item(value,2)->setBackground(QBrush(QColor(50,255,50)));
         ui->VJoySlots->item(value,2)->setText("Port 2");
         c64->VPort2 = value;
+
+        ini->endGroup();
+
+
+        ini->beginGroup("SetupFullscreen");
+
+        bvalue = ini->value("FullscreenAspectRatio",0).toBool();
+        ui->FAspectRatio->setChecked(bvalue);
+        c64->SetFullscreenAspectRatio(bvalue);
 
         ini->endGroup();
     }
@@ -175,8 +188,13 @@ void SetupWindow::SaveINI()
         ini->setValue("WindowColor32BitMode",ui->W32Bit->isChecked());
         ini->setValue("WindowDoubleSizeMode",ui->WDouble->isChecked());
         ini->setValue("WindowFilter",ui->WFilter->isChecked());
+        ini->setValue("WindowAspectRatio",ui->WAspectRatio->isChecked());
         ini->setValue("Port1",c64->VPort1);
         ini->setValue("Port2",c64->VPort2);
+        ini->endGroup();
+
+        ini->beginGroup("SetupFullscreen");
+        ini->setValue("FullscreenAspectRatio",ui->FAspectRatio->isChecked());
         ini->endGroup();
 
         char group_name[32];
@@ -317,4 +335,14 @@ void SetupWindow::UpdateToolTips()
         button = (ButtonMod*)ui->VJoySlots->cellWidget(i,4);
         if(button != NULL) button->setText(trUtf8("Löschen"));
     }
+}
+
+void SetupWindow::on_WAspectRatio_clicked(bool checked)
+{
+    c64->SetWindowAspectRatio(checked);
+}
+
+void SetupWindow::on_FAspectRatio_clicked(bool checked)
+{
+    c64->SetFullscreenAspectRatio(checked);
 }

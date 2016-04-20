@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>411</width>
-    <height>324</height>
+    <height>361</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,7 +25,7 @@
      <x>5</x>
      <y>5</y>
      <width>401</width>
-     <height>313</height>
+     <height>351</height>
     </rect>
    </property>
    <property name="font">
@@ -98,10 +98,10 @@
     <widget class="QGroupBox" name="WindowGroup">
      <property name="geometry">
       <rect>
-       <x>5</x>
-       <y>35</y>
+       <x>10</x>
+       <y>30</y>
        <width>381</width>
-       <height>86</height>
+       <height>101</height>
       </rect>
      </property>
      <property name="font">
@@ -220,17 +220,33 @@
        <bool>true</bool>
       </property>
      </widget>
+     <widget class="QCheckBox" name="WAspectRatio">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>80</y>
+        <width>177</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Erzwingt ein Bildschirm Seitenverhältnis von 4:3</string>
+      </property>
+      <property name="text">
+       <string>4:3 Seitenverhältnis</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QGroupBox" name="FullscreenGroup">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>5</x>
-       <y>125</y>
+       <x>10</x>
+       <y>145</y>
        <width>381</width>
-       <height>101</height>
+       <height>121</height>
       </rect>
      </property>
      <property name="font">
@@ -241,6 +257,22 @@
      <property name="title">
       <string>Vollbildmodus</string>
      </property>
+     <widget class="QCheckBox" name="FAspectRatio">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>177</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Erzwingt ein Bildschirm Seitenverhältnis von 4:3</string>
+      </property>
+      <property name="text">
+       <string>4:3 Seitenverhältnis</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QGroupBox" name="screenshot_group">
      <property name="enabled">
@@ -248,8 +280,8 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>5</x>
-       <y>230</y>
+       <x>10</x>
+       <y>270</y>
        <width>381</width>
        <height>51</height>
       </rect>
