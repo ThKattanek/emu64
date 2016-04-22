@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.04.2016                //
+// Letzte Änderung am 22.04.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -136,8 +136,13 @@ void SetupWindow::LoadINI(C64Class *_c64)
         ui->WPal->setChecked(bvalue);
         videopal->StartC64isPalmode = bvalue;
 
-        bvalue = ini->value("WindowColor32BitMode",0).toBool();
-        ui->W32Bit->setChecked(bvalue);
+        bvalue = ini->value("WindowColor32BitMode",1).toBool();
+
+        if(!bvalue)
+            ui->W16Bit->setChecked(true);
+        else
+            ui->W32Bit->setChecked(true);
+
         videopal->StartC64isColorBit32 = bvalue;
 
         bvalue = ini->value("WindowDoubleSizeMode",0).toBool();
