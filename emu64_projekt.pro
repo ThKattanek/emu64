@@ -135,7 +135,7 @@ FORMS    += \
 RESOURCES += \
     emu64.qrc
 
-linux-g++-32{
+linux-g++{
 DEFINES += str_system_arch=\\\"32Bit\\\"
 TARGET = emu64
 DESTDIR = "32Bit"
