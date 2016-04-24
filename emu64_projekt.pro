@@ -164,7 +164,7 @@ win32:contains(ARCH, x86_64):{
 
 DEFINES += QUAZIP_STATIC
 RC_FILE = emu64.rc
-LIBS += $$system($$ARCH-w64-mingw32.$$LINKTYP-sdl2-config --libs) $$system($$ARCH-w64-mingw32.$$LINKTYP-pkg-config SDL2_image --libs) -lquazip -lSDL2_image
+LIBS += $$system($$ARCH-w64-mingw32.$$LINKTYP-sdl2-config --libs) $$system($$ARCH-w64-mingw32.$$LINKTYP-pkg-config SDL2_image gl glu --libs) -lquazip
 
 }
 
