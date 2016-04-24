@@ -7,7 +7,7 @@ DEFINES += str_emu64_version=\\\"$$GIT_VERSION\\\"
 TRANSLATIONS = emu64_de.ts
 TRANSLATIONS = emu64_en.ts
 
-QT += core gui opengl
+QT += core gui
 CONFIG += rtti
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
