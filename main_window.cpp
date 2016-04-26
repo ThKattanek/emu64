@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.04.2016                //
+// Letzte Änderung am 24.04.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -92,6 +92,18 @@ MainWindow::~MainWindow()
 
 void MainWindow::OnInit()
 {
+    // Alle Pfade setzen //
+
+    configPath = QDir::homePath() + "/.config/emu64";
+
+#ifdef _WIN32
+    dataPath = QApplication::applicationDirPath();
+#endif
+
+#ifdef __linux__
+    dataPath = "/usr/share/emu64";
+#endif
+
     splash->setMessageRect(QRect(0,303,400, 20), Qt::AlignCenter);
 
     QFont splashFont;
@@ -102,11 +114,8 @@ void MainWindow::OnInit()
 
     splash->setFont(splashFont);
 
-    /// ApplicationPath holen und abspeichern ///
-    appPath = QApplication::applicationDirPath();
-
     /// Translator installieren ///
-    langPath = appPath+"/languages";
+    langPath = dataPath+"/languages";
     qApp->installTranslator(&qtTranslator);
     qApp->installTranslator(&appTranslator);
     QString SystemLocale = QLocale::system().name();       // "de_DE"
@@ -114,9 +123,11 @@ void MainWindow::OnInit()
 
     /// INI Dateiverwaltung erstellen ///
     splash->showStatusMessage(trUtf8("INI Dateiverwaltung wird initialisiert."),Qt::darkBlue);
-    ini = new QSettings(appPath+"/emu64.ini",QSettings::IniFormat,this);
-    LogText(QString(">> INI System wurde erzeugt: " + appPath+"/emu64.ini\n").toLatin1().data());
-    LogText(QString(">> INI System was created: " + appPath+"/emu64.ini\n").toLatin1().data());
+
+    ini = new QSettings(configPath+"/emu64.ini",QSettings::IniFormat,this);
+
+    LogText(QString(">> INI System wurde erzeugt: " + configPath + "/emu64.ini\n").toLatin1().data());
+    LogText(QString(">> INI System was created: " + configPath + "/emu64.ini\n").toLatin1().data());
 
     splash->showStatusMessage(trUtf8("Sprachmenü wir erstellt."),Qt::darkBlue);
     ini->beginGroup("MainWindow");
@@ -130,7 +141,7 @@ void MainWindow::OnInit()
     setWindowIcon(QIcon(":/grafik/emu64.ico"));
 
     /// ScreenshotPath erstellen ///
-    screenshotPath = appPath + "/screenshots/";
+    screenshotPath = configPath + "/screenshots/";
 
     QDir* dir = new QDir(screenshotPath);
 
@@ -171,7 +182,7 @@ void MainWindow::OnInit()
     /// C64 Klasse Installieren ... Das HERZ ///
     splash->showStatusMessage(trUtf8("C64 Klasse wird initialisiert."),Qt::darkBlue);
     int ret_error;
-    c64 = new C64Class(&ret_error,videopal,bind(&MainWindow::LogText,this,_1),QString(appPath + "/gfx/").toLatin1().data());
+    c64 = new C64Class(&ret_error,videopal,bind(&MainWindow::LogText,this,_1),QString(dataPath + "/gfx/").toLatin1().data());
     if(ret_error != 0)
     {
         ErrorMsg(trUtf8("Emu64 Fehler ..."),trUtf8("Fehler beim Installieren der C64 Klasse"))
@@ -240,12 +251,12 @@ void MainWindow::OnInit()
 
     /// C64 Systemroms laden ///
     splash->showStatusMessage(trUtf8("C64 Systemroms werden geladen."),Qt::darkBlue);
-    if(!c64->LoadC64Roms((char*)QString(appPath+"/roms/kernal.rom").toLatin1().data(),(char*)QString(appPath+"/roms/basic.rom").toLatin1().data(),(char*)QString(appPath+"/roms/char.rom").toLatin1().data()))
+    if(!c64->LoadC64Roms((char*)QString(dataPath+"/roms/kernal.rom").toLatin1().data(),(char*)QString(dataPath+"/roms/basic.rom").toLatin1().data(),(char*)QString(dataPath+"/roms/char.rom").toLatin1().data()))
     {
         LogText((char*)"<< ERROR: Fehler beim laden der C64 Roms\n\t");
-        LogText(QString(appPath+"/roms/kernal.rom").toLatin1().data());LogText("\n\t");
-        LogText(QString(appPath+"/roms/basic.rom").toLatin1().data());LogText("\n\t");
-        LogText(QString(appPath+"/roms/char.rom").toLatin1().data());LogText("\n");
+        LogText(QString(dataPath+"/roms/kernal.rom").toLatin1().data());LogText("\n\t");
+        LogText(QString(dataPath+"/roms/basic.rom").toLatin1().data());LogText("\n\t");
+        LogText(QString(dataPath+"/roms/char.rom").toLatin1().data());LogText("\n");
     }
 
     /// C64 Keyboard Matrix mit dem Virtual Keyboard verbinden ///

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 24.04.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -23,8 +23,9 @@
 #undef main
 int main(int argc, char *argv[])
 {
-    QTextStream *log = 0;
-    QFile LogFile("emu64.log");
+
+QTextStream *log = 0;
+QDir config_dir = QDir(QDir::homePath() + "/.config/emu64");
 
     SingleApplication app(argc, argv,  "Emu64_By_Thorsten_Kattanek");
     if (app.alreadyExists())
@@ -32,6 +33,25 @@ int main(int argc, char *argv[])
         for(int i=0;i<argc;i++) app.sendMessage(argv[i]);
         return 0;
     }
+
+#ifdef _WIN32
+    QFile LogFile("emu64.log");
+#endif
+
+#ifdef __linux__
+    if(!config_dir.exists())
+    {
+        QDir dir = QDir::root();
+        dir.mkdir(config_dir.path());
+
+        if(!config_dir.exists())
+        {
+            qDebug("Fatal Error ... not created emu64 config directory !!!");
+            return app.exec();
+        }
+    }
+    QFile LogFile(config_dir.path() + "/emu64.log");
+#endif
 
     if(LogFile.open(QIODevice::WriteOnly | QIODevice::Text))
     {

@@ -138,14 +138,14 @@ RESOURCES += \
 linux-g++{
 DEFINES += str_system_arch=\\\"32Bit\\\"
 TARGET = emu64
-DESTDIR = "32Bit"
+#DESTDIR = "32Bit"
 LIBS += -lSDL2 -lSDL2_image -lquazip -lGL -lGLU
 }
 
 linux-g++-64{
 DEFINES += str_system_arch=\\\"64Bit\\\"
 TARGET = emu64
-DESTDIR = "64Bit"
+#DESTDIR = "64Bit"
 LIBS += -lSDL2 -lSDL2_image -lquazip -lGL -lGLU
 }
 
@@ -154,18 +154,17 @@ win32{
 
 win32:contains(ARCH, x86_64):{
     DEFINES += str_system_arch=\\\"64Bit\\\"
-    DESTDIR = "bin"
+    #DESTDIR = "bin"
     TARGET = emu64
 }else{
     DEFINES += str_system_arch=\\\"32Bit\\\"
-    DESTDIR = "bin"
+    #DESTDIR = "bin"
     TARGET = emu64
 }
 
 DEFINES += QUAZIP_STATIC
 RC_FILE = emu64.rc
 LIBS += $$system($$ARCH-w64-mingw32.$$LINKTYP-sdl2-config --libs) $$system($$ARCH-w64-mingw32.$$LINKTYP-pkg-config SDL2_image gl glu --libs) -lquazip
-
 }
 
 OTHER_FILES += \
@@ -183,9 +182,7 @@ OTHER_FILES += \
     roms/basic.rom \
     roms/1541.rom \
     readme.md \
-    emu64_en.qm \
     emu64_de.ts \
-    emu64_de.qm \
     emu64_en.ts \
     floppy_sounds/stepper_inc.raw \
     floppy_sounds/stepper_dec.raw \
@@ -197,6 +194,60 @@ OTHER_FILES += \
     lizenz.pdf \
     license.pdf \
     qt_de.qm
+
+## Translation Release ##
+
+QMAKE_PRE_LINK += lrelease \"$$PWD/emu64_de.ts\" \
+                & lrelease \"$$PWD/emu64_en.ts\"
+
+# Installer
+
+linux-g++-64 | linux-g++{
+
+target.path = /usr/bin/
+INSTALLS += target
+
+roms.path = /usr/share/emu64/roms/
+roms.files += roms/kernal.rom
+roms.files += roms/char.rom
+roms.files += roms/basic.rom
+roms.files += roms/1541.rom
+INSTALLS += roms
+
+floppy_sounds.path = /usr/share/emu64/floppy_sounds/
+floppy_sounds.files += floppy_sounds/stepper_inc.raw
+floppy_sounds.files += floppy_sounds/stepper_dec.raw
+floppy_sounds.files += floppy_sounds/motor_on.raw
+floppy_sounds.files += floppy_sounds/motor_off.raw
+floppy_sounds.files += floppy_sounds/motor.raw
+floppy_sounds.files += 'floppy_sounds/FloppySound Hinweis.txt'
+floppy_sounds.files += floppy_sounds/anschlag.raw
+INSTALLS += floppy_sounds
+
+gfx.path = /usr/share/emu64/gfx/
+gfx.files += grafik/kreis0.png
+gfx.files += grafik/kreis1.png
+gfx.files += grafik/pfeil0.png
+gfx.files += grafik/pfeil1.png
+gfx.files += grafik/sdl_icon.png
+INSTALLS += gfx
+
+lan.path = /usr/share/emu64/languages/
+lan.files += emu64_de.qm
+lan.files += grafik/flaggen/emu64_de.png
+lan.files += emu64_en.qm
+lan.files += grafik/flaggen/emu64_en.png
+INSTALLS += lan
+
+desktop.path =  /usr/share/applications/
+desktop.files = emu64.desktop
+INSTALLS += desktop
+
+icon.path =  /usr/share/pixmaps/
+icon.files = grafik/emu64.png
+INSTALLS += icon
+
+}
 
 
 

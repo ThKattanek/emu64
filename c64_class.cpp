@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.04.2016                //
+// Letzte Änderung am 24.04.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -47,6 +47,16 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
 
     LogText = log_function;
     GfxPath = gfx_path;
+
+#ifdef _WIN32
+    FloppySoundPath = "floppy_sounds/";
+    RomPath = "roms/";
+#endif
+
+#ifdef __linux__
+    FloppySoundPath = "/usr/share/emu64/floppy_sounds/";
+    RomPath = "/usr/share/emu64/roms/";
+#endif
 
     LogText((char*)">> C64 Klasse wurde gestartet...\n");
     LogText((char*)">> GfxPath = ");
@@ -222,14 +232,31 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
 
     /// Floppy mit C64 verbinden ///
 
+    sprintf(filename,"%s1541.rom",RomPath);
+
+    char motor_filename[FILENAME_MAX];
+    char motor_on_filename[FILENAME_MAX];
+    char motor_off_filename[FILENAME_MAX];
+    char anschlag_filename[FILENAME_MAX];
+    char stepper_inc_filename[FILENAME_MAX];
+    char stepper_dec_filename[FILENAME_MAX];
+
+    sprintf(motor_filename,"%smotor.raw",FloppySoundPath);
+    sprintf(motor_on_filename,"%smotor_on.raw",FloppySoundPath);
+    sprintf(motor_off_filename,"%smotor_off.raw",FloppySoundPath);
+    sprintf(anschlag_filename,"%sanschlag.raw",FloppySoundPath);
+    sprintf(stepper_inc_filename,"%sstepper_inc.raw",FloppySoundPath);
+    sprintf(stepper_dec_filename,"%sstepper_dec.raw",FloppySoundPath);
+
     for(int i=0;i<FloppyAnzahl;i++)
     {
         floppy[i] = new Floppy1541(&RESET,have.freq,have.samples,&FloppyFoundBreakpoint);
         floppy[i]->SetResetReady(&FloppyResetReady[i],0xEBFF);
         floppy[i]->SetC64IEC(&C64IEC);
         floppy[i]->SetDeviceNummer(8+i);
-        floppy[i]->LoadDosRom((char*)"roms/1541.rom");
-        floppy[i]->LoadFloppySounds((char*)"floppy_sounds/motor.raw",(char*)"floppy_sounds/motor_on.raw",(char*)"floppy_sounds/motor_off.raw",(char*)"floppy_sounds/anschlag.raw",(char*)"floppy_sounds/stepper_inc.raw",(char*)"floppy_sounds/stepper_dec.raw");
+        floppy[i]->LoadDosRom(filename);
+        //floppy[i]->LoadFloppySounds((char*)"floppy_sounds/motor.raw",(char*)"floppy_sounds/motor_on.raw",(char*)"floppy_sounds/motor_off.raw",(char*)"floppy_sounds/anschlag.raw",(char*)"floppy_sounds/stepper_inc.raw",(char*)"floppy_sounds/stepper_dec.raw");
+        floppy[i]->LoadFloppySounds(motor_filename,motor_on_filename,motor_off_filename,anschlag_filename,stepper_inc_filename,stepper_dec_filename);
         floppy[i]->SetEnableFloppy(false);
         floppy[i]->SetEnableFloppySound(true);
     }

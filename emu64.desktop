@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Emu64
+Comment=A c64 emulator
+Comment[de]=Ein C64 Emulator
+Icon=emu64.png
+TryExec=emu64
+Exec=emu64 %f
+MimeType=application/x-geogebra-file;application/x-geogebra-tool;
+Categories=Game;System;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.04.2016                //
+// Letzte Änderung am 24.04.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -264,6 +264,8 @@ private:
     function<void(unsigned short,unsigned char)> *WriteProcTbl;
 
     const char* GfxPath;
+    const char* RomPath;
+    const char* FloppySoundPath;
 
     bool SDLJoystickIsOpen;
     int  JoystickAnzahl;

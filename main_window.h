@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 24.04.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -117,10 +117,15 @@ private:
     /// Varialen ///
     QTranslator appTranslator;   // Application Translator
     QTranslator qtTranslator;    // Qt library Translator
-    QString appPath;             // Pfad der emu64 Datei
+
+    QString configPath;          // Pfad für emu64.ini und emu64.log
+    QString dataPath;            // Pfad für alle Emu64 Daten
+
+    //QString appPath;             // Pfad der emu64 Datei
     QString langPath;            // Pfad für alle Sprachfiles
     QString tmpPath;             // Pfad für alle Temporären Dateien die Emu64 erzeugt (Wird beim Start und Ende geleert)
-    QString screenshotPath;       // Pfad für alle Emu64 Screenshots (nicht änderbar)
+    QString screenshotPath;      // Pfad für alle Emu64 Screenshots (nicht änderbar)
+
     QSettings *ini;
 
     bool ScreenshotsEnable;       // Konnte kein Screenshot Verzeichnis gefunden werden und auch nicht erstellt werden so ist es false
