@@ -54,7 +54,7 @@ TVSetupWindow::TVSetupWindow(QWidget *parent, C64Class *_c64, VideoPalClass *_vi
         ui->scanline_scroll->setValue(value);
         if(ui->scanline_scroll->value() == value) on_scanline_scroll_valueChanged(value);
 
-        value = ini->value("Distortion",80).toInt();
+        value = ini->value("Distortion",100).toInt();
         ui->distortion_scroll->setValue(value);
         if(ui->distortion_scroll->value() == value) on_distortion_scroll_valueChanged(value);
 

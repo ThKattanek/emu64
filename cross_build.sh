@@ -2,11 +2,11 @@
 # windows binary cross compiled with MXE and qmake (http://mxe.cc/)
 # by thorsten kattanek 2016
 
-if [ $# -ne 3 ] ; then       #Solange die Anzahl der Parameter ($#) größer 0
+if [ $# -ne 4 ] ; then       #Solange die Anzahl der Parameter ($#) größer 0
    echo ""
-   echo "Fehler: Parameter fehlen ! (cross_build.sh MXE-Pfad Zielarchitektur Linktyp)"
+   echo "Fehler: Parameter fehlen ! (cross_build.sh MXE-Pfad Zielarchitektur Linktyp PRO-File)"
    echo ""
-   echo "Beispiel: ./cross_build.sh /media/daten/mxe i686 static"
+   echo "Beispiel: ./cross_build.sh /media/daten/mxe i686 static ~/emu64/emu64_projekt.pro"
    echo ""
    exit
 fi
@@ -15,11 +15,12 @@ fi
 MXE_ROOT_PATH="${1}"
 ARCH="${2}"
 LINKTYP="${3}"
+PRO_FILE="${4}"
 
 ###############################################################################
 
 # Pfade zusammenstellen
-BUILD_PATH="./windows-${2}-${3}-build"
+BUILD_PATH="./emu64-win-${ARCH}-${LINKTYP}"
 MXE_USR_PATH="$MXE_ROOT_PATH/usr"
 MXE_BIN_PATH="$MXE_USR_PATH/bin" 
 
@@ -63,7 +64,7 @@ cd "$BUILD_PATH"
 
 # qmake run
 
-${MXE_USR_PATH}/${ARCHNAME}/qt/bin/qmake ARCH=${ARCH} LINKTYP=${LINKTYP} ..
+${MXE_USR_PATH}/${ARCHNAME}/qt/bin/qmake ARCH=${ARCH} LINKTYP=${LINKTYP} ${PRO_FILE} -r
 
 # build run
 make -j8

@@ -135,17 +135,15 @@ FORMS    += \
 RESOURCES += \
     emu64.qrc
 
-linux-g++{
+linux-g++-32{
 DEFINES += str_system_arch=\\\"32Bit\\\"
 TARGET = emu64
-#DESTDIR = "32Bit"
 LIBS += -lSDL2 -lSDL2_image -lquazip -lGL -lGLU
 }
 
 linux-g++-64{
 DEFINES += str_system_arch=\\\"64Bit\\\"
 TARGET = emu64
-#DESTDIR = "64Bit"
 LIBS += -lSDL2 -lSDL2_image -lquazip -lGL -lGLU
 }
 
@@ -202,7 +200,7 @@ QMAKE_PRE_LINK += lrelease \"$$PWD/emu64_de.ts\" \
 
 # Installer
 
-linux-g++-64 | linux-g++{
+linux-g++-64 | linux-g++-32 | linux-g++{
 
 target.path = /usr/bin/
 INSTALLS += target
@@ -220,7 +218,6 @@ floppy_sounds.files += floppy_sounds/stepper_dec.raw
 floppy_sounds.files += floppy_sounds/motor_on.raw
 floppy_sounds.files += floppy_sounds/motor_off.raw
 floppy_sounds.files += floppy_sounds/motor.raw
-floppy_sounds.files += 'floppy_sounds/FloppySound Hinweis.txt'
 floppy_sounds.files += floppy_sounds/anschlag.raw
 INSTALLS += floppy_sounds
 
