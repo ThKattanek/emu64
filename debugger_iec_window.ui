@@ -364,7 +364,7 @@
       <number>2</number>
      </property>
      <item>
-      <widget class="QPushButton" name="ExportVCD">
+      <widget class="QPushButton" name="StartExport">
        <property name="toolTip">
         <string>Die IEC Signale werden als Signal-Zeit-Diagram aufgezeichnet.</string>
        </property>

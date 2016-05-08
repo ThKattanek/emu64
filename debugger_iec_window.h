@@ -33,13 +33,14 @@ public:
     explicit DebuggerIECWindow(QWidget *parent = 0);
     ~DebuggerIECWindow();
     void RetranslateUi();
+    bool getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt);
     void SetC64Pointer(C64Class *c64);
     void UpdateSignals();
     
 private slots:
-    void on_ExportVCD_clicked();
-
     void on_StopExport_clicked();
+
+    void on_StartExport_clicked();
 
 private:
     Ui::DebuggerIECWindow *ui;
