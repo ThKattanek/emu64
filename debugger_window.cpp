@@ -907,6 +907,7 @@ bool DebuggerWindow::getSaveFileName(QWidget *parent, QString caption, QString f
    saveDialog.setConfirmOverwrite(false);
    saveDialog.setFilter(filter);
    saveDialog.selectFile(*fileName);
+   saveDialog.setOptions(QFileDialog::DontUseNativeDialog);
 
    *fileName = "";
 
@@ -2170,7 +2171,7 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
     if(AktSource > 0) c64->floppy[AktFloppyNr]->DeleteAllBreakGroups();
     else c64->DeleteAllBreakGroups();
 
-    QString filename = QFileDialog::getOpenFileName(this,trUtf8("Haltepunkte öffnen"),"",trUtf8("Emu64 Haltepunkt Datei ") + "(*.bpt)");
+    QString filename = QFileDialog::getOpenFileName(this,trUtf8("Haltepunkte öffnen"),QDir::homePath(),trUtf8("Emu64 Haltepunkt Datei ") + "(*.bpt)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
        int ret;

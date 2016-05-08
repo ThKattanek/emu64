@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.04.2016                //
+// Letzte Änderung am 08.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -459,6 +459,7 @@ bool MainWindow::getSaveFileName(QWidget *parent, QString caption, QString filte
    saveDialog.setConfirmOverwrite(false);
    saveDialog.setFilter(filter);
    saveDialog.selectFile(*fileName);
+   saveDialog.setOptions(QFileDialog::DontUseNativeDialog);
 
    *fileName = "";
 
@@ -583,7 +584,7 @@ void MainWindow::on_actionHardreset_triggered()
 
 void MainWindow::on_actionAutostart_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this,trUtf8("C64 Dateien öffnen "),"",trUtf8("C64 Programm Dateien") + "(*.prg *.c64 *.p00 *.t64 *.d64 *.g64 *.frz);;" + trUtf8("Alle Dateien") + "(*.*)");
+    QString filename = QFileDialog::getOpenFileName(this,trUtf8("C64 Dateien öffnen "),"",trUtf8("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.d64 *.g64 *.frz);;" + trUtf8("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
         c64->LoadAutoRun(0,filename.toLatin1().data());
@@ -592,7 +593,7 @@ void MainWindow::on_actionAutostart_triggered()
 
 void MainWindow::on_actionC64_Programme_direkt_laden_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this,trUtf8("C64 Dateien öffnen "),"",trUtf8("C64 Programm Dateien") + "(*.prg *.c64 *.p00 *.t64 *.frz);;" + trUtf8("Alle Dateien") + "(*.*)");
+    QString filename = QFileDialog::getOpenFileName(this,trUtf8("C64 Dateien öffnen "),"",trUtf8("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.frz);;" + trUtf8("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
         c64->LoadPRG(filename.toLatin1().data(),0);
@@ -696,7 +697,7 @@ void MainWindow::on_actionREU_entfernen_triggered()
 
 void MainWindow::on_actionREU_laden_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this,trUtf8("REU Inhalt laden"),"",trUtf8("REU Image Dateien") + "(*.reu);;" + trUtf8("Alle Dateien") + "(*.*)");
+    QString filename = QFileDialog::getOpenFileName(this,trUtf8("REU Inhalt laden"),QDir::homePath(),trUtf8("REU Image Dateien") + "(*.reu);;" + trUtf8("Alle Dateien") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
         if(c64->LoadREUImage(filename.toLatin1().data()) != 0)
@@ -738,7 +739,7 @@ void MainWindow::on_actionGEO_entfernen_triggered()
 
 void MainWindow::on_actionGEO_laden_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this,trUtf8("GEORAM Inhalt laden"),"",trUtf8("GEORAM Image Dateien") + "(*.img);;" + trUtf8("Alle Dateien") + "(*.*)");
+    QString filename = QFileDialog::getOpenFileName(this,trUtf8("GEORAM Inhalt laden"),QDir::homePath(),trUtf8("GEORAM Image Dateien") + "(*.img);;" + trUtf8("Alle Dateien") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
         if(c64->LoadGEORAMImage(filename.toLatin1().data()) != 0)
