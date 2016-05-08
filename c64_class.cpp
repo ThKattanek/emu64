@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.04.2016                //
+// Letzte Änderung am 08.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -2555,10 +2555,20 @@ unsigned char C64Class::GetMapWriteDestination(unsigned char page)
     return mmu->GetWriteDestination(page);
 }
 
-void C64Class::SaveScreenshot(char *filename)
+void C64Class::SaveScreenshot(const char *filename)
 {
     strcpy(ScreenshotFilename,filename);
     StartScreenshot = true;
+}
+
+bool C64Class::StartIECDump(const char *filename)
+{
+    return true;
+}
+
+void C64Class::StopIECDump()
+{
+
 }
 
 int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)

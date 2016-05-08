@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 08.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -36,6 +36,11 @@ public:
     void SetC64Pointer(C64Class *c64);
     void UpdateSignals();
     
+private slots:
+    void on_ExportVCD_clicked();
+
+    void on_StopExport_clicked();
+
 private:
     Ui::DebuggerIECWindow *ui;
 

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.04.2016                //
+// Letzte Änderung am 08.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -128,7 +128,10 @@ public:
     unsigned char GetMapReadSource(unsigned char page);
     unsigned char GetMapWriteDestination(unsigned char page);
 
-    void SaveScreenshot(char *filename);
+    void SaveScreenshot(const char *filename);
+
+    bool StartIECDump(const char *filename);
+    void StopIECDump();
 
     int             AktWindowXW;
     int             AktWindowYW;

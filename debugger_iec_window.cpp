@@ -8,13 +8,15 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 08.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "debugger_iec_window.h"
 #include "ui_debugger_iec_window.h"
+
+#include <QFileDialog>
 
 DebuggerIECWindow::DebuggerIECWindow(QWidget *parent) :
     QDialog(parent),
@@ -25,6 +27,9 @@ DebuggerIECWindow::DebuggerIECWindow(QWidget *parent) :
 
     iOff = new QIcon(":/grafik/green_led_off.png");
     iOn = new QIcon(":/grafik/green_led_on.png");
+
+    ui->ExportVCD->setEnabled(true);
+    ui->StopExport->setEnabled(false);
 }
 
 DebuggerIECWindow::~DebuggerIECWindow()
@@ -65,4 +70,27 @@ void DebuggerIECWindow::UpdateSignals()
 
     if(iec.ATN_OUT) ui->AtnOut->setIcon(*iOn);
     else ui->AtnOut->setIcon(*iOff);
+}
+
+void DebuggerIECWindow::on_ExportVCD_clicked()
+{
+    if(c64 == NULL) return;
+
+    QString filename = QFileDialog::getSaveFileName(this,trUtf8("Als VCD speichern"),"",trUtf8("Value Change Dump (*.vcd)") + "(*.vcd);;" + trUtf8("Alle Dateien") + "(*.*)");
+    if(filename != "")
+    {
+        if(c64->StartIECDump(filename.toLatin1().data()))
+        {
+            ui->StopExport->setEnabled(true);
+            ui->ExportVCD->setEnabled(false);
+        }
+    }
+}
+
+void DebuggerIECWindow::on_StopExport_clicked()
+{
+    c64->StopIECDump();
+
+    ui->ExportVCD->setEnabled(true);
+    ui->StopExport->setEnabled(false);
 }
