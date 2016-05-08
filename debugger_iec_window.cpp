@@ -17,6 +17,7 @@
 #include "ui_debugger_iec_window.h"
 
 #include <QFileDialog>
+#include <QMessageBox>
 
 DebuggerIECWindow::DebuggerIECWindow(QWidget *parent) :
     QDialog(parent),
@@ -76,13 +77,18 @@ void DebuggerIECWindow::on_ExportVCD_clicked()
 {
     if(c64 == NULL) return;
 
-    QString filename = QFileDialog::getSaveFileName(this,trUtf8("Als VCD speichern"),"",trUtf8("Value Change Dump (*.vcd)") + "(*.vcd);;" + trUtf8("Alle Dateien") + "(*.*)");
+    QString filename = QFileDialog::getSaveFileName(0,trUtf8("Als VCD speichern"),QDir::homePath(),trUtf8("Value Change Dump ") + "(*.vcd);;" + trUtf8("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
         if(c64->StartIECDump(filename.toLatin1().data()))
         {
             ui->StopExport->setEnabled(true);
             ui->ExportVCD->setEnabled(false);
+        }
+        else
+        {
+            // Fehler beim erstellen des IEC Dumps
+            QMessageBox::critical(this,trUtf8("Fehler beim speichern !"),trUtf8("Leider konnte der IEC Dump nicht gestartet werden."));
         }
     }
 }
