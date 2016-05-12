@@ -55,7 +55,8 @@ SOURCES += \
     c64_speed_window.cpp \
     reu_class.cpp \
     georam_class.cpp \
-    debugger_iec_window.cpp
+    debugger_iec_window.cpp \
+    vcd_class.cpp
 
 HEADERS  += \
     info_window.h \
@@ -109,7 +110,8 @@ HEADERS  += \
     firmware/usbconfig.h \
     reu_class.h \
     georam_class.h \
-    debugger_iec_window.h
+    debugger_iec_window.h \
+    vcd_class.h
 
 FORMS    += \
     info_window.ui \

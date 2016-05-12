@@ -87,6 +87,7 @@ bool DebuggerIECWindow::getSaveFileName(QWidget *parent, QString caption, QStrin
    }
 
    // Does the file already exist?
+   /*
    if (QFile::exists(tmpFileName)) {
 
        extension = saveDialog.selectedFilter();
@@ -110,6 +111,7 @@ bool DebuggerIECWindow::getSaveFileName(QWidget *parent, QString caption, QStrin
       fileInfo.setFile(tmpFileName);
       }
    }
+   */
 
    *fileName = tmpFileName;
    *fileExt = extension;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.05.2016                //
+// Letzte Änderung am 11.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -67,6 +67,8 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     BreakGroupAnz = 0;
     FloppyFoundBreakpoint = false;
     EnableExtLines = false;
+
+    IecIsDumped = false;
 
     AktC64ScreenXW = AktWindowXW = AktC64ScreenYW = AktWindowYW = 0;
 
@@ -229,6 +231,12 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
 
     cia2->FloppyIEC = &FloppyIEC;
     cia2->C64IEC = &C64IEC;
+
+    IecVcdExport.AddWire("c64_out_atn",false);
+    IecVcdExport.AddWire("c64_out_clk",false);
+    IecVcdExport.AddWire("c64_out_data",false);
+    IecVcdExport.AddWire("floppy_out_clk",false);
+    IecVcdExport.AddWire("floppy_out_data",false);
 
     /// Floppy mit C64 verbinden ///
 
@@ -697,6 +705,18 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                 }
             }
             //////////////////////////////////////////////////////////////////////////////
+
+
+            if(IecIsDumped)
+            {
+                IecVcdExport.NextStep();
+                IecVcdExport.SetWire(0,C64IEC & 16);
+                IecVcdExport.SetWire(1,C64IEC & 64);
+                IecVcdExport.SetWire(2,C64IEC & 128);
+                IecVcdExport.SetWire(3,FloppyIEC & 64);
+                IecVcdExport.SetWire(4,FloppyIEC & 128);
+            }
+
         }
 
         for(int i=0; i<(laenge/2); i++)
@@ -757,6 +777,16 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                     cpu->OneZyklus();
 
                     if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) if(CheckBreakpoints()) break;
+
+                    if(IecIsDumped)
+                    {
+                        IecVcdExport.NextStep();
+                        IecVcdExport.SetWire(0,C64IEC & 16);
+                        IecVcdExport.SetWire(1,C64IEC & 64);
+                        IecVcdExport.SetWire(2,C64IEC & 128);
+                        IecVcdExport.SetWire(3,FloppyIEC & 64);
+                        IecVcdExport.SetWire(4,FloppyIEC & 128);
+                    }
                 }
                 AnimationSpeedCounter = 0;
             }
@@ -805,6 +835,16 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                 if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) CheckBreakpoints();
 
                 if(AnimationRefreshProc != 0) AnimationRefreshProc();
+
+                if(IecIsDumped)
+                {
+                    IecVcdExport.NextStep();
+                    IecVcdExport.SetWire(0,C64IEC & 16);
+                    IecVcdExport.SetWire(1,C64IEC & 64);
+                    IecVcdExport.SetWire(2,C64IEC & 128);
+                    IecVcdExport.SetWire(3,FloppyIEC & 64);
+                    IecVcdExport.SetWire(4,FloppyIEC & 128);
+                }
             }
 
             if(OneOpc)
@@ -862,6 +902,16 @@ loop_wait_next_opc:
                 if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) CheckBreakpoints();
 
                 if(AnimationRefreshProc != 0) AnimationRefreshProc();
+
+                if(IecIsDumped)
+                {
+                    IecVcdExport.NextStep();
+                    IecVcdExport.SetWire(0,C64IEC & 16);
+                    IecVcdExport.SetWire(1,C64IEC & 64);
+                    IecVcdExport.SetWire(2,C64IEC & 128);
+                    IecVcdExport.SetWire(3,FloppyIEC & 64);
+                    IecVcdExport.SetWire(4,FloppyIEC & 128);
+                }
             }
         }
 
@@ -2563,12 +2613,25 @@ void C64Class::SaveScreenshot(const char *filename)
 
 bool C64Class::StartIECDump(const char *filename)
 {
+    char VersionString[256];
+
+    sprintf(VersionString,"Emu64 Version %s",str_emu64_version);
+
+    IecVcdExport.SetVersionString(VersionString);
+    IecVcdExport.SetTimeScaleString("989 ns");
+    IecVcdExport.SetModuleString("IEC-BUS");
+
+    if(!IecVcdExport.Open(filename)) return false;
+
+    IecIsDumped = true;
+
     return true;
 }
 
 void C64Class::StopIECDump()
 {
-
+    IecIsDumped = false;
+    IecVcdExport.Close();
 }
 
 int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)

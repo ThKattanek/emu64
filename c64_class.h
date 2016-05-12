@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.05.2016                //
+// Letzte Änderung am 12.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -27,6 +27,7 @@
 #include "georam_class.h"
 #include "floppy1541_class.h"
 #include "cpu_info.h"
+#include "vcd_class.h"
 
 #include <GL/glu.h>
 
@@ -287,8 +288,11 @@ private:
     bool EnableExtLines;
     bool ExtRDY;
 
-    unsigned char   C64IEC;     // Leitungen vom C64 zur Floppy Bit 0=ATN 1=CLK 2=DATA
-    unsigned char   FloppyIEC;	// Leitungen von Floppy zur c64 Bit 0=ATN 1=CLK 2=DATA
+    unsigned char   C64IEC;     // Leitungen vom C64 zur Floppy Bit 4=ATN 6=CLK 7=DATA
+    unsigned char   FloppyIEC;	// Leitungen von Floppy zur c64 Bit 6=CLK 7=DATA
+
+    VCDClass IecVcdExport;      // Klasse zum Exportieren der IEC Signale
+    bool IecIsDumped;
 
     /// Temporär ///
     int             EasyFlashDirty;
