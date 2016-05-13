@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.05.2016                //
+// Letzte Änderung am 13.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -689,11 +689,13 @@ void MainWindow::on_actionC64_Geschwindigkeit_triggered()
 void MainWindow::on_actionREU_einstecken_triggered()
 {
     c64->InsertREU();
+    c64->SetFocusToC64Window();
 }
 
 void MainWindow::on_actionREU_entfernen_triggered()
 {
     c64->RemoveREU();
+    c64->SetFocusToC64Window();
 }
 
 void MainWindow::on_actionREU_laden_triggered()
@@ -731,11 +733,13 @@ void MainWindow::on_actionREU_loeschen_triggered()
 void MainWindow::on_actionGEO_einstecken_triggered()
 {
     c64->InsertGEORAM();
+    c64->SetFocusToC64Window();
 }
 
 void MainWindow::on_actionGEO_entfernen_triggered()
 {
     c64->RemoveGEORAM();
+    c64->SetFocusToC64Window();
 }
 
 void MainWindow::on_actionGEO_laden_triggered()
