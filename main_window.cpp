@@ -588,6 +588,7 @@ void MainWindow::on_actionAutostart_triggered()
     if(filename != "")
     {
         c64->LoadAutoRun(0,filename.toLatin1().data());
+        c64->SetFocusToC64Window();
     }
 }
 
