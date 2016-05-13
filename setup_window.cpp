@@ -267,6 +267,7 @@ void SetupWindow::onClickButton(int idx, int idy)
     if(idx == 0)
     {
         /// Lernen ///
+        c64->SetFocusToC64Window();
         c64->StartRecJoystickMapping(idy);
     }
 
