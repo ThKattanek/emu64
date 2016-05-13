@@ -926,7 +926,7 @@ void C64Class::KeyEvent(unsigned char matrix_code,KeyStatus key_status, bool isA
 
     switch(key_status)
     {
-    case KEY_DOWN:
+    case KEY_DOWN:        
         KeyboardMatrixToPB[matrix_code>>4]|=1<<(matrix_code&0x07);
         if(isAutoShift) KeyboardMatrixToPB[AutoShift>>4]|=1<<(AutoShift&0x07);
 
@@ -1071,6 +1071,14 @@ void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool pal_enable,boo
 
     LogText((char*)">> Grafikmodus wurde gesetzt:\n");
     LogText(str00);
+}
+
+void C64Class::SetFullscreen()
+{
+    isFullscreen = true;
+    SDL_ShowCursor(false);
+    SDL_SetWindowFullscreen(C64Window,SDL_WINDOW_FULLSCREEN_DESKTOP);
+    SetFocusToC64Window();
 }
 
 void C64Class::InitGrafik()
@@ -1676,19 +1684,22 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                 }
                 break;
 
-            case SDLK_F12:
+              case SDLK_RETURN:
 
-                isFullscreen = !isFullscreen;
+                if(KMOD_LALT == event->key.keysym.mod || KMOD_RALT == event->key.keysym.mod)
+                {
+                    isFullscreen = !isFullscreen;
 
-                if(isFullscreen)
-                {
-                    SDL_ShowCursor(false);
-                    SDL_SetWindowFullscreen(C64Window,SDL_WINDOW_FULLSCREEN_DESKTOP);
-                }
-                else
-                {
-                    SDL_ShowCursor(true);
-                    SDL_SetWindowFullscreen(C64Window,0);
+                    if(isFullscreen)
+                    {
+                        SDL_ShowCursor(false);
+                        SDL_SetWindowFullscreen(C64Window,SDL_WINDOW_FULLSCREEN_DESKTOP);
+                    }
+                    else
+                    {
+                        SDL_ShowCursor(true);
+                        SDL_SetWindowFullscreen(C64Window,0);
+                    }
                 }
                 break;
 
@@ -1705,7 +1716,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             {
                 for(int i=0;i<C64KeyNum;i++)
                 {
-                    if(C64KeyTable[i].SDLKeyCode == event->key.keysym.sym)
+                    if(C64KeyTable[i].SDLKeyCode == event->key.keysym.sym && (event->key.keysym.mod != KMOD_LALT) && (event->key.keysym.mod != KMOD_RALT))
                     {
                         KeyEvent(C64KeyTable[i].MatrixCode,KEY_DOWN,C64KeyTable[i].Shift);
                     }
@@ -1743,9 +1754,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             {
             case SDLK_ESCAPE:
                 RESET = true;
-            case SDLK_F12:
 
-                break;
             default:
                 break;
             }

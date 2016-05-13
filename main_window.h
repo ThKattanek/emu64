@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.04.2016                //
+// Letzte Änderung am 13.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -101,6 +101,8 @@ private slots:
     void on_actionGEO_laden_triggered();
     void on_actionGEO_speichern_triggered();
     void on_actionGEO_loeschen_triggered();
+
+    void on_actionVollbild_triggered();
 
 protected:
     void keyPressEvent(QKeyEvent *event);

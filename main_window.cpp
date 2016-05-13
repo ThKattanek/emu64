@@ -771,3 +771,8 @@ void MainWindow::on_actionGEO_loeschen_triggered()
         c64->ClearGEORAMRam();
     }
 }
+
+void MainWindow::on_actionVollbild_triggered()
+{
+    c64->SetFullscreen();
+}

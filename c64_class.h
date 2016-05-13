@@ -69,6 +69,7 @@ public:
     void WriteC64Byte(unsigned short adresse,unsigned char wert);
     unsigned char* GetRAMPointer(unsigned short adresse);
     void SetGrafikModi(bool colbits32, bool doublesize,bool enable_pal,bool filter_enable, int fullres_xw = 0, int fullres_yw = 0);
+    void SetFullscreen(void);
     void InitGrafik(void);
     void ReleaseGrafik(void);
     void DrawC64Screen(void);

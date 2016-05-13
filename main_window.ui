@@ -164,7 +164,7 @@ background-position: center
      <x>0</x>
      <y>0</y>
      <width>505</width>
-     <height>22</height>
+     <height>16</height>
     </rect>
    </property>
    <property name="font">
@@ -850,7 +850,7 @@ background-position: center
   </action>
   <action name="actionVollbild">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Vollbild</string>
