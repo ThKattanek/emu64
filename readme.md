@@ -9,9 +9,9 @@ Nun kann das Projekt mittels make kompiliert werden
 
     >> make -j8
 
-Was geh�rt in den Emu64 Arbeitsordner:
+Was gehört in den Emu64 Arbeitsordner:
 
-- ausf�hrbare emu64 Datei f�r das jeweilige System
+- ausführbare emu64 Datei für das jeweilige System
 - 1 Verzeichnis "languages" mit den Sprachdateien qt_de.qm / qt_en.qm / emu64_de.qm / emu64_en.qm
                             und dann noch die Bilder aus dem Verzeichnis grafik/flaggen/
                             Sollten noch mehr Sprachen dazu kommen, jeweils die qt_*.qm / emu64_*.qm und emu64_*.png
