@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 14.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -50,10 +50,6 @@ class MOS6581_8085
 
     SIDDumpClass	*IoDump;
 
-    bool            Mouse1351Enable;
-    unsigned char	MouseX;
-    unsigned char	MouseY;
-
     /// Recording ///
     bool            Recording;
     int             RecSampleCounter;
@@ -67,6 +63,7 @@ class MOS6581_8085
     void SetChipType(bool type);
     void SetC64Zyklen(double ZyklenSek);
     void SetVoiceEnable(int nr, bool enable);
+    void SetPotXY(unsigned char pot_x, unsigned char pot_y);
     bool OneZyklus(void);
 
     bool SaveFreez(FILE* File);
@@ -94,6 +91,9 @@ class MOS6581_8085
     int                 C64ZyklenSek;
     double              FreqConvCounter;	// interner Counter für Fast Fast Fast Resampling ;-)
     double              FreqConvAddWert;
+
+    unsigned char   PotX;
+    unsigned char   PotY;
 
     /// Zeiger auf Sonder Wellen (Mischformen) ///
     unsigned int	*Wave0;

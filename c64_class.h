@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.05.2016                //
+// Letzte Änderung am 14.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -99,6 +99,8 @@ public:
     int LoadGEORAMImage(char* filename);
     int SaveGEORAMImage(char* filename);
     void ClearGEORAMRam(void);
+
+    void SetMouse1351Port(unsigned char port);
 
     void ResetC64CycleCounter(void);
     void SetDebugMode(bool status);
@@ -262,6 +264,8 @@ private:
     void SDLThreadPauseEnd(void);
     void OpenSDLJoystick(void);
     void CloseSDLJoystick(void);
+    void ChangePOTSwitch(void);
+    void UpdateMouse(void);
     int InitVideoCaptureSystem(void);
     void CloseVideoCaptureSystem(void);
 
@@ -303,6 +307,19 @@ private:
     PORT CIA1_PB;
     PORT CIA2_PA;
     PORT CIA2_PB;
+
+    bool Mouse1351Enable;
+    int MouseXRel;
+    int MouseYRel;
+
+    int MousePort;
+    unsigned char POT_AX;
+    unsigned char POT_AY;
+    unsigned char POT_BX;
+    unsigned char POT_BY;
+
+    unsigned char POT_X;
+    unsigned char POT_Y;
 
     unsigned char   KeyboardMatrixToPB[8];
     unsigned char   KeyboardMatrixToPA[8];

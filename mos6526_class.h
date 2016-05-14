@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 14.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -64,6 +64,8 @@ public:
     function<void(int)> CpuTriggerInterrupt;
     function<void(int)> CpuClearInterrupt;
     function<void(void)> VicTriggerLP;
+
+    function<void(void)> ChangePOTSwitch;
 
     PORT *PA;
     PORT *PB;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 14.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -482,14 +482,17 @@ void MOS6526::WriteIO(unsigned short adresse,unsigned char wert)
                 PALatch = wert;
                 PA->SetOutput(PALatch | ~DDRA);
 
-        if(CiaNr == 1)	/// Nur bei CIA2
-		{
-                        wert = ~PALatch & DDRA;
-                        //unsigned char  OLD_LINES = *C64IEC;
-                        *C64IEC = ((wert << 2) & 0x80)          // DATA
-                                | ((wert << 2) & 0x40)          // CLK
-                                | ((wert << 1) & 0x10);         // ATN
-		}
+                if(CiaNr == 0)  /// Nur bei CIA1
+                    ChangePOTSwitch();
+
+                if(CiaNr == 1)	/// Nur bei CIA2
+                {
+                    wert = ~PALatch & DDRA;
+                    //unsigned char  OLD_LINES = *C64IEC;
+                    *C64IEC = ((wert << 2) & 0x80)          // DATA
+                            | ((wert << 2) & 0x40)          // CLK
+                            | ((wert << 1) & 0x10);         // ATN
+                }
 		break;
 
 	case 1:
@@ -503,6 +506,9 @@ void MOS6526::WriteIO(unsigned short adresse,unsigned char wert)
                 IO[adresse]=wert;
                 DDRA = wert;
                 PA->SetOutput(PALatch | ~DDRA);
+
+                if(CiaNr == 0)  /// Nur bei CIA1
+                    ChangePOTSwitch();
 		break;
 
 	case 3:

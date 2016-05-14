@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.04.2016                //
+// Letzte Änderung am 14.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -59,6 +59,8 @@ private slots:
     void on_WAspectRatio_clicked(bool checked);
 
     void on_FAspectRatio_clicked(bool checked);
+
+    void on_MausPort_currentIndexChanged(int index);
 
 private:
     void UpdateToolTips();

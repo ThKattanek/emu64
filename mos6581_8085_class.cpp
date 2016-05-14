@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 14.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -58,7 +58,6 @@ MOS6581_8085::MOS6581_8085(int nummer,int samplerate,int puffersize,int *error)
     IoDump = new SIDDumpClass(IO);
     IoDump->WriteReg = &WriteReg;
 
-
     Zyklencounter = 0;
     SoundBufferPos = 0;
     SoundBufferSize = puffersize;
@@ -67,7 +66,7 @@ MOS6581_8085::MOS6581_8085(int nummer,int samplerate,int puffersize,int *error)
     SoundBufferV1 = new short[SoundBufferSize];
     SoundBufferV2 = new short[SoundBufferSize];
 
-    Mouse1351Enable = false;
+    PotX = PotY = 0xFF;
 
     Recording = false;
     RecSampleCounter = 0;
@@ -166,6 +165,12 @@ void MOS6581_8085::SetVoiceEnable(int nr, bool status)
     Voice[nr]->OscEnable = status;
 }
 
+void MOS6581_8085::SetPotXY(unsigned char pot_x, unsigned char pot_y)
+{
+    PotX = pot_x;
+    PotY = pot_y;
+}
+
 bool MOS6581_8085::OneZyklus(void)
 {
     ret = false;
@@ -257,19 +262,15 @@ unsigned char MOS6581_8085::ReadIO(unsigned short adresse)
 {
     switch(adresse&0x1F)
     {
-    case 25: // AD Wandler gibt eine 255 bei nicht angeschlossenem Paddle (Hochohmig)
+    case 25: // AD Wandler 1
         if(SidNummer == 0)
-        {
-            if(Mouse1351Enable) return MouseX;
-        }
-        return 0xFF;
+            return PotX;
+         break;
 
-    case 26: // AD Wandler gibt eine 255 bei nicht angeschlossenem Paddle (Hochohmig)
+    case 26: // AD Wandler 2
         if(SidNummer == 0)
-        {
-            if(Mouse1351Enable) return MouseY;
-        }
-            return 0xFF;
+            return PotY;
+        break;
 
     case 27:
         return OscOutput(2)>>4;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.05.2016                //
+// Letzte Änderung am 14.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -47,6 +47,13 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
 
     LogText = log_function;
     GfxPath = gfx_path;
+
+    Mouse1351Enable = false;
+    MouseXRel = MouseYRel = 0;
+
+    MousePort = 0;  // Port1 = 0 ... Port2 = 1
+    POT_AX = POT_AY = POT_BX = POT_BY = 0xFF;    // HighZ zum Beginn (Keine Paddles / Maus angeschlossen)
+    POT_X = POT_Y = 0xFF;
 
 #ifdef _WIN32
     FloppySoundPath = "floppy_sounds/";
@@ -340,6 +347,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     cia1->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
     cia1->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
     cia1->VicTriggerLP = bind(&VICII::TriggerLightpen,vic);
+    cia1->ChangePOTSwitch = bind(&C64Class::ChangePOTSwitch,this);
     cia1->PA = &CIA1_PA;
     cia1->PB = &CIA1_PB;
     cia2->RESET = &RESET;
@@ -396,6 +404,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     sid1->CycleExact = true;
     sid1->FilterOn = true;
     sid1->Reset();
+    sid1->SetPotXY(POT_X, POT_Y);
 
     sid2->RESET = &RESET;
     sid2->SetC64Zyklen(985248);     // 985248
@@ -601,6 +610,8 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
     this->vic_puffer = vic_puffer;
     vic->SwitchVideoPuffer();
     SDL_UnlockSurface(C64Screen);
+
+    if(Mouse1351Enable) UpdateMouse();
 
     IsC64ScreenObsolete = true;
 }
@@ -1682,7 +1693,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                     WaitResetReady = false;
                     RESET = false;
                 }
-                break;
+                break;   
 
               case SDLK_RETURN:
 
@@ -1807,8 +1818,81 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             break;
         }
 
-        case SDL_MOUSEMOTION:
+        case SDL_MOUSEBUTTONDOWN:
+            switch(event->button.button)
+            {
+            case SDL_BUTTON_LEFT:
+
+                // Wenn Linke STRG Taste gedrück dann Mouse 1351 umschalten
+                if(KMOD_LCTRL == SDL_GetModState())
+                {
+                    Mouse1351Enable = !Mouse1351Enable;
+                    SDL_SetRelativeMouseMode(SDL_bool(Mouse1351Enable));
+                    MouseXRel = MouseYRel = 0;
+                }
+
+                if(Mouse1351Enable)
+                {
+                    if(MousePort == 0)
+                        GamePort1 |= 0x10;
+                    else
+                        GamePort2 |= 0x10;
+                }
+                break;
+
+            case SDL_BUTTON_RIGHT:
+
+                if(Mouse1351Enable)
+                {
+                    if(MousePort == 0)
+                        GamePort1 |= 0x01;
+                    else
+                        GamePort2 |= 0x01;
+                }
+                break;
+
+            default:
+                break;
+            }
             break;
+
+    case SDL_MOUSEBUTTONUP:
+        switch(event->button.button)
+        {
+        case SDL_BUTTON_LEFT:
+
+            if(Mouse1351Enable)
+            {
+                if(MousePort == 0)
+                    GamePort1 &= ~0x10;
+                else GamePort2 &= ~0x10;
+            }
+            break;
+
+        case SDL_BUTTON_RIGHT:
+
+            if(Mouse1351Enable)
+            {
+                if(MousePort == 0)
+                    GamePort1 &= ~0x01;
+                else GamePort2 &= ~0x01;
+            }
+            break;
+
+        default:
+            break;
+        }
+        break;
+
+        case SDL_MOUSEMOTION:
+
+        if(Mouse1351Enable)
+        {
+            MouseXRel += (short)event->motion.xrel;
+            MouseYRel += (short)event->motion.yrel;
+        }
+
+        break;
 
         case SDL_QUIT:
 
@@ -2232,6 +2316,11 @@ int C64Class::SaveGEORAMImage(char* filename)
 void C64Class::ClearGEORAMRam(void)
 {
     geo->ClearRAM();
+}
+
+void C64Class::SetMouse1351Port(unsigned char port)
+{
+    MousePort = port;
 }
 
 void C64Class::SetDebugMode(bool status)
@@ -3118,4 +3207,62 @@ void C64Class::CloseSDLJoystick()
         LogText((char*)">> SDL Subsystem Joystick wurde geschlossen\n");
     }
     StopJoystickUpdate = true;
+}
+
+///
+/// \brief  Wird aufgerufen wenn der CIA1 Ausgang PA6 und PA7 sich ändert
+///         Somit Schaltet IC 4066 POTX und POTY
+///
+void C64Class::ChangePOTSwitch()
+{
+    if(!Mouse1351Enable)
+    {
+        POT_X = 0xFF;
+        POT_Y = 0xFF;
+    }
+    else
+    {
+        switch(CIA1_PA.GetOutput() >> 6)
+        {
+        case 0:
+            POT_X = POT_Y = 0xFF;
+            break;
+        case 1:
+            POT_X = POT_AX;
+            POT_Y = POT_AY;
+            break;
+        case 2:
+            POT_X = POT_BX;
+            POT_Y = POT_BY;
+            break;
+        case 3:
+            POT_X = POT_AX | POT_BX;
+            POT_Y = POT_AY | POT_BY;
+            break;
+        }
+    }
+
+    sid1->SetPotXY(POT_X, POT_Y);
+}
+
+void C64Class::UpdateMouse()
+{
+    switch(MousePort)
+    {
+    case 0: // Maus an Port 1 angeschlossen
+        POT_AX = (MouseXRel>>2) & 0x7F;
+        POT_AY = (~MouseYRel>>2) & 0x7F;
+        POT_BX = 0xFF;
+        POT_BY = 0xFF;
+        break;
+
+    case 1: // Maus an Port 2 angeschlossen
+        POT_AX = 0xFF;
+        POT_AY = 0xFF;
+        POT_BX = (MouseXRel>>2) & 0x7F;
+        POT_BY = (~MouseYRel>>2) & 0x7F;
+        break;
+    }
+
+    ChangePOTSwitch();
 }

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.05.2016                //
+// Letzte Änderung am 14.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -167,8 +167,11 @@ void SetupWindow::LoadINI(C64Class *_c64)
         ui->VJoySlots->item(value,2)->setText("Port 2");
         c64->VPort2 = value;
 
-        ini->endGroup();
+        value = ini->value("MousePort",0).toInt();
+        ui->MausPort->setCurrentIndex(value);
+        c64->SetMouse1351Port(value);
 
+        ini->endGroup();
 
         ini->beginGroup("SetupFullscreen");
 
@@ -196,6 +199,8 @@ void SetupWindow::SaveINI()
         ini->setValue("WindowAspectRatio",ui->WAspectRatio->isChecked());
         ini->setValue("Port1",c64->VPort1);
         ini->setValue("Port2",c64->VPort2);
+        ini->setValue("MousePort",ui->MausPort->currentIndex());
+
         ini->endGroup();
 
         ini->beginGroup("SetupFullscreen");
@@ -351,4 +356,9 @@ void SetupWindow::on_WAspectRatio_clicked(bool checked)
 void SetupWindow::on_FAspectRatio_clicked(bool checked)
 {
     c64->SetFullscreenAspectRatio(checked);
+}
+
+void SetupWindow::on_MausPort_currentIndexChanged(int index)
+{
+    c64->SetMouse1351Port(index);
 }
