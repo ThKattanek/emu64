@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.05.2016                //
+// Letzte Änderung am 14.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -127,6 +127,8 @@ private:
     QString langPath;            // Pfad für alle Sprachfiles
     QString tmpPath;             // Pfad für alle Temporären Dateien die Emu64 erzeugt (Wird beim Start und Ende geleert)
     QString screenshotPath;      // Pfad für alle Emu64 Screenshots (nicht änderbar)
+
+    QString lastAutoloadPath;    // Pfad der letzten Autoloadfunktion
 
     QSettings *ini;
 

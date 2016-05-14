@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.05.2016                //
+// Letzte Änderung am 14.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -50,6 +50,7 @@ MainWindow::~MainWindow()
         ini->setValue("Geometry",saveGeometry());
         ini->setValue("State",saveState());
         ini->setValue("ScreenshotCounter",ScreenshotNumber);
+        ini->setValue("LastAutoloadDir",lastAutoloadPath);
         ini->endGroup();
 
         char group_name[32];
@@ -132,6 +133,9 @@ void MainWindow::OnInit()
     splash->showStatusMessage(trUtf8("Sprachmenü wir erstellt."),Qt::darkBlue);
     ini->beginGroup("MainWindow");
     CreateLanguageMenu(ini->value("lang",SystemLocale).toString());
+
+    lastAutoloadPath = ini->value("LastAutoloadDir",QDir::homePath()).toString();
+
     ini->endGroup();
     LogText(QString(trUtf8(">> Sprachmenü wurde erstellt.") + SystemLocale + "\n").toLatin1().data());
 
@@ -584,9 +588,21 @@ void MainWindow::on_actionHardreset_triggered()
 
 void MainWindow::on_actionAutostart_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this,trUtf8("C64 Dateien öffnen "),"",trUtf8("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.d64 *.g64 *.frz);;" + trUtf8("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
+    QDir auto_path = lastAutoloadPath;
+
+    // Wenn das lestzte Autolad Verzeichnis nicht mehr existiert, wird das Homeverzeichnis gesetzt
+    if(!auto_path.exists())
+    {
+        lastAutoloadPath = QDir::homePath();
+    }
+
+    QString filename = QFileDialog::getOpenFileName(this,trUtf8("C64 Dateien öffnen "),lastAutoloadPath,trUtf8("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.d64 *.g64 *.frz);;" + trUtf8("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
+        // akutelles Autostart Verzeichnis abspeichern
+        QFileInfo file_info = filename;
+        lastAutoloadPath = file_info.absolutePath();
+
         c64->LoadAutoRun(0,filename.toLatin1().data());
         c64->SetFocusToC64Window();
     }
