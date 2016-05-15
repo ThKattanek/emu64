@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 14.05.2016                //
+// Letzte Änderung am 15.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -573,6 +573,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent*)
 
 void MainWindow::on_actionBeenden_triggered()
 {
+    if(!debugger_window->isHidden()) debugger_window->hide();
     close();
 }
 
