@@ -8,10 +8,11 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.04.2016                //
+// Letzte Änderung am 15.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
+
 
 #include "single_application.h"
 #include "main_window.h"
@@ -27,10 +28,12 @@ int main(int argc, char *argv[])
 QTextStream *log = 0;
 QDir config_dir = QDir(QDir::homePath() + "/.config/emu64");
 
-    SingleApplication app(argc, argv,  "Emu64_By_Thorsten_Kattanek");
-    if (app.alreadyExists())
+    SingleApplication *app;
+    app = new SingleApplication (argc, argv,  "Emu64_By_Thorsten_Kattanek");
+
+    if (app->alreadyExists())
     {
-        for(int i=0;i<argc;i++) app.sendMessage(argv[i]);
+        for(int i=0;i<argc;i++) app->sendMessage(argv[i]);
         return 0;
     }
 
@@ -47,7 +50,7 @@ QDir config_dir = QDir(QDir::homePath() + "/.config/emu64");
         if(!config_dir.exists())
         {
             qDebug("Fatal Error ... not created emu64 config directory !!!");
-            return app.exec();
+            return app->exec();
         }
     }
     QFile LogFile(config_dir.path() + "/emu64.log");
@@ -75,19 +78,23 @@ QDir config_dir = QDir(QDir::homePath() + "/.config/emu64");
     splash->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::SplashScreen);
     splash->show();
 
-    MainWindow w(0,splash,log);
+    MainWindow *w;
+    w = new MainWindow(0,splash,log);
 
-    QObject::connect(&app,SIGNAL(messageAvailable(QStringList)),&w,SLOT(OnMessage(QStringList)));
+    QObject::connect(app,SIGNAL(messageAvailable(QStringList)),w,SLOT(OnMessage(QStringList)));
 
-    w.log = log;
+    w->log = log;
 
     QStringList msg_list;
     for(int i=0;i<argc;i++) msg_list << argv[i];
-    w.OnMessage(msg_list);
+    w->OnMessage(msg_list);
 
-    QTimer::singleShot(500, &w, SLOT(OnInit()));
+    QTimer::singleShot(500, w, SLOT(OnInit()));
 
-    int ret = app.exec();
+    int ret = app->exec();
+
+    app->deleteSharedMemory();
+    delete w;
 
     return ret;
 };

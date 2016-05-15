@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 15.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -20,14 +20,16 @@
 
 SingleApplication::SingleApplication(int &argc, char *argv[], const QString uniqueKey) : QApplication(argc, argv)
 {
-    sharedMemory.setKey(uniqueKey);
+    sharedMemory = new QSharedMemory(this);
+
+    sharedMemory->setKey(uniqueKey);
 
     // when  can create it only if it doesn't exist
-    if (sharedMemory.create(5000))
+    if (sharedMemory->create(5000))
     {
-        sharedMemory.lock();
-        *(char*)sharedMemory.data() = '\0';
-        sharedMemory.unlock();
+        sharedMemory->lock();
+        *(char*)sharedMemory->data() = '\0';
+        sharedMemory->unlock();
 
         bAlreadyExists = false;
 
@@ -37,12 +39,18 @@ SingleApplication::SingleApplication(int &argc, char *argv[], const QString uniq
         timer->start(200);
     }
     // it exits, so we can attach it?!
-    else if (sharedMemory.attach()){
+    else if (sharedMemory->attach()){
         bAlreadyExists = true;
     }
     else{
         // error
     }
+}
+
+void SingleApplication::deleteSharedMemory()
+{
+    sharedMemory->detach();
+    delete sharedMemory;
 }
 
 
@@ -52,8 +60,8 @@ void SingleApplication::checkForMessage()
 {
     QStringList arguments;
 
-    sharedMemory.lock();
-    char *from = (char*)sharedMemory.data();
+    sharedMemory->lock();
+    char *from = (char*)sharedMemory->data();
 
     while(*from != '\0'){
         int sizeToRead = int(*from);
@@ -66,8 +74,8 @@ void SingleApplication::checkForMessage()
         arguments << QString::fromUtf8(byteArray.constData());
     }
 
-    *(char*)sharedMemory.data() = '\0';
-    sharedMemory.unlock();
+    *(char*)sharedMemory->data() = '\0';
+    sharedMemory->unlock();
 
     if(arguments.size()) emit messageAvailable( arguments );
 }
@@ -86,16 +94,16 @@ bool SingleApplication::sendMessage(const QString &message)
     byteArray.append(message.toUtf8());
     byteArray.append('\0');
 
-    sharedMemory.lock();
-    char *to = (char*)sharedMemory.data();
+    sharedMemory->lock();
+    char *to = (char*)sharedMemory->data();
     while(*to != '\0'){
         int sizeToRead = int(*to);
         to += sizeToRead + 1;
     }
 
     const char *from = byteArray.data();
-    memcpy(to, from, qMin(sharedMemory.size(), byteArray.size()));
-    sharedMemory.unlock();
+    memcpy(to, from, qMin(sharedMemory->size(), byteArray.size()));
+    sharedMemory->unlock();
 
     return true;
 }

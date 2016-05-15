@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 14.05.2016                //
+// Letzte Änderung am 15.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -281,6 +281,7 @@ unsigned char MOS6581_8085::ReadIO(unsigned short adresse)
     default:
     	return 0;
     }
+    return 0;
 }
 
 void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.04.2016                //
+// Letzte Änderung am 15.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,7 +16,8 @@
 #ifndef SINGLE_APPLICATION_H
 #define SINGLE_APPLICATION_H
 
-#include <QApplication>
+//#include <QApplication>
+#include <qapplication.h>
 #include <QSharedMemory>
 #include <QStringList>
 
@@ -26,7 +27,7 @@ class SingleApplication : public QApplication
 public:
         SingleApplication(int &argc, char *argv[], const QString uniqueKey);
 
-        ~SingleApplication(){}
+        void deleteSharedMemory();
 
         bool alreadyExists() const{
             return bAlreadyExists;
@@ -45,6 +46,6 @@ signals:
 
 private:
         bool bAlreadyExists;
-        QSharedMemory sharedMemory;
+        QSharedMemory *sharedMemory;
 };
 #endif // SINGLE_APPLICATION_H
