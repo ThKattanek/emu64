@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 14.05.2016                //
+// Letzte Änderung am 15.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1690,9 +1690,18 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                 }
                 else
                 {
-                    WaitResetReady = false;
-                    RESET = false;
+                    if(event->key.keysym.mod == KMOD_LSHIFT)
+                    {
+                        HardReset();
+                        RESET = false;
+                    }
+                    else
+                    {
+                        WaitResetReady = false;
+                        RESET = false;
+                    }
                 }
+
                 break;   
 
               case SDLK_RETURN:
@@ -1764,8 +1773,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             switch(event->key.keysym.sym)
             {
             case SDLK_ESCAPE:
-                RESET = true;
-
+               RESET = true;
             default:
                 break;
             }
