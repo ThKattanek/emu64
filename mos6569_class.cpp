@@ -705,6 +705,12 @@ inline void VICII::DrawSprites()
 								SpritePufferLine += 4;
 								break;
 							case 0x400000:
+                                /// Sprite-Grafik Kollision
+                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+2) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+3) & 0x80) AktDataColl |= AktSpriteBit;
+
 								*SpritePufferLine++ = MM0;
 								*SpritePufferLine++ = MM0;
 								*SpritePufferLine++ = MM0;
@@ -722,6 +728,12 @@ inline void VICII::DrawSprites()
 
 								break;
 							case 0x800000:
+                                /// Sprite-Grafik Kollision
+                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+2) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+3) & 0x80) AktDataColl |= AktSpriteBit;
+
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
@@ -739,6 +751,12 @@ inline void VICII::DrawSprites()
 
 								break;
 							case 0xC00000:
+                                /// Sprite-Grafik Kollision
+                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+2) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+3) & 0x80) AktDataColl |= AktSpriteBit;
+
 								*SpritePufferLine++ = MM1;
 								*SpritePufferLine++ = MM1;
 								*SpritePufferLine++ = MM1;
@@ -766,6 +784,10 @@ inline void VICII::DrawSprites()
 						{
                             if(SpriteSeqAktLine[SpriteNr] & 0x800000)
 							{
+                                /// Sprite-Grafik Kollision
+                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
 
@@ -794,6 +816,10 @@ inline void VICII::DrawSprites()
 								SpritePufferLine += 2;
 								break;
 							case 0x400000:
+                                /// Sprite-Grafik Kollision
+                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+
 								*SpritePufferLine++ = MM0;
 								*SpritePufferLine++ = MM0;
 
@@ -806,6 +832,10 @@ inline void VICII::DrawSprites()
 
 								break;
 							case 0x800000:
+                                /// Sprite-Grafik Kollision
+                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
 
@@ -818,6 +848,10 @@ inline void VICII::DrawSprites()
 
 								break;
 							case 0xC00000:
+                                /// Sprite-Grafik Kollision
+                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+
 								*SpritePufferLine++ = MM1;
 								*SpritePufferLine++ = MM1;
 
@@ -840,6 +874,9 @@ inline void VICII::DrawSprites()
 						{                            
                             if(SpriteSeqAktLine[SpriteNr] & 0x800000)
                             {
+                                /// Sprite-Grafik Kollision
+                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
 
                                 /// Sprite-Sprite Kollision
@@ -869,6 +906,12 @@ inline void VICII::DrawSprites()
 								SpritePufferLine += 4;
 								break;
 							case 0x400000:
+                                /// Sprite-Grafik Kollision
+                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+2) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+3) & 0x80) AktDataColl |= AktSpriteBit;
+
 								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MM0;
 								else SpritePufferLine++;
 								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MM0;
@@ -890,6 +933,12 @@ inline void VICII::DrawSprites()
 
 								break;
 							case 0x800000:
+                                /// Sprite-Grafik Kollision
+                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+2) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+3) & 0x80) AktDataColl |= AktSpriteBit;
+
                                 if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
                                 if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
@@ -911,6 +960,12 @@ inline void VICII::DrawSprites()
 
 								break;
 							case 0xC00000:
+                                /// Sprite-Grafik Kollision
+                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+2) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+3) & 0x80) AktDataColl |= AktSpriteBit;
+
 								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MM1;
 								else SpritePufferLine++;
 								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MM1;
@@ -942,6 +997,10 @@ inline void VICII::DrawSprites()
 						{
                             if(SpriteSeqAktLine[SpriteNr] & 0x800000)
 							{
+                                /// Sprite-Grafik Kollision
+                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+
                                 if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
                                 if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
@@ -972,6 +1031,10 @@ inline void VICII::DrawSprites()
 								SpritePufferLine += 2;
 								break;
 							case 0x400000:
+                                /// Sprite-Grafik Kollision
+                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+
 								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MM0;
 								else SpritePufferLine++;
 								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MM0;
@@ -986,6 +1049,10 @@ inline void VICII::DrawSprites()
 
 								break;
 							case 0x800000:
+                                /// Sprite-Grafik Kollision
+                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+
                                 if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
                                 if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
@@ -1000,6 +1067,10 @@ inline void VICII::DrawSprites()
 
 								break;
 							case 0xC00000:
+                                /// Sprite-Grafik Kollision
+                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+
 								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MM1;
 								else SpritePufferLine++;
 								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MM1;
@@ -1025,7 +1096,10 @@ inline void VICII::DrawSprites()
                             if(SpriteSeqAktLine[SpriteNr] & 0x800000)
 							{
                                 if(!(*SpritePufferLine&0x80))
-                                {
+                                {                                    
+                                    /// Sprite-Grafik Kollision
+                                    if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+
                                     *SpritePufferLine++ = MCOLOR[SpriteNr];
 
                                     /// Sprite-Sprite Kollision
