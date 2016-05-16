@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 16.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -92,7 +92,6 @@ private:
     unsigned char   *VideoPufferLine;
     int             DrawLineCounter;
     bool            DrawThisLine;
-    unsigned char   bitc;
 
     //// Interne Register ////
     unsigned short  MX[8];
@@ -182,7 +181,7 @@ private:
     unsigned long   SpriteSeqAktLine[8];
     bool            SpriteSeqOn[8];
     bool            SpriteCollisionEnable;
-    unsigned char	SpriteCollisionsPuffer[520];
+    unsigned char	SpriteCollisionsPuffer[MAX_XW + 4*24];
 
     ///////////////////////////////////////////////////////////////////////////
 

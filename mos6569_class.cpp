@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 16.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -641,6 +641,10 @@ inline void VICII::DrawGraphicsPseudo()
 
 inline void VICII::DrawSprites()
 {
+    unsigned char AktSpriteBit=0x80;    // Sprites werden hier von 7 nach 0 gezeichnet (Sprite 0 hat die höchste Priorität und 7 die niedrigste)
+    unsigned char AktSpriteColl=0;      // Noch keine Kollision Sprite-Sprite
+    unsigned char AktDataColl=0;        // Noch keine Kollision Sprite-Hintergrund
+
     /*
     if(!VicConfig[VIC_SPRITES_ON]) return;
 
@@ -670,25 +674,29 @@ inline void VICII::DrawSprites()
     // Spritekollisionspuffer löschen
     if(SpriteCollisionEnable)
     {
-        unsigned int *lp = (unsigned int *)SpriteCollisionsPuffer - 1;
-        for (int i=0; i < TOTAL_X/4; i++) *++lp = 0;
+        for (int i=0; i < 520; i++) SpriteCollisionsPuffer[i] = 0;
     }
 
-	bitc = 0x80;
     int SpriteNr = 7;
     while(SpriteNr >= 0)
     {
         // Ist Sprite Sichtbar ?
-        if(((SpriteViewAktLine & bitc) == bitc) && (MX[SpriteNr]<0x1F8))
+        if(((SpriteViewAktLine & AktSpriteBit) == AktSpriteBit) && (MX[SpriteNr]<0x1F8))
 		{
             SpritePufferLine = (VideoPufferLine - (62 * 8)) -4 + SpriteXDisplayTbl[MX[SpriteNr]];
-			if((MDP & bitc) == 0)	/// Prüfen auf Sprite Hinter Vordergrund
+
+            /// Temporärer Zeiger inerhalb des SpriteCollisionsPuffers auf das Aktuellen Sprites
+            unsigned char *q = SpriteCollisionsPuffer + MX[SpriteNr] + 8;
+
+            if((MDP & AktSpriteBit) == 0)	/// Prüfen auf Sprite Hinter Vordergrund
 			{
 				/// Sprites vor der Vordergrundgrafik
-				if((MXE & bitc) == bitc)
+                if((MXE & AktSpriteBit) == AktSpriteBit)
 				{
-					if((MMC & bitc) == bitc)
+                    /// Expandiertes Sprite
+                    if((MMC & AktSpriteBit) == AktSpriteBit)
 					{
+                        /// MultiColor Sprite
                         for(int i=0;i<12;i++)
 						{
                             switch(SpriteSeqAktLine[SpriteNr] & 0xC00000)
@@ -701,18 +709,51 @@ inline void VICII::DrawSprites()
 								*SpritePufferLine++ = MM0;
 								*SpritePufferLine++ = MM0;
 								*SpritePufferLine++ = MM0;
+
+                                /// Sprite-Sprite Kollision (MuliColor Expand)
+                                if (q[i<<2]) AktSpriteColl |= q[i<<2] | AktSpriteBit;
+                                else q[i<<2] = AktSpriteBit;
+                                if (q[(i<<2) + 1]) AktSpriteColl |= q[(i<<2) + 1] | AktSpriteBit;
+                                else q[(i<<2) + 1] = AktSpriteBit;
+                                if (q[(i<<2) + 2]) AktSpriteColl |= q[(i<<2) + 2] | AktSpriteBit;
+                                else q[(i<<2) + 2] = AktSpriteBit;
+                                if (q[(i<<2) + 3]) AktSpriteColl |= q[(i<<2) + 3] | AktSpriteBit;
+                                else q[(i<<2) + 3] = AktSpriteBit;
+
 								break;
 							case 0x800000:
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
+
+                                /// Sprite-Sprite Kollision (MuliColor Expand)
+                                if (q[i<<2]) AktSpriteColl |= q[i<<2] | AktSpriteBit;
+                                else q[i<<2] = AktSpriteBit;
+                                if (q[(i<<2) + 1]) AktSpriteColl |= q[(i<<2) + 1] | AktSpriteBit;
+                                else q[(i<<2) + 1] = AktSpriteBit;
+                                if (q[(i<<2) + 2]) AktSpriteColl |= q[(i<<2) + 2] | AktSpriteBit;
+                                else q[(i<<2) + 2] = AktSpriteBit;
+                                if (q[(i<<2) + 3]) AktSpriteColl |= q[(i<<2) + 3] | AktSpriteBit;
+                                else q[(i<<2) + 3] = AktSpriteBit;
+
 								break;
 							case 0xC00000:
 								*SpritePufferLine++ = MM1;
 								*SpritePufferLine++ = MM1;
 								*SpritePufferLine++ = MM1;
 								*SpritePufferLine++ = MM1;
+
+                                /// Sprite-Sprite Kollision (MuliColor Expand)
+                                if (q[i<<2]) AktSpriteColl |= q[i<<2] | AktSpriteBit;
+                                else q[i<<2] = AktSpriteBit;
+                                if (q[(i<<2) + 1]) AktSpriteColl |= q[(i<<2) + 1] | AktSpriteBit;
+                                else q[(i<<2) + 1] = AktSpriteBit;
+                                if (q[(i<<2) + 2]) AktSpriteColl |= q[(i<<2) + 2] | AktSpriteBit;
+                                else q[(i<<2) + 2] = AktSpriteBit;
+                                if (q[(i<<2) + 3]) AktSpriteColl |= q[(i<<2) + 3] | AktSpriteBit;
+                                else q[(i<<2) + 3] = AktSpriteBit;
+
 								break;
 							}
                             SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 2;
@@ -720,12 +761,19 @@ inline void VICII::DrawSprites()
 					}
 					else
 					{
+                        /// SingleColor Sprite
                         for(int i=0;i<24;i++)
 						{
                             if(SpriteSeqAktLine[SpriteNr] & 0x800000)
 							{
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
+
+                                /// Sprite-Sprite Kollision (SingleColor Expand)
+                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
+                                else q[i<<1] = AktSpriteBit;
+                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
+                                else q[(i<<1) + 1] = AktSpriteBit;
 							}
 							else SpritePufferLine += 2;
                             SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 1;
@@ -734,8 +782,10 @@ inline void VICII::DrawSprites()
 				}
 				else
 				{
-					if((MMC & bitc) == bitc)
+                    /// Nicht Expandiertes Sprite
+                    if((MMC & AktSpriteBit) == AktSpriteBit)
 					{
+                        /// MultiColor Sprite
                         for(int i=0;i<12;i++)
 						{
                             switch(SpriteSeqAktLine[SpriteNr] & 0xC00000)
@@ -746,14 +796,38 @@ inline void VICII::DrawSprites()
 							case 0x400000:
 								*SpritePufferLine++ = MM0;
 								*SpritePufferLine++ = MM0;
+
+                                /// Sprite-Sprite Kollision (MuliColor)
+                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
+                                else q[i<<1] = AktSpriteBit;
+
+                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
+                                else q[(i<<1) + 1] = AktSpriteBit;
+
 								break;
 							case 0x800000:
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
                                 *SpritePufferLine++ = MCOLOR[SpriteNr];
+
+                                /// Sprite-Sprite Kollision (MuliColor)
+                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
+                                else q[i<<1] = AktSpriteBit;
+
+                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
+                                else q[(i<<1) + 1] = AktSpriteBit;
+
 								break;
 							case 0xC00000:
 								*SpritePufferLine++ = MM1;
 								*SpritePufferLine++ = MM1;
+
+                                /// Sprite-Sprite Kollision (MuliColor)
+                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
+                                else q[i<<1] = AktSpriteBit;
+
+                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
+                                else q[(i<<1) + 1] = AktSpriteBit;
+
 								break;
 							}
                             SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 2;
@@ -761,9 +835,17 @@ inline void VICII::DrawSprites()
 					}
 					else
 					{
+                        /// SingleColor Sprite
                         for(int i=0;i<24;i++)
-						{
-                            if(SpriteSeqAktLine[SpriteNr] & 0x800000) *SpritePufferLine++ = MCOLOR[SpriteNr];
+						{                            
+                            if(SpriteSeqAktLine[SpriteNr] & 0x800000)
+                            {
+                                *SpritePufferLine++ = MCOLOR[SpriteNr];
+
+                                /// Sprite-Sprite Kollision
+                                if (q[i]) AktSpriteColl |= q[i] | AktSpriteBit;
+                                else q[i] = AktSpriteBit;
+                            }
 							else SpritePufferLine++;
                             SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 1;
 						}
@@ -773,10 +855,12 @@ inline void VICII::DrawSprites()
 			else
 			{
 				/// Sprites hinter der Vordergrundgrafik
-				if((MXE & bitc) == bitc)
+                if((MXE & AktSpriteBit) == AktSpriteBit)
 				{
-					if((MMC & bitc) == bitc)
+                    /// Expandiertes Sprite
+                    if((MMC & AktSpriteBit) == AktSpriteBit)
 					{
+                        /// MultiColor Sprite
                         for(int i=0;i<12;i++)
 						{
                             switch(SpriteSeqAktLine[SpriteNr] & 0xC00000)
@@ -793,6 +877,17 @@ inline void VICII::DrawSprites()
 								else SpritePufferLine++;
 								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MM0;
 								else SpritePufferLine++;
+
+                                /// Sprite-Sprite Kollision (MuliColor Expand)
+                                if (q[i<<2]) AktSpriteColl |= q[i<<2] | AktSpriteBit;
+                                else q[i<<2] = AktSpriteBit;
+                                if (q[(i<<2) + 1]) AktSpriteColl |= q[(i<<2) + 1] | AktSpriteBit;
+                                else q[(i<<2) + 1] = AktSpriteBit;
+                                if (q[(i<<2) + 2]) AktSpriteColl |= q[(i<<2) + 2] | AktSpriteBit;
+                                else q[(i<<2) + 2] = AktSpriteBit;
+                                if (q[(i<<2) + 3]) AktSpriteColl |= q[(i<<2) + 3] | AktSpriteBit;
+                                else q[(i<<2) + 3] = AktSpriteBit;
+
 								break;
 							case 0x800000:
                                 if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
@@ -803,6 +898,17 @@ inline void VICII::DrawSprites()
 								else SpritePufferLine++;
                                 if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
+
+                                /// Sprite-Sprite Kollision (MuliColor Expand)
+                                if (q[i<<2]) AktSpriteColl |= q[i<<2] | AktSpriteBit;
+                                else q[i<<2] = AktSpriteBit;
+                                if (q[(i<<2) + 1]) AktSpriteColl |= q[(i<<2) + 1] | AktSpriteBit;
+                                else q[(i<<2) + 1] = AktSpriteBit;
+                                if (q[(i<<2) + 2]) AktSpriteColl |= q[(i<<2) + 2] | AktSpriteBit;
+                                else q[(i<<2) + 2] = AktSpriteBit;
+                                if (q[(i<<2) + 3]) AktSpriteColl |= q[(i<<2) + 3] | AktSpriteBit;
+                                else q[(i<<2) + 3] = AktSpriteBit;
+
 								break;
 							case 0xC00000:
 								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MM1;
@@ -813,6 +919,17 @@ inline void VICII::DrawSprites()
 								else SpritePufferLine++;
 								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MM1;
 								else SpritePufferLine++;
+
+                                /// Sprite-Sprite Kollision (MuliColor Expand)
+                                if (q[i<<2]) AktSpriteColl |= q[i<<2] | AktSpriteBit;
+                                else q[i<<2] = AktSpriteBit;
+                                if (q[(i<<2) + 1]) AktSpriteColl |= q[(i<<2) + 1] | AktSpriteBit;
+                                else q[(i<<2) + 1] = AktSpriteBit;
+                                if (q[(i<<2) + 2]) AktSpriteColl |= q[(i<<2) + 2] | AktSpriteBit;
+                                else q[(i<<2) + 2] = AktSpriteBit;
+                                if (q[(i<<2) + 3]) AktSpriteColl |= q[(i<<2) + 3] | AktSpriteBit;
+                                else q[(i<<2) + 3] = AktSpriteBit;
+
 								break;
 							}
                             SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 2;
@@ -820,6 +937,7 @@ inline void VICII::DrawSprites()
 					}
 					else
 					{
+                        /// SingleColor Sprite
                         for(int i=0;i<24;i++)
 						{
                             if(SpriteSeqAktLine[SpriteNr] & 0x800000)
@@ -828,6 +946,12 @@ inline void VICII::DrawSprites()
 								else SpritePufferLine++;
                                 if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
+
+                                /// Sprite-Sprite Kollision (SingleColor Expand)
+                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
+                                else q[i<<1] = AktSpriteBit;
+                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
+                                else q[(i<<1) + 1] = AktSpriteBit;
 							}
 							else SpritePufferLine += 2;
                             SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 1;
@@ -836,8 +960,10 @@ inline void VICII::DrawSprites()
 				}
 				else
 				{
-					if((MMC & bitc) == bitc)
+                    /// Nicht Expandiertes Sprite
+                    if((MMC & AktSpriteBit) == AktSpriteBit)
 					{
+                        /// MultiColor Sprite
                         for(int i=0;i<12;i++)
 						{
                             switch(SpriteSeqAktLine[SpriteNr] & 0xC00000)
@@ -850,18 +976,42 @@ inline void VICII::DrawSprites()
 								else SpritePufferLine++;
 								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MM0;
 								else SpritePufferLine++;
+
+                                /// Sprite-Sprite Kollision (MuliColor)
+                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
+                                else q[i<<1] = AktSpriteBit;
+
+                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
+                                else q[(i<<1) + 1] = AktSpriteBit;
+
 								break;
 							case 0x800000:
                                 if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
                                 if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
 								else SpritePufferLine++;
+
+                                /// Sprite-Sprite Kollision (MuliColor)
+                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
+                                else q[i<<1] = AktSpriteBit;
+
+                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
+                                else q[(i<<1) + 1] = AktSpriteBit;
+
 								break;
 							case 0xC00000:
 								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MM1;
 								else SpritePufferLine++;
 								if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MM1;
 								else SpritePufferLine++;
+
+                                /// Sprite-Sprite Kollision (MuliColor)
+                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
+                                else q[i<<1] = AktSpriteBit;
+
+                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
+                                else q[(i<<1) + 1] = AktSpriteBit;
+
 								break;
 							}
                             SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 2;
@@ -869,12 +1019,20 @@ inline void VICII::DrawSprites()
 					}
 					else
 					{
+                        /// SingleColor Sprite
                         for(int i=0;i<24;i++)
 						{
                             if(SpriteSeqAktLine[SpriteNr] & 0x800000)
 							{
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = MCOLOR[SpriteNr];
-								else SpritePufferLine++;
+                                if(!(*SpritePufferLine&0x80))
+                                {
+                                    *SpritePufferLine++ = MCOLOR[SpriteNr];
+
+                                    /// Sprite-Sprite Kollision
+                                    if (q[i]) AktSpriteColl |= q[i] | AktSpriteBit;
+                                    else q[i] = AktSpriteBit;
+                                }
+                                else SpritePufferLine++;
 							}
 							else SpritePufferLine++;
                             SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 1;
@@ -885,8 +1043,52 @@ inline void VICII::DrawSprites()
 		}
 
         SpriteNr--;
-		bitc = bitc >> 1;
-	}
+        AktSpriteBit >>= 1;
+    }
+
+    //////////////////////// Sprite Collision ///////////////////////////
+
+    // Prüfe sprite-sprite kollisions
+    if(MM == 0)
+    {
+        // IRQ kann ausgelöst werden
+        MM |= AktSpriteColl;
+        if(MM != 0)
+        {
+            IRQFlag |= 0x04;
+            if (IRQMask & 0x04)
+            {
+                IRQFlag |= 0x80;
+                CpuTriggerInterrupt(VIC_IRQ);
+            }
+        }
+    }
+    else
+    {
+        // kein IRQ auslösen
+        MM |= AktSpriteColl;
+    }
+
+    // Prüfe sprite-gfx kollision
+    if(MD == 0)
+    {
+        // IRQ kann ausgelöst werden
+        MD |= AktDataColl;
+        if(MD != 0)
+        {
+            IRQFlag |= 0x02;
+            if (IRQMask & 0x02)
+            {
+                IRQFlag |= 0x80;
+                CpuTriggerInterrupt(VIC_IRQ);
+            }
+        }
+    }
+    else
+    {
+        // kein IRQ auslösen
+        MD |= AktDataColl;
+    }
 }
 
 inline void VICII::DrawBorder(void)
@@ -912,6 +1114,7 @@ inline void VICII::Reset(void)
 void VICII::OneZyklus(void)
 {
     static bool OLD_RESET = *RESET;
+    unsigned char SpriteBit = 0x01;
 
     AktXKoordinate = XKoordTbl[AktZyklus];
 
@@ -1088,10 +1291,9 @@ void VICII::OneZyklus(void)
         if((BadLineStatus == true) && (DisplayStatus == true)) RC = 0;
 
         /// Sprite MC + 3
-        bitc = 1;
-        for(int i=0;i<8;i++,bitc<<=1)
+        for(int i=0;i<8;i++,SpriteBit<<=1)
         {
-            if(SpriteDMA & bitc) MC[i] += 3;
+            if(SpriteDMA & SpriteBit) MC[i] += 3;
         }
 
         DrawGraphics();
@@ -1114,10 +1316,9 @@ void VICII::OneZyklus(void)
 		SpriteSeqAktLine[7] = SpriteSeq[7];
 
         /// Sprite ///
-        bitc = 0x01;
-        for(int i=0;i<8;i++,bitc<<=1)
+        for(int i=0;i<8;i++,SpriteBit<<=1)
         {
-            if((SpriteExpYFlipFlop & bitc) == bitc) MCBase[i] += 2;
+            if((SpriteExpYFlipFlop & SpriteBit) == SpriteBit) MCBase[i] += 2;
         }
 
         gZugriff();
@@ -1127,16 +1328,14 @@ void VICII::OneZyklus(void)
 		break;
 
     case 17:
-
         /// Sprite ///
-        bitc = 0x01;
-        for(int i=0;i<8;i++,bitc<<=1)
+        for(int i=0;i<8;i++,SpriteBit<<=1)
         {
-            if((SpriteExpYFlipFlop & bitc) == bitc) MCBase[i] ++;
+            if((SpriteExpYFlipFlop & SpriteBit) == SpriteBit) MCBase[i] ++;
             if(MCBase[i] >= 63)
             {
-                SpriteDMA  &= ~bitc;
-                SpriteView &= ~bitc;
+                SpriteDMA  &= ~SpriteBit;
+                SpriteView &= ~SpriteBit;
             }
         }
 
@@ -1166,8 +1365,8 @@ void VICII::OneZyklus(void)
 		/// Sprite ///
 		// In der ersten Phase von Zyklus 55 wird das Expansions-Flipflop
 		// invertiert, wenn das MxYE-Bit gesetzt ist.
-		bitc = 0x01;
-		for (int i=0; i<8; i++, bitc<<=1) if (MYE & bitc) SpriteExpYFlipFlop ^= bitc;
+
+        for (int i=0; i<8; i++, SpriteBit<<=1) if (MYE & SpriteBit) SpriteExpYFlipFlop ^= SpriteBit;
 
 		// In der ersten Phasen von Zyklus 55 wird für Sprite 0-3 geprüft, 
 		// ob das entsprechende MxE-Bit in Register $d015 gesetzt und die Y-Koordinate 
@@ -1175,16 +1374,16 @@ void VICII::OneZyklus(void)
 		// von RASTER ist. Ist dies der Fall und der DMA für das Sprite noch 
 		// ausgeschaltet, wird der DMA angeschaltet, MCBASE gelöscht und, 
 		// wenn das MxYE-Bit gesetzt ist, das Expansions-Flipflop gelöscht.
-		bitc = 0x01;
-		for (int i=0; i<4; i++, bitc<<=1)
+        SpriteBit = 0x01;
+        for (int i=0; i<4; i++, SpriteBit<<=1)
 		{
-			if ((ME & bitc) && ((AktRZ & 0xff) == MY[i]))
+            if ((ME & SpriteBit) && ((AktRZ & 0xff) == MY[i]))
 			{
-				if((SpriteDMA & bitc) == 0)
+                if((SpriteDMA & SpriteBit) == 0)
 				{
-					SpriteDMA |= bitc;
+                    SpriteDMA |= SpriteBit;
 					MCBase[i] = 0;
-					if (MYE & bitc) SpriteExpYFlipFlop &= ~bitc;
+                    if (MYE & SpriteBit) SpriteExpYFlipFlop &= ~SpriteBit;
 				}
 			}
 		}
@@ -1204,16 +1403,16 @@ void VICII::OneZyklus(void)
 		// von RASTER ist. Ist dies der Fall und der DMA für das Sprite noch 
 		// ausgeschaltet, wird der DMA angeschaltet, MCBASE gelöscht und, 
 		// wenn das MxYE-Bit gesetzt ist, das Expansions-Flipflop gelöscht.
-		bitc = 0x10;
-		for (int i=4; i<8; i++, bitc<<=1)
+        SpriteBit = 0x10;
+        for (int i=4; i<8; i++, SpriteBit<<=1)
 		{
-			if ((ME & bitc) && (AktRZ & 0xff) == MY[i])
+            if ((ME & SpriteBit) && (AktRZ & 0xff) == MY[i])
 			{
-				if((SpriteDMA & bitc) == 0)
+                if((SpriteDMA & SpriteBit) == 0)
 				{
-					SpriteDMA |= bitc;
+                    SpriteDMA |= SpriteBit;
 					MCBase[i] = 0;
-					if (MYE & bitc) SpriteExpYFlipFlop &= ~bitc;
+                    if (MYE & SpriteBit) SpriteExpYFlipFlop &= ~SpriteBit;
 				}
 			}
 		}	
@@ -1253,13 +1452,11 @@ void VICII::OneZyklus(void)
 		// geladen (MCBASE->MC) und geprüft, ob der DMA für das Sprite angeschaltet
 		// und die Y-Koordinate des Sprites gleich den unteren 8 Bits von RASTER ist.
 		// Ist dies der Fall, wird die Darstellung des Sprites angeschaltet.
-		bitc = 0x01;
-		for(int i=0;i<8;i++)
+        for(int i=0;i<8;i++, SpriteBit<<=1)
 		{
 			MC[i] = MCBase[i];
 			//if(((SpriteDMA & bitc) == bitc) && ((AktRZ&0xFF) == MY[i])) SpriteView |= bitc;
-			if(((SpriteDMA & bitc) == bitc)) SpriteView |= bitc;
-			bitc = bitc << 1;
+            if(((SpriteDMA & SpriteBit) == SpriteBit)) SpriteView |= SpriteBit;
 		}
 
 		// Sprite 0 //
@@ -1837,23 +2034,31 @@ unsigned char VICII::ReadIO(unsigned short adresse)
 
 		/// Sprite - Sprite Kollision
 		case 0x1E:
-			return 0;
+        {
+            unsigned char ret = MM;
+            MM = 0;
+            return ret;
+        }
 
 		/// Sprite - Daten Kollision
 		case 0x1F:
-			return 0;
+        {
+            unsigned char ret = MD;
+            MD = 0;
+            return ret;
+        }
 
-                case 0x20: return EC | 0xf0;
-                case 0x21: return B0C | 0xf0;
-                case 0x22: return B1C | 0xf0;
-                case 0x23: return B2C | 0xf0;
-                case 0x24: return B3C | 0xf0;
-                case 0x25: return MM0 | 0xf0;
-                case 0x26: return MM1 | 0xf0;
+        case 0x20: return EC | 0xf0;
+        case 0x21: return B0C | 0xf0;
+        case 0x22: return B1C | 0xf0;
+        case 0x23: return B2C | 0xf0;
+        case 0x24: return B3C | 0xf0;
+        case 0x25: return MM0 | 0xf0;
+        case 0x26: return MM1 | 0xf0;
 
 		case 0x27: case 0x28: case 0x29: case 0x2a:
 		case 0x2b: case 0x2c: case 0x2d: case 0x2e:
-                        return MCOLOR[adresse - 0x27] | 0xf0;
+            return MCOLOR[adresse - 0x27] | 0xf0;
 
 		default:
 			return 0xFF;
