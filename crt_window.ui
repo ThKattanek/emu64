@@ -28,7 +28,16 @@
    <property name="spacing">
     <number>2</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>2</number>
+   </property>
+   <property name="topMargin">
+    <number>2</number>
+   </property>
+   <property name="rightMargin">
+    <number>2</number>
+   </property>
+   <property name="bottomMargin">
     <number>2</number>
    </property>
    <item>
@@ -398,7 +407,7 @@
                 <string notr="true"/>
                </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>2</number>
                </property>
                <widget class="QWidget" name="PageEasyFlash">
                 <property name="enabled">
@@ -651,6 +660,37 @@
                  </property>
                  <property name="text">
                   <string/>
+                 </property>
+                </widget>
+               </widget>
+               <widget class="QWidget" name="PageAR">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <widget class="QPushButton" name="FreezButtonAR">
+                 <property name="geometry">
+                  <rect>
+                   <x>20</x>
+                   <y>70</y>
+                   <width>61</width>
+                   <height>23</height>
+                  </rect>
+                 </property>
+                 <property name="text">
+                  <string>FREEZE</string>
+                 </property>
+                </widget>
+                <widget class="QWidget" name="FC3_Logo_2" native="true">
+                 <property name="geometry">
+                  <rect>
+                   <x>10</x>
+                   <y>5</y>
+                   <width>180</width>
+                   <height>51</height>
+                  </rect>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">image: url(:/grafik/action_replay_logo.png);</string>
                  </property>
                 </widget>
                </widget>

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 28.08.2011                //
+// Letzte Änderung am 20.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -35,6 +35,7 @@ CrtWindow::CrtWindow(QWidget *parent, QSettings *_ini) :
 
     ui->PageEasyFlash->setEnabled(false);
     ui->PageFC->setEnabled(false);
+    ui->PageAR->setEnabled(false);
 
     ui->MoreCRTPage->setMinimumWidth(0);
 
@@ -217,6 +218,16 @@ void CrtWindow::onSelectFile(QString filename)
 
         switch(crt_info.HardwareType)
         {
+        case 1: // Action Replay
+            if(!win_exp)
+            {
+                this->resize(this->width()+200,this->height());
+                this->setMinimumWidth(this->minimumWidth()+200);
+            }
+            ui->MoreCRTPage->setMinimumWidth(200);
+            ui->MoreCRTPage->setCurrentIndex(2);
+            win_exp = true;
+            break;
         case 3: // FC_III
             if(!win_exp)
             {
@@ -303,9 +314,13 @@ void CrtWindow::on_InsertCRT_clicked()
         {
             ui->PageFC->setEnabled(false);
             ui->PageEasyFlash->setEnabled(false);
+            ui->PageAR->setEnabled(false);
             insterted_hwtyp = crt_info.HardwareType;
             switch(insterted_hwtyp)
             {
+            case 1:
+                ui->PageAR->setEnabled(true);
+                break;
             case 3:
                 ui->PageFC->setEnabled(true);
                 break;
@@ -322,6 +337,7 @@ void CrtWindow::on_RemoveCRT_clicked()
 {
     ui->PageFC->setEnabled(false);
     ui->PageEasyFlash->setEnabled(false);
+    ui->PageAR->setEnabled(false);
     c64->RemoveCRT();
 }
 
@@ -348,4 +364,9 @@ void CrtWindow::on_FreezButtonFC3_clicked()
 void CrtWindow::on_EF_JUMPER0_toggled(bool checked)
 {
     crt->SetEasyFlashJumper(!checked);
+}
+
+void CrtWindow::on_FreezButtonAR_clicked()
+{
+    crt->Freeze();
 }

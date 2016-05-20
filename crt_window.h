@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 20.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -54,6 +54,8 @@ private slots:
     void on_RemoveCRT_clicked();
     void on_FreezButtonFC3_clicked();
     void on_EF_JUMPER0_toggled(bool checked);
+
+    void on_FreezButtonAR_clicked();
 
 private:
     Ui::CrtWindow *ui;

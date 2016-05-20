@@ -42,6 +42,8 @@ CRTClass::CRTClass()
 
     ChangeLED = 0;
     ResetAllLEDS();
+
+    ARFreez = false;
 }
 
 CRTClass::~CRTClass()
@@ -57,6 +59,7 @@ void CRTClass::ResetAllLEDS(void)
 
 void CRTClass::SetMemLogicAR(unsigned short adresse)
 {
+    if(!ActionReplayAktiv) return;
     unsigned char io2, pla_adresse, pla_out;
 
     if((adresse >= 0xdf00) && (adresse <= 0xdfff))
@@ -73,7 +76,10 @@ void CRTClass::SetMemLogicAR(unsigned short adresse)
     // Bit 6 - AdreesBit 14
     // Bit 7 - FreezBit
 
-    pla_adresse = ((ARRegister >> 5) & 1) | (ARRegister & 2) | ((ARRegister << 2) & 4) | io2 | ((adresse >> 9) & 16) | ((adresse >> 10) & 32) | ((adresse >> 8) & 64) | 128;
+    if(ARFreez)
+        pla_adresse = ((ARRegister >> 5) & 1) | (ARRegister & 2) | ((ARRegister << 2) & 4) | io2 | ((adresse >> 9) & 16) | ((adresse >> 10) & 32) | ((adresse >> 8) & 64) | 0;
+    else
+        pla_adresse = ((ARRegister >> 5) & 1) | (ARRegister & 2) | ((ARRegister << 2) & 4) | io2 | ((adresse >> 9) & 16) | ((adresse >> 10) & 32) | ((adresse >> 8) & 64) | 128;
 
     // PLA Ausgang
     // Bit 0 - ROM Enable (CE)
@@ -608,7 +614,11 @@ void CRTClass::Freeze(void)
         switch(CRTTyp)
         {
                 case 1:
-
+                /// ActionReplay 4/5/6
+                    ARFreez = true;
+                    WriteIO1(0xDE00,0);
+                    CpuTriggerInterrupt(CRT_IRQ);
+                    CpuTriggerInterrupt(CRT_NMI);
                     break;
 
                 /// Final Cartridge III
@@ -627,7 +637,9 @@ void CRTClass::WriteIO1(unsigned short adresse,unsigned char wert)
         case 1:		// Action Replay 4/5/6
                     if(ActionReplayAktiv)
                     {
-                        if(wert & 0x04) ActionReplayAktiv = false;
+                        if(wert & 0x04){
+                            ActionReplayAktiv = false;
+                        }
 
                         RomLBank = (wert>>3) & 0x03;
 
@@ -653,6 +665,8 @@ void CRTClass::WriteIO1(unsigned short adresse,unsigned char wert)
 
                         ARRegister = wert;
                         SetMemLogicAR(adresse);
+
+                        ARFreez = false;
                     }
                 break;
         case 4:

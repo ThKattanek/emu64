@@ -99,6 +99,7 @@ public:
 
     //// Action Replay 4/5/6 ////
     unsigned char   ARRegister;             // Inhalt des zuletzt geschriebenen $DExx Wert
+    bool            ARFreez;
     bool            ActionReplayAktiv;
     bool            EnableActionReplayRam;
     unsigned char   ActionReplayRam[0x2000];    // 8KB
