@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 20.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,6 +18,7 @@
 
 #include "structs.h"
 #include "am29f040_class.h"
+#include "mk7pla.h"
 
 #include "tr1/functional"
 using namespace std::tr1;
@@ -96,11 +97,17 @@ public:
 
     int             RomLBank;
 
-    //// Action Replay 4 ////
+    //// Action Replay 4/5/6 ////
+    unsigned char   ARRegister;             // Inhalt des zuletzt geschriebenen $DExx Wert
     bool            ActionReplayAktiv;
+    bool            EnableActionReplayRam;
+    unsigned char   ActionReplayRam[0x2000];    // 8KB
 
 private:
     void ResetAllLEDS(void);
+    void SetMemLogicAR(unsigned short adresse);
+
+    unsigned char pla_adresse;
 };
 
 #endif // CRT_CLASS_H

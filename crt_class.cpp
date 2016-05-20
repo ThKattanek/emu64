@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 20.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -53,6 +53,41 @@ void CRTClass::ResetAllLEDS(void)
     LED_00=LED_00_OLD=LED_01=LED_01_OLD=false;
     if(ChangeLED != 0) ChangeLED(0,LED_00);
     if(ChangeLED != 0) ChangeLED(1,LED_01);
+}
+
+void CRTClass::SetMemLogicAR(unsigned short adresse)
+{
+    unsigned char io2, pla_adresse, pla_out;
+
+    if((adresse >= 0xdf00) && (adresse <= 0xdfff))
+        io2 = 0;
+    else io2 = 8;
+
+    // Die Adresse für die PLA wird wie folgt gebildet
+    // Bit 0 - DatenBit 5
+    // Bit 1 - DatenBit 1
+    // Bit 2 - DatenBit 0
+    // Bit 3 - IO2 (Low wenn Adresse DF00-DFFF)
+    // Bit 4 - AdressBit 13
+    // Bit 5 - AdressBit 15
+    // Bit 6 - AdreesBit 14
+    // Bit 7 - FreezBit
+
+    pla_adresse = ((ARRegister >> 5) & 1) | (ARRegister & 2) | ((ARRegister << 2) & 4) | io2 | ((adresse >> 9) & 16) | ((adresse >> 10) & 32) | ((adresse >> 8) & 64) | 128;
+
+    // PLA Ausgang
+    // Bit 0 - ROM Enable (CE)
+    // Bit 1 - RAM Enable (CS)
+    // Bit 2 - GAME
+    // Bit 3 - EXROM
+    pla_out = mk7pla[pla_adresse];
+
+    EnableActionReplayRam = (~pla_out>>1 & 1);
+
+    *GAME = (pla_out & 4);
+    *EXROM = (pla_out & 8);
+
+    ChangeMemMapProc();
 }
 
 inline unsigned long CRTClass::conv_dword(unsigned long wert)
@@ -537,8 +572,9 @@ void CRTClass::Reset(void)
         {
                 switch(CRTTyp)
                 {
-                case 1:		// Action Replay 4
+                case 1:		// Action Replay 4/5/6
                         ActionReplayAktiv = true;
+                        WriteIO1(0xDE00,0);
                         break;
                 case 3:		//Final Cartgide III
                         WriteIO2(0xDFFF,0x00);
@@ -571,6 +607,10 @@ void CRTClass::Freeze(void)
 
         switch(CRTTyp)
         {
+                case 1:
+
+                    break;
+
                 /// Final Cartridge III
                 case 3:
                         WriteIO2(0xDFFF,16);
@@ -584,20 +624,36 @@ void CRTClass::WriteIO1(unsigned short adresse,unsigned char wert)
 
         switch(CRTTyp)
         {
-        case 1:		// Action Replay 4
-                if(adresse == 0xDE00)
-                {
-                        RomLBank = (wert >> 4) & 1;
-                        RomLBank = ((wert & 1) | (RomLBank << 1)) & 3;
-                        *EXROM = ((~wert >> 3) & 1)^1;
-                        *GAME = ((~wert >> 1) & 1)^1;
+        case 1:		// Action Replay 4/5/6
+                    if(ActionReplayAktiv)
+                    {
+                        if(wert & 0x04) ActionReplayAktiv = false;
 
-                        if(ActionReplayAktiv)
+                        RomLBank = (wert>>3) & 0x03;
+
+                        switch(RomLBank)
                         {
-                                ChangeMemMapProc();
-                                if(wert & 0x04) ActionReplayAktiv = false;
+                        case 0x00:
+                                ROM_LO = CRT_ROM_BANK1 + (0 * 0x2000);
+                                ROM_HI = CRT_ROM_BANK1 + (0 * 0x2000);
+                                break;
+                        case 0x01:
+                                ROM_LO = CRT_ROM_BANK1 + (1 * 0x2000);
+                                ROM_HI = CRT_ROM_BANK1 + (1 * 0x2000);
+                                break;
+                        case 0x02:
+                                ROM_LO = CRT_ROM_BANK1 + (2 * 0x2000);
+                                ROM_HI = CRT_ROM_BANK1 + (2 * 0x2000);
+                                break;
+                        case 0x03:
+                                ROM_LO = CRT_ROM_BANK1 + (3 * 0x2000);
+                                ROM_HI = CRT_ROM_BANK1 + (3 * 0x2000);
+                                break;
                         }
-                }
+
+                        ARRegister = wert;
+                        SetMemLogicAR(adresse);
+                    }
                 break;
         case 4:
                 if(adresse == 0xDE00)
@@ -724,6 +780,10 @@ void CRTClass::WriteIO2(unsigned short adresse,unsigned char wert)
         if(!CRTInsert) return;
         switch(CRTTyp)
         {
+        case 1:     // Action Replay 4/5/6
+                ActionReplayRam[(adresse & 0xFF) + 0x1F00] = wert;
+                RAM_C64[adresse] = wert;
+            break;
         case 3:		// Final Cartridge III
                 if((adresse & 0xFF) == 0xFF)
                 {
@@ -767,20 +827,15 @@ unsigned char CRTClass::ReadIO2(unsigned short adresse)
 
         switch(CRTTyp)
         {
-        case 1:		// Action Replay 4
-                if(!ActionReplayAktiv) return 0x00;	// Eigl. Zufallszahlen (Vic Phi)
-                switch (RomLBank)
-                {
-                        case 0:
-                                return CRT_ROM_BANK1[adresse & 0x1fff];
-                        case 1:
-                                return CRT_ROM_BANK1[(adresse & 0x1fff) + 0x2000];
-                        case 2:
-                                return CRT_ROM_BANK1[(adresse & 0x1fff) + 0x4000];
-                        case 3:
-                                return CRT_ROM_BANK1[(adresse & 0x1fff) + 0x6000];
-                }
-                return 0;
+        case 1:		// Action Replay 4/5/6
+
+            SetMemLogicAR(adresse);
+
+            if(!ActionReplayAktiv) return 0x00;	// Eigl. Zufallszahlen (Vic Phi)
+
+            if(EnableActionReplayRam) return ActionReplayRam[(adresse & 0xFF) + 0x1F00];
+            else return ROM_LO[(adresse & 0xFF) + 0x1F00];
+
                 break;
         case 3:		// Final Cartridge III
                 switch (RomLBank)
@@ -811,8 +866,10 @@ unsigned char CRTClass::ReadRom1(unsigned short adresse)
 
         switch(CRTTyp)
         {
-        case 1:		// Action Replay 4
-                return CRT_ROM_BANK1[(adresse & 0x1FFF) + (RomLBank << 13)];
+        case 1:		// Action Replay 4/5/6
+                SetMemLogicAR(adresse);
+                if(!EnableActionReplayRam) return ROM_LO[adresse & 0x1FFF];
+                else return ActionReplayRam[adresse & 0x1FFF];
                 break;
         case 32:	// EasyFlash
                 return am29f040Lo->Read((adresse & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13));
@@ -863,6 +920,14 @@ void CRTClass::WriteRom1(unsigned short adresse,unsigned char wert)	// 0x8000
 
         switch(CRTTyp)
         {
+        case 1:     // Action Replay 4/5/6
+                SetMemLogicAR(adresse);
+                if(EnableActionReplayRam)
+                {
+                    ActionReplayRam[adresse & 0x1FFF] = wert;
+                }
+                RAM_C64[adresse] = wert;
+            break;
         case 32:	// EasyFlash
                 am29f040Lo->Write((adresse & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13),wert);
                 RAM_C64[adresse] = wert;

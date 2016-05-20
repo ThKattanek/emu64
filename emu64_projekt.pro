@@ -111,7 +111,8 @@ HEADERS  += \
     reu_class.h \
     georam_class.h \
     debugger_iec_window.h \
-    vcd_class.h
+    vcd_class.h \
+    mk7pla.h
 
 FORMS    += \
     info_window.ui \
