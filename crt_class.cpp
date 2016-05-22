@@ -668,6 +668,7 @@ void CRTClass::WriteIO1(unsigned short adresse,unsigned char wert)
 
                         ARFreez = false;
                     }
+                    RAM_C64[adresse] = wert;
                 break;
         case 4:
                 if(adresse == 0xDE00)
@@ -842,11 +843,8 @@ unsigned char CRTClass::ReadIO2(unsigned short adresse)
         switch(CRTTyp)
         {
         case 1:		// Action Replay 4/5/6
-
             SetMemLogicAR(adresse);
-
             if(!ActionReplayAktiv) return 0x00;	// Eigl. Zufallszahlen (Vic Phi)
-
             if(EnableActionReplayRam) return ActionReplayRam[(adresse & 0xFF) + 0x1F00];
             else return ROM_LO[(adresse & 0xFF) + 0x1F00];
 

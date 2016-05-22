@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014        		//
+// Letzte Änderung am 21.05.2016        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -411,7 +411,7 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
     // Create GCR data (338 Bytes)
     unsigned char SUM;
     // SYNC
-    *P++ = 0xFF;
+    *P++ = 0xFF;                                // SYNC
     *P++ = 0xFF;								// SYNC
     *P++ = 0xFF;								// SYNC
     *P++ = 0xFF;								// SYNC
@@ -440,7 +440,9 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
     ConvertToGCR(buffer, P);
     P += 5;
 
-    memset(P, 0x55, 8);							// Gap
+    unsigned char gap_size = D64_SECTOR_GAP[D64_TRACK_ZONE[spur]];
+    memset(P, 0x55, gap_size);							// Gap
+    P += gap_size;
 }
 
 inline void Floppy1541::ConvertToGCR(unsigned char *source_buffer, unsigned char *destination_buffer)

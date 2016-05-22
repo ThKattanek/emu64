@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.05.2016                //
+// Letzte Änderung am 21.05.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,7 +18,7 @@
 
 #include <QDebug>
 
-#define floppy_asyncron                  // Schaltet die Floppy Asyncron
+//#define floppy_asyncron                  // Schaltet die Floppy Asyncron
 #define more_one_floppy_cylce_count 66   // alle "more_one_floppy_cycle_counts" wird 1 FloppyZyklus doppelt ausgeführt
 
 void AudioMix(void *nichtVerwendet, Uint8 *stream, int laenge);

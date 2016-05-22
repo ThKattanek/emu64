@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014        		//
+// Letzte Änderung am 21.05.2016        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -28,6 +28,18 @@ using namespace std::tr1;
 using namespace std::tr1::placeholders;
 
 static const int NUM_SECTORS[42] = {21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,19,19,19,19,19,19,19,18,18,18,18,18,18,17,17,17,17,17,17,17,17,17,17,17,17};
+
+//const unsigned char NUM_SECTORS[41] = {0,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,
+//                       19,19,19,19,19,19,19,
+//                       18,18,18,18,18,18,
+//                       17,17,17,17,17,17,17,17,17,17};
+
+const unsigned char D64_TRACK_ZONE[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                   1,1,1,1,1,1,1,
+                   2,2,2,2,2,2,
+                   3,3,3,3,3,3,3,3,3,3};
+
+const unsigned char D64_SECTOR_GAP[4] = {1,10,5,2};
 
 #define D64 0
 #define G64 1
