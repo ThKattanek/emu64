@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.05.2016                //
+// Letzte Änderung am 01.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -30,6 +30,8 @@ QDir config_dir = QDir(QDir::homePath() + "/.config/emu64");
 
     SingleApplication *app;
     app = new SingleApplication (argc, argv,  "Emu64_By_Thorsten_Kattanek");
+
+    //app->deleteSharedMemory();
 
     if (app->alreadyExists())
     {

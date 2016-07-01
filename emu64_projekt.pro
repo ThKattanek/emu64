@@ -8,7 +8,8 @@ TRANSLATIONS = emu64_de.ts
 TRANSLATIONS = emu64_en.ts
 
 QT += core gui
-CONFIG += rtti
+#CONFIG += rtti
+#CONFIG += console
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 14.05.2016                //
+// Letzte Änderung am 01.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -278,6 +278,7 @@ private:
 
     bool SDLJoystickIsOpen;
     int  JoystickAnzahl;
+    SDL_Joystick *Joystick[MAX_JOYSTICKS];
     const char *JoystickNamen[MAX_JOYSTICKS];
     bool StopJoystickUpdate;
     bool JoyStickUdateIsStop;

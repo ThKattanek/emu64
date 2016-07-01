@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.05.2016                //
+// Letzte Änderung am 01.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,7 +18,7 @@
 
 #include <QDebug>
 
-//#define floppy_asyncron                  // Schaltet die Floppy Asyncron
+#define floppy_asyncron                  // Schaltet die Floppy Asyncron
 #define more_one_floppy_cylce_count 66   // alle "more_one_floppy_cycle_counts" wird 1 FloppyZyklus doppelt ausgeführt
 
 void AudioMix(void *nichtVerwendet, Uint8 *stream, int laenge);
@@ -472,7 +472,7 @@ void C64Class::EndEmulation()
     while (!LoopThreadIsEnd)
         SDL_Delay(1);
 
-    SDL_DetachThread(sdl_thread);
+    //SDL_DetachThread(sdl_thread);
 
     SDL_PauseAudio(1);
     SDL_CloseAudio();
@@ -1451,6 +1451,9 @@ void C64Class::SetFullscreenAspectRatio(bool enabled)
 
 void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 {
+    static bool joy_center_flag = true;
+    static char joy_axis_tbl[5] = {1,1,0,0,-1};
+
     switch (event->type)
     {
         case SDL_WINDOWEVENT:
@@ -1535,6 +1538,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
         {
             if((RecJoyMapping == true) && (RecPollingWait == false))
             {
+                LogText("<< Peggy Test: Joy Hat Motion [REC]\n");
                 if(event->jhat.value > 0)
                 {
                     VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_HAT;
@@ -1599,16 +1603,16 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
         {
             if((RecJoyMapping == true) && (RecPollingWait == false))
             {
-                if(!((event->jaxis.value >= -10) && (event->jaxis.value <= 10)))
+                if(((event->jaxis.value < -16000) || (event->jaxis.value > 16000)) && (joy_center_flag == true) && ((event->jaxis.axis & 1) == joy_axis_tbl[RecJoyMappingPos]))
                 {
+                    joy_center_flag = false;
+
                     VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_AXIS;
                     VJoys[RecJoySlotNr].JoyIndex[RecJoyMappingPos] = event->jaxis.which;
                     VJoys[RecJoySlotNr].AxisNr[RecJoyMappingPos] = event->jaxis.axis;
                     if(event->jaxis.value > 0) VJoys[RecJoySlotNr].AxisValue[RecJoyMappingPos] = 0;
                     else VJoys[RecJoySlotNr].AxisValue[RecJoyMappingPos] = 1;
-                }
-                else
-                {
+
                     RecJoyMappingPos++;
                     if(RecJoyMappingPos == 5)
                     {
@@ -1620,6 +1624,11 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                         RecPollingWait = true;
                         RecPollingWaitCounter = RecPollingWaitStart;
                     }
+                }
+
+                if((event->jaxis.value > -14000) && (event->jaxis.value < 14000))
+                {
+                    joy_center_flag = true;
                 }
             }
             else
@@ -1634,7 +1643,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                                 (VJoys[VPort1].Type[i] == VJOY_TYPE_AXIS) &&
                                 (VJoys[VPort1].JoyIndex[i] == event->jaxis.which))
                         {
-                            if(!((event->jaxis.value >= -10) && (event->jaxis.value <= 10)))
+                            if(!((event->jaxis.value >= -14000) && (event->jaxis.value <= 14000)))
                             {
                                 if(event->jaxis.value > 16000)
                                 {
@@ -1660,7 +1669,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                                 (VJoys[VPort2].Type[i] == VJOY_TYPE_AXIS) &&
                                 (VJoys[VPort2].JoyIndex[i] == event->jaxis.which))
                         {
-                            if(!((event->jaxis.value >= -10) && (event->jaxis.value <= 10)))
+                            if(!((event->jaxis.value >= -14000) && (event->jaxis.value <= 14000)))
                             {
                                 if(event->jaxis.value > 16000)
                                 {
@@ -3185,13 +3194,12 @@ void C64Class::OpenSDLJoystick()
         if(JoystickAnzahl > 0)
         {
             for(int i=0; i<JoystickAnzahl;i++)
-            {
-                /// FIX ME ///
-                //JoystickNamen[i] = SDL_JoystickName(i);
+            {                
+                Joystick[i] = SDL_JoystickOpen(i);
+                JoystickNamen[i] = SDL_JoystickName(Joystick[i]);
 
                 sprintf(str00,">>   [%2.2d] %s\n",i,JoystickNamen[i]);
                 LogText(str00);
-                SDL_JoystickOpen(i);
             }
         }
     }
