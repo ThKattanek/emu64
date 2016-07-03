@@ -38,6 +38,8 @@ build_deb.sh nach ~/Programmierung/Aktuelle_Projekte/builds/emu64-linux-amd64 ko
 
 cd ~/Programmierung/Aktuelle_Projekte/builds/emu64-linux-amd64
 build_deb.sh anpassen --> Version usw.
+description-pak Datei erstellen mit Text zur Beschreibung der Anwendung
+z.B. "Das ist ein echt cooler C64 Emulator. Besonders die Obefläche und die Bedienung machen diesen Emulator zu einem Vergnügen."
 ./build_deb.sh
 
 --> Es befindet sich nun ein deb und rpm im Verzeichnis

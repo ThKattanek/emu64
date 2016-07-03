@@ -1538,7 +1538,6 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
         {
             if((RecJoyMapping == true) && (RecPollingWait == false))
             {
-                LogText("<< Peggy Test: Joy Hat Motion [REC]\n");
                 if(event->jhat.value > 0)
                 {
                     VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_HAT;
