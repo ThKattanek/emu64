@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.07.2016                //
+// Letzte Änderung am 12.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -397,6 +397,8 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     cia1->Reset();
     cia2->Reset();
 
+    SIDVolume = 1.0;
+
     sid1->RESET = &RESET;
     sid1->SetC64Zyklen(985248);     // 985248
     sid1->SetChipType(MOS_8580);
@@ -732,10 +734,10 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
 
         for(int i=0; i<(laenge/2); i++)
         {
-            puffer[i] = sid1->SoundBuffer[i];
+            puffer[i] = short(sid1->SoundBuffer[i] * SIDVolume);
         }
 
-        SDL_MixAudioFormat((unsigned char*)puffer,(unsigned char*)sid1->SoundBuffer,have.format,laenge,100);
+        //SDL_MixAudioFormat((unsigned char*)puffer,(unsigned char*)sid1->SoundBuffer,have.format,laenge,100);
 
         /// Floppysound dazu mixen ///
         for(int i=0; i< FloppyAnzahl; i++)
@@ -2746,6 +2748,11 @@ void C64Class::StopIECDump()
 {
     IecIsDumped = false;
     IecVcdExport.Close();
+}
+
+void C64Class::SetSIDVolume(float volume)
+{
+    SIDVolume = volume;
 }
 
 int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)

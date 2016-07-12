@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.07.2016                //
+// Letzte Änderung am 12.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -137,6 +137,8 @@ public:
     bool StartIECDump(const char *filename);
     void StopIECDump();
 
+    void SetSIDVolume(float volume);    // Lautstärke der SID's (0.0f - 1.0f)
+
     int             AktWindowXW;
     int             AktWindowYW;
     int             AktWindowColorBits;
@@ -247,6 +249,8 @@ public:
 
     bool StartScreenshot;
     char ScreenshotFilename[1024];
+
+    float SIDVolume;
 
 private:
     void CalcDistortionGrid();

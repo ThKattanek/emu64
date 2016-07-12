@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 14.05.2016                //
+// Letzte Änderung am 12.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -70,18 +70,18 @@ void SetupWindow::LoadINI(C64Class *_c64)
             ini->beginGroup(group_name);
 
             QTableWidgetItem *item = new QTableWidgetItem(ini->value("Name","Slot " + QVariant(i+1).toString()).toString());
-            //item->setToolTip(trUtf8("Mit einem doppelklick kann man den Namen ändern."));
+            item->setToolTip(trUtf8("Mit einem doppelklick kann man den Namen ändern."));
             ui->VJoySlots->setItem(i,0,item);
             ui->VJoySlots->setRowHeight(i,18);
 
             item = new QTableWidgetItem("");
             item->setFlags(Qt::ItemIsEditable);
-            //item->setToolTip(trUtf8("Verbindet diesen Slot mit dem C64 Gameport 1"));
+            item->setToolTip(trUtf8("Verbindet diesen Slot mit dem C64 Gameport 1"));
             ui->VJoySlots->setItem(i,1,item);
 
             item = new QTableWidgetItem("");
             item->setFlags(Qt::ItemIsEditable);
-            //item->setToolTip(trUtf8("Verbindet diesen Slot mit dem C64 Gameport 2"));
+            item->setToolTip(trUtf8("Verbindet diesen Slot mit dem C64 Gameport 2"));
             ui->VJoySlots->setItem(i,2,item);
 
             ButtonMod *button;
@@ -180,6 +180,14 @@ void SetupWindow::LoadINI(C64Class *_c64)
         c64->SetFullscreenAspectRatio(bvalue);
 
         ini->endGroup();
+
+        ini->beginGroup("Sound");
+
+        value = ini->value("SIDVolume",100).toInt();
+        ui->SIDVolume->setValue(value);
+        c64->SetSIDVolume(value / 100.0);
+
+        ini->endGroup();
     }
     ////////////////////////////////////
 
@@ -224,6 +232,10 @@ void SetupWindow::SaveINI()
             ini->setValue("AxisValue",QByteArray((const char*)c64->VJoys[i].AxisValue,5));
             ini->endGroup();
         }
+
+        ini->beginGroup("Sound");
+        ini->setValue("SIDVolume",ui->SIDVolume->value());
+        ini->endGroup();
     }
 }
 
@@ -361,4 +373,10 @@ void SetupWindow::on_FAspectRatio_clicked(bool checked)
 void SetupWindow::on_MausPort_currentIndexChanged(int index)
 {
     c64->SetMouse1351Port(index);
+}
+
+void SetupWindow::on_SIDVolume_valueChanged(int value)
+{
+   ui->SIDVolumeOut->setText(QVariant(value).toString() + "%");
+   c64->SetSIDVolume(value / 100.0);
 }
