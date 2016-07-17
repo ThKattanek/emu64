@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 16.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -40,14 +40,15 @@ public:
     ~WidgetFileBrowse();
 
 private slots:
-    void on_treeView_dir_clicked(QModelIndex index);
-    void onlistView_files_currentChanged(const QModelIndex &current, const QModelIndex &previous);
     void on_listWidget_zip_itemSelectionChanged();
+    void on_listView_filebrowser_doubleClicked(const QModelIndex &index);
+    void on_to_parent_clicked();
+    void on_listView_filebrowser_clicked(const QModelIndex &index);
 
 private:
     Ui::WidgetFileBrowse *ui;
     QFileSystemModel *dirmodel;
-    QFileSystemModel *filemodel;
+    QString akt_fullpath;
     QStringList ZIPExt;
 
 signals:
