@@ -30,6 +30,8 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini) :
     ini = _ini;
     ui->setupUi(this);
 
+    FileTypes = QStringList() << "DEL" << "SEQ" << "PRG" << "USR" << "REL" << "CBM" << "E00" << "E?C";
+
     green_led = new QIcon(":/grafik/green_led_7x7.png");
     yellow_led = new QIcon(":/grafik/yellow_led_7x7.png");
     red_led = new QIcon(":/grafik/red_led_7x7.png");
@@ -59,8 +61,6 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini) :
     // Kontextmenü erstellen
     ui->D64FileTable->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->D64FileTable, SIGNAL(customContextMenuRequested(QPoint)),SLOT(OnCustomMenuRequested(QPoint)));
-
-    FileTypes = QStringList() << "DEL" << "SEQ" << "PRG" << "USR" << "REL" << "CBM" << "E00" << "E?C";
 }
 
 FloppyWindow::~FloppyWindow()
@@ -242,18 +242,21 @@ void FloppyWindow::RefreshD64FileList()
         ui->D64FileTable->cellWidget(i,1)->setFont(*c64_font);
         QLabel* label = (QLabel*) ui->D64FileTable->cellWidget(i,1);
         label->setAlignment(Qt::AlignTop);
+        label->setStyleSheet("color: rgb(100, 100, 255);");
 
         // Spur setzen
         ui->D64FileTable->setCellWidget(i,2,new QLabel(QVariant(d64[floppy].D64Files[i].Track).toString() + " "));
         ui->D64FileTable->cellWidget(i,2)->setFont(*c64_font);
         label = (QLabel*) ui->D64FileTable->cellWidget(i,2);
         label->setAlignment(Qt::AlignTop | Qt::AlignRight);
+        label->setStyleSheet("color: rgb(100, 100, 255);");
 
         // Sektor setzen
         ui->D64FileTable->setCellWidget(i,3,new QLabel(QVariant(d64[floppy].D64Files[i].Sektor).toString() + " "));
         ui->D64FileTable->cellWidget(i,3)->setFont(*c64_font);
         label = (QLabel*) ui->D64FileTable->cellWidget(i,3);
         label->setAlignment(Qt::AlignTop | Qt::AlignRight);
+        label->setStyleSheet("color: rgb(100, 100, 255);");
 
         // Adresse setzen
         QString str;
@@ -262,12 +265,14 @@ void FloppyWindow::RefreshD64FileList()
         ui->D64FileTable->cellWidget(i,4)->setFont(*c64_font);
         label = (QLabel*) ui->D64FileTable->cellWidget(i,4);
         label->setAlignment(Qt::AlignTop);
+        label->setStyleSheet("color: rgb(100, 100, 255);");
 
         // Size setzen
         ui->D64FileTable->setCellWidget(i,5,new QLabel(QVariant(d64[floppy].D64Files[i].Laenge).toString() + " "));
         ui->D64FileTable->cellWidget(i,5)->setFont(*c64_font);
         label = (QLabel*) ui->D64FileTable->cellWidget(i,5);
         label->setAlignment(Qt::AlignTop | Qt::AlignRight);
+        label->setStyleSheet("color: rgb(100, 100, 255);");
 
         // Typ setzen
         QString strTyp;
@@ -282,8 +287,7 @@ void FloppyWindow::RefreshD64FileList()
         ui->D64FileTable->cellWidget(i,6)->setFont(*c64_font);
         label = (QLabel*) ui->D64FileTable->cellWidget(i,6);
         label->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-
-
+        label->setStyleSheet("color: rgb(100, 100, 255);");
 
         // Höhe der Zeile setzen
 #ifdef _WIN32
