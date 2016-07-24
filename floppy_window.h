@@ -19,6 +19,7 @@
 #define FloppyAnzahl 4
 
 #include <QDialog>
+#include <QMenu>
 #include <QSettings>
 #include "d64_class.h"
 
@@ -63,7 +64,6 @@ private:
     QString AktFileName[FloppyAnzahl];
     D64Class d64[FloppyAnzahl];
     void RefreshD64FileList(void);
-
 
     QIcon *green_led ;
     QIcon *yellow_led;

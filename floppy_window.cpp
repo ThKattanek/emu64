@@ -184,7 +184,18 @@ void FloppyWindow::OnCustomMenuRequested(QPoint pos)
     QModelIndex index= ui->D64FileTable->indexAt(pos);
 
     QMenu *menu=new QMenu(this);
-    menu->addAction(new QAction("Export --> PRG", this));
+
+    QAction *action = new QAction(trUtf8("Laden und Starten mit Reset ohne Kernal"), this);
+    QFont font = action->font();
+    font.setBold(true);
+    action->setFont(font);
+    menu->addAction(action);
+
+    menu->addAction(new QAction(trUtf8("Laden und Starten mit Reset"), this));
+    menu->addAction(new QAction(trUtf8("Laden und Starten"), this));
+    menu->addAction(new QAction(trUtf8("Laden"), this));
+    menu->addAction(new QAction(trUtf8("Export"), this));
+
     menu->popup(ui->D64FileTable->viewport()->mapToGlobal(pos));
     connect(menu,SIGNAL(triggered(QAction*)),this,SLOT(OnD64KontexMenu(QAction*)));
 }
@@ -304,7 +315,6 @@ void FloppyWindow::RefreshD64FileList()
         {
             ui->D64FileTable->setRowHeight(i,0);
         }
-
     }
 }
 

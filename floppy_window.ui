@@ -218,7 +218,7 @@
          <item>
           <widget class="QCheckBox" name="ViewSplatFiles">
            <property name="text">
-            <string>Gelöschte Dateien anzeigen</string>
+            <string>Gelöschte Dateien (Splat-Files) anzeigen</string>
            </property>
           </widget>
          </item>
