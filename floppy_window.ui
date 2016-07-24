@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>945</width>
-    <height>639</height>
+    <width>826</width>
+    <height>241</height>
    </rect>
   </property>
   <property name="font">
@@ -66,7 +66,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QSplitter" name="splitter">
+    <widget class="QSplitter" name="splitter_1">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -78,7 +78,7 @@
        </size>
       </property>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -89,12 +89,15 @@
           <enum>QLayout::SetDefaultConstraint</enum>
          </property>
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="DiskName">
            <property name="font">
             <font>
              <weight>75</weight>
              <bold>true</bold>
             </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(50, 50, 255);</string>
            </property>
            <property name="text">
             <string>Name</string>
@@ -120,41 +123,17 @@
         </layout>
        </item>
        <item>
-        <widget class="QTableWidget" name="D64Table">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>16777215</height>
-          </size>
-         </property>
+        <widget class="QTableWidget" name="D64FileTable">
          <property name="focusPolicy">
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="selectionMode">
           <enum>QAbstractItemView::SingleSelection</enum>
          </property>
-         <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectItems</enum>
-         </property>
          <property name="showGrid">
           <bool>false</bool>
          </property>
-         <attribute name="horizontalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
          <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderHighlightSections">
           <bool>false</bool>
          </attribute>
         </widget>

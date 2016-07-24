@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.07.2016                //
+// Letzte Änderung am 24.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -30,27 +30,29 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini) :
     ini = _ini;
     ui->setupUi(this);
 
+    green_led = new QIcon(":/grafik/GreenLED_On.png");
+    yellow_led = new QIcon(":/grafik/YellowLED_On.png");
+    red_led = new QIcon(":/grafik/RedLED_On.png");
+
     QFontDatabase fontDB;
     fontDB.addApplicationFont(":/fonts/emu64.ttf");
-    c64_font = new QFont("Emu64 D64 Directory",16);
+    c64_font = new QFont("Emu64 D64 Directory",18); // Linux18
+    c64_font->setStyleStrategy(QFont::PreferAntialias);
+    c64_font->setBold(false);
+    c64_font->setKerning(true);
+
+    ui->DiskName->setFont(*c64_font);
+
+    //ui->D64FileTable->setFont(*c64_font);
+    ui->D64FileTable->setColumnCount(1);
+    ui->D64FileTable->setColumnWidth(0,280);
 
     connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(OnSelectFile(QString)));
     ui->FileBrowser->SetFileFilter(QStringList()<<"*.d64"<<"*.g64");
 
     // Kontextmenü erstellen
-    ui->D64Table->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->D64Table, SIGNAL(customContextMenuRequested(QPoint)),SLOT(OnCustomMenuRequested(QPoint)));
-
-    ui->D64Table->setRowCount(MAX_D64_FILES);
-    ui->D64Table->setColumnCount(1);
-
-    for(int i=0; i<MAX_D64_FILES; i++)
-    {
-        ui->D64Table->setRowHeight(i,8);
-        WidgetD64File *w = new WidgetD64File(this);
-        ui->D64Table->setCellWidget(i,0,w);
-        ui->D64Table->setColumnWidth(0,w->width());
-    }
+    ui->D64FileTable->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->D64FileTable, SIGNAL(customContextMenuRequested(QPoint)),SLOT(OnCustomMenuRequested(QPoint)));
 
     FileTypes = QStringList() << "DEL" << "SEQ" << "PRG" << "USR" << "REL" << "CBM" << "E00" << "E?C";
 }
@@ -61,7 +63,12 @@ FloppyWindow::~FloppyWindow()
     if(ini != 0)
     {
         ini->beginGroup("FloppyWindow");
-        if(isOneShowed) ini->setValue("Geometry",saveGeometry());
+        if(isOneShowed)
+        {
+            ini->setValue("Geometry",saveGeometry());
+            //ini->setValue("Splitter1Pos",ui->splitter_1->set);
+        }
+
         if(isHidden()) ini->setValue("Show",false);
         else ini->setValue("Show",true);
         ini->endGroup();
@@ -92,6 +99,10 @@ void FloppyWindow::LoadIni()
     {
         ini->beginGroup("FloppyWindow");
         if(ini->contains("Geometry")) restoreGeometry(ini->value("Geometry").toByteArray());
+        if(ini->contains("Splitter1Pos"))
+        {
+
+        }
         ini->endGroup();
 
         char group_name[32];
@@ -110,7 +121,7 @@ void FloppyWindow::LoadIni()
 
         ui->FileBrowser->SetAktDir(AktDir[0]);
         ui->FileBrowser->SetAktFile(AktDir[0],AktFile[0]);
-        RefreshD64Table();
+        RefreshD64FileList();
     }
     ////////////////////////////////////
 }
@@ -133,7 +144,7 @@ void FloppyWindow::OnSelectFile(QString filename)
         if("D64" == AktFileName[FloppyNr].right(3).toUpper())
         {
             d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toLatin1().data());
-            RefreshD64Table();
+            RefreshD64FileList();
             emit ChangeFloppyImage(FloppyNr);
         }
     }
@@ -163,17 +174,17 @@ void FloppyWindow::on_FloppySelect_currentIndexChanged(int index)
     {
         ui->FileBrowser->SetAktDir(AktDir[index]);
         ui->FileBrowser->SetAktFile(AktDir[index],AktFile[index]);
-        RefreshD64Table();
+        RefreshD64FileList();
     }
 }
 
 void FloppyWindow::OnCustomMenuRequested(QPoint pos)
 {
-    QModelIndex index= ui->D64Table->indexAt(pos);
+    QModelIndex index= ui->D64FileTable->indexAt(pos);
 
     QMenu *menu=new QMenu(this);
     menu->addAction(new QAction("Export --> PRG", this));
-    menu->popup(ui->D64Table->viewport()->mapToGlobal(pos));
+    menu->popup(ui->D64FileTable->viewport()->mapToGlobal(pos));
     connect(menu,SIGNAL(triggered(QAction*)),this,SLOT(OnD64KontexMenu(QAction*)));
 }
 
@@ -195,6 +206,7 @@ QString FloppyWindow::GetAktD64Name(int floppynr)
     return d64[floppynr].D64Name;
 }
 
+/*
 void FloppyWindow::RefreshD64Table(void)
 {
     QString filename;
@@ -215,11 +227,14 @@ void FloppyWindow::RefreshD64Table(void)
 
     WidgetD64File *w;
 
+    ui->DiskName->setText(d64[floppy].D64Name);
+
     for(int i=0; i<MAX_D64_FILES;i++)
     {
         if(ui->D64Table->isRowHidden(i)) break;
         ui->D64Table->setRowHidden(i,true);
     }
+
     for(int i=0; i<d64_files;i++)
     {
         if(MAX_D64_FILES == i) break;
@@ -263,4 +278,43 @@ void FloppyWindow::RefreshD64Table(void)
         w->SetLabels(filename,spur,sektor,adresse,size,typ);
         ui->D64Table->setRowHidden(i,false);
     }
+}
+*/
+
+void FloppyWindow::RefreshD64FileList()
+{
+    ui->D64FileTable->clear();
+
+    int floppy = ui->FloppySelect->currentIndex();
+    int d64_files = d64[floppy].DateiAnzahl;
+
+    ui->DiskName->setText(d64[floppy].D64Name);
+
+    ui->D64FileTable->setHorizontalHeaderLabels(QStringList() << "Filename");
+
+    ui->D64FileTable->setRowCount(d64_files);
+
+    for(int i=0; i<d64_files;i++)
+    {
+        ui->D64FileTable->setCellWidget(i,0,new QLabel(d64[floppy].D64Files[i].Name));
+        ui->D64FileTable->cellWidget(i,0)->setFont(*c64_font);
+
+#ifdef _WIN32
+    ui->D64FileTable->setRowHeight(i,9);
+    ui->D64FileTable->cellWidget(i,0)->setFixedHeight(10);
+#endif
+
+#ifdef __linux__
+    ui->D64FileTable->setRowHeight(i,8);
+    ui->D64FileTable->cellWidget(i,0)->setFixedHeight(9);
+#endif
+
+        QLabel* label = (QLabel*) ui->D64FileTable->cellWidget(i,0);
+        label->setAlignment(Qt::AlignTop);
+    }
+}
+
+void FloppyWindow::on_splitter_1_splitterMoved(int pos, int index)
+{
+    qDebug("Splitter1_Pos: %d, Splitter_1_index: %d\n",pos,index);
 }

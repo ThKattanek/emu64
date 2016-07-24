@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.07.2016                //
+// Letzte Änderung am 24.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -21,7 +21,6 @@
 #include <QDialog>
 #include <QSettings>
 #include "d64_class.h"
-#include "widget_d64_file.h"
 
 namespace Ui {
     class FloppyWindow;
@@ -53,6 +52,8 @@ private slots:
     void OnCustomMenuRequested(QPoint pos);
     void OnD64KontexMenu(QAction *actions);
 
+    void on_splitter_1_splitterMoved(int pos, int index);
+
 private:
     Ui::FloppyWindow *ui;
     QFont *c64_font;
@@ -62,7 +63,13 @@ private:
     QString AktFile[FloppyAnzahl];
     QString AktFileName[FloppyAnzahl];
     D64Class d64[FloppyAnzahl];
-    void RefreshD64Table(void);
+    void RefreshD64FileList(void);
+
+
+    QIcon *green_led ;
+    QIcon *yellow_led;
+    QIcon *red_led;
+
 };
 
 #endif // FLOPPY_WINDOW_H
