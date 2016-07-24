@@ -30,9 +30,9 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini) :
     ini = _ini;
     ui->setupUi(this);
 
-    green_led = new QIcon(":/grafik/GreenLED_On.png");
-    yellow_led = new QIcon(":/grafik/YellowLED_On.png");
-    red_led = new QIcon(":/grafik/RedLED_On.png");
+    green_led = new QIcon(":/grafik/green_led_7x7.png");
+    yellow_led = new QIcon(":/grafik/yellow_led_7x7.png");
+    red_led = new QIcon(":/grafik/red_led_7x7.png");
 
     QFontDatabase fontDB;
     fontDB.addApplicationFont(":/fonts/emu64.ttf");
@@ -43,9 +43,15 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini) :
 
     ui->DiskName->setFont(*c64_font);
 
-    //ui->D64FileTable->setFont(*c64_font);
-    ui->D64FileTable->setColumnCount(1);
-    ui->D64FileTable->setColumnWidth(0,280);
+    // Spalten für D64 Datei-Anzeige hinzufügen
+    ui->D64FileTable->setColumnCount(7);
+    ui->D64FileTable->setColumnWidth(0,20);
+    ui->D64FileTable->setColumnWidth(1,132);
+    ui->D64FileTable->setColumnWidth(2,30);
+    ui->D64FileTable->setColumnWidth(3,30);
+    ui->D64FileTable->setColumnWidth(4,55);
+    ui->D64FileTable->setColumnWidth(5,40);
+    ui->D64FileTable->setColumnWidth(6,40);
 
     connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(OnSelectFile(QString)));
     ui->FileBrowser->SetFileFilter(QStringList()<<"*.d64"<<"*.g64");
@@ -66,7 +72,6 @@ FloppyWindow::~FloppyWindow()
         if(isOneShowed)
         {
             ini->setValue("Geometry",saveGeometry());
-            //ini->setValue("Splitter1Pos",ui->splitter_1->set);
         }
 
         if(isHidden()) ini->setValue("Show",false);
@@ -99,10 +104,6 @@ void FloppyWindow::LoadIni()
     {
         ini->beginGroup("FloppyWindow");
         if(ini->contains("Geometry")) restoreGeometry(ini->value("Geometry").toByteArray());
-        if(ini->contains("Splitter1Pos"))
-        {
-
-        }
         ini->endGroup();
 
         char group_name[32];
@@ -206,115 +207,104 @@ QString FloppyWindow::GetAktD64Name(int floppynr)
     return d64[floppynr].D64Name;
 }
 
-/*
-void FloppyWindow::RefreshD64Table(void)
-{
-    QString filename;
-    QString spur;
-    QString sektor;
-    QString adresse;
-    QString size;
-    QString typ;
-
-    unsigned short Adresse;
-    unsigned char Typ;
-    unsigned char Spur;
-    unsigned char Sektor;
-    unsigned short Laenge;
-
-    int floppy = ui->FloppySelect->currentIndex();
-    int d64_files = d64[floppy].DateiAnzahl;
-
-    WidgetD64File *w;
-
-    ui->DiskName->setText(d64[floppy].D64Name);
-
-    for(int i=0; i<MAX_D64_FILES;i++)
-    {
-        if(ui->D64Table->isRowHidden(i)) break;
-        ui->D64Table->setRowHidden(i,true);
-    }
-
-    for(int i=0; i<d64_files;i++)
-    {
-        if(MAX_D64_FILES == i) break;
-
-        w = (WidgetD64File*)ui->D64Table->cellWidget(i,0);
-
-        Adresse = d64[floppy].D64Files[i].Adresse;
-        Typ = d64[floppy].D64Files[i].Typ;
-        Spur = d64[floppy].D64Files[i].Track;
-        Sektor = d64[floppy].D64Files[i].Sektor;
-        Laenge = d64[floppy].D64Files[i].Laenge;
-
-        if((Adresse == 0x0801) && ((Typ & 0x07) == 2)) w->SetRMode(0);
-        else
-        {
-            if((Adresse < 0x0801) && ((Typ & 0x07) == 2)) w->SetRMode(1);
-            else w->SetRMode(2);
-        }
-        filename = d64[floppy].D64Files[i].Name;
-        filename = "   " + filename;
-        if(Typ & 0x40) typ = FileTypes[Typ&0x07] + "<";
-        else typ = FileTypes[Typ&0x07];
-        if(Typ & 0x80) typ = "  " + typ;
-        else typ = " *" + typ;
-
-
-        char str01[16];
-        sprintf(str01,"%2.2d",Sektor);
-        sektor = str01;
-
-        sprintf(str01,"%2.2d",Spur);
-        spur = str01;
-
-        sprintf(str01,"$%4.4X",Adresse);
-        adresse = str01;
-
-        sprintf(str01,"%d",Laenge);
-        size = str01;
-        size = " " + size;
-
-        w->SetLabels(filename,spur,sektor,adresse,size,typ);
-        ui->D64Table->setRowHidden(i,false);
-    }
-}
-*/
-
 void FloppyWindow::RefreshD64FileList()
 {
+    // D64 File-Anzeige löschen
     ui->D64FileTable->clear();
 
+    // Aktuell ausgewählte Floppy
     int floppy = ui->FloppySelect->currentIndex();
+    // Anzahl der Files
     int d64_files = d64[floppy].DateiAnzahl;
 
+    // D64 Name ermitteln und anzeigen
     ui->DiskName->setText(d64[floppy].D64Name);
 
-    ui->D64FileTable->setHorizontalHeaderLabels(QStringList() << "Filename");
+    // Headerlabels setzen
+    ui->D64FileTable->setHorizontalHeaderLabels(QStringList() << "" << "DATEI" << "SP" << "SK" << "ADR" << "SIZE" << "TYP");
 
+    // Anzahl der Zeilen setzen
     ui->D64FileTable->setRowCount(d64_files);
-
     for(int i=0; i<d64_files;i++)
     {
-        ui->D64FileTable->setCellWidget(i,0,new QLabel(d64[floppy].D64Files[i].Name));
-        ui->D64FileTable->cellWidget(i,0)->setFont(*c64_font);
+        // Icon in Abhängigkeit der Startbarkeit setzen
+        QTableWidgetItem *icon_item = new QTableWidgetItem;
+        if((d64[floppy].D64Files[i].Adresse==0x0801) && ((d64[floppy].D64Files[i].Typ & 7)==(2))) icon_item->setIcon(*green_led);
+        else
+        {
+            if((d64[floppy].D64Files[i].Adresse<0x0801) && ((d64[floppy].D64Files[i].Typ & 7)==(2))) icon_item->setIcon(*yellow_led);
+            else icon_item->setIcon(*red_led);
+        }
+        ui->D64FileTable->setItem(i,0,icon_item);
 
+        // Dateiname setzen
+        ui->D64FileTable->setCellWidget(i,1,new QLabel(d64[floppy].D64Files[i].Name));
+        ui->D64FileTable->cellWidget(i,1)->setFont(*c64_font);
+        QLabel* label = (QLabel*) ui->D64FileTable->cellWidget(i,1);
+        label->setAlignment(Qt::AlignTop);
+
+        // Spur setzen
+        ui->D64FileTable->setCellWidget(i,2,new QLabel(QVariant(d64[floppy].D64Files[i].Track).toString() + " "));
+        ui->D64FileTable->cellWidget(i,2)->setFont(*c64_font);
+        label = (QLabel*) ui->D64FileTable->cellWidget(i,2);
+        label->setAlignment(Qt::AlignTop | Qt::AlignRight);
+
+        // Sektor setzen
+        ui->D64FileTable->setCellWidget(i,3,new QLabel(QVariant(d64[floppy].D64Files[i].Sektor).toString() + " "));
+        ui->D64FileTable->cellWidget(i,3)->setFont(*c64_font);
+        label = (QLabel*) ui->D64FileTable->cellWidget(i,3);
+        label->setAlignment(Qt::AlignTop | Qt::AlignRight);
+
+        // Adresse setzen
+        QString str;
+        str.sprintf(" $%04X",d64[floppy].D64Files[i].Adresse);
+        ui->D64FileTable->setCellWidget(i,4,new QLabel(str));
+        ui->D64FileTable->cellWidget(i,4)->setFont(*c64_font);
+        label = (QLabel*) ui->D64FileTable->cellWidget(i,4);
+        label->setAlignment(Qt::AlignTop);
+
+        // Size setzen
+        ui->D64FileTable->setCellWidget(i,5,new QLabel(QVariant(d64[floppy].D64Files[i].Laenge).toString() + " "));
+        ui->D64FileTable->cellWidget(i,5)->setFont(*c64_font);
+        label = (QLabel*) ui->D64FileTable->cellWidget(i,5);
+        label->setAlignment(Qt::AlignTop | Qt::AlignRight);
+
+        // Typ setzen
+        QString strTyp;
+        int FileTyp = d64[floppy].D64Files[i].Typ;
+
+        if(FileTyp & 0x40) strTyp = FileTypes[FileTyp & 0x07] + "<";
+        else strTyp = FileTypes[FileTyp & 0x07];
+        if(FileTyp & 0x80) strTyp = " " + strTyp;
+        else strTyp = "*" + strTyp;
+
+        ui->D64FileTable->setCellWidget(i,6,new QLabel(strTyp));
+        ui->D64FileTable->cellWidget(i,6)->setFont(*c64_font);
+        label = (QLabel*) ui->D64FileTable->cellWidget(i,6);
+        label->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+
+
+
+        // Höhe der Zeile setzen
 #ifdef _WIN32
     ui->D64FileTable->setRowHeight(i,9);
-    ui->D64FileTable->cellWidget(i,0)->setFixedHeight(10);
+    ui->D64FileTable->cellWidget(i,1)->setFixedHeight(10);
 #endif
 
 #ifdef __linux__
     ui->D64FileTable->setRowHeight(i,8);
-    ui->D64FileTable->cellWidget(i,0)->setFixedHeight(9);
+    ui->D64FileTable->cellWidget(i,1)->setFixedHeight(9);
 #endif
 
-        QLabel* label = (QLabel*) ui->D64FileTable->cellWidget(i,0);
-        label->setAlignment(Qt::AlignTop);
+        if(!(FileTyp & 0x80) && !ui->ViewSplatFiles->isChecked())
+        {
+            ui->D64FileTable->setRowHeight(i,0);
+        }
+
     }
 }
 
-void FloppyWindow::on_splitter_1_splitterMoved(int pos, int index)
+void FloppyWindow::on_ViewSplatFiles_clicked()
 {
-    qDebug("Splitter1_Pos: %d, Splitter_1_index: %d\n",pos,index);
+    RefreshD64FileList();
 }

@@ -51,8 +51,7 @@ private slots:
     void OnRemoveImage(int floppynr);
     void OnCustomMenuRequested(QPoint pos);
     void OnD64KontexMenu(QAction *actions);
-
-    void on_splitter_1_splitterMoved(int pos, int index);
+    void on_ViewSplatFiles_clicked();
 
 private:
     Ui::FloppyWindow *ui;
