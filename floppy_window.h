@@ -51,7 +51,11 @@ private slots:
     void OnChangeFloppyNummer(int floppynr);
     void OnRemoveImage(int floppynr);
     void OnCustomMenuRequested(QPoint pos);
-    void OnD64KontexMenu(QAction *actions);
+    void OnD64FileStart0(bool);
+    void OnD64FileStart1(bool);
+    void OnD64FileStart2(bool);
+    void OnD64FileStart3(bool);
+    void OnD64FileExport(bool);
     void on_ViewSplatFiles_clicked();
 
 private:

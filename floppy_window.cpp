@@ -181,31 +181,51 @@ void FloppyWindow::on_FloppySelect_currentIndexChanged(int index)
 
 void FloppyWindow::OnCustomMenuRequested(QPoint pos)
 {
-    QModelIndex index= ui->D64FileTable->indexAt(pos);
+   // QModelIndex index= ui->D64FileTable->indexAt(pos);
 
     QMenu *menu=new QMenu(this);
-
-    QAction *action = new QAction(trUtf8("Laden und Starten mit Reset ohne Kernal"), this);
-    QFont font = action->font();
-    font.setBold(true);
-    action->setFont(font);
-    menu->addAction(action);
-
+    menu->addAction(new QAction(trUtf8("Laden und Starten mit Reset ohne Kernal"), this));
     menu->addAction(new QAction(trUtf8("Laden und Starten mit Reset"), this));
     menu->addAction(new QAction(trUtf8("Laden und Starten"), this));
     menu->addAction(new QAction(trUtf8("Laden"), this));
     menu->addAction(new QAction(trUtf8("Export"), this));
 
+    // Oberster Eintrag hervorheben
+    QFont font = menu->actions().at(0)->font();
+    font.setBold(true);
+    menu->actions().at(0)->setFont(font);
+
     menu->popup(ui->D64FileTable->viewport()->mapToGlobal(pos));
-    connect(menu,SIGNAL(triggered(QAction*)),this,SLOT(OnD64KontexMenu(QAction*)));
+    connect(menu->actions().at(0),SIGNAL(triggered(bool)),this,SLOT(OnD64FileStart0(bool)));
+    connect(menu->actions().at(1),SIGNAL(triggered(bool)),this,SLOT(OnD64FileStart1(bool)));
+    connect(menu->actions().at(2),SIGNAL(triggered(bool)),this,SLOT(OnD64FileStart2(bool)));
+    connect(menu->actions().at(3),SIGNAL(triggered(bool)),this,SLOT(OnD64FileStart3(bool)));
+    connect(menu->actions().at(4),SIGNAL(triggered(bool)),this,SLOT(OnD64FileExport(bool)));
 }
 
-void FloppyWindow::OnD64KontexMenu(QAction *actions)
+void FloppyWindow::OnD64FileStart0(bool)
 {
-    if(actions->text() == "Export --> PRG")
-    {
-        //d64[0].ExportPrg(ui->D64Table->currentRow(),"/home/thorsten/test.prg");
-    }
+    qDebug("Start0");
+}
+
+void FloppyWindow::OnD64FileStart1(bool)
+{
+    qDebug("Start1");
+}
+
+void FloppyWindow::OnD64FileStart2(bool)
+{
+    qDebug("Start2");
+}
+
+void FloppyWindow::OnD64FileStart3(bool)
+{
+    qDebug("Start3");
+}
+
+void FloppyWindow::OnD64FileExport(bool)
+{
+    qDebug("Export");
 }
 
 QString FloppyWindow::GetAktFilename(int floppynr)
