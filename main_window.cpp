@@ -213,7 +213,7 @@ void MainWindow::OnInit()
     LogText(trUtf8(">> C64KeyboardWindow wurde erzeugt\n").toLatin1().data());
 
     splash->showStatusMessage(trUtf8("CRTWindow wird erstellt."),Qt::darkBlue);
-    crt_window = new CrtWindow(this,ini);
+    crt_window = new CrtWindow(this,ini,c64);
     LogText(trUtf8(">> CrtWindow wurde erzeugt\n").toLatin1().data());
 
     splash->showStatusMessage(trUtf8("DebuggerWindow wird erstellt."),Qt::darkBlue);
@@ -247,10 +247,8 @@ void MainWindow::OnInit()
     splash->showStatusMessage(trUtf8("C64 Speed Window wird mit C64 Klasse verbunden."),Qt::darkBlue);
     speed_window->SetC64Pointer(c64);
 
-    /// CRT Klasse mit CRT Window verbinden ///
-    splash->showStatusMessage(trUtf8("CRT Window wird mit CRT Klasee verbunden."),Qt::darkBlue);
-    crt_window->crt = c64->crt;
-    crt_window->c64 = c64;
+    /// CRT LED mit CRT_Window verbinden ///
+    splash->showStatusMessage(trUtf8("CRT LED mit CRT Window verbunden."),Qt::darkBlue);
     c64->crt->ChangeLED = bind(&CrtWindow::ChangeLED,crt_window,_1,_2);
 
     /// C64 Systemroms laden ///

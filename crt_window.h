@@ -24,8 +24,6 @@
 #include "c64_class.h"
 #include "structs.h"
 
-
-
 namespace Ui {
     class CrtWindow;
 }
@@ -35,15 +33,12 @@ class CrtWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit CrtWindow(QWidget *parent = 0, QSettings *ini = 0);
+    explicit CrtWindow(QWidget *parent = 0, QSettings *ini = 0, C64Class *c64 = 0);
     ~CrtWindow();
     void LoadIni(void);
     void RetranslateUi();
     void showEvent(QShowEvent *event);
     void ChangeLED(int,bool);
-
-    CRTClass *crt;
-    C64Class *c64;
 
 private slots:
     void on_ViewChipData_clicked();
@@ -59,6 +54,8 @@ private slots:
 
 private:
     Ui::CrtWindow *ui;
+    CRTClass *crt;
+    C64Class *c64;
     QSettings *ini;
     bool isOneShowed;
     bool ChipDataExpand;

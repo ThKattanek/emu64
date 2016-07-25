@@ -19,12 +19,14 @@
 #include "crt_window.h"
 #include "ui_crt_window.h"
 
-CrtWindow::CrtWindow(QWidget *parent, QSettings *_ini) :
+CrtWindow::CrtWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
     QDialog(parent),
     ui(new Ui::CrtWindow)
 {
     ini = _ini;
-    crt = 0;
+
+    this->c64 = c64;
+    crt = c64->crt;
 
     ui->setupUi(this);
 
