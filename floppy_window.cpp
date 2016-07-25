@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.07.2016                //
+// Letzte Änderung am 25.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -22,13 +22,16 @@
 
 #define MAX_D64_FILES 128
 
-FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini) :
+FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QString tmp_path) :
     QDialog(parent),
     ui(new Ui::FloppyWindow),
     isOneShowed(false)
 {
     ini = _ini;
     ui->setupUi(this);
+
+    this->c64 = c64;
+    this->TmpPath = tmp_path;
 
     FileTypes = QStringList() << "DEL" << "SEQ" << "PRG" << "USR" << "REL" << "CBM" << "E00" << "E?C";
 
@@ -48,7 +51,7 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini) :
     // Spalten für D64 Datei-Anzeige hinzufügen
     ui->D64FileTable->setColumnCount(7);
     ui->D64FileTable->setColumnWidth(0,20);
-    ui->D64FileTable->setColumnWidth(1,132);
+    ui->D64FileTable->setColumnWidth(1,140);
     ui->D64FileTable->setColumnWidth(2,30);
     ui->D64FileTable->setColumnWidth(3,30);
     ui->D64FileTable->setColumnWidth(4,55);
@@ -181,8 +184,6 @@ void FloppyWindow::on_FloppySelect_currentIndexChanged(int index)
 
 void FloppyWindow::OnCustomMenuRequested(QPoint pos)
 {
-   // QModelIndex index= ui->D64FileTable->indexAt(pos);
-
     QMenu *menu=new QMenu(this);
     menu->addAction(new QAction(trUtf8("Laden und Starten mit Reset ohne Kernal"), this));
     menu->addAction(new QAction(trUtf8("Laden und Starten mit Reset"), this));
@@ -205,27 +206,34 @@ void FloppyWindow::OnCustomMenuRequested(QPoint pos)
 
 void FloppyWindow::OnD64FileStart0(bool)
 {
-    qDebug("Start0");
+    int file_index = ui->D64FileTable->currentIndex().row();
+    int floppy_nr = ui->FloppySelect->currentIndex();
+    QString FileName = TmpPath + "/tmp.prg";
+
+    if(d64[floppy_nr].ExportPrg(file_index,FileName.toAscii().data()))
+    {
+        c64->LoadAutoRun(floppy_nr,FileName.toAscii().data());
+    }
 }
 
 void FloppyWindow::OnD64FileStart1(bool)
 {
-    qDebug("Start1");
+    int file_index = ui->D64FileTable->currentIndex().row();
 }
 
 void FloppyWindow::OnD64FileStart2(bool)
 {
-    qDebug("Start2");
+    int file_index = ui->D64FileTable->currentIndex().row();
 }
 
 void FloppyWindow::OnD64FileStart3(bool)
 {
-    qDebug("Start3");
+    int file_index = ui->D64FileTable->currentIndex().row();
 }
 
 void FloppyWindow::OnD64FileExport(bool)
 {
-    qDebug("Export");
+    int file_index = ui->D64FileTable->currentIndex().row();
 }
 
 QString FloppyWindow::GetAktFilename(int floppynr)
@@ -341,4 +349,9 @@ void FloppyWindow::RefreshD64FileList()
 void FloppyWindow::on_ViewSplatFiles_clicked()
 {
     RefreshD64FileList();
+}
+
+void FloppyWindow::on_D64FileTable_cellDoubleClicked(int row, int column)
+{
+    OnD64FileStart0(0);
 }

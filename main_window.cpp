@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.05.2016                //
+// Letzte Änderung am 25.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -89,6 +89,9 @@ MainWindow::~MainWindow()
 
     LogText(trUtf8("\n>> Emu64 wurde sauber beendet...").toLatin1().data());
     delete log;
+
+    // Temporäre Dateien löschen
+    QFile::remove(tmpPath + "/tmp.prg");
 }
 
 void MainWindow::OnInit()
@@ -104,6 +107,10 @@ void MainWindow::OnInit()
 #ifdef __linux__
     dataPath = "/usr/share/emu64";
 #endif
+
+
+    tmpPath = QDir::tempPath();
+    LogText((QString(">> TEMP Path = ") + tmpPath + QString("\n")).toAscii());
 
     splash->setMessageRect(QRect(0,303,400, 20), Qt::AlignCenter);
 
@@ -205,7 +212,7 @@ void MainWindow::OnInit()
     LogText(trUtf8(">> TVSetupWindow wurde erzeugt\n").toLatin1().data());
 
     splash->showStatusMessage(trUtf8("FloppyWindow wird erstellt."),Qt::darkBlue);
-    floppy_window = new FloppyWindow(this,ini);
+    floppy_window = new FloppyWindow(this,ini,c64,tmpPath);
     LogText(trUtf8(">> FloppyWindow wurde erzeugt\n").toLatin1().data());
 
     splash->showStatusMessage(trUtf8("C64KeyboardWindow wird erstellt."),Qt::darkBlue);
