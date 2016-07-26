@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.07.2016                //
+// Letzte Änderung am 26.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -219,21 +219,27 @@ void FloppyWindow::OnD64FileStart0(bool)
 void FloppyWindow::OnD64FileStart1(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
+    int floppy_nr = ui->FloppySelect->currentIndex();
+    c64->LoadPRGFromD64(floppy_nr,d64[floppy_nr].D64Files[file_index].Name,0);
 }
 
 void FloppyWindow::OnD64FileStart2(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
+    int floppy_nr = ui->FloppySelect->currentIndex();
+    c64->LoadPRGFromD64(floppy_nr,d64[floppy_nr].D64Files[file_index].Name,1);
 }
 
 void FloppyWindow::OnD64FileStart3(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
+    int floppy_nr = ui->FloppySelect->currentIndex();
+    c64->LoadPRGFromD64(floppy_nr,d64[floppy_nr].D64Files[file_index].Name,2);
 }
 
 void FloppyWindow::OnD64FileExport(bool)
 {
-    int file_index = ui->D64FileTable->currentIndex().row();
+    //int file_index = ui->D64FileTable->currentIndex().row();
 }
 
 QString FloppyWindow::GetAktFilename(int floppynr)

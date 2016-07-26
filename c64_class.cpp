@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.07.2016                //
+// Letzte Änderung am 26.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1033,6 +1033,31 @@ bool C64Class::LoadDiskImage(int floppy_nr, char *filename)
         return floppy[floppy_nr]->LoadDiskImage(filename);
     }
     return false;
+}
+
+void C64Class::LoadPRGFromD64(int floppy_nr, char *c64_filename, int command)
+{
+    char str00[1024];
+    KillCommandLine();
+
+    switch (command)
+    {
+    case 0:
+        HardReset();
+        SDL_Delay(1000);
+        //sprintf(str00,"LOAD\"%s\",%d,1%c",c64_filename,floppy_nr+8,13);
+        sprintf(str00,"LOAD\"%s\",%d,1%cRUN%c",c64_filename,floppy_nr+8,13,13);
+        SetCommandLine(str00);
+        break;
+    case 1:
+        sprintf(str00,"LOAD\"%s\",%d,1%cRUN%c",c64_filename,floppy_nr+8,13,13);
+        SetCommandLine(str00);
+        break;
+    case 2:
+        sprintf(str00,"LOAD\"%s\",%d,1%c",c64_filename,floppy_nr+8,13);
+        SetCommandLine(str00);
+        break;
+    }
 }
 
 void C64Class::SetCommandLine(char* c64_command)
