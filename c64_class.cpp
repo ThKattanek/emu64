@@ -1044,8 +1044,7 @@ void C64Class::LoadPRGFromD64(int floppy_nr, char *c64_filename, int command)
     {
     case 0:
         HardReset();
-        SDL_Delay(1000);
-        //sprintf(str00,"LOAD\"%s\",%d,1%c",c64_filename,floppy_nr+8,13);
+        SDL_Delay(100);
         sprintf(str00,"LOAD\"%s\",%d,1%cRUN%c",c64_filename,floppy_nr+8,13,13);
         SetCommandLine(str00);
         break;
