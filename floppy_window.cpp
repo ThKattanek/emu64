@@ -16,6 +16,8 @@
 #include <QFontDatabase>
 #include <QDebug>
 #include <QMenu>
+#include <QFileDialog>
+#include <QMessageBox>
 
 #include "floppy_window.h"
 #include "ui_floppy_window.h"
@@ -62,6 +64,7 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QStr
     ui->FileBrowser->SetFileFilter(QStringList()<<"*.d64"<<"*.g64");
 
     // Kontextmenü erstellen
+    CompatibleMMCFileName = false;
     ui->D64FileTable->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->D64FileTable, SIGNAL(customContextMenuRequested(QPoint)),SLOT(OnCustomMenuRequested(QPoint)));
 }
@@ -75,6 +78,7 @@ FloppyWindow::~FloppyWindow()
         if(isOneShowed)
         {
             ini->setValue("Geometry",saveGeometry());
+            ini->setValue("PrgExportMMCCompatible",CompatibleMMCFileName);
         }
 
         if(isHidden()) ini->setValue("Show",false);
@@ -107,6 +111,7 @@ void FloppyWindow::LoadIni()
     {
         ini->beginGroup("FloppyWindow");
         if(ini->contains("Geometry")) restoreGeometry(ini->value("Geometry").toByteArray());
+        CompatibleMMCFileName = ini->value("PrgExportMMCCompatible", true).toBool();
         ini->endGroup();
 
         char group_name[32];
@@ -189,7 +194,15 @@ void FloppyWindow::OnCustomMenuRequested(QPoint pos)
     menu->addAction(new QAction(trUtf8("Laden und Starten mit Reset"), this));
     menu->addAction(new QAction(trUtf8("Laden und Starten"), this));
     menu->addAction(new QAction(trUtf8("Laden"), this));
-    menu->addAction(new QAction(trUtf8("Export"), this));
+
+    QMenu *menu_export = new QMenu(this);
+    menu_export->setTitle("Export");
+    menu_export->addAction(new QAction(trUtf8("Deitei exportieren"), this));
+    menu_export->addAction(new QAction(trUtf8("Dateiname MMC/SD2IEC kompatibel"), this));
+    menu_export->actions().at(1)->setCheckable(true);
+    menu_export->actions().at(1)->setChecked(CompatibleMMCFileName);
+
+    menu->addMenu(menu_export);
 
     // Oberster Eintrag hervorheben
     QFont font = menu->actions().at(0)->font();
@@ -201,7 +214,8 @@ void FloppyWindow::OnCustomMenuRequested(QPoint pos)
     connect(menu->actions().at(1),SIGNAL(triggered(bool)),this,SLOT(OnD64FileStart1(bool)));
     connect(menu->actions().at(2),SIGNAL(triggered(bool)),this,SLOT(OnD64FileStart2(bool)));
     connect(menu->actions().at(3),SIGNAL(triggered(bool)),this,SLOT(OnD64FileStart3(bool)));
-    connect(menu->actions().at(4),SIGNAL(triggered(bool)),this,SLOT(OnD64FileExport(bool)));
+    connect(menu_export->actions().at(0),SIGNAL(triggered(bool)),this,SLOT(OnPRGExport(bool)));
+    connect(menu_export->actions().at(1),SIGNAL(triggered(bool)),this,SLOT(OnPRGNameMMCKompatibel(bool)));
 }
 
 void FloppyWindow::OnD64FileStart0(bool)
@@ -237,9 +251,53 @@ void FloppyWindow::OnD64FileStart3(bool)
     c64->LoadPRGFromD64(floppy_nr,d64[floppy_nr].D64Files[file_index].Name,2);
 }
 
-void FloppyWindow::OnD64FileExport(bool)
+void FloppyWindow::OnPRGExport(bool)
 {
-    //int file_index = ui->D64FileTable->currentIndex().row();
+    int file_index = ui->D64FileTable->currentIndex().row();
+    int floppy_nr = ui->FloppySelect->currentIndex();
+
+    // Alle nichterlaubten Zeichen in einem Dateinamen entfernen.
+    char c64_filename[17];
+    for (int i=0;i<17;i++)
+    {
+       c64_filename[i] = d64[floppy_nr].D64Files[file_index].Name[i];
+       if(c64_filename[i]=='/') c64_filename[i]=' ';
+       if(c64_filename[i]=='\\') c64_filename[i]=' ';
+       if(c64_filename[i]==':') c64_filename[i]=' ';
+       if(c64_filename[i]=='<') c64_filename[i]=' ';
+       if(c64_filename[i]=='>') c64_filename[i]=' ';
+       if(c64_filename[i]=='.') c64_filename[i]=' ';
+    }
+    c64_filename[16] = 0;
+
+    QString filename = QString(c64_filename);
+    QString fileext = FileTypes[d64[floppy_nr].D64Files[file_index].Typ & 7];
+
+    if(CompatibleMMCFileName)
+    {
+        filename = filename.toLower();
+        fileext = fileext.toLower();
+    }
+
+    if(c64 == NULL) return;
+
+    if(!getSaveFileName(this,trUtf8("C64 Datei Exportieren"),trUtf8("C64 Programmdatei ") + "(*.prg *.seq *.usr *.rel *.cbm *.e00 *.del);;" + trUtf8("Alle Dateien ") + "(*.*)",&filename,&fileext))
+        return;
+
+    if(filename != "")
+    {
+        if(!d64[floppy_nr].ExportPrg(file_index,filename.toAscii().data()))
+        {
+            QMessageBox::critical(this,"C64 Datei Export","Fehler beim exportieren der C64 Datei.\nDie Datei konnte nicht exortiert.");
+        }
+    }
+}
+
+void FloppyWindow::OnPRGNameMMCKompatibel(bool)
+{
+    if(CompatibleMMCFileName)
+        CompatibleMMCFileName = false;
+    else CompatibleMMCFileName = true;
 }
 
 QString FloppyWindow::GetAktFilename(int floppynr)
@@ -360,4 +418,52 @@ void FloppyWindow::on_ViewSplatFiles_clicked()
 void FloppyWindow::on_D64FileTable_cellDoubleClicked(int row, int column)
 {
     OnD64FileStart0(0);
+}
+
+bool FloppyWindow::getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt)
+{
+   if (fileName == NULL)      // "parent" is allowed to be NULL!
+      return false;
+
+   QFileDialog saveDialog(parent);
+   saveDialog.setWindowTitle(caption);
+   saveDialog.setAcceptMode(QFileDialog::AcceptSave);
+   saveDialog.setConfirmOverwrite(false);
+   saveDialog.setFilter(filter);
+   saveDialog.selectFile(*fileName);
+   saveDialog.setDefaultSuffix(*fileExt);
+   saveDialog.setOptions(QFileDialog::DontUseNativeDialog);
+
+   *fileName = "";
+
+   if (!saveDialog.exec())
+      return false;      // User pressed "Cancel"
+
+   QStringList fileList = saveDialog.selectedFiles();
+   if (fileList.count() != 1)
+      return false;      // Should not happen, just to be sure
+
+   QString tmpFileName = fileList.at(0);
+   QString extension;
+
+   QFileInfo fileInfo(tmpFileName);
+   if (fileInfo.suffix().isEmpty()) {
+      // Add the suffix selected by the user
+
+      extension = saveDialog.selectedFilter();
+      extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
+      extension = extension.left(extension.indexOf(")"));
+      extension = extension.simplified();
+
+      // If the filter specifies more than one extension, choose the first one
+      if (extension.indexOf(" ") != -1)
+         extension = extension.left(extension.indexOf(" "));
+
+      tmpFileName = tmpFileName + QString(".") + extension;
+      fileInfo.setFile(tmpFileName);
+   }
+
+   *fileName = tmpFileName;
+   *fileExt = extension;
+   return true;
 }
