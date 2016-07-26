@@ -48,7 +48,6 @@ SOURCES += \
     widget_memory_zeile.cpp \
     widget_bit_leiste.cpp \
     setup_window.cpp \
-    widget_d64_file.cpp \
     debugger_vic_window.cpp \
     single_application.cpp \
     button_mod.cpp \
@@ -102,7 +101,6 @@ HEADERS  += \
     widget_memory_zeile.h \
     widget_bit_leiste.h \
     setup_window.h \
-    widget_d64_file.h \
     debugger_vic_window.h \
     single_application.h \
     button_mod.h \
@@ -131,7 +129,6 @@ FORMS    += \
     widget_memory_zeile.ui \
     widget_bit_leiste.ui \
     setup_window.ui \
-    widget_d64_file.ui \
     debugger_vic_window.ui \
     c64_speed_window.ui \
     debugger_iec_window.ui

@@ -61,5 +61,12 @@
         <file>grafik/emu64_logo_120_120.png</file>
         <file>grafik/toolbar32/speed.png</file>
         <file>grafik/action_replay_logo.png</file>
+        <file>grafik/go-up.png</file>
+        <file>grafik/green_led_8x8.png</file>
+        <file>grafik/red_led_8x8.png</file>
+        <file>grafik/yellow_led_8x8.png</file>
+        <file>grafik/green_led_7x7.png</file>
+        <file>grafik/red_led_7x7.png</file>
+        <file>grafik/yellow_led_7x7.png</file>
     </qresource>
 </RCC>

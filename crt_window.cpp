@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.05.2016                //
+// Letzte Änderung am 25.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,12 +19,14 @@
 #include "crt_window.h"
 #include "ui_crt_window.h"
 
-CrtWindow::CrtWindow(QWidget *parent, QSettings *_ini) :
+CrtWindow::CrtWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
     QDialog(parent),
     ui(new Ui::CrtWindow)
 {
     ini = _ini;
-    crt = 0;
+
+    this->c64 = c64;
+    crt = c64->crt;
 
     ui->setupUi(this);
 

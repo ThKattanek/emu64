@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>593</width>
-    <height>319</height>
+    <width>692</width>
+    <height>424</height>
    </rect>
   </property>
   <property name="font">
@@ -20,10 +20,7 @@
   <property name="windowTitle">
    <string>Floppy 1541 II (Diskeditor)</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
-   <property name="margin">
-    <number>1</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <property name="spacing">
@@ -69,25 +66,20 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <property name="spacing">
-      <number>0</number>
+    <widget class="QSplitter" name="splitter_1">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <item>
-      <widget class="WidgetFileBrowse" name="FileBrowser" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>200</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
+     <widget class="WidgetFileBrowse" name="FileBrowser" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>200</width>
+        <height>0</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout">
-       <property name="spacing">
-        <number>0</number>
-       </property>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <property name="spacing">
@@ -96,6 +88,34 @@
          <property name="sizeConstraint">
           <enum>QLayout::SetDefaultConstraint</enum>
          </property>
+         <item>
+          <widget class="QLabel" name="DiskName">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(50, 50, 255);</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <property name="lineWidth">
+            <number>1</number>
+           </property>
+           <property name="text">
+            <string>Name</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+           </property>
+          </widget>
+         </item>
          <item>
           <spacer name="horizontalSpacer_2">
            <property name="orientation">
@@ -106,84 +126,120 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>25</width>
+             <width>0</width>
              <height>10</height>
             </size>
            </property>
           </spacer>
          </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="D64FileTable">
+         <property name="palette">
+          <palette>
+           <active>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>0</red>
+               <green>0</green>
+               <blue>100</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>0</red>
+               <green>0</green>
+               <blue>100</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="showGrid">
+          <bool>false</bool>
+         </property>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLabel" name="label">
-           <property name="font">
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
+          <widget class="QCheckBox" name="D64FileTableBigSize">
            <property name="text">
-            <string>Name</string>
+            <string>BigSize</string>
            </property>
           </widget>
          </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
-         <property name="spacing">
-          <number>0</number>
-         </property>
          <item>
-          <widget class="QTableWidget" name="D64Table">
-           <property name="minimumSize">
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
             <size>
-             <width>385</width>
-             <height>0</height>
+             <width>20</width>
+             <height>20</height>
             </size>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>385</width>
-             <height>16777215</height>
-            </size>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="ViewSplatFiles">
+           <property name="text">
+            <string>Gelöschte Dateien (Splat-Files) anzeigen</string>
            </property>
-           <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
-           </property>
-           <property name="selectionMode">
-            <enum>QAbstractItemView::SingleSelection</enum>
-           </property>
-           <property name="selectionBehavior">
-            <enum>QAbstractItemView::SelectItems</enum>
-           </property>
-           <property name="showGrid">
-            <bool>false</bool>
-           </property>
-           <attribute name="horizontalHeaderVisible">
-            <bool>false</bool>
-           </attribute>
-           <attribute name="horizontalHeaderHighlightSections">
-            <bool>false</bool>
-           </attribute>
-           <attribute name="verticalHeaderVisible">
-            <bool>false</bool>
-           </attribute>
-           <attribute name="verticalHeaderHighlightSections">
-            <bool>false</bool>
-           </attribute>
           </widget>
          </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <property name="spacing">
-          <number>0</number>
-         </property>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
         </layout>
        </item>
       </layout>
-     </item>
-    </layout>
+     </widget>
+    </widget>
    </item>
   </layout>
  </widget>
