@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.07.2016                //
+// Letzte Änderung am 27.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -43,14 +43,14 @@ public:
 private slots:
     void on_ViewChipData_clicked();
     void on_NewEasyFlashCRT_clicked();
-    void onSelectFile(QString filename);
     void on_InsertCRT_clicked();
-    void onChipList_currentChanged(const QModelIndex &current, const QModelIndex &previous);
     void on_RemoveCRT_clicked();
     void on_FreezButtonFC3_clicked();
     void on_EF_JUMPER0_toggled(bool checked);
-
     void on_FreezButtonAR_clicked();
+
+    void onSelectFile(QString filename);
+    void onChipList_currentChanged(const QModelIndex &current, const QModelIndex &previous);
 
 private:
     Ui::CrtWindow *ui;

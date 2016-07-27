@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.07.2016                //
+// Letzte Änderung am 27.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -38,6 +38,9 @@ public:
     void SetAktDir(QString akt_dir);
     void SetAktFile(QString akt_dir, QString akt_file);
     ~WidgetFileBrowse();
+
+signals:
+    void FileDoubleClick(void);
 
 private slots:
     void on_listWidget_zip_itemSelectionChanged();

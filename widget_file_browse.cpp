@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.07.2016                //
+// Letzte Änderung am 27.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -130,6 +130,7 @@ void WidgetFileBrowse::on_listView_filebrowser_doubleClicked(const QModelIndex &
         akt_fullpath = dirmodel->filePath(index);
         ui->AktPath->setText(akt_fullpath);
     }
+    else emit FileDoubleClick();
 }
 
 void WidgetFileBrowse::on_to_parent_clicked()
