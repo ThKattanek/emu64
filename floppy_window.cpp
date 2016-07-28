@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.07.2016                //
+// Letzte Änderung am 27.07.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -78,6 +78,7 @@ FloppyWindow::~FloppyWindow()
         if(isOneShowed)
         {
             ini->setValue("Geometry",saveGeometry());
+            ini->setValue("ViewSplatFile",ui->ViewSplatFiles->isChecked());
             ini->setValue("PrgExportMMCCompatible",CompatibleMMCFileName);
         }
 
@@ -111,6 +112,7 @@ void FloppyWindow::LoadIni()
     {
         ini->beginGroup("FloppyWindow");
         if(ini->contains("Geometry")) restoreGeometry(ini->value("Geometry").toByteArray());
+        ui->ViewSplatFiles->setChecked(ini->value("ViewSplatFile",false).toBool());
         CompatibleMMCFileName = ini->value("PrgExportMMCCompatible", true).toBool();
         ini->endGroup();
 
