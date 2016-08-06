@@ -81,6 +81,8 @@ FloppyWindow::~FloppyWindow()
         {
             ini->setValue("Geometry",saveGeometry());
             ini->setValue("ViewSplatFile",ui->ViewSplatFiles->isChecked());
+            ini->setValue("D64ViewBigSize",ui->D64FileTableBigSize->isChecked());
+
             ini->setValue("PrgExportMMCCompatible",CompatibleMMCFileName);
         }
 
@@ -115,6 +117,7 @@ void FloppyWindow::LoadIni()
         ini->beginGroup("FloppyWindow");
         if(ini->contains("Geometry")) restoreGeometry(ini->value("Geometry").toByteArray());
         ui->ViewSplatFiles->setChecked(ini->value("ViewSplatFile",false).toBool());
+        ui->D64FileTableBigSize->setChecked(ini->value("D64ViewBigSize",false).toBool());
         CompatibleMMCFileName = ini->value("PrgExportMMCCompatible", true).toBool();
         ini->endGroup();
 
@@ -172,7 +175,6 @@ void FloppyWindow::OnSelectFile(QString filename)
 
 void FloppyWindow::OnChangeFloppyNummer(int floppynr)
 {
-    show();
     ui->FloppySelect->setCurrentIndex(floppynr);
 }
 
