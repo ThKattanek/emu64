@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.07.2016                //
+// Letzte Änderung am 06.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1059,6 +1059,11 @@ void C64Class::LoadPRGFromD64(int floppy_nr, char *c64_filename, int command)
         SetCommandLine(str00);
         break;
     }
+}
+
+void C64Class::SetFloppyWriteProtect(int floppy_nr, bool status)
+{
+    floppy[floppy_nr]->SetWriteProtect(status);
 }
 
 void C64Class::SetCommandLine(char* c64_command)

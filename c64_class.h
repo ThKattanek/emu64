@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.07.2016                //
+// Letzte Änderung am 06.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -64,6 +64,7 @@ public:
     bool LoadFloppyRom(int floppy_nr,char *dos1541rom);
     bool LoadDiskImage(int floppy_nr,char *filename);
     void LoadPRGFromD64(int floppy_nr,char *c64_filename,int command);
+    void SetFloppyWriteProtect(int floppy_nr, bool status);
     void SetCommandLine(char *c64_command);
     void KillCommandLine(void);
     unsigned char ReadC64Byte(unsigned short adresse);
