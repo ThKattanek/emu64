@@ -210,6 +210,9 @@ bool Floppy1541::LoadDiskImage(char* filename)
 
     if(0==strcmp("D64",EXT))
     {
+        // Image wird immer erst WriteProtect gesetzt
+        SetWriteProtect(true);
+
         // Diskwechsel simulieren
         StartDiskChange();
 
@@ -242,6 +245,9 @@ bool Floppy1541::LoadDiskImage(char* filename)
         unsigned short  tracksize;
         unsigned short trackpos[84];
         unsigned short trackspeed[84];
+
+        // Image wird immer erst WriteProtect gesetzt
+        SetWriteProtect(true);
 
         // Diskwechsel simulieren
         StartDiskChange();
