@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.07.2016                //
+// Letzte Änderung am 06.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,6 +18,7 @@
 
 #include <QWidget>
 #include <QFileSystemModel>
+#include <QMessageBox>
 
 #include "quazip/quazip.h"
 #include "quazip/quazipfile.h"
@@ -37,16 +38,20 @@ public:
     QString GetAktFile(void);
     void SetAktDir(QString akt_dir);
     void SetAktFile(QString akt_dir, QString akt_file);
+    void EnableWriteProtectCheck(bool enabled);
+    bool isFileWriteProtect(QString filename);
     ~WidgetFileBrowse();
 
 signals:
     void FileDoubleClick(void);
+    void WriteProtectedChanged(bool status);    // true = Schreibgeschützt
 
 private slots:
     void on_listWidget_zip_itemSelectionChanged();
     void on_listView_filebrowser_doubleClicked(const QModelIndex &index);
     void on_to_parent_clicked();
     void on_listView_filebrowser_clicked(const QModelIndex &index);
+    void on_WriteProtected_clicked(bool checked);
 
 private:
     Ui::WidgetFileBrowse *ui;

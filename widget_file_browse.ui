@@ -100,6 +100,21 @@
        </property>
       </widget>
      </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QCheckBox" name="WriteProtected">
+         <property name="toolTip">
+          <string>Setzt den Schreibschutz der Datei.
+Ein nachträgliches setzen verhindert das überschreiben des Images.</string>
+         </property>
+         <property name="text">
+          <string>Disk Schreibschutz</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
     </layout>
    </item>
   </layout>

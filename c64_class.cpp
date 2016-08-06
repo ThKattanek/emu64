@@ -1063,6 +1063,8 @@ void C64Class::LoadPRGFromD64(int floppy_nr, char *c64_filename, int command)
 
 void C64Class::SetFloppyWriteProtect(int floppy_nr, bool status)
 {
+    if(floppy_nr < 0 || floppy_nr > 3) return;
+
     floppy[floppy_nr]->SetWriteProtect(status);
 }
 

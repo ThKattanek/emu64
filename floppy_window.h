@@ -8,15 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.07.2016                //
+// Letzte Änderung am 06.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #ifndef FLOPPY_WINDOW_H
 #define FLOPPY_WINDOW_H
-
-#define FloppyAnzahl 4
 
 #include <QDialog>
 #include <QMenu>
@@ -48,6 +46,7 @@ signals:
 private slots:
     void on_FloppySelect_currentIndexChanged(int index);
     void on_ViewSplatFiles_clicked();
+    void on_D64FileTable_cellDoubleClicked(int, int);
 
     void OnSelectFile(QString filename);
     void OnChangeFloppyNummer(int floppynr);
@@ -59,7 +58,7 @@ private slots:
     void OnD64FileStart3(bool);
     void OnPRGExport(bool);
     void OnPRGNameMMCKompatibel(bool);
-    void on_D64FileTable_cellDoubleClicked(int, int);
+    void OnWriteProtectedChanged(bool);
 
 private:
     void RefreshD64FileList(void);

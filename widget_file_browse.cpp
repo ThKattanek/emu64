@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.07.2016                //
+// Letzte Änderung am 06.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -28,6 +28,9 @@ WidgetFileBrowse::WidgetFileBrowse(QWidget *parent) :
 
     ui->listWidget_zip->setMinimumHeight(0);
     ui->listWidget_zip->setMaximumHeight(0);
+
+    // Schreibschutzoption defaultmäßig verbergen
+    ui->WriteProtected->setVisible(false);
 
     dirmodel = new QFileSystemModel(this);
     dirmodel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files | QDir::AllEntries);
@@ -85,7 +88,23 @@ void WidgetFileBrowse::SetAktFile(QString akt_dir, QString akt_file)
     QModelIndex idx = dirmodel->index(akt_dir + "/" + akt_file);
     ui->listView_filebrowser->setCurrentIndex(idx);
     ui->listView_filebrowser->scrollTo(idx,QAbstractItemView::PositionAtCenter);
+
+    on_listView_filebrowser_clicked(idx);
+
     emit select_file(dirmodel->fileInfo(idx).absoluteFilePath());
+}
+
+void WidgetFileBrowse::EnableWriteProtectCheck(bool enabled)
+{
+    ui->WriteProtected->setVisible(enabled);
+}
+
+bool WidgetFileBrowse::isFileWriteProtect(QString filename)
+{
+    QFileInfo file(filename);
+    QFile::Permissions permissions = file.permissions();
+
+    return !permissions.testFlag(QFile::WriteOwner);
 }
 
 void WidgetFileBrowse::on_listWidget_zip_itemSelectionChanged()
@@ -149,11 +168,19 @@ void WidgetFileBrowse::on_listView_filebrowser_clicked(const QModelIndex &index)
         // Kein Verzeichnis
         QString AktFileName = dirmodel->filePath(index);
 
+        emit select_file(AktFileName);
+
         if("ZIP" == AktFileName.right(3).toUpper())
         {
             ui->listWidget_zip->clear();
             ui->listWidget_zip->setMaximumHeight(120);
             ui->listWidget_zip->setMinimumHeight(120);
+
+            ui->WriteProtected->setChecked(true);
+            ui->WriteProtected->setEnabled(false);
+
+            if(ui->WriteProtected->isVisible())
+                emit WriteProtectedChanged(true);
 
             QuaZip zip(AktFileName);
             if(zip.open(QuaZip::mdUnzip))
@@ -173,12 +200,57 @@ void WidgetFileBrowse::on_listView_filebrowser_clicked(const QModelIndex &index)
         {
             ui->listWidget_zip->setMaximumHeight(0);
             ui->listWidget_zip->setMinimumHeight(0);
+            ui->WriteProtected->setEnabled(true);
+
+            QFileInfo file(AktFileName);
+            QFile::Permissions permissions = file.permissions();
+
+            bool wp = !permissions.testFlag(QFile::WriteOwner);
+
+            ui->WriteProtected->setChecked(wp);
+
+            if(ui->WriteProtected->isVisible())
+            {
+                emit WriteProtectedChanged(wp);
+            }
         }
-        emit select_file(dirmodel->filePath(index));
     }
     else
     {
         ui->listWidget_zip->setMaximumHeight(0);
         ui->listWidget_zip->setMinimumHeight(0);
+    }
+}
+
+void WidgetFileBrowse::on_WriteProtected_clicked(bool checked)
+{
+    QString AktFileName = dirmodel->filePath(ui->listView_filebrowser->currentIndex());
+    QFile file(AktFileName);
+    QFile::Permissions permissions;
+
+    if(checked)
+    {
+        file.setPermissions(QFile::ReadOwner | QFile::ReadGroup | QFile::ReadOther);
+
+        permissions = QFileInfo(AktFileName).permissions();
+
+        if(permissions.testFlag(QFile::WriteOwner))
+        {
+            QMessageBox::warning(this,trUtf8("Fehler !"),trUtf8("Leider konnte der Schreibschutz der Disk Image Datei nicht gesetzt werden.\nBitte überprüfen Sie ob Sie über genügend Rechte verfügen.\nDer Emu64 wird diese Datei dennoch nicht verändern !"));
+        }
+        emit WriteProtectedChanged(checked);
+    }
+    else
+    {
+        file.setPermissions(QFile::ReadOwner | QFile::ReadGroup | QFile::ReadOther | QFile::WriteOwner);
+
+        permissions = QFileInfo(AktFileName).permissions();
+
+        if(!permissions.testFlag(QFile::WriteOwner))
+        {
+            ui->WriteProtected->setChecked(true);
+            QMessageBox::warning(this,trUtf8("Fehler !"),trUtf8("Leider konnte der Schreibschutz der Disk Image Datei nicht entfernt werden.\nBitte überprüfen Sie ob Sie über genügend Rechte verfügen.\n Auf das Disk Image kann momentan nicht geschrieben werden !"));
+        }
+        emit WriteProtectedChanged(ui->WriteProtected->isChecked());
     }
 }

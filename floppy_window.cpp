@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.07.2016                //
+// Letzte Änderung am 06.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -61,7 +61,9 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QStr
     ui->D64FileTable->setColumnWidth(6,40);
 
     connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(OnSelectFile(QString)));
+    connect(ui->FileBrowser,SIGNAL(WriteProtectedChanged(bool)),this,SLOT(OnWriteProtectedChanged(bool)));
     ui->FileBrowser->SetFileFilter(QStringList()<<"*.d64"<<"*.g64");
+    ui->FileBrowser->EnableWriteProtectCheck(true);
 
     // Kontextmenü erstellen
     CompatibleMMCFileName = false;
@@ -127,12 +129,19 @@ void FloppyWindow::LoadIni()
             AktFileName[i] = AktDir[i] + "/" + AktFile[i];
             d64[i].LoadD64(AktFileName[i].toLatin1().data());
 
+            // Write Protect für alle Floppys setzen
+            c64->floppy[i]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktFileName[i]));
+
             ini->endGroup();
         }
 
         ui->FileBrowser->SetAktDir(AktDir[0]);
         ui->FileBrowser->SetAktFile(AktDir[0],AktFile[0]);
+
         RefreshD64FileList();
+
+        // Write Protect nochmal für alle Floppy 0 setzen
+        c64->floppy[0]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktDir[0] + "/" + AktFile[0]));
     }
     ////////////////////////////////////
 }
@@ -300,6 +309,11 @@ void FloppyWindow::OnPRGNameMMCKompatibel(bool)
     if(CompatibleMMCFileName)
         CompatibleMMCFileName = false;
     else CompatibleMMCFileName = true;
+}
+
+void FloppyWindow::OnWriteProtectedChanged(bool wp_satus)
+{
+    c64->SetFloppyWriteProtect(ui->FloppySelect->currentIndex(),wp_satus);
 }
 
 QString FloppyWindow::GetAktFilename(int floppynr)
