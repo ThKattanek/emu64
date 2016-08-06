@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 06.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -48,7 +48,7 @@ public:
     /// Variablen ///
 
     bool            *RESET;
-    bool            *WriteProtected;
+    bool            *WriteProtect;
     bool            *DiskMotorOn;
     unsigned char   *FloppyIEC;
     unsigned char   *C64IEC;

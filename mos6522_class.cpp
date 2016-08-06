@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 06.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -343,7 +343,7 @@ unsigned char MOS6522::ReadIO(unsigned short adresse)
                 case 0x00:
                 {
                     static unsigned char WP;
-                    if (*WriteProtected) WP = 0;
+                    if (*WriteProtect) WP = 0;
                     else WP = 0x10;
 
                     if (SyncFound != 0)
