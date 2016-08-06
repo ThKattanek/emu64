@@ -115,6 +115,8 @@ Floppy1541::Floppy1541(bool *reset, int samplerate,int puffersize, bool *floppy_
 
 Floppy1541::~Floppy1541()
 {
+    CheckImageWrite();
+
     FloppySoundEnabled = false;
     FloppyEnabled = false;
     delete SoundBuffer;
@@ -325,7 +327,7 @@ inline void Floppy1541::CheckImageWrite(void)
 {
     FILE *File;
 
-    if(ImageWriteStatus)
+    if(ImageWriteStatus && !WriteProtectAkt)
     {
         switch(ImageTyp)
         {
