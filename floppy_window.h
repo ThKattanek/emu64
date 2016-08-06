@@ -44,10 +44,6 @@ signals:
     void ChangeFloppyImage(int floppynr);
 
 private slots:
-    void on_FloppySelect_currentIndexChanged(int index);
-    void on_ViewSplatFiles_clicked();
-    void on_D64FileTable_cellDoubleClicked(int, int);
-
     void OnSelectFile(QString filename);
     void OnChangeFloppyNummer(int floppynr);
     void OnRemoveImage(int floppynr);
@@ -60,12 +56,20 @@ private slots:
     void OnPRGNameMMCKompatibel(bool);
     void OnWriteProtectedChanged(bool);
 
+    void on_FloppySelect_currentIndexChanged(int index);
+    void on_ViewSplatFiles_clicked();
+    void on_D64FileTable_cellDoubleClicked(int, int);
+    void on_D64FileTableBigSize_clicked(bool checked);
+
 private:
     void RefreshD64FileList(void);
-    bool getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt);
+    bool GetSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt);
+    void SetD64BigSize(bool enable);
 
     Ui::FloppyWindow *ui;
     QFont *c64_font;
+    QFont *c64_font1;   // NormalSize (18)
+    QFont *c64_font2;   // BigSize (36)
     QSettings *ini;
     C64Class *c64;
     bool isOneShowed;
@@ -77,6 +81,14 @@ private:
     QIcon *green_led ;
     QIcon *yellow_led;
     QIcon *red_led;
+
+    QIcon *green_led_small;
+    QIcon *yellow_led_small;
+    QIcon *red_led_small;
+
+    QIcon *green_led_big;
+    QIcon *yellow_led_big;
+    QIcon *red_led_big;
 
     QString TmpPath;
 

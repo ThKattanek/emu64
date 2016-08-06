@@ -37,28 +37,32 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QStr
 
     FileTypes = QStringList() << "DEL" << "SEQ" << "PRG" << "USR" << "REL" << "CBM" << "E00" << "E?C";
 
-    green_led = new QIcon(":/grafik/green_led_7x7.png");
-    yellow_led = new QIcon(":/grafik/yellow_led_7x7.png");
-    red_led = new QIcon(":/grafik/red_led_7x7.png");
+    green_led_small = new QIcon(":/grafik/green_led_7x7.png");
+    yellow_led_small = new QIcon(":/grafik/yellow_led_7x7.png");
+    red_led_small = new QIcon(":/grafik/red_led_7x7.png");
+
+    green_led_big = new QIcon(":/grafik/green_led_on.png");
+    yellow_led_big = new QIcon(":/grafik/yellow_led_on.png");
+    red_led_big = new QIcon(":/grafik/red_led_on.png");
 
     QFontDatabase fontDB;
     fontDB.addApplicationFont(":/fonts/emu64.ttf");
-    c64_font = new QFont("Emu64 D64 Directory",18); // Linux18
-    c64_font->setStyleStrategy(QFont::PreferAntialias);
-    c64_font->setBold(false);
-    c64_font->setKerning(true);
+    c64_font1 = new QFont("Emu64 D64 Directory",18);
+    c64_font1->setStyleStrategy(QFont::PreferAntialias);
+    c64_font1->setBold(false);
+    c64_font1->setKerning(true);
 
-    ui->DiskName->setFont(*c64_font);
+    c64_font2 = new QFont("Emu64 D64 Directory",36);
+    c64_font2->setStyleStrategy(QFont::PreferAntialias);
+    c64_font2->setBold(false);
+    c64_font2->setKerning(true);
+
+    c64_font = c64_font1;
+
+    ui->DiskName->setFont(*c64_font1);
 
     // Spalten für D64 Datei-Anzeige hinzufügen
     ui->D64FileTable->setColumnCount(7);
-    ui->D64FileTable->setColumnWidth(0,20);
-    ui->D64FileTable->setColumnWidth(1,140);
-    ui->D64FileTable->setColumnWidth(2,30);
-    ui->D64FileTable->setColumnWidth(3,30);
-    ui->D64FileTable->setColumnWidth(4,55);
-    ui->D64FileTable->setColumnWidth(5,40);
-    ui->D64FileTable->setColumnWidth(6,40);
 
     connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(OnSelectFile(QString)));
     connect(ui->FileBrowser,SIGNAL(WriteProtectedChanged(bool)),this,SLOT(OnWriteProtectedChanged(bool)));
@@ -82,7 +86,6 @@ FloppyWindow::~FloppyWindow()
             ini->setValue("Geometry",saveGeometry());
             ini->setValue("ViewSplatFile",ui->ViewSplatFiles->isChecked());
             ini->setValue("D64ViewBigSize",ui->D64FileTableBigSize->isChecked());
-
             ini->setValue("PrgExportMMCCompatible",CompatibleMMCFileName);
         }
 
@@ -120,6 +123,9 @@ void FloppyWindow::LoadIni()
         ui->D64FileTableBigSize->setChecked(ini->value("D64ViewBigSize",false).toBool());
         CompatibleMMCFileName = ini->value("PrgExportMMCCompatible", true).toBool();
         ini->endGroup();
+
+        // ViewD64BigSize setzen
+        SetD64BigSize(ui->D64FileTableBigSize->isChecked());
 
         char group_name[32];
         for(int i=0; i<FloppyAnzahl; i++)
@@ -294,7 +300,7 @@ void FloppyWindow::OnPRGExport(bool)
 
     if(c64 == NULL) return;
 
-    if(!getSaveFileName(this,trUtf8("C64 Datei Exportieren"),trUtf8("C64 Programmdatei ") + "(*.prg *.seq *.usr *.rel *.cbm *.e00 *.del);;" + trUtf8("Alle Dateien ") + "(*.*)",&filename,&fileext))
+    if(!GetSaveFileName(this,trUtf8("C64 Datei Exportieren"),trUtf8("C64 Programmdatei ") + "(*.prg *.seq *.usr *.rel *.cbm *.e00 *.del);;" + trUtf8("Alle Dateien ") + "(*.*)",&filename,&fileext))
         return;
 
     if(filename != "")
@@ -412,13 +418,29 @@ void FloppyWindow::RefreshD64FileList()
 
         // Höhe der Zeile setzen
 #ifdef _WIN32
-    ui->D64FileTable->setRowHeight(i,9);
-    ui->D64FileTable->cellWidget(i,1)->setFixedHeight(10);
+    if(ui->D64FileTableBigSize->isChecked())
+    {
+        ui->D64FileTable->setRowHeight(i,18);
+        ui->D64FileTable->cellWidget(i,1)->setFixedHeight(20);
+    }
+    else
+    {
+        ui->D64FileTable->setRowHeight(i,9);
+        ui->D64FileTable->cellWidget(i,1)->setFixedHeight(10);
+    }
 #endif
 
 #ifdef __linux__
-    ui->D64FileTable->setRowHeight(i,8);
-    ui->D64FileTable->cellWidget(i,1)->setFixedHeight(9);
+    if(ui->D64FileTableBigSize->isChecked())
+    {
+        ui->D64FileTable->setRowHeight(i,16);
+        ui->D64FileTable->cellWidget(i,1)->setFixedHeight(18);
+    }
+    else
+    {
+        ui->D64FileTable->setRowHeight(i,8);
+        ui->D64FileTable->cellWidget(i,1)->setFixedHeight(9);
+    }
 #endif
 
         if(!(FileTyp & 0x80) && !ui->ViewSplatFiles->isChecked())
@@ -438,7 +460,7 @@ void FloppyWindow::on_D64FileTable_cellDoubleClicked(int , int )
     OnD64FileStart0(0);
 }
 
-bool FloppyWindow::getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt)
+bool FloppyWindow::GetSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt)
 {
    if (fileName == NULL)      // "parent" is allowed to be NULL!
       return false;
@@ -484,4 +506,52 @@ bool FloppyWindow::getSaveFileName(QWidget *parent, QString caption, QString fil
    *fileName = tmpFileName;
    *fileExt = extension;
    return true;
+}
+
+void FloppyWindow::SetD64BigSize(bool enable)
+{
+    if(enable)
+    {
+        c64_font = c64_font2;
+
+        green_led = green_led_big;
+        yellow_led = yellow_led_big;
+        red_led = red_led_big;
+
+        ui->D64FileTable->setMinimumWidth(395 * 2);
+        ui->D64FileTable->setMaximumWidth(395 * 2);
+
+        ui->D64FileTable->setColumnWidth(0,20 * 2);
+        ui->D64FileTable->setColumnWidth(1,145 * 2);
+        ui->D64FileTable->setColumnWidth(2,30 * 2);
+        ui->D64FileTable->setColumnWidth(3,30 * 2);
+        ui->D64FileTable->setColumnWidth(4,55 * 2);
+        ui->D64FileTable->setColumnWidth(5,45 * 2);
+        ui->D64FileTable->setColumnWidth(6,45 * 2);
+    }
+    else
+    {
+        c64_font = c64_font1;
+
+        green_led = green_led_small;
+        yellow_led = yellow_led_small;
+        red_led = red_led_small;
+
+        ui->D64FileTable->setMinimumWidth(395);
+        ui->D64FileTable->setMaximumWidth(395);
+
+        ui->D64FileTable->setColumnWidth(0,20);
+        ui->D64FileTable->setColumnWidth(1,145);
+        ui->D64FileTable->setColumnWidth(2,30);
+        ui->D64FileTable->setColumnWidth(3,30);
+        ui->D64FileTable->setColumnWidth(4,55);
+        ui->D64FileTable->setColumnWidth(5,45);
+        ui->D64FileTable->setColumnWidth(6,45);
+    }
+}
+
+void FloppyWindow::on_D64FileTableBigSize_clicked(bool checked)
+{
+    SetD64BigSize(checked);
+    RefreshD64FileList();
 }
