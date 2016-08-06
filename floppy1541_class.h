@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.05.2016        		//
+// Letzte Änderung am 06.08.2016        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -45,6 +45,9 @@ const unsigned char D64_SECTOR_GAP[4] = {1,10,5,2};
 #define G64 1
 #define MAX_BREAK_GROUPS 256
 
+#define DISK_CHANGE_STATE_COUNTS 4
+#define DISK_CHANGE_STATE_CYCLES 1000
+
 class Floppy1541
 {    
 public:
@@ -65,6 +68,7 @@ public:
     void UnLoadDiskImage(void);
     void SetC64IEC(unsigned char* port);
     void SetDeviceNummer(unsigned char nummer);
+    void SetWriteProtect(bool status);
     bool LoadDosRom(char* filename);
     bool OneZyklus(void);
     void GetCpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg);
@@ -104,7 +108,6 @@ public:
     bool            *RESET;
     unsigned char   FloppyIECLocal;
     unsigned char   Jumper;
-    bool            WriteProtected;
     bool            StepperInc;
     bool            StepperDec;
     bool            StepperAnschlag;
@@ -125,10 +128,16 @@ private:
     void GCRToSector(unsigned int spur, unsigned int sektor);
     void ConvertToD64(unsigned char *source_buffer, unsigned char *destination_buffer);
     void RenderFloppySound(void);
+    void StartDiskChange(void);
 
     /// Variablen ///
 
     bool    FloppyEnabled;
+    bool    WriteProtect;
+    bool    WriteProtectAkt;            // Wird zusätzlich für Diskwechselsimaltion benötigt
+
+    int     DiskChangeSimState;         // 0 = momentan kein Diskwechsel
+    int     DiskChangeSimCycleCounter;
 
     REG_STRUCT rs;
 

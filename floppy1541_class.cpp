@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.05.2016        		//
+// Letzte Änderung am 06.08.2016        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -81,9 +81,11 @@ Floppy1541::Floppy1541(bool *reset, int samplerate,int puffersize, bool *floppy_
 
     Jumper = 0;
     via1->Jumper = &Jumper;
-    WriteProtected = false;
-    via2->WriteProtected = &WriteProtected;
+    WriteProtect = WriteProtectAkt = false;
+    via2->WriteProtect = &WriteProtect;
     via2->DiskMotorOn = &DiskMotorOn;
+
+    DiskChangeSimState = 0;
 
     cpu->RESET = reset;
     via1->RESET = reset;
@@ -206,8 +208,8 @@ bool Floppy1541::LoadDiskImage(char* filename)
 
     if(0==strcmp("D64",EXT))
     {
-        /// Diskwechsel Simulieren ///
-        WriteProtected = !WriteProtected;
+        // Diskwechsel simulieren
+        StartDiskChange();
 
         file = fopen(filename, "rb");
         if (file == NULL)
@@ -227,18 +229,6 @@ bool Floppy1541::LoadDiskImage(char* filename)
         ImageWriteStatus = false;
         ImageTyp = D64;
 
-        /*
-        /// Diskwechsel Simulieren ///
-        Sleep(20);
-        WriteProtected = !WriteProtected;
-        Sleep(20);
-        WriteProtected = !WriteProtected;
-        Sleep(20);
-        WriteProtected = !WriteProtected;
-        */
-
-        //ExportGCRTrack("/home/thorsten/test.trk",18);
-
         return true;
     }
 
@@ -251,8 +241,8 @@ bool Floppy1541::LoadDiskImage(char* filename)
         unsigned short trackpos[84];
         unsigned short trackspeed[84];
 
-        /// Diskwechsel Simulieren ///
-        WriteProtected = !WriteProtected;
+        // Diskwechsel simulieren
+        StartDiskChange();
 
         file = fopen(filename, "rb");
         if (file == NULL)
@@ -328,7 +318,7 @@ void Floppy1541::UnLoadDiskImage(void)
     CheckImageWrite();
     for(int i=0;i<174848;i++) D64Image[i] = 0;
     for(int i=0;i<665952;i++) GCRImage[i] = 0;
-    WriteProtected = false;
+    WriteProtect = false;
 }
 
 inline void Floppy1541::CheckImageWrite(void)
@@ -552,6 +542,11 @@ void Floppy1541::SetDeviceNummer(unsigned char nummer)
     cpu->Reset();
 }
 
+void Floppy1541::SetWriteProtect(bool status)
+{
+    WriteProtect = WriteProtectAkt = status;
+}
+
 void Floppy1541::GetFloppyInfo(FLOPPY_INFO *fi)
 {
     fi->Sektor = RAM[0x19];
@@ -748,6 +743,22 @@ bool Floppy1541::OneZyklus(void)
     }
 
     if(!FloppyEnabled) return true;
+
+    // Disk Wechsel Simulieren
+    if(DiskChangeSimState != 0)
+    {
+        DiskChangeSimCycleCounter--;
+        if(DiskChangeSimCycleCounter == 0)
+        {
+            DiskChangeSimState--;
+            if(DiskChangeSimState != 0)
+            {
+                WriteProtect = !WriteProtect;
+                DiskChangeSimCycleCounter = DISK_CHANGE_STATE_CYCLES;
+            }
+            else WriteProtect = WriteProtectAkt;
+        }
+    }
 
     CycleCounter++;
 
@@ -958,6 +969,13 @@ void Floppy1541::RenderFloppySound(void)
     SoundBuffer[SoundBufferPos] =  (short)(SoundBuffer[SoundBufferPos] * Volume);
     SoundBufferPos++;
     if(SoundBufferPos >= SoundBufferSize) SoundBufferPos = 0;
+}
+
+void Floppy1541::StartDiskChange()
+{
+    DiskChangeSimState = DISK_CHANGE_STATE_COUNTS;
+    DiskChangeSimCycleCounter = DISK_CHANGE_STATE_CYCLES;
+    WriteProtect = !WriteProtect;
 }
 
 int Floppy1541::AddBreakGroup(void)
