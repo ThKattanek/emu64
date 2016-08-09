@@ -617,10 +617,6 @@ void FloppyWindow::on_CreateNewD64_clicked()
             }
         }
     }
-    else
-    {
-        qDebug("Abbruch");
-    }
 
     delete floppy_new_d64_window;
 }
