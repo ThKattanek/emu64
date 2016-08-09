@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.08.2016                //
+// Letzte Änderung am 09.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -45,8 +45,7 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QStr
     yellow_led_big = new QIcon(":/grafik/yellow_led_on.png");
     red_led_big = new QIcon(":/grafik/red_led_on.png");
 
-    QFontDatabase fontDB;
-    fontDB.addApplicationFont(":/fonts/emu64.ttf");
+    QFontDatabase::addApplicationFont(":/fonts/emu64.ttf");
     c64_font1 = new QFont("Emu64 D64 Directory",18);
     c64_font1->setStyleStrategy(QFont::PreferAntialias);
     c64_font1->setBold(false);
@@ -104,7 +103,20 @@ FloppyWindow::~FloppyWindow()
         }
     }
     ////////////////////////////////////
+
+    delete green_led_small;
+    delete yellow_led_small;
+    delete red_led_small;
+    delete green_led_big;
+    delete yellow_led_big;
+    delete red_led_big;
+
+    delete c64_font1;
+    delete c64_font2;
+
     delete ui;
+
+
 }
 
 void FloppyWindow::showEvent(QShowEvent*)
@@ -554,4 +566,61 @@ void FloppyWindow::on_D64FileTableBigSize_clicked(bool checked)
 {
     SetD64BigSize(checked);
     RefreshD64FileList();
+}
+
+void FloppyWindow::on_CreateNewD64_clicked()
+{
+    FloppyNewD64Window *floppy_new_d64_window = new FloppyNewD64Window(this);
+
+    if(floppy_new_d64_window->exec())
+    {
+        QString filename = floppy_new_d64_window->GetFilename();
+        QString diskname = floppy_new_d64_window->GetDiskname();
+        QString diskid   = floppy_new_d64_window->GetDiskID();
+        QString fullpath;
+
+        if(filename.right(4).toUpper() != ".D64")
+            filename += ".d64";
+
+        fullpath = ui->FileBrowser->GetAktDir() + "/" + filename;
+
+        QFile file(fullpath);
+        if(!file.exists())
+        {
+            D64Class d64;
+            if(!d64.CreateDiskImage(fullpath.toAscii().data(),diskname.toAscii().data(),diskid.toAscii().data()))
+            {
+                QMessageBox::critical(this,trUtf8("Fehler!"),trUtf8("Es konnte kein neues Diskimage erstellt werden."));
+            }
+            else
+            {
+                ui->FileBrowser->SetAktDir(ui->FileBrowser->GetAktDir());
+                ui->FileBrowser->SetAktFile(ui->FileBrowser->GetAktDir(),filename);
+                RefreshD64FileList();
+            }
+        }
+        else
+        {
+            if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Achtung!"),trUtf8("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
+            {
+                D64Class d64;
+                if(!d64.CreateDiskImage(fullpath.toAscii().data(),diskname.toAscii().data(),diskid.toAscii().data()))
+                {
+                    QMessageBox::critical(this,trUtf8("Fehler!"),trUtf8("Es konnte kein neues Diskimage erstellt werden."));
+                }
+                else
+                {
+                    ui->FileBrowser->SetAktDir(ui->FileBrowser->GetAktDir());
+                    ui->FileBrowser->SetAktFile(ui->FileBrowser->GetAktDir(),filename);
+                    RefreshD64FileList();
+                }
+            }
+        }
+    }
+    else
+    {
+        qDebug("Abbruch");
+    }
+
+    delete floppy_new_d64_window;
 }

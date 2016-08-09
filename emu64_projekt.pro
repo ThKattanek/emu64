@@ -56,7 +56,8 @@ SOURCES += \
     reu_class.cpp \
     georam_class.cpp \
     debugger_iec_window.cpp \
-    vcd_class.cpp
+    vcd_class.cpp \
+    floppy_new_d64_window.cpp
 
 HEADERS  += \
     info_window.h \
@@ -111,7 +112,8 @@ HEADERS  += \
     georam_class.h \
     debugger_iec_window.h \
     vcd_class.h \
-    mk7pla.h
+    mk7pla.h \
+    floppy_new_d64_window.h
 
 FORMS    += \
     info_window.ui \
@@ -131,7 +133,8 @@ FORMS    += \
     setup_window.ui \
     debugger_vic_window.ui \
     c64_speed_window.ui \
-    debugger_iec_window.ui
+    debugger_iec_window.ui \
+    floppy_new_d64_window.ui
 
 RESOURCES += \
     emu64.qrc

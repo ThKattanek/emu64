@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.08.2016                //
+// Letzte Änderung am 09.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,8 +19,10 @@
 #include <QDialog>
 #include <QMenu>
 #include <QSettings>
+
 #include "d64_class.h"
 #include "c64_class.h"
+#include "floppy_new_d64_window.h"
 
 namespace Ui {
     class FloppyWindow;
@@ -60,6 +62,7 @@ private slots:
     void on_ViewSplatFiles_clicked();
     void on_D64FileTable_cellDoubleClicked(int, int);
     void on_D64FileTableBigSize_clicked(bool checked);
+    void on_CreateNewD64_clicked();
 
 private:
     void RefreshD64FileList(void);
@@ -67,6 +70,7 @@ private:
     void SetD64BigSize(bool enable);
 
     Ui::FloppyWindow *ui;
+
     QFont *c64_font;
     QFont *c64_font1;   // NormalSize (18)
     QFont *c64_font2;   // BigSize (36)
