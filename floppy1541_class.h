@@ -116,6 +116,8 @@ public:
     unsigned short  History[256];
     unsigned char   HistoryPointer;
 
+    int SyncFoundCount;
+
 private:
 
     /// Funktionen ///

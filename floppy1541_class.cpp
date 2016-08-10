@@ -231,6 +231,8 @@ bool Floppy1541::LoadDiskImage(char* filename)
         ImageWriteStatus = false;
         ImageTyp = D64;
 
+        SyncFoundCount = 0;
+
         return true;
     }
 
@@ -300,15 +302,7 @@ bool Floppy1541::LoadDiskImage(char* filename)
         ImageWriteStatus = false;
         ImageTyp = G64;
 
-        /*
-        /// Diskwechsel Simulieren ///
-        Sleep(20);
-        WriteProtected = !WriteProtected;
-        Sleep(20);
-        WriteProtected = !WriteProtected;
-        Sleep(20);
-        WriteProtected = !WriteProtected;
-        */
+        SyncFoundCount = 0;
 
         return true;
     }
@@ -384,10 +378,10 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
     // Create GCR header (15 Bytes)
     // SYNC
     *P++ = 0xFF;								// SYNC
-    *P++ = 0xFF;								// SYNC
-    *P++ = 0xFF;								// SYNC
-    *P++ = 0xFF;								// SYNC
-    *P++ = 0xFF;								// SYNC
+    //*P++ = 0xFF;								// SYNC
+    //*P++ = 0xFF;								// SYNC
+    //*P++ = 0xFF;								// SYNC
+    //*P++ = 0xFF;								// SYNC
     buffer[0] = 0x08;							// Header mark
     buffer[1] = sektor ^ spur ^ id2 ^ id1;		// Checksum
     buffer[2] = sektor;
@@ -398,16 +392,16 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
     buffer[2] = 0x0F;
     buffer[3] = 0x0F;
     ConvertToGCR(buffer, P+5);
-    P += 10;
+    P += 9;
 
     // Create GCR data (338 Bytes)
     unsigned char SUM;
     // SYNC
     *P++ = 0xFF;                                // SYNC
-    *P++ = 0xFF;								// SYNC
-    *P++ = 0xFF;								// SYNC
-    *P++ = 0xFF;								// SYNC
-    *P++ = 0xFF;								// SYNC
+    //*P++ = 0xFF;								// SYNC
+    //*P++ = 0xFF;								// SYNC
+    //*P++ = 0xFF;								// SYNC
+    //*P++ = 0xFF;								// SYNC
     buffer[0] = 0x07;							// Data mark
     SUM = buffer[1] = block[0];
     SUM ^= buffer[2] = block[1];
@@ -841,12 +835,34 @@ unsigned char Floppy1541::ReadRom(unsigned short adresse)
 }
 
 bool Floppy1541::SyncFound(void)
-{    
+{
+    bool found = false;
+
     if (AktHalbSpur >= ((NUM_TRACKS-1) * 2)) return false;
+
+    // NEU TEST
+    /*
+    if(*GCR_PTR == 0xFF)
+    {
+        SyncFoundCount++;
+        if(SyncFoundCount == 5)
+        {
+            found = true;
+            GCR_PTR --;
+        }
+    }
+    else
+    {
+        SyncFoundCount = 0;
+        GCR_PTR ++;	// Rotate disk
+        if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
+    }
+
+    return found;
+    */
 
     if(*GCR_PTR == 0xFF)
     {
-
 L1:
         GCR_PTR++;
         if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
