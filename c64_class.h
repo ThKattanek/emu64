@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.08.2016                //
+// Letzte Änderung am 12.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -38,6 +38,8 @@
 #include "tr1/functional"
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
+
+#define MAX_C64_SCREEN_TITLE_LENGTH 100
 
 #define FloppyAnzahl 4
 #define MAX_BREAK_GROUPS 256
@@ -71,6 +73,7 @@ public:
     void WriteC64Byte(unsigned short adresse,unsigned char wert);
     unsigned char* GetRAMPointer(unsigned short adresse);
     void SetGrafikModi(bool colbits32, bool doublesize,bool enable_pal,bool filter_enable, int fullres_xw = 0, int fullres_yw = 0);
+    void SetWindowTitle(char *title_name);
     void SetFullscreen(void);
     void InitGrafik(void);
     void ReleaseGrafik(void);
@@ -281,6 +284,8 @@ private:
     const char* GfxPath;
     const char* RomPath;
     const char* FloppySoundPath;
+
+    char window_title[MAX_C64_SCREEN_TITLE_LENGTH];
 
     bool SDLJoystickIsOpen;
     int  JoystickAnzahl;

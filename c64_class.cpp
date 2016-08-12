@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.08.2016                //
+// Letzte Änderung am 12.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1117,6 +1117,12 @@ void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool pal_enable,boo
     LogText(str00);
 }
 
+void C64Class::SetWindowTitle(char *title_name)
+{
+    strcpy(window_title, title_name);
+    SDL_SetWindowTitle(C64Window, title_name);
+}
+
 void C64Class::SetFullscreen()
 {
     isFullscreen = true;
@@ -1178,7 +1184,7 @@ void C64Class::InitGrafik()
 
     if(C64Window == NULL)
     {
-        C64Window = SDL_CreateWindow("C64 Screen",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,AktWindowXW,AktWindowYW,SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+        C64Window = SDL_CreateWindow(window_title,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,AktWindowXW,AktWindowYW,SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
         SDL_SetWindowIcon(C64Window,C64ScreenIcon);
     }
     else SDL_SetWindowSize(C64Window,AktWindowXW,AktWindowYW);

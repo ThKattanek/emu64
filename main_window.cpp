@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.07.2016                //
+// Letzte Änderung am 12.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -200,6 +200,8 @@ void MainWindow::OnInit()
         this->close();
     }
 
+    SetC64ScreenTitle();
+
     /// Window Klassen erstellen ///
     /// Unter MAC sollte ohne übergabe des this Zeigers die Klasseb erstellt werden
 
@@ -326,6 +328,7 @@ void MainWindow::OnInit()
         /// CRT Ini erst jetzt laden ///
         crt_window->LoadIni();
     }
+
     this->update();
 
     /// Screenshot Reset mit SetupWindow verbinden ///
@@ -453,8 +456,12 @@ void MainWindow::RetranslateUi()
     setup_window->RetranslateUi();
     speed_window->RetranslateUi();
 
-    //SDL_WM_SetCaption(trUtf8("C64 Bildschirm").toLatin1().data(),0);
+    SetC64ScreenTitle();
+}
 
+void MainWindow::SetC64ScreenTitle()
+{
+    c64->SetWindowTitle(trUtf8("C64 Bildschirm").toLatin1().data());
 }
 
 bool MainWindow::getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt)

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 14.05.2016                //
+// Letzte Änderung am 12.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -113,6 +113,7 @@ private:
     void changeEvent(QEvent *event);  
     void CreateLanguageMenu(QString defaultLocale);
     void RetranslateUi();
+    void SetC64ScreenTitle(void);
     bool getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt);
     void ExecuteCommandLine();
 

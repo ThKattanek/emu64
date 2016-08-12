@@ -2836,88 +2836,93 @@ Soll diese überschrieben werden?</source>
         <source>CRT LED mit CRT Window verbunden.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="main_window.cpp" line="456"/>
+        <source>C64 Bildschirm</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="605"/>
-        <location filename="main_window.cpp" line="619"/>
+        <location filename="main_window.cpp" line="604"/>
+        <location filename="main_window.cpp" line="618"/>
         <source>C64 Dateien öffnen </source>
         <oldsource>C64 Dateien Ã¶ffnen </oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="605"/>
-        <location filename="main_window.cpp" line="619"/>
+        <location filename="main_window.cpp" line="604"/>
+        <location filename="main_window.cpp" line="618"/>
         <source>C64 Programm Dateien </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="605"/>
-        <location filename="main_window.cpp" line="619"/>
+        <location filename="main_window.cpp" line="604"/>
+        <location filename="main_window.cpp" line="618"/>
         <source>Alle Dateien </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="725"/>
+        <location filename="main_window.cpp" line="724"/>
         <source>REU Inhalt laden</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="725"/>
-        <location filename="main_window.cpp" line="738"/>
+        <location filename="main_window.cpp" line="724"/>
+        <location filename="main_window.cpp" line="737"/>
         <source>REU Image Dateien</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="729"/>
-        <location filename="main_window.cpp" line="742"/>
+        <location filename="main_window.cpp" line="728"/>
+        <location filename="main_window.cpp" line="741"/>
         <source>Beim laden des REU Images trat ein Fehler auf!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="738"/>
+        <location filename="main_window.cpp" line="737"/>
         <source>REU Inhalt speichern</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="747"/>
+        <location filename="main_window.cpp" line="746"/>
         <source>REU Speicher löschen ...</source>
         <oldsource>REU Speicher lÃ¶schen ...</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="747"/>
+        <location filename="main_window.cpp" line="746"/>
         <source>Möchten Sie den Inhalt des REU Speichers wirklich löschen?</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="791"/>
+        <location filename="main_window.cpp" line="790"/>
         <source>GEORAM Speicher löschen ...</source>
         <oldsource>GEORAM Speicher lÃ¶schen ...</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="791"/>
+        <location filename="main_window.cpp" line="790"/>
         <source>Möchten Sie den Inhalt des GEORAM Speichers wirklich löschen?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="769"/>
+        <location filename="main_window.cpp" line="768"/>
         <source>GEORAM Inhalt laden</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="769"/>
-        <location filename="main_window.cpp" line="782"/>
+        <location filename="main_window.cpp" line="768"/>
+        <location filename="main_window.cpp" line="781"/>
         <source>GEORAM Image Dateien</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="773"/>
-        <location filename="main_window.cpp" line="786"/>
+        <location filename="main_window.cpp" line="772"/>
+        <location filename="main_window.cpp" line="785"/>
         <source>Beim laden des GEORAM Images trat ein Fehler auf!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="782"/>
+        <location filename="main_window.cpp" line="781"/>
         <source>GEORAM Inhalt speichern</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2933,11 +2938,11 @@ Soll diese überschrieben werden?</source>
     </message>
     <message>
         <location filename="main_window.cpp" line="199"/>
-        <location filename="main_window.cpp" line="700"/>
-        <location filename="main_window.cpp" line="729"/>
-        <location filename="main_window.cpp" line="742"/>
-        <location filename="main_window.cpp" line="773"/>
-        <location filename="main_window.cpp" line="786"/>
+        <location filename="main_window.cpp" line="699"/>
+        <location filename="main_window.cpp" line="728"/>
+        <location filename="main_window.cpp" line="741"/>
+        <location filename="main_window.cpp" line="772"/>
+        <location filename="main_window.cpp" line="785"/>
         <source>Emu64 Fehler ...</source>
         <translation></translation>
     </message>
@@ -2974,15 +2979,15 @@ Soll diese überschrieben werden?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="725"/>
-        <location filename="main_window.cpp" line="738"/>
-        <location filename="main_window.cpp" line="769"/>
-        <location filename="main_window.cpp" line="782"/>
+        <location filename="main_window.cpp" line="724"/>
+        <location filename="main_window.cpp" line="737"/>
+        <location filename="main_window.cpp" line="768"/>
+        <location filename="main_window.cpp" line="781"/>
         <source>Alle Dateien</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="700"/>
+        <location filename="main_window.cpp" line="699"/>
         <source>Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.
 Überprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !</source>
         <translation type="unfinished">Es sind keine Screenshots möglich, da Emu64 kein Screenshot Verzeichnis anlegen konnte.
@@ -3031,14 +3036,14 @@ Soll diese überschrieben werden?</source>
     <name>QObject</name>
     <message utf8="true">
         <location filename="debugger_window.cpp" line="949"/>
-        <location filename="main_window.cpp" line="510"/>
+        <location filename="main_window.cpp" line="509"/>
         <source>Überschreiben?</source>
         <oldsource>Ãberschreiben?</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
         <location filename="debugger_window.cpp" line="950"/>
-        <location filename="main_window.cpp" line="511"/>
+        <location filename="main_window.cpp" line="510"/>
         <source>Soll die Datei &quot;%1&quot; überschrieben werden?</source>
         <oldsource>Soll die Datei &quot;%1&quot; Ã¼berschrieben werden?</oldsource>
         <translation type="unfinished"></translation>

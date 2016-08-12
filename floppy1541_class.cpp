@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.08.2016        		//
+// Letzte Änderung am 12.08.2016        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -836,7 +836,7 @@ unsigned char Floppy1541::ReadRom(unsigned short adresse)
 
 bool Floppy1541::SyncFound(void)
 {
-    bool found = false;
+    // bool found = false;
 
     if (AktHalbSpur >= ((NUM_TRACKS-1) * 2)) return false;
 
