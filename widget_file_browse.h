@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.08.2016                //
+// Letzte Änderung am 12.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -33,6 +33,7 @@ class WidgetFileBrowse : public QWidget
 
 public:
     explicit WidgetFileBrowse(QWidget *parent = 0);
+    void RetranslateUi();
     void SetFileFilter(const QStringList & filters);
     QString GetAktDir(void);
     QString GetAktFile(void);

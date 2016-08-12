@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.08.2016                //
+// Letzte Änderung am 12.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -26,11 +26,12 @@
 
 FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QString tmp_path) :
     QDialog(parent),
-    ui(new Ui::FloppyWindow),
-    isOneShowed(false)
+    ui(new Ui::FloppyWindow)
 {
     ini = _ini;
     ui->setupUi(this);
+
+    isOneShowed = false;
 
     this->c64 = c64;
     this->TmpPath = tmp_path;
@@ -170,6 +171,7 @@ void FloppyWindow::LoadIni()
 void FloppyWindow::RetranslateUi()
 {
     ui->retranslateUi(this);
+    ui->FileBrowser->RetranslateUi();
     this->update();
 }
 
@@ -210,6 +212,8 @@ void FloppyWindow::OnRemoveImage(int floppynr)
 
 void FloppyWindow::on_FloppySelect_currentIndexChanged(int index)
 {
+    if(index < 0) return;
+
     if(isOneShowed)
     {
         ui->FileBrowser->SetAktDir(AktDir[index]);

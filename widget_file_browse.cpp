@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.08.2016                //
+// Letzte Änderung am 12.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -40,6 +40,12 @@ WidgetFileBrowse::WidgetFileBrowse(QWidget *parent) :
     ui->listView_filebrowser->model()->sort(0,Qt::AscendingOrder);
     akt_fullpath = dirmodel->rootPath();
     ui->AktPath->setText(akt_fullpath);
+}
+
+void WidgetFileBrowse::RetranslateUi()
+{
+    ui->retranslateUi(this);
+    this->update();
 }
 
 WidgetFileBrowse::~WidgetFileBrowse()

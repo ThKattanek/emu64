@@ -33,7 +33,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Filename:</string>
+          <string>Dateiname:</string>
          </property>
         </widget>
        </item>
@@ -53,7 +53,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Diskname</string>
+          <string>Diskname:</string>
          </property>
         </widget>
        </item>
@@ -73,7 +73,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Disk ID</string>
+          <string>Disk ID:</string>
          </property>
         </widget>
        </item>
