@@ -232,7 +232,7 @@ void FloppyWindow::OnCustomMenuRequested(QPoint pos)
 
     QMenu *menu_export = new QMenu(this);
     menu_export->setTitle("Export");
-    menu_export->addAction(new QAction(trUtf8("Deitei exportieren"), this));
+    menu_export->addAction(new QAction(trUtf8("Datei exportieren"), this));
     menu_export->addAction(new QAction(trUtf8("Dateiname MMC/SD2IEC kompatibel"), this));
     menu_export->actions().at(1)->setCheckable(true);
     menu_export->actions().at(1)->setChecked(CompatibleMMCFileName);

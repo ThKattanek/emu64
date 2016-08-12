@@ -275,7 +275,7 @@
          <item>
           <widget class="QCheckBox" name="D64FileTableBigSize">
            <property name="text">
-            <string>BigSize</string>
+            <string>Blindenmodus</string>
            </property>
           </widget>
          </item>
