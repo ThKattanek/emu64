@@ -249,3 +249,6 @@ icon.files = grafik/emu64.png
 INSTALLS += icon
 
 }
+
+DISTFILES += \
+    build_deb.sh
