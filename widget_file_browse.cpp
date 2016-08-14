@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.08.2016                //
+// Letzte Änderung am 14.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -66,7 +66,7 @@ void WidgetFileBrowse::SetFileFilter(const QStringList &filters)
 
 QString WidgetFileBrowse::GetAktDir(void)
 {
-    return dirmodel->fileInfo(ui->listView_filebrowser->currentIndex()).absolutePath();
+    return akt_fullpath;
 }
 
 QString WidgetFileBrowse::GetAktFile(void)
