@@ -178,7 +178,6 @@ OTHER_FILES += \
     docs/readme linux.txt \
     docs/readme.txt \
     fonts/lucon.ttf \
-    fonts/emu64.ttf \
     roms/kernal.rom \
     roms/char.rom \
     roms/basic.rom \

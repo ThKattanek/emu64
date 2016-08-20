@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.08.2016                //
+// Letzte Änderung am 20.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -22,8 +22,9 @@ FloppyNewD64Window::FloppyNewD64Window(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QFontDatabase::addApplicationFont(":/fonts/emu64.ttf");
-    c64_font1 = new QFont("Emu64 D64 Directory",18);
+    QFontDatabase::addApplicationFont(":/fonts/C64_Pro-STYLE.ttf");
+    c64_font1 = new QFont("C64 Pro");
+    c64_font1->setPixelSize(8);
     c64_font1->setStyleStrategy(QFont::PreferAntialias);
     c64_font1->setBold(false);
     c64_font1->setKerning(true);

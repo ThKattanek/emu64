@@ -31,9 +31,14 @@ WidgetFloppyStatus::WidgetFloppyStatus(QWidget *parent, int floppy_nr, Floppy154
     ui->setupUi(this);
 
     QFontDatabase fontDB;
-    fontDB.addApplicationFont(":/fonts/emu64.ttf");
-    QFont font("Emu64 D64 Directory",16);
+
+    fontDB.addApplicationFont(":/fonts/C64_Pro-STYLE.ttf");
+    QFont font("C64 Pro");
+    font.setPixelSize(8);
+    font.setStyleStrategy(QFont::PreferAntialias);
     font.setBold(false);
+    font.setKerning(true);
+
     ui->DisknameOut->setFont(font);
 
     iGreenLedOff = new QIcon(":/grafik/green_off_32.png");

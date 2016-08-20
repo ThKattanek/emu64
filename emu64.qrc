@@ -46,7 +46,6 @@
         <file>grafik/toolbar32/floppy.png</file>
         <file>grafik/export_24x24.png</file>
         <file>grafik/memory_icon.png</file>
-        <file>fonts/emu64.ttf</file>
         <file>grafik/fc3_logo.png</file>
         <file>grafik/red_off_20.png</file>
         <file>grafik/red_on_20.png</file>
@@ -68,5 +67,6 @@
         <file>grafik/green_led_7x7.png</file>
         <file>grafik/red_led_7x7.png</file>
         <file>grafik/yellow_led_7x7.png</file>
+        <file>fonts/C64_Pro-STYLE.ttf</file>
     </qresource>
 </RCC>

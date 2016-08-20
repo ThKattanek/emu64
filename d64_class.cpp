@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 20.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -117,8 +117,6 @@ L30:
     for (z=0;z<16;z++)
     {
         D64Files[DateiAnzahl].Name[z]=Block[SI+5+z];
-        if((unsigned char)D64Files[DateiAnzahl].Name[z]==0xA0) D64Files[DateiAnzahl].Name[z]=0;
-        if((unsigned char)D64Files[DateiAnzahl].Name[z]==173) D64Files[DateiAnzahl].Name[z]=157;
     }
 
     SI+=32;

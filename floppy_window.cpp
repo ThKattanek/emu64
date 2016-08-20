@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.08.2016                //
+// Letzte Änderung am 20.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -46,13 +46,15 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QStr
     yellow_led_big = new QIcon(":/grafik/yellow_led_on.png");
     red_led_big = new QIcon(":/grafik/red_led_on.png");
 
-    QFontDatabase::addApplicationFont(":/fonts/emu64.ttf");
-    c64_font1 = new QFont("Emu64 D64 Directory",18);
+    QFontDatabase::addApplicationFont(":/fonts/C64_Pro-STYLE.ttf");
+    c64_font1 = new QFont("C64 Pro");
+    c64_font1->setPixelSize(8);
     c64_font1->setStyleStrategy(QFont::PreferAntialias);
     c64_font1->setBold(false);
     c64_font1->setKerning(true);
 
-    c64_font2 = new QFont("Emu64 D64 Directory",36);
+    c64_font2 = new QFont("C64 Pro");
+    c64_font2->setPixelSize(16);
     c64_font2->setStyleStrategy(QFont::PreferAntialias);
     c64_font2->setBold(false);
     c64_font2->setKerning(true);
@@ -381,7 +383,19 @@ void FloppyWindow::RefreshD64FileList()
         ui->D64FileTable->setItem(i,0,icon_item);
 
         // Dateiname setzen
-        ui->D64FileTable->setCellWidget(i,1,new QLabel(d64[floppy].D64Files[i].Name));
+        QString name_str;
+        for(int j=0; j < strlen(d64[floppy].D64Files[i].Name); j++)
+        {
+            if(((unsigned char)d64[floppy].D64Files[i].Name[j] == 32) || ((unsigned char)d64[floppy].D64Files[i].Name[j] == 160))
+                name_str += " ";
+            else if(((unsigned char)d64[floppy].D64Files[i].Name[j] > 127) && ((unsigned char)d64[floppy].D64Files[i].Name[j] < 160))
+                name_str += QChar(((unsigned char)d64[floppy].D64Files[i].Name[j]) + 0xee40);
+            else
+            name_str += QChar(((unsigned char)d64[floppy].D64Files[i].Name[j]) + 0xe000);
+        }
+
+        ui->D64FileTable->setCellWidget(i,1,new QLabel(name_str));
+
         ui->D64FileTable->cellWidget(i,1)->setFont(*c64_font);
         QLabel* label = (QLabel*) ui->D64FileTable->cellWidget(i,1);
         label->setAlignment(Qt::AlignTop);
@@ -450,12 +464,12 @@ void FloppyWindow::RefreshD64FileList()
     if(ui->D64FileTableBigSize->isChecked())
     {
         ui->D64FileTable->setRowHeight(i,16);
-        ui->D64FileTable->cellWidget(i,1)->setFixedHeight(18);
+        ui->D64FileTable->cellWidget(i,1)->setFixedHeight(16);
     }
     else
     {
         ui->D64FileTable->setRowHeight(i,8);
-        ui->D64FileTable->cellWidget(i,1)->setFixedHeight(9);
+        ui->D64FileTable->cellWidget(i,1)->setFixedHeight(8);
     }
 #endif
 
