@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.08.2016                //
+// Letzte Änderung am 22.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -230,7 +230,8 @@ void MainWindow::OnInit()
     LogText(trUtf8(">> DebuggerWindow wurde erzeugt\n").toLatin1().data());
 
     splash->showStatusMessage(trUtf8("SetupWindow wird erstellt."),Qt::darkBlue);
-    setup_window = new SetupWindow(this,SLOT(onChangeGrafikModi(bool,bool,bool,bool,bool)),videopal,ini);
+    setup_window = new SetupWindow(this,SLOT(OnChangeGrafikModi(bool,bool,bool,bool,bool)),videopal,ini);
+    connect(setup_window,SIGNAL(finished(int)),this,SLOT(OnSetupFished(int)));
     LogText(trUtf8(">> SetupWindow wurde erzeugt\n").toLatin1().data());
 
     splash->showStatusMessage(trUtf8("C64SpeedWindow wird erstellt."),Qt::darkBlue);
@@ -677,7 +678,7 @@ void MainWindow::on_actionEmu64_Einstellungen_triggered()
     else setup_window->hide();
 }
 
-void MainWindow::onChangeGrafikModi(bool fullscreen, bool palmode, bool doublemode, bool bit32mode, bool filter)
+void MainWindow::OnChangeGrafikModi(bool fullscreen, bool palmode, bool doublemode, bool bit32mode, bool filter)
 {
     if(!fullscreen)
     {
@@ -695,6 +696,12 @@ void MainWindow::OnChangeFloppyImage(int floppynr)
 void MainWindow::OnResetScreenshotCounter()
 {
     ScreenshotNumber = 0;
+}
+
+void MainWindow::OnSetupFished(int result)
+{
+    if(result == 0)
+        c64->StopRecJoystickMapping();
 }
 
 void MainWindow::on_actionScreenshot_triggered()

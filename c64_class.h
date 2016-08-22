@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.08.2016                //
+// Letzte Änderung am 22.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -132,6 +132,7 @@ public:
     bool ExportASM(char* filename, unsigned short start_adresse, unsigned short end_adresse, int source);
     void JoystickNewScan(void);
     void StartRecJoystickMapping(int slot_nr);
+    void StopRecJoystickMapping(void);
     void ClearJoystickMapping(int slot_nr);
 
     unsigned char GetMapReadSource(unsigned char page);

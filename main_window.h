@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.08.2016                //
+// Letzte Änderung am 22.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -86,9 +86,6 @@ private slots:
     void on_actionHardreset_triggered();
     void on_actionC64_Programme_direkt_laden_triggered();
     void on_actionEmu64_Einstellungen_triggered();
-    void onChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode, bool filter);
-    void OnChangeFloppyImage(int floppynr);
-    void OnResetScreenshotCounter(void);
     void on_actionScreenshot_triggered();
     void on_actionC64_Geschwindigkeit_triggered();
     void on_actionREU_einstecken_triggered();
@@ -101,8 +98,12 @@ private slots:
     void on_actionGEO_laden_triggered();
     void on_actionGEO_speichern_triggered();
     void on_actionGEO_loeschen_triggered();
-
     void on_actionVollbild_triggered();
+
+    void OnChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode, bool filter);
+    void OnChangeFloppyImage(int floppynr);
+    void OnResetScreenshotCounter(void);
+    void OnSetupFished(int result);
 
 protected:
     void keyPressEvent(QKeyEvent *event);

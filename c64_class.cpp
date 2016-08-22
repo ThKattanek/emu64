@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.08.2016                //
+// Letzte Änderung am 22.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -3167,6 +3167,12 @@ void C64Class::StartRecJoystickMapping(int slot_nr)
     RecJoySlotNr = slot_nr;
     RecJoyMappingPos = 0;
     RecJoyMapping = true;
+}
+
+void C64Class::StopRecJoystickMapping()
+{
+    if(RecJoyMapping)
+        RecJoyMapping = false;
 }
 
 void C64Class::ClearJoystickMapping(int slot_nr)
