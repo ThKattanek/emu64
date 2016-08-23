@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.08.2016                //
+// Letzte Änderung am 23.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -27,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent,customSplashScreen* _splash,QTextStream *
 {
     splash = _splash;
     log = _log;
+
+    isFirstPaintEvent = false;
 
     /// Haputfenster UI setzen ///
     ui->setupUi(this);
@@ -92,6 +94,17 @@ MainWindow::~MainWindow()
 
     // Temporäre Dateien löschen
     QFile::remove(tmpPath + "/tmp.prg");
+}
+
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+    QWidget::paintEvent(event);
+
+    if(!isFirstPaintEvent)
+    {
+        isFirstPaintEvent = true;
+        c64->SetFocusToC64Window();
+    }
 }
 
 void MainWindow::OnInit()
@@ -376,6 +389,13 @@ void MainWindow::changeEvent(QEvent *event)
       appTranslator.load("emu64_" + locale, langPath);
       RetranslateUi();
     }
+
+    if (event->type() == QEvent::Show)
+    {
+        qDebug("Show Event");
+        c64->SetFocusToC64Window();
+    }
+
     QMainWindow::changeEvent(event);
 }
 

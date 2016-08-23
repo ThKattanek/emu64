@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.08.2016                //
+// Letzte Änderung am 23.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -57,6 +57,9 @@ public:
     explicit MainWindow(QWidget *parent = 0,customSplashScreen* _splash = NULL,QTextStream *_log = NULL);
     ~MainWindow();
     Ui::MainWindow *ui;
+
+    void paintEvent(QPaintEvent *event);
+
 
     customSplashScreen *splash;
 
@@ -147,6 +150,8 @@ private:
     C64SpeedWindow *speed_window;               // C64 Speed Window
 
     QStringList commandLine;                    // Enthält den an Emu64 übergebenen String
+
+    bool isFirstPaintEvent;
 };
 
 #endif // MAINWINDOW_H
