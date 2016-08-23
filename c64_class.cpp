@@ -1189,7 +1189,8 @@ void C64Class::InitGrafik()
 
     if(C64Window == NULL)
     {
-        C64Window = SDL_CreateWindow(window_title,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,AktWindowXW,AktWindowYW,SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+        C64Window = SDL_CreateWindow(window_title,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,AktWindowXW,AktWindowYW,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+
         SDL_SetWindowIcon(C64Window,C64ScreenIcon);
     }
     else SDL_SetWindowSize(C64Window,AktWindowXW,AktWindowYW);
