@@ -85,10 +85,10 @@ public:
     void SetC64Speed(int speed);
     void SetDistortion(float value);
     void SetMouseHiddenTime(int time);  // Time in ms // Bei 0 Wird der Cursor nicht mehr ausgeblendet
-    void GetAktWindowPos(int *x, int *y);
-    void SetAktWindowPos(int x, int y);
-    void GetAktWindowSize(int *x, int *y);
-    void SetAktWindowSize(int w, int h);
+    void GetWindowPos(int *x, int *y);
+    void SetWindowPos(int x, int y);
+    void GetWindowSize(int *x, int *y);
+    void SetWindowSize(int w, int h);
 
     void SoftReset(void);
     void HardReset(void);
@@ -164,6 +164,8 @@ public:
     int             FullResYW;
     bool            isFullscreen;
     bool            ChangeGrafikModi;
+    bool            ChangeWindowPos;
+    bool            ChangeWindowSize;
     bool            HoldVicRefresh;
     bool            VicRefreshIsHold;
 
@@ -173,6 +175,11 @@ public:
 
     SDL_Window      *C64Window;
     SDL_GLContext   GLContext;
+
+    int             win_pos_x;
+    int             win_pos_y;
+    int             win_size_w;
+    int             win_size_h;
 
     SDL_AudioSpec want,have;
 

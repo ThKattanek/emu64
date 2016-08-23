@@ -71,6 +71,17 @@ MainWindow::~MainWindow()
     }
     /////////////////////////////////////
 
+    int x,y,w,h;
+    c64->GetWindowPos(&x, &y);
+    c64->GetWindowSize(&w, &h);
+
+    ini->beginGroup("C64Screen");
+    ini->setValue("PosX",x);
+    ini->setValue("PosY",y);
+    ini->setValue("SizeW",w);
+    ini->setValue("SizeH",h);
+    ini->endGroup();
+
     /// WindowKlassen schließen ///
 
     delete setup_window;
@@ -362,6 +373,26 @@ void MainWindow::OnInit()
     this->show();
 
     ExecuteCommandLine();
+
+    ini->beginGroup("C64Screen");
+
+    int x = ini->value("PosX",-1).toInt();
+    int y = ini->value("PosY",-1).toInt();
+
+    if((x>0) && (y>0))
+    {
+        c64->SetWindowPos(x,y);
+    }
+
+    int w = ini->value("SizeW",-1).toInt();
+    int h = ini->value("SizeH",-1).toInt();
+
+    if((w>0) && (h>0))
+    {
+        c64->SetWindowSize(w,h);
+    }
+
+    ini->endGroup();
 }
 
 void MainWindow::OnMessage(QStringList msg)

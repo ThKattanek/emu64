@@ -36,6 +36,10 @@ int SDLThreadLoad(void *userdat);
 C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> log_function, const char* gfx_path):
     mmu(NULL),cpu(NULL),vic(NULL),sid1(NULL),sid2(NULL),cia1(NULL),cia2(NULL),crt(NULL)
 {   
+    ChangeGrafikModi = false;
+    ChangeWindowPos = false;
+    ChangeWindowSize = false;
+
     JoyStickUdateIsStop = true,
     RecJoyMapping = false,
     StopJoystickUpdate = true;
@@ -529,6 +533,18 @@ int SDLThread(void *userdat)
         {
             c64->ChangeGrafikModi = false;
             c64->InitGrafik();
+        }
+
+        if(c64->ChangeWindowPos)
+        {
+            c64->ChangeWindowPos = false;
+            SDL_SetWindowPosition(c64->C64Window, c64->win_pos_x, c64->win_pos_y);
+        }
+
+        if(c64->ChangeWindowSize)
+        {
+            c64->ChangeWindowSize = false;
+            SDL_SetWindowSize(c64->C64Window, c64->win_size_w, c64->win_size_h);
         }
 
         /// Wird ausgeführt wenn Keine Thread Pause anliegt ///
@@ -1985,24 +2001,28 @@ void C64Class::SetMouseHiddenTime(int time)
     MouseHiddenTime = time;
 }
 
-void C64Class::GetAktWindowPos(int *x, int *y)
+void C64Class::GetWindowPos(int *x, int *y)
 {
     SDL_GetWindowPosition(C64Window, x, y);
 }
 
-void C64Class::SetAktWindowPos(int x, int y)
+void C64Class::SetWindowPos(int x, int y)
 {
-    SDL_SetWindowPosition(C64Window, x, y);
+    this->win_pos_x = x;
+    this->win_pos_y = y;
+    ChangeWindowPos = true;
 }
 
-void C64Class::GetAktWindowSize(int *w, int *h)
+void C64Class::GetWindowSize(int *w, int *h)
 {
     SDL_GetWindowSize(C64Window, w, h);
 }
 
-void C64Class::SetAktWindowSize(int w, int h)
+void C64Class::SetWindowSize(int w, int h)
 {
-    SDL_SetWindowSize(C64Window, w, h);
+    this->win_size_w = w;
+    this->win_size_h = h;
+    ChangeWindowSize = true;
 }
 
 void C64Class::SetC64Speed(int speed)
