@@ -447,31 +447,16 @@ void FloppyWindow::RefreshD64FileList()
         label->setStyleSheet("color: rgb(100, 100, 255);");
 
         // Höhe der Zeile setzen
-#ifdef _WIN32
-    if(ui->D64FileTableBigSize->isChecked())
-    {
-        ui->D64FileTable->setRowHeight(i,18);
-        ui->D64FileTable->cellWidget(i,1)->setFixedHeight(20);
-    }
-    else
-    {
-        ui->D64FileTable->setRowHeight(i,9);
-        ui->D64FileTable->cellWidget(i,1)->setFixedHeight(10);
-    }
-#endif
-
-#ifdef __linux__
-    if(ui->D64FileTableBigSize->isChecked())
-    {
-        ui->D64FileTable->setRowHeight(i,16);
-        ui->D64FileTable->cellWidget(i,1)->setFixedHeight(16);
-    }
-    else
-    {
-        ui->D64FileTable->setRowHeight(i,8);
-        ui->D64FileTable->cellWidget(i,1)->setFixedHeight(8);
-    }
-#endif
+        if(ui->D64FileTableBigSize->isChecked())
+        {
+            ui->D64FileTable->setRowHeight(i,16);
+            ui->D64FileTable->cellWidget(i,1)->setFixedHeight(16);
+        }
+        else
+        {
+            ui->D64FileTable->setRowHeight(i,8);
+            ui->D64FileTable->cellWidget(i,1)->setFixedHeight(8);
+        }
 
         if(!(FileTyp & 0x80) && !ui->ViewSplatFiles->isChecked())
         {
