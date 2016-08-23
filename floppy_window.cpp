@@ -384,7 +384,7 @@ void FloppyWindow::RefreshD64FileList()
 
         // Dateiname setzen
         QString name_str;
-        for(int j=0; j < strlen(d64[floppy].D64Files[i].Name); j++)
+        for(int j=0; j < (int)strlen(d64[floppy].D64Files[i].Name); j++)
         {
             if(((unsigned char)d64[floppy].D64Files[i].Name[j] == 32) || ((unsigned char)d64[floppy].D64Files[i].Name[j] == 160))
                 name_str += " ";
