@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.08.2016                //
+// Letzte Änderung am 23.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -84,6 +84,7 @@ public:
     void AnalyzeSDLEvent(SDL_Event *event);
     void SetC64Speed(int speed);
     void SetDistortion(float value);
+    void SetMouseHiddenTime(int time);  // Time in ms // Bei 0 Wird der Cursor nicht mehr ausgeblendet
 
     void SoftReset(void);
     void HardReset(void);
@@ -134,6 +135,7 @@ public:
     void StartRecJoystickMapping(int slot_nr);
     void StopRecJoystickMapping(void);
     void ClearJoystickMapping(int slot_nr);
+    void IncMouseHiddenCounter(void);
 
     unsigned char GetMapReadSource(unsigned char page);
     unsigned char GetMapWriteDestination(unsigned char page);
@@ -379,6 +381,10 @@ private:
     bool	OneZyk;
     bool	OneOpc;
     int     OneOpcSource;
+
+    bool    MouseIsHidden;
+    int     MouseHiddenCounter;
+    int     MouseHiddenTime;
 };
 
 #endif // C64CLASS_H

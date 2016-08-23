@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.07.2016                //
+// Letzte Änderung am 23.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -61,6 +61,10 @@ private slots:
     void onClickButton(int idx, int idy);
 
     void on_SIDVolume_valueChanged(int value);
+
+    void on_AutoMouseHide_clicked(bool checked);
+
+    void on_AutoMouseHideTime_valueChanged(int arg1);
 
 private:
     void UpdateToolTips();

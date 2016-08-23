@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.07.2016                //
+// Letzte Änderung am 23.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -171,6 +171,29 @@ void SetupWindow::LoadINI(C64Class *_c64)
         ui->MausPort->setCurrentIndex(value);
         c64->SetMouse1351Port(value);
 
+        bvalue = ini->value("AutoMouseHide",false).toBool();
+        value = ini->value("AutoMouseHideTime",3).toInt();
+
+        /*
+        if(!bvalue)
+            c64->SetMouseHiddenTime(0);
+        else
+            c64->SetMouseHiddenTime(value * 1000);
+        */
+
+        if(!bvalue)
+        {
+            ui->AutoMouseHide->setChecked(false);
+            ui->AutoMouseHideTime->setEnabled(false);
+        }
+        else
+        {
+            ui->AutoMouseHide->setChecked(true);
+            ui->AutoMouseHideTime->setEnabled(true);
+        }
+
+        ui->AutoMouseHideTime->setValue(value);
+
         ini->endGroup();
 
         ini->beginGroup("SetupFullscreen");
@@ -208,7 +231,8 @@ void SetupWindow::SaveINI()
         ini->setValue("Port1",c64->VPort1);
         ini->setValue("Port2",c64->VPort2);
         ini->setValue("MousePort",ui->MausPort->currentIndex());
-
+        ini->setValue("AutoMouseHide",ui->AutoMouseHide->isChecked());
+        ini->setValue("AutoMouseHideTime",ui->AutoMouseHideTime->value());
         ini->endGroup();
 
         ini->beginGroup("SetupFullscreen");
@@ -379,4 +403,24 @@ void SetupWindow::on_SIDVolume_valueChanged(int value)
 {
    ui->SIDVolumeOut->setText(QVariant(value).toString() + "%");
    c64->SetSIDVolume(value / 100.0);
+}
+
+void SetupWindow::on_AutoMouseHide_clicked(bool checked)
+{
+    if(checked)
+    {
+        ui->AutoMouseHideTime->setEnabled(true);
+        c64->SetMouseHiddenTime(ui->AutoMouseHideTime->value() * 1000);
+    }
+    else
+    {
+        ui->AutoMouseHideTime->setEnabled(false);
+        c64->SetMouseHiddenTime(0);
+    }
+}
+
+void SetupWindow::on_AutoMouseHideTime_valueChanged(int arg1)
+{
+    if(ui->AutoMouseHide->isChecked()) c64->SetMouseHiddenTime(arg1 * 1000);
+    else c64->SetMouseHiddenTime(0);
 }

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.08.2016                //
+// Letzte Änderung am 23.08.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -54,6 +54,10 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     MousePort = 0;  // Port1 = 0 ... Port2 = 1
     POT_AX = POT_AY = POT_BX = POT_BY = 0xFF;    // HighZ zum Beginn (Keine Paddles / Maus angeschlossen)
     POT_X = POT_Y = 0xFF;
+
+    MouseIsHidden = false;
+    MouseHiddenCounter = 0;
+    MouseHiddenTime = 3000;
 
 #ifdef _WIN32
     FloppySoundPath = "floppy_sounds/";
@@ -487,7 +491,6 @@ void AudioMix(void *userdat, Uint8 *stream, int laenge)
 {
     C64Class *c64 = (C64Class*)userdat;
 
-
     if(c64->RecPollingWait)
     {
         c64->RecPollingWaitCounter--;
@@ -554,6 +557,8 @@ int SDLThread(void *userdat)
             SDL_Delay(1);
             if(!c64->sdl_thread_is_paused) c64->sdl_thread_is_paused = true;
         }
+
+        c64->IncMouseHiddenCounter();
     }
 
     c64->ReleaseGrafik();
@@ -1941,6 +1946,13 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
         case SDL_MOUSEMOTION:
 
+        if(!isFullscreen)
+        {
+            MouseHiddenCounter = 0;
+            MouseIsHidden = false;
+            SDL_ShowCursor(true);
+        }
+
         if(Mouse1351Enable)
         {
             MouseXRel += (short)event->motion.xrel;
@@ -1967,12 +1979,15 @@ void C64Class::SetDistortion(float value)
     CalcDistortionGrid();
 }
 
+void C64Class::SetMouseHiddenTime(int time)
+{
+    MouseHiddenTime = time;
+}
+
 void C64Class::SetC64Speed(int speed)
 {
     sid1->SetC64Zyklen(985248.f*(float)speed/100.f);
 }
-
-
 
 int SDLThreadLoad(void *userdat)
 {
@@ -3192,6 +3207,19 @@ void C64Class::ClearJoystickMapping(int slot_nr)
         VJoys[slot_nr].HatValue[i] = 0;
         VJoys[slot_nr].AxisNr[i] = 0;
         VJoys[slot_nr].AxisValue[i] = 0;
+    }
+}
+
+void C64Class::IncMouseHiddenCounter()
+{
+    if(!MouseIsHidden && (MouseHiddenTime > 0))
+    {
+        MouseHiddenCounter++;
+        if(MouseHiddenCounter >= MouseHiddenTime)
+        {
+            MouseIsHidden = true;
+            SDL_ShowCursor(false);
+        }
     }
 }
 

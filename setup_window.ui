@@ -34,7 +34,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="EmualtionTab">
     <property name="enabled">
@@ -171,7 +171,7 @@
        <x>10</x>
        <y>30</y>
        <width>381</width>
-       <height>101</height>
+       <height>131</height>
       </rect>
      </property>
      <property name="font">
@@ -309,6 +309,41 @@
        <string>4:3 Seitenverhältnis</string>
       </property>
      </widget>
+     <widget class="QCheckBox" name="AutoMouseHide">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>100</y>
+        <width>141</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Blendet den Mauszeiger nach einer einstellbaren Zeit automatisch aus.</string>
+      </property>
+      <property name="text">
+       <string>Mauszeiger ausblenden</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="AutoMouseHideTime">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>100</y>
+        <width>42</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>90</number>
+      </property>
+     </widget>
     </widget>
     <widget class="QGroupBox" name="FullscreenGroup">
      <property name="enabled">
@@ -317,9 +352,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>145</y>
+       <y>165</y>
        <width>381</width>
-       <height>121</height>
+       <height>101</height>
       </rect>
      </property>
      <property name="font">
