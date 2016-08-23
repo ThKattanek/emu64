@@ -1985,6 +1985,26 @@ void C64Class::SetMouseHiddenTime(int time)
     MouseHiddenTime = time;
 }
 
+void C64Class::GetAktWindowPos(int *x, int *y)
+{
+    SDL_GetWindowPosition(C64Window, x, y);
+}
+
+void C64Class::SetAktWindowPos(int x, int y)
+{
+    SDL_SetWindowPosition(C64Window, x, y);
+}
+
+void C64Class::GetAktWindowSize(int *w, int *h)
+{
+    SDL_GetWindowSize(C64Window, w, h);
+}
+
+void C64Class::SetAktWindowSize(int w, int h)
+{
+    SDL_SetWindowSize(C64Window, w, h);
+}
+
 void C64Class::SetC64Speed(int speed)
 {
     sid1->SetC64Zyklen(985248.f*(float)speed/100.f);

@@ -85,6 +85,10 @@ public:
     void SetC64Speed(int speed);
     void SetDistortion(float value);
     void SetMouseHiddenTime(int time);  // Time in ms // Bei 0 Wird der Cursor nicht mehr ausgeblendet
+    void GetAktWindowPos(int *x, int *y);
+    void SetAktWindowPos(int x, int y);
+    void GetAktWindowSize(int *x, int *y);
+    void SetAktWindowSize(int w, int h);
 
     void SoftReset(void);
     void HardReset(void);
