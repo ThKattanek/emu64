@@ -1482,13 +1482,13 @@ void C64Class::DrawC64Screen()
         else glBindTexture(GL_TEXTURE_2D,Kreis0Texture);
         glBegin(GL_QUADS);
         glTexCoord2i(1,0);
-        glVertex3f(0.07,-0.09,0);
+        glVertex3f(0.11,-0.15,0);
         glTexCoord2i(1,1);
-        glVertex3f(0.07,0.09,0.0);
+        glVertex3f(0.11,0.15,0.0);
         glTexCoord2i(0,1);
-        glVertex3f(-0.07,0.09,0);
+        glVertex3f(-0.11,0.15,0);
         glTexCoord2i(0,0);
-        glVertex3f(-0.07,-0.09,0);
+        glVertex3f(-0.11,-0.15,0);
         glEnd();
     }
 
