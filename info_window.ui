@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>346</width>
-    <height>426</height>
+    <width>361</width>
+    <height>416</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>188</x>
      <y>56</y>
-     <width>105</width>
-     <height>69</height>
+     <width>106</width>
+     <height>76</height>
     </rect>
    </property>
    <property name="autoFillBackground">
@@ -34,9 +34,9 @@
   <widget class="QWidget" name="widget_2" native="true">
    <property name="geometry">
     <rect>
-     <x>4</x>
-     <y>296</y>
-     <width>337</width>
+     <x>5</x>
+     <y>285</y>
+     <width>351</width>
      <height>113</height>
     </rect>
    </property>
@@ -47,9 +47,9 @@
   <widget class="QLabel" name="moreinfosOut">
    <property name="geometry">
     <rect>
-     <x>4</x>
-     <y>408</y>
-     <width>333</width>
+     <x>5</x>
+     <y>400</y>
+     <width>351</width>
      <height>17</height>
     </rect>
    </property>
@@ -144,8 +144,8 @@
     <rect>
      <x>4</x>
      <y>144</y>
-     <width>337</width>
-     <height>149</height>
+     <width>351</width>
+     <height>81</height>
     </rect>
    </property>
    <property name="font">
@@ -181,51 +181,6 @@
      <string>Hoeppi</string>
     </property>
    </item>
-   <item>
-    <property name="text">
-     <string>6581freak</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>purmike</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Tracker</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Yeti</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>radischen</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Evil.Joe</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Tuxist</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Matuschek</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Retro-Schulzi</string>
-    </property>
-   </item>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
@@ -243,7 +198,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Betatester und mehr ...</string>
+    <string>Besonderen Dank an ...</string>
    </property>
   </widget>
   <widget class="QWidget" name="widget_3" native="true">
@@ -259,7 +214,74 @@
     <string notr="true">border-image: url(:/grafik/emu64_logo_120_120.png);</string>
    </property>
   </widget>
+  <widget class="QWidget" name="widget_4" native="true">
+   <property name="geometry">
+    <rect>
+     <x>5</x>
+     <y>230</y>
+     <width>108</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border-image: url(:/grafik/style64.png);</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>245</y>
+     <width>91</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.style64.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;www.style64.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+   <property name="openExternalLinks">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>125</x>
+     <y>230</y>
+     <width>106</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>C64 TTF von Style64</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
+ <designerdata>
+  <property name="gridDeltaX">
+   <number>5</number>
+  </property>
+  <property name="gridDeltaY">
+   <number>5</number>
+  </property>
+  <property name="gridSnapX">
+   <bool>true</bool>
+  </property>
+  <property name="gridSnapY">
+   <bool>true</bool>
+  </property>
+  <property name="gridVisible">
+   <bool>true</bool>
+  </property>
+ </designerdata>
 </ui>
