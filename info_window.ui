@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>361</width>
+    <width>371</width>
     <height>416</height>
    </rect>
   </property>
@@ -36,7 +36,7 @@
     <rect>
      <x>5</x>
      <y>285</y>
-     <width>351</width>
+     <width>361</width>
      <height>113</height>
     </rect>
    </property>
@@ -144,7 +144,7 @@
     <rect>
      <x>4</x>
      <y>144</y>
-     <width>351</width>
+     <width>361</width>
      <height>81</height>
     </rect>
    </property>
@@ -256,12 +256,12 @@
     <rect>
      <x>125</x>
      <y>230</y>
-     <width>106</width>
+     <width>236</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>C64 TTF von Style64</string>
+    <string>Emu64 benutzt C64-Pro-Style TTF von Style64</string>
    </property>
   </widget>
  </widget>
