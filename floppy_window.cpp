@@ -197,6 +197,8 @@ void FloppyWindow::OnSelectFile(QString filename)
 
 void FloppyWindow::OnChangeFloppyNummer(int floppynr)
 {
+    if(this->isHidden())
+        this->setHidden(false);
     ui->FloppySelect->setCurrentIndex(floppynr);
 }
 
