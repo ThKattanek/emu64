@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.08.2016                //
+// Letzte Änderung am 05.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -91,6 +91,7 @@ MainWindow::~MainWindow()
     delete info_window;
     delete tv_setup_window;
     delete floppy_window;
+    delete tape_window;
     delete c64_keyboard_window;
     delete crt_window;
     delete debugger_window;
@@ -241,6 +242,10 @@ void MainWindow::OnInit()
     floppy_window = new FloppyWindow(this,ini,c64,tmpPath);
     LogText(trUtf8(">> FloppyWindow wurde erzeugt\n").toLatin1().data());
 
+    splash->showStatusMessage(trUtf8("TapeWindow wird erstellt."),Qt::darkBlue);
+    tape_window = new TapeWindow(this,ini,c64);
+    LogText(trUtf8(">> TapeWindow wurde erzeugt\n").toLatin1().data());
+
     splash->showStatusMessage(trUtf8("C64KeyboardWindow wird erstellt."),Qt::darkBlue);
     c64_keyboard_window = new C64KeyboardWindow(this,ini);
     LogText(trUtf8(">> C64KeyboardWindow wurde erzeugt\n").toLatin1().data());
@@ -352,6 +357,9 @@ void MainWindow::OnInit()
 
         /// CRT Ini erst jetzt laden ///
         crt_window->LoadIni();
+
+        /// TAPE Ini laden ///
+        tape_window->LoadIni();
     }
 
     this->update();
@@ -503,6 +511,7 @@ void MainWindow::RetranslateUi()
     tv_setup_window->RetranslateUi();
     c64_keyboard_window->RetranslateUi();
     floppy_window->RetranslateUi();
+    tape_window->RetranslateUi();
     crt_window->RetranslateUi();
     debugger_window->RetranslateUi();
     setup_window->RetranslateUi();
@@ -862,4 +871,10 @@ void MainWindow::on_actionGEO_loeschen_triggered()
 void MainWindow::on_actionVollbild_triggered()
 {
     c64->SetFullscreen();
+}
+
+void MainWindow::on_actionBandlaufwerk_1530_triggered()
+{
+    if(tape_window->isHidden()) tape_window->show();
+    else tape_window->hide();
 }

@@ -57,7 +57,9 @@ SOURCES += \
     georam_class.cpp \
     debugger_iec_window.cpp \
     vcd_class.cpp \
-    floppy_new_d64_window.cpp
+    floppy_new_d64_window.cpp \
+    tape1530_class.cpp \
+    tape_window.cpp
 
 HEADERS  += \
     info_window.h \
@@ -113,7 +115,9 @@ HEADERS  += \
     debugger_iec_window.h \
     vcd_class.h \
     mk7pla.h \
-    floppy_new_d64_window.h
+    floppy_new_d64_window.h \
+    tape1530_class.h \
+    tape_window.h
 
 FORMS    += \
     info_window.ui \
@@ -134,7 +138,8 @@ FORMS    += \
     debugger_vic_window.ui \
     c64_speed_window.ui \
     debugger_iec_window.ui \
-    floppy_new_d64_window.ui
+    floppy_new_d64_window.ui \
+    tape_window.ui
 
 RESOURCES += \
     emu64.qrc

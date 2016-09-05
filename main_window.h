@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.08.2016                //
+// Letzte Änderung am 04.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -39,6 +39,7 @@
 #include "debugger_window.h"
 #include "setup_window.h"
 #include "c64_speed_window.h"
+#include "tape_window.h"
 
 #include "c64_class.h"
 
@@ -102,6 +103,7 @@ private slots:
     void on_actionGEO_speichern_triggered();
     void on_actionGEO_loeschen_triggered();
     void on_actionVollbild_triggered();
+    void on_actionBandlaufwerk_1530_triggered();
 
     void OnChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode, bool filter);
     void OnChangeFloppyImage(int floppynr);
@@ -143,6 +145,7 @@ private:
     InfoWindow *info_window;                    // Info Fenster Klasse (wird vom MainWindow als Modal gestartet)
     TVSetupWindow *tv_setup_window;             // TV Einstellungsfenster
     FloppyWindow *floppy_window;                // Floppy Editor / Auswahl
+    TapeWindow *tape_window;                    // Datasette
     C64KeyboardWindow *c64_keyboard_window;     // Virtuelle C64 Tastatur
     CrtWindow *crt_window;                      // CRT Auswahl Fenster
     DebuggerWindow *debugger_window;            // Debugger / Disassembler Fenster
