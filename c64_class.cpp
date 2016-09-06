@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.08.2016                //
+// Letzte Änderung am 06.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -241,6 +241,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     crt = new CRTClass();
     reu = new REUClass();
     geo = new GEORAMClass();
+    tape = new TAPE1530(have.freq,have.samples);
 
     vic_puffer = vic->VideoPuffer;
 
@@ -1056,6 +1057,11 @@ bool C64Class::LoadDiskImage(int floppy_nr, char *filename)
         return floppy[floppy_nr]->LoadDiskImage(filename);
     }
     return false;
+}
+
+bool C64Class::LoadTapeImage(char *filename)
+{
+    return tape->LoadTapeImage(filename);
 }
 
 void C64Class::LoadPRGFromD64(int floppy_nr, char *c64_filename, int command)

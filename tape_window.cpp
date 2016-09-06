@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.09.2016                //
+// Letzte Änderung am 06.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -22,6 +22,8 @@ TapeWindow::TapeWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
 {
     ini = _ini;
     ui->setupUi(this);
+
+    connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(OnSelectFile(QString)));
 
     ui->FileBrowser->SetFileFilter(QStringList()<<"*.tap"<<"*.wav");
 
@@ -73,4 +75,10 @@ void TapeWindow::LoadIni()
 void TapeWindow::showEvent(QShowEvent *event)
 {
     isOneShowed = true;
+}
+
+void TapeWindow::OnSelectFile(QString filename)
+{
+    if(!c64->LoadTapeImage(filename.toAscii().data()))
+        QMessageBox::warning(this,trUtf8("Fehler!"),trUtf8("Fehler beim laden des TapeImages"));
 }
