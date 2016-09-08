@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.09.2016                //
+// Letzte Änderung am 08.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -39,7 +39,15 @@ public:
 private slots:
     void OnSelectFile(QString filename);
 
+    void on_Rec_clicked();
+    void on_Play_clicked();
+    void on_Rew_clicked();
+    void on_FFw_clicked();
+    void on_Stop_clicked();
+
 private:
+    void UpdateStateTapeKeys(unsigned char key_pressed);
+
     Ui::TapeWindow *ui;
 
     QSettings *ini;

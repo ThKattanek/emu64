@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.09.2016                //
+// Letzte Änderung am 08.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -66,7 +66,6 @@ public:
     bool LoadC64Roms(char *kernalrom,char *basicrom,char *charrom);
     bool LoadFloppyRom(int floppy_nr,char *dos1541rom);
     bool LoadDiskImage(int floppy_nr,char *filename);
-    bool LoadTapeImage(char *filename);
     void LoadPRGFromD64(int floppy_nr,char *c64_filename,int command);
     void SetFloppyWriteProtect(int floppy_nr, bool status);
     void SetCommandLine(char *c64_command);
@@ -91,6 +90,9 @@ public:
     void SetWindowPos(int x, int y);
     void GetWindowSize(int *x, int *y);
     void SetWindowSize(int w, int h);
+
+    bool LoadTapeImage(char *filename);
+    unsigned char SetTapeKeys(unsigned char pressed_key);
 
     void SoftReset(void);
     void HardReset(void);

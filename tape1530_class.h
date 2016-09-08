@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.09.2016                //
+// Letzte Änderung am 08.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -27,35 +27,23 @@ enum TAPE_IMAGE_TYP
     WAV
 };
 
-/*
-enum TAPE_KEY_STATE
-{
-    TAPE_IS_STOP,
-    TAPE_IS_PLAY,
-    TAPE_IS_REW,
-    TAPE_IS_FFW,
-    TAPE_IS_REC,
-    TAPE_IS_PAUSE
-};
-*/
-
 class TAPE1530
 {
 public:
     TAPE1530(int samplerate, int puffersize);
     bool LoadTapeImage(char* filename);
+    unsigned char SetTapeKeys(unsigned char pressed_key);
     void OneCycle(void);
 
+    MOS6510_PORT    *CPU_PORT;
+    bool            CassRead;
+
 private:
-
-    MOS6510_PORT    *CpuPort;
-
     FILE            *file;
 
     bool            IsTapeInsert;
     bool            IsRecTapeInsert;
     bool            WritePotected;
-    bool            CassRead;
 
     unsigned int    TapeType;
     unsigned char   TapeVersion;

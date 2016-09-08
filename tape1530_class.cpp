@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.09.2016                //
+// Letzte Änderung am 08.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,7 +17,7 @@
 
 TAPE1530::TAPE1530(int samplerate, int puffersize)
 {
-    CpuPort = NULL;
+    CPU_PORT = NULL;
 
     Samplerate=(double)samplerate;
     FreqConvAddWert=((double)1.0)/((double)985248.0/Samplerate);
@@ -169,10 +169,72 @@ bool TAPE1530::LoadTapeImage(char *filename)
     return false;
 }
 
+unsigned char TAPE1530::SetTapeKeys(unsigned char pressed_key)
+{
+    switch (pressed_key)
+    {
+    case TAPE_KEY_STOP:
+        CPU_PORT->ConfigChanged(0, 0, 0x17);
+        PressedKeys = 0;
+        TapeStatus = TAPE_IS_STOP;
+        break;
+    case TAPE_KEY_PLAY:
+        if(IsTapeInsert)
+        {
+            CPU_PORT->ConfigChanged(1, 0, 0x17);
+            WaitCounter = 0;
+            PressedKeys = TAPE_KEY_PLAY;
+            TapeStatus = TAPE_IS_PLAY;
+        }
+        else
+        {
+            CPU_PORT->ConfigChanged(0, 0, 0x17);
+            PressedKeys = 0;
+        }
+        break;
+    case TAPE_KEY_REW:
+        if(IsTapeInsert)
+        {
+            CPU_PORT->ConfigChanged(1, 0, 0x17);
+            PressedKeys = TAPE_KEY_REW;
+            TapeStatus = TAPE_IS_REW;
+        }
+        else
+        {
+            CPU_PORT->ConfigChanged(0, 0, 0x17);
+            PressedKeys = 0;
+        }
+        break;
+    case TAPE_KEY_FFW:
+        if(IsTapeInsert)
+        {
+            CPU_PORT->ConfigChanged(1, 0, 0x17);
+            PressedKeys = TAPE_KEY_FFW;
+            TapeStatus = TAPE_IS_FFW;
+        }
+        else
+        {
+            CPU_PORT->ConfigChanged(0, 0, 0x17);
+            PressedKeys = 0;
+        }
+        break;
+    case TAPE_KEY_REC:
+        PressedKeys = 0;
+        break;
+    case TAPE_KEY_PAUSE:
+        PressedKeys = 0;
+        break;
+    default:
+        PressedKeys = 0;
+        break;
+    }
+    return PressedKeys;
+}
+
 void TAPE1530::OneCycle()
 {
     if(file == NULL) return;
-    if(CpuPort == NULL) return;
+    if(CPU_PORT == NULL) return;
 
     static unsigned short WaveOut;
     static bool MotorStatusTmp = false;
@@ -194,61 +256,62 @@ void TAPE1530::OneCycle()
     switch (TapeType)
     {
     case WAV:
+    {
+        switch (TapeStatus)
         {
-            switch (TapeStatus)
+            case TAPE_IS_PLAY:
+            if(CPU_PORT->DATASETTE_MOTOR)
             {
-                case TAPE_IS_PLAY:
-                    if(CpuPort->DATASETTE_MOTOR)
+                WaveCounter += AddWaveWert;
+                if(WaveCounter >= 1.0f)
+                {
+                    WaveCounter -= 1.0f;
+                    for(int i=0;i<(WAVEChannels);i++)
                     {
-                        WaveCounter += AddWaveWert;
-                        if(WaveCounter >= 1.0f)
+                        switch(WAVEBitPerSample)
                         {
-                            WaveCounter -= 1.0f;
-                            for(int i=0;i<(WAVEChannels);i++)
+                            case 8:
+                            fread(&ReadByte,1,sizeof(ReadByte),file);
+                            if((i == WAVEDataChannel) || (WAVEChannels == 1))
                             {
-                                switch(WAVEBitPerSample)
-                                {
-                                case 8:
-                                    fread(&ReadByte,1,sizeof(ReadByte),file);
-                                    if((i == WAVEDataChannel) || (WAVEChannels == 1))
-                                    {
-                                        if(ReadByte < WAVELowPeek8Bit) WaveStatus = Low;
-                                            else if(ReadByte > WAVEHighPeek8Bit) WaveStatus = High;
+                                if(ReadByte < WAVELowPeek8Bit) WaveStatus = Low;
+                                    else if(ReadByte > WAVEHighPeek8Bit) WaveStatus = High;
 
 
-                                        if((OldWaveStatus == Low) && (WaveStatus == High)) CassRead = !CassRead;
-                                        OldWaveStatus = WaveStatus;
+                                if((OldWaveStatus == Low) && (WaveStatus == High)) CassRead = !CassRead;
+                                OldWaveStatus = WaveStatus;
 
-                                        if(CassRead) WaveOut = 0x1FFF;
-                                        else WaveOut = 1;
-                                    }
-                                    break;
-                                case 16:
-                                    fread(&ReadWord,1,sizeof(ReadWord),file);
-                                    if((i == WAVEDataChannel) || (WAVEChannels == 1))
-                                    {
-                                        ReadWord += 0x8000;
-                                        if(ReadWord < WAVELowPeek16Bit) WaveStatus = Low;
-                                            else if(ReadWord > WAVEHighPeek16Bit) WaveStatus = High;
-
-
-                                        if((OldWaveStatus == Low) && (WaveStatus == High)) CassRead = !CassRead;
-                                        OldWaveStatus = WaveStatus;
-
-                                        if(CassRead) WaveOut = 0x1FFF;
-                                        else WaveOut = 1;
-                                    }
-                                    break;
-                                }
+                                if(CassRead) WaveOut = 0x1FFF;
+                                else WaveOut = 1;
                             }
+                            break;
+
+                            case 16:
+                            fread(&ReadWord,1,sizeof(ReadWord),file);
+                            if((i == WAVEDataChannel) || (WAVEChannels == 1))
+                            {
+                                ReadWord += 0x8000;
+                                if(ReadWord < WAVELowPeek16Bit) WaveStatus = Low;
+                                    else if(ReadWord > WAVEHighPeek16Bit) WaveStatus = High;
+
+
+                                if((OldWaveStatus == Low) && (WaveStatus == High)) CassRead = !CassRead;
+                                OldWaveStatus = WaveStatus;
+
+                                if(CassRead) WaveOut = 0x1FFF;
+                                else WaveOut = 1;
+                            }
+                            break;
                         }
-                        Counter += 0.00000330823863;
                     }
-                    break;
+                }
+                Counter += 0.00000330823863;
             }
             break;
         }
         break;
+    }
+    break;
 
     case TAP:
         switch (TapeStatus)
@@ -256,7 +319,7 @@ void TAPE1530::OneCycle()
         case TAPE_IS_STOP:
             break;
         case TAPE_IS_PLAY:
-            if(CpuPort->DATASETTE_MOTOR && !TapePosIsEnd)
+            if(CPU_PORT->DATASETTE_MOTOR && !TapePosIsEnd)
             {
                 if(!MotorStatusTmp) WaitCounter = 0;
                 MotorStatusTmp = true;
@@ -301,7 +364,7 @@ void TAPE1530::OneCycle()
             CycleCounter = 15;
             while(CycleCounter != 0)
             {
-                if(CpuPort->DATASETTE_MOTOR && !TapePosIsEnd)
+                if(CPU_PORT->DATASETTE_MOTOR && !TapePosIsEnd)
                 {
                     if(!MotorStatusTmp) WaitCounter = 0;
                     MotorStatusTmp = true;
@@ -336,7 +399,7 @@ void TAPE1530::OneCycle()
             CycleCounter = 15;
             while(CycleCounter != 0)
             {
-                if(CpuPort->DATASETTE_MOTOR && !TapePosIsStart)
+                if(CPU_PORT->DATASETTE_MOTOR && !TapePosIsStart)
                 {
                     TapePosIsEnd = false;
                     Counter -= 0.00000330823863;

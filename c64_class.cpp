@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.09.2016                //
+// Letzte Änderung am 08.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -380,9 +380,9 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
 
     ReuIsInsert = false;
 
-    /// Datasette mit C64 verbinden ///
-    //tape->CPU_PORT = &CPU_PORT;
-    //cia1_FLAG_PIN = &tape->CassRead;
+    /// Tape mit C64 verbinden ///
+    tape->CPU_PORT = &CPU_PORT;
+    cia1->FLAG_PIN = &tape->CassRead;
 
     /// CRT mit MMU verbinden ///
     crt->RAM_C64 = mmu->GetRAMPointer();
@@ -684,6 +684,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
             sid1->OneZyklus();
             //sid2->OneZyklus();
             reu->OneZyklus();
+            tape->OneCycle();
 
             if(EnableExtLines) RDY_BA = ExtRDY;
             cpu->OneZyklus();
@@ -807,6 +808,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                     sid1->OneZyklus();
                     //sid2->OneZyklus();
                     reu->OneZyklus();
+                    tape->OneCycle();
 
                     if(EnableExtLines) RDY_BA = ExtRDY;
                     cpu->OneZyklus();
@@ -863,6 +865,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                 sid1->OneZyklus();
                 //sid2->OneZyklus();
                 reu->OneZyklus();
+                tape->OneCycle();
 
                 if(EnableExtLines) RDY_BA = ExtRDY;
                 cpu->OneZyklus();
@@ -900,7 +903,10 @@ loop_wait_next_opc:
                 sid1->OneZyklus();
                 //sid2->OneZyklus();
                 reu->OneZyklus();
+                tape->OneCycle();
 
+                // Prüfen welches die aktuelle CPU ist (CPU,Floppy0,..1,..2,..3)
+                // Diese wird genau um ein Opcode ausgeführt
                 if(OneOpcSource > 0)
                 {
                     int FloppyNr = OneOpcSource - 1;
@@ -1057,11 +1063,6 @@ bool C64Class::LoadDiskImage(int floppy_nr, char *filename)
         return floppy[floppy_nr]->LoadDiskImage(filename);
     }
     return false;
-}
-
-bool C64Class::LoadTapeImage(char *filename)
-{
-    return tape->LoadTapeImage(filename);
 }
 
 void C64Class::LoadPRGFromD64(int floppy_nr, char *c64_filename, int command)
@@ -2029,6 +2030,16 @@ void C64Class::SetWindowSize(int w, int h)
     this->win_size_w = w;
     this->win_size_h = h;
     ChangeWindowSize = true;
+}
+
+bool C64Class::LoadTapeImage(char *filename)
+{
+    return tape->LoadTapeImage(filename);
+}
+
+unsigned char C64Class::SetTapeKeys(unsigned char pressed_key)
+{
+    return tape->SetTapeKeys(pressed_key);
 }
 
 void C64Class::SetC64Speed(int speed)
