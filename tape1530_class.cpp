@@ -525,5 +525,5 @@ unsigned int TAPE1530::GetCounter()
     // Trendlinie
     // f(x) = 1.99276712596766 * 10^-8 * x^3 - 0.000101391 * x^2 + 0.3404893716 * x + 1.1934882664
 
-    return (1.99276712596766e-8 * (time*time*time) - 0.000101391 * (time*time) + 0.3404893716 * time) * 100;
+    return (1.99277e-8 * (time*time*time) - 0.000101 * (time*time) + 0.345 * time) * 100;
 }
