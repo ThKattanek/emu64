@@ -59,7 +59,8 @@ SOURCES += \
     vcd_class.cpp \
     floppy_new_d64_window.cpp \
     tape1530_class.cpp \
-    tape_window.cpp
+    tape_window.cpp \
+    widget_tape_counter.cpp
 
 HEADERS  += \
     info_window.h \
@@ -117,7 +118,8 @@ HEADERS  += \
     mk7pla.h \
     floppy_new_d64_window.h \
     tape1530_class.h \
-    tape_window.h
+    tape_window.h \
+    widget_tape_counter.h
 
 FORMS    += \
     info_window.ui \
@@ -139,7 +141,8 @@ FORMS    += \
     c64_speed_window.ui \
     debugger_iec_window.ui \
     floppy_new_d64_window.ui \
-    tape_window.ui
+    tape_window.ui \
+    widget_tape_counter.ui
 
 RESOURCES += \
     emu64.qrc
