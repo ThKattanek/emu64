@@ -15,6 +15,8 @@ public:
     explicit WidgetTapeCounter(QWidget *parent = 0);
     ~WidgetTapeCounter();
 
+    void SetCounter(unsigned int count);
+
 private:
     Ui::WidgetTapeCounter *ui;
 };

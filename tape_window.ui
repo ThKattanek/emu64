@@ -119,25 +119,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>COUNTER:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="Counter">
-       <property name="font">
-        <font>
-         <pointsize>14</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>0000</string>
-       </property>
-      </widget>
+      <widget class="WidgetTapeCounter" name="Counter" native="true"/>
      </item>
      <item>
       <spacer name="horizontalSpacer_2">
@@ -164,6 +146,12 @@
    <class>WidgetFileBrowse</class>
    <extends>QWidget</extends>
    <header>widget_file_browse.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WidgetTapeCounter</class>
+   <extends>QWidget</extends>
+   <header>widget_tape_counter.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

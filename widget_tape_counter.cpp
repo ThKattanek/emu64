@@ -12,3 +12,8 @@ WidgetTapeCounter::~WidgetTapeCounter()
 {
     delete ui;
 }
+
+void WidgetTapeCounter::SetCounter(unsigned int count)
+{
+    ui->TestLabel->setText(QVariant(count).toString());
+}

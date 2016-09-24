@@ -101,7 +101,7 @@ void TapeWindow::OnSelectFile(QString filename)
 
 void TapeWindow::OnRefreshGUI()
 {
-    ui->Counter->setText(QVariant(c64->GetTapeCounter()).toString());
+    ui->Counter->SetCounter(c64->GetTapeCounter());
 }
 
 void TapeWindow::on_Rec_clicked()
