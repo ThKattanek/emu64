@@ -19,6 +19,7 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <math.h>
 
 #include "mos6510_class.h"
 
@@ -45,6 +46,8 @@ public:
     bool            CassRead;
 
 private:
+    void CalcTime2CounterTbl(void);
+
     FILE            *file;
 
     unsigned char   *TapeBuffer;
@@ -70,6 +73,8 @@ private:
     unsigned int	WaitCounter;
 
     float           Counter;
+    float Time2CounterTbl[1800];    // Platz für 1800 sek (30min)
+
 
     float           AddWaveWert;
     float           WaveCounter;

@@ -23,6 +23,9 @@ TAPE1530::TAPE1530(int samplerate, int puffersize)
     FreqConvAddWert=((double)1.0)/((double)985248.0/Samplerate);
     FreqConvCounter=0.0;
 
+    // Konvertierungstabelle berechnen
+    CalcTime2CounterTbl();
+
     ZyklenCounter=0;
 
     TapeBuffer = NULL;
@@ -372,12 +375,8 @@ void TAPE1530::OneCycle()
                         tmp[2] = TapeBuffer[TapeBufferPos+3];
                         WaitCounter = cycles;
                         TapeBufferPos += 4;
-
-                        std::cout << "LongWait: " << cycles << std::endl;
-
                     }
                     else WaitCounter = (TapeBuffer[TapeBufferPos++]<<3);
-                    //TapePosCycles += WaitCounter;
                 }
                 else WaitCounter--;
 
@@ -416,12 +415,8 @@ void TAPE1530::OneCycle()
                             tmp[2] = TapeBuffer[TapeBufferPos+3];
                             WaitCounter = cycles;
                             TapeBufferPos += 4;
-
-                            std::cout << "LongWait REW: " << cycles << std::endl;
-
                         }
                         else WaitCounter = (TapeBuffer[TapeBufferPos++]<<3);
-                        //TapePosCycles += WaitCounter;
                     }
                     else WaitCounter--;
 
@@ -461,11 +456,8 @@ void TAPE1530::OneCycle()
                             tmp[2] = TapeBuffer[TapeBufferPos+3];
                             WaitCounter = cycles;
                             TapeBufferPos--;
-
-                            std::cout << "LongWait REW: " << cycles << std::endl;
                         }
                         else WaitCounter = (TapeBuffer[TapeBufferPos--]<<3);
-                        //TapePosCycles -= WaitCounter;
 
                         if(TapeBufferPos > 3)
                         {
@@ -521,9 +513,32 @@ unsigned int TAPE1530::GetCounter()
         TapePosCycles = 0;
     float time = TapePosCycles / 985248.0;
 
-    // Formel Time to Counter
-    // Trendlinie
-    // f(x) = 1.99276712596766 * 10^-8 * x^3 - 0.000101391 * x^2 + 0.3404893716 * x + 1.1934882664
+    int time_sek = roundf(time);
+    float conv_wert;
 
-    return (1.99277e-8 * (time*time*time) - 0.000101 * (time*time) + 0.345 * time) * 100;
+    if(time_sek < 1800)
+        conv_wert = Time2CounterTbl[time_sek];
+    else
+        conv_wert = Time2CounterTbl[1799];
+    return time * conv_wert * 100;
+}
+
+void TAPE1530::CalcTime2CounterTbl()
+{
+    static float tbl1[9] = {0.357,0.3425,0.3175,0.2964,0.2786,0.2623,0.2479,0.2353,0.2220};
+    static float tbl2[9] = {0,146,315,506,718,953,1210,1487,1800};
+
+    int pos1 = 0;
+    for(int i=0; i<8; i++)
+    {
+        float mul = (tbl1[i+1] - tbl1[i]) / (tbl2[i+1] - tbl2[i]);
+
+        int j=0;
+        while(pos1 < tbl2[i+1])
+        {
+            Time2CounterTbl[pos1] = tbl1[i] + mul*j;
+            j++;
+            pos1++;
+        }
+    }
 }
