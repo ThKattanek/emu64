@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.09.2016                //
+// Letzte Änderung am 24.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -93,6 +93,7 @@ public:
 
     bool LoadTapeImage(char *filename);
     unsigned char SetTapeKeys(unsigned char pressed_key);
+    unsigned int GetTapeCounter();
 
     void SoftReset(void);
     void HardReset(void);

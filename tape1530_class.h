@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.09.2016                //
+// Letzte Änderung am 24.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,6 +18,7 @@
 
 #include <cstring>
 #include <fstream>
+#include <iostream>
 
 #include "mos6510_class.h"
 
@@ -27,6 +28,9 @@ enum TAPE_IMAGE_TYP
     WAV
 };
 
+#define REW_SPEED 15 // 15-Fache Geschwindigkeit
+#define FFW_SPEED 15 // 15-Fache Geschwindigkeit
+
 class TAPE1530
 {
 public:
@@ -35,11 +39,18 @@ public:
     unsigned char SetTapeKeys(unsigned char pressed_key);
     void OneCycle(void);
 
+    unsigned int GetCounter();
+
     MOS6510_PORT    *CPU_PORT;
     bool            CassRead;
 
 private:
     FILE            *file;
+
+    unsigned char   *TapeBuffer;
+    unsigned int    TapeBufferSize;
+    unsigned int    TapeBufferPos;
+    unsigned int    TapePosCycles;
 
     bool            IsTapeInsert;
     bool            IsRecTapeInsert;
@@ -48,14 +59,12 @@ private:
     unsigned int    TapeType;
     unsigned char   TapeVersion;
 
-    unsigned int    TapeSize;
-    unsigned int    TapePos;
-
     bool            TapePosIsStart;
     bool            TapePosIsEnd;
 
     unsigned char   PressedKeys;
     int             TapeStatus;
+    int             LastTapeStatus;
 
     unsigned int	ZyklenCounter;
     unsigned int	WaitCounter;

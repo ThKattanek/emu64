@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.09.2016                //
+// Letzte Änderung am 24.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -23,13 +23,19 @@ TapeWindow::TapeWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
     ini = _ini;
     ui->setupUi(this);
 
+    // Filebrowser initialisieren
     connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(OnSelectFile(QString)));
-
     ui->FileBrowser->SetFileFilter(QStringList()<<"*.tap"<<"*.wav");
 
+    // Wird momentan nicht angezeigt
     isOneShowed = false;
 
     this->c64 = c64;
+
+    refresh_timer = new QTimer(this);
+    refresh_timer->setInterval(40);    // 40ms also 25x in der Sekunde
+    refresh_timer->stop();
+    connect(refresh_timer,SIGNAL(timeout()),this,SLOT(OnRefreshGUI()));
 }
 
 TapeWindow::~TapeWindow()
@@ -47,6 +53,8 @@ TapeWindow::~TapeWindow()
         ini->endGroup();
     }
     ////////////////////////////////////
+
+    delete refresh_timer;
 
     delete ui;
 }
@@ -72,9 +80,16 @@ void TapeWindow::LoadIni()
     ////////////////////////////////////
 }
 
-void TapeWindow::showEvent(QShowEvent *event)
+void TapeWindow::showEvent(QShowEvent*)
 {
     isOneShowed = true;
+    refresh_timer->start();
+}
+
+void TapeWindow::hideEvent(QHideEvent*)
+{
+    isOneShowed = false;
+    refresh_timer->stop();
 }
 
 void TapeWindow::OnSelectFile(QString filename)
@@ -84,8 +99,14 @@ void TapeWindow::OnSelectFile(QString filename)
         QMessageBox::warning(this,trUtf8("Fehler!"),trUtf8("Fehler beim laden des TapeImages"));
 }
 
+void TapeWindow::OnRefreshGUI()
+{
+    ui->Counter->setText(QVariant(c64->GetTapeCounter()).toString());
+}
+
 void TapeWindow::on_Rec_clicked()
 {
+    UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_REC));
 }
 
 void TapeWindow::on_Play_clicked()
@@ -95,14 +116,17 @@ void TapeWindow::on_Play_clicked()
 
 void TapeWindow::on_Rew_clicked()
 {
+    UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_REW));
 }
 
 void TapeWindow::on_FFw_clicked()
 {
+    UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_FFW));
 }
 
 void TapeWindow::on_Stop_clicked()
 {
+    UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_STOP));
 }
 
 void TapeWindow::UpdateStateTapeKeys(unsigned char key_pressed)

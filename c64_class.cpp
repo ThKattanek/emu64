@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.09.2016                //
+// Letzte Änderung am 24.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -2040,6 +2040,11 @@ bool C64Class::LoadTapeImage(char *filename)
 unsigned char C64Class::SetTapeKeys(unsigned char pressed_key)
 {
     return tape->SetTapeKeys(pressed_key);
+}
+
+unsigned int C64Class::GetTapeCounter()
+{
+    return tape->GetCounter();
 }
 
 void C64Class::SetC64Speed(int speed)

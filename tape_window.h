@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.09.2016                //
+// Letzte Änderung am 24.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,6 +18,8 @@
 
 #include <QDialog>
 #include <QSettings>
+#include <QTimer>
+#include <QShowEvent>
 
 #include "c64_class.h"
 
@@ -34,10 +36,12 @@ public:
     ~TapeWindow();
     void RetranslateUi();
     void LoadIni();
-    void showEvent(QShowEvent *event);
+    void showEvent(QShowEvent*);
+    void hideEvent(QHideEvent*);
 
 private slots:
     void OnSelectFile(QString filename);
+    void OnRefreshGUI();
 
     void on_Rec_clicked();
     void on_Play_clicked();
@@ -54,6 +58,8 @@ private:
     C64Class *c64;
 
     bool isOneShowed;
+
+    QTimer *refresh_timer;
 };
 
 #endif // TAPE_WINDOW_H

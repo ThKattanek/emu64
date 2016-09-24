@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.09.2016                //
+// Letzte Änderung am 24.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -25,6 +25,10 @@ TAPE1530::TAPE1530(int samplerate, int puffersize)
 
     ZyklenCounter=0;
 
+    TapeBuffer = NULL;
+    TapeBufferSize = 0;
+    TapeBufferPos = 0;
+
     SoundBufferPos = 0;
     SoundBufferSize = puffersize;
     SoundBuffer = new unsigned short[SoundBufferSize];
@@ -40,9 +44,6 @@ TAPE1530::TAPE1530(int samplerate, int puffersize)
 
     Volume = 0.4f;
     Counter = 0;
-
-    TapePos = 0;
-    TapeSize = 0;
 }
 
 bool TAPE1530::LoadTapeImage(char *filename)
@@ -55,6 +56,14 @@ bool TAPE1530::LoadTapeImage(char *filename)
         IsTapeInsert = false;
         WritePotected = true;
     }
+
+    WAVEFormatTag = 0;
+    WAVEChannels = 0;
+    WAVESampleRate = 0;
+    WAVEBytePerSek = 0;
+    WAVEBlockAlign = 0;
+    WAVEBitPerSample = 0;
+    WAVEDataSize = 0;
 
     int len = (int)strlen(filename);
     strcpy(EXT,filename+len-3);
@@ -83,11 +92,29 @@ bool TAPE1530::LoadTapeImage(char *filename)
 
         fread(&TapeVersion,1,1,file);
         fseek(file,0x10,SEEK_SET);
-        fread(&TapeSize,1,4,file);
+        fread(&TapeBufferSize,1,4,file);
+
+        // Speicher für TapeBuffer reservieren vorher evtl. alten wieder freigeben
+        if(TapeBuffer != NULL)
+            delete[] TapeBuffer;
+
+        TapeBuffer = new unsigned char[TapeBufferSize];
+        if(TapeBuffer == NULL) return false;
+
+        // Tape Daten in Buffer laden
+        unsigned long reading_bytes = fread (TapeBuffer,1,TapeBufferSize,file);
+        if(reading_bytes != TapeBufferSize)
+        {
+            std::cout << "Tapeimage ist defekt !" << std::endl << "Anzahl der Daten stimmt nicht mit der Anzahl im Tape Header überein." << std::endl;
+            return false;
+        }
+
+        WaitCounter = 0;
 
         TapeType = 0;
         IsTapeInsert = true;
-        TapePos = 0;
+        TapeBufferPos = 0;
+        TapePosCycles = 0;
 
         TapePosIsStart = true;
         TapePosIsEnd = false;
@@ -105,7 +132,7 @@ bool TAPE1530::LoadTapeImage(char *filename)
             return false;
         }
 
-        fread(Kennung,1,sizeof(Kennung),file);
+        fread(Kennung,1,4,file);
         Kennung[4]=0;
         if(0!=strcmp("RIFF",Kennung))
         {
@@ -115,7 +142,7 @@ bool TAPE1530::LoadTapeImage(char *filename)
 
         fseek(file,4,SEEK_CUR);
 
-        fread(Kennung,1,sizeof(Kennung),file);
+        fread(Kennung,1,4,file);
         Kennung[4]=0;
         if(0!=strcmp("WAVE",Kennung))
         {
@@ -123,7 +150,7 @@ bool TAPE1530::LoadTapeImage(char *filename)
             return false;
         }
 
-        fread(Kennung,1,sizeof(Kennung),file);
+        fread(Kennung,1,4,file);
         Kennung[4]=0;
         if(0!=strcmp("fmt ",Kennung))
         {
@@ -133,17 +160,17 @@ bool TAPE1530::LoadTapeImage(char *filename)
 
         fseek(file,4,SEEK_CUR);
 
-        fread(&WAVEFormatTag,1,sizeof(WAVEFormatTag),file);
+        fread(&WAVEFormatTag,1,2,file);
         if(WAVEFormatTag != 1) return false;
 
-        fread(&WAVEChannels,1,sizeof(WAVEChannels),file);
+        fread(&WAVEChannels,1,2,file);
 
-        fread(&WAVESampleRate,1,sizeof(WAVESampleRate),file);
-        fread(&WAVEBytePerSek,1,sizeof(WAVEBytePerSek),file);
-        fread(&WAVEBlockAlign,1,sizeof(WAVEBlockAlign),file);
-        fread(&WAVEBitPerSample,1,sizeof(WAVEBitPerSample),file);
+        fread(&WAVESampleRate,1,4,file);
+        fread(&WAVEBytePerSek,1,4,file);
+        fread(&WAVEBlockAlign,1,2,file);
+        fread(&WAVEBitPerSample,1,2,file);
 
-        fread(Kennung,1,sizeof(Kennung),file);
+        fread(Kennung,1,4,file);
         Kennung[4]=0;
         if(0!=strcmp("data",Kennung))
         {
@@ -151,11 +178,10 @@ bool TAPE1530::LoadTapeImage(char *filename)
             return false;
         }
 
-        fread(&WAVEDataSize,1,sizeof(WAVEDataSize),file);
+        fread(&WAVEDataSize,1,4,file);
 
         TapeType = 1;
         IsTapeInsert = true;
-        TapePos = 0;
 
         TapePosIsStart = true;
         TapePosIsEnd = false;
@@ -182,7 +208,6 @@ unsigned char TAPE1530::SetTapeKeys(unsigned char pressed_key)
         if(IsTapeInsert)
         {
             CPU_PORT->ConfigChanged(1, 0, 0x17);
-            WaitCounter = 0;
             PressedKeys = TAPE_KEY_PLAY;
             TapeStatus = TAPE_IS_PLAY;
         }
@@ -234,6 +259,7 @@ unsigned char TAPE1530::SetTapeKeys(unsigned char pressed_key)
 void TAPE1530::OneCycle()
 {
     if(file == NULL) return;
+    if(!IsTapeInsert) return;
     if(CPU_PORT == NULL) return;
 
     static unsigned short WaveOut;
@@ -248,10 +274,9 @@ void TAPE1530::OneCycle()
         Middle
     };
 
-    static int CycleCounter;
+    int CycleCounter;
     static int WaveStatus;
     static int OldWaveStatus;
-
 
     switch (TapeType)
     {
@@ -271,7 +296,7 @@ void TAPE1530::OneCycle()
                         switch(WAVEBitPerSample)
                         {
                             case 8:
-                            fread(&ReadByte,1,sizeof(ReadByte),file);
+                            fread(&ReadByte,1,1,file);
                             if((i == WAVEDataChannel) || (WAVEChannels == 1))
                             {
                                 if(ReadByte < WAVELowPeek8Bit) WaveStatus = Low;
@@ -287,7 +312,7 @@ void TAPE1530::OneCycle()
                             break;
 
                             case 16:
-                            fread(&ReadWord,1,sizeof(ReadWord),file);
+                            fread(&ReadWord,1,2,file);
                             if((i == WAVEDataChannel) || (WAVEChannels == 1))
                             {
                                 ReadWord += 0x8000;
@@ -330,38 +355,47 @@ void TAPE1530::OneCycle()
                     if(WaveOut == 1)
                     {
                         WaveOut = 0x1FFF;
-
                     }
                     else
                     {
                         WaveOut = 1;
-
                     }
 
-                    fread (&ReadByte,1,1,file);
-                    TapePos++;
-
-                    if(ReadByte == 0)
+                    if(TapeBuffer[TapeBufferPos] == 0)
                     {
-                        unsigned long tmp;
-                        fread (&tmp,1,3,file);
-                        TapePos+=3;
-                        WaitCounter = tmp>>8;
+                        // Wenn 0 dann die nächsten 3Bytes in unsigned int (32Bit) wandeln
+                        // Mit Hilfe eines Zeigers auf cycles
+                        unsigned int cycles = 0;
+                        unsigned char *tmp = (unsigned char*)&cycles;
+                        tmp[0] = TapeBuffer[TapeBufferPos+1];
+                        tmp[1] = TapeBuffer[TapeBufferPos+2];
+                        tmp[2] = TapeBuffer[TapeBufferPos+3];
+                        WaitCounter = cycles;
+                        TapeBufferPos += 4;
+
+                        std::cout << "LongWait: " << cycles << std::endl;
+
                     }
-                    else WaitCounter = (ReadByte*8);
+                    else WaitCounter = (TapeBuffer[TapeBufferPos++]<<3);
+                    //TapePosCycles += WaitCounter;
                 }
-                WaitCounter--;
+                else WaitCounter--;
+
                 TapePosIsStart = false;
-                Counter += 0.00000330823863;
 
-                if(TapePos >= TapeSize) TapePosIsEnd = true;
-
+                if(TapeBufferPos >= TapeBufferSize)
+                {
+                    TapeBufferPos = TapeBufferSize-1;
+                    TapePosIsEnd = true;
+                }
+                TapePosCycles++;
             }
             else MotorStatusTmp = false;
 
             break;
+
         case TAPE_IS_FFW:
-            CycleCounter = 15;
+            CycleCounter = FFW_SPEED;
             while(CycleCounter != 0)
             {
                 if(CPU_PORT->DATASETTE_MOTOR && !TapePosIsEnd)
@@ -371,24 +405,34 @@ void TAPE1530::OneCycle()
 
                     if(WaitCounter == 0)
                     {
-                        fread (&ReadByte,1,1,file);
-                        TapePos++;
-
-                        if(ReadByte == 0)
+                        if(TapeBuffer[TapeBufferPos] == 0)
                         {
-                            unsigned long tmp;
-                            fread (&tmp,1,3,file);
-                            TapePos+=3;
-                            WaitCounter = tmp>>8;
+                            // Wenn 0 dann die nächsten 3Bytes in unsigned int (32Bit) wandeln
+                            // Mit Hilfe eines Zeigers auf cycles
+                            unsigned int cycles = 0;
+                            unsigned char *tmp = (unsigned char*)&cycles;
+                            tmp[0] = TapeBuffer[TapeBufferPos+1];
+                            tmp[1] = TapeBuffer[TapeBufferPos+2];
+                            tmp[2] = TapeBuffer[TapeBufferPos+3];
+                            WaitCounter = cycles;
+                            TapeBufferPos += 4;
+
+                            std::cout << "LongWait REW: " << cycles << std::endl;
+
                         }
-                        else WaitCounter = (ReadByte*8);
+                        else WaitCounter = (TapeBuffer[TapeBufferPos++]<<3);
+                        //TapePosCycles += WaitCounter;
                     }
-                    WaitCounter--;
+                    else WaitCounter--;
+
                     TapePosIsStart = false;
-                    Counter += 0.00000330823863;
 
-                    if(TapePos >= TapeSize) TapePosIsEnd = true;
-
+                    if(TapeBufferPos >= TapeBufferSize)
+                    {
+                        TapeBufferPos = TapeBufferSize-1;
+                        TapePosIsEnd = true;
+                    }
+                    TapePosCycles++;
                 }
                 else MotorStatusTmp = false;
                 CycleCounter--;
@@ -396,20 +440,68 @@ void TAPE1530::OneCycle()
             break;
 
         case TAPE_IS_REW:
-            CycleCounter = 15;
+            CycleCounter = REW_SPEED;
             while(CycleCounter != 0)
             {
                 if(CPU_PORT->DATASETTE_MOTOR && !TapePosIsStart)
                 {
+                    if(!MotorStatusTmp) WaitCounter = 0;
+                    MotorStatusTmp = true;
+
+                    if(WaitCounter == 0)
+                    {
+                        if(TapeBuffer[TapeBufferPos] == 0)
+                        {
+                            // Wenn 0 dann die nächsten 3Bytes in unsigned int (32Bit) wandeln
+                            // Mit Hilfe eines Zeigers auf cycles
+                            unsigned int cycles = 0;
+                            unsigned char *tmp = (unsigned char*)&cycles;
+                            tmp[0] = TapeBuffer[TapeBufferPos+1];
+                            tmp[1] = TapeBuffer[TapeBufferPos+2];
+                            tmp[2] = TapeBuffer[TapeBufferPos+3];
+                            WaitCounter = cycles;
+                            TapeBufferPos--;
+
+                            std::cout << "LongWait REW: " << cycles << std::endl;
+                        }
+                        else WaitCounter = (TapeBuffer[TapeBufferPos--]<<3);
+                        //TapePosCycles -= WaitCounter;
+
+                        if(TapeBufferPos > 3)
+                        {
+                            if((TapeBuffer[TapeBufferPos-3] == 0) && (TapeBuffer[TapeBufferPos-4] != 0))
+                                TapeBufferPos -= 3;
+                        }
+                        else if(TapeBufferPos == 3)
+                        {
+                            if(TapeBuffer[0] == 0)
+                            {
+                                TapeBufferPos = 0;
+                            }
+                        }
+
+                    }
+                    else WaitCounter--;
+
                     TapePosIsEnd = false;
-                    Counter -= 0.00000330823863;
+
+                    if(TapeBufferPos <= 0)
+                    {
+                        TapeBufferPos = 0;
+                        TapePosIsStart = true;
+                        TapePosCycles = 0;
+                    }
+                    else TapePosCycles--;
                 }
+                else MotorStatusTmp = false;
+
                 CycleCounter--;
             }
             break;
         }
-
+        LastTapeStatus = TapeStatus;
     }
+
     ZyklenCounter++;
     FreqConvCounter+=FreqConvAddWert;
     if(FreqConvCounter>=(double)1.0)
@@ -421,4 +513,17 @@ void TAPE1530::OneCycle()
         else SoundBuffer[SoundBufferPos++]=0;
         if(SoundBufferPos >= SoundBufferSize) SoundBufferPos = 0;
     }
+}
+
+unsigned int TAPE1530::GetCounter()
+{
+    if((signed int)TapePosCycles < 0)
+        TapePosCycles = 0;
+    float time = TapePosCycles / 985248.0;
+
+    // Formel Time to Counter
+    // Trendlinie
+    // f(x) = 1.99276712596766 * 10^-8 * x^3 - 0.000101391 * x^2 + 0.3404893716 * x + 1.1934882664
+
+    return (1.99276712596766e-8 * (time*time*time) - 0.000101391 * (time*time) + 0.3404893716 * time) * 100;
 }
