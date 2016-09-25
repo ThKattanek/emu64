@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.09.2016                //
+// Letzte Änderung am 25.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -2045,6 +2045,16 @@ unsigned char C64Class::SetTapeKeys(unsigned char pressed_key)
 unsigned int C64Class::GetTapeCounter()
 {
     return tape->GetCounter();
+}
+
+float C64Class::GetTapeLenTime()
+{
+    return tape->GetTapeLenTime();
+}
+
+unsigned int C64Class::GetTapeLenCount()
+{
+    return tape->GetTapeLenCount();
 }
 
 void C64Class::SetC64Speed(int speed)
