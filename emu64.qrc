@@ -69,5 +69,6 @@
         <file>grafik/yellow_led_7x7.png</file>
         <file>fonts/C64_Pro-STYLE.ttf</file>
         <file>grafik/style64.png</file>
+        <file>grafik/counter_numbers_24_384.png</file>
     </qresource>
 </RCC>
