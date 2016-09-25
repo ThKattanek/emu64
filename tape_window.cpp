@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.09.2016                //
+// Letzte Änderung am 25.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -97,6 +97,17 @@ void TapeWindow::OnSelectFile(QString filename)
     UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_STOP));
     if(!c64->LoadTapeImage(filename.toAscii().data()))
         QMessageBox::warning(this,trUtf8("Fehler!"),trUtf8("Fehler beim laden des TapeImages"));
+
+    unsigned int tape_time = roundf(c64->GetTapeLenTime());
+
+    QString TimeString = "";
+    TimeString += QVariant(tape_time / 3600).toString() + "h ";
+    tape_time %= 3600;
+    TimeString += QVariant(tape_time / 60).toString() + "m ";
+    tape_time %= 60;
+    TimeString += QVariant(tape_time).toString() + "s";
+
+    ui->TapeInfoOut->setText(trUtf8("Tape Länge: ") + TimeString + " [MaxCounter: " + QVariant(c64->GetTapeLenCount()).toString() + "]");
 }
 
 void TapeWindow::OnRefreshGUI()

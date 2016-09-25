@@ -583,7 +583,7 @@ void TAPE1530::CalcTapeLenTime()
         else sum_cycles += (TapeBuffer[i++]<<3);
     }
 
-    float TapeLenTime = sum_cycles / 985248.0;
+    TapeLenTime = sum_cycles / 985248.0;
 
     unsigned int TapeLenTimeInt = roundf(TapeLenTime);
 
