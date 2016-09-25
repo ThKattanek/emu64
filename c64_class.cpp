@@ -2042,6 +2042,11 @@ unsigned char C64Class::SetTapeKeys(unsigned char pressed_key)
     return tape->SetTapeKeys(pressed_key);
 }
 
+bool C64Class::GetTapeMotorStatus()
+{
+    return !(CPU_PORT.DATA_READ & 32);
+}
+
 unsigned int C64Class::GetTapeCounter()
 {
     return tape->GetCounter();

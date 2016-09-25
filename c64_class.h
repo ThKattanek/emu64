@@ -93,6 +93,7 @@ public:
 
     bool LoadTapeImage(char *filename);
     unsigned char SetTapeKeys(unsigned char pressed_key);
+    bool GetTapeMotorStatus();
     unsigned int GetTapeCounter();
     float GetTapeLenTime();
     unsigned int GetTapeLenCount();

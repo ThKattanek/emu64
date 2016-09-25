@@ -23,6 +23,15 @@ TapeWindow::TapeWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
     ini = _ini;
     ui->setupUi(this);
 
+    // ICON's für LED's laden
+    GreenLEDOff = new QIcon(":/grafik/green_led_off.png");
+    GreenLEDOn = new QIcon(":/grafik/green_led_on.png");
+    RedLEDOff = new QIcon(":/grafik/red_led_off.png");
+    RedLEDOn = new QIcon(":/grafik/red_led_on.png");
+
+    ui->MotorLED->setIcon(*GreenLEDOff);
+    ui->RecordLED->setIcon(*RedLEDOff);
+
     // Filebrowser initialisieren
     connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(OnSelectFile(QString)));
     ui->FileBrowser->SetFileFilter(QStringList()<<"*.tap"<<"*.wav");
@@ -112,7 +121,12 @@ void TapeWindow::OnSelectFile(QString filename)
 
 void TapeWindow::OnRefreshGUI()
 {
+    // Counter setzen
     ui->Counter->SetCounter(c64->GetTapeCounter());
+
+    // LED's updaten
+    if(c64->GetTapeMotorStatus()) ui->MotorLED->setIcon(*GreenLEDOn);
+    else ui->MotorLED->setIcon(*GreenLEDOff);
 }
 
 void TapeWindow::on_Rec_clicked()

@@ -57,6 +57,12 @@ private:
     QSettings *ini;
     C64Class *c64;
 
+    QIcon *GreenLEDOff;
+    QIcon *GreenLEDOn;
+
+    QIcon *RedLEDOff;
+    QIcon *RedLEDOn;
+
     bool isOneShowed;
 
     QTimer *refresh_timer;
