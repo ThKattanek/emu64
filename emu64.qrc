@@ -70,5 +70,6 @@
         <file>fonts/C64_Pro-STYLE.ttf</file>
         <file>grafik/style64.png</file>
         <file>grafik/counter_numbers_24_384.png</file>
+        <file>grafik/counter_numbers_24_384_blend.png</file>
     </qresource>
 </RCC>
