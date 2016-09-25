@@ -27,6 +27,7 @@ TAPE1530::TAPE1530(int samplerate, int puffersize)
     CalcTime2CounterTbl();
 
     TapeLenTime = 0;
+    TapeLenCount = 0;
 
     ZyklenCounter=0;
 
@@ -78,6 +79,7 @@ bool TAPE1530::LoadTapeImage(char *filename)
     EXT[2]=toupper(EXT[2]);
 
     TapeLenTime = 0;
+    TapeLenCount = 0;
 
     if(0==strcmp("TAP",EXT))
     {
