@@ -29,8 +29,8 @@ enum TAPE_IMAGE_TYP
     WAV
 };
 
-#define REW_SPEED 15 // 15-Fache Geschwindigkeit
-#define FFW_SPEED 15 // 15-Fache Geschwindigkeit
+#define REW_SPEED 12 // 15-Fache Geschwindigkeit
+#define FFW_SPEED 12 // 15-Fache Geschwindigkeit
 
 class TAPE1530
 {
