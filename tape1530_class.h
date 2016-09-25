@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.09.2016                //
+// Letzte Änderung am 25.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -42,11 +42,15 @@ public:
 
     unsigned int GetCounter();
 
+    float GetTapeLenTime();
+    unsigned int GetTapeLenCount();
+
     MOS6510_PORT    *CPU_PORT;
     bool            CassRead;
 
 private:
     void CalcTime2CounterTbl(void);
+    void CalcTapeLenTime();
 
     FILE            *file;
 
@@ -54,6 +58,9 @@ private:
     unsigned int    TapeBufferSize;
     unsigned int    TapeBufferPos;
     unsigned int    TapePosCycles;
+
+    float           TapeLenTime;
+    unsigned int    TapeLenCount;
 
     bool            IsTapeInsert;
     bool            IsRecTapeInsert;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.09.2016                //
+// Letzte Änderung am 25.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -25,6 +25,8 @@ TAPE1530::TAPE1530(int samplerate, int puffersize)
 
     // Konvertierungstabelle berechnen
     CalcTime2CounterTbl();
+
+    TapeLenTime = 0;
 
     ZyklenCounter=0;
 
@@ -75,6 +77,8 @@ bool TAPE1530::LoadTapeImage(char *filename)
     EXT[1]=toupper(EXT[1]);
     EXT[2]=toupper(EXT[2]);
 
+    TapeLenTime = 0;
+
     if(0==strcmp("TAP",EXT))
     {
         char Kennung[13];
@@ -121,6 +125,8 @@ bool TAPE1530::LoadTapeImage(char *filename)
 
         TapePosIsStart = true;
         TapePosIsEnd = false;
+
+        CalcTapeLenTime();
 
         return true;
     }
@@ -523,6 +529,16 @@ unsigned int TAPE1530::GetCounter()
     return time * conv_wert * 100;
 }
 
+float TAPE1530::GetTapeLenTime()
+{
+    return TapeLenTime;
+}
+
+unsigned int TAPE1530::GetTapeLenCount()
+{
+    return TapeLenCount;
+}
+
 void TAPE1530::CalcTime2CounterTbl()
 {
     static float tbl1[9] = {0.357,0.3425,0.3175,0.2964,0.2786,0.2623,0.2479,0.2353,0.2220};
@@ -541,4 +557,40 @@ void TAPE1530::CalcTime2CounterTbl()
             pos1++;
         }
     }
+}
+
+void TAPE1530::CalcTapeLenTime()
+{
+    unsigned int sum_cycles = 0;
+    int i=0;
+
+    while(i < TapeBufferSize)
+    {
+        if(TapeBuffer[i] == 0)
+        {
+            // Wenn 0 dann die nächsten 3Bytes in unsigned int (32Bit) wandeln
+            // Mit Hilfe eines Zeigers auf cycles
+            unsigned int cycles = 0;
+            unsigned char *tmp = (unsigned char*)&cycles;
+            tmp[0] = TapeBuffer[i+1];
+            tmp[1] = TapeBuffer[i+2];
+            tmp[2] = TapeBuffer[i+3];
+            sum_cycles += cycles;
+            i += 4;
+        }
+        else sum_cycles += (TapeBuffer[i++]<<3);
+    }
+
+    float TapeLenTime = sum_cycles / 985248.0;
+
+    unsigned int TapeLenTimeInt = roundf(TapeLenTime);
+
+    // Zu Counter Konvertieren
+    float conv_wert;
+    if(TapeLenTimeInt < 1800)
+        conv_wert = Time2CounterTbl[TapeLenTimeInt];
+    else
+        conv_wert = Time2CounterTbl[1799];
+
+    TapeLenCount = TapeLenTime * conv_wert;
 }
