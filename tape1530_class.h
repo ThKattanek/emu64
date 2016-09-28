@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.09.2016                //
+// Letzte Änderung am 28.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -36,8 +36,11 @@ class TAPE1530
 {
 public:
     TAPE1530(int samplerate, int puffersize);
+    ~TAPE1530();
     bool LoadTapeImage(char* filename);
     unsigned char SetTapeKeys(unsigned char pressed_key);
+    void *GetSoundBuffer(void);
+    void ZeroSoundBufferPos();
     void OneCycle(void);
 
     unsigned int GetCounter();
@@ -78,6 +81,7 @@ private:
 
     unsigned int	ZyklenCounter;
     unsigned int	WaitCounter;
+    unsigned int    WaitCounterHalf;
 
     float           Counter;
     float Time2CounterTbl[1800];    // Platz für 1800 sek (30min)

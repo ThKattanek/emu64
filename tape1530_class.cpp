@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.09.2016                //
+// Letzte Änderung am 28.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -50,6 +50,11 @@ TAPE1530::TAPE1530(int samplerate, int puffersize)
 
     Volume = 0.4f;
     Counter = 0;
+}
+
+TAPE1530::~TAPE1530()
+{
+    if(SoundBuffer != NULL) delete[] SoundBuffer;
 }
 
 bool TAPE1530::LoadTapeImage(char *filename)
@@ -267,6 +272,16 @@ unsigned char TAPE1530::SetTapeKeys(unsigned char pressed_key)
     return PressedKeys;
 }
 
+void *TAPE1530::GetSoundBuffer()
+{
+    return SoundBuffer;
+}
+
+void TAPE1530::ZeroSoundBufferPos()
+{
+    SoundBufferPos = 0;
+}
+
 void TAPE1530::OneCycle()
 {
     if(file == NULL) return;
@@ -363,14 +378,6 @@ void TAPE1530::OneCycle()
                 if(WaitCounter == 0)
                 {
                     CassRead = !CassRead;
-                    if(WaveOut == 1)
-                    {
-                        WaveOut = 0x1FFF;
-                    }
-                    else
-                    {
-                        WaveOut = 1;
-                    }
 
                     if(TapeBuffer[TapeBufferPos] == 0)
                     {
@@ -385,8 +392,15 @@ void TAPE1530::OneCycle()
                         TapeBufferPos += 4;
                     }
                     else WaitCounter = (TapeBuffer[TapeBufferPos++]<<3);
+
+                    WaveOut = 1;
+                    WaitCounterHalf = WaitCounter >> 1;
                 }
-                else WaitCounter--;
+                else
+                {
+                    WaitCounter--;
+                    if(WaitCounter == WaitCounterHalf) WaveOut = 0x1FFF;
+                }
 
                 TapePosIsStart = false;
 

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.09.2016                //
+// Letzte Änderung am 28.09.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -649,6 +649,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
     sid2->SoundBufferPos = 0;
     for(int i=0; i< FloppyAnzahl; i++)
         floppy[i]->ZeroSoundBufferPos();
+    tape->ZeroSoundBufferPos();
 
     if(!DebugMode)
     {
@@ -767,6 +768,8 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
         {
             if(floppy[i]->GetEnableFloppySound()) SDL_MixAudio((unsigned char*)puffer,(unsigned char*)floppy[i]->GetSoundBuffer(),laenge,255);
         }
+
+        SDL_MixAudio((unsigned char*)puffer,(unsigned char*)tape->GetSoundBuffer(),laenge,255);
     }
     else
     {
