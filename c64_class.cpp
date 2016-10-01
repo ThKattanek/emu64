@@ -26,7 +26,7 @@ int SDLThread(void *userdat);
 int SDLThreadLoad(void *userdat);
 
 #define AudioSampleRate 44100
-#define AudioPufferSize 882    // 882 bei 44.100 Khz
+#define AudioPufferSize (882*2)    // 882 bei 44.100 Khz
 #define RecPollingWaitStart 20
 
 #define C64ScreenXW 384         //384
