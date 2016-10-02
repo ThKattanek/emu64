@@ -34,7 +34,8 @@ TapeWindow::TapeWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
 
     // Filebrowser initialisieren
     connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(OnSelectFile(QString)));
-    ui->FileBrowser->SetFileFilter(QStringList()<<"*.tap"<<"*.wav");
+    //ui->FileBrowser->SetFileFilter(QStringList()<<"*.tap"<<"*.wav");
+    ui->FileBrowser->SetFileFilter(QStringList()<<"*.tap");
 
     // Wird momentan nicht angezeigt
     isOneShowed = false;
