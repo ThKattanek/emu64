@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.09.2016                //
+// Letzte Änderung am 02.10.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -49,8 +49,11 @@ private slots:
     void on_FFw_clicked();
     void on_Stop_clicked();
 
+    void on_Volume_clicked();
+
 private:
     void UpdateStateTapeKeys(unsigned char key_pressed);
+    void SetTapeVolume(int mode);
 
     Ui::TapeWindow *ui;
 
@@ -62,6 +65,13 @@ private:
 
     QIcon *RedLEDOff;
     QIcon *RedLEDOn;
+
+    int TapeSoundVolumeMode;
+
+    QIcon *VolMute;
+    QIcon *VolLow;
+    QIcon *VolMedium;
+    QIcon *VolHigh;
 
     bool isOneShowed;
 

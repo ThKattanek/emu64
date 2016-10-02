@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.09.2016                //
+// Letzte Änderung am 02.10.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -97,6 +97,7 @@ public:
     unsigned int GetTapeCounter();
     float GetTapeLenTime();
     unsigned int GetTapeLenCount();
+    void SetTapeSoundVolume(float volume);
 
     void SoftReset(void);
     void HardReset(void);

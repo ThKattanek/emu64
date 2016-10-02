@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 28.09.2016                //
+// Letzte Änderung am 02.10.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,9 +19,19 @@ TAPE1530::TAPE1530(int samplerate, int puffersize)
 {
     CPU_PORT = NULL;
 
-    Samplerate=(double)samplerate;
-    FreqConvAddWert=((double)1.0)/((double)985248.0/Samplerate);
-    FreqConvCounter=0.0;
+    Samplerate = (float)samplerate;
+    FreqConvAddWert = 1.0/(985248.0/Samplerate);
+    FreqConvCounter = 0.0;
+
+    PlayFrequenzFaktor = 4294967296.0 / 985248.0;     // 2^32 / Samplerate;
+    PlayCounter = 0;
+    PlayAddWert = 0;
+
+    // WaveTableSinus füllen
+    for(int i=0; i<SAMPLE_TBL_LENGTH; i++)
+    {
+        WaveTableSinus[i] = sin(((2*M_PI)/SAMPLE_TBL_LENGTH)*i+1.0*M_PI) * 0x1FFF;
+    }
 
     // Konvertierungstabelle berechnen
     CalcTime2CounterTbl();
@@ -37,7 +47,7 @@ TAPE1530::TAPE1530(int samplerate, int puffersize)
 
     SoundBufferPos = 0;
     SoundBufferSize = puffersize;
-    SoundBuffer = new unsigned short[SoundBufferSize];
+    SoundBuffer = new signed short[SoundBufferSize];
 
     file = NULL;
     WaitCounter = 0;
@@ -48,7 +58,7 @@ TAPE1530::TAPE1530(int samplerate, int puffersize)
     IsRecTapeInsert = false;
     WritePotected = true;
 
-    Volume = 0.4f;
+    Volume = 0.0f;
     Counter = 0;
 }
 
@@ -288,7 +298,7 @@ void TAPE1530::OneCycle()
     if(!IsTapeInsert) return;
     if(CPU_PORT == NULL) return;
 
-    static unsigned short WaveOut;
+    static signed short WaveOut;
     static bool MotorStatusTmp = false;
     static unsigned char ReadByte;
     static unsigned short ReadWord;
@@ -393,13 +403,21 @@ void TAPE1530::OneCycle()
                     }
                     else WaitCounter = (TapeBuffer[TapeBufferPos++]<<3);
 
-                    WaveOut = 1;
-                    WaitCounterHalf = WaitCounter >> 1;
+                    float Frequenz = 1.0 / (WaitCounter / 985248.0);
+                    PlayCounter = 0;
+                    PlayAddWert = (unsigned long)(Frequenz * PlayFrequenzFaktor);
+
+                    //WaveOut = 1;
+                    //WaitCounterHalf = WaitCounter >> 1;
                 }
                 else
                 {
                     WaitCounter--;
-                    if(WaitCounter == WaitCounterHalf) WaveOut = 0x1FFF;
+
+                    WaveOut = (WaveTableSinus[(PlayCounter >> 16)&0xffff]);
+                    PlayCounter += PlayAddWert;
+
+                    //if(WaitCounter == WaitCounterHalf) WaveOut = 0x1FFF;
                 }
 
                 TapePosIsStart = false;
@@ -527,6 +545,11 @@ void TAPE1530::OneCycle()
         else SoundBuffer[SoundBufferPos++]=0;
         if(SoundBufferPos >= SoundBufferSize) SoundBufferPos = 0;
     }
+}
+
+void TAPE1530::SetTapeSoundVolume(float volume)
+{
+    this->Volume = volume;
 }
 
 unsigned int TAPE1530::GetCounter()

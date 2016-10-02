@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 28.09.2016                //
+// Letzte Änderung am 02.10.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -32,6 +32,8 @@ enum TAPE_IMAGE_TYP
 #define REW_SPEED 12 // 15-Fache Geschwindigkeit
 #define FFW_SPEED 12 // 15-Fache Geschwindigkeit
 
+#define SAMPLE_TBL_LENGTH 0x10000
+
 class TAPE1530
 {
 public:
@@ -43,6 +45,7 @@ public:
     void ZeroSoundBufferPos();
     void OneCycle(void);
 
+    void SetTapeSoundVolume(float volume);
     unsigned int GetCounter();
 
     float GetTapeLenTime();
@@ -106,12 +109,17 @@ private:
     float           Samplerate;
     float           FreqConvCounter;
     float           FreqConvAddWert;
-    unsigned short	*SoundBuffer;
+    signed short	*SoundBuffer;
     unsigned int	SoundBufferPos;
     unsigned int	SoundBufferSize;
     bool			SoundOutputEnable;
     float           Volume;
 
+    float PlayFrequenzFaktor;
+    unsigned long PlayCounter;
+    unsigned long PlayAddWert;
+
+    unsigned short WaveTableSinus[SAMPLE_TBL_LENGTH];
 };
 
 #endif // TAPE1530_H

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.09.2016                //
+// Letzte Änderung am 02.10.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -31,6 +31,15 @@ TapeWindow::TapeWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
 
     ui->MotorLED->setIcon(*GreenLEDOff);
     ui->RecordLED->setIcon(*RedLEDOff);
+
+    VolMute = new QIcon(":/grafik/audio_volume_mute.png");
+    VolLow = new QIcon(":/grafik/audio_volume_low.png");
+    VolMedium = new QIcon(":/grafik/audio_volume_medium.png");
+    VolHigh = new QIcon(":/grafik/audio_volume_high.png");
+
+    c64->SetTapeSoundVolume(0.0);
+    TapeSoundVolumeMode = 0;
+    ui->Volume->setIcon(*VolMute);
 
     // Filebrowser initialisieren
     connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(OnSelectFile(QString)));
@@ -167,4 +176,42 @@ void TapeWindow::UpdateStateTapeKeys(unsigned char key_pressed)
     else ui->FFw->setChecked(false);
     if(key_pressed & TAPE_KEY_STOP) ui->Stop->setChecked(true);
     else ui->Stop->setChecked(false);
+}
+
+void TapeWindow::on_Volume_clicked()
+{
+    if(TapeSoundVolumeMode == 3) TapeSoundVolumeMode = 0;
+    else TapeSoundVolumeMode++;
+    SetTapeVolume(TapeSoundVolumeMode);
+}
+
+void TapeWindow::SetTapeVolume(int mode)
+{
+    TapeSoundVolumeMode = mode;
+
+    switch(mode)
+    {
+    case 0:
+        ui->Volume->setIcon(*VolMute);
+        c64->SetTapeSoundVolume(0.0);
+        ui->Volume->setToolTip(trUtf8("Datasette Lautsprecher ist ausgeschaltet."));
+        break;
+    case 1:
+        ui->Volume->setIcon(*VolLow);
+        c64->SetTapeSoundVolume(0.05);
+        ui->Volume->setToolTip(trUtf8("Datasette Lautsprecher ist auf leise gestellt."));
+        break;
+    case 2:
+        ui->Volume->setIcon(*VolMedium);
+        c64->SetTapeSoundVolume(0.1);
+        ui->Volume->setToolTip(trUtf8("Datasette Lautsprecher ist auf mittel gestellt."));
+        break;
+    case 3:
+        ui->Volume->setIcon(*VolHigh);
+        c64->SetTapeSoundVolume(0.3);
+        ui->Volume->setToolTip(trUtf8("Datasette Lautsprecher ist auf laut gestellt."));
+        break;
+    default:
+        break;
+    }
 }

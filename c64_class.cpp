@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 28.09.2016                //
+// Letzte Änderung am 02.10.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -2063,6 +2063,11 @@ float C64Class::GetTapeLenTime()
 unsigned int C64Class::GetTapeLenCount()
 {
     return tape->GetTapeLenCount();
+}
+
+void C64Class::SetTapeSoundVolume(float volume)
+{
+    tape->SetTapeSoundVolume(volume);
 }
 
 void C64Class::SetC64Speed(int speed)
