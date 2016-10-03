@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.10.2016                //
+// Letzte Änderung am 03.10.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -137,11 +137,48 @@ void TapeWindow::OnRefreshGUI()
     // LED's updaten
     if(c64->GetTapeMotorStatus()) ui->MotorLED->setIcon(*GreenLEDOn);
     else ui->MotorLED->setIcon(*GreenLEDOff);
+
+    if(c64->GetTapeRecordLedStatus()) ui->RecordLED->setIcon(*RedLEDOn);
+    else ui->RecordLED->setIcon(*RedLEDOff);
 }
 
 void TapeWindow::on_Rec_clicked()
 {
-    UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_REC));
+    TapeNewWindow tnw(this);
+    tnw.setWindowTitle(trUtf8("Name des neues TAP Files."));
+
+    if(tnw.exec())
+    {
+        QString filename = tnw.GetFilename();
+        if(!(filename == ""))
+        {
+            AddFileExtension(filename, ".tap");
+
+            QString fullpath = ui->FileBrowser->GetAktDir() + "/" + filename;
+
+            if(QFile::exists(fullpath))
+            {
+                if(QMessageBox::No == QMessageBox::question(this,trUtf8("Achtung!"),trUtf8("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
+                {
+                    UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_STOP));
+                    return;
+                }
+            }
+
+            // Theoretisch bereit zur Aufnahme
+            if(!c64->RecordTapeImage(fullpath.toAscii().data()))
+            {
+                QMessageBox::information(this,trUtf8("Achtung"),trUtf8("Es konnte keine Aufnahme gestartet werden.\nBitte überprüfen Sie ob sie ausreichend Rechte besitzen."));
+            }
+            else UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_REC));
+        }
+        else
+        {
+            QMessageBox::information(this,trUtf8("Achtung"),trUtf8("Es muss ein Tape Name angegeben werden.\nEs wird keine Aufnahme gestartet!"));
+            UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_STOP));
+        }
+    }
+    else UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_STOP));
 }
 
 void TapeWindow::on_Play_clicked()
@@ -166,8 +203,6 @@ void TapeWindow::on_Stop_clicked()
 
 void TapeWindow::UpdateStateTapeKeys(unsigned char key_pressed)
 {
-    if(key_pressed & TAPE_KEY_REC) ui->Rec->setChecked(true);
-    else ui->Rec->setChecked(false);
     if(key_pressed & TAPE_KEY_PLAY) ui->Play->setChecked(true);
     else ui->Play->setChecked(false);
     if(key_pressed & TAPE_KEY_REW) ui->Rew->setChecked(true);
@@ -176,6 +211,15 @@ void TapeWindow::UpdateStateTapeKeys(unsigned char key_pressed)
     else ui->FFw->setChecked(false);
     if(key_pressed & TAPE_KEY_STOP) ui->Stop->setChecked(true);
     else ui->Stop->setChecked(false);
+    if(key_pressed & TAPE_KEY_REC)
+    {
+        ui->Rec->setChecked(true);
+        ui->Play->setChecked(true);
+    }
+    else
+    {
+        ui->Rec->setChecked(false);
+    }
 }
 
 void TapeWindow::on_Volume_clicked()
@@ -214,4 +258,14 @@ void TapeWindow::SetTapeVolume(int mode)
     default:
         break;
     }
+}
+
+void TapeWindow::AddFileExtension(QString& filename, const QString extension)
+{
+    if(filename.length() > 4)
+    {
+        if(!(filename.right(4).toLower() == extension.toLower()))
+            filename += extension;
+    }
+    else filename += extension;
 }

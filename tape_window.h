@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.10.2016                //
+// Letzte Änderung am 03.10.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -22,6 +22,7 @@
 #include <QShowEvent>
 
 #include "c64_class.h"
+#include "tape_new_window.h"
 
 namespace Ui {
 class TapeWindow;
@@ -54,6 +55,7 @@ private slots:
 private:
     void UpdateStateTapeKeys(unsigned char key_pressed);
     void SetTapeVolume(int mode);
+    void AddFileExtension(QString &filename, const QString extension);
 
     Ui::TapeWindow *ui;
 

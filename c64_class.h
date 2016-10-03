@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.10.2016                //
+// Letzte Änderung am 03.10.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -92,8 +92,10 @@ public:
     void SetWindowSize(int w, int h);
 
     bool LoadTapeImage(char *filename);
+    bool RecordTapeImage(char* filename);
     unsigned char SetTapeKeys(unsigned char pressed_key);
     bool GetTapeMotorStatus();
+    bool GetTapeRecordLedStatus();
     unsigned int GetTapeCounter();
     float GetTapeLenTime();
     unsigned int GetTapeLenCount();

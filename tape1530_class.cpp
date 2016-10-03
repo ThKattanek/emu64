@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.10.2016                //
+// Letzte Änderung am 03.10.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -50,6 +50,7 @@ TAPE1530::TAPE1530(int samplerate, int puffersize)
     SoundBuffer = new signed short[SoundBufferSize];
 
     file = NULL;
+    recfile = NULL;
     WaitCounter = 0;
 
     PressedKeys = 0;
@@ -64,6 +65,7 @@ TAPE1530::TAPE1530(int samplerate, int puffersize)
 
 TAPE1530::~TAPE1530()
 {
+    StopRecordImage();
     if(SoundBuffer != NULL) delete[] SoundBuffer;
 }
 
@@ -217,8 +219,47 @@ bool TAPE1530::LoadTapeImage(char *filename)
 
         return true;
     }
-
     return false;
+}
+
+bool TAPE1530::RecordTapeImage(char *filename)
+{
+    if(recfile != NULL) return false;
+
+    // Datei zum schreiben öffnen
+    recfile = fopen(filename, "wb");
+    if (recfile == NULL)
+        return false;
+
+    char Kennung[] = "C64-TAPE-RAW";
+    unsigned int WriteDWord = 0;
+
+    // 0x00: Kennung
+    fwrite(Kennung,1,12,recfile);
+    // 0x0C: Version + 0x0D: Future expansion
+    fwrite(&WriteDWord,1,4,recfile);
+    // 0x10: Platzhalter Datasize
+    fwrite(&WriteDWord,1,4,recfile);
+    // 0x14: Daten
+
+    TapePosCycles = RecCyclesCounter = RecTapeSize = 0;
+    IsRecTapeInsert = true;
+
+    return true;
+}
+
+void TAPE1530::StopRecordImage()
+{
+    if(recfile != NULL)
+    {
+        // Datasize eintragen
+        fseek(recfile,0x10,SEEK_SET);
+        fwrite(&RecTapeSize,1,4,recfile);
+
+        fclose(recfile);
+        recfile = NULL;
+    }
+    IsRecTapeInsert = false;
 }
 
 unsigned char TAPE1530::SetTapeKeys(unsigned char pressed_key)
@@ -226,6 +267,7 @@ unsigned char TAPE1530::SetTapeKeys(unsigned char pressed_key)
     switch (pressed_key)
     {
     case TAPE_KEY_STOP:
+        StopRecordImage();
         CPU_PORT->ConfigChanged(0, 0, 0x17);
         PressedKeys = 0;
         TapeStatus = TAPE_IS_STOP;
@@ -244,6 +286,7 @@ unsigned char TAPE1530::SetTapeKeys(unsigned char pressed_key)
         }
         break;
     case TAPE_KEY_REW:
+        StopRecordImage();
         if(IsTapeInsert)
         {
             CPU_PORT->ConfigChanged(1, 0, 0x17);
@@ -257,6 +300,7 @@ unsigned char TAPE1530::SetTapeKeys(unsigned char pressed_key)
         }
         break;
     case TAPE_KEY_FFW:
+        StopRecordImage();
         if(IsTapeInsert)
         {
             CPU_PORT->ConfigChanged(1, 0, 0x17);
@@ -270,7 +314,18 @@ unsigned char TAPE1530::SetTapeKeys(unsigned char pressed_key)
         }
         break;
     case TAPE_KEY_REC:
-        PressedKeys = 0;
+        if(IsRecTapeInsert)
+        {
+            CPU_PORT->ConfigChanged(1, 0, 0x17);
+            PressedKeys = TAPE_KEY_REC;
+            TapeStatus = TAPE_IS_REC;
+        }
+        else
+        {
+            CPU_PORT->ConfigChanged(0, 0, 0x17);
+            PressedKeys = 0;
+        }
+        //PressedKeys = 0;
         break;
     case TAPE_KEY_PAUSE:
         PressedKeys = 0;
@@ -302,6 +357,10 @@ void TAPE1530::OneCycle()
     static bool MotorStatusTmp = false;
     static unsigned char ReadByte;
     static unsigned short ReadWord;
+    static unsigned char WriteByte;
+    static unsigned short WriteWord;
+
+    static unsigned char CPU_PORT_OLD;
 
     enum
     {
@@ -430,7 +489,38 @@ void TAPE1530::OneCycle()
                 TapePosCycles++;
             }
             else MotorStatusTmp = false;
+            break;
 
+        case TAPE_IS_REC:
+            if(CPU_PORT->DATASETTE_MOTOR && !TapePosIsEnd)
+            {
+                if(!MotorStatusTmp) WaitCounter = 0;
+                MotorStatusTmp = true;
+
+                if(((CPU_PORT->DATA & 8) == 8) && ((CPU_PORT_OLD & 8) == 0))	// PIN Wechsel
+                {
+                    if(RecCyclesCounter > 2040)
+                    {
+                        WriteByte = 0;
+                        WriteWord = (unsigned short)(RecCyclesCounter << 8);
+                        fwrite(&WriteByte,1,1,recfile);
+                        fwrite(&WriteWord,1,3,recfile);
+                        RecTapeSize += 4;
+                    }
+                    else
+                    {
+                        WriteByte = (unsigned char)(RecCyclesCounter >> 3);
+                        WriteByte++;
+                        fwrite(&WriteByte,1,1,recfile);
+                        RecTapeSize ++;
+                    }
+                    RecCyclesCounter = 0;
+                }
+                CPU_PORT_OLD = (CPU_PORT->DATA & 8);
+                RecCyclesCounter++;
+                TapePosCycles++;
+            }
+            else MotorStatusTmp = false;
             break;
 
         case TAPE_IS_FFW:
@@ -578,6 +668,12 @@ unsigned int TAPE1530::GetTapeLenCount()
     return TapeLenCount;
 }
 
+bool TAPE1530::IsPressedRecord()
+{
+    if(TapeStatus == TAPE_IS_REC) return true;
+    else return false;
+}
+
 void TAPE1530::CalcTime2CounterTbl()
 {
     static float tbl1[9] = {0.357,0.3425,0.3175,0.2964,0.2786,0.2623,0.2479,0.2353,0.2220};
@@ -601,7 +697,7 @@ void TAPE1530::CalcTime2CounterTbl()
 void TAPE1530::CalcTapeLenTime()
 {
     unsigned int sum_cycles = 0;
-    int i=0;
+    unsigned int i = 0;
 
     while(i < TapeBufferSize)
     {

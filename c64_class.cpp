@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.10.2016                //
+// Letzte Änderung am 03.10.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -2040,6 +2040,11 @@ bool C64Class::LoadTapeImage(char *filename)
     return tape->LoadTapeImage(filename);
 }
 
+bool C64Class::RecordTapeImage(char *filename)
+{
+    return tape->RecordTapeImage(filename);
+}
+
 unsigned char C64Class::SetTapeKeys(unsigned char pressed_key)
 {
     return tape->SetTapeKeys(pressed_key);
@@ -2048,6 +2053,12 @@ unsigned char C64Class::SetTapeKeys(unsigned char pressed_key)
 bool C64Class::GetTapeMotorStatus()
 {
     return !(CPU_PORT.DATA_READ & 32);
+}
+
+bool C64Class::GetTapeRecordLedStatus()
+{
+    if((!(CPU_PORT.DATA_READ & 32)) && tape->IsPressedRecord()) return true;
+    else return false;
 }
 
 unsigned int C64Class::GetTapeCounter()
