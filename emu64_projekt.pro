@@ -60,7 +60,8 @@ SOURCES += \
     floppy_new_d64_window.cpp \
     tape1530_class.cpp \
     tape_window.cpp \
-    widget_tape_counter.cpp
+    widget_tape_counter.cpp \
+    tape_new_window.cpp
 
 HEADERS  += \
     info_window.h \
@@ -119,7 +120,8 @@ HEADERS  += \
     floppy_new_d64_window.h \
     tape1530_class.h \
     tape_window.h \
-    widget_tape_counter.h
+    widget_tape_counter.h \
+    tape_new_window.h
 
 FORMS    += \
     info_window.ui \
@@ -142,7 +144,8 @@ FORMS    += \
     debugger_iec_window.ui \
     floppy_new_d64_window.ui \
     tape_window.ui \
-    widget_tape_counter.ui
+    widget_tape_counter.ui \
+    tape_new_window.ui
 
 RESOURCES += \
     emu64.qrc
