@@ -174,6 +174,7 @@ void TapeWindow::on_Rec_clicked()
             {
                 UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_REC));
                 ui->FileBrowser->RefreshAktDir();
+                ui->FileBrowser->setEnabled(false);
             }
         }
         else
@@ -203,6 +204,7 @@ void TapeWindow::on_FFw_clicked()
 void TapeWindow::on_Stop_clicked()
 {
     UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_STOP));
+    ui->FileBrowser->setEnabled(true);
     ui->FileBrowser->RefreshAktDir();
 }
 
