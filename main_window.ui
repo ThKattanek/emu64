@@ -122,6 +122,9 @@ background-position: center
    </property>
   </widget>
   <widget class="QToolBar" name="toolBar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="windowTitle">
     <string notr="true">toolBar</string>
    </property>
@@ -149,7 +152,6 @@ background-position: center
    <addaction name="actionBeenden"/>
    <addaction name="menu_main_info"/>
    <addaction name="actionScreenshot"/>
-   <addaction name="actionHandbuch"/>
    <addaction name="actionFloppy_1541_II"/>
    <addaction name="actionBandlaufwerk_1530"/>
    <addaction name="actionSteckmodule"/>
@@ -157,6 +159,7 @@ background-position: center
    <addaction name="actionSoftreset"/>
    <addaction name="actionHardreset"/>
    <addaction name="actionC64_Geschwindigkeit"/>
+   <addaction name="actionHandbuch"/>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -937,7 +940,7 @@ background-position: center
   </action>
   <action name="actionHandbuch">
    <property name="enabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="emu64.qrc">
