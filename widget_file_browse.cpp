@@ -100,6 +100,15 @@ void WidgetFileBrowse::SetAktFile(QString akt_dir, QString akt_file)
     emit select_file(dirmodel->fileInfo(idx).absoluteFilePath());
 }
 
+void WidgetFileBrowse::RefreshAktDir()
+{
+    if(akt_fullpath == "") return;
+
+    ui->listView_filebrowser->setRootIndex(dirmodel->setRootPath(akt_fullpath));
+    akt_fullpath = dirmodel->rootPath();
+    ui->AktPath->setText(akt_fullpath);
+}
+
 void WidgetFileBrowse::EnableWriteProtectCheck(bool enabled)
 {
     ui->WriteProtected->setVisible(enabled);

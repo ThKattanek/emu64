@@ -39,6 +39,7 @@ public:
     QString GetAktFile(void);
     void SetAktDir(QString akt_dir);
     void SetAktFile(QString akt_dir, QString akt_file);
+    void RefreshAktDir(void);
     void EnableWriteProtectCheck(bool enabled);
     bool isFileWriteProtect(QString filename);
     ~WidgetFileBrowse();

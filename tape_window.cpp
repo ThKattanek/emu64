@@ -170,7 +170,11 @@ void TapeWindow::on_Rec_clicked()
             {
                 QMessageBox::information(this,trUtf8("Achtung"),trUtf8("Es konnte keine Aufnahme gestartet werden.\nBitte überprüfen Sie ob sie ausreichend Rechte besitzen."));
             }
-            else UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_REC));
+            else
+            {
+                UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_REC));
+                ui->FileBrowser->RefreshAktDir();
+            }
         }
         else
         {
