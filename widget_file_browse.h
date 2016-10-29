@@ -55,6 +55,8 @@ private slots:
     void on_listView_filebrowser_clicked(const QModelIndex &index);
     void on_WriteProtected_clicked(bool checked);
 
+    void on_view_refresh_clicked();
+
 private:
     Ui::WidgetFileBrowse *ui;
     QFileSystemModel *dirmodel;

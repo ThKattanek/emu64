@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.10.2016                //
+// Letzte Änderung am 29.10.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -203,6 +203,7 @@ void TapeWindow::on_FFw_clicked()
 void TapeWindow::on_Stop_clicked()
 {
     UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_STOP));
+    ui->FileBrowser->RefreshAktDir();
 }
 
 void TapeWindow::UpdateStateTapeKeys(unsigned char key_pressed)

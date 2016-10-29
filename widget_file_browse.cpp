@@ -102,9 +102,8 @@ void WidgetFileBrowse::RefreshAktDir()
 {
     if(akt_fullpath == "") return;
 
-    ui->listView_filebrowser->setRootIndex(dirmodel->setRootPath(akt_fullpath));
-    akt_fullpath = dirmodel->rootPath();
-    ui->AktPath->setText(akt_fullpath);
+    dirmodel->setRootPath("");
+    dirmodel->setRootPath(akt_fullpath);
 }
 
 void WidgetFileBrowse::EnableWriteProtectCheck(bool enabled)
@@ -264,4 +263,9 @@ void WidgetFileBrowse::on_WriteProtected_clicked(bool checked)
         }
         emit WriteProtectedChanged(ui->WriteProtected->isChecked());
     }
+}
+
+void WidgetFileBrowse::on_view_refresh_clicked()
+{
+    RefreshAktDir();
 }

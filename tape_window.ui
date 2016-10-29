@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1055</width>
-    <height>328</height>
+    <width>485</width>
+    <height>380</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -282,7 +282,7 @@
    <item>
     <widget class="QLabel" name="TapeInfoOut">
      <property name="text">
-      <string>TextLabel</string>
+      <string/>
      </property>
     </widget>
    </item>

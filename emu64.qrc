@@ -71,5 +71,6 @@
         <file>grafik/style64.png</file>
         <file>grafik/counter_numbers_24_384.png</file>
         <file>grafik/counter_numbers_24_32_blend.png</file>
+        <file>grafik/view-refresh.png</file>
     </qresource>
 </RCC>
