@@ -2134,33 +2134,38 @@ Soll diese überschrieben werden?</source>
         <source>Selmiak (+ Emu64 Logo, engl. Übersetzung, Emu64-Wiki)</source>
         <translation></translation>
     </message>
-    <message>
+    <message utf8="true">
         <location filename="info_window.ui" line="171"/>
+        <source>Tobias Kattanek (engl. Übersetzung)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="info_window.ui" line="176"/>
         <source>Peggy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="info_window.ui" line="176"/>
+        <location filename="info_window.ui" line="181"/>
         <source>Andreas Goller</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="info_window.ui" line="181"/>
+        <location filename="info_window.ui" line="186"/>
         <source>Hoeppi</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="info_window.ui" line="201"/>
+        <location filename="info_window.ui" line="206"/>
         <source>Besonderen Dank an ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="info_window.ui" line="245"/>
+        <location filename="info_window.ui" line="250"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.style64.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;www.style64.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="info_window.ui" line="264"/>
+        <location filename="info_window.ui" line="269"/>
         <source>Emu64 benutzt C64-Pro-Style TTF von Style64</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2168,429 +2173,429 @@ Soll diese überschrieben werden?</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="main_window.ui" line="198"/>
+        <location filename="main_window.ui" line="201"/>
         <source>Hilfe</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="208"/>
+        <location filename="main_window.ui" line="211"/>
         <source>C64 Dateien</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="218"/>
+        <location filename="main_window.ui" line="221"/>
         <source>Reset</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="225"/>
+        <location filename="main_window.ui" line="228"/>
         <source>Tools</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="229"/>
+        <location filename="main_window.ui" line="232"/>
         <source>Emuliert eine komplette REU mit 16 MB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="246"/>
+        <location filename="main_window.ui" line="249"/>
         <source>Emuliert eine komplette GEO- bzw NEO-RAM mit 2 MB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="274"/>
+        <location filename="main_window.ui" line="277"/>
         <source>Einstellungen</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="292"/>
+        <location filename="main_window.ui" line="295"/>
         <source>Sprache</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="300"/>
+        <location filename="main_window.ui" line="303"/>
         <source>Datei</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="324"/>
+        <location filename="main_window.ui" line="327"/>
         <source>Info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="327"/>
+        <location filename="main_window.ui" line="330"/>
         <source>Infos zur aktuellen Emu64 Version.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="349"/>
         <location filename="main_window.ui" line="352"/>
+        <location filename="main_window.ui" line="355"/>
         <source>Floppy 1541 II</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="355"/>
+        <location filename="main_window.ui" line="358"/>
         <source>Hier können Sie C64 Diskimages auswählen oder bearbeiten. [D64,G64,ZIP]</source>
         <translation>Hier kannst du C64 Diskimages auswählen oder bearbeiten. [D64,G64,ZIP]</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="380"/>
         <location filename="main_window.ui" line="383"/>
         <location filename="main_window.ui" line="386"/>
+        <location filename="main_window.ui" line="389"/>
         <source>Datasette 1530</source>
         <oldsource>Kassettenlaufwerk 1530</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="389"/>
+        <location filename="main_window.ui" line="392"/>
         <source>Alle Funktionen der Datasette 1530. [TAP,WAV]</source>
         <oldsource>Alle Funktionen eines Kassettenlaufwerks 1530. [TAP,WAV]</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="414"/>
         <location filename="main_window.ui" line="417"/>
+        <location filename="main_window.ui" line="420"/>
         <source>Steckmodule</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="420"/>
+        <location filename="main_window.ui" line="423"/>
         <source>Hier können Sie ein Steckmodul in den Emu64 einsetzen. [CRT]</source>
         <translation>Hier kannst du ein Steckmodul in den Emu64 einsetzen. [CRT]</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="441"/>
+        <location filename="main_window.ui" line="444"/>
         <source>Autostart</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="444"/>
+        <location filename="main_window.ui" line="447"/>
         <source>Die schnellste möglichkeit ein C64 Programm zu laden und zu starten. [PRG,T64,P00,FRZ,D64,G64]</source>
         <translation>Die schnellste Möglichkeit ein C64 Programm zu laden und zu starten. [PRG,T64,P00,FRZ,D64,G64]</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="471"/>
+        <location filename="main_window.ui" line="474"/>
         <source>C64 Programme direkt laden</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="474"/>
+        <location filename="main_window.ui" line="477"/>
         <source>Hier wird das Programm direkt in den Speicher geladen ohne C64 Laderoutiene. [PRG,T64,P00,FRZ]</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="499"/>
+        <location filename="main_window.ui" line="502"/>
         <source>Softreset</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="502"/>
+        <location filename="main_window.ui" line="505"/>
         <source>Führt ein Softreset des C64 durch. Das C64 RAM wird dabei nicht gelöscht.</source>
         <translation>Führt einen Softreset des C64 durch. Der C64 RAM wird dabei nicht gelöscht.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="527"/>
+        <location filename="main_window.ui" line="530"/>
         <source>Hardreset</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="530"/>
+        <location filename="main_window.ui" line="533"/>
         <source>Führt ein Hardreset des C64 durch. Das C64 RAM wird dabei gelöscht. Es gleicht dem Ein- und Auschalten des C64.</source>
         <translation>Führt einen Hardreset des C64 durch. Der C64 RAM wird dabei gelöscht. Der Vorgang ist mit dem Ein- und Auschalten des C64 vergleichbar.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="555"/>
         <location filename="main_window.ui" line="558"/>
         <location filename="main_window.ui" line="561"/>
+        <location filename="main_window.ui" line="564"/>
         <source>Beenden</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="564"/>
+        <location filename="main_window.ui" line="567"/>
         <source>Beendet den Emu64.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="585"/>
+        <location filename="main_window.ui" line="588"/>
         <source>Quick C64 Snapshot</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="588"/>
+        <location filename="main_window.ui" line="591"/>
         <source>Den aktuellen Zustand des C64 speichern, um zu einem späteren Zeitpunkt wieder zu laden.</source>
         <translation>Den aktuellen Zustand des C64 speichern, um diesen zu einem späteren Zeitpunkt wieder zu laden.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="613"/>
+        <location filename="main_window.ui" line="616"/>
         <source>Screenshot</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="616"/>
+        <location filename="main_window.ui" line="619"/>
         <source>Erzeugt ein Bildschirmfoto vom C64 Bildschirm.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="626"/>
+        <location filename="main_window.ui" line="629"/>
         <source>F12</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="637"/>
+        <location filename="main_window.ui" line="640"/>
         <source>SID Dump</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="640"/>
+        <location filename="main_window.ui" line="643"/>
         <source>Zeichnen Sie alle SID (Sound Interface Device) Signale auf um sie später mit dem  mitgelieferten SID Player abzuspielen.</source>
         <translation>Zeichnet alle SID (Sound Interface Device) Signale auf um sie später mit dem  mitgelieferten SID Player abzuspielen.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="659"/>
+        <location filename="main_window.ui" line="662"/>
         <source>SID Player</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="662"/>
+        <location filename="main_window.ui" line="665"/>
         <source>Schaltet in den SID Player Modus. Damit wird der Emu64 zu einem vollwertigen SID Player.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="684"/>
+        <location filename="main_window.ui" line="687"/>
         <source>Debugger/Disassembler</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="687"/>
+        <location filename="main_window.ui" line="690"/>
         <source>Sehr Komfortabler Debugger und Disassembler.</source>
         <translation>Sehr komfortabler Debugger und Disassembler.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="709"/>
+        <location filename="main_window.ui" line="712"/>
         <source>C64 Geschwindigkeit</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="712"/>
+        <location filename="main_window.ui" line="715"/>
         <source>Hier können Sie die C64 Geschwindigkeit sufenlos von 5% bis 500% einstellen.</source>
         <translation>Hier kannst du die C64 Geschwindigkeit stufenlos von 5% bis 500% einstellen.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="730"/>
+        <location filename="main_window.ui" line="733"/>
         <source>Cross Assembler</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="733"/>
+        <location filename="main_window.ui" line="736"/>
         <source>Integrierter 2Pass Assembler der an TurboAss angelehnt ist.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="751"/>
+        <location filename="main_window.ui" line="754"/>
         <source>Lan64 </source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="754"/>
+        <location filename="main_window.ui" line="757"/>
         <source>Hiermit kann man Programme vom PC zum C64 übertragen.</source>
         <translation>Hiermit kannst du Programme vom PC zum C64 übertragen.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="772"/>
+        <location filename="main_window.ui" line="775"/>
         <source>Virtuelle C64 Tastatur</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="775"/>
+        <location filename="main_window.ui" line="778"/>
         <source>Eine Virtuelle C64 Tastatur, diese zeigt auch alle C64 Symbole.</source>
         <translation>Die Virtuelle C64 Tastatur zeigt auch alle C64 Symbole.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="986"/>
+        <location filename="main_window.ui" line="989"/>
         <source>REU einstecken</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="989"/>
+        <location filename="main_window.ui" line="992"/>
         <source>Die REU wird in den C64 gesteckt.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="994"/>
+        <location filename="main_window.ui" line="997"/>
         <source>REU entfernen</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="997"/>
+        <location filename="main_window.ui" line="1000"/>
         <source>Die REU wird aus dem C64 rausgezogen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="1002"/>
-        <location filename="main_window.ui" line="1042"/>
+        <location filename="main_window.ui" line="1005"/>
+        <location filename="main_window.ui" line="1045"/>
         <source>Inhalt aus einer Datei laden</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="1005"/>
+        <location filename="main_window.ui" line="1008"/>
         <source>Der Inhalt der REU wird aus einer externen Datei geladen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="1010"/>
-        <location filename="main_window.ui" line="1050"/>
+        <location filename="main_window.ui" line="1013"/>
+        <location filename="main_window.ui" line="1053"/>
         <source>Inhalt in eine Datei speichern</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="1013"/>
+        <location filename="main_window.ui" line="1016"/>
         <source>Der Inhalt der REU wird in eine externen Datei gespeichert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="1018"/>
-        <location filename="main_window.ui" line="1058"/>
+        <location filename="main_window.ui" line="1021"/>
+        <location filename="main_window.ui" line="1061"/>
         <source>Inhalt löschen</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="1021"/>
+        <location filename="main_window.ui" line="1024"/>
         <source>Der Inhalt der REU wird gelöscht.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="1026"/>
+        <location filename="main_window.ui" line="1029"/>
         <source>GEO-RAM einstecken</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="1029"/>
+        <location filename="main_window.ui" line="1032"/>
         <source>Die GEO-RAM wird in den C64 gesteckt.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="1034"/>
+        <location filename="main_window.ui" line="1037"/>
         <source>GEO-RAM entfernen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="1037"/>
+        <location filename="main_window.ui" line="1040"/>
         <source>Die GEO-RAM wird aus dem C64 rausgezogen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="1045"/>
+        <location filename="main_window.ui" line="1048"/>
         <source>Der Inhalt der GEO-RAM wird aus einer externen Datei geladen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="1053"/>
+        <location filename="main_window.ui" line="1056"/>
         <source>Der Inhalt der GEO-RAM wird in eine externen Datei gespeichert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="1061"/>
+        <location filename="main_window.ui" line="1064"/>
         <source>Der Inhalt der GEO-RAM wird gelöscht.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="235"/>
+        <location filename="main_window.ui" line="238"/>
         <source>REU 1764 (16MB)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="249"/>
+        <location filename="main_window.ui" line="252"/>
         <source>GEO- / NEO-RAM (2MB)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="793"/>
+        <location filename="main_window.ui" line="796"/>
         <source>Audio und Video Aufnahme</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="796"/>
+        <location filename="main_window.ui" line="799"/>
         <source>Mit diesem Tool können sie die den Ton und das Videobild aufnehmen.</source>
         <translation>Mit diesem Tool kannst du den Ton und das Videobild aufnehmen.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="814"/>
+        <location filename="main_window.ui" line="817"/>
         <source>Emu64 Einstellungen</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="817"/>
+        <location filename="main_window.ui" line="820"/>
         <source>Hier stellen sie den Emu64 nach ihren wünschen ein.</source>
         <translation>Hier konfigurierst du den Emu64 nach deinen Wünschen.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="835"/>
+        <location filename="main_window.ui" line="838"/>
         <source>TV/Video Einstellungen</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="838"/>
+        <location filename="main_window.ui" line="841"/>
         <source>Hiermit kann man das Aussehen der Videoausgabe verändern. Z.B.: Sättigung, Helligkeit und Kontrast.</source>
         <oldsource>Hiermit kann man das Aussehen der Videoausgabe verändern. z.B.: Sättigung, Helligkeit und Kontrast.</oldsource>
         <translation>Hiermit veränderst du das Aussehen der Videoausgabe. Z.B.: Sättigung, Helligkeit und Kontrast.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="856"/>
+        <location filename="main_window.ui" line="859"/>
         <source>Vollbild</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="859"/>
+        <location filename="main_window.ui" line="862"/>
         <source>Emu64 wird im Vollbild ausgeführt.</source>
         <translation>Führt Emu64 im Vollbild aus.</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="880"/>
+        <location filename="main_window.ui" line="883"/>
         <source>C64 Tastaturbelegung ändern</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="883"/>
+        <location filename="main_window.ui" line="886"/>
         <source>Hiermit können Sie die komplette Tastaturbelegung(C64) ändern.</source>
         <translation>Hier kannst du die komplette Tastaturbelegung(C64) ändern.</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="901"/>
+        <location filename="main_window.ui" line="904"/>
         <source>C64 Tastaturbelegung zurücksetzen</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="904"/>
+        <location filename="main_window.ui" line="907"/>
         <source>Hiermit wird die Tastaturbelegung auf Standardwerte zurück gesetzt.</source>
         <translation>Hiermit setzt du die Tastaturbelegung auf Standardwerte zurück.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="922"/>
+        <location filename="main_window.ui" line="925"/>
         <source>Fenster Optionen</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="925"/>
+        <location filename="main_window.ui" line="928"/>
         <source>Funktionen die die Emu64 Fenster beeinflussen.</source>
         <translation>Einstellungen für die verschiedenen Emu64 Fenster.</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="947"/>
+        <location filename="main_window.ui" line="950"/>
         <source>Handbuch</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="950"/>
+        <location filename="main_window.ui" line="953"/>
         <source>Öffnet das Emu64 Handbuch.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="968"/>
+        <location filename="main_window.ui" line="971"/>
         <source>GameBase64</source>
         <translation></translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.ui" line="971"/>
+        <location filename="main_window.ui" line="974"/>
         <source>Über dieses Tool ist es möglich auf alle Spiele die es in der GameBase64 gibt zuzugreifen.</source>
         <translation></translation>
     </message>
@@ -3536,6 +3541,7 @@ Bitte überprüfen Sie ob Sie über genügend Rechte verfügen.
     <message utf8="true">
         <location filename="widget_file_browse.cpp" line="293"/>
         <source>Möchten Sie diese Datei wirklich entfernen?
+
 </source>
         <translation type="unfinished"></translation>
     </message>

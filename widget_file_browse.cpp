@@ -290,7 +290,7 @@ void WidgetFileBrowse::on_delete_file_clicked()
 
     if(!QFile(file_path).exists()) return;
 
-    if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Löschen?"),trUtf8("Möchten Sie diese Datei wirklich entfernen?\n") + "[" + file_path + "]",QMessageBox::Yes | QMessageBox::No))
+    if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Löschen?"),trUtf8("Möchten Sie diese Datei wirklich entfernen?\n\n") + "[" + file_path + "]",QMessageBox::Yes | QMessageBox::No))
     {
         QFile(file_path).remove();
     }
