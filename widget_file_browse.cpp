@@ -24,6 +24,8 @@ WidgetFileBrowse::WidgetFileBrowse(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->delete_file->setDisabled(true);
+
     connect(ui->listView_filebrowser,SIGNAL(activated(QModelIndex)),this,SLOT(on_listView_filebrowser_clicked(QModelIndex)));
 
     ui->listWidget_zip->setMinimumHeight(0);
@@ -94,6 +96,14 @@ void WidgetFileBrowse::SetAktFile(QString akt_dir, QString akt_file)
     ui->listView_filebrowser->scrollTo(idx,QAbstractItemView::PositionAtCenter);
 
     on_listView_filebrowser_clicked(idx);
+
+    // Prüfen ob Aktuell ausgewählte Datei ein Verzeichnis ist oder nicht
+    // In Abhängigkeit davon den Delete Button setzen
+    if(!dirmodel->fileInfo(ui->listView_filebrowser->currentIndex()).isDir())
+        ui->delete_file->setDisabled(false);
+    else
+        ui->delete_file->setDisabled(true);
+
 
     emit select_file(dirmodel->fileInfo(idx).absoluteFilePath());
 }
@@ -178,6 +188,8 @@ void WidgetFileBrowse::on_listView_filebrowser_clicked(const QModelIndex &index)
         // Kein Verzeichnis
         QString AktFileName = dirmodel->filePath(index);
 
+        ui->delete_file->setEnabled(true);
+
         emit select_file(AktFileName);
 
         if("ZIP" == AktFileName.right(3).toUpper())
@@ -227,6 +239,8 @@ void WidgetFileBrowse::on_listView_filebrowser_clicked(const QModelIndex &index)
     }
     else
     {
+        ui->delete_file->setEnabled(false);
+
         ui->listWidget_zip->setMaximumHeight(0);
         ui->listWidget_zip->setMinimumHeight(0);
     }
@@ -268,4 +282,16 @@ void WidgetFileBrowse::on_WriteProtected_clicked(bool checked)
 void WidgetFileBrowse::on_view_refresh_clicked()
 {
     RefreshAktDir();
+}
+
+void WidgetFileBrowse::on_delete_file_clicked()
+{
+    QString file_path = dirmodel->fileInfo(ui->listView_filebrowser->currentIndex()).absoluteFilePath().toAscii().data();
+
+    if(!QFile(file_path).exists()) return;
+
+    if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Löschen?"),trUtf8("Möchten Sie diese Datei wirklich entfernen?\n") + "[" + file_path + "]",QMessageBox::Yes | QMessageBox::No))
+    {
+        QFile(file_path).remove();
+    }
 }

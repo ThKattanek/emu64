@@ -57,6 +57,8 @@ private slots:
 
     void on_view_refresh_clicked();
 
+    void on_delete_file_clicked();
+
 private:
     Ui::WidgetFileBrowse *ui;
     QFileSystemModel *dirmodel;
