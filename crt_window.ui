@@ -199,7 +199,7 @@
                <property name="font">
                 <font>
                  <family>Arial</family>
-                 <pointsize>7</pointsize>
+                 <pointsize>8</pointsize>
                 </font>
                </property>
                <property name="styleSheet">
@@ -218,7 +218,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>7</pointsize>
+                  <pointsize>8</pointsize>
                   <weight>75</weight>
                   <bold>true</bold>
                  </font>
@@ -231,7 +231,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>7</pointsize>
+                  <pointsize>8</pointsize>
                   <weight>75</weight>
                   <bold>true</bold>
                  </font>
@@ -298,7 +298,7 @@
                <property name="font">
                 <font>
                  <family>Arial</family>
-                 <pointsize>7</pointsize>
+                 <pointsize>8</pointsize>
                 </font>
                </property>
                <property name="styleSheet">
@@ -314,7 +314,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>7</pointsize>
+                  <pointsize>8</pointsize>
                   <weight>75</weight>
                   <bold>true</bold>
                  </font>
@@ -327,7 +327,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>7</pointsize>
+                  <pointsize>8</pointsize>
                   <weight>75</weight>
                   <bold>true</bold>
                  </font>
@@ -340,7 +340,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>7</pointsize>
+                  <pointsize>8</pointsize>
                   <weight>75</weight>
                   <bold>true</bold>
                  </font>
@@ -353,7 +353,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>7</pointsize>
+                  <pointsize>8</pointsize>
                   <weight>75</weight>
                   <bold>true</bold>
                  </font>
@@ -366,7 +366,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>7</pointsize>
+                  <pointsize>8</pointsize>
                   <weight>75</weight>
                   <bold>true</bold>
                  </font>

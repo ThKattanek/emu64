@@ -114,6 +114,9 @@
        </item>
        <item>
         <widget class="QToolButton" name="delete_file">
+         <property name="toolTip">
+          <string>Datei löschen</string>
+         </property>
          <property name="text">
           <string>...</string>
          </property>
