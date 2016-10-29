@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 14.08.2016                //
+// Letzte Änderung am 29.10.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -36,8 +36,6 @@ WidgetFileBrowse::WidgetFileBrowse(QWidget *parent) :
     dirmodel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files | QDir::AllEntries);
     dirmodel->setRootPath(QDir::rootPath());
     ui->listView_filebrowser->setModel(dirmodel);
-    dirmodel->sort(0,Qt::AscendingOrder);
-    ui->listView_filebrowser->model()->sort(0,Qt::AscendingOrder);
     akt_fullpath = dirmodel->rootPath();
     ui->AktPath->setText(akt_fullpath);
 }
@@ -169,10 +167,8 @@ void WidgetFileBrowse::on_listView_filebrowser_doubleClicked(const QModelIndex &
 
 void WidgetFileBrowse::on_to_parent_clicked()
 {
-    ui->listView_filebrowser->setRootIndex(dirmodel->parent(dirmodel->index(akt_fullpath)));
-    dirmodel->sort(0,Qt::AscendingOrder);
-    ui->listView_filebrowser->model()->sort(0,Qt::AscendingOrder);
     akt_fullpath =  dirmodel->filePath(dirmodel->parent(dirmodel->index(akt_fullpath)));
+    SetAktDir(akt_fullpath);
     ui->AktPath->setText(akt_fullpath);
 }
 
