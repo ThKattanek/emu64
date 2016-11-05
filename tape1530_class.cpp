@@ -354,7 +354,7 @@ void TAPE1530::ZeroSoundBufferPos()
 
 void TAPE1530::OneCycle()
 {
-    if(file == NULL) return;
+    //if(file == NULL) return;
     if(!IsTapeInsert) return;
     if(CPU_PORT == NULL) return;
 
