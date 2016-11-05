@@ -73,5 +73,6 @@
         <file>grafik/counter_numbers_24_32_blend.png</file>
         <file>grafik/view-refresh.png</file>
         <file>grafik/delete.png</file>
+        <file>grafik/go-home.png</file>
     </qresource>
 </RCC>

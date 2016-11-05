@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.10.2016                //
+// Letzte Änderung am 05.11.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -40,6 +40,14 @@ WidgetFileBrowse::WidgetFileBrowse(QWidget *parent) :
     ui->listView_filebrowser->setModel(dirmodel);
     akt_fullpath = dirmodel->rootPath();
     ui->AktPath->setText(akt_fullpath);
+
+    // Laufwerke in Liste eintragen
+    QFileInfoList file_info_list = QDir::drives();
+
+    for(int i=0; i < file_info_list.count(); i++)
+    {
+        ui->drive_list->addItem(file_info_list.at(i).absoluteFilePath());
+    }
 }
 
 void WidgetFileBrowse::RetranslateUi()
@@ -81,6 +89,17 @@ void WidgetFileBrowse::SetAktDir(QString akt_dir)
     ui->listView_filebrowser->setRootIndex(dirmodel->setRootPath(akt_dir));
     akt_fullpath = dirmodel->rootPath();
     ui->AktPath->setText(akt_fullpath);
+
+    QString lw = rootPathName(akt_dir);
+
+    if(lw == "")
+    {
+        QDir dir(akt_dir);
+        lw = dir.rootPath();
+    }
+
+    int idx = ui->drive_list->findText(lw);
+    ui->drive_list->setCurrentIndex(idx);
 }
 
 void WidgetFileBrowse::SetAktFile(QString akt_dir, QString akt_file)
@@ -298,4 +317,30 @@ void WidgetFileBrowse::on_delete_file_clicked()
             QMessageBox::critical(this,trUtf8("Fehler !"),trUtf8("Die Datei konnte nicht gelöscht werden.\n\n") + file.errorString());
         }
     }
+}
+
+void WidgetFileBrowse::on_to_home_clicked()
+{
+    SetAktDir(QDir::homePath());
+}
+
+QString WidgetFileBrowse::rootPathName(const QString &aPath)
+{
+    QRegExp reg("([A-Za-z]:[\\\\|/])");
+
+    int nIndex = reg.indexIn(aPath);
+
+    QString strRootPathName;
+
+    if (nIndex > -1)
+    {
+        strRootPathName = reg.cap(1);
+    }
+
+    return strRootPathName;
+}
+
+void WidgetFileBrowse::on_drive_list_currentIndexChanged(const QString &arg1)
+{
+    SetAktDir(arg1);
 }

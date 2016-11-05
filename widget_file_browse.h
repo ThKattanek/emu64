@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.10.2016                //
+// Letzte Änderung am 05.11.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,6 +19,7 @@
 #include <QWidget>
 #include <QFileSystemModel>
 #include <QMessageBox>
+#include <QRegExp>
 
 #include "quazip/quazip.h"
 #include "quazip/quazipfile.h"
@@ -54,12 +55,14 @@ private slots:
     void on_to_parent_clicked();
     void on_listView_filebrowser_clicked(const QModelIndex &index);
     void on_WriteProtected_clicked(bool checked);
-
     void on_view_refresh_clicked();
-
     void on_delete_file_clicked();
+    void on_to_home_clicked();
+    void on_drive_list_currentIndexChanged(const QString &arg1);
 
 private:
+    QString rootPathName(const QString &aPath);
+
     Ui::WidgetFileBrowse *ui;
     QFileSystemModel *dirmodel;
     QString akt_fullpath;
