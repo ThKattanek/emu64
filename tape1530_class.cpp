@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.10.2016                //
+// Letzte Änderung am 05.11.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -148,6 +148,9 @@ bool TAPE1530::LoadTapeImage(char *filename)
         TapePosIsEnd = false;
 
         CalcTapeLenTime();
+
+        fclose(file);
+        file = NULL;
 
         return true;
     }
