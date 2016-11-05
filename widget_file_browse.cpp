@@ -292,6 +292,10 @@ void WidgetFileBrowse::on_delete_file_clicked()
 
     if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Löschen?"),trUtf8("Möchten Sie diese Datei wirklich entfernen?\n\n") + "[" + file_path + "]",QMessageBox::Yes | QMessageBox::No))
     {
-        QFile(file_path).remove();
+        QFile file(file_path);
+        if(!file.remove())
+        {
+            QMessageBox::critical(this,trUtf8("Fehler !"),trUtf8("Die Datei konnte nicht gelöscht werden.\n\n") + file.errorString());
+        }
     }
 }
