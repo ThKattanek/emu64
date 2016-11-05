@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.09.2016                //
+// Letzte Änderung am 05.11.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -105,7 +105,12 @@ MainWindow::~MainWindow()
     delete log;
 
     // Temporäre Dateien löschen
-    QFile::remove(tmpPath + "/tmp.prg");
+    QFile tmpfile(tmpPath + "/tmp.prg");
+
+    if(tmpfile.exists())
+    {
+        tmpfile.remove();
+    }
 }
 
 void MainWindow::paintEvent(QPaintEvent *event)
