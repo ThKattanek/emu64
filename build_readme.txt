@@ -37,9 +37,9 @@ Paketbau Linux Debian / Red Hat:
 Vorraussetzung --> alien muss installiert sein
 Auf dem System muss make install ausgeführt worden sein, bevor das Script gestarten wird.
 
-build_deb.sh nach ~/Programmierung/Aktuelle_Projekte/builds/emu64-linux-amd64 kopieren
+build_deb.sh nach ~/Programmierung/Aktuelle_Projekte/builds/emu64_linux_amd64 kopieren
 
-cd ~/Programmierung/Aktuelle_Projekte/builds/emu64-linux-amd64
+cd ~/Programmierung/Aktuelle_Projekte/builds/emu64_linux_amd64
 build_deb.sh anpassen --> Version usw.
 
 "description-pak" erstellen mit Inhalt zur Beschreibung der Anwendung
@@ -58,6 +58,7 @@ Das geschieht in Fedora Version 23 32-Bit und 64-32Bit
 
 Mit der 64-Bit Version anfangen. Diese ist vom Aufbau fast korrekt !!
 
+rpmrebuild -pe emu64-5.0.10-1.x86_64.rpm 
 rpmrebuild -pe emu64-5.0.10-1.i386.rpm 
 
 Es müssen "/" und "/usr/bin" entfernt werden, sonst kommt ein Fehler beim installieren.
