@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.11.2016                //
+// Letzte Änderung am 06.11.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -328,6 +328,9 @@ void MainWindow::OnInit()
         connect(w,SIGNAL(RemoveImage(int)),floppy_window,SLOT(OnRemoveImage(int)));
     }
 
+    /// Close Evend von C64 Klasse hierher leiten
+    c64->CloseEventC64Screen = bind(&MainWindow::CloseC64Screeen,this);
+
     connect(floppy_window,SIGNAL(ChangeFloppyImage(int)),this,SLOT(OnChangeFloppyImage(int)));
 
     ////////// Load from INI ///////////
@@ -420,6 +423,11 @@ void MainWindow::LogText(const char *log_text)
     {
         *log << log_text;
     }
+}
+
+void MainWindow::CloseC64Screeen()
+{
+    on_actionBeenden_triggered();
 }
 
 void MainWindow::changeEvent(QEvent *event)

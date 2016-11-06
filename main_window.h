@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.09.2016                //
+// Letzte Änderung am 06.11.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -70,6 +70,9 @@ public:
     /// C64 Klasse ///
     C64Class *c64;
     VideoPalClass *videopal;
+
+    /// Close Event von der C64 Klasse
+    void CloseC64Screeen(void);
 
 public slots:
     void OnMessage(QStringList msg);

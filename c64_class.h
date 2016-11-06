@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.10.2016                //
+// Letzte Änderung am 06.11.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -274,6 +274,7 @@ public:
     function<void(void)> AnimationRefreshProc;
     function<void(void)> BreakpointProc;
     function<void(char*)> LogText;
+    function<void(void)> CloseEventC64Screen;
 
     unsigned short	C64History[256];
     unsigned char	C64HistoryPointer;

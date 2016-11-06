@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.10.2016                //
+// Letzte Änderung am 06.11.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -48,6 +48,8 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
 
     VPort1 = 0;
     VPort2 = 1;
+
+    CloseEventC64Screen = NULL;
 
     LogText = log_function;
     GfxPath = gfx_path;
@@ -1989,6 +1991,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
         break;
 
         case SDL_QUIT:
+            if(CloseEventC64Screen != NULL) CloseEventC64Screen();
 
 #ifdef _WIN32
         //LoopThreadEnd = true;
