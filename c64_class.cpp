@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.11.2016                //
+// Letzte Änderung am 23.11.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -3330,7 +3330,6 @@ void C64Class::OpenSDLJoystick()
     int AbbruchCounter = 1000;
     while(!JoyStickUdateIsStop && (AbbruchCounter > 0))
     {
-        SDL_Delay(1);
         AbbruchCounter--;
     }
 
@@ -3390,7 +3389,6 @@ void C64Class::CloseSDLJoystick()
     int AbbruchCounter = 1000;
     while(!JoyStickUdateIsStop && (AbbruchCounter > 0))
     {
-        SDL_Delay(1);
         AbbruchCounter--;
     }
     if(SDLJoystickIsOpen)
