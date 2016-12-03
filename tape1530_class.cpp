@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.11.2016                //
+// Letzte Änderung am 03.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -47,7 +47,7 @@ TAPE1530::TAPE1530(int samplerate, int puffersize)
 
     SoundBufferPos = 0;
     SoundBufferSize = puffersize;
-    SoundBuffer = new signed short[SoundBufferSize];
+    SoundBuffer = new signed short[SoundBufferSize*2];
     for(int i=0; i<puffersize; i++)
         SoundBuffer[i] = 0;
 
@@ -636,9 +636,17 @@ void TAPE1530::OneCycle()
         FreqConvCounter-=(double)1.0;
         ZyklenCounter=0;
 
-        if(IsTapeInsert || IsRecTapeInsert)SoundBuffer[SoundBufferPos++] = short (WaveOut * Volume);
-        else SoundBuffer[SoundBufferPos++]=0;
-        if(SoundBufferPos >= SoundBufferSize) SoundBufferPos = 0;
+        if(IsTapeInsert || IsRecTapeInsert)
+        {
+            SoundBuffer[SoundBufferPos] = SoundBuffer[SoundBufferPos+1] = short (WaveOut * Volume);
+            SoundBufferPos += 2;
+        }
+        else
+        {
+            SoundBuffer[SoundBufferPos++]=0;
+            SoundBuffer[SoundBufferPos++]=0;
+        }
+        if(SoundBufferPos >= SoundBufferSize*2) SoundBufferPos = 0;
     }
 }
 

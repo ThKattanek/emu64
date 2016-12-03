@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.08.2016                //
+// Letzte Änderung am 03.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -65,6 +65,18 @@ private slots:
     void on_AutoMouseHide_clicked(bool checked);
 
     void on_AutoMouseHideTime_valueChanged(int arg1);
+
+    void on_FirstSidTyp_currentIndexChanged(int index);
+
+    void on_SecondSidTyp_currentIndexChanged(int index);
+
+    void on_SecondSidAddress_currentIndexChanged(int index);
+
+    void on_SecondSidEnable_toggled(bool checked);
+
+    void on_SidCycleExactEnable_toggled(bool checked);
+
+    void on_SidFilterEnable_toggled(bool checked);
 
 private:
     void UpdateToolTips();

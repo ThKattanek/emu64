@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.08.2016                //
+// Letzte Änderung am 03.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -29,6 +29,18 @@ SetupWindow::SetupWindow(QWidget *parent,const char *member,VideoPalClass *_vide
     ui->setupUi(this);
 
     ui->C64Farbmodus->addItems(QStringList()<<"Emu64"<<"Emu64 (bis 4.00)"<<"CCS64"<<"PC64"<<"C64S"<<"VICE"<<"FRODO"<<trUtf8("Schwarz / Weiß"));
+    ui->FirstSidTyp->addItems(QStringList()<<"MOS-6581"<<"MOS-8580");
+    ui->SecondSidTyp->addItems(QStringList()<<"MOS-6581"<<"MOS-8580");
+
+    ui->SecondSidTyp->setEnabled(false);
+    ui->SecondSidAddress->setEnabled(false);
+    ui->sid_io_label->setEnabled(false);
+
+    for(int i=0; i<32; i++)
+    {
+        QString IOAdress = QString().number(i * 32 + 0xD400, 16).prepend("$").toUpper();
+        ui->SecondSidAddress->addItem(IOAdress);
+    }
 }
 
 SetupWindow::~SetupWindow()
@@ -127,6 +139,8 @@ void SetupWindow::LoadINI(C64Class *_c64)
 
         int value;
         bool bvalue;
+        QString svalue;
+
         ini->beginGroup("SetupWindow");
 
         value = ini->value("NoPALColorMode",0).toInt();
@@ -211,6 +225,50 @@ void SetupWindow::LoadINI(C64Class *_c64)
         c64->SetSIDVolume(value / 100.0);
 
         ini->endGroup();
+
+        ini->beginGroup("SID");
+        svalue = ini->value("SID1Typ","8580").toString();
+
+        if(svalue == "8580")
+        {
+            ui->FirstSidTyp->setCurrentIndex(1);
+            c64->SetFirstSidTyp(MOS_8580);
+        }
+        if(svalue == "6581")
+        {
+            ui->FirstSidTyp->setCurrentIndex(0);
+            c64->SetFirstSidTyp(MOS_6581);
+        }
+
+        svalue = ini->value("SID2Typ","8580").toString();
+        if(svalue == "8580")
+        {
+            ui->SecondSidTyp->setCurrentIndex(1);
+            c64->SetSecondSidTyp(MOS_8580);
+        }
+        if(svalue == "6581")
+        {
+            ui->SecondSidTyp->setCurrentIndex(0);
+            c64->SetSecondSidTyp(MOS_6581);
+        }
+
+        bvalue = ini->value("StereoSid",false).toBool();
+        ui->SecondSidEnable->setChecked(bvalue);
+        on_SecondSidEnable_toggled(bvalue);
+
+        value = ini->value("StereoSidAddress",1).toInt();
+        ui->SecondSidAddress->setCurrentIndex(value);
+        on_SecondSidAddress_currentIndexChanged(value);
+
+        bvalue = ini->value("CycleExact",true).toBool();
+        ui->SidCycleExactEnable->setChecked(bvalue);
+        on_SidCycleExactEnable_toggled(bvalue);
+
+        bvalue = ini->value("Filter",true).toBool();
+        ui->SidFilterEnable->setChecked(bvalue);
+        on_SidFilterEnable_toggled(bvalue);
+
+        ini->endGroup();
     }
     ////////////////////////////////////
 
@@ -259,6 +317,39 @@ void SetupWindow::SaveINI()
 
         ini->beginGroup("Sound");
         ini->setValue("SIDVolume",ui->SIDVolume->value());
+        ini->endGroup();
+
+        ini->beginGroup("SID");
+
+        switch (ui->FirstSidTyp->currentIndex()) {
+        case MOS_8580:
+            ini->setValue("SID1Typ","8580");
+            break;
+
+        case MOS_6581:
+            ini->setValue("SID1Typ","6581");
+            break;
+        default:
+            break;
+        }
+
+        switch (ui->SecondSidTyp->currentIndex()) {
+        case MOS_8580:
+            ini->setValue("SID2Typ","8580");
+            break;
+
+        case MOS_6581:
+            ini->setValue("SID2Typ","6581");
+            break;
+        default:
+            break;
+        }
+
+        ini->setValue("StereoSid",ui->SecondSidEnable->isChecked());
+        ini->setValue("StereoSidAddress",ui->SecondSidAddress->currentIndex());
+        ini->setValue("CycleExact",ui->SidCycleExactEnable->isChecked());
+        ini->setValue("Filter",ui->SidFilterEnable->isChecked());
+
         ini->endGroup();
     }
 }
@@ -423,4 +514,47 @@ void SetupWindow::on_AutoMouseHideTime_valueChanged(int arg1)
 {
     if(ui->AutoMouseHide->isChecked()) c64->SetMouseHiddenTime(arg1 * 1000);
     else c64->SetMouseHiddenTime(0);
+}
+
+void SetupWindow::on_FirstSidTyp_currentIndexChanged(int index)
+{
+    if (index > 1) return;
+    if (c64 == NULL) return;
+
+    c64->SetFirstSidTyp(index);
+}
+
+void SetupWindow::on_SecondSidTyp_currentIndexChanged(int index)
+{
+    if (index > 1) return;
+    if (c64 == NULL) return;
+
+    c64->SetSecondSidTyp(index);
+}
+
+void SetupWindow::on_SecondSidAddress_currentIndexChanged(int index)
+{
+    if(c64 == NULL) return;
+
+    unsigned short sid_address = index * 0x20 + 0xd400;
+    c64->SetSecondSidAddress(sid_address);
+}
+
+void SetupWindow::on_SecondSidEnable_toggled(bool checked)
+{
+    c64->EnableSecondSid(checked);
+
+    ui->SecondSidTyp->setEnabled(checked);
+    ui->SecondSidAddress->setEnabled(checked);
+    ui->sid_io_label->setEnabled(checked);
+}
+
+void SetupWindow::on_SidCycleExactEnable_toggled(bool checked)
+{
+    c64->SetSidCycleExact(checked);
+}
+
+void SetupWindow::on_SidFilterEnable_toggled(bool checked)
+{
+    c64->SetSidFilter(checked);
 }

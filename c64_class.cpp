@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.11.2016                //
+// Letzte Änderung am 03.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -26,7 +26,7 @@ int SDLThread(void *userdat);
 int SDLThreadLoad(void *userdat);
 
 #define AudioSampleRate 44100
-#define AudioPufferSize (882*2)    // 882 bei 44.100 Khz
+#define AudioPufferSize (882*4)    // 882 bei 44.100 Khz
 #define RecPollingWaitStart 20
 
 #define C64ScreenXW 384         //384
@@ -198,7 +198,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     SDL_memset(&want, 0, sizeof(want));
     want.freq = AudioSampleRate;
     want.format = AUDIO_S16;
-    want.channels = 1;
+    want.channels = 2;
     want.samples = AudioPufferSize;
     want.callback = AudioMix;
     want.userdata = this;
@@ -422,7 +422,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     sid2->RESET = &RESET;
     sid2->SetC64Zyklen(985248);     // 985248
     sid2->SetChipType(MOS_8580);
-    sid2->SoundOutputEnable = false;
+    sid2->SoundOutputEnable = true;
     sid2->CycleExact = true;
     sid2->FilterOn = true;
     sid2->Reset();
@@ -655,7 +655,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
 
     if(!DebugMode)
     {
-        while((sid1->SoundBufferPos < (laenge/2) && (DebugMode == false)))
+        while((sid1->SoundBufferPos < (laenge/4) && (DebugMode == false)))
         {
             CheckKeys();
             CycleCounter++;
@@ -685,7 +685,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
             cia1->OneZyklus();
             cia2->OneZyklus();
             sid1->OneZyklus();
-            //sid2->OneZyklus();
+            if(StereoEnable) sid2->OneZyklus();
             reu->OneZyklus();
             tape->OneCycle();
 
@@ -758,18 +758,36 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
 
         }
 
-        for(int i=0; i<(laenge/2); i++)
+
+
+        if(StereoEnable)
         {
-            puffer[i] = short(sid1->SoundBuffer[i] * SIDVolume);
+            int j=0;
+            for(int i=0; i<(laenge/2); i+=2)
+            {
+                puffer[i] = short(sid1->SoundBuffer[j] * SIDVolume);
+                puffer[i+1] = short(sid2->SoundBuffer[j] * SIDVolume);
+                j++;
+            }
+        }
+        else
+        {
+            int j=0;
+            for(int i=0; i<(laenge/2); i+=2)
+            {
+                puffer[i] = puffer[i+1] = short(sid1->SoundBuffer[j] * SIDVolume);
+                j++;
+            }
         }
 
-        //SDL_MixAudioFormat((unsigned char*)puffer,(unsigned char*)sid1->SoundBuffer,have.format,laenge,100);
-
         /// Floppysound dazu mixen ///
+
         for(int i=0; i< FloppyAnzahl; i++)
         {
             if(floppy[i]->GetEnableFloppySound()) SDL_MixAudio((unsigned char*)puffer,(unsigned char*)floppy[i]->GetSoundBuffer(),laenge,255);
         }
+
+        /// Tapesound dazu mixen ///
 
         SDL_MixAudio((unsigned char*)puffer,(unsigned char*)tape->GetSoundBuffer(),laenge,255);
     }
@@ -811,7 +829,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                     cia1->OneZyklus();
                     cia2->OneZyklus();
                     sid1->OneZyklus();
-                    //sid2->OneZyklus();
+                    if(StereoEnable) sid2->OneZyklus();
                     reu->OneZyklus();
                     tape->OneCycle();
 
@@ -868,7 +886,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                 cia1->OneZyklus();
                 cia2->OneZyklus();
                 sid1->OneZyklus();
-                //sid2->OneZyklus();
+                if(StereoEnable) sid2->OneZyklus();
                 reu->OneZyklus();
                 tape->OneCycle();
 
@@ -906,7 +924,7 @@ loop_wait_next_opc:
                 cia1->OneZyklus();
                 cia2->OneZyklus();
                 sid1->OneZyklus();
-                //sid2->OneZyklus();
+                if(StereoEnable) sid2->OneZyklus();
                 reu->OneZyklus();
                 tape->OneCycle();
 
@@ -2905,6 +2923,38 @@ void C64Class::StopIECDump()
 void C64Class::SetSIDVolume(float volume)
 {
     SIDVolume = volume;
+}
+
+void C64Class::SetFirstSidTyp(int sid_typ)
+{
+    sid1->SetChipType(sid_typ);
+}
+
+void C64Class::SetSecondSidTyp(int sid_typ)
+{
+    sid2->SetChipType(sid_typ);
+}
+
+void C64Class::EnableSecondSid(bool enable)
+{
+    StereoEnable = enable;
+}
+
+void C64Class::SetSecondSidAddress(unsigned short address)
+{
+    Sid2Adresse = address;
+}
+
+void C64Class::SetSidCycleExact(bool enable)
+{
+    sid1->CycleExact = enable;
+    sid2->CycleExact = enable;
+}
+
+void C64Class::SetSidFilter(bool enable)
+{
+    sid1->FilterOn = enable;
+    sid2->FilterOn = enable;
 }
 
 int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)

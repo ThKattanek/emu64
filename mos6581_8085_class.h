@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 14.05.2016                //
+// Letzte Änderung am 03.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -60,7 +60,7 @@ class MOS6581_8085
     virtual ~MOS6581_8085(void);
     void ChangeSampleRate(int samplerate,int puffersize);
     void Reset(void);
-    void SetChipType(bool type);
+    void SetChipType(int type);
     void SetC64Zyklen(double ZyklenSek);
     void SetVoiceEnable(int nr, bool enable);
     void SetPotXY(unsigned char pot_x, unsigned char pot_y);
@@ -86,7 +86,7 @@ class MOS6581_8085
     VOICEClass          *vd;    // Für Temporären zugriff auf die Voices (Destination Voice)
 
     int	SidNummer;
-    bool                SidModel;
+    int SidModel;
 
     int                 C64ZyklenSek;
     double              FreqConvCounter;	// interner Counter für Fast Fast Fast Resampling ;-)

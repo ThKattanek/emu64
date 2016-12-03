@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.08.2016        		//
+// Letzte Änderung am 03.12.2016        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -109,8 +109,8 @@ Floppy1541::Floppy1541(bool *reset, int samplerate,int puffersize, bool *floppy_
     FreqConvCounter = 0.0;
     SoundBufferPos = 0;
     SoundBufferSize = puffersize;
-    SoundBuffer = new short[SoundBufferSize];
-    for(int i=0;i<SoundBufferSize;i++) SoundBuffer[i] = 0;
+    SoundBuffer = new short[SoundBufferSize*2];
+    for(int i=0;i<SoundBufferSize*2;i++) SoundBuffer[i] = 0;
 }
 
 Floppy1541::~Floppy1541()
@@ -986,9 +986,14 @@ void Floppy1541::RenderFloppySound(void)
         }
         break;
     }
+
     SoundBuffer[SoundBufferPos] =  (short)(SoundBuffer[SoundBufferPos] * Volume);
-    SoundBufferPos++;
-    if(SoundBufferPos >= SoundBufferSize) SoundBufferPos = 0;
+    SoundBuffer[SoundBufferPos+1] = SoundBuffer[SoundBufferPos];
+    SoundBufferPos += 2;
+
+    //SoundBufferPos++;
+
+    if(SoundBufferPos >= SoundBufferSize*2) SoundBufferPos = 0;
 }
 
 void Floppy1541::StartDiskChange()

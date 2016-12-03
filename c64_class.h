@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.11.2016                //
+// Letzte Änderung am 03.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -161,6 +161,12 @@ public:
     void StopIECDump();
 
     void SetSIDVolume(float volume);    // Lautstärke der SID's (0.0f - 1.0f)
+    void SetFirstSidTyp(int sid_typ);   // SID Typ des 1. SID (MOS_6581 oder MOS_8580)
+    void SetSecondSidTyp(int sid_typ);  // SID Typ des 2. SID (MOS_6581 oder MOS_8580)
+    void EnableSecondSid(bool enable);  // 2. SID aktivieren
+    void SetSecondSidAddress(unsigned short address);
+    void SetSidCycleExact(bool enable);
+    void SetSidFilter(bool enable);
 
     int             AktWindowXW;
     int             AktWindowYW;

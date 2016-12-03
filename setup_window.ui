@@ -34,15 +34,134 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
+   </property>
+   <property name="documentMode">
+    <bool>false</bool>
    </property>
    <widget class="QWidget" name="EmualtionTab">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <attribute name="title">
      <string>Emulation</string>
     </attribute>
+    <widget class="QGroupBox" name="FullscreenGroup_2">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>381</width>
+       <height>121</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="title">
+      <string>SID</string>
+     </property>
+     <widget class="QComboBox" name="FirstSidTyp">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>51</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="SecondSidTyp">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>50</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="SecondSidAddress">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>50</y>
+        <width>69</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>25</y>
+        <width>47</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>1. SID</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="SecondSidEnable">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>22</y>
+        <width>70</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>2. SID</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="sid_io_label">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>25</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>IO Bereich</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="SidCycleExactEnable">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>77</y>
+        <width>151</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Zyklengenaue Emulation</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="SidFilterEnable">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>97</y>
+        <width>151</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Filter Emulation</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
    <widget class="QWidget" name="SoundTab">
     <property name="enabled">
@@ -133,9 +252,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>10</y>
+       <y>6</y>
        <width>101</width>
-       <height>16</height>
+       <height>20</height>
       </rect>
      </property>
      <property name="font">
