@@ -71,7 +71,8 @@ class MOS6581_8085
 
     void WriteIO(unsigned short adresse,unsigned char wert);
     unsigned char ReadIO(unsigned short adresse);
-    
+    void SetIODelayEnable(bool enable);
+
   private:
     /* Variable */
     int                 Zyklencounter;
@@ -80,6 +81,11 @@ class MOS6581_8085
     double              Samplerate;
     VOICEClass          *Voice[3];
     unsigned char       IO[32];
+
+    bool                IODelayEnable;
+    unsigned char       IODelayPuffer[1048576][2];
+    int                 IODelayRPos;
+    int                 IODelayWPos;
 
     VOICEClass          *v;     // Für Temporären zugriff auf die Voices
     VOICEClass          *vs;    // Für Temporären zugriff auf die Voices (Source Voice)

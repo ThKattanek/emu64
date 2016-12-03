@@ -35,6 +35,16 @@ MOS6581_8085::MOS6581_8085(int nummer,int samplerate,int puffersize,int *error)
     FreqConvAddWert=((double)1.0)/((double)C64ZyklenSek/Samplerate);
     FreqConvCounter=0.0;
 
+    IODelayEnable = false;
+    IODelayRPos = 0;
+    IODelayWPos = 1000;
+
+    for(int i=0; i<1048576; i++)
+    {
+        IODelayPuffer[i][0] = 0x20;
+        IODelayPuffer[i][1] = 0;
+    }
+
     Voice[0]->OscEnable = true;
     Voice[1]->OscEnable = true;
     Voice[2]->OscEnable = true;
@@ -235,6 +245,21 @@ bool MOS6581_8085::OneZyklus(void)
         if(RecSampleCounter == 19656) RecSampleCounter = 0;
     }
     WriteReg = 0xFF;
+
+    //////// IO Delay ///////
+    if(IODelayEnable)
+    {
+        if(IODelayPuffer[IODelayRPos][0] < 0x20)
+            WriteIO(IODelayPuffer[IODelayRPos][0],IODelayPuffer[IODelayRPos][1]);
+
+        IODelayRPos++;
+        IODelayRPos &= 0xFFFFF;
+        IODelayWPos++;
+        IODelayWPos &= 0xFFFFF;
+
+        IODelayPuffer[IODelayWPos][0] = 0x20;
+    }
+
     return ret;
 }
 
@@ -284,12 +309,36 @@ unsigned char MOS6581_8085::ReadIO(unsigned short adresse)
     return 0;
 }
 
+void MOS6581_8085::SetIODelayEnable(bool enable)
+{
+    IODelayEnable = enable;
+}
+
 void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)
 {
     static bool KeyNext;
-    WriteReg = adresse & 0x1F;
-    IO[adresse & 0x1F]=wert;
-    
+
+    if(!IODelayEnable)
+    {
+        WriteReg = adresse & 0x1F;
+        IO[adresse & 0x1F]=wert;
+    }
+    else
+    {
+        if(adresse > 0xD3FF)  // kommt von CPU
+        {
+            IODelayPuffer[IODelayWPos][0] = adresse & 0x1F;
+            IODelayPuffer[IODelayWPos][1] = wert;
+            return;
+        }
+        else                // kommt aus Delas
+        {
+            wert = IODelayPuffer[IODelayRPos][1];
+            WriteReg = adresse & 0x1F;
+            IO[adresse & 0x1F]=wert;
+        }
+    }
+
     switch(adresse&0x1F)
     {
     case 0: // FrequenzLO für Stimme 0

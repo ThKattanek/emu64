@@ -2943,6 +2943,10 @@ void C64Class::EnableSecondSid(bool enable)
 void C64Class::SetSecondSidAddress(unsigned short address)
 {
     Sid2Adresse = address;
+    if(Sid2Adresse == 0xD400)
+        sid2->SetIODelayEnable(true);
+    else
+        sid2->SetIODelayEnable(false);
 }
 
 void C64Class::SetSidCycleExact(bool enable)
