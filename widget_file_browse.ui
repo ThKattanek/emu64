@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>171</width>
+    <width>173</width>
     <height>360</height>
    </rect>
   </property>
@@ -97,6 +97,9 @@
        </item>
        <item>
         <widget class="QToolButton" name="to_home">
+         <property name="toolTip">
+          <string>Wechselt in das Homeverzeichnis</string>
+         </property>
          <property name="text">
           <string>Home</string>
          </property>
