@@ -429,6 +429,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
 
     StereoEnable = false;
     Sid2Adresse = 0xD420;
+    Sid6ChannelMode = false;
 
     vic->RESET = &RESET;
     vic->BA = &RDY_BA;
@@ -762,12 +763,24 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
 
         if(StereoEnable)
         {
-            int j=0;
-            for(int i=0; i<(laenge/2); i+=2)
+            if(!Sid6ChannelMode)
             {
-                puffer[i] = short(sid1->SoundBuffer[j] * SIDVolume);
-                puffer[i+1] = short(sid2->SoundBuffer[j] * SIDVolume);
-                j++;
+                int j=0;
+                for(int i=0; i<(laenge/2); i+=2)
+                {
+                    puffer[i] = short(sid1->SoundBuffer[j] * SIDVolume);
+                    puffer[i+1] = short(sid2->SoundBuffer[j] * SIDVolume);
+                    j++;
+                }
+            }
+            else
+            {
+                int j=0;
+                for(int i=0; i<(laenge/2); i+=2)
+                {
+                    puffer[i] = puffer[i+1] = ((short(sid1->SoundBuffer[j]) + short(sid2->SoundBuffer[j])) * SIDVolume * 0.75f);
+                    j++;
+                }
             }
         }
         else
@@ -2953,6 +2966,11 @@ void C64Class::SetSecondSidAddress(unsigned short address)
         sid2->SetIODelayEnable(true);
     else
         sid2->SetIODelayEnable(false);
+}
+
+void C64Class::SetSid6ChannelMode(bool enable)
+{
+    Sid6ChannelMode = enable;
 }
 
 void C64Class::SetSidCycleExact(bool enable)

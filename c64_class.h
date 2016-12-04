@@ -165,6 +165,7 @@ public:
     void SetSecondSidTyp(int sid_typ);  // SID Typ des 2. SID (MOS_6581 oder MOS_8580)
     void EnableSecondSid(bool enable);  // 2. SID aktivieren
     void SetSecondSidAddress(unsigned short address);
+    void SetSid6ChannelMode(bool enable);
     void SetSidCycleExact(bool enable);
     void SetSidFilter(bool enable);
 
@@ -263,6 +264,7 @@ public:
 
     bool            StereoEnable;
     unsigned short  Sid2Adresse;
+    bool            Sid6ChannelMode;
 
     unsigned char   KeyboardMatrixToPBExt[8];
     unsigned char   KeyboardMatrixToPAExt[8];

@@ -78,6 +78,8 @@ private slots:
 
     void on_SidFilterEnable_toggled(bool checked);
 
+    void on_Sid6ChannelMode_toggled(bool checked);
+
 private:
     void UpdateToolTips();
     Ui::SetupWindow *ui;

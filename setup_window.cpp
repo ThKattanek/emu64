@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.12.2016                //
+// Letzte Änderung am 04.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -260,6 +260,10 @@ void SetupWindow::LoadINI(C64Class *_c64)
         ui->SecondSidAddress->setCurrentIndex(value);
         on_SecondSidAddress_currentIndexChanged(value);
 
+        bvalue = ini->value("6ChannelMode",false).toBool();
+        ui->Sid6ChannelMode->setChecked(bvalue);
+        on_Sid6ChannelMode_toggled(bvalue);
+
         bvalue = ini->value("CycleExact",true).toBool();
         ui->SidCycleExactEnable->setChecked(bvalue);
         on_SidCycleExactEnable_toggled(bvalue);
@@ -347,6 +351,7 @@ void SetupWindow::SaveINI()
 
         ini->setValue("StereoSid",ui->SecondSidEnable->isChecked());
         ini->setValue("StereoSidAddress",ui->SecondSidAddress->currentIndex());
+        ini->setValue("6ChannelMode",ui->Sid6ChannelMode->isChecked());
         ini->setValue("CycleExact",ui->SidCycleExactEnable->isChecked());
         ini->setValue("Filter",ui->SidFilterEnable->isChecked());
 
@@ -542,19 +547,61 @@ void SetupWindow::on_SecondSidAddress_currentIndexChanged(int index)
 
 void SetupWindow::on_SecondSidEnable_toggled(bool checked)
 {
-    c64->EnableSecondSid(checked);
+    if(c64 != NULL)
+        c64->EnableSecondSid(checked);
 
     ui->SecondSidTyp->setEnabled(checked);
     ui->SecondSidAddress->setEnabled(checked);
     ui->sid_io_label->setEnabled(checked);
+    ui->Sid6ChannelMode->setEnabled(checked);
+
+    if(!checked)
+    {
+        ui->sid1_label->setText("1. SID [L/R]");
+        ui->SecondSidEnable->setText("2. SID");
+    }
+    else
+    {
+        if(ui->Sid6ChannelMode->isChecked())
+        {
+            ui->sid1_label->setText("1. SID [L/R]");
+            ui->SecondSidEnable->setText("2. SID [L/R]");
+        }
+        else
+        {
+            ui->sid1_label->setText("1. SID [L]");
+            ui->SecondSidEnable->setText("2. SID [R]");
+        }
+    }
 }
 
 void SetupWindow::on_SidCycleExactEnable_toggled(bool checked)
 {
-    c64->SetSidCycleExact(checked);
+    if(c64 != NULL)
+        c64->SetSidCycleExact(checked);
 }
 
 void SetupWindow::on_SidFilterEnable_toggled(bool checked)
 {
-    c64->SetSidFilter(checked);
+    if(c64 != NULL)
+        c64->SetSidFilter(checked);
+}
+
+void SetupWindow::on_Sid6ChannelMode_toggled(bool checked)
+{
+    if(c64 != NULL)
+        c64->SetSid6ChannelMode(checked);
+
+    if(!ui->SecondSidEnable->isChecked()) return;
+
+    if(checked)
+    {
+        ui->sid1_label->setText("1. SID [L/R]");
+        ui->SecondSidEnable->setText("2. SID [L/R]");
+    }
+    else
+    {
+        ui->sid1_label->setText("1. SID [L]");
+        ui->SecondSidEnable->setText("2. SID [R]");
+    }
 }
