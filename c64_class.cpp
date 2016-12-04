@@ -1545,6 +1545,8 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
     static bool joy_center_flag = true;
     static char joy_axis_tbl[5] = {1,1,0,0,-1};
 
+    SDL_Keymod keymod;
+
     switch (event->type)
     {
         case SDL_WINDOWEVENT:
@@ -1805,7 +1807,9 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
               case SDLK_RETURN:
 
-                if(KMOD_LALT == event->key.keysym.mod || KMOD_RALT == event->key.keysym.mod)
+                keymod = SDL_GetModState();
+
+                if(KMOD_MODE == (keymod & KMOD_MODE) || KMOD_LALT == (keymod & KMOD_LALT) || KMOD_RALT == (keymod & KMOD_RALT))
                 {
                     isFullscreen = !isFullscreen;
 
@@ -1820,6 +1824,8 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                         SDL_SetWindowFullscreen(C64Window,0);
                     }
                 }
+
+
                 break;
 
             default:
