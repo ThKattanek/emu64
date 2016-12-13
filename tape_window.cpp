@@ -107,7 +107,6 @@ void TapeWindow::showEvent(QShowEvent*)
 
 void TapeWindow::hideEvent(QHideEvent*)
 {
-    isOneShowed = false;
     refresh_timer->stop();
 }
 
