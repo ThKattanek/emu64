@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.11.2016                //
+// Letzte Änderung am 17.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -181,10 +181,46 @@ void MainWindow::OnInit()
     LogText(QString(trUtf8(">> Translator wurde intsalliert: Systemsprache = ") + SystemLocale + "\n").toLatin1().data());
     setWindowIcon(QIcon(":/grafik/emu64.ico"));
 
+    /// RomSetPath erstellen ///
+    romsetPath = configPath + "/romsets/";
+
+    QDir* dir = new QDir(romsetPath);
+
+    splash->showStatusMessage(trUtf8("RomSet-Verzeichnis wird gesucht."),Qt::darkBlue);
+    if(dir->exists())
+    {
+        LogText(trUtf8(">> Ein RomSet Verzeichnis ist vorhanden\n").toLatin1().data());
+        RomSetEnable = true;
+    }
+    else
+    {
+        splash->showStatusMessage(trUtf8("RomSet-Verzeichnis wird erstellt."),Qt::darkBlue);
+        LogText(trUtf8("<< Ein RomSet-Verzeichnis ist nicht vorhanden\n").toLatin1().data());
+        if(dir->mkdir(romsetPath))
+        {
+            LogText(trUtf8(">> Ein neues RomSet-Verzeichnis wurde erstellt\n").toLatin1().data());
+            RomSetEnable = true;
+        }
+        else
+        {
+            LogText(trUtf8("<< Ein neues RomSet-Verzeichnis konnte nicht erstellt werden\n<< Keine Screenshots möglich !!").toLatin1().data());
+            RomSetEnable = false;
+        }
+    }
+
+    delete dir;
+
+    if(RomSetEnable)
+    {
+        LogText(">> romsetPath = ");
+        LogText(romsetPath.toLatin1().data());
+        LogText("\n");
+    }
+
     /// ScreenshotPath erstellen ///
     screenshotPath = configPath + "/screenshots/";
 
-    QDir* dir = new QDir(screenshotPath);
+    dir = new QDir(screenshotPath);
 
     splash->showStatusMessage(trUtf8("Screenshotverzeichnis wird gesucht."),Qt::darkBlue);
     if(dir->exists())
@@ -207,6 +243,8 @@ void MainWindow::OnInit()
             ScreenshotsEnable = false;
         }
     }
+
+    delete dir;
 
     if(ScreenshotsEnable)
     {
@@ -264,7 +302,7 @@ void MainWindow::OnInit()
     LogText(trUtf8(">> DebuggerWindow wurde erzeugt\n").toLatin1().data());
 
     splash->showStatusMessage(trUtf8("SetupWindow wird erstellt."),Qt::darkBlue);
-    setup_window = new SetupWindow(this,SLOT(OnChangeGrafikModi(bool,bool,bool,bool,bool)),videopal,ini);
+    setup_window = new SetupWindow(this,SLOT(OnChangeGrafikModi(bool,bool,bool,bool,bool)),videopal,ini,&romsetPath,&dataPath);
     connect(setup_window,SIGNAL(finished(int)),this,SLOT(OnSetupFished(int)));
     LogText(trUtf8(">> SetupWindow wurde erzeugt\n").toLatin1().data());
 

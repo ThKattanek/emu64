@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.12.2016                //
+// Letzte Änderung am 17.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -3426,7 +3426,7 @@ void C64Class::OpenSDLJoystick()
     else
     {
         SDLJoystickIsOpen = true;
-        LogText((char*)">> SDL Subsytem Joystick wurde erfolgreich geöffnet\n");
+        LogText((char*)">> SDL Subsytem Joystick wurde erfolgreich geoeffnet\n");
         JoystickAnzahl = SDL_NumJoysticks();
         if(JoystickAnzahl > MAX_JOYSTICKS) JoystickAnzahl = MAX_JOYSTICKS;
 

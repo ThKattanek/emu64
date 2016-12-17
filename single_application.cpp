@@ -94,7 +94,7 @@ bool SingleApplication::sendMessage(const QString &message)
     byteArray.append(message.toUtf8());
     byteArray.append('\0');
 
-    sharedMemory->lock();
+    //sharedMemory->lock();
     char *to = (char*)sharedMemory->data();
     while(*to != '\0'){
         int sizeToRead = int(*to);

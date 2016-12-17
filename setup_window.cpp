@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.12.2016                //
+// Letzte Änderung am 17.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,31 +16,45 @@
 #include "setup_window.h"
 #include "ui_setup_window.h"
 
-SetupWindow::SetupWindow(QWidget *parent,const char *member,VideoPalClass *_videopal, QSettings *_ini) :
+#define DEFAULT_ROMSET_NEAME "Original C64 II"
+
+SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoPalClass *videopal, QSettings *ini, QString *romsetPath, QString *dataPath) :
     QDialog(parent),
     ui(new Ui::SetupWindow),
     videopal(0),
     c64(0)
 {
-    videopal = _videopal;
-    ini = _ini;
+    this->videopal = videopal;
+    this->ini = ini;
     connect(this,SIGNAL(ChangeGrafikModi(bool,bool,bool,bool,bool)),parent,member);
+    this->romsetPath = romsetPath;
+    this->dataPath = dataPath;
 
     ui->setupUi(this);
 
+    // VIC Farbmodi zur ComboBox hinzufügen
     ui->C64Farbmodus->addItems(QStringList()<<"Emu64"<<"Emu64 (bis 4.00)"<<"CCS64"<<"PC64"<<"C64S"<<"VICE"<<"FRODO"<<trUtf8("Schwarz / Weiß"));
+    // SID Typen zur ComboBox hinzufügen
     ui->FirstSidTyp->addItems(QStringList()<<"MOS-6581"<<"MOS-8580");
     ui->SecondSidTyp->addItems(QStringList()<<"MOS-6581"<<"MOS-8580");
 
+    // SID Default Einstellungen setzen
     ui->SecondSidTyp->setEnabled(false);
     ui->SecondSidAddress->setEnabled(false);
     ui->sid_io_label->setEnabled(false);
 
+    // Second SID Adressbereiche in ComboBox eintragen
     for(int i=0; i<32; i++)
     {
         QString IOAdress = QString().number(i * 32 + 0xD400, 16).prepend("$").toUpper();
         ui->SecondSidAddress->addItem(IOAdress);
     }
+
+    // Alle RomSets auslesen und in ComboBox eintragen
+    ui->SelectRomSet->addItem(DEFAULT_ROMSET_NEAME);
+
+    QStringList romset_names = GetAllRomsetNames(romsetPath);
+    ui->SelectRomSet->addItems(romset_names);
 }
 
 SetupWindow::~SetupWindow()
@@ -56,9 +70,9 @@ void SetupWindow::RetranslateUi()
     this->update();
 }
 
-void SetupWindow::LoadINI(C64Class *_c64)
+void SetupWindow::LoadINI(C64Class *c64)
 {
-    c64 = _c64;
+    this->c64 = c64;
 
     ////////// Load from INI ///////////
     if(ini != 0)
@@ -188,13 +202,6 @@ void SetupWindow::LoadINI(C64Class *_c64)
         bvalue = ini->value("AutoMouseHide",false).toBool();
         value = ini->value("AutoMouseHideTime",3).toInt();
 
-        /*
-        if(!bvalue)
-            c64->SetMouseHiddenTime(0);
-        else
-            c64->SetMouseHiddenTime(value * 1000);
-        */
-
         if(!bvalue)
         {
             ui->AutoMouseHide->setChecked(false);
@@ -207,6 +214,10 @@ void SetupWindow::LoadINI(C64Class *_c64)
         }
 
         ui->AutoMouseHideTime->setValue(value);
+
+        svalue = ini->value("RomSet",DEFAULT_ROMSET_NEAME).toString();
+        value = ui->SelectRomSet->findText(svalue);
+        if(value != -1) ui->SelectRomSet->setCurrentIndex(value);
 
         ini->endGroup();
 
@@ -295,6 +306,7 @@ void SetupWindow::SaveINI()
         ini->setValue("MousePort",ui->MausPort->currentIndex());
         ini->setValue("AutoMouseHide",ui->AutoMouseHide->isChecked());
         ini->setValue("AutoMouseHideTime",ui->AutoMouseHideTime->value());
+        ini->setValue("RomSet",ui->SelectRomSet->currentText());
         ini->endGroup();
 
         ini->beginGroup("SetupFullscreen");
@@ -480,6 +492,60 @@ void SetupWindow::UpdateToolTips()
     }
 }
 
+QStringList SetupWindow::GetAllRomsetNames(QString *root_dir)
+{
+    QStringList romset_names;
+    if(root_dir == NULL) return romset_names;
+
+    QDir dir(*root_dir);
+
+    if(dir.exists())
+    {
+        QDirIterator directories(*root_dir, QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+
+        while(directories.hasNext())
+        {
+            directories.next();
+
+            // Prüfen ob alle RomFiles vorhanden sind
+            QFile file;
+            int anz = 0;
+
+            // Auf Kernal Rom prüfen
+            file.setFileName(directories.filePath() + "/kernal.rom");
+            if(file.exists())
+                if(file.size() == 8192)
+                    anz++;
+
+            // Auf Basic Rom prüfen
+            file.setFileName(directories.filePath() + "/basic.rom");
+            if(file.exists())
+                if(file.size() == 8192)
+                    anz++;
+
+            // Auf Charakter Rom prüfen
+            file.setFileName(directories.filePath() + "/char.rom");
+            if(file.exists())
+                if(file.size() == 4096)
+                    anz++;
+
+            // Auf 1541-Dos Rom prüfen (Floppy 0)
+            file.setFileName(directories.filePath() + "/1541.rom");
+            if(file.exists())
+                if(file.size() == 16384)
+                    anz++;
+
+            if(anz == 4)
+            {
+                // Es handelt sich um ein gültiges RomSet
+                romset_names << directories.fileName();
+            }
+        }
+    }
+
+    return romset_names;
+}
+
 void SetupWindow::on_WAspectRatio_clicked(bool checked)
 {
     c64->SetWindowAspectRatio(checked);
@@ -603,5 +669,41 @@ void SetupWindow::on_Sid6ChannelMode_toggled(bool checked)
     {
         ui->sid1_label->setText("1. SID [L]");
         ui->SecondSidEnable->setText("2. SID [R]");
+    }
+}
+
+void SetupWindow::on_SelectRomSet_currentIndexChanged(const QString &arg1)
+{
+    qDebug("RomSet: %s",arg1.toAscii().data());
+
+    QString kernal_rom, basic_rom, char_rom, dos1541_rom;
+
+    if(arg1 == DEFAULT_ROMSET_NEAME)
+    {
+        // Default RomSet laden
+        kernal_rom = *dataPath+"/roms/kernal.rom";
+        basic_rom = *dataPath+"/roms/basic.rom";
+        char_rom = *dataPath+"/roms/char.rom";
+        dos1541_rom = *dataPath+"/roms/1541.rom";
+
+    }
+    else
+    {
+        kernal_rom = *romsetPath + arg1 + "/kernal.rom";
+        basic_rom = *romsetPath + arg1 + "/basic.rom";
+        char_rom = *romsetPath + arg1 + "/char.rom";
+        dos1541_rom = *romsetPath + arg1 + "/1541.rom";
+    }
+
+    if(c64 != NULL)
+    {
+        c64->LoadC64Roms(kernal_rom.toLatin1().data(),basic_rom.toLatin1().data(),char_rom.toLatin1().data());
+
+        for(int i=0; i<FloppyAnzahl; i++)
+        {
+            c64->LoadFloppyRom(i,dos1541_rom.toLatin1().data());
+        }
+
+        c64->HardReset();
     }
 }

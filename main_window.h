@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.11.2016                //
+// Letzte Änderung am 17.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -137,6 +137,7 @@ private:
     QString langPath;            // Pfad für alle Sprachfiles
     QString tmpPath;             // Pfad für alle Temporären Dateien die Emu64 erzeugt (Wird beim Start und Ende geleert)
     QString screenshotPath;      // Pfad für alle Emu64 Screenshots (nicht änderbar)
+    QString romsetPath;          // Pfad für Benutzerdefinierte ROM-Sets
 
     QString lastAutoloadPath;    // Pfad der letzten Autoloadfunktion
 
@@ -144,6 +145,8 @@ private:
 
     bool ScreenshotsEnable;       // Konnte kein Screenshot Verzeichnis gefunden werden und auch nicht erstellt werden so ist es false
     int ScreenshotNumber;         // Nummer des nächsten Screenshots
+
+    bool RomSetEnable;            // False wenn kein RomSet-Verzeichnis existiert und keins erstellt werden konnte
 
     InfoWindow *info_window;                    // Info Fenster Klasse (wird vom MainWindow als Modal gestartet)
     TVSetupWindow *tv_setup_window;             // TV Einstellungsfenster

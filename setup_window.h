@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.12.2016                //
+// Letzte Änderung am 17.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,6 +19,9 @@
 #include <QDialog>
 #include <QSettings>
 #include <QTableWidgetItem>
+#include <QDir>
+#include <QDirIterator>
+#include <QFile>
 #include <QDebug>
 #include "button_mod.h"
 #include "videopal_class.h"
@@ -33,10 +36,10 @@ class SetupWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit SetupWindow(QWidget *parent = 0,const char *member = 0,VideoPalClass *_videopal = 0, QSettings *_ini = 0);
+    explicit SetupWindow(QWidget *parent = 0, const char *member = 0, VideoPalClass *videopal = 0, QSettings *ini = 0, QString *romsetPath = 0, QString *dataPath = 0);
     ~SetupWindow();
     void RetranslateUi();
-    void LoadINI(C64Class *_c64);
+    void LoadINI(C64Class *c64);
     void SaveINI();
     void ReSetup(void);
 
@@ -57,33 +60,27 @@ private slots:
     void on_WAspectRatio_clicked(bool checked);
     void on_FAspectRatio_clicked(bool checked);
     void on_MausPort_currentIndexChanged(int index);
-
     void onClickButton(int idx, int idy);
-
     void on_SIDVolume_valueChanged(int value);
-
     void on_AutoMouseHide_clicked(bool checked);
-
     void on_AutoMouseHideTime_valueChanged(int arg1);
-
     void on_FirstSidTyp_currentIndexChanged(int index);
-
     void on_SecondSidTyp_currentIndexChanged(int index);
-
     void on_SecondSidAddress_currentIndexChanged(int index);
-
     void on_SecondSidEnable_toggled(bool checked);
-
     void on_SidCycleExactEnable_toggled(bool checked);
-
     void on_SidFilterEnable_toggled(bool checked);
-
     void on_Sid6ChannelMode_toggled(bool checked);
+    void on_SelectRomSet_currentIndexChanged(const QString &arg1);
 
 private:
     void UpdateToolTips();
+    QStringList GetAllRomsetNames(QString *root_dir);
+
     Ui::SetupWindow *ui;
-    VideoPalClass* videopal;
+    QString *romsetPath;
+    QString *dataPath;
+    VideoPalClass *videopal;
     QSettings *ini;
     C64Class *c64;
 };
