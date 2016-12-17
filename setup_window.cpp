@@ -50,11 +50,7 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoPalClass *vid
         ui->SecondSidAddress->addItem(IOAdress);
     }
 
-    // Alle RomSets auslesen und in ComboBox eintragen
-    ui->SelectRomSet->addItem(DEFAULT_ROMSET_NEAME);
-
-    QStringList romset_names = GetAllRomsetNames(romsetPath);
-    ui->SelectRomSet->addItems(romset_names);
+    FillRomSetCombo();
 }
 
 SetupWindow::~SetupWindow()
@@ -492,16 +488,27 @@ void SetupWindow::UpdateToolTips()
     }
 }
 
-QStringList SetupWindow::GetAllRomsetNames(QString *root_dir)
+void SetupWindow::FillRomSetCombo()
+{
+    // Alle RomSets auslesen und in ComboBox eintragen
+
+    ui->SelectRomSet->clear();
+    ui->SelectRomSet->addItem(DEFAULT_ROMSET_NEAME);
+
+    QStringList romset_names = GetAllRomsetNames(romsetPath);
+    ui->SelectRomSet->addItems(romset_names);
+}
+
+QStringList SetupWindow::GetAllRomsetNames(const QString *romset_dir)
 {
     QStringList romset_names;
-    if(root_dir == NULL) return romset_names;
+    if(romset_dir == NULL) return romset_names;
 
-    QDir dir(*root_dir);
+    QDir dir(*romset_dir);
 
     if(dir.exists())
     {
-        QDirIterator directories(*root_dir, QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+        QDirIterator directories(*romset_dir, QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot);
 
         while(directories.hasNext())
         {
@@ -709,4 +716,38 @@ void SetupWindow::on_SelectRomSet_currentIndexChanged(const QString &arg1)
 
         c64->HardReset();
     }
+}
+
+void SetupWindow::on_DeleteRomSet_clicked()
+{
+    if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Löschen?"),trUtf8("Möchten Sie dieses RomSet wirklich entfernen?\n\n") + "[" + ui->SelectRomSet->currentText() + "]",QMessageBox::Yes | QMessageBox::No))
+    {
+        if(!RemoveDir(*romsetPath + ui->SelectRomSet->currentText()))
+            QMessageBox::critical(this,trUtf8("Löschen?"),trUtf8("RomSet konnte nicht gelöscht werden"));
+
+        FillRomSetCombo();
+    }
+}
+
+bool SetupWindow::RemoveDir(const QString & dirName)
+{
+    bool result = true;
+    QDir dir(dirName);
+
+    if (dir.exists()) {
+        Q_FOREACH(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
+            if (info.isDir()) {
+                result = RemoveDir(info.absoluteFilePath());
+            }
+            else {
+                result = QFile::remove(info.absoluteFilePath());
+            }
+
+            if (!result) {
+                return result;
+            }
+        }
+        result = QDir().rmdir(dirName);
+    }
+    return result;
 }

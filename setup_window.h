@@ -22,6 +22,7 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
+#include <QMessageBox>
 #include <QDebug>
 #include "button_mod.h"
 #include "videopal_class.h"
@@ -72,10 +73,13 @@ private slots:
     void on_SidFilterEnable_toggled(bool checked);
     void on_Sid6ChannelMode_toggled(bool checked);
     void on_SelectRomSet_currentIndexChanged(const QString &arg1);
+    void on_DeleteRomSet_clicked();
 
 private:
     void UpdateToolTips();
-    QStringList GetAllRomsetNames(QString *root_dir);
+    void FillRomSetCombo();
+    QStringList GetAllRomsetNames(const QString *romset_dir);
+    bool RemoveDir(const QString & dirName);
 
     Ui::SetupWindow *ui;
     QString *romsetPath;
