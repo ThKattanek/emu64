@@ -686,6 +686,7 @@ void SetupWindow::on_SelectRomSet_currentIndexChanged(const QString &arg1)
         char_rom = *dataPath+"/roms/char.rom";
         dos1541_rom = *dataPath+"/roms/1541.rom";
 
+        ui->DeleteRomSet->setEnabled(false);
     }
     else
     {
@@ -693,6 +694,8 @@ void SetupWindow::on_SelectRomSet_currentIndexChanged(const QString &arg1)
         basic_rom = *romsetPath + arg1 + "/basic.rom";
         char_rom = *romsetPath + arg1 + "/char.rom";
         dos1541_rom = *romsetPath + arg1 + "/1541.rom";
+
+        ui->DeleteRomSet->setEnabled(true);
     }
 
     if(c64 != NULL)
