@@ -681,8 +681,6 @@ void SetupWindow::on_Sid6ChannelMode_toggled(bool checked)
 
 void SetupWindow::on_SelectRomSet_currentIndexChanged(const QString &arg1)
 {
-    qDebug("RomSet: %s",arg1.toAscii().data());
-
     QString kernal_rom, basic_rom, char_rom, dos1541_rom;
 
     if(arg1 == DEFAULT_ROMSET_NEAME)
@@ -750,4 +748,70 @@ bool SetupWindow::RemoveDir(const QString & dirName)
         result = QDir().rmdir(dirName);
     }
     return result;
+}
+
+void SetupWindow::on_NewRomSet_clicked()
+{
+    NewRomSetWindow *new_romset_window = new NewRomSetWindow(this,romsetPath);
+
+    if(new_romset_window->exec())
+    {
+        // Neues Romset erstellen
+        if(new_romset_window->GetRomSetName() != "")
+        {
+            QString NewRomSetDir = *romsetPath + new_romset_window->GetRomSetName();
+            QDir romset_dir(NewRomSetDir);
+            if(!romset_dir.exists())
+            {
+                if(romset_dir.mkdir(NewRomSetDir))
+                {
+                    // Verzeichnis wurde erstellt
+                    QString Source, Target;
+
+                    // Kernal kopieren
+                    Source = new_romset_window->GetKernalRomFilename();
+                    if(Source == "")
+                        Source = *dataPath+"/roms/kernal.rom";
+
+                    Target = NewRomSetDir + "/kernal.rom";
+                    QFile::copy(Source, Target);
+
+                    // Basic kopieren
+                    Source = new_romset_window->GetBasicRomFilename();
+                    if(Source == "")
+                        Source = *dataPath+"/roms/basic.rom";
+                    Target = NewRomSetDir + "/basic.rom";
+                    QFile::copy(Source, Target);
+
+                    // Char kopieren
+                    Source = new_romset_window->GetCharRomFilename();
+                    if(Source == "")
+                        Source = *dataPath+"/roms/char.rom";
+                    Target = NewRomSetDir + "/char.rom";
+                    QFile::copy(Source, Target);
+
+                    // 1541 kopieren
+                    Source = new_romset_window->GetDos1541RomFilename();
+                    if(Source == "")
+                        Source = *dataPath+"/roms/1541.rom";
+                    Target = NewRomSetDir + "/1541.rom";
+                    QFile::copy(Source, Target);
+
+                    FillRomSetCombo();
+                    int idx = ui->SelectRomSet->findText(new_romset_window->GetRomSetName());
+                    ui->SelectRomSet->setCurrentIndex(idx);
+
+                }
+                else
+                    QMessageBox::critical(this,"Fehler...","Es konnte das ROM-Set Verzeichnis nicht erstellt werden.");
+            }
+        }
+    }
+    else
+    {
+        // Dialog abgebrochen
+
+    }
+
+    delete new_romset_window;
 }

@@ -24,9 +24,11 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QDebug>
+
 #include "button_mod.h"
 #include "videopal_class.h"
 #include "c64_class.h"
+#include "new_romset_window.h"
 
 namespace Ui {
     class SetupWindow;
@@ -75,6 +77,8 @@ private slots:
     void on_SelectRomSet_currentIndexChanged(const QString &arg1);
     void on_DeleteRomSet_clicked();
 
+    void on_NewRomSet_clicked();
+
 private:
     void UpdateToolTips();
     void FillRomSetCombo();
@@ -82,6 +86,7 @@ private:
     bool RemoveDir(const QString & dirName);
 
     Ui::SetupWindow *ui;
+
     QString *romsetPath;
     QString *dataPath;
     VideoPalClass *videopal;
