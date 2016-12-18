@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 18.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -73,7 +73,7 @@ enum
         TAPE_IS_PAUSE
 };
 
-#define IntQuellenC64 6
+#define IntQuellenC64 10
 
 enum
 {
@@ -85,6 +85,7 @@ enum
         CRT_IRQ,
         EXT_IRQ,
         EXT_NMI,
+        RESTORE_NMI,
         NOP_INT
 };
 
