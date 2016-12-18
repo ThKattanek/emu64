@@ -338,4 +338,11 @@ struct POINT_STRUCT
     float y;
 };
 
+struct C64_KEYS
+{
+    unsigned char MatrixCode;
+    unsigned long SDLKeyCode;
+    bool          Shift;
+};
+
 #endif // STRUCTS_H

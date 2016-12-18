@@ -348,6 +348,16 @@ void MainWindow::OnInit()
     c64_keyboard_window->KeyMatrixToPA = c64->KeyboardMatrixToPAExt;
     c64_keyboard_window->KeyMatrixToPB = c64->KeyboardMatrixToPBExt;
 
+
+    /// C64 Key Mapping aus INI laden
+
+    C64_KEYS* c64_keys = c64->GetC64KeyTable();
+
+    for(int i=0; i<c64->GetC64KeyTableSize(); i++)
+    {
+        qDebug("MatrixCode: %2.X, SDLKeyCode: %8.X",c64_keys[i].MatrixCode, c64_keys[i].SDLKeyCode);
+    }
+
     /// Tabelle für Floppy's Ertsellen ///
     splash->showStatusMessage(trUtf8("Tabelle für Floppy's wird erstellt."),Qt::darkBlue);
     ui->FloppyTabel->setRowCount(FloppyAnzahl);

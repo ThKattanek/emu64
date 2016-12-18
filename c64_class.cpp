@@ -1821,10 +1821,6 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
                 break;
 
-              case SDLK_DELETE:
-                cpu->TriggerInterrupt(RESTORE_NMI);
-                break;
-
               case SDLK_RETURN:
 
                 keymod = SDL_GetModState();
@@ -1875,11 +1871,17 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                 }
                 else
                 {
-                    for(int i=0;i<C64KeyNum;i++)
+                    /// Auf RESTORE KEY TESTEN
+                    if(C64KeyTable[64].SDLKeyCode == event->key.keysym.sym)
+                        cpu->TriggerInterrupt(RESTORE_NMI);
+                    else
                     {
-                        if(C64KeyTable[i].SDLKeyCode == event->key.keysym.sym && (event->key.keysym.mod != KMOD_LALT) && (event->key.keysym.mod != KMOD_RALT))
+                        for(int i=0;i<C64KeyNum;i++)
                         {
-                            KeyEvent(C64KeyTable[i].MatrixCode,KEY_DOWN,C64KeyTable[i].Shift);
+                            if(C64KeyTable[i].SDLKeyCode == event->key.keysym.sym && (event->key.keysym.mod != KMOD_LALT) && (event->key.keysym.mod != KMOD_RALT))
+                            {
+                                KeyEvent(C64KeyTable[i].MatrixCode,KEY_DOWN,C64KeyTable[i].Shift);
+                            }
                         }
                     }
                 }
@@ -1917,9 +1919,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             case SDLK_F12:
                RESET = true;
                 break;
-            case SDLK_DELETE:
-                cpu->ClearInterrupt(RESTORE_NMI);
-                break;
+
             default:
                 break;
             }
@@ -1938,11 +1938,17 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             }
             else
             {
-                for(int i=0;i<C64KeyNum;i++)
+                /// Auf RESTORE KEY TESTEN
+                if(C64KeyTable[64].SDLKeyCode == event->key.keysym.sym)
+                    cpu->ClearInterrupt(RESTORE_NMI);
+                else
                 {
-                    if(C64KeyTable[i].SDLKeyCode == event->key.keysym.sym)
+                    for(int i=0;i<C64KeyNum;i++)
                     {
-                        KeyEvent(C64KeyTable[i].MatrixCode,KEY_UP,C64KeyTable[i].Shift);
+                        if(C64KeyTable[i].SDLKeyCode == event->key.keysym.sym)
+                        {
+                            KeyEvent(C64KeyTable[i].MatrixCode,KEY_UP,C64KeyTable[i].Shift);
+                        }
                     }
                 }
             }
@@ -3443,6 +3449,16 @@ void C64Class::StopRecKeyMap()
 bool C64Class::GetRecKeyMapStatus()
 {
     return IsKeyMapRec;
+}
+
+C64_KEYS *C64Class::GetC64KeyTable()
+{
+    return C64KeyTable;
+}
+
+int C64Class::GetC64KeyTableSize()
+{
+    return C64KeyNum;
 }
 
 void C64Class::OpenSDLJoystick()

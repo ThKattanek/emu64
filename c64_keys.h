@@ -18,13 +18,6 @@
 
 #include "SDL2/SDL_keycode.h"
 
-struct C64_KEYS
-{
-    unsigned char MatrixCode;
-    int           SDLKeyCode;
-    bool          Shift;
-};
-
 #define C64KeyNum 72
 
 C64_KEYS C64KeyTable[C64KeyNum]={
@@ -79,14 +72,14 @@ C64_KEYS C64KeyTable[C64KeyNum]={
     {0x52,SDLK_l,false},                    /// L
     {0x53,SDLK_KP_MINUS,false},             /// -
     {0x54,SDLK_PERIOD,false},               /// .
-    {0x55,0xffff,false},                    /// :               !
-    {0x56,0xffff,false},                    /// @               !
+    {0x55,0xFFFFFFFF,false},                /// :
+    {0x56,0xFFFFFFFF,false},                /// @
     {0x57,SDLK_COMMA,false},                /// ,
 
-    {0x60,0xffff,false},                    /// ENGL. PFUND     !
+    {0x60,0xFFFFFFFF,false},                /// ENGL. PFUND
     {0x61,SDLK_KP_MULTIPLY,false},          /// *
     {0x62,SDLK_SEMICOLON,false},            /// ;
-    {0x63,0xffff,false},                    /// HOME            !
+    {0x63,0xFFFFFFFF,false},                /// HOME
     {0x64,SDLK_RSHIFT,false},               /// SHIF_RECHTS
     {0x65,SDLK_HASH,false},                 /// =
     {0x66,SDLK_PLUS,false},                 /// PFEIL HOCH
@@ -101,8 +94,8 @@ C64_KEYS C64KeyTable[C64KeyNum]={
     {0x76,SDLK_q,false},                    /// Q
     {0x77,SDLK_TAB,false},                  /// RUN/STOP
 
-    {0x00,0xffff,true},                     /// PLATZHALTER
-    {0x01,0xffff,true},                     /// PLATZHALTER
+    {0x80,SDLK_DELETE,false},               /// RESTORE
+    {0x01,0xFFFFFFFF,true},                 /// PLATZHALTER
 
     {0x02,SDLK_LEFT,true},                  /// CRSR_L
     {0x03,SDLK_F8,true},                    /// F8
