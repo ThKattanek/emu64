@@ -38,7 +38,7 @@ C64_KEYS C64KeyTable[C64KeyNum]={
     {0x14,SDLK_z,false},                    /// Z
     {0x15,SDLK_s,false},                    /// S
     {0x16,SDLK_e,false},                    /// E
-    {0x17,SDLK_LSHIFT,false},               /// SHIFT_LINKS
+    {0x17,SDLK_LSHIFT,false},               /// SHIFT_L
 
     {0x20,SDLK_5,false},                    /// 5
     {0x21,SDLK_r,false},                    /// R
@@ -76,13 +76,13 @@ C64_KEYS C64KeyTable[C64KeyNum]={
     {0x56,0xFFFFFFFF,false},                /// @
     {0x57,SDLK_COMMA,false},                /// ,
 
-    {0x60,0xFFFFFFFF,false},                /// ENGL. PFUND
+    {0x60,0xFFFFFFFF,false},                /// £
     {0x61,SDLK_KP_MULTIPLY,false},          /// *
     {0x62,SDLK_SEMICOLON,false},            /// ;
     {0x63,0xFFFFFFFF,false},                /// HOME
-    {0x64,SDLK_RSHIFT,false},               /// SHIF_RECHTS
+    {0x64,SDLK_RSHIFT,false},               /// SHIFT_R
     {0x65,SDLK_HASH,false},                 /// =
-    {0x66,SDLK_PLUS,false},                 /// PFEIL HOCH
+    {0x66,SDLK_PLUS,false},                 /// PFEIL UP
     {0x67,SDLK_MINUS,false},                /// SLASH (/)
 
     {0x70,SDLK_1,false},                    /// 1
@@ -103,6 +103,90 @@ C64_KEYS C64KeyTable[C64KeyNum]={
     {0x05,SDLK_F4,true},                    /// F4
     {0x06,SDLK_F6,true},                    /// F6
     {0x07,SDLK_UP,true},                    /// CRSR_U
+};
+
+const char* C64KeyNames[C64KeyNum]={
+    "DEL",
+    "RETURN",
+    "CRSR_RIGHT",
+    "F7",
+    "F5",
+    "F3",
+    "F1",
+    "CRSR_DOWN",
+
+    "3",
+    "W",
+    "A",
+    "4",
+    "Z",
+    "S",
+    "E",
+    "SHIFT_LEFT",
+
+    "5",
+    "R",
+    "D",
+    "6",
+    "C",
+    "F",
+    "T",
+    "X",
+
+    "7",
+    "Y",
+    "G",
+    "8",
+    "B",
+    "H",
+    "U",
+    "V",
+
+    "9",
+    "I",
+    "J",
+    "0",
+    "M",
+    "K",
+    "O",
+    "N",
+
+    "+",
+    "P",
+    "L",
+    "-",
+    ".",
+    ":",
+    "@",
+    ",",
+
+    "£",
+    "*",
+    ";",
+    "HOME",
+    "SHIFT_RIGHT",
+    "=",
+    "ARROW UP",
+    "/",
+
+    "1",
+    "ARROW_LEFT",
+    "CONTROL",
+    "2",
+    "SPACE",
+    "COMMODORE",
+    "Q",
+    "RUN/STOP",
+
+    "RESTORE",
+    "PLATZHALTER",
+
+    "CRSR_LEFT",
+    "F8",
+    "F2",
+    "F4",
+    "F6",
+    "CRSR_UP",
 };
 
 #endif // C64_KEYS_H
