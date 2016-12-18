@@ -1797,7 +1797,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
         {
             switch(event->key.keysym.sym)
             {
-            case SDLK_ESCAPE:
+            case SDLK_F12:
                 if(RecJoyMapping)
                 {
                     RecJoyMapping = false;
@@ -1894,7 +1894,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
         {
             switch(event->key.keysym.sym)
             {
-            case SDLK_ESCAPE:
+            case SDLK_F12:
                RESET = true;
                 break;
             case SDLK_DELETE:

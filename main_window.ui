@@ -512,7 +512,7 @@ background-position: center
     </font>
    </property>
    <property name="shortcut">
-    <string notr="true">Esc</string>
+    <string notr="true">F12</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
@@ -540,7 +540,7 @@ background-position: center
     </font>
    </property>
    <property name="shortcut">
-    <string notr="true">Shift+Esc</string>
+    <string notr="true">Shift+F12</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
@@ -626,7 +626,7 @@ background-position: center
     </font>
    </property>
    <property name="shortcut">
-    <string>F12</string>
+    <string>F9</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
