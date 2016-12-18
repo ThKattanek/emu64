@@ -21,8 +21,14 @@ ShowC64KeyMappingWindow::ShowC64KeyMappingWindow(QWidget *parent, C64Class *c64)
     ui(new Ui::ShowC64KeyMappingWindow)
 {
     this->c64 = c64;
-
     ui->setupUi(this);
+
+    QFontDatabase fontDB;
+    fontDB.addApplicationFont(":/fonts/lucon.ttf");
+    QFont font1("Lucida Console",10);
+
+    ui->text_out->setFont(font1);
+
     UpdateText();
 }
 
@@ -44,7 +50,7 @@ void ShowC64KeyMappingWindow::UpdateText()
 
     for(int i=0; i<c64_key_table_size; i++)
     {
-        QString line = QString(c64_key_names[i]);
+        QString line = QString(trUtf8(c64_key_names[i])) + " ";
         int len = line.length();
         for(int j=0; j<(14-len); j++)
         {
@@ -54,15 +60,15 @@ void ShowC64KeyMappingWindow::UpdateText()
         line += "|";
 
         //const char* sdl_key_name = SDL_GetKeyName(c64_key_table[i].SDLKeyCode);
-        QString sdl_key_name = QString(SDL_GetKeyName(c64_key_table[i].SDLKeyCode));
+        QString sdl_key_name = QString(trUtf8(SDL_GetKeyName(c64_key_table[i].SDLKeyCode)));
 
         len = sdl_key_name.length();
-        for(int j=0; j<(16-len); j++)
+        for(int j=0; j<(15-len); j++)
         {
             line += ".";
         }
 
-        line += sdl_key_name;
+        line += " " + sdl_key_name;
 
         ui->text_out->appendPlainText(line);
     }

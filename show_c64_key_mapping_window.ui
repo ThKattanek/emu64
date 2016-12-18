@@ -18,8 +18,8 @@
     <widget class="QPlainTextEdit" name="text_out">
      <property name="font">
       <font>
-       <family>Courier 10 Pitch</family>
-       <pointsize>11</pointsize>
+       <family>DejaVu Sans Mono</family>
+       <pointsize>10</pointsize>
        <weight>75</weight>
        <bold>true</bold>
       </font>
