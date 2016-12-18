@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek       	//
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 18.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -49,11 +49,13 @@ static unsigned char KeyMatrixToPB_LM[8];
 static unsigned char KeyMatrixToPA_RM[8];
 static unsigned char KeyMatrixToPB_RM[8];
 
-C64KeyboardWindow::C64KeyboardWindow(QWidget *parent, QSettings *_ini) :
+C64KeyboardWindow::C64KeyboardWindow(QWidget *parent, QSettings *ini, C64Class *c64) :
     QDialog(parent),
     ui(new Ui::C64KeyboardWindow)
 {
-    ini = _ini;
+    this->c64 = c64;
+    this->ini = ini;
+
     ui->setupUi(this);
 
     for(int i=0;i<7;i++)
@@ -265,19 +267,37 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
 
             RecKeyPress = true;
             blink_flip = true;
+            RecTimeOut = 24;
+
+            // Restore Taste
             if((AKT_Y_KEY == 1) && (AKT_X_KEY == 14))
             {
+                if(c64 != NULL) c64->StopRecKeyMap();
                 RecKeyPress = false;
                 blink_flip = false;
+                return;
             }
+
+            // Shift Lock Taste
             if((AKT_Y_KEY == 2) && (AKT_X_KEY == 1))
             {
+                if(c64 != NULL) c64->StopRecKeyMap();
                 RecKeyPress = false;
                 blink_flip = false;
+                return;
             }
+
             RecKeyAktX = AKT_X_KEY;
             RecKeyAktY = AKT_Y_KEY;
             update();
+
+            unsigned char matrix_code = VK_TO_C64[RecKeyAktY][RecKeyAktX];
+
+            qDebug("MatrixCode: %2.X",matrix_code );
+
+            c64->SetFocusToC64Window();
+            c64->StartRecKeyMap(matrix_code);
+            timer->start(200);
         }
     }
 }
@@ -346,10 +366,21 @@ void C64KeyboardWindow::paintEvent(QPaintEvent*)
 
 void C64KeyboardWindow::timer_event()
 {
-    if(blink_flip)
+    RecTimeOut--;
+    if(RecTimeOut == 0 || c64->GetRecKeyMapStatus() == false)
     {
-            blink_flip = false;
+        timer->stop();
+        c64->StopRecKeyMap();
+        RecKeyPress = false;
+        blink_flip = false;
     }
-    else blink_flip = true;
+    else
+    {
+        if(blink_flip)
+        {
+                blink_flip = false;
+        }
+        else blink_flip = true;
+    }
     update();
 }

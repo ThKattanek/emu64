@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.12.2016                //
+// Letzte Änderung am 18.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -151,6 +151,10 @@ public:
     void StopRecJoystickMapping(void);
     void ClearJoystickMapping(int slot_nr);
     void IncMouseHiddenCounter(void);
+
+    void StartRecKeyMap(unsigned char keymatrix_code);
+    void StopRecKeyMap();
+    bool GetRecKeyMapStatus();
 
     unsigned char GetMapReadSource(unsigned char page);
     unsigned char GetMapWriteDestination(unsigned char page);
@@ -417,6 +421,9 @@ private:
     bool    MouseIsHidden;
     int     MouseHiddenCounter;
     int     MouseHiddenTime;
+
+    bool            IsKeyMapRec;
+    unsigned char   RecMatrixCode;
 };
 
 #endif // C64CLASS_H

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 18.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -22,6 +22,8 @@
 #include <QSettings>
 #include <QTimer>
 
+#include "./c64_class.h"
+
 namespace Ui {
     class C64KeyboardWindow;
 }
@@ -31,7 +33,7 @@ class C64KeyboardWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit C64KeyboardWindow(QWidget *parent = 0, QSettings *_ini = 0);
+    explicit C64KeyboardWindow(QWidget *parent = 0, QSettings *ini = 0, C64Class *c64 = 0);
     ~C64KeyboardWindow();
     void RetranslateUi();
     void resizeEvent(QResizeEvent *event);
@@ -77,7 +79,11 @@ private:
     unsigned char RecKeyAktX;
     unsigned char RecKeyAktY;
 
+    int RecTimeOut;
+
     bool isOneShowed;
+
+    C64Class *c64;
 };
 
 #endif // C64_KEYBOARD_WINDOW_H

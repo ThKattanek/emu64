@@ -290,7 +290,7 @@ void MainWindow::OnInit()
     LogText(trUtf8(">> TapeWindow wurde erzeugt\n").toLatin1().data());
 
     splash->showStatusMessage(trUtf8("C64KeyboardWindow wird erstellt."),Qt::darkBlue);
-    c64_keyboard_window = new C64KeyboardWindow(this,ini);
+    c64_keyboard_window = new C64KeyboardWindow(this,ini,c64);
     LogText(trUtf8(">> C64KeyboardWindow wurde erzeugt\n").toLatin1().data());
 
     splash->showStatusMessage(trUtf8("CRTWindow wird erstellt."),Qt::darkBlue);

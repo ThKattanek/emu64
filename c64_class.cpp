@@ -46,6 +46,9 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     SDLJoystickIsOpen = false;
     JoystickAnzahl = 0;
 
+    IsKeyMapRec = false;
+    RecMatrixCode = false;
+
     VPort1 = 0;
     VPort2 = 1;
 
@@ -1816,7 +1819,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                     }
                 }
 
-                break;   
+                break;
 
               case SDLK_DELETE:
                 cpu->TriggerInterrupt(RESTORE_NMI);
@@ -1856,11 +1859,28 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             }
             else
             {
-                for(int i=0;i<C64KeyNum;i++)
+                if(IsKeyMapRec)
                 {
-                    if(C64KeyTable[i].SDLKeyCode == event->key.keysym.sym && (event->key.keysym.mod != KMOD_LALT) && (event->key.keysym.mod != KMOD_RALT))
+                    // Mappen der gedrückten Taste
+                    for(int i=0;i<C64KeyNum;i++)
                     {
-                        KeyEvent(C64KeyTable[i].MatrixCode,KEY_DOWN,C64KeyTable[i].Shift);
+                        if(C64KeyTable[i].SDLKeyCode == event->key.keysym.sym)
+                        {
+                            C64KeyTable[i].SDLKeyCode = 0xFFFF;
+                        }
+                    }
+
+                    C64KeyTable[((RecMatrixCode & 0xF0)>>1) + (RecMatrixCode & 0x07)].SDLKeyCode = event->key.keysym.sym;
+                    IsKeyMapRec = false;
+                }
+                else
+                {
+                    for(int i=0;i<C64KeyNum;i++)
+                    {
+                        if(C64KeyTable[i].SDLKeyCode == event->key.keysym.sym && (event->key.keysym.mod != KMOD_LALT) && (event->key.keysym.mod != KMOD_RALT))
+                        {
+                            KeyEvent(C64KeyTable[i].MatrixCode,KEY_DOWN,C64KeyTable[i].Shift);
+                        }
                     }
                 }
             }
@@ -3407,6 +3427,22 @@ void C64Class::IncMouseHiddenCounter()
             SDL_ShowCursor(false);
         }
     }
+}
+
+void C64Class::StartRecKeyMap(unsigned char keymatrix_code)
+{
+    RecMatrixCode = keymatrix_code;
+    IsKeyMapRec = true;
+}
+
+void C64Class::StopRecKeyMap()
+{
+    IsKeyMapRec = false;
+}
+
+bool C64Class::GetRecKeyMapStatus()
+{
+    return IsKeyMapRec;
 }
 
 void C64Class::OpenSDLJoystick()
