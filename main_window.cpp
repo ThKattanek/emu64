@@ -68,19 +68,32 @@ MainWindow::~MainWindow()
             ini->setValue("VolumeMode",w->GetFloppyVolume());
             ini->endGroup();
         }
+
+        int x,y,w,h;
+        c64->GetWindowPos(&x, &y);
+        c64->GetWindowSize(&w, &h);
+
+        ini->beginGroup("C64Screen");
+        ini->setValue("PosX",x);
+        ini->setValue("PosY",y);
+        ini->setValue("SizeW",w);
+        ini->setValue("SizeH",h);
+        ini->endGroup();
+
+        C64_KEYS* c64_key_table = c64->GetC64KeyTable();
+        int c64_key_table_size = c64->GetC64KeyTableSize();
+
+        ini->beginGroup("C64KeyMapping");
+
+        for(int i=0; i<c64_key_table_size; i++)
+        {
+            QString name = "C64_KEY_" + QVariant(i).toString();
+            ini->setValue(name,(int)c64_key_table[i].SDLKeyCode);
+        }
+
+        ini->endGroup();
     }
     /////////////////////////////////////
-
-    int x,y,w,h;
-    c64->GetWindowPos(&x, &y);
-    c64->GetWindowSize(&w, &h);
-
-    ini->beginGroup("C64Screen");
-    ini->setValue("PosX",x);
-    ini->setValue("PosY",y);
-    ini->setValue("SizeW",w);
-    ini->setValue("SizeH",h);
-    ini->endGroup();
 
     /// WindowKlassen schließen ///
 
@@ -349,15 +362,6 @@ void MainWindow::OnInit()
     c64_keyboard_window->KeyMatrixToPB = c64->KeyboardMatrixToPBExt;
 
 
-    /// C64 Key Mapping aus INI laden
-
-    C64_KEYS* c64_keys = c64->GetC64KeyTable();
-
-    for(int i=0; i<c64->GetC64KeyTableSize(); i++)
-    {
-        qDebug("MatrixCode: %2.X, SDLKeyCode: %8.X",c64_keys[i].MatrixCode, c64_keys[i].SDLKeyCode);
-    }
-
     /// Tabelle für Floppy's Ertsellen ///
     splash->showStatusMessage(trUtf8("Tabelle für Floppy's wird erstellt."),Qt::darkBlue);
     ui->FloppyTabel->setRowCount(FloppyAnzahl);
@@ -416,6 +420,26 @@ void MainWindow::OnInit()
 
         /// TAPE Ini laden ///
         tape_window->LoadIni();
+
+        /// C64 Key Mapping aus INI laden ///
+
+        C64_KEYS* c64_key_table = c64->GetC64KeyTable();
+        int c64_key_table_size = c64->GetC64KeyTableSize();
+
+        ini->beginGroup("C64KeyMapping");
+
+        for(int i=0; i<c64_key_table_size; i++)
+        {
+            QString name = "C64_KEY_" + QVariant(i).toString();
+            unsigned long sdl_key_code = ini->value(name,0xFFFFFFFF).toUInt();
+
+            if(sdl_key_code != 0xFFFFFFFF)
+            {
+                c64_key_table[i].SDLKeyCode = sdl_key_code;
+            }
+        }
+
+        ini->endGroup();
     }
 
     this->update();
