@@ -3456,6 +3456,11 @@ C64_KEYS *C64Class::GetC64KeyTable()
     return C64KeyTable;
 }
 
+const char **C64Class::GetC64KeyNameTable()
+{
+    return C64KeyNames;
+}
+
 int C64Class::GetC64KeyTableSize()
 {
     return C64KeyNum;

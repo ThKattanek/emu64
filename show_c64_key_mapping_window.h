@@ -31,9 +31,12 @@ class ShowC64KeyMappingWindow : public QDialog
 public:
     explicit ShowC64KeyMappingWindow(QWidget *parent = 0, C64Class *c64 = 0);
     ~ShowC64KeyMappingWindow();
+    void UpdateText();
 
 private:
     Ui::ShowC64KeyMappingWindow *ui;
+
+    C64Class *c64;
 };
 
 #endif // SHOW_C64_KEY_MAPPING_WINDOW_H

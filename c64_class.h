@@ -156,6 +156,7 @@ public:
     void StopRecKeyMap();
     bool GetRecKeyMapStatus();
     C64_KEYS* GetC64KeyTable();
+    const char **GetC64KeyNameTable();
     int GetC64KeyTableSize();
 
     unsigned char GetMapReadSource(unsigned char page);

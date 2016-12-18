@@ -109,6 +109,7 @@ MainWindow::~MainWindow()
     delete crt_window;
     delete debugger_window;
     delete speed_window;
+    delete show_c64keymap_window;
 
     delete ui;
     delete ini;
@@ -322,6 +323,10 @@ void MainWindow::OnInit()
     splash->showStatusMessage(trUtf8("C64SpeedWindow wird erstellt."),Qt::darkBlue);
     speed_window = new C64SpeedWindow(this,ini);
     LogText(trUtf8(">> C64SpeedWindow wurde erzeugt\n").toLatin1().data());
+
+    splash->showStatusMessage(trUtf8("ShowC64KeyMapWindow wird erstellt."),Qt::darkBlue);
+    show_c64keymap_window = new ShowC64KeyMappingWindow(this,c64);
+    LogText(trUtf8(">> ShowC64KeyMapWindow wurde erzeugt\n").toLatin1().data());
 
     ini->beginGroup("MainWindow");
     splash->showStatusMessage(trUtf8("Screenshotnummer wir geladen."),Qt::darkBlue);
@@ -936,4 +941,10 @@ void MainWindow::on_actionBandlaufwerk_1530_triggered()
 {
     if(tape_window->isHidden()) tape_window->show();
     else tape_window->hide();
+}
+
+void MainWindow::on_actionC64_Tastenbelegung_Show_triggered()
+{
+    show_c64keymap_window->UpdateText();
+    show_c64keymap_window->show();
 }

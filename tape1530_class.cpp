@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.12.2016                //
+// Letzte Änderung am 18.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -48,7 +48,7 @@ TAPE1530::TAPE1530(int samplerate, int puffersize)
     SoundBufferPos = 0;
     SoundBufferSize = puffersize;
     SoundBuffer = new signed short[SoundBufferSize*2];
-    for(int i=0; i<SoundBufferSize*2; i++)
+    for(int i=0; i<(puffersize*2); i++)
         SoundBuffer[i] = 0;
 
     file = NULL;

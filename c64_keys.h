@@ -72,14 +72,14 @@ C64_KEYS C64KeyTable[C64KeyNum]={
     {0x52,SDLK_l,false},                    /// L
     {0x53,SDLK_KP_MINUS,false},             /// -
     {0x54,SDLK_PERIOD,false},               /// .
-    {0x55,0xFFFFFFFF,false},                /// :
-    {0x56,0xFFFFFFFF,false},                /// @
+    {0x55,-1,false},                        /// :
+    {0x56,-1,false},                        /// @
     {0x57,SDLK_COMMA,false},                /// ,
 
-    {0x60,0xFFFFFFFF,false},                /// £
+    {0x60,-1,false},                        /// £
     {0x61,SDLK_KP_MULTIPLY,false},          /// *
     {0x62,SDLK_SEMICOLON,false},            /// ;
-    {0x63,0xFFFFFFFF,false},                /// HOME
+    {0x63,-1,false},                        /// HOME
     {0x64,SDLK_RSHIFT,false},               /// SHIFT_R
     {0x65,SDLK_HASH,false},                 /// =
     {0x66,SDLK_PLUS,false},                 /// PFEIL UP
@@ -95,7 +95,7 @@ C64_KEYS C64KeyTable[C64KeyNum]={
     {0x77,SDLK_TAB,false},                  /// RUN/STOP
 
     {0x80,SDLK_DELETE,false},               /// RESTORE
-    {0x01,0xFFFFFFFF,true},                 /// PLATZHALTER
+    {0x01,-1,true},                         /// PLATZHALTER
 
     {0x02,SDLK_LEFT,true},                  /// CRSR_L
     {0x03,SDLK_F8,true},                    /// F8
@@ -179,7 +179,7 @@ const char* C64KeyNames[C64KeyNum]={
     "RUN/STOP",
 
     "RESTORE",
-    "PLATZHALTER",
+    "",
 
     "CRSR_LEFT",
     "F8",

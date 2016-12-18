@@ -341,7 +341,7 @@ struct POINT_STRUCT
 struct C64_KEYS
 {
     unsigned char MatrixCode;
-    unsigned long SDLKeyCode;
+    int SDLKeyCode;
     bool          Shift;
 };
 

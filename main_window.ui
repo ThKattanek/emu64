@@ -202,6 +202,8 @@ background-position: center
     </property>
     <addaction name="menu_main_info"/>
     <addaction name="actionHandbuch"/>
+    <addaction name="separator"/>
+    <addaction name="actionC64_Tastenbelegung_Show"/>
    </widget>
    <widget class="QMenu" name="menuC64_Dateien">
     <property name="toolTip">
@@ -1062,6 +1064,17 @@ background-position: center
    </property>
    <property name="statusTip">
     <string>Der Inhalt der GEO-RAM wird gelöscht.</string>
+   </property>
+  </action>
+  <action name="actionC64_Tastenbelegung_Show">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>C64 Tastenbelegung anzeigen</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
    </property>
   </action>
  </widget>

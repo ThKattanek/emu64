@@ -114,6 +114,8 @@ private slots:
     void OnResetScreenshotCounter(void);
     void OnSetupFished(int result);
 
+    void on_actionC64_Tastenbelegung_Show_triggered();
+
 private:
     /// Funktionen ///
     void changeEvent(QEvent *event);  
@@ -145,17 +147,18 @@ private:
 
     bool RomSetEnable;            // False wenn kein RomSet-Verzeichnis existiert und keins erstellt werden konnte
 
-    InfoWindow *info_window;                    // Info Fenster Klasse (wird vom MainWindow als Modal gestartet)
-    TVSetupWindow *tv_setup_window;             // TV Einstellungsfenster
-    FloppyWindow *floppy_window;                // Floppy Editor / Auswahl
-    TapeWindow *tape_window;                    // Datasette
-    C64KeyboardWindow *c64_keyboard_window;     // Virtuelle C64 Tastatur
-    CrtWindow *crt_window;                      // CRT Auswahl Fenster
-    DebuggerWindow *debugger_window;            // Debugger / Disassembler Fenster
-    SetupWindow *setup_window;                  // Setup Fenster
-    C64SpeedWindow *speed_window;               // C64 Speed Window
+    InfoWindow *info_window;                        // Info Fenster Klasse (wird vom MainWindow als Modal gestartet)
+    TVSetupWindow *tv_setup_window;                 // TV Einstellungsfenster
+    FloppyWindow *floppy_window;                    // Floppy Editor / Auswahl
+    TapeWindow *tape_window;                        // Datasette
+    C64KeyboardWindow *c64_keyboard_window;         // Virtuelle C64 Tastatur
+    CrtWindow *crt_window;                          // CRT Auswahl Fenster
+    DebuggerWindow *debugger_window;                // Debugger / Disassembler Fenster
+    SetupWindow *setup_window;                      // Setup Fenster
+    C64SpeedWindow *speed_window;                   // C64 Speed Window
+    ShowC64KeyMappingWindow *show_c64keymap_window; //C64 Key Map Window
 
-    QStringList commandLine;                    // Enthält den an Emu64 übergebenen String
+    QStringList commandLine;                        // Enthält den an Emu64 übergebenen String
 
     bool isFirstPaintEvent;
 };
