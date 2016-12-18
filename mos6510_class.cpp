@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 18.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -79,7 +79,7 @@ void MOS6510::TriggerInterrupt(int typ)
     case CIA_NMI:
             if(Interrupts[CIA_NMI] == true) return;
             Interrupts[CIA_NMI] = true;
-            if(Interrupts[CRT_NMI] == false) NMIState = true;
+            if((Interrupts[CRT_NMI] == false) && (Interrupts[RESTORE_NMI] == false)) NMIState = true;
             break;
     case VIC_IRQ:
             //Interrupts[VIC_IRQ] = true;
@@ -92,7 +92,14 @@ void MOS6510::TriggerInterrupt(int typ)
     case CRT_NMI:
             if(Interrupts[CRT_NMI] == true) return;
             Interrupts[CRT_NMI] = true;
-            if(Interrupts[CIA_NMI] == false) NMIState = true;
+            if((Interrupts[CIA_NMI] == false) && (Interrupts[RESTORE_NMI] == false)) NMIState = true;
+            break;
+    case RESTORE_NMI:
+            if(Interrupts[RESTORE_NMI] == true) return;
+            Interrupts[RESTORE_NMI] = true;
+            if((Interrupts[CIA_NMI] == false) && (Interrupts[CRT_NMI] == false)) NMIState = true;
+            break;
+    default:
             break;
     }
 }
@@ -136,6 +143,12 @@ void MOS6510::ClearInterrupt(int typ)
     case CRT_NMI:
             Interrupts[CRT_NMI] = false;
             if(Interrupts[CIA_NMI] == false) NMIState = false;
+            break;
+    case RESTORE_NMI:
+            Interrupts[RESTORE_NMI] = false;
+            if((Interrupts[CIA_NMI] == false) && (Interrupts[CRT_NMI] == false)) NMIState = false;
+            break;
+    default:
             break;
     }
 }
@@ -378,6 +391,7 @@ bool MOS6510::OneZyklus(void)
         CpuWait=false;
         Interrupts[CIA_NMI] = false;
         Interrupts[CRT_NMI] = false;
+        Interrupts[RESTORE_NMI] = false;
 
         IRQLine = 0;
         for(int i=0;i<5;i++) IRQLinePuffer[i] = 0;

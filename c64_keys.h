@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 18.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -79,22 +79,15 @@ C64_KEYS C64KeyTable[C64KeyNum]={
     {0x52,SDLK_l,false},                    /// L
     {0x53,SDLK_KP_MINUS,false},             /// -
     {0x54,SDLK_PERIOD,false},               /// .
-
     //{0x55,SDLK_WORLD_86,false},             /// :
-
     //{0x56,SDLK_WORLD_92,false},             /// @
-
     {0x57,SDLK_COMMA,false},                /// ,
 
     //{0x60,SDLK_WORLD_63,false},             /// ENGL. PFUND
-
     {0x61,SDLK_KP_MULTIPLY,false},          /// *
-
     //{0x62,SDLK_WORLD_68,false},             /// ;
     {0x62,SDLK_SEMICOLON,false},
-
     //{0x63,SDLK_COMPOSE,false},              /// HOME
-
     {0x64,SDLK_RSHIFT,false},               /// SHIF_RECHTS
     {0x65,SDLK_HASH,false},                 /// =
     {0x66,SDLK_PLUS,false},                 /// PFEIL HOCH

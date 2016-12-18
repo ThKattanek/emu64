@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.12.2016                //
+// Letzte Änderung am 18.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1818,6 +1818,10 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
                 break;   
 
+              case SDLK_DELETE:
+                cpu->TriggerInterrupt(RESTORE_NMI);
+                break;
+
               case SDLK_RETURN:
 
                 keymod = SDL_GetModState();
@@ -1892,6 +1896,10 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             {
             case SDLK_ESCAPE:
                RESET = true;
+                break;
+            case SDLK_DELETE:
+                cpu->ClearInterrupt(RESTORE_NMI);
+                break;
             default:
                 break;
             }
