@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.12.2016                //
+// Letzte Änderung am 18.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -667,32 +667,6 @@ void MainWindow::on_menu_main_info_triggered()
 
 
     info_window->show();
-}
-
-void MainWindow::keyPressEvent(QKeyEvent*)
-{
-    /*
-    for(int i=0;i<64;i++)
-    {
-        if(C64KeyTable[i].nativeVirtualKey == event->nativeVirtualKey())
-        {
-            c64->KeyEvent(C64KeyTable[i].MatrixCode,KEY_DOWN);
-        }
-    }
-    */
-}
-
-void MainWindow::keyReleaseEvent(QKeyEvent*)
-{
-    /*
-    for(int i=0;i<64;i++)
-    {
-        if(C64KeyTable[i].nativeVirtualKey == event->nativeVirtualKey())
-        {
-            c64->KeyEvent(C64KeyTable[i].MatrixCode,KEY_UP);
-        }
-    }
-    */
 }
 
 void MainWindow::on_actionBeenden_triggered()

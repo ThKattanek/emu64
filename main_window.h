@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.12.2016                //
+// Letzte Änderung am 18.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -112,10 +112,6 @@ private slots:
     void OnChangeFloppyImage(int floppynr);
     void OnResetScreenshotCounter(void);
     void OnSetupFished(int result);
-
-protected:
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
 
 private:
     /// Funktionen ///
