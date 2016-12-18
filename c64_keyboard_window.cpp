@@ -293,8 +293,6 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
 
             unsigned char matrix_code = VK_TO_C64[RecKeyAktY][RecKeyAktX];
 
-            qDebug("MatrixCode: %2.X",matrix_code );
-
             c64->SetFocusToC64Window();
             c64->StartRecKeyMap(matrix_code);
             timer->start(200);
