@@ -29,17 +29,18 @@
 #include <stdlib.h>
 
 /// Windows ///
-#include "custom_splashscreen.h"
-#include "widget_floppy_status.h"
-#include "info_window.h"
-#include "tv_setup_window.h"
-#include "floppy_window.h"
-#include "c64_keyboard_window.h"
-#include "crt_window.h"
-#include "debugger_window.h"
-#include "setup_window.h"
-#include "c64_speed_window.h"
-#include "tape_window.h"
+#include "./custom_splashscreen.h"
+#include "./widget_floppy_status.h"
+#include "./info_window.h"
+#include "./tv_setup_window.h"
+#include "./floppy_window.h"
+#include "./c64_keyboard_window.h"
+#include "./crt_window.h"
+#include "./debugger_window.h"
+#include "./setup_window.h"
+#include "./c64_speed_window.h"
+#include "./tape_window.h"
+#include "./show_c64_key_mapping_window.h"
 
 #include "c64_class.h"
 
