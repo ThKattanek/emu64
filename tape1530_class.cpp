@@ -48,7 +48,7 @@ TAPE1530::TAPE1530(int samplerate, int puffersize)
     SoundBufferPos = 0;
     SoundBufferSize = puffersize;
     SoundBuffer = new signed short[SoundBufferSize*2];
-    for(int i=0; i<puffersize; i++)
+    for(int i=0; i<SoundBufferSize*2; i++)
         SoundBuffer[i] = 0;
 
     file = NULL;
