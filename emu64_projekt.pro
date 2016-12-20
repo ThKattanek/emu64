@@ -63,7 +63,8 @@ SOURCES += \
     widget_tape_counter.cpp \
     tape_new_window.cpp \
     new_romset_window.cpp \
-    show_c64_key_mapping_window.cpp
+    show_c64_key_mapping_window.cpp \
+    crt_new_easyflash_window.cpp
 
 HEADERS  += \
     info_window.h \
@@ -125,7 +126,8 @@ HEADERS  += \
     widget_tape_counter.h \
     tape_new_window.h \
     new_romset_window.h \
-    show_c64_key_mapping_window.h
+    show_c64_key_mapping_window.h \
+    crt_new_easyflash_window.h
 
 FORMS    += \
     info_window.ui \
@@ -151,7 +153,8 @@ FORMS    += \
     widget_tape_counter.ui \
     tape_new_window.ui \
     new_romset_window.ui \
-    show_c64_key_mapping_window.ui
+    show_c64_key_mapping_window.ui \
+    crt_new_easyflash_window.ui
 
 RESOURCES += \
     emu64.qrc

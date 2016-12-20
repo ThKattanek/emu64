@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.07.2016                //
+// Letzte Änderung am 20.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -306,7 +306,52 @@ void CrtWindow::onChipList_currentChanged(const QModelIndex &current, const QMod
 
 void CrtWindow::on_NewEasyFlashCRT_clicked()
 {
+    CRTNewEasyflashWindow *crt_new_ef_window = new CRTNewEasyflashWindow(this);
 
+    if(crt_new_ef_window->exec())
+    {
+        QString filename = crt_new_ef_window->GetFilename();
+        QString crt_name = crt_new_ef_window->GetCrtName();
+        QString fullpath;
+
+        if(filename.right(4).toUpper() != ".CRT")
+            filename += ".crt";
+
+        fullpath = ui->FileBrowser->GetAktDir() + "/" + filename;
+
+        //qDebug(fullpath.toLatin1().data());
+
+        QFile file(fullpath);
+        if(!file.exists())
+        {
+            if(c64->CreateNewEasyFlashImage(fullpath.toLatin1().data(), crt_name.toLatin1().data()))
+            {
+                QMessageBox::critical(this,trUtf8("Fehler!"),trUtf8("Es konnte kein neues EasyFlash Image erstellt werden."));
+            }
+            else
+            {
+                ui->FileBrowser->SetAktDir(ui->FileBrowser->GetAktDir());
+                ui->FileBrowser->SetAktFile(ui->FileBrowser->GetAktDir(),filename);
+            }
+        }
+        else
+        {
+            if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Achtung!"),trUtf8("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
+            {
+                if(c64->CreateNewEasyFlashImage(fullpath.toLatin1().data(), crt_name.toLatin1().data()))
+                {
+                    QMessageBox::critical(this,trUtf8("Fehler!"),trUtf8("Es konnte kein neues EasyFlash Image erstellt werden."));
+                }
+                else
+                {
+                    ui->FileBrowser->SetAktDir(ui->FileBrowser->GetAktDir());
+                    ui->FileBrowser->SetAktFile(ui->FileBrowser->GetAktDir(),filename);
+                }
+            }
+        }
+    }
+
+    delete crt_new_ef_window;
 }
 
 void CrtWindow::on_InsertCRT_clicked()

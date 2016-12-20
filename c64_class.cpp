@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.12.2016                //
+// Letzte Änderung am 19.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -2479,6 +2479,11 @@ void C64Class::RemoveCRT(void)
     IOSource = 0;
     KillCommandLine();
     HardReset();
+}
+
+int C64Class::CreateNewEasyFlashImage(char *filename, char *crt_name)
+{
+    return crt->CreateNewEasyFlashImage(filename, crt_name);
 }
 
 void C64Class::InsertREU(void)

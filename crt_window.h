@@ -24,6 +24,8 @@
 #include "c64_class.h"
 #include "structs.h"
 
+#include "./crt_new_easyflash_window.h"
+
 namespace Ui {
     class CrtWindow;
 }

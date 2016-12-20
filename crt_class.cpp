@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.05.2016                //
+// Letzte Änderung am 19.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -255,7 +255,7 @@ void CRTClass::RemoveCRTImage()
         ResetAllLEDS();
 }
 
-int CRTClass::NewEasyFlashImage(char* filename,char* crt_name)
+int CRTClass::CreateNewEasyFlashImage(char* filename,char* crt_name)
 {
         const char* Kennung = "C64 CARTRIDGE   ";
         const char* ChipKennung = "CHIP";

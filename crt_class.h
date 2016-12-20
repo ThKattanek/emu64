@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.05.2016                //
+// Letzte Änderung am 19.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -35,7 +35,7 @@ public:
     unsigned char* GetFlash040Byte(int nr);
     int LoadCRTImage(char* filename);
     void RemoveCRTImage(void);
-    int NewEasyFlashImage(char* filename,char* crt_name);
+    int CreateNewEasyFlashImage(char* filename,char* crt_name);
     int WriteEasyFlashImage(char* filename);
     int GetCRTInfo(char* filename,CRT_INFO_STRUCT* crtinfo);
     void SetEasyFlashJumper(bool enabled);
