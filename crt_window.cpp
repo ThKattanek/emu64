@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.12.2016                //
+// Letzte Änderung am 22.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -30,8 +30,8 @@ CrtWindow::CrtWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
 
     ui->setupUi(this);
 
-    LedRedOff = new QIcon(":/grafik/RedLED_Off.png");
-    LedRedOn = new QIcon(":/grafik/RedLED_On.png");
+    LedRedOff = new QIcon(":/grafik/red_led_off.png");
+    LedRedOn = new QIcon(":/grafik/red_led_on.png");
     ui->FC3_LED->setIcon(*LedRedOff);
     ui->EF_LED->setIcon(*LedRedOff);
 
@@ -69,6 +69,13 @@ CrtWindow::CrtWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
     ui->ChipData->setHeaderLabels(QStringList() << "ADR"<<"0"<<"1"<<"2"<<"3"<<"4"<<"5"<<"6"<<"7"<<"8"<<"9"<<"A"<<"B"<<"C"<<"D"<<"E"<<"F");
     ui->ChipData->setColumnWidth(0,50);
     for(int i=0;i<16;i++) ui->ChipData->setColumnWidth(i+1,24);
+
+    ChangeLED(1, false);
+
+    timer1 = new QTimer(this);
+    timer1->setInterval(20);
+    connect(timer1,SIGNAL(timeout()),this,SLOT(onTimer1()));
+    timer1->start();
 }
 
 CrtWindow::~CrtWindow()
@@ -121,6 +128,12 @@ void CrtWindow::LoadIni(void)
 void CrtWindow::showEvent(QShowEvent*)
 {
     isOneShowed = true;
+    timer1->start();
+}
+
+void CrtWindow::hideEvent(QHideEvent *event)
+{
+    timer1->stop();
 }
 
 void CrtWindow::RetranslateUi()
@@ -304,6 +317,24 @@ void CrtWindow::onChipList_currentChanged(const QModelIndex &current, const QMod
     }
 }
 
+void CrtWindow::onTimer1()
+{
+    if(LedStatusOld[0] != LedStatus[0])
+    {
+        if(LedStatus[0]) ui->FC3_LED->setIcon(*LedRedOn);
+        else ui->FC3_LED->setIcon(*LedRedOff);
+    }
+
+    if(LedStatusOld[1] != LedStatus[1])
+    {
+        if(LedStatus[1]) ui->EF_LED->setIcon(*LedRedOn);
+        else ui->EF_LED->setIcon(*LedRedOff);
+    }
+
+    for(int i=0; i<LED_COUNT; i++)
+        LedStatusOld[i] = LedStatus[i];
+}
+
 void CrtWindow::on_NewEasyFlashCRT_clicked()
 {
     CRTNewEasyflashWindow *crt_new_ef_window = new CRTNewEasyflashWindow(this);
@@ -391,16 +422,9 @@ void CrtWindow::on_RemoveCRT_clicked()
 
 void CrtWindow::ChangeLED(int LedNr, bool LedStatus)
 {
-    switch(LedNr)
+    if(LedNr < LED_COUNT)
     {
-    case 0: /// FC3
-        if(LedStatus) ui->FC3_LED->setIcon(*LedRedOn);
-        else ui->FC3_LED->setIcon(*LedRedOff);
-        break;
-    case 1: /// EF
-        if(LedStatus) ui->EF_LED->setIcon(*LedRedOn);
-        else ui->EF_LED->setIcon(*LedRedOff);
-        break;
+        this->LedStatus[LedNr] = LedStatus;
     }
 }
 

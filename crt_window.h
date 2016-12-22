@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.07.2016                //
+// Letzte Änderung am 22.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,12 +19,15 @@
 #include <QDialog>
 #include <QSettings>
 #include <QModelIndex>
+#include <QTimer>
 
 #include "crt_class.h"
 #include "c64_class.h"
 #include "structs.h"
 
 #include "./crt_new_easyflash_window.h"
+
+#define LED_COUNT 2
 
 namespace Ui {
     class CrtWindow;
@@ -40,6 +43,7 @@ public:
     void LoadIni(void);
     void RetranslateUi();
     void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent *event);
     void ChangeLED(int,bool);
 
 private slots:
@@ -53,6 +57,7 @@ private slots:
 
     void onSelectFile(QString filename);
     void onChipList_currentChanged(const QModelIndex &current, const QModelIndex &previous);
+    void onTimer1();
 
 private:
     Ui::CrtWindow *ui;
@@ -66,6 +71,9 @@ private:
     CRT_INFO_STRUCT crt_info;
     bool CRTIsSelected;
     QString SelCRTFileName;
+    QTimer *timer1;
+    bool LedStatus[LED_COUNT];
+    bool LedStatusOld[LED_COUNT];
     QIcon *LedRedOn;
     QIcon *LedRedOff;
 };
