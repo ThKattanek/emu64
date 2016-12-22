@@ -1027,7 +1027,7 @@ void C64Class::SoftReset()
 {
     WaitResetReady = false;
     SetReset(false,true);
-    SDL_Delay(20);
+    SDL_Delay(40);
     SetReset(true,true);
 }
 
@@ -1035,7 +1035,7 @@ void C64Class::HardReset()
 {
     WaitResetReady = false;
     SetReset(false,false);
-    SDL_Delay(20);
+    SDL_Delay(40);
     SetReset(true,true);
 }
 
