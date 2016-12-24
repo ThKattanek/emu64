@@ -43,7 +43,7 @@ public:
     void LoadIni(void);
     void RetranslateUi();
     void showEvent(QShowEvent *event);
-    void hideEvent(QHideEvent *event);
+    void hideEvent(QHideEvent *);
     void ChangeLED(int,bool);
 
 private slots:

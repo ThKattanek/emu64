@@ -217,7 +217,7 @@ void MainWindow::OnInit()
         }
         else
         {
-            LogText(trUtf8("<< Ein neues RomSet-Verzeichnis konnte nicht erstellt werden\n<< Keine Screenshots möglich !!").toLatin1().data());
+            LogText(trUtf8("<< Ein neues RomSet-Verzeichnis konnte nicht erstellt werden\n").toLatin1().data());
             RomSetEnable = false;
         }
     }

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.12.2016                //
+// Letzte Änderung am 24.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -131,7 +131,7 @@ void CrtWindow::showEvent(QShowEvent*)
     timer1->start();
 }
 
-void CrtWindow::hideEvent(QHideEvent *event)
+void CrtWindow::hideEvent(QHideEvent*)
 {
     timer1->stop();
 }
