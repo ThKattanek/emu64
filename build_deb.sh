@@ -11,7 +11,7 @@ checkinstall -D \
     --maintainer="Thorsten Kattanek\\<thorsten.Kattanek@emu64.de\\>" \
     --pkgarch=$(dpkg \
     --print-architecture) \
-    --pkgversion="5.0.13" \
+    --pkgversion="5.0.14" \
     --pkgrelease="0" \
     --pkgname=emu64 \
     --requires="libc6 \(\>= 2.4\),libgcc1 \(\>= 1:4.1.1\),libncurses5 \(\>= 5.5-5~\),libpcap0.8 \(\>= 0.9.8\),libstdc++6 \(\>= 4.1.1\),libtinfo5, \
