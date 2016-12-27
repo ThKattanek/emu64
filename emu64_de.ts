@@ -2703,7 +2703,7 @@ Soll diese überschrieben werden?</source>
         <source>&gt;&gt; C64SpeedWindow wurde erzeugt
 </source>
         <oldsource>CRT Window wird mit CRT Klasee verbunden.</oldsource>
-        <translation type="unfinished">CRT Window wird mit CRT Klasse verbunden.</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="355"/>

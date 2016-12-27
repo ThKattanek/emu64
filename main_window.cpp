@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.12.2016                //
+// Letzte Änderung am 27.12.2016                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -329,27 +329,32 @@ void MainWindow::OnInit()
     LogText(trUtf8(">> ShowC64KeyMapWindow wurde erzeugt\n").toLatin1().data());
 
     ini->beginGroup("MainWindow");
-    splash->showStatusMessage(trUtf8("Screenshotnummer wir geladen."),Qt::darkBlue);
+    splash->showStatusMessage(trUtf8("Screenshotnummer wird geladen."),Qt::darkBlue);
     ScreenshotNumber = (int)ini->value("ScreenshotCounter",0).toInt();
     ini->endGroup();
+    LogText(trUtf8(">> Aktuelle Screenshotnummer wurde geladen\n").toLatin1().data());
 
     splash->showStatusMessage(trUtf8("SetupWindow wird mit INI abgeglichen."),Qt::darkBlue);
     setup_window->ReSetup();
+    LogText(trUtf8(">> SetupWindow ReSetup wurde durchgeführt\n").toLatin1().data());
 
-    splash->showStatusMessage(trUtf8("SDL Window Titelleiste wird benannt."),Qt::darkBlue);
+    //splash->showStatusMessage(trUtf8("SDL Window Titelleiste wird benannt."),Qt::darkBlue);
     //SDL_WM_SetCaption((const char*)trUtf8("C64 Bildschirm").toLatin1().data(),0);
 
     /// Debugger Window mit C64 verbinden ///
     splash->showStatusMessage(trUtf8("Debugger Window wird mit C64 Klasse verbunden."),Qt::darkBlue);
     debugger_window->SetC64Pointer(c64);
+    LogText(trUtf8(">> DebuggerWindow wurde mit C64 Klasse verbunden\n").toLatin1().data());
 
     /// C64 Speed Window mit C64 verbinden ///
     splash->showStatusMessage(trUtf8("C64 Speed Window wird mit C64 Klasse verbunden."),Qt::darkBlue);
     speed_window->SetC64Pointer(c64);
+    LogText(trUtf8(">> C64SpeedWindow wurde mit C64 Klasse verbunden\n").toLatin1().data());
 
     /// CRT LED mit CRT_Window verbinden ///
     splash->showStatusMessage(trUtf8("CRT LED mit CRT Window verbunden."),Qt::darkBlue);
     c64->crt->ChangeLED = bind(&CrtWindow::ChangeLED,crt_window,_1,_2);
+    LogText(trUtf8(">> CRT LED wurde mit CrtWindow verbunden\n").toLatin1().data());
 
     /// C64 Systemroms laden ///
     splash->showStatusMessage(trUtf8("C64 Systemroms werden geladen."),Qt::darkBlue);
@@ -360,17 +365,20 @@ void MainWindow::OnInit()
         LogText(QString(dataPath+"/roms/basic.rom").toLatin1().data());LogText("\n\t");
         LogText(QString(dataPath+"/roms/char.rom").toLatin1().data());LogText("\n");
     }
+    else LogText(trUtf8(">> Alle C64 Roms geladen\n").toLatin1().data());
 
     /// C64 Keyboard Matrix mit dem Virtual Keyboard verbinden ///
     splash->showStatusMessage(trUtf8("C64 Key-Matrix wird mit Virtual Keyboard verbunden."),Qt::darkBlue);
     c64_keyboard_window->KeyMatrixToPA = c64->KeyboardMatrixToPAExt;
     c64_keyboard_window->KeyMatrixToPB = c64->KeyboardMatrixToPBExt;
+    LogText(trUtf8(">> C64 Key-Matrix wurde mit Virtual Keyboard verbunden\n").toLatin1().data());
 
 
     /// Tabelle für Floppy's Ertsellen ///
     splash->showStatusMessage(trUtf8("Tabelle für Floppy's wird erstellt."),Qt::darkBlue);
     ui->FloppyTabel->setRowCount(FloppyAnzahl);
     ui->FloppyTabel->setColumnCount(1);
+    LogText(trUtf8(">> Tabelle für alle Floppy Laufwerke wurde erzeugt\n").toLatin1().data());
 
     for(int i=0; i<FloppyAnzahl; i++)
     {
@@ -384,17 +392,21 @@ void MainWindow::OnInit()
         connect(w,SIGNAL(LoadImage(int)),floppy_window,SLOT(OnChangeFloppyNummer(int)));
         connect(w,SIGNAL(RemoveImage(int)),floppy_window,SLOT(OnRemoveImage(int)));
     }
+    LogText(trUtf8(">> Alle Floppy Lauferke in Tabelle eingetragen\n").toLatin1().data());
 
     /// Close Evend von C64 Klasse hierher leiten
     c64->CloseEventC64Screen = bind(&MainWindow::CloseC64Screeen,this);
+    LogText(trUtf8(">> SDL Window Close Event mit MainWindow verknüpft\n").toLatin1().data());
 
     connect(floppy_window,SIGNAL(ChangeFloppyImage(int)),this,SLOT(OnChangeFloppyImage(int)));
+    LogText(trUtf8(">> ChangeFloppyImage Event mit MainWindow verknüpft\n").toLatin1().data());
 
     ////////// Load from INI ///////////
     splash->showStatusMessage(trUtf8("Einstellungen werden von INI geladen und gesetzt."),Qt::darkBlue);
     if(ini != NULL)
     {
         floppy_window->LoadIni();
+        LogText(trUtf8(">> FloppyWindow LoadIni wurde ausgeführt\n").toLatin1().data());
 
         ini->beginGroup("MainWindow");
         if(ini->contains("Geometry")) restoreGeometry(ini->value("Geometry").toByteArray());
@@ -419,12 +431,15 @@ void MainWindow::OnInit()
 
         /// SETUP Ini laden ///
         setup_window->LoadINI(c64);
+        LogText(trUtf8(">> SetupWindow LoadIni wurde ausgeführt\n").toLatin1().data());
 
         /// CRT Ini erst jetzt laden ///
         crt_window->LoadIni();
+        LogText(trUtf8(">> CrtWindow LoadIni wurde ausgeführt\n").toLatin1().data());
 
         /// TAPE Ini laden ///
         tape_window->LoadIni();
+        LogText(trUtf8(">> TapeWindow LoadIni wurde ausgeführt\n").toLatin1().data());
 
         /// C64 Key Mapping aus INI laden ///
 
@@ -444,6 +459,8 @@ void MainWindow::OnInit()
             }
         }
 
+        LogText(trUtf8(">> C64 Tastatur Mapping aus INI geladen\n").toLatin1().data());
+
         ini->endGroup();
     }
 
@@ -452,20 +469,6 @@ void MainWindow::OnInit()
     /// Screenshot Reset mit SetupWindow verbinden ///
     connect(setup_window,SIGNAL(ResetSreenshotCounter()),this,SLOT(OnResetScreenshotCounter()));
 
-    /////////////////////////////////////
-    splash->showStatusMessage(trUtf8("C64 EMULATION WIRD NUN GESTARET."),Qt::darkBlue);
-    if(ret_error == 0) c64->StartEmulation();
-    else
-    {
-        this->close();
-        return;
-    }
-    c64->HardReset();
-
-    splash->close();
-    this->show();
-
-    ExecuteCommandLine();
 
     ini->beginGroup("C64Screen");
 
@@ -487,7 +490,23 @@ void MainWindow::OnInit()
 
     ini->endGroup();
 
-    LogText(">> Emu64 wurde initialisiert");
+    LogText(">> Emu64 wurde initialisiert\n");
+
+
+    /////////////////////////////////////
+    splash->showStatusMessage(trUtf8("C64 EMULATION WIRD NUN GESTARET."),Qt::darkBlue);
+    if(ret_error == 0) c64->StartEmulation();
+    else
+    {
+        this->close();
+        return;
+    }
+    c64->HardReset();
+
+    splash->close();
+    this->show();
+
+    ExecuteCommandLine();
 }
 
 void MainWindow::OnMessage(QStringList msg)

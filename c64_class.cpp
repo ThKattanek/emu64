@@ -35,7 +35,7 @@ int SDLThreadLoad(void *userdat);
 
 C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> log_function, const char* gfx_path):
     mmu(NULL),cpu(NULL),vic(NULL),sid1(NULL),sid2(NULL),cia1(NULL),cia2(NULL),crt(NULL)
-{   
+{
     ChangeGrafikModi = false;
     ChangeWindowPos = false;
     ChangeWindowSize = false;
@@ -1006,7 +1006,7 @@ void C64Class::KeyEvent(unsigned char matrix_code,KeyStatus key_status, bool isA
 
     switch(key_status)
     {
-    case KEY_DOWN:        
+    case KEY_DOWN:
         KeyboardMatrixToPB[matrix_code>>4]|=1<<(matrix_code&0x07);
         if(isAutoShift) KeyboardMatrixToPB[AutoShift>>4]|=1<<(AutoShift&0x07);
 
@@ -1405,7 +1405,7 @@ void C64Class::ReleaseGrafik()
 }
 
 void C64Class::DrawC64Screen()
-{   
+{
     /// Auf Screenshot Start prüfen ///
     if(StartScreenshot)
     {
@@ -3518,7 +3518,7 @@ void C64Class::OpenSDLJoystick()
         if(JoystickAnzahl > 0)
         {
             for(int i=0; i<JoystickAnzahl;i++)
-            {                
+            {
                 Joystick[i] = SDL_JoystickOpen(i);
                 JoystickNamen[i] = SDL_JoystickName(Joystick[i]);
 
