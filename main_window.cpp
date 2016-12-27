@@ -486,6 +486,8 @@ void MainWindow::OnInit()
     }
 
     ini->endGroup();
+
+    LogText(">> Emu64 wurde initialisiert");
 }
 
 void MainWindow::OnMessage(QStringList msg)
@@ -499,6 +501,7 @@ void MainWindow::LogText(const char *log_text)
     if(log != NULL)
     {
         *log << log_text;
+        log->flush();
     }
 }
 
