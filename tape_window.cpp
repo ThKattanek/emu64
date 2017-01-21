@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.11.2016                //
+// Letzte Änderung am 21.01.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -42,7 +42,7 @@ TapeWindow::TapeWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
     ui->Volume->setIcon(*VolMute);
 
     // Filebrowser initialisieren
-    connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(OnSelectFile(QString)));
+    connect(ui->FileBrowser,SIGNAL(SelectFile(QString)),this,SLOT(OnSelectFile(QString)));
     //ui->FileBrowser->SetFileFilter(QStringList()<<"*.tap"<<"*.wav");
     ui->FileBrowser->SetFileFilter(QStringList()<<"*.tap");
 

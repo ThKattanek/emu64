@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.12.2016                //
+// Letzte Änderung am 21.01.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -45,7 +45,7 @@ CrtWindow::CrtWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
     fontDB.addApplicationFont(":/fonts/lucon.ttf");
     QFont font("Lucida Console",8);
 
-    connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(onSelectFile(QString)));
+    connect(ui->FileBrowser,SIGNAL(SelectFile(QString)),this,SLOT(onSelectFile(QString)));
     connect(ui->ChipList->selectionModel(),SIGNAL(currentChanged(QModelIndex,QModelIndex)),this,SLOT(onChipList_currentChanged(QModelIndex,QModelIndex)));
     connect(ui->FileBrowser,SIGNAL(FileDoubleClick()),this,SLOT(on_InsertCRT_clicked()));
 

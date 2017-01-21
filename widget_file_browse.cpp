@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.11.2016                //
+// Letzte Änderung am 21.01.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -124,7 +124,7 @@ void WidgetFileBrowse::SetAktFile(QString akt_dir, QString akt_file)
         ui->delete_file->setDisabled(true);
 
 
-    emit select_file(dirmodel->fileInfo(idx).absoluteFilePath());
+    emit SelectFile(dirmodel->fileInfo(idx).absoluteFilePath());
 }
 
 void WidgetFileBrowse::RefreshAktDir()
@@ -176,7 +176,7 @@ void WidgetFileBrowse::on_listWidget_zip_itemSelectionChanged()
             outfile.close();
         }
         zip.close();
-        emit select_file(OutFileName);
+        emit SelectFile(OutFileName);
     }
 }
 
@@ -209,7 +209,7 @@ void WidgetFileBrowse::on_listView_filebrowser_clicked(const QModelIndex &index)
 
         ui->delete_file->setEnabled(true);
 
-        emit select_file(AktFileName);
+        emit SelectFile(AktFileName);
 
         if("ZIP" == AktFileName.right(3).toUpper())
         {

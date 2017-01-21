@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.08.2016                //
+// Letzte Änderung am 21.01.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -66,7 +66,7 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QStr
     // Spalten für D64 Datei-Anzeige hinzufügen
     ui->D64FileTable->setColumnCount(7);
 
-    connect(ui->FileBrowser,SIGNAL(select_file(QString)),this,SLOT(OnSelectFile(QString)));
+    connect(ui->FileBrowser,SIGNAL(SelectFile(QString)),this,SLOT(OnSelectFile(QString)));
     connect(ui->FileBrowser,SIGNAL(WriteProtectedChanged(bool)),this,SLOT(OnWriteProtectedChanged(bool)));
     ui->FileBrowser->SetFileFilter(QStringList()<<"*.d64"<<"*.g64");
     ui->FileBrowser->EnableWriteProtectCheck(true);

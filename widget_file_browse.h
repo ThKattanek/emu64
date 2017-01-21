@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.11.2016                //
+// Letzte Änderung am 21.01.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -47,6 +47,7 @@ public:
 
 signals:
     void FileDoubleClick(void);
+    void SelectFile(QString filename);
     void WriteProtectedChanged(bool status);    // true = Schreibgeschützt
 
 private slots:
@@ -67,9 +68,6 @@ private:
     QFileSystemModel *dirmodel;
     QString akt_fullpath;
     QStringList ZIPExt;
-
-signals:
-    void select_file(QString filename);
 };
 
 #endif // WIDGET_FILE_BROWSE_H
