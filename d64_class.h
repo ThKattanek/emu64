@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014        		//
+// Letzte Änderung am 23.02.2017        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,8 +16,9 @@
 #ifndef D64_CLASS_H
 #define D64_CLASS_H
 
-#include "cstring"
+#include <cstring>
 #include <fstream>
+#include <iostream>
 using namespace std;
 
 #include "structs.h"
@@ -38,6 +39,7 @@ class D64Class
 
     private:
     void ReadBlock(unsigned char Track, unsigned char Sektor, unsigned char * PUFFER);
+    void OutputBlock(unsigned char *buffer);
     unsigned char D64Image[174848];
     unsigned char Block[256];
     unsigned char BlockTmp[256];

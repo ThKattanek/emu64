@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.12.2016                //
+// Letzte Änderung am 23.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -77,6 +77,8 @@ int D64Class::LoadD64(char* Filename)
     fclose(file);
 
     ReadBlock(18,0,Block);
+
+    OutputBlock(Block);
 
     Track = Block[0];
     Sektor = Block[1];
@@ -201,4 +203,18 @@ void D64Class::ReadBlock(unsigned char Track, unsigned char Sektor, unsigned cha
     TEMP=TRACK_INDEX[Track]+Sektor;
     TEMP*=256;
     for (int z=0;z<256;z++) PUFFER[z]=D64Image[TEMP+z];
+}
+
+void D64Class::OutputBlock(unsigned char *buffer)
+{
+    for(int i=0; i<16; i++)
+    {
+        int adr = i*16;
+        for(int j=0; j<16; j++)
+        {
+            printf("%2.2X ",buffer[adr+j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
 }
