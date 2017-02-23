@@ -78,10 +78,15 @@ int D64Class::LoadD64(char* Filename)
 
     ReadBlock(18,0,Block);
 
-    OutputBlock(Block);
+    // OutputBlock(Block);
 
     Track = Block[0];
     Sektor = Block[1];
+
+    // Wenn Spur oder Sektor außerhalb der D64 Spezifikation ist
+    // wird der Standard Ort gesetzt (18/1)
+    if(Track > 35) Track = 18;
+    if(Sektor > 21) Sektor = 1;
 
     int z;
     for (z=0;z<23;z++)
