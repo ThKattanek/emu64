@@ -64,7 +64,8 @@ SOURCES += \
     tape_new_window.cpp \
     new_romset_window.cpp \
     show_c64_key_mapping_window.cpp \
-    crt_new_easyflash_window.cpp
+    crt_new_easyflash_window.cpp \
+    command_line_class.cpp
 
 HEADERS  += \
     info_window.h \
@@ -127,7 +128,8 @@ HEADERS  += \
     tape_new_window.h \
     new_romset_window.h \
     show_c64_key_mapping_window.h \
-    crt_new_easyflash_window.h
+    crt_new_easyflash_window.h \
+    command_line_class.h
 
 FORMS    += \
     info_window.ui \
