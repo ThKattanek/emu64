@@ -124,6 +124,7 @@ private:
     void SetC64ScreenTitle(void);
     bool getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt);
     void ExecuteCommandLine();
+    void SplashMessage(const QString &message, const QColor &color);
 
     /// Varialen ///
     QTranslator appTranslator;   // Application Translator

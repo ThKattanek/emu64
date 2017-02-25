@@ -99,15 +99,19 @@ int main(int argc, char *argv[])
 
     if(log!=0) *log << "Emu64 Version: " << str_emu64_version << "\n\n";
 
+
     QPixmap image(":/splash");
     customSplashScreen *splash = new customSplashScreen(image);
     splash->setPixmap(image);
     splash->setMask(image.mask());
     splash->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::SplashScreen);
+
     splash->show();
+
 
     MainWindow *w;
     w = new MainWindow(0,splash,log);
+    //w = new MainWindow(0,NULL,log);
 
     QObject::connect(app,SIGNAL(messageAvailable(QStringList)),w,SLOT(OnMessage(QStringList)));
 
@@ -117,7 +121,7 @@ int main(int argc, char *argv[])
     for(int i=0;i<argc;i++) msg_list << argv[i];
     w->OnMessage(msg_list);
 
-    QTimer::singleShot(500, w, SLOT(OnInit()));
+    w->OnInit();
 
     int ret = app->exec();
 
