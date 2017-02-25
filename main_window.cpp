@@ -30,6 +30,10 @@ MainWindow::MainWindow(QWidget *parent,customSplashScreen* splash,QTextStream *l
 
     isFirstPaintEvent = false;
 
+    this->setGeometry(0,0,0,0);
+    this->show();
+    this->hide();
+
     /// Haputfenster UI setzen ///
     ui->setupUi(this);
 
@@ -134,7 +138,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
     if(!isFirstPaintEvent)
     {
         isFirstPaintEvent = true;
-        c64->SetFocusToC64Window();
+        if(c64 != NULL) c64->SetFocusToC64Window();
     }
 }
 
@@ -152,19 +156,21 @@ void MainWindow::OnInit()
     dataPath = "/usr/share/emu64";
 #endif
 
-
     tmpPath = QDir::tempPath();
     LogText((QString(">> TEMP Path = ") + tmpPath + QString("\n")).toAscii());
 
-    splash->setMessageRect(QRect(0,303,400, 20), Qt::AlignCenter);
+    if(splash != NULL)
+    {
+        splash->setMessageRect(QRect(0,303,400, 20), Qt::AlignCenter);
 
-    QFont splashFont;
-    splashFont.setFamily("Arial");
-    splashFont.setBold(true);
-    splashFont.setPixelSize(10);
-    splashFont.setStretch(125);
+        QFont splashFont;
+        splashFont.setFamily("Arial");
+        splashFont.setBold(true);
+        splashFont.setPixelSize(10);
+        splashFont.setStretch(125);
 
-    splash->setFont(splashFont);
+        splash->setFont(splashFont);
+    }
 
     /// Translator installieren ///
     langPath = dataPath+"/languages";
@@ -174,14 +180,14 @@ void MainWindow::OnInit()
     SystemLocale.truncate(SystemLocale.lastIndexOf('_'));  // "de"
 
     /// INI Dateiverwaltung erstellen ///
-    splash->showStatusMessage(trUtf8("INI Dateiverwaltung wird initialisiert."),Qt::darkBlue);
+    SplashMessage(trUtf8("INI Dateiverwaltung wird initialisiert."),Qt::darkBlue);
 
     ini = new QSettings(configPath+"/emu64.ini",QSettings::IniFormat,this);
 
     LogText(QString(">> INI System wurde erzeugt: " + configPath + "/emu64.ini\n").toLatin1().data());
     LogText(QString(">> INI System was created: " + configPath + "/emu64.ini\n").toLatin1().data());
 
-    splash->showStatusMessage(trUtf8("Sprachmenü wir erstellt."),Qt::darkBlue);
+    SplashMessage(trUtf8("Sprachmenü wir erstellt."),Qt::darkBlue);
     ini->beginGroup("MainWindow");
     CreateLanguageMenu(ini->value("lang",SystemLocale).toString());
 
@@ -191,7 +197,7 @@ void MainWindow::OnInit()
     LogText(QString(trUtf8(">> Sprachmenü wurde erstellt.") + SystemLocale + "\n").toLatin1().data());
 
 
-    splash->showStatusMessage(trUtf8("Translator wurde installiert."),Qt::darkBlue);
+    SplashMessage(trUtf8("Translator wurde installiert."),Qt::darkBlue);
     LogText(QString(trUtf8(">> Translator wurde intsalliert: Systemsprache = ") + SystemLocale + "\n").toLatin1().data());
     setWindowIcon(QIcon(":/grafik/emu64.ico"));
 
@@ -200,7 +206,7 @@ void MainWindow::OnInit()
 
     QDir* dir = new QDir(romsetPath);
 
-    splash->showStatusMessage(trUtf8("RomSet-Verzeichnis wird gesucht."),Qt::darkBlue);
+    SplashMessage(trUtf8("RomSet-Verzeichnis wird gesucht."),Qt::darkBlue);
     if(dir->exists())
     {
         LogText(trUtf8(">> Ein RomSet Verzeichnis ist vorhanden\n").toLatin1().data());
@@ -208,7 +214,7 @@ void MainWindow::OnInit()
     }
     else
     {
-        splash->showStatusMessage(trUtf8("RomSet-Verzeichnis wird erstellt."),Qt::darkBlue);
+        SplashMessage(trUtf8("RomSet-Verzeichnis wird erstellt."),Qt::darkBlue);
         LogText(trUtf8("<< Ein RomSet-Verzeichnis ist nicht vorhanden\n").toLatin1().data());
         if(dir->mkdir(romsetPath))
         {
@@ -236,7 +242,7 @@ void MainWindow::OnInit()
 
     dir = new QDir(screenshotPath);
 
-    splash->showStatusMessage(trUtf8("Screenshotverzeichnis wird gesucht."),Qt::darkBlue);
+    SplashMessage(trUtf8("Screenshotverzeichnis wird gesucht."),Qt::darkBlue);
     if(dir->exists())
     {
         LogText(trUtf8(">> Ein Screenshot Verzeichnis ist vorhanden\n").toLatin1().data());
@@ -244,7 +250,7 @@ void MainWindow::OnInit()
     }
     else
     {
-        splash->showStatusMessage(trUtf8("Screenshotverzeichnis wird erstellt."),Qt::darkBlue);
+        SplashMessage(trUtf8("Screenshotverzeichnis wird erstellt."),Qt::darkBlue);
         LogText(trUtf8("<< Ein Screenshot Verzeichnis ist nicht vorhanden\n").toLatin1().data());
         if(dir->mkdir(screenshotPath))
         {
@@ -268,12 +274,12 @@ void MainWindow::OnInit()
     }
 
     /// Klassen installieren ///
-    splash->showStatusMessage(trUtf8("VideoPal Klasse wird initialisiert."),Qt::darkBlue);
+    SplashMessage(trUtf8("VideoPal Klasse wird initialisiert."),Qt::darkBlue);
     videopal = new VideoPalClass();
     LogText(trUtf8(">> VideoPal Klasse wurde installiert\n").toLatin1().data());
 
     /// C64 Klasse Installieren ... Das HERZ ///
-    splash->showStatusMessage(trUtf8("C64 Klasse wird initialisiert."),Qt::darkBlue);
+    SplashMessage(trUtf8("C64 Klasse wird initialisiert."),Qt::darkBlue);
     int ret_error;
     c64 = new C64Class(&ret_error,videopal,bind(&MainWindow::LogText,this,_1),QString(dataPath + "/gfx/").toLatin1().data());
     if(ret_error != 0)
@@ -287,77 +293,77 @@ void MainWindow::OnInit()
     /// Window Klassen erstellen ///
     /// Unter MAC sollte ohne übergabe des this Zeigers die Klasseb erstellt werden
 
-    splash->showStatusMessage(trUtf8("InfoWindow wird erstellt."),Qt::darkBlue);
+    SplashMessage(trUtf8("InfoWindow wird erstellt."),Qt::darkBlue);
     info_window = new InfoWindow(this);
     LogText(trUtf8(">> InfoWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(trUtf8("TVSetupWindow wird erstellt."),Qt::darkBlue);
+    SplashMessage(trUtf8("TVSetupWindow wird erstellt."),Qt::darkBlue);
     tv_setup_window = new TVSetupWindow(this,c64,videopal,ini);
     LogText(trUtf8(">> TVSetupWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(trUtf8("FloppyWindow wird erstellt."),Qt::darkBlue);
+    SplashMessage(trUtf8("FloppyWindow wird erstellt."),Qt::darkBlue);
     floppy_window = new FloppyWindow(this,ini,c64,tmpPath);
     LogText(trUtf8(">> FloppyWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(trUtf8("TapeWindow wird erstellt."),Qt::darkBlue);
+    SplashMessage(trUtf8("TapeWindow wird erstellt."),Qt::darkBlue);
     tape_window = new TapeWindow(this,ini,c64);
     LogText(trUtf8(">> TapeWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(trUtf8("C64KeyboardWindow wird erstellt."),Qt::darkBlue);
+    SplashMessage(trUtf8("C64KeyboardWindow wird erstellt."),Qt::darkBlue);
     c64_keyboard_window = new C64KeyboardWindow(this,ini,c64);
     LogText(trUtf8(">> C64KeyboardWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(trUtf8("CRTWindow wird erstellt."),Qt::darkBlue);
+    SplashMessage(trUtf8("CRTWindow wird erstellt."),Qt::darkBlue);
     crt_window = new CrtWindow(this,ini,c64);
     LogText(trUtf8(">> CrtWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(trUtf8("DebuggerWindow wird erstellt."),Qt::darkBlue);
+    SplashMessage(trUtf8("DebuggerWindow wird erstellt."),Qt::darkBlue);
     debugger_window = new DebuggerWindow(this,ini);
     LogText(trUtf8(">> DebuggerWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(trUtf8("SetupWindow wird erstellt."),Qt::darkBlue);
+    SplashMessage(trUtf8("SetupWindow wird erstellt."),Qt::darkBlue);
     setup_window = new SetupWindow(this,SLOT(OnChangeGrafikModi(bool,bool,bool,bool,bool)),videopal,ini,&romsetPath,&dataPath);
     connect(setup_window,SIGNAL(finished(int)),this,SLOT(OnSetupFished(int)));
     LogText(trUtf8(">> SetupWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(trUtf8("C64SpeedWindow wird erstellt."),Qt::darkBlue);
+    SplashMessage(trUtf8("C64SpeedWindow wird erstellt."),Qt::darkBlue);
     speed_window = new C64SpeedWindow(this,ini);
     LogText(trUtf8(">> C64SpeedWindow wurde erzeugt\n").toLatin1().data());
 
-    splash->showStatusMessage(trUtf8("ShowC64KeyMapWindow wird erstellt."),Qt::darkBlue);
+    SplashMessage(trUtf8("ShowC64KeyMapWindow wird erstellt."),Qt::darkBlue);
     show_c64keymap_window = new ShowC64KeyMappingWindow(this,c64);
     LogText(trUtf8(">> ShowC64KeyMapWindow wurde erzeugt\n").toLatin1().data());
 
     ini->beginGroup("MainWindow");
-    splash->showStatusMessage(trUtf8("Screenshotnummer wird geladen."),Qt::darkBlue);
+    SplashMessage(trUtf8("Screenshotnummer wird geladen."),Qt::darkBlue);
     ScreenshotNumber = (int)ini->value("ScreenshotCounter",0).toInt();
     ini->endGroup();
     LogText(trUtf8(">> Aktuelle Screenshotnummer wurde geladen\n").toLatin1().data());
 
-    splash->showStatusMessage(trUtf8("SetupWindow wird mit INI abgeglichen."),Qt::darkBlue);
+    SplashMessage(trUtf8("SetupWindow wird mit INI abgeglichen."),Qt::darkBlue);
     setup_window->ReSetup();
     LogText(trUtf8(">> SetupWindow ReSetup wurde durchgeführt\n").toLatin1().data());
 
-    //splash->showStatusMessage(trUtf8("SDL Window Titelleiste wird benannt."),Qt::darkBlue);
+    //SplashMessage(trUtf8("SDL Window Titelleiste wird benannt."),Qt::darkBlue);
     //SDL_WM_SetCaption((const char*)trUtf8("C64 Bildschirm").toLatin1().data(),0);
 
     /// Debugger Window mit C64 verbinden ///
-    splash->showStatusMessage(trUtf8("Debugger Window wird mit C64 Klasse verbunden."),Qt::darkBlue);
+    SplashMessage(trUtf8("Debugger Window wird mit C64 Klasse verbunden."),Qt::darkBlue);
     debugger_window->SetC64Pointer(c64);
     LogText(trUtf8(">> DebuggerWindow wurde mit C64 Klasse verbunden\n").toLatin1().data());
 
     /// C64 Speed Window mit C64 verbinden ///
-    splash->showStatusMessage(trUtf8("C64 Speed Window wird mit C64 Klasse verbunden."),Qt::darkBlue);
+    SplashMessage(trUtf8("C64 Speed Window wird mit C64 Klasse verbunden."),Qt::darkBlue);
     speed_window->SetC64Pointer(c64);
     LogText(trUtf8(">> C64SpeedWindow wurde mit C64 Klasse verbunden\n").toLatin1().data());
 
     /// CRT LED mit CRT_Window verbinden ///
-    splash->showStatusMessage(trUtf8("CRT LED mit CRT Window verbunden."),Qt::darkBlue);
+    SplashMessage(trUtf8("CRT LED mit CRT Window verbunden."),Qt::darkBlue);
     c64->crt->ChangeLED = bind(&CrtWindow::ChangeLED,crt_window,_1,_2);
     LogText(trUtf8(">> CRT LED wurde mit CrtWindow verbunden\n").toLatin1().data());
 
     /// C64 Systemroms laden ///
-    splash->showStatusMessage(trUtf8("C64 Systemroms werden geladen."),Qt::darkBlue);
+    SplashMessage(trUtf8("C64 Systemroms werden geladen."),Qt::darkBlue);
     if(!c64->LoadC64Roms((char*)QString(dataPath+"/roms/kernal.rom").toLatin1().data(),(char*)QString(dataPath+"/roms/basic.rom").toLatin1().data(),(char*)QString(dataPath+"/roms/char.rom").toLatin1().data()))
     {
         LogText((char*)"<< ERROR: Fehler beim laden der C64 Roms\n\t");
@@ -368,21 +374,21 @@ void MainWindow::OnInit()
     else LogText(trUtf8(">> Alle C64 Roms geladen\n").toLatin1().data());
 
     /// C64 Keyboard Matrix mit dem Virtual Keyboard verbinden ///
-    splash->showStatusMessage(trUtf8("C64 Key-Matrix wird mit Virtual Keyboard verbunden."),Qt::darkBlue);
+    SplashMessage(trUtf8("C64 Key-Matrix wird mit Virtual Keyboard verbunden."),Qt::darkBlue);
     c64_keyboard_window->KeyMatrixToPA = c64->KeyboardMatrixToPAExt;
     c64_keyboard_window->KeyMatrixToPB = c64->KeyboardMatrixToPBExt;
     LogText(trUtf8(">> C64 Key-Matrix wurde mit Virtual Keyboard verbunden\n").toLatin1().data());
 
 
     /// Tabelle für Floppy's Ertsellen ///
-    splash->showStatusMessage(trUtf8("Tabelle für Floppy's wird erstellt."),Qt::darkBlue);
+    SplashMessage(trUtf8("Tabelle für Floppy's wird erstellt."),Qt::darkBlue);
     ui->FloppyTabel->setRowCount(FloppyAnzahl);
     ui->FloppyTabel->setColumnCount(1);
     LogText(trUtf8(">> Tabelle für alle Floppy Laufwerke wurde erzeugt\n").toLatin1().data());
 
     for(int i=0; i<FloppyAnzahl; i++)
     {
-        splash->showStatusMessage(trUtf8("Floppy: ") + QVariant(i).toString() + "wird in Tabelle eingefügt",Qt::darkBlue);
+        SplashMessage(trUtf8("Floppy: ") + QVariant(i).toString() + "wird in Tabelle eingefügt",Qt::darkBlue);
         ui->FloppyTabel->setRowHeight(i,24);
         WidgetFloppyStatus *w = new WidgetFloppyStatus(this,i,c64->floppy[i]);
         w->SetGeraeteID(i+8);
@@ -402,7 +408,7 @@ void MainWindow::OnInit()
     LogText(trUtf8(">> ChangeFloppyImage Event mit MainWindow verknüpft\n").toLatin1().data());
 
     ////////// Load from INI ///////////
-    splash->showStatusMessage(trUtf8("Einstellungen werden von INI geladen und gesetzt."),Qt::darkBlue);
+    SplashMessage(trUtf8("Einstellungen werden von INI geladen und gesetzt."),Qt::darkBlue);
     if(ini != NULL)
     {
         floppy_window->LoadIni();
@@ -494,7 +500,7 @@ void MainWindow::OnInit()
 
 
     /////////////////////////////////////
-    splash->showStatusMessage(trUtf8("C64 EMULATION WIRD NUN GESTARET."),Qt::darkBlue);
+    SplashMessage(trUtf8("C64 EMULATION WIRD NUN GESTARET."),Qt::darkBlue);
     if(ret_error == 0) c64->StartEmulation();
     else
     {
@@ -503,10 +509,9 @@ void MainWindow::OnInit()
     }
     c64->HardReset();
 
-    splash->close();
-    this->show();
+    if(splash != NULL) splash->close();
 
-    ExecuteCommandLine();
+    this->show();
 }
 
 void MainWindow::OnMessage(QStringList msg)
@@ -714,6 +719,11 @@ void MainWindow::ExecuteCommandLine()
     cout << "ExecuteCommandLine" << endl;
     if(commandLine.length() > 1)
         c64->LoadAutoRun(0,commandLine[1].toLatin1().data());
+}
+
+void MainWindow::SplashMessage(const QString &message, const QColor &color)
+{
+    if(splash != NULL) splash->showStatusMessage(message,color);
 }
 
 void MainWindow::on_menu_main_info_triggered()
