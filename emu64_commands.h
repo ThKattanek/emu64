@@ -19,6 +19,7 @@
 // Defineren aller Kommandozeilen Parameter
 enum CMD_COMMAND {CMD_HELP,CMD_VERSION,CMD_MULTIPLE_INSTANCE,CMD_NOSPLASH};
 static const CMD_STRUCT command_list[]{
+    {CMD_NOSPLASH,"","nosplash","Der SplashScreen wird beim Start nicht angezeigt."},
     {CMD_MULTIPLE_INSTANCE,"","multiple-instance","Ermöglicht das starten mehrerer Emu64 Instanzen."},
     {CMD_HELP,"?","help","Dieser Text."},
     {CMD_VERSION,"","version","Zeigt die aktuelle Versionsnummer an."}

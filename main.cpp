@@ -103,18 +103,22 @@ int main(int argc, char *argv[])
 
     if(log!=0) *log << "Emu64 Version: " << str_emu64_version << "\n\n";
 
-
-    QPixmap image(":/splash");
-    customSplashScreen *splash = new customSplashScreen(image);
-    splash->setPixmap(image);
-    splash->setMask(image.mask());
-    splash->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::SplashScreen);
-
-    splash->show();
-
     MainWindow *w;
-    w = new MainWindow(0,splash,log);
-    //w = new MainWindow(0,NULL,log);
+
+    if(!cmd_line->FoundCommand(CMD_NOSPLASH))
+    {
+        QPixmap image(":/splash");
+        customSplashScreen *splash = new customSplashScreen(image);
+        splash->setPixmap(image);
+        splash->setMask(image.mask());
+        splash->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::SplashScreen);
+        splash->show();
+        w = new MainWindow(0,splash,log);
+    }
+    else
+    {
+        w = new MainWindow(0,NULL,log);
+    }
 
     QObject::connect(app,SIGNAL(messageAvailable(QStringList)),w,SLOT(OnMessage(QStringList)));
 
