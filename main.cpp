@@ -8,25 +8,43 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.11.2016                //
+// Letzte Änderung am 25.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 
-#include "single_application.h"
-#include "main_window.h"
+#include "./single_application.h"
+#include "./main_window.h"
 
-#include "custom_splashscreen.h"
+#include "./custom_splashscreen.h"
 #include <QBitmap>
 #include <QTimer>
+
+#include "./command_line_class.h"
+#include "./emu64_commands.h"
 
 #undef main
 int main(int argc, char *argv[])
 {
+    QTextStream *log = 0;
+    QDir config_dir = QDir(QDir::homePath() + "/.config/emu64");
 
-QTextStream *log = 0;
-QDir config_dir = QDir(QDir::homePath() + "/.config/emu64");
+    CommandLineClass *cmd_line = new CommandLineClass(argc, argv, "emu64",command_list, command_list_count);
+
+    if(cmd_line->GetCommandCount() > 0)
+    {
+        if(cmd_line->GetCommand(0) == CMD_HELP)
+        {
+            cmd_line->ShowHelp();
+            return(0x0);
+        }
+        if(cmd_line->GetCommand(0) == CMD_VERSION)
+        {
+            printf("Version: %s\n\n",str_emu64_version);
+            return(0x0);
+        }
+    }
 
     SingleApplication *app;
     app = new SingleApplication (argc, argv,  "Emu64_By_Thorsten_Kattanek");
@@ -98,5 +116,6 @@ QDir config_dir = QDir(QDir::homePath() + "/.config/emu64");
     app->deleteSharedMemory();
     delete w;
 
+    cout << "ExitCode: 0x" << std::hex << ret << endl;
     return ret;
 };

@@ -11,6 +11,9 @@ QT += core gui
 #CONFIG += rtti
 #CONFIG += console
 
+CONFIG += c++11
+QMAKE_CXXFLAGS += -std=c++11
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TEMPLATE = app
@@ -129,7 +132,8 @@ HEADERS  += \
     new_romset_window.h \
     show_c64_key_mapping_window.h \
     crt_new_easyflash_window.h \
-    command_line_class.h
+    command_line_class.h \
+    emu64_commands.h
 
 FORMS    += \
     info_window.ui \

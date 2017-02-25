@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.12.2016                //
+// Letzte Änderung am 24.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -56,7 +56,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0,customSplashScreen* _splash = NULL,QTextStream *_log = NULL);
+    explicit MainWindow(QWidget *parent = 0, customSplashScreen* splash = NULL, QTextStream *log = NULL);
     ~MainWindow();
     Ui::MainWindow *ui;
 

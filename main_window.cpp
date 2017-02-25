@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.12.2016                //
+// Letzte Änderung am 24.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,14 +19,14 @@
 #include <QDebug>
 #include <QDir>
 
-MainWindow::MainWindow(QWidget *parent,customSplashScreen* _splash,QTextStream *_log) :
+MainWindow::MainWindow(QWidget *parent,customSplashScreen* splash,QTextStream *log) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     c64(NULL),
     commandLine(NULL)
 {
-    splash = _splash;
-    log = _log;
+    this->splash = splash;
+    this->log = log;
 
     isFirstPaintEvent = false;
 
@@ -711,6 +711,7 @@ bool MainWindow::getSaveFileName(QWidget *parent, QString caption, QString filte
 
 void MainWindow::ExecuteCommandLine()
 {
+    cout << "ExecuteCommandLine" << endl;
     if(commandLine.length() > 1)
         c64->LoadAutoRun(0,commandLine[1].toLatin1().data());
 }
