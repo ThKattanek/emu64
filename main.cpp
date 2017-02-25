@@ -40,8 +40,6 @@ int main(int argc, char *argv[])
         return(0x0);
     }
 
-    printf("Commands: %d\n\n", cmd_line->GetCommandCount());
-
     if(cmd_line->GetCommandCount() > 0)
     {
         if(cmd_line->GetCommand(0) == CMD_HELP)
