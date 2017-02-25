@@ -13,7 +13,6 @@
 //                                              //
 //////////////////////////////////////////////////
 
-
 #include "./single_application.h"
 #include "./main_window.h"
 
@@ -57,12 +56,17 @@ int main(int argc, char *argv[])
     SingleApplication *app;
     app = new SingleApplication (argc, argv,  "Emu64_By_Thorsten_Kattanek");
 
-    //app->deleteSharedMemory();
-
-    if (app->alreadyExists())
+    if(!cmd_line->FoundCommand(CMD_MULTIPLE_INSTANCE))
     {
-        for(int i=0;i<argc;i++) app->sendMessage(argv[i]);
-        return 0;
+        if (app->alreadyExists())
+        {
+            for(int i=0;i<argc;i++) app->sendMessage(argv[i]);
+            return 0;
+        }
+        else
+        {
+
+        }
     }
 
 #ifdef _WIN32
@@ -107,7 +111,6 @@ int main(int argc, char *argv[])
     splash->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::SplashScreen);
 
     splash->show();
-
 
     MainWindow *w;
     w = new MainWindow(0,splash,log);
