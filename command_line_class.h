@@ -25,7 +25,7 @@ struct CMD_STRUCT
 {
     int cmdCommand;                   // CMD_COMMAND
     const char *shortCommand;         // Kurzbezeichnung (bsp.: -a)
-    const char *longCommand;          // Langbezeichnung (bsp.: -all)
+    const char *longCommand;          // Langbezeichnung (bsp.: --all)
     const char *legend;               // Erklärung als Kurztext
 };
 
@@ -40,6 +40,10 @@ public:
     void ShowHelp();
 
 private:
+    bool CheckShortCommands(const char *short_commands);
+    bool CheckLongCommands(const char *long_command);
+    void AddCommand(int command);
+    void OutUnknowOptionError(const char *command, bool is_long);
     const CMD_STRUCT *all_commands_list;
     int all_commands_list_count;
     int max_long_command_len;
