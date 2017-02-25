@@ -17,7 +17,7 @@
 #define EMU64_COMMANDS_H
 
 // Defineren aller Kommandozeilen Parameter
-enum CMD_COMMAND {CMD_HELP,CMD_VERSION};
+enum CMD_COMMAND {CMD_HELP,CMD_VERSION,CMD_NOSPLASH};
 static const CMD_STRUCT command_list[]{
     {CMD_HELP,"?","help","Dieser Text."},
     {CMD_VERSION,"","version","Zeigt die aktuelle Versionsnummer an."}

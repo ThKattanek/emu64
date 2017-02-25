@@ -37,6 +37,7 @@ public:
     CommandLineClass(int argc, char *argv[], const char* app_name, const CMD_STRUCT *command_list, int command_list_count);
     int GetCommandCount();
     int GetCommand(int number);
+    bool FoundCommand(int command);
     void ShowHelp();
 
 private:
@@ -46,7 +47,7 @@ private:
     void OutUnknowOptionError(const char *command, bool is_long);
     const CMD_STRUCT *all_commands_list;
     int all_commands_list_count;
-    int max_long_command_len;
+    unsigned int max_long_command_len;
 
     const char* app_name;
 

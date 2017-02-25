@@ -56,8 +56,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    return(0x0);
-
     SingleApplication *app;
     app = new SingleApplication (argc, argv,  "Emu64_By_Thorsten_Kattanek");
 

@@ -181,6 +181,22 @@ void CommandLineClass::AddCommand(int command)
     }
 }
 
+bool CommandLineClass::FoundCommand(int command)
+{
+    bool found = false;
+
+    for(int i=0; i<command_count; i++)
+    {
+        if(command_list[i] == command)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    return found;
+}
+
 void CommandLineClass::OutUnknowOptionError(const char *command, bool is_long)
 {
     if(!is_long)
