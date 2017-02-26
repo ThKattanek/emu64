@@ -34,6 +34,9 @@ emu64 [PARAMETER]
 --poke64 <Adresse (0-65535)> <Wert (0-255)>
     Schreibt ein Byte an eine C64 Adresse.
 
+--limitcycles <nZyklen>
+    Beendet den Emulator nach n Zyklen mit Exitcode 1.
+
 --nosplash
     Der SplashScreen wird beim Start nicht angezeigt.
 

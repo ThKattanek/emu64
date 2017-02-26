@@ -790,11 +790,10 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
             break;
         case CMD_POKE_64:
             adr = cmd_line->GetArgInt(i+1, &error);
-            if(error)
-                break;
+            if(error) break;
+
             val = cmd_line->GetArgInt(i+2, &error);
-            if(error)
-                break;
+            if(error) break;
 
             if(!(adr >= 0x0000 && adr <= 0xffff))
             {
@@ -809,7 +808,18 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
             }
 
             c64->WriteC64Byte((unsigned short)adr,(unsigned char)val);
+            break;
+        case CMD_LIMITCYCLES:
+            val = cmd_line->GetArgInt(i+1, &error);
+            if(error) break;
 
+            if(!(val > 0))
+            {
+                cmd_line->OutErrorMsg("Die Anzahl der Zyklen müssen größer als 0 sein.","--help");
+                break;
+            }
+
+            cout << "Zyklen:" << val << endl;
             break;
         }
 
