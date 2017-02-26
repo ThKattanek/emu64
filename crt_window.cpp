@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.01.2017                //
+// Letzte Änderung am 26.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -123,6 +123,25 @@ void CrtWindow::LoadIni(void)
         ini->endGroup();
     }
     ////////////////////////////////////
+}
+
+bool CrtWindow::SetCrtImage(QString filename)
+{
+    QFileInfo fi = QFileInfo(filename);
+
+    ui->FileBrowser->SetAktDir(fi.absolutePath());
+    ui->FileBrowser->SetAktFile(fi.absolutePath(),fi.fileName());
+    return CRTIsSelected;
+}
+
+void CrtWindow::ConnectCrt()
+{
+    on_InsertCRT_clicked();
+}
+
+void CrtWindow::DisconnectCrt()
+{
+    on_RemoveCRT_clicked();
 }
 
 void CrtWindow::showEvent(QShowEvent*)

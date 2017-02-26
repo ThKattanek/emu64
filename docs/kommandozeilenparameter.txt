@@ -15,10 +15,15 @@ Hier nun alle Kommandozeilenparameter und dessen beschreibung...
 
 emu64 [PARAMETER]
 
--m, --mount-disk <laufwerksnummer> <filename>
-
+-m, --mount-disk <laufwerksnummer> <Dateiname>
     Mountet ein Diskimage. Die Laufwerksnummer muss zwischen 8 und 11 liegen.
     Bsp.: --mount-disk 8 ~\c64\test.d64
+
+--mount-crt <Dateiname>
+    Steckt ein Modulimage in den Expansionport ein.
+
+--umount-crt
+    Entfernt ein Modulimage aus dem Expansionsport.
 
 -r, --soft-reset
     Führt einen Soft Reset durch.
@@ -26,19 +31,19 @@ emu64 [PARAMETER]
 -R, --hard-reset
     Führt einen Hard Reset durch.
 
-    --poke64 <Adresse (0-65535)> <Wert (0-255)>
+--poke64 <Adresse (0-65535)> <Wert (0-255)>
     Schreibt ein Byte an eine C64 Adresse.
 
-    --nosplash
+--nosplash
     Der SplashScreen wird beim Start nicht angezeigt.
 
-    --multiple-instance
+--multiple-instance
     Ermöglicht das starten mehrerer Emu64 Instanzen.
 
 -?, --help
     Ein Hilfe Text wird angezeigt und Emu64 wird nicht gestartet.
 
-    --version
+--version
     Zeigt die aktuelle Emu64 Versionsnummer an.
 
 

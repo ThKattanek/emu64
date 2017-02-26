@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.12.2016                //
+// Letzte Änderung am 26.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -41,6 +41,9 @@ public:
     explicit CrtWindow(QWidget *parent = 0, QSettings *ini = 0, C64Class *c64 = 0);
     ~CrtWindow();
     void LoadIni(void);
+    bool SetCrtImage(QString filename);
+    void ConnectCrt();
+    void DisconnectCrt();
     void RetranslateUi();
     void showEvent(QShowEvent *event);
     void hideEvent(QHideEvent *);

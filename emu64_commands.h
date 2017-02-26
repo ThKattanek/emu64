@@ -18,9 +18,11 @@
 
 // Defineren aller Kommandozeilen Parameter
 enum CMD_COMMAND {CMD_HELP,CMD_VERSION,CMD_MULTIPLE_INSTANCE,CMD_NOSPLASH,CMD_SOFTRESET,CMD_HARDRESET,\
-                 CMD_MOUNT_DISK,CMD_POKE_64};
+                 CMD_MOUNT_DISK,CMD_MOUNT_CRT,CMD_UMOUNT_CRT,CMD_POKE_64};
 static const CMD_STRUCT command_list[]{
     {CMD_MOUNT_DISK,"m","mount-disk","Mountet ein Diskimage. --mount-disk <Laufwerksnummer (8-11)> <Dateiname>",2},
+    {CMD_MOUNT_CRT,"","mount-crt","Steckt ein Modulimage in den Expansionport ein. --mount-crt <Dateiname>",1},
+    {CMD_UMOUNT_CRT,"","umount-crt","Entfernt ein Modulimage aus dem Expansionsport. --umount-crt",0},
     {CMD_SOFTRESET,"r","soft-reset","Führt einen Soft Reset durch.",0},
     {CMD_HARDRESET,"R","hard-reset","Führt einen Hard Reset durch.",0},
     {CMD_POKE_64,"","poke64","Schreibt ein Byte an eine C64 Adresse. --poke64 <Adresse (0-65535)> <Wert (0-255)>",2},

@@ -725,8 +725,9 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
     CommandLineClass *cmd_line = new CommandLineClass(arg.size(), arg.data(), "emu64",command_list, command_list_count);
 
     bool error;
-    int lwnr;
+    int lwnr,adr,val;
     char *filename;
+    QFileInfo *fi;
 
     bool loop_break = false;
 
@@ -752,7 +753,7 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
             {
                 if(lwnr >= 8 && lwnr <= 11)
                 {
-                    QFileInfo *fi = new QFileInfo(filename);
+                    fi = new QFileInfo(filename);
                     if(fi->exists())
                     {
                         cout << "Laufwerksnummer: " << lwnr << endl;
@@ -765,17 +766,33 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
                         }
                     }
                     else
-                        cout << "Die angebene Datei existiert nicht" << endl;
+                        cout << "Die angebene Datei existiert nicht." << endl;
                 }
                 else
                     cmd_line->OutErrorMsg("Laufwerksnummer muss zwischen 8 und 11 liegen!","--help");
             }
             break;
+        case CMD_MOUNT_CRT:
+            filename = cmd_line->GetArg(i+1);
+            fi = new QFileInfo(filename);
+            if(fi->exists())
+            {
+                if(crt_window->SetCrtImage(fi->absoluteFilePath()))
+                {
+                    crt_window->ConnectCrt();
+                }
+            }
+            else
+                cout << "Die angebene Datei existiert nicht." << endl;
+            break;
+        case CMD_UMOUNT_CRT:
+            crt_window->DisconnectCrt();
+            break;
         case CMD_POKE_64:
-            int adr = cmd_line->GetArgInt(i+1, &error);
+            adr = cmd_line->GetArgInt(i+1, &error);
             if(error)
                 break;
-            int val = cmd_line->GetArgInt(i+2, &error);
+            val = cmd_line->GetArgInt(i+2, &error);
             if(error)
                 break;
 
