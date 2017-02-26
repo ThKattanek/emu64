@@ -65,7 +65,6 @@ public:
 
     void paintEvent(QPaintEvent *event);
 
-
     customSplashScreen *splash;
 
     QTextStream *log;
@@ -77,6 +76,11 @@ public:
 
     /// Close Event von der C64 Klasse
     void CloseC64Screeen(void);
+
+    /// LimitCyclesEvent von der C64 Klass
+    void LimitCyclesEvent(void);
+
+    bool IsLimitCyclesEvent;
 
 public slots:
     void OnMessage(QStringList msg);

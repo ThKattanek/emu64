@@ -400,6 +400,11 @@ void MainWindow::OnInit()
     c64->CloseEventC64Screen = bind(&MainWindow::CloseC64Screeen,this);
     LogText(trUtf8(">> SDL Window Close Event mit MainWindow verknüpft\n").toLatin1().data());
 
+    /// LimitCyclesEvent von C64 Klasse hierher leiten
+    IsLimitCyclesEvent = false;
+    c64->LimitCyclesEvent = bind(&MainWindow::LimitCyclesEvent,this);
+    LogText(trUtf8(">> C64Class LimitCycelsEvent mit MainWindow verknüpft\n").toLatin1().data());
+
     connect(floppy_window,SIGNAL(ChangeFloppyImage(int)),this,SLOT(OnChangeFloppyImage(int)));
     LogText(trUtf8(">> ChangeFloppyImage Event mit MainWindow verknüpft\n").toLatin1().data());
 
@@ -538,6 +543,12 @@ void MainWindow::LogText(const char *log_text)
 void MainWindow::CloseC64Screeen()
 {
     on_actionBeenden_triggered();
+}
+
+void MainWindow::LimitCyclesEvent()
+{
+    IsLimitCyclesEvent = true;
+    close();
 }
 
 void MainWindow::changeEvent(QEvent *event)

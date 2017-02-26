@@ -53,6 +53,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     VPort2 = 1;
 
     CloseEventC64Screen = NULL;
+    LimitCyclesEvent = NULL;
 
     LogText = log_function;
     GfxPath = gfx_path;

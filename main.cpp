@@ -142,6 +142,9 @@ int main(int argc, char *argv[])
     int ret = app->exec();
 
     app->deleteSharedMemory();
+
+    if(w->IsLimitCyclesEvent) ret = 1;
+
     delete w;
 
     cout << "ExitCode: 0x" << std::hex << ret << endl;
