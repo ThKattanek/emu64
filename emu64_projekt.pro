@@ -198,9 +198,7 @@ OTHER_FILES += \
     emu64.rc \
     docs/ToDo \
     ../bin/Creating Final Versions/Linux/readme.txt \
-    docs/readme linux.txt \
-    docs/readme linux.txt \
-    docs/readme linux.txt \
+    docs/kommandozeilenparameter.txt \
     docs/readme.txt \
     fonts/lucon.ttf \
     roms/kernal.rom \
