@@ -830,7 +830,16 @@ void MainWindow::on_actionAutostart_triggered()
         QFileInfo file_info = filename;
         lastAutoloadPath = file_info.absolutePath();
 
-        c64->LoadAutoRun(0,filename.toLatin1().data());
+        if(c64->LoadAutoRun(0,filename.toLatin1().data()) == 0)
+        {
+            // Prüfen welche
+            if(file_info.suffix().toUpper() == "D64")
+            {
+                WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(0,0);
+                w->SetEnableFloppy(true);
+                floppy_window->SetDiskImage(0,filename);
+            }
+        }
         c64->SetFocusToC64Window();
     }
 }
