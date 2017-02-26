@@ -1,1 +1,39 @@
- 
+Emu64 V5.xx Kommandozeilenparameter
+
+Wenn man Emu64 ohne den Parameter --multiple-instance aufruft, wird geprüft ob
+schon eine Emu64 Instanz gestartet ist. Wenn ja werden alle Parameter an dieser
+Instanz weitergereicht. Somit ist es möglich den Emu64 sozusagen "Fernzuseteuern".
+
+Hinweise:
+
+Alle Argumente in <> Klammer müssen angegeben werden, wenn nicht wird eine Fehlermeldung ausgegeben.
+Alle Argumente in [] Klammern sind Optional.
+
+Hier nun alle Kommandozeilenparameter und dessen beschreibung...
+
+-m, --mount-disk <laufwerksnummer> <filename>
+    Mountet ein Diskimage. Es muss die Laufwerksnummer [8-11] und der Filename des Diskimage angegeben werden.
+    Bsp.: --mount-disk 8 ~\c64\test.d64
+
+-r, --soft-reset
+    Führt einen Soft Reset durch.
+
+-R, --hard-reset
+    Führt einen Hard Reset durch.
+
+    --nosplash
+    Der SplashScreen wird beim Start nicht angezeigt.
+
+    --multiple-instance
+    Ermöglicht das starten mehrerer Emu64 Instanzen.
+
+-?, --help
+    Ein Hilfe Text wird angezeigt und Emu64 wird nicht gestartet.
+
+    --version
+    Zeigt die aktuelle Emu64 Versionsnummer an.
+
+
+
+
+by Th.Kattanek (C)2017
