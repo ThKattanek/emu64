@@ -18,11 +18,12 @@
 
 // Defineren aller Kommandozeilen Parameter
 enum CMD_COMMAND {CMD_HELP,CMD_VERSION,CMD_MULTIPLE_INSTANCE,CMD_NOSPLASH,CMD_SOFTRESET,CMD_HARDRESET,\
-                 CMD_MOUNT_DISK};
+                 CMD_MOUNT_DISK,CMD_POKE_64};
 static const CMD_STRUCT command_list[]{
-    {CMD_MOUNT_DISK,"m","mount-disk","Mountet ein Diskimage. Bsp.: --mount-disk 8 test.d64",2},
-    {CMD_SOFTRESET,"r","soft-reset","Führt einen Soft Reset durch. (Single Instance)",0},
-    {CMD_HARDRESET,"R","hard-reset","Führt einen Hard Reset durch. (Single Instance)",0},
+    {CMD_MOUNT_DISK,"m","mount-disk","Mountet ein Diskimage. --mount-disk <Laufwerksnummer (8-11)> <Dateiname>",2},
+    {CMD_SOFTRESET,"r","soft-reset","Führt einen Soft Reset durch.",0},
+    {CMD_HARDRESET,"R","hard-reset","Führt einen Hard Reset durch.",0},
+    {CMD_POKE_64,"","poke64","Schreibt ein Byte an eine C64 Adresse. --poke64 <Adresse (0-65535)> <Wert (0-255)>",2},
     {CMD_NOSPLASH,"","nosplash","Der SplashScreen wird beim Start nicht angezeigt.",0},
     {CMD_MULTIPLE_INSTANCE,"","multiple-instance","Ermöglicht das starten mehrerer Emu64 Instanzen.",0},
     {CMD_HELP,"?","help","Dieser Text.",0},

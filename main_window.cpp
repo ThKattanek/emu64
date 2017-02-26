@@ -724,7 +724,12 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
 {
     CommandLineClass *cmd_line = new CommandLineClass(arg.size(), arg.data(), "emu64",command_list, command_list_count);
 
+    bool error;
+    int lwnr;
+    char *filename;
+
     bool loop_break = false;
+
     for(int i=0; i<cmd_line->GetCommandCount() && !loop_break; i++)
     {
         int akt_command = cmd_line->GetCommand(i);
@@ -740,9 +745,8 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
             c64->SoftReset();
             break;
         case CMD_MOUNT_DISK:
-            bool error;
-            int lwnr = cmd_line->GetArgInt(i+1, &error);
-            char *filename = cmd_line->GetArg(i+2);
+            lwnr = cmd_line->GetArgInt(i+1, &error);
+            filename = cmd_line->GetArg(i+2);
 
             if(!error)
             {
@@ -766,6 +770,29 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
                 else
                     cmd_line->OutErrorMsg("Laufwerksnummer muss zwischen 8 und 11 liegen!","--help");
             }
+            break;
+        case CMD_POKE_64:
+            int adr = cmd_line->GetArgInt(i+1, &error);
+            if(error)
+                break;
+            int val = cmd_line->GetArgInt(i+2, &error);
+            if(error)
+                break;
+
+            if(!(adr >= 0x0000 && adr <= 0xffff))
+            {
+                cmd_line->OutErrorMsg("Die Adresse muss zwischen (0)0x0000 und (65535)0xffff liegen!","--help");
+                break;
+            }
+
+            if(!(val >= 0x00 && val <= 0xff))
+            {
+                cmd_line->OutErrorMsg("Der zu schreibende Wert muss zwischen 0(0x00) und 255(0xff) liegen!","--help");
+                break;
+            }
+
+            c64->WriteC64Byte((unsigned short)adr,(unsigned char)val);
+
             break;
         }
 
