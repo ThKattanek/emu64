@@ -8,11 +8,16 @@ Hinweise:
 
 Alle Argumente in <> Klammer müssen angegeben werden, wenn nicht wird eine Fehlermeldung ausgegeben.
 Alle Argumente in [] Klammern sind Optional.
+Überall wo als Argument eine Zahl erwarten wird kann diese auch als Hexadezimale Zahl angegeben werden.
+Dazu wird der Hexzahl ein 0x (kleines x) vorran gestellt! (Bsp.: 0xff)
 
 Hier nun alle Kommandozeilenparameter und dessen beschreibung...
 
+emu64 [PARAMETER]
+
 -m, --mount-disk <laufwerksnummer> <filename>
-    Mountet ein Diskimage. Es muss die Laufwerksnummer [8-11] und der Filename des Diskimage angegeben werden.
+
+    Mountet ein Diskimage. Die Laufwerksnummer muss zwischen 8 und 11 liegen.
     Bsp.: --mount-disk 8 ~\c64\test.d64
 
 -r, --soft-reset
