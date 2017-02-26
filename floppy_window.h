@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.08.2016                //
+// Letzte Änderung am 26.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -37,6 +37,7 @@ public:
     ~FloppyWindow();
     void RetranslateUi();
     void LoadIni();
+    bool SetDiskImage(int floppynr, QString filename);
     void showEvent(QShowEvent *event);
     QString GetAktFilename(int floppynr);
     QString GetAktD64Name(int floppynr);

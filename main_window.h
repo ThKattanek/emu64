@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.02.2017                //
+// Letzte Änderung am 25.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -26,6 +26,7 @@
 #include <QBitmap>
 #include <QRect>
 #include <QThread>
+#include <QDir>
 #include <stdlib.h>
 
 /// Windows ///
@@ -42,6 +43,8 @@
 #include "./tape_window.h"
 #include "./show_c64_key_mapping_window.h"
 
+#include "./command_line_class.h"
+#include "./emu64_commands.h"
 #include "c64_class.h"
 
 #define loging 'if(log!=0) *log'
@@ -123,7 +126,7 @@ private:
     void RetranslateUi();
     void SetC64ScreenTitle(void);
     bool getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt);
-    void ExecuteCommandLine();
+    void ExecuteCommandLine(vector<char*> &arg);
     void SplashMessage(const QString &message, const QColor &color);
 
     /// Varialen ///
@@ -159,7 +162,7 @@ private:
     C64SpeedWindow *speed_window;                   // C64 Speed Window
     ShowC64KeyMappingWindow *show_c64keymap_window; //C64 Key Map Window
 
-    QStringList commandLine;                        // Enthält den an Emu64 übergebenen String
+    //QStringList commandLine;                        // Enthält den an Emu64 übergebenen String
 
     bool isFirstPaintEvent;
 };

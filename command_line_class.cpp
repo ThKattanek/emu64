@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.02.2017                //
+// Letzte Änderung am 26.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -50,8 +50,49 @@ CommandLineClass::CommandLineClass(int argc, char *argv[], const char *app_name,
                         break;
                     }
                 }
+                else
+                {
+                    AddCommand(CMD_ARG,argv[i]);
+                }
+            }
+            else
+            {
+                AddCommand(CMD_ARG,argv[i]);
             }
         } 
+    }
+
+    // Prüfen auf Richtige Anzahl von Argumenten
+
+    for(int i=0; i<command_count; i++)
+    {
+        // Command suchen (sind immer keine Argumente)
+        if(!CheckArg(i))
+        {
+            int arg_count = 0;
+            for(int j=i+1; j<command_count; j++)
+            {
+                if(CheckArg(j))
+                {
+                    arg_count++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if(arg_count != GetCommandArgCount(this->command_list[i]))
+            {
+               // printf("%s: Ungültige Option -- %s\n",app_name,command);
+
+                printf("%s: Ungültige Anzahl der Argumente von -- \"%s\"\n",app_name, this->command_arg[i]);
+                command_count = -1;
+                break;
+            }
+        }
+        if(command_count == -1)
+            break;
     }
 
     // Größe des längsten LongCommand ermitteln
@@ -76,6 +117,52 @@ int CommandLineClass::GetCommand(int number)
     }
 
     return -1;
+}
+
+bool CommandLineClass::CheckArg(int number)
+{
+    if(number < command_count)
+    {
+        if(command_list[number] == CMD_ARG)
+            return true;
+        else
+            return false;
+    }
+    else return false;
+}
+
+char *CommandLineClass::GetArg(int number)
+{
+    if(number < command_count)
+    {
+        return command_arg[number];
+    }
+
+    return NULL;
+}
+
+int CommandLineClass::GetArgInt(int number, bool *err)
+{
+    *err = true;
+    int z = 0;
+
+    if(number < command_count)
+    {
+        char *arg = command_arg[number];
+        char *endzgr;
+        z = strtol(arg, &endzgr, 10);
+
+        if((strlen(arg) + arg) == endzgr)
+            *err = false;
+
+        if(*err)
+            printf("%s: Ein Argument konnte nicht in eine Zahl umgewnadelt werden! -- %s\n",app_name,arg);
+    }
+    else
+    {
+        // number befindet sich auserhalb des Puffer
+    }
+    return z;
 }
 
 void CommandLineClass::ShowHelp()
@@ -121,7 +208,9 @@ bool CommandLineClass::CheckShortCommands(const char *short_commands)
         {
             if(all_commands_list[j].shortCommand[0] == short_commands[i])
             {
-                AddCommand(all_commands_list[j].cmdCommand);
+                char *str = new char[3];
+                sprintf(str,"%s", all_commands_list[j].shortCommand);
+                AddCommand(all_commands_list[j].cmdCommand, str);
                 found = true;
             }
         }
@@ -147,7 +236,9 @@ bool CommandLineClass::CheckLongCommands(const char *long_command)
     {
         if(strcmp(long_command, all_commands_list[i].longCommand) == 0)
         {
-            AddCommand(all_commands_list[i].cmdCommand);
+            char *str = new char[255];
+            sprintf(str,"--%s", long_command);
+            AddCommand(all_commands_list[i].cmdCommand, str);
             found = true;
         }
     }
@@ -162,22 +253,27 @@ bool CommandLineClass::CheckLongCommands(const char *long_command)
     return true;
 }
 
-void CommandLineClass::AddCommand(int command)
+int CommandLineClass::GetCommandArgCount(int command)
 {
-    if(command_count >= 0)
+    for(int i=0; i<all_commands_list_count; i++)
     {
-        bool found = false;
-        for(int i=0; i<command_count; i++)
+        if(all_commands_list[i].cmdCommand == command)
         {
-            if(command_list[i] == command)
-                found = true;
+            return all_commands_list[i].arg_count;
+            break;
         }
+    }
 
-        if(!found)
-        {
-            command_list[command_count] = command;
-            command_count++;
-        }
+    return -1;
+}
+
+void CommandLineClass::AddCommand(int command, char *arg)
+{
+    if(command_count >= 0 && command_count < MAX_COMMANDS)
+    {
+        command_list[command_count] = command;
+        command_arg[command_count] = arg;
+        command_count++;
     }
 }
 
@@ -195,6 +291,12 @@ bool CommandLineClass::FoundCommand(int command)
     }
 
     return found;
+}
+
+void CommandLineClass::OutErrorMsg(const char *msg, const char *help_opt)
+{
+    printf("%s: %s\n",app_name,msg);
+    printf("\"%s %s\" liefert weitere Informationen.\n",app_name, help_opt);
 }
 
 void CommandLineClass::OutUnknowOptionError(const char *command, bool is_long)

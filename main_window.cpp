@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.02.2017                //
+// Letzte Änderung am 26.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,14 +16,10 @@
 #include "main_window.h"
 #include "ui_main_window.h"
 
-#include <QDebug>
-#include <QDir>
-
 MainWindow::MainWindow(QWidget *parent,customSplashScreen* splash,QTextStream *log) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    c64(NULL),
-    commandLine(NULL)
+    c64(NULL)
 {
     this->splash = splash;
     this->log = log;
@@ -516,8 +512,18 @@ void MainWindow::OnInit()
 
 void MainWindow::OnMessage(QStringList msg)
 {
-    commandLine = msg;
-    if(c64 != NULL)  ExecuteCommandLine();
+    vector<char*> list;
+
+    if(c64 != NULL)
+    {
+        for(int i=0; i<msg.length(); i++)
+        {
+            char *p = new char[msg.at(i).size()+1];
+            strcpy(p,msg.at(i).toAscii().data());
+            list.push_back(p);
+        }
+        ExecuteCommandLine(list);
+    }
 }
 
 void MainWindow::LogText(const char *log_text)
@@ -714,11 +720,61 @@ bool MainWindow::getSaveFileName(QWidget *parent, QString caption, QString filte
    return true;
 }
 
-void MainWindow::ExecuteCommandLine()
+void MainWindow::ExecuteCommandLine(vector<char *> &arg)
 {
-    cout << "ExecuteCommandLine" << endl;
-    if(commandLine.length() > 1)
-        c64->LoadAutoRun(0,commandLine[1].toLatin1().data());
+    CommandLineClass *cmd_line = new CommandLineClass(arg.size(), arg.data(), "emu64",command_list, command_list_count);
+
+    bool loop_break = false;
+    for(int i=0; i<cmd_line->GetCommandCount() && !loop_break; i++)
+    {
+        int akt_command = cmd_line->GetCommand(i);
+        switch(akt_command)
+        {
+        case CMD_ARG:
+            c64->LoadAutoRun(0,cmd_line->GetArg(i));
+            break;
+        case CMD_HARDRESET:
+            c64->HardReset();
+            break;
+        case CMD_SOFTRESET:
+            c64->SoftReset();
+            break;
+        case CMD_MOUNT_DISK:
+            bool error;
+            int lwnr = cmd_line->GetArgInt(i+1, &error);
+            char *filename = cmd_line->GetArg(i+2);
+
+            if(!error)
+            {
+                if(lwnr >= 8 && lwnr <= 11)
+                {
+                    QFileInfo *fi = new QFileInfo(filename);
+                    if(fi->exists())
+                    {
+                        cout << "Laufwerksnummer: " << lwnr << endl;
+                        cout << "Disk Image: " << fi->fileName().toAscii().data() << endl;
+
+                        if(floppy_window->SetDiskImage(lwnr-8, fi->absoluteFilePath()))
+                        {
+                            WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(lwnr-8,0);
+                            w->SetEnableFloppy(true);
+                        }
+                    }
+                    else
+                        cout << "Die angebene Datei existiert nicht" << endl;
+                }
+                else
+                    cmd_line->OutErrorMsg("Laufwerksnummer muss zwischen 8 und 11 liegen!","--help");
+            }
+            break;
+        }
+
+        // ----------------------------------------------------
+
+        // i korregieren (abhängig von der Anzahl der Argumente)
+        if(akt_command != CMD_ARG)
+            i += cmd_line->GetCommandArgCount(akt_command);
+    }
 }
 
 void MainWindow::SplashMessage(const QString &message, const QColor &color)

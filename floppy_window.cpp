@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.01.2017                //
+// Letzte Änderung am 26.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -168,6 +168,28 @@ void FloppyWindow::LoadIni()
         c64->floppy[0]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktDir[0] + "/" + AktFile[0]));
     }
     ////////////////////////////////////
+}
+
+bool FloppyWindow::SetDiskImage(int floppynr, QString filename)
+{
+    if(floppynr >= FloppyAnzahl) return false;
+
+    QFileInfo fi = QFileInfo(filename);
+
+    AktDir[floppynr] = fi.absolutePath();
+    AktFile[floppynr] = fi.fileName();
+    AktFileName[floppynr] = AktDir[floppynr] + "/" + AktFile[floppynr];
+    d64[floppynr].LoadD64(AktFileName[floppynr].toLatin1().data());
+
+    c64->floppy[floppynr]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktFileName[floppynr]));
+
+    ui->FloppySelect->setCurrentIndex(floppynr);
+    ui->FileBrowser->SetAktDir(AktDir[floppynr]);
+    ui->FileBrowser->SetAktFile(AktDir[floppynr],AktFile[floppynr]);
+
+    RefreshD64FileList();
+
+    return true;
 }
 
 void FloppyWindow::RetranslateUi()

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.05.2016                //
+// Letzte Änderung am 26.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -36,7 +36,7 @@ SingleApplication::SingleApplication(int &argc, char *argv[], const QString uniq
         // start checking for messages of other instances.
         QTimer *timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(checkForMessage()));
-        timer->start(200);
+        timer->start(20);
     }
     // it exits, so we can attach it?!
     else if (sharedMemory->attach()){

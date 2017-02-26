@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.02.2017                //
+// Letzte Änderung am 26.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -56,17 +56,24 @@ int main(int argc, char *argv[])
     SingleApplication *app;
     app = new SingleApplication (argc, argv,  "Emu64_By_Thorsten_Kattanek");
 
+    bool isFirstInstance;
+
     if(!cmd_line->FoundCommand(CMD_MULTIPLE_INSTANCE))
     {
         if (app->alreadyExists())
         {
             for(int i=0;i<argc;i++) app->sendMessage(argv[i]);
+            isFirstInstance = false;
             return 0;
         }
         else
         {
-
+             isFirstInstance = true;
         }
+    }
+    else
+    {
+        isFirstInstance = true;
     }
 
 #ifdef _WIN32
@@ -123,12 +130,14 @@ int main(int argc, char *argv[])
     QObject::connect(app,SIGNAL(messageAvailable(QStringList)),w,SLOT(OnMessage(QStringList)));
 
     w->log = log;
-
-    QStringList msg_list;
-    for(int i=0;i<argc;i++) msg_list << argv[i];
-    w->OnMessage(msg_list);
-
     w->OnInit();
+
+    if(isFirstInstance)
+    {
+        QStringList msg_list;
+        for(int i=0;i<argc;i++) msg_list << argv[i];
+        w->OnMessage(msg_list);
+    }
 
     int ret = app->exec();
 
