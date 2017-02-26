@@ -150,10 +150,32 @@ int CommandLineClass::GetArgInt(int number, bool *err)
     {
         char *arg = command_arg[number];
         char *endzgr;
-        z = strtol(arg, &endzgr, 10);
 
-        if((strlen(arg) + arg) == endzgr)
-            *err = false;
+        if(strlen(arg) > 2)
+        {
+            // prüfen auf HEX
+            if(arg[0] == '0' && arg[1] == 'x')
+            {
+                z = strtol(arg+2, &endzgr, 16);
+
+                if((strlen(arg) + arg) == endzgr)
+                    *err = false;
+            }
+            else
+            {
+                z = strtol(arg, &endzgr, 10);
+
+                if((strlen(arg) + arg) == endzgr)
+                    *err = false;
+            }
+        }
+        else
+        {
+            z = strtol(arg, &endzgr, 10);
+
+            if((strlen(arg) + arg) == endzgr)
+                *err = false;
+        }
 
         if(*err)
             printf("%s: Ein Argument konnte nicht in eine Zahl umgewnadelt werden! -- %s\n",app_name,arg);
