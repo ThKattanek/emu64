@@ -819,7 +819,7 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
                 break;
             }
 
-            cout << "Zyklen:" << val << endl;
+            c64->SetLimitCycles(val);
             break;
         }
 

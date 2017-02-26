@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.12.2016                //
+// Letzte Änderung am 26.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -299,6 +299,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     ComandZeileCountS = false;
     DebugMode = OneZyk = OneOpc = false;
     CycleCounter = 0;
+    LimitCylesCounter = 0;
     DebugAnimation = false;
     AnimationRefreshProc = 0;
     AnimationSpeedAdd = (double)AudioPufferSize/(double)AudioSampleRate;
@@ -498,6 +499,11 @@ void C64Class::EndEmulation()
     SDL_Quit();
 }
 
+void C64Class::SetLimitCycles(int nCycles)
+{
+    LimitCylesCounter = nCycles;
+}
+
 void AudioMix(void *userdat, Uint8 *stream, int laenge)
 {
     C64Class *c64 = (C64Class*)userdat;
@@ -663,6 +669,16 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
         {
             CheckKeys();
             CycleCounter++;
+
+            if(LimitCylesCounter > 0)
+            {
+                LimitCylesCounter--;
+                if(LimitCylesCounter == 0)
+                {
+                    // Event auslösen
+                    if(LimitCyclesEvent != 0) LimitCyclesEvent();
+                }
+            }
 
             /// Für Externe Erweiterungen ///
             //if(ExtZyklus) ZyklusProcExt();

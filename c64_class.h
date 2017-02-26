@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.12.2016                //
+// Letzte Änderung am 26.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -61,6 +61,7 @@ public:
     ~C64Class();
     void StartEmulation(void);
     void EndEmulation(void);
+    void SetLimitCycles(int nCycles);
     void FillAudioBuffer(unsigned char *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
     void KeyEvent(unsigned char  matrix_code,KeyStatus status, bool isAutoShift);
     bool LoadC64Roms(char *kernalrom,char *basicrom,char *charrom);
@@ -292,6 +293,7 @@ public:
     function<void(void)> BreakpointProc;
     function<void(char*)> LogText;
     function<void(void)> CloseEventC64Screen;
+    function<void(void)> LimitCyclesEvent;
 
     unsigned short	C64History[256];
     unsigned char	C64HistoryPointer;
@@ -415,6 +417,8 @@ private:
     bool	ComandZeileCountS;
 
     int     CycleCounter;
+    int     LimitCylesCounter;      // Dieser Counter wird wenn er > 0 ist bei jeden Zyklus um 1 runtergezählt
+                                    // Wechselt er von 1 auf 0 wird die Emulation angehalten und ein Ergeignis ausgelöst
     bool    DebugMode;
     bool	DebugAnimation;
     double  AnimationSpeedAdd;
@@ -422,6 +426,7 @@ private:
     bool	OneZyk;
     bool	OneOpc;
     int     OneOpcSource;
+
 
     bool    MouseIsHidden;
     int     MouseHiddenCounter;
