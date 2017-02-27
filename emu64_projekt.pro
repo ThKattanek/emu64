@@ -11,8 +11,6 @@ QT += core gui
 #CONFIG += rtti
 #CONFIG += console
 
-#QMAKE_CXXFLAGS += -std=c++11
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TEMPLATE = app
@@ -165,12 +163,14 @@ RESOURCES += \
     emu64.qrc
 
 linux-g++-32{
+#QMAKE_CXXFLAGS += -std=c++11
 DEFINES += str_system_arch=\\\"32Bit\\\"
 TARGET = emu64
 LIBS += -lSDL2 -lSDL2_image -lquazip -lGL -lGLU
 }
 
 linux-g++-64{
+QMAKE_CXXFLAGS += -std=c++11
 DEFINES += str_system_arch=\\\"64Bit\\\"
 TARGET = emu64
 LIBS += -lSDL2 -lSDL2_image -lquazip -lGL -lGLU
