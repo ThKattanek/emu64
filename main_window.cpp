@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.02.2017                //
+// Letzte Änderung am 27.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -748,7 +748,9 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
         switch(akt_command)
         {
         case CMD_ARG:
-            c64->LoadAutoRun(0,cmd_line->GetArg(i));
+            break;
+        case CMD_AUTOSTART:
+            c64->LoadAutoRun(0,cmd_line->GetArg(i+1));
             break;
         case CMD_HARDRESET:
             c64->HardReset();

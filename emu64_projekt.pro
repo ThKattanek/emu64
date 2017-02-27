@@ -11,7 +11,7 @@ QT += core gui
 #CONFIG += rtti
 #CONFIG += console
 
-QMAKE_CXXFLAGS += -std=c++11
+#QMAKE_CXXFLAGS += -std=c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -183,10 +183,12 @@ win32:contains(ARCH, x86_64):{
     DEFINES += str_system_arch=\\\"64Bit\\\"
     #DESTDIR = "bin"
     TARGET = emu64
+
 }else{
     DEFINES += str_system_arch=\\\"32Bit\\\"
     #DESTDIR = "bin"
     TARGET = emu64
+    LIBS += -lSDL2 -lopengl32 -lGLU32 -lSDL2_image
 }
 
 DEFINES += QUAZIP_STATIC

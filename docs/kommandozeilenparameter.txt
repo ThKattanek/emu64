@@ -15,6 +15,9 @@ Hier nun alle Kommandozeilenparameter und dessen beschreibung...
 
 emu64 [PARAMETER]
 
+-a, --autostart <Dateiname>
+    Lädt ein C64 Programm (prg,t00 ...) und startet es gleich.
+
 -m, --mount-disk <laufwerksnummer> <Dateiname>
     Mountet ein Diskimage. Die Laufwerksnummer muss zwischen 8 und 11 liegen.
     Bsp.: --mount-disk 8 ~\c64\test.d64

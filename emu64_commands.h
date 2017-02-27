@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.02.2017                //
+// Letzte Änderung am 27.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,8 +18,9 @@
 
 // Defineren aller Kommandozeilen Parameter
 enum CMD_COMMAND {CMD_HELP,CMD_VERSION,CMD_MULTIPLE_INSTANCE,CMD_NOSPLASH,CMD_SOFTRESET,CMD_HARDRESET,\
-                 CMD_MOUNT_DISK,CMD_MOUNT_CRT,CMD_UMOUNT_CRT,CMD_POKE_64,CMD_LIMITCYCLES};
+                 CMD_MOUNT_DISK,CMD_MOUNT_CRT,CMD_UMOUNT_CRT,CMD_POKE_64,CMD_LIMITCYCLES,CMD_AUTOSTART};
 static const CMD_STRUCT command_list[]{
+    {CMD_AUTOSTART,"a","autostart","Lädt ein C64 Programm (prg,t00 ...) und startet es gleich.",1},
     {CMD_MOUNT_DISK,"m","mount-disk","Mountet ein Diskimage. --mount-disk <Laufwerksnummer (8-11)> <Dateiname>",2},
     {CMD_MOUNT_CRT,"","mount-crt","Steckt ein Modulimage in den Expansionport ein. --mount-crt <Dateiname>",1},
     {CMD_UMOUNT_CRT,"","umount-crt","Entfernt ein Modulimage aus dem Expansionsport. --umount-crt",0},
