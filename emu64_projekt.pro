@@ -184,16 +184,24 @@ win32:contains(ARCH, x86_64):{
     #DESTDIR = "bin"
     TARGET = emu64
 
+
 }else{
     DEFINES += str_system_arch=\\\"32Bit\\\"
     #DESTDIR = "bin"
     TARGET = emu64
-    LIBS += -lSDL2 -lopengl32 -lGLU32 -lSDL2_image
 }
 
 DEFINES += QUAZIP_STATIC
 RC_FILE = emu64.rc
-LIBS += $$system($$ARCH-w64-mingw32.$$LINKTYP-sdl2-config --libs) $$system($$ARCH-w64-mingw32.$$LINKTYP-pkg-config SDL2_image gl glu --libs) -lquazip
+
+win32:contains(QMAKE_HOST.os,Linux):{
+    LIBS += $$system($$ARCH-w64-mingw32.$$LINKTYP-sdl2-config --libs) $$system($$ARCH-w64-mingw32.$$LINKTYP-pkg-config SDL2_image gl glu --libs) -lquazip
+}
+
+win32:contains(QMAKE_HOST.os,Windows):{
+    LIBS += -lSDL2 -lopengl32 -lGLU32 -lSDL2_image
+}
+
 }
 
 OTHER_FILES += \
