@@ -199,7 +199,7 @@ win32:contains(QMAKE_HOST.os,Linux):{
 }
 
 win32:contains(QMAKE_HOST.os,Windows):{
-    LIBS += -lSDL2 -lopengl32 -lGLU32 -lSDL2_image
+    LIBS += -lSDL2 -lopengl32 -lGLU32 -lSDL2_image -lquazip
 }
 
 }
