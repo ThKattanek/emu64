@@ -34,7 +34,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <property name="documentMode">
     <bool>false</bool>
@@ -622,7 +622,7 @@
        <string>Format</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox">
+     <widget class="QComboBox" name="ScreenshotFormat">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -642,11 +642,6 @@
       <property name="toolTip">
        <string>Hier kann man das Screenshot Format einstellen.</string>
       </property>
-      <item>
-       <property name="text">
-        <string>BMP</string>
-       </property>
-      </item>
      </widget>
      <widget class="QPushButton" name="ResetSShotCounter">
       <property name="geometry">

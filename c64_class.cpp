@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.02.2017                //
+// Letzte Änderung am 01.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1427,7 +1427,18 @@ void C64Class::DrawC64Screen()
     if(StartScreenshot)
     {
         StartScreenshot = false;
-        SDL_SaveBMP(C64Screen,ScreenshotFilename);
+
+        switch (ScreenshotFormat) {
+        case SCREENSHOT_FORMAT_BMP:
+            SDL_SaveBMP(C64Screen,ScreenshotFilename);
+            break;
+        case SCREENSHOT_FORMAT_PNG:
+            SDL_SavePNG(C64Screen,ScreenshotFilename);
+            break;
+        default:
+
+            break;
+        }
     }
 
     /// Fensterinhalt löschen
@@ -2966,10 +2977,19 @@ unsigned char C64Class::GetMapWriteDestination(unsigned char page)
     return mmu->GetWriteDestination(page);
 }
 
-void C64Class::SaveScreenshot(const char *filename)
+void C64Class::SaveScreenshot(const char *filename, int format)
 {
+
     strcpy(ScreenshotFilename,filename);
+    ScreenshotFormat = format;
     StartScreenshot = true;
+}
+
+const char *C64Class::GetScreenshotFormatName(int format)
+{
+    if(format >= SCREENSHOT_FORMATS_COUNT)
+        return NULL;
+    return ScreenschotFormatName[format];
 }
 
 bool C64Class::StartIECDump(const char *filename)

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.12.2016                //
+// Letzte Änderung am 01.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -48,6 +48,12 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoPalClass *vid
     {
         QString IOAdress = QString().number(i * 32 + 0xD400, 16).prepend("$").toUpper();
         ui->SecondSidAddress->addItem(IOAdress);
+    }
+
+    // Screenshotformate in Combobox eintragen
+    for(int i=0; i<SCREENSHOT_FORMATS_COUNT; i++)
+    {
+        ui->ScreenshotFormat->addItem(c64->GetScreenshotFormatName(i));
     }
 
     FillRomSetCombo();
@@ -280,6 +286,12 @@ void SetupWindow::LoadINI(C64Class *c64)
         on_SidFilterEnable_toggled(bvalue);
 
         ini->endGroup();
+
+        ini->beginGroup("MainWindow");
+        value = ini->value("ScreenshotFormatNr",SCREENSHOT_FORMAT_PNG).toInt();
+        ui->ScreenshotFormat->setCurrentIndex(value);
+        ini->endGroup();
+
     }
     ////////////////////////////////////
 
@@ -362,7 +374,10 @@ void SetupWindow::SaveINI()
         ini->setValue("6ChannelMode",ui->Sid6ChannelMode->isChecked());
         ini->setValue("CycleExact",ui->SidCycleExactEnable->isChecked());
         ini->setValue("Filter",ui->SidFilterEnable->isChecked());
+        ini->endGroup();
 
+        ini->beginGroup("MainWindow");
+        ini->setValue("ScreenshotFormatNr",ui->ScreenshotFormat->currentIndex());
         ini->endGroup();
     }
 }
@@ -400,6 +415,11 @@ void SetupWindow::on_WFilter_toggled(bool)
 void SetupWindow::ReSetup()
 {
     emit ChangeGrafikModi(false,ui->WPal->isChecked(),ui->WDouble->isChecked(),ui->W32Bit->isChecked(),ui->WFilter->isChecked());
+}
+
+int SetupWindow::GetScreenshotFormat()
+{
+    return ui->ScreenshotFormat->currentIndex();
 }
 
 void SetupWindow::on_ResetSShotCounter_clicked()
@@ -814,4 +834,9 @@ void SetupWindow::on_NewRomSet_clicked()
     }
 
     delete new_romset_window;
+}
+
+void SetupWindow::on_ScreenshotFormat_currentIndexChanged(int index)
+{
+
 }

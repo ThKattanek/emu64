@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.02.2017                //
+// Letzte Änderung am 01.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,19 +16,20 @@
 #ifndef C64CLASS_H
 #define C64CLASS_H
 
-#include "videopal_class.h"
-#include "mmu_class.h"
-#include "mos6510_class.h"
-#include "mos6569_class.h"
-#include "mos6581_8085_class.h"
-#include "mos6526_class.h"
-#include "crt_class.h"
-#include "reu_class.h"
-#include "georam_class.h"
-#include "floppy1541_class.h"
-#include "tape1530_class.h"
-#include "cpu_info.h"
-#include "vcd_class.h"
+#include "./videopal_class.h"
+#include "./mmu_class.h"
+#include "./mos6510_class.h"
+#include "./mos6569_class.h"
+#include "./mos6581_8085_class.h"
+#include "./mos6526_class.h"
+#include "./crt_class.h"
+#include "./reu_class.h"
+#include "./georam_class.h"
+#include "./floppy1541_class.h"
+#include "./tape1530_class.h"
+#include "./cpu_info.h"
+#include "./vcd_class.h"
+#include "./savepng.h"
 
 #include <GL/glu.h>
 
@@ -52,6 +53,9 @@ using namespace std::tr1::placeholders;
 #define SCREEN_RATIO_4_3 1.34        // Screenratio 4:3 (1,33333)
 #define SCREEN_RATIO_5_4 1.25        // Screenratio 5:4 (1,25)
 #define SCREEN_RATIO_16_9 1.777      // Screenratio 16:9 (1,777)
+
+enum SCREENSHOT_FORMATS {SCREENSHOT_FORMAT_BMP, SCREENSHOT_FORMAT_PNG, SCREENSHOT_FORMATS_COUNT};
+static const char *ScreenschotFormatName[SCREENSHOT_FORMATS_COUNT]{"BMP","PNG"};
 
 class C64Class
 {
@@ -165,7 +169,8 @@ public:
     unsigned char GetMapReadSource(unsigned char page);
     unsigned char GetMapWriteDestination(unsigned char page);
 
-    void SaveScreenshot(const char *filename);
+    void SaveScreenshot(const char *filename, int format = SCREENSHOT_FORMAT_PNG);
+    const char *GetScreenshotFormatName(int format);
 
     bool StartIECDump(const char *filename);
     void StopIECDump();
@@ -300,6 +305,7 @@ public:
 
     bool StartScreenshot;
     char ScreenshotFilename[1024];
+    int  ScreenshotFormat;
 
     float SIDVolume;
 

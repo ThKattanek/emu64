@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.12.2016                //
+// Letzte Änderung am 01.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -46,6 +46,8 @@ public:
     void SaveINI();
     void ReSetup(void);
 
+    int GetScreenshotFormat();
+
 signals:
     void ChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode, bool filter);
     void ResetSreenshotCounter(void);
@@ -76,8 +78,8 @@ private slots:
     void on_Sid6ChannelMode_toggled(bool checked);
     void on_SelectRomSet_currentIndexChanged(const QString &arg1);
     void on_DeleteRomSet_clicked();
-
     void on_NewRomSet_clicked();
+    void on_ScreenshotFormat_currentIndexChanged(int index);
 
 private:
     void UpdateToolTips();

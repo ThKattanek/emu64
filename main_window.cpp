@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.02.2017                //
+// Letzte Änderung am 01.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -994,10 +994,22 @@ void MainWindow::OnSetupFished(int result)
 }
 
 void MainWindow::on_actionScreenshot_triggered()
-{
+{    
     if(ScreenshotsEnable)
     {
-        c64->SaveScreenshot(QString(screenshotPath + "emu64_" + QVariant(ScreenshotNumber).toString() + ".bmp").toLatin1().data());
+        int format = setup_window->GetScreenshotFormat();
+        switch (format)
+        {
+        case SCREENSHOT_FORMAT_BMP:
+            c64->SaveScreenshot(QString(screenshotPath + "emu64_" + QVariant(ScreenshotNumber).toString() + ".bmp").toLatin1().data(),format);
+            break;
+        case SCREENSHOT_FORMAT_PNG:
+            c64->SaveScreenshot(QString(screenshotPath + "emu64_" + QVariant(ScreenshotNumber).toString() + ".png").toLatin1().data(),format);
+            break;
+        default:
+            break;
+        }
+
         ScreenshotNumber++;
     }
     else QMessageBox::critical(this,trUtf8("Emu64 Fehler ..."),trUtf8("Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.\nÜberprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !"));

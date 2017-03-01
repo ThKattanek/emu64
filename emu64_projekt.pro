@@ -65,7 +65,8 @@ SOURCES += \
     new_romset_window.cpp \
     show_c64_key_mapping_window.cpp \
     crt_new_easyflash_window.cpp \
-    command_line_class.cpp
+    command_line_class.cpp \
+    savepng.c
 
 HEADERS  += \
     info_window.h \
@@ -130,7 +131,8 @@ HEADERS  += \
     show_c64_key_mapping_window.h \
     crt_new_easyflash_window.h \
     command_line_class.h \
-    emu64_commands.h
+    emu64_commands.h \
+    savepng.h
 
 FORMS    += \
     info_window.ui \
@@ -166,14 +168,14 @@ linux-g++-32{
 #QMAKE_CXXFLAGS += -std=c++11
 DEFINES += str_system_arch=\\\"32Bit\\\"
 TARGET = emu64
-LIBS += -lSDL2 -lSDL2_image -lquazip -lGL -lGLU
+LIBS += -lSDL2 -lSDL2_image -lpng -lquazip -lGL -lGLU
 }
 
 linux-g++-64{
 QMAKE_CXXFLAGS += -std=c++11
 DEFINES += str_system_arch=\\\"64Bit\\\"
 TARGET = emu64
-LIBS += -lSDL2 -lSDL2_image -lquazip -lGL -lGLU
+LIBS += -lSDL2 -lSDL2_image -lpng -lquazip -lGL -lGLU
 }
 
 # Windows Crossbuild with MXE
@@ -195,11 +197,11 @@ DEFINES += QUAZIP_STATIC
 RC_FILE = emu64.rc
 
 win32:contains(QMAKE_HOST.os,Linux):{
-    LIBS += $$system($$ARCH-w64-mingw32.$$LINKTYP-sdl2-config --libs) $$system($$ARCH-w64-mingw32.$$LINKTYP-pkg-config SDL2_image gl glu --libs) -lquazip
+    LIBS += $$system($$ARCH-w64-mingw32.$$LINKTYP-sdl2-config --libs) $$system($$ARCH-w64-mingw32.$$LINKTYP-pkg-config SDL2_image png gl glu --libs) -lquazip
 }
 
 win32:contains(QMAKE_HOST.os,Windows):{
-    LIBS += -lSDL2 -lopengl32 -lGLU32 -lSDL2_image -lquazip
+    LIBS += -lSDL2 -lopengl32 -lGLU32 -lSDL2_image -lpng -lquazip
 }
 
 }
