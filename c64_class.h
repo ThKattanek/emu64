@@ -55,7 +55,6 @@ using namespace std::tr1::placeholders;
 #define SCREEN_RATIO_16_9 1.777      // Screenratio 16:9 (1,777)
 
 enum SCREENSHOT_FORMATS {SCREENSHOT_FORMAT_BMP, SCREENSHOT_FORMAT_PNG, SCREENSHOT_FORMATS_COUNT};
-static const char *ScreenschotFormatName[SCREENSHOT_FORMATS_COUNT]{"BMP","PNG"};
 
 class C64Class
 {

@@ -79,7 +79,6 @@ private slots:
     void on_SelectRomSet_currentIndexChanged(const QString &arg1);
     void on_DeleteRomSet_clicked();
     void on_NewRomSet_clicked();
-    void on_ScreenshotFormat_currentIndexChanged(int index);
 
 private:
     void UpdateToolTips();

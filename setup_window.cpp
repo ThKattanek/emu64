@@ -835,8 +835,3 @@ void SetupWindow::on_NewRomSet_clicked()
 
     delete new_romset_window;
 }
-
-void SetupWindow::on_ScreenshotFormat_currentIndexChanged(int index)
-{
-
-}

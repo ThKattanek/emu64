@@ -33,6 +33,8 @@ int SDLThreadLoad(void *userdat);
 #define C64ScreenYW 272         //272
 #define C64FirstViewedPixel 104 //104
 
+static const char *ScreenschotFormatName[SCREENSHOT_FORMATS_COUNT]{"BMP","PNG"};
+
 C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> log_function, const char* gfx_path):
     mmu(NULL),cpu(NULL),vic(NULL),sid1(NULL),sid2(NULL),cia1(NULL),cia2(NULL),crt(NULL)
 {
