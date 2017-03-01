@@ -101,6 +101,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     EnableFullscreenAspectRatio = true;
     IsC64ScreenObsolete = false;
     StartScreenshot = false;
+    ExitScreenshotEnable = false;
     FrameSkipCounter=1;
 
     DistortionEnable = true;
@@ -486,12 +487,20 @@ void C64Class::StartEmulation()
 
 void C64Class::EndEmulation()
 {
+
+    if(ExitScreenshotEnable)
+    {
+        SDL_SavePNG(C64Screen, ExitScreenshotFilename);
+    }
+
     /// Loop Thread beenden ///
     LoopThreadEnd = true;
     while (!LoopThreadIsEnd)
         SDL_Delay(1);
 
     //SDL_DetachThread(sdl_thread);
+
+
 
     SDL_PauseAudio(1);
     SDL_CloseAudio();
@@ -2990,6 +2999,12 @@ const char *C64Class::GetScreenshotFormatName(int format)
     if(format >= SCREENSHOT_FORMATS_COUNT)
         return NULL;
     return ScreenschotFormatName[format];
+}
+
+void C64Class::SetExitScreenshot(const char *filename)
+{
+    strcpy(ExitScreenshotFilename,filename);
+    ExitScreenshotEnable = true;
 }
 
 bool C64Class::StartIECDump(const char *filename)

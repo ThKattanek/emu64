@@ -171,6 +171,7 @@ public:
 
     void SaveScreenshot(const char *filename, int format = SCREENSHOT_FORMAT_PNG);
     const char *GetScreenshotFormatName(int format);
+    void SetExitScreenshot(const char *filename);
 
     bool StartIECDump(const char *filename);
     void StopIECDump();
@@ -306,6 +307,9 @@ public:
     bool StartScreenshot;
     char ScreenshotFilename[1024];
     int  ScreenshotFormat;
+
+    bool ExitScreenshotEnable;
+    char ExitScreenshotFilename[1024];
 
     float SIDVolume;
 

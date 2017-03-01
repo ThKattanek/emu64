@@ -831,8 +831,11 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
                 cmd_line->OutErrorMsg("Die Anzahl der Zyklen müssen größer als 0 sein.","--help");
                 break;
             }
-
             c64->SetLimitCycles(val);
+            break;
+
+        case CMD_EXIT_SCREENSHOT:
+            c64->SetExitScreenshot(cmd_line->GetArg(i+1));
             break;
         }
 
