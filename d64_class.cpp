@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.02.2017                //
+// Letzte Änderung am 11.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -116,7 +116,6 @@ L30:
     D64Files[DateiAnzahl].Adresse+=BlockTmp[2];
 
     unsigned short int TEMP;
-    TEMP=0;
     TEMP=Block[SI+31]<<8;
     TEMP+=Block[SI+30];
     D64Files[DateiAnzahl].Laenge=TEMP;

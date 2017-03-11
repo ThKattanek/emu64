@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.03.2017                //
+// Letzte Änderung am 11.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent,customSplashScreen* splash,QTextStream *l
 
 MainWindow::~MainWindow()
 {
-    showNormal();
+    cout << "MainWindow Destruktor" << endl;
     //////////// Save to INI ////////////
     if(ini != NULL)
     {
@@ -513,6 +513,8 @@ void MainWindow::OnInit()
     if(splash != NULL) splash->close();
 
     this->show();
+
+        std::cout << "OnInitEnd" << std::endl;
 }
 
 void MainWindow::OnMessage(QStringList msg)
@@ -548,6 +550,7 @@ void MainWindow::CloseC64Screeen()
 void MainWindow::LimitCyclesEvent()
 {
     IsLimitCyclesEvent = true;
+    showNormal();
     close();
 }
 
@@ -870,6 +873,7 @@ void MainWindow::on_menu_main_info_triggered()
 void MainWindow::on_actionBeenden_triggered()
 {
     if(!debugger_window->isHidden()) debugger_window->hide();
+    showNormal();
     close();
 }
 

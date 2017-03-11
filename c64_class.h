@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.03.2017                //
+// Letzte Änderung am 11.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -208,6 +208,8 @@ public:
 
     SDL_Window      *C64Window;
     SDL_GLContext   GLContext;
+
+    SDL_mutex       *mutex1;  // Dient für das füllen des Soundbuffers
 
     int             win_pos_x;
     int             win_pos_y;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.03.2017                //
+// Letzte Änderung am 11.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -94,6 +94,8 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     IecIsDumped = false;
 
     AktC64ScreenXW = AktWindowXW = AktC64ScreenYW = AktWindowYW = 0;
+
+    mutex1 = SDL_CreateMutex();
 
     C64Window = NULL;
     C64Screen = NULL;
@@ -489,7 +491,6 @@ void C64Class::StartEmulation()
 
 void C64Class::EndEmulation()
 {
-
     if(ExitScreenshotEnable)
     {
         SDL_SavePNG(C64Screen, ExitScreenshotFilename);
@@ -519,14 +520,15 @@ void C64Class::SetLimitCycles(int nCycles)
 void AudioMix(void *userdat, Uint8 *stream, int laenge)
 {
     C64Class *c64 = (C64Class*)userdat;
-
     if(c64->RecPollingWait)
     {
         c64->RecPollingWaitCounter--;
         if(c64->RecPollingWaitCounter == 0) c64->RecPollingWait = false;
     }
 
+    SDL_LockMutex(c64->mutex1);
     c64->FillAudioBuffer(stream,laenge);
+    SDL_UnlockMutex(c64->mutex1);
 }
 
 void C64Class::SDLThreadPauseBegin()

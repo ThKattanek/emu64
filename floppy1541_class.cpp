@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.12.2016        		//
+// Letzte Änderung am 11.03.2017        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -428,7 +428,6 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
 
     unsigned char gap_size = D64_SECTOR_GAP[D64_TRACK_ZONE[spur]];
     memset(P, 0x55, gap_size);							// Gap
-    P += gap_size;
 }
 
 inline void Floppy1541::ConvertToGCR(unsigned char *source_buffer, unsigned char *destination_buffer)
@@ -596,7 +595,7 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     File = fopen(motor_sound, "rb");
     if (File == NULL)
     {
-            delete FloppySound00;
+            delete[] FloppySound00;
             return 0x02;
     }
 
@@ -611,8 +610,8 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     File = fopen(motor_off_sound, "rb");
     if (File == NULL)
     {
-            delete FloppySound00;
-            delete FloppySound01;
+            delete[] FloppySound00;
+            delete[] FloppySound01;
             return 0x03;
     }
 
@@ -627,9 +626,9 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     File = fopen(Stepper_inc_sound, "rb");
     if (File == NULL)
     {
-            delete FloppySound00;
-            delete FloppySound01;
-            delete FloppySound02;
+            delete[] FloppySound00;
+            delete[] FloppySound01;
+            delete[] FloppySound02;
             return 0x04;
     }
 
@@ -644,10 +643,10 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     File = fopen(stepper_dec_sound, "rb");
     if (File == NULL)
     {
-            delete FloppySound00;
-            delete FloppySound01;
-            delete FloppySound02;
-            delete FloppySound03;
+            delete[] FloppySound00;
+            delete[] FloppySound01;
+            delete[] FloppySound02;
+            delete[] FloppySound03;
             return 0x05;
     }
 
@@ -662,11 +661,11 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     File = fopen(anschlag_sound, "rb");
     if (File == NULL)
     {
-            delete FloppySound00;
-            delete FloppySound01;
-            delete FloppySound02;
-            delete FloppySound03;
-            delete FloppySound04;
+            delete[] FloppySound00;
+            delete[] FloppySound01;
+            delete[] FloppySound02;
+            delete[] FloppySound03;
+            delete[] FloppySound04;
             return 0x06;
     }
 
