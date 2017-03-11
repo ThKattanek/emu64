@@ -44,7 +44,6 @@ MainWindow::MainWindow(QWidget *parent,customSplashScreen* splash,QTextStream *l
 
 MainWindow::~MainWindow()
 {
-    cout << "MainWindow Destruktor" << endl;
     //////////// Save to INI ////////////
     if(ini != NULL)
     {
@@ -513,8 +512,6 @@ void MainWindow::OnInit()
     if(splash != NULL) splash->close();
 
     this->show();
-
-        std::cout << "OnInitEnd" << std::endl;
 }
 
 void MainWindow::OnMessage(QStringList msg)
@@ -550,8 +547,7 @@ void MainWindow::CloseC64Screeen()
 void MainWindow::LimitCyclesEvent()
 {
     IsLimitCyclesEvent = true;
-    showNormal();
-    close();
+    on_actionBeenden_triggered();
 }
 
 void MainWindow::changeEvent(QEvent *event)

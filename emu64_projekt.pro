@@ -168,14 +168,14 @@ linux-g++-32{
 #QMAKE_CXXFLAGS += -std=c++11
 DEFINES += str_system_arch=\\\"32Bit\\\"
 TARGET = emu64
-LIBS += -lSDL2 -lSDL2_image -lpng -lquazip -lGL -lGLU
+LIBS += -lX11 -lSDL2 -lSDL2_image -lpng -lquazip -lGL -lGLU
 }
 
 linux-g++-64{
 QMAKE_CXXFLAGS += -std=c++11
 DEFINES += str_system_arch=\\\"64Bit\\\"
 TARGET = emu64
-LIBS += -lSDL2 -lSDL2_image -lpng -lquazip -lGL -lGLU
+LIBS += -lX11 -lSDL2 -lSDL2_image -lpng -lquazip -lGL -lGLU
 }
 
 # Windows Crossbuild with MXE

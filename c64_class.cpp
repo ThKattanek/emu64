@@ -501,7 +501,7 @@ void C64Class::EndEmulation()
     while (!LoopThreadIsEnd)
         SDL_Delay(1);
 
-    //SDL_DetachThread(sdl_thread);
+    SDL_DetachThread(sdl_thread);
 
 
 

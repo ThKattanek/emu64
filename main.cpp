@@ -23,9 +23,18 @@
 #include "./command_line_class.h"   // Klasse zur Auswertung der KomandLine
 #include "./emu64_commands.h"       // Struktur mit allen verfügbaren Kommandos
 
+#if (!defined(SINGLE_THREADED_PLAYBACK) and defined(Q_WS_X11))
+#include <X11/Xlib.h>
+#endif
+
 #undef main
 int main(int argc, char *argv[])
 {
+
+#if (!defined(SINGLE_THREADED_PLAYBACK) and defined(Q_WS_X11))
+    XInitThreads();
+#endif
+
     QTextStream *log = 0;
     QDir config_dir = QDir(QDir::homePath() + "/.config/emu64");
 
