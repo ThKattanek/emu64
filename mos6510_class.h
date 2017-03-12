@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 11.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -36,6 +36,7 @@ public:
     void SetRegister(REG_STRUCT *reg);
     bool GetInterrupts(int typ);
     void GetInterneRegister(IREG_STRUCT *ireg);
+    void SetEnableDebugCart(bool enabled);
     //bool SaveFreez(FILE *File);
     //bool LoadFreez(FILE *File,unsigned short Version);
 
@@ -51,6 +52,7 @@ public:
     bool *RDY;
     bool *RESET;
     bool WRITE_FF00;
+    bool WRITE_D7FF;
 
     bool EnableExtInterrupts;
 
@@ -99,6 +101,8 @@ private:
 
     bool            NMIState;
     bool            isNMI;
+
+    bool            EnableDebugCart;
 };
 
 #define SetAdresseLo(wert) Adresse = ((Adresse&0xFF00)|wert)

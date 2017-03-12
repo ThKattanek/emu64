@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.12.2016                //
+// Letzte Änderung am 11.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -46,6 +46,9 @@ MOS6510::MOS6510(void)
     isNMI = false;
     IRQLine = 0;
     for(int i=0;i<5;i++) IRQLinePuffer[i] = 0;
+
+    EnableDebugCart = false;
+    WRITE_D7FF = false;
 }
 
 MOS6510::~MOS6510(void)
@@ -238,6 +241,12 @@ void MOS6510::GetInterneRegister(IREG_STRUCT* ireg)
     ireg->RESET = *RESET;
 }
 
+void MOS6510::SetEnableDebugCart(bool enabled)
+{
+    EnableDebugCart = enabled;
+    WRITE_D7FF = false;
+}
+
 /*
 bool MOS6510::SaveFreez(FILE *File)
 {
@@ -353,6 +362,9 @@ inline unsigned char MOS6510::Read(unsigned short adresse)
 
 inline void MOS6510::Write(unsigned short adresse, unsigned char wert)
 {
+    if((EnableDebugCart == true) && (adresse == 0xd7ff))
+        WRITE_D7FF = true;
+
     if(adresse == 0xFF00) WRITE_FF00 = true;
     if(Breakpoints[adresse] & 32)
     {
