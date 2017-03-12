@@ -22,6 +22,7 @@
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
 
+#define DEBUG_CART_ADRESS 0xD7FF
 
 class MOS6510
 {
@@ -37,6 +38,7 @@ public:
     bool GetInterrupts(int typ);
     void GetInterneRegister(IREG_STRUCT *ireg);
     void SetEnableDebugCart(bool enabled);
+    unsigned char GetDebugCartValue();
     //bool SaveFreez(FILE *File);
     //bool LoadFreez(FILE *File,unsigned short Version);
 
@@ -52,7 +54,7 @@ public:
     bool *RDY;
     bool *RESET;
     bool WRITE_FF00;
-    bool WRITE_D7FF;
+    bool WRITE_DEBUG_CART;
 
     bool EnableExtInterrupts;
 
@@ -103,6 +105,7 @@ private:
     bool            isNMI;
 
     bool            EnableDebugCart;
+    unsigned char   DebugCartValue;
 };
 
 #define SetAdresseLo(wert) Adresse = ((Adresse&0xFF00)|wert)
