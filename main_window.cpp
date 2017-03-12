@@ -836,6 +836,9 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
         case CMD_EXIT_SCREENSHOT:
             c64->SetExitScreenshot(cmd_line->GetArg(i+1));
             break;
+
+        case CMD_DEBUG_CART:
+            break;
         }
 
         // ----------------------------------------------------

@@ -43,6 +43,12 @@ emu64 [PARAMETER]
 --nosplash
     Der SplashScreen wird beim Start nicht angezeigt.
 
+--exitscreenshot <Dateiname>
+    Speichert vor dem beenden noch ein Screenshot als png.
+
+--debugcart
+    Beendet den Emu64 bei einem Schreibzugriff auf $d7ff und gibt den Wert als Exitcode zurück.
+
 --multiple-instance
     Ermöglicht das starten mehrerer Emu64 Instanzen.
 
