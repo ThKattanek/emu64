@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.03.2017                //
+// Letzte Änderung am 12.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -65,6 +65,7 @@ public:
     void StartEmulation(void);
     void EndEmulation(void);
     void SetLimitCycles(int nCycles);
+    void SetEnableDebugCart(bool enabled);
     void FillAudioBuffer(unsigned char *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
     void KeyEvent(unsigned char  matrix_code,KeyStatus status, bool isAutoShift);
     bool LoadC64Roms(char *kernalrom,char *basicrom,char *charrom);
@@ -301,6 +302,7 @@ public:
     function<void(char*)> LogText;
     function<void(void)> CloseEventC64Screen;
     function<void(void)> LimitCyclesEvent;
+    function<void(unsigned char)> DebugCartEvent;
 
     unsigned short	C64History[256];
     unsigned char	C64HistoryPointer;

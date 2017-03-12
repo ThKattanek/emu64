@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.03.2017                //
+// Letzte Änderung am 12.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -56,6 +56,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
 
     CloseEventC64Screen = NULL;
     LimitCyclesEvent = NULL;
+    DebugCartEvent = NULL;
 
     LogText = log_function;
     GfxPath = gfx_path;
@@ -513,6 +514,11 @@ void C64Class::SetLimitCycles(int nCycles)
     LimitCylesCounter = nCycles;
 }
 
+void C64Class::SetEnableDebugCart(bool enabled)
+{
+    cpu->SetEnableDebugCart(enabled);
+}
+
 void AudioMix(void *userdat, Uint8 *stream, int laenge)
 {
     C64Class *c64 = (C64Class*)userdat;
@@ -688,6 +694,12 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                     // Event auslösen
                     if(LimitCyclesEvent != 0) LimitCyclesEvent();
                 }
+            }
+
+            if(cpu->WRITE_DEBUG_CART)
+            {
+                // Event auslösen
+                if(DebugCartEvent != 0) DebugCartEvent(cpu->GetDebugCartValue());
             }
 
             /// Für Externe Erweiterungen ///
