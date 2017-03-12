@@ -699,6 +699,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
             if(cpu->WRITE_DEBUG_CART)
             {
                 // Event auslösen
+                cpu->WRITE_DEBUG_CART = false;
                 if(DebugCartEvent != 0) DebugCartEvent(cpu->GetDebugCartValue());
             }
 

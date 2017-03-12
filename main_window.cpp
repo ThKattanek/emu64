@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.03.2017                //
+// Letzte Änderung am 12.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -404,6 +404,11 @@ void MainWindow::OnInit()
     c64->LimitCyclesEvent = bind(&MainWindow::LimitCyclesEvent,this);
     LogText(trUtf8(">> C64Class LimitCycelsEvent mit MainWindow verknüpft\n").toLatin1().data());
 
+    /// DebugCartEvent von C64 Klasse hierher leiten
+    IsDebugCartEvent = false;
+    c64->DebugCartEvent = bind(&MainWindow::DebugCartEvent,this,_1);
+    LogText(trUtf8(">> C64Class DebugCartEvent mit MainWindow verknüpft\n").toLatin1().data());
+
     connect(floppy_window,SIGNAL(ChangeFloppyImage(int)),this,SLOT(OnChangeFloppyImage(int)));
     LogText(trUtf8(">> ChangeFloppyImage Event mit MainWindow verknüpft\n").toLatin1().data());
 
@@ -547,6 +552,13 @@ void MainWindow::CloseC64Screeen()
 void MainWindow::LimitCyclesEvent()
 {
     IsLimitCyclesEvent = true;
+    on_actionBeenden_triggered();
+}
+
+void MainWindow::DebugCartEvent(unsigned char value)
+{
+    DebugCartValue = value;
+    IsDebugCartEvent = true;
     on_actionBeenden_triggered();
 }
 
@@ -838,6 +850,7 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
             break;
 
         case CMD_DEBUG_CART:
+            c64->SetEnableDebugCart(true);
             break;
         }
 

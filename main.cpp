@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.03.2017                //
+// Letzte Änderung am 12.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -153,6 +153,7 @@ int main(int argc, char *argv[])
     app->deleteSharedMemory();
 
     if(w->IsLimitCyclesEvent) ret = 1;
+    if(w->IsDebugCartEvent) ret = w->DebugCartValue;
 
     delete w;
 

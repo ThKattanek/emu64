@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.02.2017                //
+// Letzte Änderung am 12.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -77,10 +77,14 @@ public:
     /// Close Event von der C64 Klasse
     void CloseC64Screeen(void);
 
-    /// LimitCyclesEvent von der C64 Klass
+    /// LimitCyclesEvent von der C64 Klasse
     void LimitCyclesEvent(void);
-
     bool IsLimitCyclesEvent;
+
+    /// DebugCartEvent von der C64 Klasse
+    void DebugCartEvent(unsigned char value);
+    bool IsDebugCartEvent;
+    unsigned char DebugCartValue;
 
 public slots:
     void OnMessage(QStringList msg);
