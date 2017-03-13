@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.03.2017                //
+// Letzte Änderung am 13.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,7 +19,7 @@
 // Defineren aller Kommandozeilen Parameter
 enum CMD_COMMAND {CMD_HELP,CMD_VERSION,CMD_MULTIPLE_INSTANCE,CMD_NOSPLASH,CMD_SOFTRESET,CMD_HARDRESET,\
                  CMD_MOUNT_DISK,CMD_MOUNT_CRT,CMD_UMOUNT_CRT,CMD_POKE_64,CMD_LIMITCYCLES,CMD_AUTOSTART,\
-                 CMD_EXIT_SCREENSHOT,CMD_DEBUG_CART};
+                 CMD_EXIT_SCREENSHOT,CMD_DEBUG_CART,CMD_WARP_MODE};
 static const CMD_STRUCT command_list[]{
     {CMD_AUTOSTART,"a","autostart","Lädt ein C64 Programm (prg,t00 ...) und startet es gleich.",1},
     {CMD_MOUNT_DISK,"m","mount-disk","Mountet ein Diskimage. --mount-disk <Laufwerksnummer (8-11)> <Dateiname>",2},
@@ -27,6 +27,7 @@ static const CMD_STRUCT command_list[]{
     {CMD_UMOUNT_CRT,"","umount-crt","Entfernt ein Modulimage aus dem Expansionsport. --umount-crt",0},
     {CMD_SOFTRESET,"r","soft-reset","Führt einen Soft Reset durch.",0},
     {CMD_HARDRESET,"R","hard-reset","Führt einen Hard Reset durch.",0},
+    {CMD_WARP_MODE,"","warp","Aktiviert den WarpMode. (Maximum C64 Speed / kein Sound)",0},
     {CMD_POKE_64,"","poke64","Schreibt ein Byte an eine C64 Adresse. --poke64 <Adresse (0-65535)> <Wert (0-255)>",2},
     {CMD_LIMITCYCLES,"","limitcycles","Beendet den Emulator nach n Zyklen mit Exitcode 1. --limitcycles <nZyklen>",1},
     {CMD_NOSPLASH,"","nosplash","Der SplashScreen wird beim Start nicht angezeigt.",0},

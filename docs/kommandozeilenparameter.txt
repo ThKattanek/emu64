@@ -34,6 +34,9 @@ emu64 [PARAMETER]
 -R, --hard-reset
     Führt einen Hard Reset durch.
 
+--warp
+    Aktiviert den WarpMode. (Maximum C64 Speed / kein Sound)
+
 --poke64 <Adresse (0-65535)> <Wert (0-255)>
     Schreibt ein Byte an eine C64 Adresse.
 

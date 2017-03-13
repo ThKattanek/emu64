@@ -225,6 +225,19 @@
     <enum>Qt::Horizontal</enum>
    </property>
   </widget>
+  <widget class="QCheckBox" name="WarpMode">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>6</y>
+     <width>51</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Warp</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

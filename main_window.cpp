@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.03.2017                //
+// Letzte Änderung am 13.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -811,6 +811,9 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
             break;
         case CMD_UMOUNT_CRT:
             crt_window->DisconnectCrt();
+            break;
+        case CMD_WARP_MODE:
+            c64->EnableWarpMode(true);
             break;
         case CMD_POKE_64:
             adr = cmd_line->GetArgInt(i+1, &error);

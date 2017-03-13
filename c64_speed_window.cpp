@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 13.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -153,4 +153,9 @@ void C64SpeedWindow::SetPauseTooltip()
     {
         ui->Pause->setToolTip(trUtf8("Hält den C64 komplett an."));
     }
+}
+
+void C64SpeedWindow::on_WarpMode_clicked(bool checked)
+{
+    c64->EnableWarpMode(checked);
 }

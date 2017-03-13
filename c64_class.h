@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.03.2017                //
+// Letzte Änderung am 13.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -66,6 +66,7 @@ public:
     void EndEmulation(void);
     void SetLimitCycles(int nCycles);
     void SetEnableDebugCart(bool enabled);
+    void WarpModeLoop(void);
     void FillAudioBuffer(unsigned char *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
     void KeyEvent(unsigned char  matrix_code,KeyStatus status, bool isAutoShift);
     bool LoadC64Roms(char *kernalrom,char *basicrom,char *charrom);
@@ -89,6 +90,7 @@ public:
     void SetFullscreenAspectRatio(bool enabled);
     void AnalyzeSDLEvent(SDL_Event *event);
     void SetC64Speed(int speed);
+    void EnableWarpMode(bool enabled);
     void SetDistortion(float value);
     void SetMouseHiddenTime(int time);  // Time in ms // Bei 0 Wird der Cursor nicht mehr ausgeblendet
     void GetWindowPos(int *x, int *y);
@@ -261,6 +263,9 @@ public:
     SDL_Thread      *sdl_thread;
     bool            sdl_thread_pause;
     bool            sdl_thread_is_paused;
+
+    SDL_Thread      *warp_thread;
+    bool            warp_thread_end;
 
     unsigned char   *vic_puffer;
     VideoPalClass   *pal;
@@ -440,6 +445,7 @@ private:
     bool	OneOpc;
     int     OneOpcSource;
 
+    bool    WarpMode;
 
     bool    MouseIsHidden;
     int     MouseHiddenCounter;

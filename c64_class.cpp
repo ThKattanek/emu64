@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.03.2017                //
+// Letzte Änderung am 13.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -24,6 +24,7 @@
 void AudioMix(void *nichtVerwendet, Uint8 *stream, int laenge);
 int SDLThread(void *userdat);
 int SDLThreadLoad(void *userdat);
+int SDLThreadWarp(void *userdat);
 
 #define AudioSampleRate 44100
 #define AudioPufferSize (882*4)    // 882 bei 44.100 Khz
@@ -57,6 +58,8 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     CloseEventC64Screen = NULL;
     LimitCyclesEvent = NULL;
     DebugCartEvent = NULL;
+
+    WarpMode = false;
 
     LogText = log_function;
     GfxPath = gfx_path;
@@ -492,6 +495,7 @@ void C64Class::StartEmulation()
 
 void C64Class::EndEmulation()
 {
+    EnableWarpMode(false);
     if(ExitScreenshotEnable)
     {
         SDL_SavePNG(C64Screen, ExitScreenshotFilename);
@@ -531,6 +535,17 @@ void AudioMix(void *userdat, Uint8 *stream, int laenge)
     SDL_LockMutex(c64->mutex1);
     c64->FillAudioBuffer(stream,laenge);
     SDL_UnlockMutex(c64->mutex1);
+}
+
+int SDLThreadWarp(void *userdat)
+{
+    C64Class *c64 = (C64Class*)userdat;
+
+    while(!c64->warp_thread_end)
+    {
+        c64->WarpModeLoop();
+    }
+    return 0;
 }
 
 void C64Class::SDLThreadPauseBegin()
@@ -666,6 +681,116 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
     if(Mouse1351Enable) UpdateMouse();
 
     IsC64ScreenObsolete = true;
+}
+
+void C64Class::WarpModeLoop()
+{
+    static unsigned int counter_plus=0;
+
+    CheckKeys();
+    CycleCounter++;
+
+    if(LimitCylesCounter > 0)
+    {
+        LimitCylesCounter--;
+        if(LimitCylesCounter == 0)
+        {
+            // Event auslösen
+            if(LimitCyclesEvent != 0) LimitCyclesEvent();
+        }
+    }
+
+    if(cpu->WRITE_DEBUG_CART)
+    {
+        // Event auslösen
+        cpu->WRITE_DEBUG_CART = false;
+        if(DebugCartEvent != 0) DebugCartEvent(cpu->GetDebugCartValue());
+    }
+
+    /// Für Externe Erweiterungen ///
+    //if(ExtZyklus) ZyklusProcExt();
+
+    FloppyIEC = 0;
+    for(int i=0; i<FloppyAnzahl; i++)
+    {
+        floppy[i]->OneZyklus();
+
+        #ifdef floppy_asyncron
+        counter_plus++;
+        if(counter_plus == more_one_floppy_cylce_count)
+        {
+            counter_plus = 0;
+            floppy[i]->OneZyklus();
+        }
+        #endif
+
+        FloppyIEC |= ~floppy[i]->FloppyIECLocal;
+    }
+    FloppyIEC = ~FloppyIEC;
+
+    vic->OneZyklus();
+    cia1->OneZyklus();
+    cia2->OneZyklus();
+
+    sid1->OneZyklus();
+    if(StereoEnable) sid2->OneZyklus();
+
+    reu->OneZyklus();
+    tape->OneCycle();
+
+    if(EnableExtLines) RDY_BA = ExtRDY;
+    cpu->OneZyklus();
+
+    ////////////////////////// Testweise //////////////////////////
+
+    static int zyklen_counter = 0;
+    if(++zyklen_counter == 19656)
+    {
+        zyklen_counter = 0;
+        if(WaitResetReady)
+        {
+            if(!floppy[0]->GetEnableFloppy())
+            {
+                if(C64ResetReady)
+                {
+                    SDL_CreateThread(SDLThreadLoad ,"C64Thread",this);
+                    WaitResetReady = false;
+                }
+            }
+            else
+            {
+                if((C64ResetReady == true) && (FloppyResetReady[0] == true))
+                {
+                    SDL_CreateThread(SDLThreadLoad ,"C64Thread" ,this);
+                    WaitResetReady = false;
+                }
+            }
+        }
+
+        if(ComandZeileCountS)
+        {
+            ComandZeileCountS=false;
+            if(ComandZeileStatus)
+            {
+                if(ComandZeileCount==ComandZeileSize)
+                {
+                    ComandZeileStatus=false;
+                }
+                else
+                {
+                    WriteC64Byte(0xC6,1);
+                    WriteC64Byte(0x277,ComandZeile[ComandZeileCount]);
+                    ComandZeileCount++;
+                }
+            }
+        }
+        if(ReadC64Byte(0xC6)==0)
+        {
+            ComandZeileCountS=true;
+        }
+    }
+    //////////////////////////////////////////////////////////////////////////////
+
 }
 
 void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
@@ -2208,6 +2333,32 @@ void C64Class::SetTapeSoundVolume(float volume)
 void C64Class::SetC64Speed(int speed)
 {
     sid1->SetC64Zyklen(985248.f*(float)speed/100.f);
+}
+
+void C64Class::EnableWarpMode(bool enabled)
+{
+    if(enabled == WarpMode) return;
+
+    // WarpMode setzen
+    WarpMode = enabled;
+
+    if(WarpMode)
+    {
+        // WarpMode aktivieren
+        SDL_PauseAudio(1);          // Audiostream pausieren
+        SDL_LockMutex(mutex1);      // Warten auf Mutex1 und sperren
+        warp_thread_end = false;
+        warp_thread = SDL_CreateThread(SDLThreadWarp,"WarpThread",this);
+        cout << "WarpOn" << endl;
+    }
+    else
+    {
+        // WarpMode deaktivieren
+        cout << "WarpOff" << endl;
+        warp_thread_end = true;
+        SDL_UnlockMutex(mutex1);    // Mutex1 wieder freigeben
+        SDL_PauseAudio(0);          // Audiostream wieder starten
+    }
 }
 
 int SDLThreadLoad(void *userdat)

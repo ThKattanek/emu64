@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 13.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -48,6 +48,8 @@ private slots:
     void on_Set500_clicked();
     void on_Pause_clicked();
     void SetPauseTooltip();
+
+    void on_WarpMode_clicked(bool checked);
 
 private:
     QSettings *ini;
