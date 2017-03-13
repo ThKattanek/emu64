@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.03.2017                //
+// Letzte Änderung am 13.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     if(cmd_line->GetCommandCount() < 0)
     {
         printf("\"emu64 --help\" liefert weitere Informationen.\n");
-        return(0x0);
+        return(0x01);
     }
 
     if(cmd_line->GetCommandCount() > 0)
