@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.03.2017                //
+// Letzte Änderung am 14.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -27,7 +27,15 @@ int SDLThreadLoad(void *userdat);
 int SDLThreadWarp(void *userdat);
 
 #define AudioSampleRate 44100
-#define AudioPufferSize (882*4)    // 882 bei 44.100 Khz
+
+#ifdef _WIN32
+    #define AudioPufferSize (882*2)    // 882 bei 44.100 Khz
+#else
+    #define AudioPufferSize (882*4)    // 882 bei 44.100 Khz
+#endif
+
+
+
 #define RecPollingWaitStart 20
 
 #define C64ScreenXW 384         //384
