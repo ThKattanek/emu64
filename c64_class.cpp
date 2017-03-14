@@ -31,7 +31,7 @@ int SDLThreadWarp(void *userdat);
 #ifdef _WIN32
     #define AudioPufferSize (882)    // 882 bei 44.100 Khz
 #else
-    #define AudioPufferSize (882*4)    // 882 bei 44.100 Khz
+    #define AudioPufferSize (882*2)    // 882 bei 44.100 Khz
 #endif
 
 
