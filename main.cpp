@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     if(cmd_line->GetCommandCount() < 0)
     {
         printf("\"emu64 --help\" liefert weitere Informationen.\n");
-        return(0x01);
+        return(-1);
     }
 
     if(cmd_line->GetCommandCount() > 0)
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
                 else
                 {
                     cout << "emu64.ini konnte nicht gelöscht werden." << endl;
-                    return(0x01);
+                    return(-1);
                 }
         }
         if(cmd_line->GetCommand(0) == CMD_HELP)
