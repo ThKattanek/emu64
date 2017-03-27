@@ -35,10 +35,10 @@ TVSetupWindow::TVSetupWindow(QWidget *parent, C64Class *_c64, VideoPalClass *_vi
         value = ini->value("Saettigung",75).toInt();
         ui->saettigung_scroll->setValue(value);
         if(ui->saettigung_scroll->value() == value) on_saettigung_scroll_valueChanged(value);
-        value = ini->value("Helligkeit",50).toInt();
+        value = ini->value("Helligkeit",40).toInt();
         ui->helligkeit_scroll->setValue(value);
         if(ui->helligkeit_scroll->value() == value) on_helligkeit_scroll_valueChanged(value);
-        value = ini->value("Kontrast",85).toInt();
+        value = ini->value("Kontrast",50).toInt();
         ui->kontrast_scroll->setValue(value);
         if(ui->kontrast_scroll->value() == value) on_kontrast_scroll_valueChanged(value);
         value = ini->value("HorBlurY",2).toInt();
@@ -50,7 +50,7 @@ TVSetupWindow::TVSetupWindow(QWidget *parent, C64Class *_c64, VideoPalClass *_vi
         value = ini->value("PhaseLineOffset",840).toInt();
         ui->phase_scroll->setValue(value);
         if(ui->phase_scroll->value() == value) on_phase_scroll_valueChanged(value);
-        value = ini->value("Scanline",85).toInt();
+        value = ini->value("Scanline",60).toInt();
         ui->scanline_scroll->setValue(value);
         if(ui->scanline_scroll->value() == value) on_scanline_scroll_valueChanged(value);
 
