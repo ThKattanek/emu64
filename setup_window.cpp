@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.03.2017                //
+// Letzte Änderung am 27.03.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,7 +16,7 @@
 #include "setup_window.h"
 #include "ui_setup_window.h"
 
-#define DEFAULT_ROMSET_NEAME "Original C64 II"
+#define DEFAULT_ROMSET_NAME "Original C64 II"
 
 SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoPalClass *videopal, QSettings *ini, QString *romsetPath, QString *dataPath) :
     QDialog(parent),
@@ -33,7 +33,7 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoPalClass *vid
     ui->setupUi(this);
 
     // VIC Farbmodi zur ComboBox hinzufügen
-    ui->C64Farbmodus->addItems(QStringList()<<"Emu64"<<"Emu64 (bis 4.00)"<<"CCS64"<<"PC64"<<"C64S"<<"VICE"<<"FRODO"<<trUtf8("Schwarz / Weiß"));
+    ui->C64Farbmodus->addItems(QStringList()<<"Emu64"<<"Emu64 (bis 4.00)"<<"CCS64"<<"PC64"<<"C64S"<<"Vice"<<"Frodo"<<trUtf8("Pepto")<<trUtf8("Schwarz / Weiß"));
     // SID Typen zur ComboBox hinzufügen
     ui->FirstSidTyp->addItems(QStringList()<<"MOS-6581"<<"MOS-8580");
     ui->SecondSidTyp->addItems(QStringList()<<"MOS-6581"<<"MOS-8580");
@@ -217,7 +217,7 @@ void SetupWindow::LoadINI(C64Class *c64)
 
         ui->AutoMouseHideTime->setValue(value);
 
-        svalue = ini->value("RomSet",DEFAULT_ROMSET_NEAME).toString();
+        svalue = ini->value("RomSet",DEFAULT_ROMSET_NAME).toString();
         value = ui->SelectRomSet->findText(svalue);
         if(value != -1) ui->SelectRomSet->setCurrentIndex(value);
 
@@ -513,7 +513,7 @@ void SetupWindow::FillRomSetCombo()
     // Alle RomSets auslesen und in ComboBox eintragen
 
     ui->SelectRomSet->clear();
-    ui->SelectRomSet->addItem(DEFAULT_ROMSET_NEAME);
+    ui->SelectRomSet->addItem(DEFAULT_ROMSET_NAME);
 
     QStringList romset_names = GetAllRomsetNames(romsetPath);
     ui->SelectRomSet->addItems(romset_names);
@@ -703,7 +703,7 @@ void SetupWindow::on_SelectRomSet_currentIndexChanged(const QString &arg1)
 {
     QString kernal_rom, basic_rom, char_rom, dos1541_rom;
 
-    if(arg1 == DEFAULT_ROMSET_NEAME)
+    if(arg1 == DEFAULT_ROMSET_NAME)
     {
         // Default RomSet laden
         kernal_rom = *dataPath+"/roms/kernal.rom";
