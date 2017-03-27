@@ -55,6 +55,9 @@ emu64 [PARAMETER]
 --multiple-instance
     Ermöglicht das starten mehrerer Emu64 Instanzen.
 
+--reset-ini
+    Setzt die emu64.ini zurück. (Alle bisherigen Einstellungen gehen verloren!)
+
 -?, --help
     Ein Hilfe Text wird angezeigt und Emu64 wird nicht gestartet.
 
