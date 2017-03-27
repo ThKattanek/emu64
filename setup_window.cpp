@@ -159,10 +159,10 @@ void SetupWindow::LoadINI(C64Class *c64)
 
         ini->beginGroup("SetupWindow");
 
-        value = ini->value("NoPALColorMode",0).toInt();
+        value = ini->value("NoPALColorMode",7).toInt();
         ui->C64Farbmodus->setCurrentIndex(value);
 
-        bvalue = ini->value("WindowPalMode",1).toBool();
+        bvalue = ini->value("WindowPalMode",0).toBool();
         ui->WPal->setChecked(bvalue);
         videopal->StartC64isPalmode = bvalue;
 
