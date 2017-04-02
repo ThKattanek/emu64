@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 14.03.2017                //
+// Letzte Änderung am 02.04.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -597,6 +597,15 @@ int SDLThread(void *userdat)
         {
             c64->ChangeWindowSize = false;
             SDL_SetWindowSize(c64->C64Window, c64->win_size_w, c64->win_size_h);
+
+#ifdef _WIN32
+            c64->AktWindowXW = c64->win_size_w;
+            c64->AktWindowYW = c64->win_size_h;
+            glViewport(0,0,c64->AktWindowXW, c64->AktWindowYW);
+            glMatrixMode(GL_PROJECTION);
+            glOrtho(0,c64->AktWindowXW, c64->AktWindowYW,0,-1,1);
+            glLoadIdentity();
+#endif
         }
 
         /// Wird ausgeführt wenn Keine Thread Pause anliegt ///
