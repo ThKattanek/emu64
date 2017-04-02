@@ -8,7 +8,7 @@ Linux:
 
 #32Bit
 cd ~/Programmierung/Aktuelle_Projekte/builds
-mkdir emu64_linux_i386
+mkdir emu64_linux_final_i386
 cd emu64_linux_i386
 qmake ../../emu64/emu64_projekt.pro -spec linux-g++-32 -r
 make -j8
@@ -16,7 +16,7 @@ sudo make install
 
 #64Bit
 cd ~/Programmierung/Aktuelle_Projekte/builds
-mkdir emu64_linux_amd64
+mkdir emu64_linux_final_amd64
 cd emu64_linux_amd64
 qmake ../../emu64/emu64_projekt.pro -spec linux-g++-64 -r
 make -j8

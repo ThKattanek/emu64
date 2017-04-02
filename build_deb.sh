@@ -11,11 +11,11 @@ checkinstall -D \
     --maintainer="Thorsten Kattanek\\<thorsten.Kattanek@emu64.de\\>" \
     --pkgarch=$(dpkg \
     --print-architecture) \
-    --pkgversion="5.0.14" \
+    --pkgversion="5.0.15" \
     --pkgrelease="0" \
     --pkgname=emu64 \
     --requires="libc6 \(\>= 2.4\),libgcc1 \(\>= 1:4.1.1\),libncurses5 \(\>= 5.5-5~\),libpcap0.8 \(\>= 0.9.8\),libstdc++6 \(\>= 4.1.1\),libtinfo5, \
-		libqtcore4, libqtgui4, libsdl2-2.0-0 \(\>= 2-2.0-0\), libsdl2-image-2.0-0 \(\>= 2.0-0\), libquazip1"
+		libqtcore4, libqtgui4, libsdl2-2.0-0 \(\>= 2-2.0-0\), libsdl2-image-2.0-0 \(\>= 2.0-0\), libquazip1, libpng12-0, libx11-6"
 
 alien -r *.deb
 alien -t *.deb
