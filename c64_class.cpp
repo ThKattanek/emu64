@@ -1358,7 +1358,7 @@ void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool pal_enable,boo
 
     ChangeGrafikModi = true;
 
-    char str00[100];
+    char str00[255];
     sprintf(str00,">>   32Bit = %d\n>>   Doublesize = %d\n>>   PAL = %d\n>>   Filter = %d\n>>   FullResXW = %d\n>>   FullResrYW = %d\n",ColBits32,DoubleSize,PalEnable,FilterEnable,FullResXW,FullResYW);
 
     LogText((char*)">> Grafikmodus wurde gesetzt:\n");
