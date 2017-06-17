@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>371</width>
-    <height>416</height>
+    <height>507</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,18 +37,18 @@
      <x>5</x>
      <y>285</y>
      <width>361</width>
-     <height>113</height>
+     <height>200</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">border-image: url(:/grafik/qt_sdl_logo_300x113.png);</string>
+    <string notr="true">border-image: url(:/grafik/qt_sdl_ffmpeg_logo_300x200.png);</string>
    </property>
   </widget>
   <widget class="QLabel" name="moreinfosOut">
    <property name="geometry">
     <rect>
      <x>5</x>
-     <y>400</y>
+     <y>487</y>
      <width>351</width>
      <height>17</height>
     </rect>

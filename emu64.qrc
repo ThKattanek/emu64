@@ -4,7 +4,6 @@
         <file>grafik/play_blue_transprent.png</file>
         <file>grafik/stop_blue_transprent.png</file>
         <file>grafik/red_kreuz.png</file>
-        <file>grafik/qt_sdl_logo_300x113.png</file>
         <file>grafik/toolbar32/aus.png</file>
         <file>grafik/toolbar32/info.png</file>
         <file>grafik/toolbar32/datasette.png</file>
@@ -74,5 +73,6 @@
         <file>grafik/view-refresh.png</file>
         <file>grafik/delete.png</file>
         <file>grafik/go-home.png</file>
+        <file>grafik/qt_sdl_ffmpeg_logo_300x200.png</file>
     </qresource>
 </RCC>
