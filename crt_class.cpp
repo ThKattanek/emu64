@@ -149,6 +149,7 @@ int CRTClass::LoadCRTImage(char* filename)
         unsigned short chip_adr;
         unsigned short chip_size;
         int Bank1Pos,Bank2Pos,Bank3Pos;
+        size_t reading_elements;
 
         file = fopen (filename, "rb");
         if (file == NULL)
@@ -156,7 +157,7 @@ int CRTClass::LoadCRTImage(char* filename)
                 return 0x01;
         }
 
-        fread(Kennung,1,16,file);
+        reading_elements = fread(Kennung,1,16,file);
         Kennung[16] = 0;
 
         if(0!=strcmp("C64 CARTRIDGE   ",Kennung))
@@ -165,16 +166,16 @@ int CRTClass::LoadCRTImage(char* filename)
                 return 0x02;
         }
 
-        fread(&HeaderLength,1,sizeof(HeaderLength),file);
+        reading_elements = fread(&HeaderLength,1,sizeof(HeaderLength),file);
         HeaderLength = conv_dword(HeaderLength);
 
-        fread(&Version,1,sizeof(Version),file);
+        reading_elements = fread(&Version,1,sizeof(Version),file);
 
-        fread(&CRTTyp,1,sizeof(CRTTyp),file);
+        reading_elements = fread(&CRTTyp,1,sizeof(CRTTyp),file);
         CRTTyp = CRTTyp<<8 | CRTTyp>>8;
 
-        fread(&exrom,1,sizeof(exrom),file);
-        fread(&game,1,sizeof(game),file);
+        reading_elements = fread(&exrom,1,sizeof(exrom),file);
+        reading_elements = fread(&game,1,sizeof(game),file);
 
         if(exrom == 0) CRT_EXROM = false;
         else CRT_EXROM = true;
@@ -200,33 +201,33 @@ L1:
                         //MessageBox(0,"Fehler 128 in CRT Modul","Emu64",0);
                         goto L2;
                 }
-                fread(&HeaderLength,1,sizeof(HeaderLength),file);
+                reading_elements = fread(&HeaderLength,1,sizeof(HeaderLength),file);
                 HeaderLength = conv_dword(HeaderLength);
                 akt_pos += HeaderLength;
 
                 fseek(file,4,SEEK_CUR);
-                fread(&chip_adr,1,2,file);
+                reading_elements = fread(&chip_adr,1,2,file);
                 chip_adr = chip_adr<<8 | chip_adr>>8;
-                fread(&chip_size,1,2,file);
+                reading_elements = fread(&chip_size,1,2,file);
                 chip_size = chip_size<<8 | chip_size>>8;
 
                 switch(chip_adr)
                 {
                 case 0x8000:
-                        fread(CRT_ROM_BANK1 + Bank1Pos,1,0x2000,file);
+                        reading_elements = fread(CRT_ROM_BANK1 + Bank1Pos,1,0x2000,file);
                         Bank1Pos += 0x2000;
                         if(chip_size == 0x4000)
                         {
-                                fread(CRT_ROM_BANK2 + Bank2Pos,1,0x2000,file);
+                                reading_elements = fread(CRT_ROM_BANK2 + Bank2Pos,1,0x2000,file);
                                 Bank2Pos += 0x2000;
                         }
                         break;
                 case 0xA000:
-                        fread(CRT_ROM_BANK2 + Bank2Pos,1,0x2000,file);
+                        reading_elements = fread(CRT_ROM_BANK2 + Bank2Pos,1,0x2000,file);
                         Bank2Pos += 0x2000;
                         break;
                 case 0xE000:
-                                fread(CRT_ROM_BANK2 + Bank2Pos,1,0x2000,file);
+                                reading_elements = fread(CRT_ROM_BANK2 + Bank2Pos,1,0x2000,file);
                                 Bank2Pos += 0x2000;
                         break;
                 }
@@ -476,6 +477,7 @@ int CRTClass::GetCRTInfo(char* filename,CRT_INFO_STRUCT* crtinfo)
         unsigned long akt_pos;
         unsigned short tmp;
         int Bank1Pos,Bank2Pos,Bank3Pos;
+        size_t reading_elements;
 
         File = fopen (filename, "rb");
         if (File == NULL)
@@ -483,7 +485,7 @@ int CRTClass::GetCRTInfo(char* filename,CRT_INFO_STRUCT* crtinfo)
                 return 0x01;
         }
 
-        fread(Kennung,1,16,File);
+        reading_elements = fread(Kennung,1,16,File);
         Kennung[16] = 0;
 
         if(0!=strcmp("C64 CARTRIDGE   ",Kennung))
@@ -492,23 +494,23 @@ int CRTClass::GetCRTInfo(char* filename,CRT_INFO_STRUCT* crtinfo)
                 return 0x02;
         }
 
-        fread(&HeaderLength,1,sizeof(HeaderLength),File);
+        reading_elements = fread(&HeaderLength,1,sizeof(HeaderLength),File);
         HeaderLength = conv_dword(HeaderLength);
 
-        fread(&Version,1,sizeof(Version),File);
+        reading_elements = fread(&Version,1,sizeof(Version),File);
 
         sprintf(crtinfo->Version,"%X.%2.2X",(unsigned char)Version,Version>>8);
 
-        fread(&crtinfo->HardwareType,1,sizeof(crtinfo->HardwareType),File);
+        reading_elements = fread(&crtinfo->HardwareType,1,sizeof(crtinfo->HardwareType),File);
         crtinfo->HardwareType = crtinfo->HardwareType<<8 | crtinfo->HardwareType>>8;
         if(crtinfo->HardwareType > 32) crtinfo->HardwareTypeString = (char*)TYPE_STRING[33];
         else crtinfo->HardwareTypeString = (char*)TYPE_STRING[crtinfo->HardwareType];
 
-        fread(&crtinfo->EXROM,1,sizeof(crtinfo->EXROM),File);
-        fread(&crtinfo->GAME,1,sizeof(crtinfo->GAME),File);
+        reading_elements = fread(&crtinfo->EXROM,1,sizeof(crtinfo->EXROM),File);
+        reading_elements = fread(&crtinfo->GAME,1,sizeof(crtinfo->GAME),File);
 
         fseek(File,0x0020,SEEK_SET);
-        fread(crtinfo->Name,1,32,File);
+        reading_elements = fread(crtinfo->Name,1,32,File);
 
         akt_pos = 0x40;
         crtinfo->ChipCount = 0;
@@ -519,42 +521,42 @@ L1:
         Kennung[4] = 0;
         if(0==strcmp("CHIP",Kennung))
         {
-                fread(&HeaderLength,1,sizeof(HeaderLength),File);
+                reading_elements = fread(&HeaderLength,1,sizeof(HeaderLength),File);
                 HeaderLength = conv_dword(HeaderLength);
 
-                fread(&tmp,1,2,File);
+                reading_elements = fread(&tmp,1,2,File);
                 tmp = tmp<<8 | tmp>>8;
                 crtinfo->ChipInfo[crtinfo->ChipCount].Type = tmp;
-                fread(&tmp,1,2,File);
+                reading_elements = fread(&tmp,1,2,File);
                 tmp = tmp<<8 | tmp>>8;
                 crtinfo->ChipInfo[crtinfo->ChipCount].BankLocation = tmp;
-                fread(&tmp,1,2,File);
+                reading_elements = fread(&tmp,1,2,File);
                 tmp = tmp<<8 | tmp>>8;
                 crtinfo->ChipInfo[crtinfo->ChipCount].LoadAdress = tmp;
-                fread(&tmp,1,2,File);
+                reading_elements = fread(&tmp,1,2,File);
                 tmp = tmp<<8 | tmp>>8;
                 crtinfo->ChipInfo[crtinfo->ChipCount].ChipSize = tmp;
 
                 switch(crtinfo->ChipInfo[crtinfo->ChipCount].LoadAdress)
                 {
                 case 0x8000:
-                        fread(CRT_ROM_BANK1_TMP + Bank1Pos,1,0x2000,File);
+                        reading_elements = fread(CRT_ROM_BANK1_TMP + Bank1Pos,1,0x2000,File);
                         crtinfo->ChipInfo[crtinfo->ChipCount].BufferPointer = CRT_ROM_BANK1_TMP + Bank1Pos;
                         Bank1Pos += 0x2000;
                         if(tmp == 0x4000)
                         {
-                                fread(CRT_ROM_BANK1_TMP + Bank1Pos,1,0x2000,File);
+                                reading_elements = fread(CRT_ROM_BANK1_TMP + Bank1Pos,1,0x2000,File);
                                 //crtinfo->ChipInfoHi[crtinfo->ChipCount].BufferPointer = CRT_ROM_BANK2_TMP + Bank2Pos;
                                 Bank1Pos += 0x2000;
                         }
                         break;
                 case 0xA000:
-                        fread(CRT_ROM_BANK2_TMP + Bank2Pos,1,0x2000,File);
+                        reading_elements = fread(CRT_ROM_BANK2_TMP + Bank2Pos,1,0x2000,File);
                         crtinfo->ChipInfo[crtinfo->ChipCount].BufferPointer = CRT_ROM_BANK2_TMP + Bank2Pos;
                         Bank2Pos += 0x2000;
                         break;
                 case 0xE000:
-                        fread(CRT_ROM_BANK2_TMP + Bank2Pos,1,0x2000,File);
+                        reading_elements = fread(CRT_ROM_BANK2_TMP + Bank2Pos,1,0x2000,File);
                         crtinfo->ChipInfo[crtinfo->ChipCount].BufferPointer = CRT_ROM_BANK2_TMP + Bank2Pos;
                         Bank2Pos += 0x2000;
                         break;

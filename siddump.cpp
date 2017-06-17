@@ -103,6 +103,8 @@ void SIDDumpClass::CycleTickCapture(void)
 
 bool SIDDumpClass::LoadDump(char* filename)
 {
+    int reading_bytes;
+
     if(DumpIsLoaded)
     {
         DumpIsLoaded = false;
@@ -123,13 +125,26 @@ bool SIDDumpClass::LoadDump(char* filename)
 
     char Kennung[9];
     Kennung[8]=0;
-    fread (Kennung,1,8,PlayFile);
-    if(0!=strcmp("SID_DUMP",Kennung))
+    reading_bytes = fread (Kennung,1,8,PlayFile);
+    if(reading_bytes != 8)
     {
+        fclose(PlayFile);
         return false;
     }
 
-    fread (Dump,1,DumpSize,PlayFile);
+    if(0!=strcmp("SID_DUMP",Kennung))
+    {
+        fclose(PlayFile);
+        return false;
+    }
+
+    reading_bytes = fread (Dump,1,DumpSize,PlayFile);
+
+    if(reading_bytes != DumpSize)
+    {
+        fclose(PlayFile);
+        return false;
+    }
 
     fclose(PlayFile);
 

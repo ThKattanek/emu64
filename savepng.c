@@ -25,10 +25,11 @@
 #endif
 
 /* libpng callbacks */ 
-static void png_error_SDL(png_structp ctx, png_const_charp str)
+static void png_error_SDL(png_structp png_ptr, png_const_charp str)
 {
 	SDL_SetError("libpng: %s\n", str);
 }
+
 static void png_write_SDL(png_structp png_ptr, png_bytep data, png_size_t length)
 {
 	SDL_RWops *rw = (SDL_RWops*)png_get_io_ptr(png_ptr);

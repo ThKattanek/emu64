@@ -2560,6 +2560,7 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         LogText((char*)"\n");
 
         char Kennung[32];
+        int reading_bytes;
         unsigned short T64Entries;
         unsigned short StartAdresse;
         unsigned short EndAdresse;
@@ -2572,10 +2573,26 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
                 return 0x01;
         }
 
-        fread(Kennung,1,32,file);
+        reading_bytes = fread(Kennung,1,32,file);
+        if(reading_bytes != 32)
+        {
+            cout << "Error T64 0x02" << endl;
+            fclose(file);
+            return 0x02;
+        }
+
+        // Es gibt irgendwie zu viele verschiedene Kennungen :(
+        /*
+        if((strcmp(Kennung, "C64 tape image file") != 0) && (strcmp(Kennung, "C64S tape image file") != 0))
+        {
+            cout << "Error T64 0x03" << endl;
+            fclose(file);
+            return 0x03;
+        }
+        */
 
         fseek(file,4,SEEK_CUR);
-        fread(&T64Entries,1,2,file);
+        reading_bytes = fread(&T64Entries,1,2,file);
 
         if(T64Entries==0)
         {
@@ -2592,14 +2609,14 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         */
 
         fseek(file,0x42,SEEK_SET);
-        fread(&StartAdresse,1,2,file);
+        reading_bytes = fread(&StartAdresse,1,2,file);
         if(ret_startadresse != 0) *ret_startadresse = StartAdresse;
-        fread(&EndAdresse,1,2,file);
+        reading_bytes = fread(&EndAdresse,1,2,file);
         fseek(file,2,SEEK_CUR);
-        fread(&FileStartOffset,1,4,file);
+        reading_bytes = fread(&FileStartOffset,1,4,file);
 
         fseek(file,FileStartOffset,SEEK_SET);
-        fread(RAM+StartAdresse,1,EndAdresse-StartAdresse,file);
+        reading_bytes = fread(RAM+StartAdresse,1,EndAdresse-StartAdresse,file);
         fclose(file);
 
         RAM[0x2B] = 0x01;
@@ -2950,6 +2967,8 @@ int C64Class::LoadBreakGroups(char *filename)
     char Kennung[10];
     char Version;
     unsigned char Groupanzahl;
+    size_t reading_elements;
+
 
     DeleteAllBreakGroups();
 
@@ -2961,7 +2980,7 @@ int C64Class::LoadBreakGroups(char *filename)
     }
 
     /// Kennung ///
-    fread(Kennung,sizeof(Kennung),1,file);
+    reading_elements = fread(Kennung,sizeof(Kennung),1,file);
     if(0 != strcmp("EMU64_BPT",Kennung))
     {
         /// Kein Emu64 Format ///
@@ -2970,39 +2989,39 @@ int C64Class::LoadBreakGroups(char *filename)
     }
 
     /// Version ///
-    fread(&Version,sizeof(Version),1,file);
+    reading_elements = fread(&Version,sizeof(Version),1,file);
     if(Version > 1) return -3;
 
     /// Groupanzahl ///
-    fread(&Groupanzahl,sizeof(Groupanzahl),1,file);
+    reading_elements = fread(&Groupanzahl,sizeof(Groupanzahl),1,file);
     if(Groupanzahl == 0) return -4;
 
     /// Groups ///
     for(int ii=0;ii<Groupanzahl;ii++)
     {
         int i = AddBreakGroup();
-        fread(BreakGroup[i]->Name,sizeof(BreakGroup[i]->Name),1,file);
-        fread(&BreakGroup[i]->Enable,sizeof(BreakGroup[i]->Enable),1,file);
-        fread(&BreakGroup[i]->bPC,sizeof(BreakGroup[i]->bPC),1,file);
-        fread(&BreakGroup[i]->iPC,sizeof(BreakGroup[i]->iPC),1,file);
-        fread(&BreakGroup[i]->bAC,sizeof(BreakGroup[i]->bAC),1,file);
-        fread(&BreakGroup[i]->iAC,sizeof(BreakGroup[i]->iAC),1,file);
-        fread(&BreakGroup[i]->bXR,sizeof(BreakGroup[i]->bXR),1,file);
-        fread(&BreakGroup[i]->iXR,sizeof(BreakGroup[i]->iXR),1,file);
-        fread(&BreakGroup[i]->bYR,sizeof(BreakGroup[i]->bYR),1,file);
-        fread(&BreakGroup[i]->iYR,sizeof(BreakGroup[i]->iYR),1,file);
-        fread(&BreakGroup[i]->bRAdresse,sizeof(BreakGroup[i]->bRAdresse),1,file);
-        fread(&BreakGroup[i]->iRAdresse,sizeof(BreakGroup[i]->iRAdresse),1,file);
-        fread(&BreakGroup[i]->bWAdresse,sizeof(BreakGroup[i]->bWAdresse),1,file);
-        fread(&BreakGroup[i]->iWAdresse,sizeof(BreakGroup[i]->iWAdresse),1,file);
-        fread(&BreakGroup[i]->bRWert,sizeof(BreakGroup[i]->bRWert),1,file);
-        fread(&BreakGroup[i]->iRWert,sizeof(BreakGroup[i]->iRWert),1,file);
-        fread(&BreakGroup[i]->bWWert,sizeof(BreakGroup[i]->bWWert),1,file);
-        fread(&BreakGroup[i]->iWWert,sizeof(BreakGroup[i]->iWWert),1,file);
-        fread(&BreakGroup[i]->bRZ,sizeof(BreakGroup[i]->bRZ),1,file);
-        fread(&BreakGroup[i]->iRZ,sizeof(BreakGroup[i]->iRZ),1,file);
-        fread(&BreakGroup[i]->bRZZyklus,sizeof(BreakGroup[i]->bRZZyklus),1,file);
-        fread(&BreakGroup[i]->iRZZyklus,sizeof(BreakGroup[i]->iRZZyklus),1,file);
+        reading_elements = fread(BreakGroup[i]->Name,sizeof(BreakGroup[i]->Name),1,file);
+        reading_elements = fread(&BreakGroup[i]->Enable,sizeof(BreakGroup[i]->Enable),1,file);
+        reading_elements = fread(&BreakGroup[i]->bPC,sizeof(BreakGroup[i]->bPC),1,file);
+        reading_elements = fread(&BreakGroup[i]->iPC,sizeof(BreakGroup[i]->iPC),1,file);
+        reading_elements = fread(&BreakGroup[i]->bAC,sizeof(BreakGroup[i]->bAC),1,file);
+        reading_elements = fread(&BreakGroup[i]->iAC,sizeof(BreakGroup[i]->iAC),1,file);
+        reading_elements = fread(&BreakGroup[i]->bXR,sizeof(BreakGroup[i]->bXR),1,file);
+        reading_elements = fread(&BreakGroup[i]->iXR,sizeof(BreakGroup[i]->iXR),1,file);
+        reading_elements = fread(&BreakGroup[i]->bYR,sizeof(BreakGroup[i]->bYR),1,file);
+        reading_elements = fread(&BreakGroup[i]->iYR,sizeof(BreakGroup[i]->iYR),1,file);
+        reading_elements = fread(&BreakGroup[i]->bRAdresse,sizeof(BreakGroup[i]->bRAdresse),1,file);
+        reading_elements = fread(&BreakGroup[i]->iRAdresse,sizeof(BreakGroup[i]->iRAdresse),1,file);
+        reading_elements = fread(&BreakGroup[i]->bWAdresse,sizeof(BreakGroup[i]->bWAdresse),1,file);
+        reading_elements = fread(&BreakGroup[i]->iWAdresse,sizeof(BreakGroup[i]->iWAdresse),1,file);
+        reading_elements = fread(&BreakGroup[i]->bRWert,sizeof(BreakGroup[i]->bRWert),1,file);
+        reading_elements = fread(&BreakGroup[i]->iRWert,sizeof(BreakGroup[i]->iRWert),1,file);
+        reading_elements = fread(&BreakGroup[i]->bWWert,sizeof(BreakGroup[i]->bWWert),1,file);
+        reading_elements = fread(&BreakGroup[i]->iWWert,sizeof(BreakGroup[i]->iWWert),1,file);
+        reading_elements = fread(&BreakGroup[i]->bRZ,sizeof(BreakGroup[i]->bRZ),1,file);
+        reading_elements = fread(&BreakGroup[i]->iRZ,sizeof(BreakGroup[i]->iRZ),1,file);
+        reading_elements = fread(&BreakGroup[i]->bRZZyklus,sizeof(BreakGroup[i]->bRZZyklus),1,file);
+        reading_elements = fread(&BreakGroup[i]->iRZZyklus,sizeof(BreakGroup[i]->iRZZyklus),1,file);
     }
     return 0;
 }

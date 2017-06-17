@@ -197,6 +197,7 @@ bool Floppy1541::LoadDiskImage(char* filename)
 {
     FILE *file;
     char EXT[4];
+    size_t reading_elements;
 
     int len = (int)strlen(filename);
     strcpy(EXT,filename+len-3);
@@ -221,7 +222,7 @@ bool Floppy1541::LoadDiskImage(char* filename)
 
         for(int i=0;i<(665952);i++) GCRImage[i]=0x00;
 
-        fread (D64Image,1,174848,file);
+        reading_elements = fread (D64Image,1,174848,file);
         fclose(file);
         D64ImageToGCRImage();
 
@@ -256,7 +257,7 @@ bool Floppy1541::LoadDiskImage(char* filename)
 
         for(int i=0;i<(665952);i++) GCRImage[i]=0x00;
 
-        fread (kennung,1,8,file);
+        reading_elements = fread (kennung,1,8,file);
         kennung[8]=0;
 
         if(0 != strcmp("GCR-1541",kennung))
@@ -265,35 +266,35 @@ bool Floppy1541::LoadDiskImage(char* filename)
             return false;
         }
 
-        fread (&version,1,1,file);
+        reading_elements = fread (&version,1,1,file);
         if(version != 0)
         {
             //MessageBox(0,"Dies Version unterstützt nur G64 Images Version 1","Error!",0);
             return false;
         }
 
-        fread (&trackanzahl,1,1,file);
+        reading_elements = fread (&trackanzahl,1,1,file);
         if(trackanzahl > 84)
         {
             //MessageBox(0,"Das Image enthält zuviele Tracks!","Error!",0);
         }
 
-        fread (&tracksize,1,2,file);
+        reading_elements = fread (&tracksize,1,2,file);
         if(tracksize != 7928)
         {
             //MessageBox(0,"Unbekannte Trackgröße","Error!",0);
         }
 
-        fread (&trackpos,4,84,file);
-        fread (&trackspeed,4,84,file);
+        reading_elements = fread (&trackpos,4,84,file);
+        reading_elements = fread (&trackspeed,4,84,file);
 
         for(int i=0;i<trackanzahl;i++)
         {
             if(trackpos[i] != 0)
             {
                 fseek(file,trackpos[i],SEEK_SET);
-                fread(&TrackSize[i],1,2,file);
-                fread(GCRImage+(i*tracksize),1,tracksize-2,file);
+                reading_elements = fread(&TrackSize[i],1,2,file);
+                reading_elements = fread(GCRImage+(i*tracksize),1,tracksize-2,file);
             }
         }
 
@@ -575,6 +576,7 @@ bool Floppy1541::LoadDosRom(char* filename)
 int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* motor_off_sound, char* anschlag_sound, char* stepper_dec_sound, char* Stepper_inc_sound)
 {
     FILE* File;
+    size_t reading_elements;
 
     FloppySoundsLoaded = false;
 
@@ -589,7 +591,7 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     fseek(File,0,SEEK_SET);
 
     FloppySound00 = new unsigned short[FloppySound00Size];
-    fread(FloppySound00,2,FloppySound00Size,File);
+    reading_elements = fread(FloppySound00,2,FloppySound00Size,File);
     fclose(File);
 
     File = fopen(motor_sound, "rb");
@@ -604,7 +606,7 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     fseek(File,0,SEEK_SET);
 
     FloppySound01 = new unsigned short[FloppySound01Size];
-    fread(FloppySound01,2,FloppySound01Size,File);
+    reading_elements = fread(FloppySound01,2,FloppySound01Size,File);
     fclose(File);
 
     File = fopen(motor_off_sound, "rb");
@@ -620,7 +622,7 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     fseek(File,0,SEEK_SET);
 
     FloppySound02 = new unsigned short[FloppySound02Size];
-    fread(FloppySound02,2,FloppySound02Size,File);
+    reading_elements = fread(FloppySound02,2,FloppySound02Size,File);
     fclose(File);
 
     File = fopen(Stepper_inc_sound, "rb");
@@ -637,7 +639,7 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     fseek(File,0,SEEK_SET);
 
     FloppySound03 = new unsigned short[FloppySound03Size];
-    fread(FloppySound03,2,FloppySound03Size,File);
+    reading_elements = fread(FloppySound03,2,FloppySound03Size,File);
     fclose(File);
 
     File = fopen(stepper_dec_sound, "rb");
@@ -655,7 +657,7 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     fseek(File,0,SEEK_SET);
 
     FloppySound04 = new unsigned short[FloppySound04Size];
-    fread(FloppySound04,2,FloppySound04Size,File);
+    reading_elements = fread(FloppySound04,2,FloppySound04Size,File);
     fclose(File);
 
     File = fopen(anschlag_sound, "rb");
@@ -674,7 +676,7 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     fseek(File,0,SEEK_SET);
 
     FloppySound05 = new unsigned short[FloppySound05Size];
-    fread(FloppySound05,2,FloppySound05Size,File);
+    reading_elements = fread(FloppySound05,2,FloppySound05Size,File);
     fclose(File);
 
     FloppySoundsLoaded = true;
@@ -1071,6 +1073,7 @@ int Floppy1541::LoadBreakGroups(char *filename)
     char Kennung[10];
     char Version;
     unsigned char Groupanzahl;
+    size_t reading_elements;
 
     DeleteAllBreakGroups();
 
@@ -1082,7 +1085,7 @@ int Floppy1541::LoadBreakGroups(char *filename)
     }
 
     /// Kennung ///
-    fread(Kennung,sizeof(Kennung),1,file);
+    reading_elements = fread(Kennung,sizeof(Kennung),1,file);
     if(0 != strcmp("EMU64_BPT",Kennung))
     {
         /// Kein Emu64 Format ///
@@ -1091,39 +1094,39 @@ int Floppy1541::LoadBreakGroups(char *filename)
     }
 
     /// Version ///
-    fread(&Version,sizeof(Version),1,file);
+    reading_elements = fread(&Version,sizeof(Version),1,file);
     if(Version > 1) return -3;
 
     /// Groupanzahl ///
-    fread(&Groupanzahl,sizeof(Groupanzahl),1,file);
+    reading_elements = fread(&Groupanzahl,sizeof(Groupanzahl),1,file);
     if(Groupanzahl == 0) return -4;
 
     /// Groups ///
     for(int ii=0;ii<Groupanzahl;ii++)
     {
         int i = AddBreakGroup();
-        fread(BreakGroup[i]->Name,sizeof(BreakGroup[i]->Name),1,file);
-        fread(&BreakGroup[i]->Enable,sizeof(BreakGroup[i]->Enable),1,file);
-        fread(&BreakGroup[i]->bPC,sizeof(BreakGroup[i]->bPC),1,file);
-        fread(&BreakGroup[i]->iPC,sizeof(BreakGroup[i]->iPC),1,file);
-        fread(&BreakGroup[i]->bAC,sizeof(BreakGroup[i]->bAC),1,file);
-        fread(&BreakGroup[i]->iAC,sizeof(BreakGroup[i]->iAC),1,file);
-        fread(&BreakGroup[i]->bXR,sizeof(BreakGroup[i]->bXR),1,file);
-        fread(&BreakGroup[i]->iXR,sizeof(BreakGroup[i]->iXR),1,file);
-        fread(&BreakGroup[i]->bYR,sizeof(BreakGroup[i]->bYR),1,file);
-        fread(&BreakGroup[i]->iYR,sizeof(BreakGroup[i]->iYR),1,file);
-        fread(&BreakGroup[i]->bRAdresse,sizeof(BreakGroup[i]->bRAdresse),1,file);
-        fread(&BreakGroup[i]->iRAdresse,sizeof(BreakGroup[i]->iRAdresse),1,file);
-        fread(&BreakGroup[i]->bWAdresse,sizeof(BreakGroup[i]->bWAdresse),1,file);
-        fread(&BreakGroup[i]->iWAdresse,sizeof(BreakGroup[i]->iWAdresse),1,file);
-        fread(&BreakGroup[i]->bRWert,sizeof(BreakGroup[i]->bRWert),1,file);
-        fread(&BreakGroup[i]->iRWert,sizeof(BreakGroup[i]->iRWert),1,file);
-        fread(&BreakGroup[i]->bWWert,sizeof(BreakGroup[i]->bWWert),1,file);
-        fread(&BreakGroup[i]->iWWert,sizeof(BreakGroup[i]->iWWert),1,file);
-        fread(&BreakGroup[i]->bRZ,sizeof(BreakGroup[i]->bRZ),1,file);
-        fread(&BreakGroup[i]->iRZ,sizeof(BreakGroup[i]->iRZ),1,file);
-        fread(&BreakGroup[i]->bRZZyklus,sizeof(BreakGroup[i]->bRZZyklus),1,file);
-        fread(&BreakGroup[i]->iRZZyklus,sizeof(BreakGroup[i]->iRZZyklus),1,file);
+        reading_elements = fread(BreakGroup[i]->Name,sizeof(BreakGroup[i]->Name),1,file);
+        reading_elements = fread(&BreakGroup[i]->Enable,sizeof(BreakGroup[i]->Enable),1,file);
+        reading_elements = fread(&BreakGroup[i]->bPC,sizeof(BreakGroup[i]->bPC),1,file);
+        reading_elements = fread(&BreakGroup[i]->iPC,sizeof(BreakGroup[i]->iPC),1,file);
+        reading_elements = fread(&BreakGroup[i]->bAC,sizeof(BreakGroup[i]->bAC),1,file);
+        reading_elements = fread(&BreakGroup[i]->iAC,sizeof(BreakGroup[i]->iAC),1,file);
+        reading_elements = fread(&BreakGroup[i]->bXR,sizeof(BreakGroup[i]->bXR),1,file);
+        reading_elements = fread(&BreakGroup[i]->iXR,sizeof(BreakGroup[i]->iXR),1,file);
+        reading_elements = fread(&BreakGroup[i]->bYR,sizeof(BreakGroup[i]->bYR),1,file);
+        reading_elements = fread(&BreakGroup[i]->iYR,sizeof(BreakGroup[i]->iYR),1,file);
+        reading_elements = fread(&BreakGroup[i]->bRAdresse,sizeof(BreakGroup[i]->bRAdresse),1,file);
+        reading_elements = fread(&BreakGroup[i]->iRAdresse,sizeof(BreakGroup[i]->iRAdresse),1,file);
+        reading_elements = fread(&BreakGroup[i]->bWAdresse,sizeof(BreakGroup[i]->bWAdresse),1,file);
+        reading_elements = fread(&BreakGroup[i]->iWAdresse,sizeof(BreakGroup[i]->iWAdresse),1,file);
+        reading_elements = fread(&BreakGroup[i]->bRWert,sizeof(BreakGroup[i]->bRWert),1,file);
+        reading_elements = fread(&BreakGroup[i]->iRWert,sizeof(BreakGroup[i]->iRWert),1,file);
+        reading_elements = fread(&BreakGroup[i]->bWWert,sizeof(BreakGroup[i]->bWWert),1,file);
+        reading_elements = fread(&BreakGroup[i]->iWWert,sizeof(BreakGroup[i]->iWWert),1,file);
+        reading_elements = fread(&BreakGroup[i]->bRZ,sizeof(BreakGroup[i]->bRZ),1,file);
+        reading_elements = fread(&BreakGroup[i]->iRZ,sizeof(BreakGroup[i]->iRZ),1,file);
+        reading_elements = fread(&BreakGroup[i]->bRZZyklus,sizeof(BreakGroup[i]->bRZZyklus),1,file);
+        reading_elements = fread(&BreakGroup[i]->iRZZyklus,sizeof(BreakGroup[i]->iRZZyklus),1,file);
     }
     return 0;
 }

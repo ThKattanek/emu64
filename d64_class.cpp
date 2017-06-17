@@ -66,6 +66,7 @@ int D64Class::LoadD64(char* Filename)
 {
     int Track,Sektor;
     FILE* file;
+    size_t reading_elements;
 
     file = fopen(Filename, "rb");
     if (file == NULL)
@@ -73,7 +74,7 @@ int D64Class::LoadD64(char* Filename)
         return 1;
     }
 
-    fread (D64Image,1,174848,file);
+    reading_elements = fread (D64Image,1,174848,file);
     fclose(file);
 
     ReadBlock(18,0,Block);

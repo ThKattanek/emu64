@@ -166,6 +166,14 @@ RESOURCES += \
 
 linux-g++-32{
 #QMAKE_CXXFLAGS += -std=c++11
+
+#Warnung [Nicht benutzter Parameter] abschalten
+QMAKE_CFLAGS += -Wno-unused-parameter
+#Warnung [Nicht benutzte Variable] abschalten
+QMAKE_CXXFLAGS += -Wno-unused-but-set-variable
+#Warnung [Nicht benutzter Rückgabewert] abschalten
+QMAKE_CXXFLAGS += -Wno-unused-result
+
 DEFINES += str_system_arch=\\\"32Bit\\\"
 TARGET = emu64
 LIBS += -lX11 -lSDL2 -lSDL2_image -lpng -lquazip -lGL -lGLU
@@ -173,6 +181,14 @@ LIBS += -lX11 -lSDL2 -lSDL2_image -lpng -lquazip -lGL -lGLU
 
 linux-g++-64{
 QMAKE_CXXFLAGS += -std=c++11
+
+#Warnung [Nicht benutzter Parameter] abschalten
+QMAKE_CFLAGS += -Wno-unused-parameter
+#Warnung [Nicht benutzte Variable] abschalten
+QMAKE_CXXFLAGS += -Wno-unused-but-set-variable
+#Warnung [Nicht benutzter Rückgabewert] abschalten
+QMAKE_CXXFLAGS += -Wno-unused-result
+
 DEFINES += str_system_arch=\\\"64Bit\\\"
 TARGET = emu64
 LIBS += -lX11 -lSDL2 -lSDL2_image -lpng -lquazip -lGL -lGLU
