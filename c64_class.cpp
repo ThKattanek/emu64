@@ -57,6 +57,8 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     SDLJoystickIsOpen = false;
     JoystickAnzahl = 0;
 
+    isReturnKeyDown = false;
+
     IsKeyMapRec = false;
     RecMatrixCode = false;
 
@@ -2017,10 +2019,9 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
                 keymod = SDL_GetModState();
 
-                if(KMOD_MODE == (keymod & KMOD_MODE) || KMOD_LALT == (keymod & KMOD_LALT) || KMOD_RALT == (keymod & KMOD_RALT))
+                if((KMOD_MODE == (keymod & KMOD_MODE) || KMOD_LALT == (keymod & KMOD_LALT) || KMOD_RALT == (keymod & KMOD_RALT)) && (isReturnKeyDown == false))
                 {
                     isFullscreen = !isFullscreen;
-
                     if(isFullscreen)
                     {
                         SDL_ShowCursor(false);
@@ -2031,9 +2032,10 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                         SDL_ShowCursor(true);
                         SDL_SetWindowFullscreen(C64Window,0);
                     }
+
                 }
 
-
+                isReturnKeyDown = true;
                 break;
 
             default:
@@ -2108,6 +2110,11 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
         {
             switch(event->key.keysym.sym)
             {
+
+            case SDLK_RETURN:
+                isReturnKeyDown = false;
+                break;
+
             case SDLK_F12:
                RESET = true;
                 break;

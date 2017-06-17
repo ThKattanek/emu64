@@ -400,6 +400,8 @@ private:
     unsigned char   KeyboardMatrixToPB[8];
     unsigned char   KeyboardMatrixToPA[8];
 
+    bool isReturnKeyDown;
+
     bool ReuIsInsert;
 
     /////////////////////// BREAKPOINTS ////////////////////////
