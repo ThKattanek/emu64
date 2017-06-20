@@ -177,6 +177,7 @@ QMAKE_CXXFLAGS += -Wno-unused-result
 DEFINES += str_system_arch=\\\"32Bit\\\"
 TARGET = emu64
 LIBS += -lX11 -lSDL2 -lSDL2_image -lpng -lquazip -lGL -lGLU
+LIBS += -lavutil
 }
 
 linux-g++-64{
@@ -192,6 +193,7 @@ QMAKE_CXXFLAGS += -Wno-unused-result
 DEFINES += str_system_arch=\\\"64Bit\\\"
 TARGET = emu64
 LIBS += -lX11 -lSDL2 -lSDL2_image -lpng -lquazip -lGL -lGLU
+LIBS += -lavutil
 }
 
 # Windows Crossbuild with MXE

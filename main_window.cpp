@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.03.2017                //
+// Letzte Änderung am 20.06.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -879,8 +879,7 @@ void MainWindow::on_menu_main_info_triggered()
     QString emu64_version = QString("Emu64 V") + QString(str_emu64_version);
 
     info_window->SetEmu64VersionText(emu64_version);
-    info_window->SetMoreInfoText("Qt Version: " + QString(qVersion()) + " / SDL Version: " + sdl_version);
-
+    info_window->SetMoreInfoText("Qt Version: " + QString(qVersion()) + " / SDL Version: " + sdl_version + " / FFMpeg Version: " + QString(av_version_info()));
 
     info_window->show();
 }

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.03.2017                //
+// Letzte Änderung am 20.06.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -36,6 +36,15 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_image.h>
+
+extern "C"
+{
+    #define __STDC_CONSTANT_MACROS // for UINT64_C
+    #include <libavutil/avutil.h>
+    #include <libavutil/version.h>
+}
+
+#include <libavcodec/avcodec.h>
 
 #include "tr1/functional"
 using namespace std::tr1;
