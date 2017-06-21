@@ -58,6 +58,9 @@ emu64 [PARAMETER]
 --reset-ini
     Setzt die emu64.ini zurück. (Alle bisherigen Einstellungen gehen verloren!)
 
+--video-capture <Dateiname>
+    Startet die Aufzeichnung des C64 Screens.
+
 -?, --help
     Ein Hilfe Text wird angezeigt und Emu64 wird nicht gestartet.
 

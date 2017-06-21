@@ -19,7 +19,7 @@
 // Defineren aller Kommandozeilen Parameter
 enum CMD_COMMAND {CMD_HELP,CMD_VERSION,CMD_MULTIPLE_INSTANCE,CMD_NOSPLASH,CMD_SOFTRESET,CMD_HARDRESET,\
                  CMD_MOUNT_DISK,CMD_MOUNT_CRT,CMD_UMOUNT_CRT,CMD_POKE_64,CMD_LIMITCYCLES,CMD_AUTOSTART,\
-                 CMD_EXIT_SCREENSHOT,CMD_DEBUG_CART,CMD_WARP_MODE,CMD_RESET_INI};
+                 CMD_EXIT_SCREENSHOT,CMD_DEBUG_CART,CMD_WARP_MODE,CMD_RESET_INI,CMD_VIDEOCAPTURE};
 static const CMD_STRUCT command_list[]{
     {CMD_AUTOSTART,"a","autostart","Lädt ein C64 Programm (prg,t00 ...) und startet es gleich.",1},
     {CMD_MOUNT_DISK,"m","mount-disk","Mountet ein Diskimage. --mount-disk <Laufwerksnummer (8-11)> <Dateiname>",2},
@@ -35,6 +35,7 @@ static const CMD_STRUCT command_list[]{
     {CMD_DEBUG_CART,"","debugcart","Beendet den Emu64 bei einem Schreibzugriff auf $d7ff und gibt den Wert als Exitcode zurück.",0},
     {CMD_MULTIPLE_INSTANCE,"","multiple-instance","Ermöglicht das starten mehrerer Emu64 Instanzen.",0},
     {CMD_RESET_INI,"","reset-ini","Setzt die emu64.ini zurück. (Alle bisherigen Einstellungen gehen verloren!)",0},
+    {CMD_VIDEOCAPTURE,"","video-capture","Startet die Aufzeichnung des C64 Screens. --video-capture <Dateiname>",1},
     {CMD_HELP,"?","help","Dieser Text.",0},
     {CMD_VERSION,"","version","Zeigt die aktuelle Versionsnummer an.",0}
 };

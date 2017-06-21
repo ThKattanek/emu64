@@ -855,6 +855,10 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
         case CMD_DEBUG_CART:
             c64->SetEnableDebugCart(true);
             break;
+
+        case CMD_VIDEOCAPTURE:
+            cout << "Test ..." << endl;
+            break;
         }
 
         // ----------------------------------------------------
