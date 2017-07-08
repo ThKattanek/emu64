@@ -30,21 +30,13 @@
 #include "./cpu_info.h"
 #include "./vcd_class.h"
 #include "./savepng.h"
+#include "./video_capture_class.h"
 
 #include <GL/glu.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_image.h>
-
-extern "C"
-{
-    #define __STDC_CONSTANT_MACROS // for UINT64_C
-    #include <libavutil/avutil.h>
-    #include <libavutil/version.h>
-}
-
-#include <libavcodec/avcodec.h>
 
 #include "tr1/functional"
 using namespace std::tr1;
@@ -183,6 +175,10 @@ public:
     void SaveScreenshot(const char *filename, int format = SCREENSHOT_FORMAT_PNG);
     const char *GetScreenshotFormatName(int format);
     void SetExitScreenshot(const char *filename);
+
+    const char *GetAVVersion();
+    bool StartVideoRecord(const char *filename);
+    void StopVideoRecord();
 
     bool StartIECDump(const char *filename);
     void StopIECDump();
@@ -329,6 +325,8 @@ public:
     char ExitScreenshotFilename[1024];
 
     float SIDVolume;
+
+    VideoCaptureClass *VideoCapture;
 
 private:
     void CalcDistortionGrid();

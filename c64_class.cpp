@@ -125,6 +125,8 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     DistortionEnable = true;
     SetDistortion(-0.05);
 
+    VideoCapture = NULL;
+
     /// SDL Installieren ///
 
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0)
@@ -215,6 +217,10 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
         if ( (Kreis1->w & (Kreis1->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
         if ( (Kreis1->h & (Kreis1->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Hoehe ist keine Potenz von 2^n\n");
     }
+
+    /// VideoCaptuer installieren ///
+
+    VideoCapture = new VideoCaptureClass();
 
     /// SLD Audio Installieren (C64 Emulation) ///
 
@@ -494,6 +500,8 @@ C64Class::~C64Class()
     if(crt != NULL) delete crt;
     if(reu != NULL) delete reu;
     if(geo != NULL) delete geo;
+
+    if(VideoCapture != NULL) delete VideoCapture;
 }
 
 void C64Class::StartEmulation()
@@ -3210,6 +3218,21 @@ void C64Class::SetExitScreenshot(const char *filename)
 {
     strcpy(ExitScreenshotFilename,filename);
     ExitScreenshotEnable = true;
+}
+
+const char *C64Class::GetAVVersion()
+{
+    return VideoCapture->GetAVVersion();
+}
+
+bool C64Class::StartVideoRecord(const char *filename)
+{
+
+}
+
+void C64Class::StopVideoRecord()
+{
+
 }
 
 bool C64Class::StartIECDump(const char *filename)

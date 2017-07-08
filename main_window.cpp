@@ -857,7 +857,8 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
             break;
 
         case CMD_VIDEOCAPTURE:
-            cout << "Test ..." << endl;
+            cout << "Video Record: " << cmd_line->GetArg(i+1) << endl;
+            c64->StartVideoRecord(cmd_line->GetArg(i+1));
             break;
         }
 
@@ -883,7 +884,7 @@ void MainWindow::on_menu_main_info_triggered()
     QString emu64_version = QString("Emu64 V") + QString(str_emu64_version);
 
     info_window->SetEmu64VersionText(emu64_version);
-    info_window->SetMoreInfoText("Qt Version: " + QString(qVersion()) + " / SDL Version: " + sdl_version + " / FFMpeg Version: " + QString(av_version_info()));
+    info_window->SetMoreInfoText("Qt Version: " + QString(qVersion()) + " / SDL Version: " + sdl_version + " / FFMpeg Version: " + QString(c64->GetAVVersion()));
 
     info_window->show();
 }
