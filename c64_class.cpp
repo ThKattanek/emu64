@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.04.2017                //
+// Letzte Änderung am 11.07.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -701,9 +701,19 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
 
     SDL_LockSurface(C64Screen);
     pal->ConvertVideo((void*)C64Screen->pixels,C64Screen->pitch,vic_puffer,104,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
+
     this->vic_puffer = vic_puffer;
     vic->SwitchVideoPuffer();
     SDL_UnlockSurface(C64Screen);
+
+
+    ///////////////////////////////////
+
+    VideoCapture->WriteRGBAFrame((uint8_t*)C64Screen->pixels,C64Screen->pitch);
+
+    ///////////////////////////////////
+
+
 
     if(Mouse1351Enable) UpdateMouse();
 
@@ -3227,12 +3237,19 @@ const char *C64Class::GetAVVersion()
 
 bool C64Class::StartVideoRecord(const char *filename)
 {
-
+    if(VideoCapture != NULL)
+    {
+        return VideoCapture->StartCapture(filename,"mpeg2video",AktC64ScreenXW,AktC64ScreenYW);
+    }
+    return false;
 }
 
 void C64Class::StopVideoRecord()
 {
-
+    if(VideoCapture != NULL)
+    {
+        VideoCapture->StopCapture();
+    }
 }
 
 bool C64Class::StartIECDump(const char *filename)
