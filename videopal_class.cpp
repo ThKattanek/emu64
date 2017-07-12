@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 12.07.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -68,15 +68,6 @@ VideoPalClass::VideoPalClass(void)
 VideoPalClass::~VideoPalClass(void)
 {
 }
-
-/*
-void VideoPalClass::SetPixelFormat()
-{
-    pixel_format = format;
-    SetC64Palette(AktFarbMode);
-    CreateVicIIColors();
-}
-*/
 
 void VideoPalClass::SetDisplayMode(int DisplayMode)
 {
@@ -144,7 +135,7 @@ void VideoPalClass::SetC64Palette(int palnr)
         for(int i=0;i<16;i++)
         {
             /// Für 32Bit Video Display ///
-            Palette32Bit[ij] = 0xff000000 | COLOR_RGBA1[0]<<16 | COLOR_RGBA1[1]<<8 | COLOR_RGBA1[2];
+            Palette32Bit[ij] = 0xFF000000 | COLOR_RGBA1[2]<<16 | COLOR_RGBA1[1]<<8 | COLOR_RGBA1[0];
 
             /// Für 16Bit Video Display ///
             /// RGB-565
@@ -271,9 +262,9 @@ inline void VideoPalClass::CreateVicIIColors(void)
 
                                                 if(DestDisplayMode == 32)
                                                 {
-                                                    RGB =  (unsigned long)ColorOut.r<<16; // Rot
-                                                    RGB |= (unsigned long)ColorOut.g<<8;  // Grün
-                                                    RGB |= (unsigned long)ColorOut.b;     // Blau
+                                                    RGB =  (unsigned long)ColorOut.r;       // Rot
+                                                    RGB |= (unsigned long)ColorOut.g<<8;    // Grün
+                                                    RGB |= (unsigned long)ColorOut.b<<16;   // Blau
 
                                                     BlurTable0[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
                                                 }
@@ -308,9 +299,9 @@ inline void VideoPalClass::CreateVicIIColors(void)
 
                                                 if(DestDisplayMode == 32)
                                                 {
-                                                    RGB =  (unsigned long)ColorOut.r<<16; // Rot
-                                                    RGB |= (unsigned long)ColorOut.g<<8;  // Grün
-                                                    RGB |= (unsigned long)ColorOut.b;     // Blau
+                                                    RGB =  (unsigned long)ColorOut.r;       // Rot
+                                                    RGB |= (unsigned long)ColorOut.g<<8;    // Grün
+                                                    RGB |= (unsigned long)ColorOut.b<<16;   // Blau
 
                                                     BlurTable0S[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
                                                 }
@@ -364,9 +355,9 @@ inline void VideoPalClass::CreateVicIIColors(void)
 
                                                 if(DestDisplayMode == 32)
                                                 {
-                                                    RGB =  (unsigned long)ColorOut.r<<16; // Rot
-                                                    RGB |= (unsigned long)ColorOut.g<<8;  // Grün
-                                                    RGB |= (unsigned long)ColorOut.b;     // Blau
+                                                    RGB =  (unsigned long)ColorOut.r;       // Rot
+                                                    RGB |= (unsigned long)ColorOut.g<<8;    // Grün
+                                                    RGB |= (unsigned long)ColorOut.b<<16;   // Blau
 
                                                     BlurTable1[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
 
@@ -402,9 +393,9 @@ inline void VideoPalClass::CreateVicIIColors(void)
 
                                                 if(DestDisplayMode == 32)
                                                 {
-                                                    RGB =  (unsigned long)ColorOut.r<<16; // Rot
-                                                    RGB |= (unsigned long)ColorOut.g<<8;  // Grün
-                                                    RGB |= (unsigned long)ColorOut.b;     // Blau
+                                                    RGB =  (unsigned long)ColorOut.r;       // Rot
+                                                    RGB |= (unsigned long)ColorOut.g<<8;    // Grün
+                                                    RGB |= (unsigned long)ColorOut.b<<16;   // Blau
 
                                                     BlurTable1S[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
                                                 }

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.07.2017                //
+// Letzte Änderung am 12.07.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -222,7 +222,7 @@ void VideoCaptureClass::WriteRGBAFrame(uint8_t *data, int linesize)
              src_pixels = data + y*linesize;
              for (int x = 0; x < VideoCodecContext->width; x++)
              {
-                 Y =  0.257*src_pixels[0] + 0.504*src_pixels[1] + 0.098*src_pixels[2] + 16;
+                 Y =  0.257*src_pixels[2] + 0.504*src_pixels[1] + 0.098*src_pixels[0] + 16;
                  src_pixels += 4;
                  VideoFrame->data[0][y * VideoFrame->linesize[0] + x] = Y;
              }
@@ -237,9 +237,9 @@ void VideoCaptureClass::WriteRGBAFrame(uint8_t *data, int linesize)
                  src_pixels = data + y*linesize;
                  for (int x = 0; x < VideoCodecContext->width/2; x++)
                  {
-                     r = (src_pixels[0]+src_pixels[4]+src_pixels[0+linesize]+src_pixels[4+linesize]) / 4;
+                     r = (src_pixels[2]+src_pixels[6]+src_pixels[2+linesize]+src_pixels[6+linesize]) / 4;
                      g = (src_pixels[1]+src_pixels[5]+src_pixels[1+linesize]+src_pixels[5+linesize]) / 4;
-                     b = (src_pixels[2]+src_pixels[6]+src_pixels[2+linesize]+src_pixels[6+linesize]) / 4;
+                     b = (src_pixels[0]+src_pixels[4]+src_pixels[0+linesize]+src_pixels[4+linesize]) / 4;
 
                      src_pixels += 8;
 
@@ -256,9 +256,9 @@ void VideoCaptureClass::WriteRGBAFrame(uint8_t *data, int linesize)
                  src_pixels = data + y*linesize;
                  for (int x = 0; x < VideoCodecContext->width/2; x++)
                  {
-                     r = (src_pixels[0]+src_pixels[4]) / 2;
+                     r = (src_pixels[2]+src_pixels[6]) / 2;
                      g = (src_pixels[1]+src_pixels[5]) / 2;
-                     b = (src_pixels[2]+src_pixels[6]) / 2;
+                     b = (src_pixels[0]+src_pixels[4]) / 2;
 
                      src_pixels += 8;
 

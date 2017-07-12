@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.07.2017                //
+// Letzte Änderung am 12.07.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1495,7 +1495,7 @@ void C64Class::InitGrafik()
        SDL_FreeSurface(C64Screen);
     C64Screen = SDL_CreateRGBSurface(0,AktC64ScreenXW,AktC64ScreenYW,AktWindowColorBits,0,0,0,0);
 
-    glTexImage2D( GL_TEXTURE_2D, 0, 4, AktC64ScreenXW,AktC64ScreenYW, 0,GL_BGRA, GL_UNSIGNED_BYTE, C64ScreenBuffer );
+    glTexImage2D( GL_TEXTURE_2D, 0, 4, AktC64ScreenXW,AktC64ScreenYW, 0,GL_RGBA, GL_UNSIGNED_BYTE, C64ScreenBuffer );
 
     GLenum  TextureFormat = 0;
     GLint   NofColors = 0;
@@ -1506,17 +1506,11 @@ void C64Class::InitGrafik()
 
         if(NofColors == 4)
         {
-            if(Pfeil0->format->Rmask==0x000000ff)
-                TextureFormat=GL_RGBA;
-            else
-                TextureFormat=GL_BGRA;
+            TextureFormat=GL_RGBA;
         }
         else if(NofColors == 3) //no alpha channel
         {
-            if(Pfeil0->format->Rmask==0x000000ff)
-                TextureFormat=GL_RGB;
-            else
-                TextureFormat=GL_BGR;
+            TextureFormat=GL_RGB;
         }
     }
 
@@ -1631,7 +1625,7 @@ void C64Class::DrawC64Screen()
 
     /// Texture auswählen und mit aktuellen C64 Bilddaten füllen
     glBindTexture(GL_TEXTURE_2D,C64ScreenTexture);
-    glTexSubImage2D(GL_TEXTURE_2D,0,0,0, AktC64ScreenXW, AktC64ScreenYW,GL_BGRA, GL_UNSIGNED_BYTE, C64Screen->pixels);
+    glTexSubImage2D(GL_TEXTURE_2D,0,0,0, AktC64ScreenXW, AktC64ScreenYW,GL_RGBA, GL_UNSIGNED_BYTE, C64Screen->pixels);
 
     /// Aspect Ratio berechnen
     float scale_x;
