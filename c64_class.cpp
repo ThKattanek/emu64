@@ -709,10 +709,9 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
 
     ///////////////////////////////////
 
-    VideoCapture->WriteRGBAFrame((uint8_t*)C64Screen->pixels,C64Screen->pitch);
+    VideoCapture->WriteFrame((uint8_t*)C64Screen->pixels,C64Screen->pitch);
 
     ///////////////////////////////////
-
 
 
     if(Mouse1351Enable) UpdateMouse();
@@ -3233,7 +3232,7 @@ bool C64Class::StartVideoRecord(const char *filename)
 {
     if(VideoCapture != NULL)
     {
-        return VideoCapture->StartCapture(filename,"mpeg2video",AktC64ScreenXW,AktC64ScreenYW);
+        return VideoCapture->StartCapture(filename,"mp4",AktC64ScreenXW,AktC64ScreenYW);
     }
     return false;
 }

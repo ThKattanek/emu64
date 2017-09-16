@@ -67,7 +67,8 @@ SOURCES += \
     crt_new_easyflash_window.cpp \
     command_line_class.cpp \
     savepng.c \
-    video_capture_class.cpp
+    video_capture_class.cpp \
+    video_encoder_class.cpp
 
 HEADERS  += \
     info_window.h \
@@ -134,7 +135,8 @@ HEADERS  += \
     command_line_class.h \
     emu64_commands.h \
     savepng.h \
-    video_capture_class.h
+    video_capture_class.h \
+    video_encoder_class.h
 
 FORMS    += \
     info_window.ui \
@@ -179,7 +181,7 @@ QMAKE_CXXFLAGS += -Wno-unused-result
 DEFINES += str_system_arch=\\\"32Bit\\\"
 TARGET = emu64
 LIBS += -lX11 -lSDL2 -lSDL2_image -lpng -lquazip -lGL -lGLU
-LIBS += -lavutil -lavcodec -lavformat
+LIBS += -lavutil -lavcodec -lavformat -lswscale -lswresample
 }
 
 linux-g++-64{
@@ -195,7 +197,7 @@ QMAKE_CXXFLAGS += -Wno-unused-result
 DEFINES += str_system_arch=\\\"64Bit\\\"
 TARGET = emu64
 LIBS += -lX11 -lSDL2 -lSDL2_image -lpng -lquazip -lGL -lGLU
-LIBS += -lavutil -lavcodec -lavformat
+LIBS += -lavutil -lavcodec -lavformat -lswscale -lswresample
 }
 
 # Windows Crossbuild with MXE
@@ -220,12 +222,12 @@ win32:contains(QMAKE_HOST.os,Linux):{
     QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS
     LIBS += $$system($$ARCH-w64-mingw32.$$LINKTYP-sdl2-config --libs) $$system($$ARCH-w64-mingw32.$$LINKTYP-pkg-config SDL2_image gl glu --libs)
     LIBS += -lpng -lquazip
-    LIBS += -lavutil -lavcodec -lavformat
+    LIBS += -lavutil -lavcodec -lavformat -lswscale -lswresample
 }
 
 win32:contains(QMAKE_HOST.os,Windows):{
     LIBS += -lSDL2 -lopengl32 -lGLU32 -lSDL2_image -lpng -lquazip
-    LIBS += -lavutil -lavcodec -lavformat
+    LIBS += -lavutil -lavcodec -lavformat -lswscale -lswresample
 }
 
 }

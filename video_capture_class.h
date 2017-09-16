@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.07.2017                //
+// Letzte Änderung am 16.09.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,19 +17,38 @@
 #define VIDEO_CAPTURE_CLASS_H
 
 #include <iostream>
+
 using namespace std;
 
 extern "C"
 {
-    #define __STDC_CONSTANT_MACROS // for UINT64_C
-    #include <libavutil/avutil.h>
-    #include <libavutil/version.h>
-
-    #include <libavcodec/avcodec.h>
+    #include <libavutil/avassert.h>
+    #include <libavutil/channel_layout.h>
     #include <libavutil/opt.h>
-    #include <libavutil/imgutils.h>
+    #include <libavutil/mathematics.h>
+    #include <libavutil/timestamp.h>
     #include <libavformat/avformat.h>
+    #include <libswscale/swscale.h>
+    #include <libswresample/swresample.h>
 }
+
+#define STREAM_DURATION   10.0
+#define STREAM_FRAME_RATE 50 /* 50 frames/s */
+#define STREAM_PIX_FMT    AV_PIX_FMT_YUV420P /* default pix_fmt */
+#define SCALE_FLAGS SWS_BICUBIC
+
+typedef struct OutputStream {
+    AVStream *st;
+    AVCodecContext *enc;
+    /* pts of the next frame that will be generated */
+    int64_t next_pts;
+    int samples_count;
+    AVFrame *frame;
+    AVFrame *tmp_frame;
+    float t, tincr, tincr2;
+    struct SwsContext *sws_ctx;
+    struct SwrContext *swr_ctx;
+} OutputStream;
 
 class VideoCaptureClass
 {
@@ -40,20 +59,35 @@ public:
     const char *GetAVVersion();
     bool StartCapture(const char *filename, const char *codec_name, int xw, int yw);
     void StopCapture();
-    void WriteRGBAFrame(uint8_t *data, int linesize);
+    void WriteFrame(uint8_t *data, int linesize);
 
 private:
-    void VideoEncode(AVCodecContext *enc_ctx, AVFrame *frame, AVPacket *pkt,FILE *outfile);
+    void AddStream(OutputStream *ost, AVFormatContext *oc, AVCodec **codec, enum AVCodecID codec_id);
+    void CloseStream(AVFormatContext *oc, OutputStream *ost);
+    bool OpenVideo(AVFormatContext *oc, AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
+    AVFrame* AllocPicture(enum AVPixelFormat pix_fmt, int width, int height);
+    bool OpenAudio(AVFormatContext *oc, AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
+    AVFrame* AllocAudioFrame(enum AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
+    int WriteVideoFrame(AVFormatContext *oc, OutputStream *ost);
+    int WriteAudioFrame(AVFormatContext *oc, OutputStream *ost);
+    int WriteFrame(AVFormatContext *fmt_ctx, const AVRational *time_base, AVStream *st, AVPacket *pkt);
+    void LogPacket(const AVFormatContext *fmt_ctx, const AVPacket *pkt);
+
+    AVFrame* GetVideoFrame(OutputStream *ost);
+    void FillyuvImage(AVFrame *pict, int frame_index, int width, int height);
+    AVFrame* GetAudioFrame(OutputStream *ost);
 
     bool CaptureIsActive;
     int VideoXW, VideoYW;
-    AVCodec *VideoCodec;
-    AVCodecContext *VideoCodecContext;
-    AVPacket *VideoPacket;
-    AVFrame *VideoFrame;
-    FILE *VideoOutFile;
 
-    uint8_t EndCode[4];
+    bool HaveVideo, HaveAudio;
+    int EncodeVideo, EncodeAudio;
+
+    AVFormatContext *FormatCtx;
+    AVOutputFormat  *OutputFormat;
+    OutputStream VideoStream, AudioStream;
+    AVCodec *AudioCodec, *VideoCodec;
+    AVDictionary *Options;
 };
 
 #endif // VIDEO_CAPTURE_CLASS_H
