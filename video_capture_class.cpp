@@ -24,6 +24,8 @@ VideoCaptureClass::VideoCaptureClass()
     AudioCodec = VideoCodec = NULL;
     VideoStream = AudioStream = {0};
 
+    SourceAudioData = new unsigned short[SOURCE_SAMPLE_BUFFER_LEN];
+
     AudioBitrate = 64000;
     VideoBitrate = 400000;
 
@@ -36,6 +38,8 @@ VideoCaptureClass::~VideoCaptureClass()
     {
         cout << "VideoCaptureClass: " << "Stoppen erzwingen!" << endl;
         StopCapture();
+
+        delete[] SourceAudioData;
     }
 }
 
@@ -63,6 +67,10 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
 
     HaveVideo = HaveAudio = false;
     EncodeVideo = EncodeAudio = 0;
+
+    AvailableAudioData = false;
+    SourceAudioDataLength = 0;
+    FrameSamplesPt = 0;
 
     Options = NULL;
 
@@ -137,28 +145,10 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
     cout << "Video Auflösung: " << VideoXW << " x " << VideoYW << endl;
     cout << "VideoCodec: " << VideoCodec->name << endl;
     cout << "AudioCodec: " << AudioCodec->name << endl;
+    cout << "AudioFrameSize: " << AudioStream.enc->frame_size << endl;
 
-
-
-    // TEST AUSGABE //
-
-
-    /*
-    while (EncodeVideo || EncodeAudio)
-    //while (EncodeAudio)
-    {
-        if (EncodeVideo && (!EncodeAudio || av_compare_ts(VideoStream.next_pts, VideoStream.enc->time_base, AudioStream.next_pts, AudioStream.enc->time_base) <= 0))
-        {
-            EncodeVideo = !WriteVideoFrame(FormatCtx, &VideoStream);
-        }
-        else
-        {
-            EncodeAudio = !WriteAudioFrame(FormatCtx, &AudioStream);
-        }
-    }
-    */
-
-    /////////////////
+    FrameAudioDataL = new unsigned short[AudioStream.enc->frame_size];
+    FrameAudioDataR = new unsigned short[AudioStream.enc->frame_size];
 
     CaptureIsActive = true;
     return true;
@@ -194,6 +184,9 @@ void VideoCaptureClass::StopCapture()
 
     avformat_free_context(FormatCtx);
     FormatCtx = NULL;
+
+    delete[] FrameAudioDataL;
+    delete[] FrameAudioDataR;
 }
 
 void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
@@ -202,28 +195,50 @@ void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
 
     SourceVideoData = data;
     SourceVideoLineSize = linesize;
-
     EncodeVideo = !WriteVideoFrame(FormatCtx, &VideoStream);
-    EncodeAudio = !WriteAudioFrame(FormatCtx, &AudioStream);
 
-    /*
-    uint8_t *src_pixels;
-    uint8_t *dst_pixels;
+    int n_sample = AudioStream.enc->frame_size;
 
-    /// RGBA to RGB
-    for (int y = 0; y < VideoYW; y++)
+    if(AvailableAudioData)
     {
-        src_pixels = data + y*linesize;
-        dst_pixels = Frame->data[0] + y*Frame->linesize[0];
-        for (int x = 0; x < VideoXW; x++)
+        unsigned short* src = SourceAudioData;
+
+        if(SourceAudioDataLength/2 < n_sample)
         {
-            *dst_pixels++ = *src_pixels++;
-            *dst_pixels++ = *src_pixels++;
-            *dst_pixels++ = *src_pixels++;
-            src_pixels++;
+           for(int i=0; i<SourceAudioDataLength/2; i++)
+           {
+                FrameAudioDataL[FrameSamplesPt] = *src++;
+                FrameAudioDataR[FrameSamplesPt++] = *src++;
+                if(FrameSamplesPt == n_sample)
+                {
+                    FrameSamplesPt = 0;
+                    EncodeAudio = !WriteAudioFrame(FormatCtx, &AudioStream);
+                }
+           }
         }
+        AvailableAudioData = false;
     }
-    */
+}
+
+void VideoCaptureClass::FillSourceAudioBuffer(uint16_t *data, int len)
+{
+    if(!CaptureIsActive) return;
+
+    if(AvailableAudioData)
+        cout << "Error: Audio Buffer Overflow !!" << endl;
+
+    if(len > SOURCE_SAMPLE_BUFFER_LEN)
+    {
+        cerr << "Error: Sampledaten größer als Buffer !!" << endl;
+        return;
+    }
+
+    for(int i=0; i<len; i++)
+        SourceAudioData[i] = data[i];
+
+    SourceAudioDataLength = len;
+
+    AvailableAudioData = true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -533,7 +548,11 @@ int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
     int dst_nb_samples;
     av_init_packet(&pkt);
     c = ost->enc;
+
     frame = GetAudioFrame(ost);
+
+    if(frame == NULL) return 0;
+
     if (frame)
     {
         /* convert samples from native format to destination codec format, using the resampler */
@@ -695,23 +714,16 @@ AVFrame* VideoCaptureClass::GetAudioFrame(OutputStream *ost)
     int j, i, v;
     int16_t *q = (int16_t*)frame->data[0];
 
-    /* check if we want to generate more frames */
-    /*
-    if (av_compare_ts(ost->next_pts, ost->enc->time_base,
-                      STREAM_DURATION, (AVRational){ 1, 1 }) >= 0)
-        return NULL;
-    */
-
-    cout << "nb_samples: " << frame->nb_samples << endl;
-
-    for (j = 0; j <frame->nb_samples; j++) {
-        v = (int)(sin(ost->t) * 10000);
-        for (i = 0; i < ost->enc->channels; i++)
-            *q++ = v;
+    for (j = 0; j <frame->nb_samples; j++)
+    {
+        *q++ = FrameAudioDataL[j];
+        *q++ = FrameAudioDataR[j];
         ost->t     += ost->tincr;
         ost->tincr += ost->tincr2;
     }
+
     frame->pts = ost->next_pts;
     ost->next_pts  += frame->nb_samples;
+
     return frame;
 }

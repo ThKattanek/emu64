@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.07.2017                //
+// Letzte Änderung am 17.09.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -995,6 +995,9 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                 j++;
             }
         }
+
+        /// Capture Audio
+        VideoCapture->FillSourceAudioBuffer(puffer, laenge/2);
 
         /// Floppysound dazu mixen ///
 

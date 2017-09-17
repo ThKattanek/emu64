@@ -36,6 +36,7 @@ extern "C"
 #define STREAM_FRAME_RATE 50 /* 50 frames/s */
 #define STREAM_PIX_FMT    AV_PIX_FMT_YUV420P /* default pix_fmt */
 #define SCALE_FLAGS SWS_BICUBIC
+#define SOURCE_SAMPLE_BUFFER_LEN 0x100000
 
 typedef struct OutputStream {
     AVStream *st;
@@ -62,6 +63,7 @@ public:
     bool StartCapture(const char *filename, const char *codec_name, int xw, int yw);
     void StopCapture();
     void AddFrame(uint8_t *data, int linesize);
+    void FillSourceAudioBuffer(uint16_t *data, int len);
 
 private:
     void AddStream(OutputStream *ost, AVFormatContext *oc, AVCodec **codec, enum AVCodecID codec_id);
@@ -95,6 +97,14 @@ private:
 
     unsigned char* SourceVideoData;
     int SourceVideoLineSize;
+
+    bool AvailableAudioData;
+    unsigned short* SourceAudioData;
+    int SourceAudioDataLength;
+    int FrameSamplesPt;
+
+    unsigned short* FrameAudioDataL;
+    unsigned short* FrameAudioDataR;
 
 };
 
