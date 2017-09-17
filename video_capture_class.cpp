@@ -8,11 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.09.2017                //
+// Letzte Änderung am 17.09.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
+#include "video_capture_class.h"
 #include "video_capture_class.h"
 
 VideoCaptureClass::VideoCaptureClass()
@@ -22,6 +23,9 @@ VideoCaptureClass::VideoCaptureClass()
     FormatCtx = NULL;
     AudioCodec = VideoCodec = NULL;
     VideoStream = AudioStream = {0};
+
+    AudioBitrate = 64000;
+    VideoBitrate = 400000;
 
     cout << "FFMPEG Version: " << GetAVVersion() << endl;
 }
@@ -38,6 +42,16 @@ VideoCaptureClass::~VideoCaptureClass()
 const char* VideoCaptureClass::GetAVVersion()
 {
     return av_version_info();
+}
+
+void VideoCaptureClass::SetVideoBitrate(int video_bitrate)
+{
+    VideoBitrate = video_bitrate;
+}
+
+void VideoCaptureClass::SetAudioBitrate(int audio_bitrate)
+{
+    AudioBitrate = audio_bitrate;
 }
 
 bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_name, int xw, int yw)
@@ -128,10 +142,11 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
 
     // TEST AUSGABE //
 
+
+    /*
     while (EncodeVideo || EncodeAudio)
     //while (EncodeAudio)
     {
-        /* select the stream to encode */
         if (EncodeVideo && (!EncodeAudio || av_compare_ts(VideoStream.next_pts, VideoStream.enc->time_base, AudioStream.next_pts, AudioStream.enc->time_base) <= 0))
         {
             EncodeVideo = !WriteVideoFrame(FormatCtx, &VideoStream);
@@ -141,6 +156,7 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
             EncodeAudio = !WriteAudioFrame(FormatCtx, &AudioStream);
         }
     }
+    */
 
     /////////////////
 
@@ -180,18 +196,19 @@ void VideoCaptureClass::StopCapture()
     FormatCtx = NULL;
 }
 
-void VideoCaptureClass::WriteFrame(uint8_t *data, int linesize)
+void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
 {
     if(!CaptureIsActive) return;
 
-    /*
-    static char test = 0;
+    SourceVideoData = data;
+    SourceVideoLineSize = linesize;
 
+    EncodeVideo = !WriteVideoFrame(FormatCtx, &VideoStream);
+    EncodeAudio = !WriteAudioFrame(FormatCtx, &AudioStream);
+
+    /*
     uint8_t *src_pixels;
     uint8_t *dst_pixels;
-
-    if(test&1)
-    {
 
     /// RGBA to RGB
     for (int y = 0; y < VideoYW; y++)
@@ -206,15 +223,6 @@ void VideoCaptureClass::WriteFrame(uint8_t *data, int linesize)
             src_pixels++;
         }
     }
-
-    CreateSample((short *)Sample, SampleSize / 2);
-
-    if (!VEncoder.AddFrame(Frame, Sample, SampleSize ))
-    {
-        printf("Cannot write frame\n");
-    }
-    }
-    test++;
     */
 }
 
@@ -233,11 +241,14 @@ void VideoCaptureClass::AddStream(OutputStream *ost, AVFormatContext *oc, AVCode
                 avcodec_get_name(codec_id));
         exit(1);
     }
+
+
     ost->st = avformat_new_stream(oc, NULL);
     if (!ost->st) {
         fprintf(stderr, "Could not allocate stream\n");
         exit(1);
     }
+
     ost->st->id = oc->nb_streams-1;
     c = avcodec_alloc_context3(*codec);
     if (!c) {
@@ -249,7 +260,7 @@ void VideoCaptureClass::AddStream(OutputStream *ost, AVFormatContext *oc, AVCode
     case AVMEDIA_TYPE_AUDIO:
         c->sample_fmt  = (*codec)->sample_fmts ?
             (*codec)->sample_fmts[0] : AV_SAMPLE_FMT_FLTP;
-        c->bit_rate    = 64000;
+        c->bit_rate    = AudioBitrate;
         c->sample_rate = 44100;
         if ((*codec)->supported_samplerates) {
             c->sample_rate = (*codec)->supported_samplerates[0];
@@ -270,12 +281,15 @@ void VideoCaptureClass::AddStream(OutputStream *ost, AVFormatContext *oc, AVCode
         c->channels        = av_get_channel_layout_nb_channels(c->channel_layout);
         ost->st->time_base = (AVRational){ 1, c->sample_rate };
         break;
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     case AVMEDIA_TYPE_VIDEO:
         c->codec_id = codec_id;
-        c->bit_rate = 400000;
+        c->bit_rate = VideoBitrate;
         /* Resolution must be a multiple of two. */
-        c->width    = 352;
-        c->height   = 288;
+        c->width    = VideoXW;
+        c->height   = VideoYW;
         /* timebase: This is the fundamental unit of time (in seconds) in terms
          * of which frame timestamps are represented. For fixed-fps content,
          * timebase should be 1/framerate and timestamp increments should be
@@ -403,10 +417,15 @@ bool VideoCaptureClass::OpenAudio(AVFormatContext *oc, AVCodec *codec, OutputStr
     ost->tincr = 2 * M_PI * 110.0 / c->sample_rate;
     /* increment frequency by 110 Hz per second */
     ost->tincr2 = 2 * M_PI * 110.0 / c->sample_rate / c->sample_rate;
+
     if (c->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE)
+    {
         nb_samples = 10000;
+    }
     else
+    {
         nb_samples = c->frame_size;
+    }
 
     ost->frame     = AllocAudioFrame(c->sample_fmt, c->channel_layout, c->sample_rate, nb_samples);
     ost->tmp_frame = AllocAudioFrame(AV_SAMPLE_FMT_S16, c->channel_layout, c->sample_rate, nb_samples);
@@ -515,11 +534,11 @@ int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
     av_init_packet(&pkt);
     c = ost->enc;
     frame = GetAudioFrame(ost);
-    if (frame) {
+    if (frame)
+    {
         /* convert samples from native format to destination codec format, using the resampler */
             /* compute destination number of samples */
-            dst_nb_samples = av_rescale_rnd(swr_get_delay(ost->swr_ctx, c->sample_rate) + frame->nb_samples,
-                                            c->sample_rate, c->sample_rate, AV_ROUND_UP);
+            dst_nb_samples = av_rescale_rnd(swr_get_delay(ost->swr_ctx, c->sample_rate) + frame->nb_samples, c->sample_rate, c->sample_rate, AV_ROUND_UP);
             av_assert0(dst_nb_samples == frame->nb_samples);
         /* when we pass a frame to the encoder, it may keep a reference to it
          * internally;
@@ -529,10 +548,9 @@ int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
         if (ret < 0)
             exit(1);
         /* convert to destination format */
-        ret = swr_convert(ost->swr_ctx,
-                          ost->frame->data, dst_nb_samples,
-                          (const uint8_t **)frame->data, frame->nb_samples);
-        if (ret < 0) {
+        ret = swr_convert(ost->swr_ctx, ost->frame->data, dst_nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
+        if (ret < 0)
+        {
             fprintf(stderr, "Error while converting\n");
             exit(1);
         }
@@ -591,9 +609,14 @@ AVFrame* VideoCaptureClass::GetVideoFrame(OutputStream *ost)
 {
     AVCodecContext *c = ost->enc;
     /* check if we want to generate more frames */
+
+    /*
     if (av_compare_ts(ost->next_pts, c->time_base,
                       STREAM_DURATION, (AVRational){ 1, 1 }) >= 0)
         return NULL;
+    */
+
+
     /* when we pass a frame to the encoder, it may keep a reference to it
      * internally; make sure we do not overwrite it here */
 
@@ -629,17 +652,39 @@ AVFrame* VideoCaptureClass::GetVideoFrame(OutputStream *ost)
 
 void VideoCaptureClass::FillyuvImage(AVFrame *pict, int frame_index, int width, int height)
 {
-    int x, y, i;
-    i = frame_index;
-    /* Y */
-    for (y = 0; y < height; y++)
-        for (x = 0; x < width; x++)
-            pict->data[0][y * pict->linesize[0] + x] = x + y + i * 3;
-    /* Cb and Cr */
-    for (y = 0; y < height / 2; y++) {
-        for (x = 0; x < width / 2; x++) {
-            pict->data[1][y * pict->linesize[1] + x] = 128 + y + i * 2;
-            pict->data[2][y * pict->linesize[2] + x] = 64 + x + i * 5;
+    uint8_t *src_pixels;
+    uint8_t Y;
+    uint8_t Cb,Cr;
+    uint8_t r,g,b;
+
+    // Y
+    for (int y = 0; y < height; y++)
+    {
+        src_pixels = SourceVideoData + y*SourceVideoLineSize;
+        for (int x = 0; x < width; x++)
+        {
+            Y =  0.257*src_pixels[2] + 0.504*src_pixels[1] + 0.098*src_pixels[0] + 16;
+            src_pixels += 4;
+            pict->data[0][y * pict->linesize[0] + x] = Y;
+        }
+    }
+
+    // Cb and Cr
+    for (int y = 0; y < height; y+=2)
+    {
+        src_pixels = SourceVideoData + y*SourceVideoLineSize;
+        for (int x = 0; x < width/2; x++)
+        {
+            r = (src_pixels[2]+src_pixels[6]+src_pixels[2+SourceVideoLineSize]+src_pixels[6+SourceVideoLineSize]) / 4;
+            g = (src_pixels[1]+src_pixels[5]+src_pixels[1+SourceVideoLineSize]+src_pixels[5+SourceVideoLineSize]) / 4;
+            b = (src_pixels[0]+src_pixels[4]+src_pixels[0+SourceVideoLineSize]+src_pixels[4+SourceVideoLineSize]) / 4;
+
+            src_pixels += 8;
+
+            Cb = -0.148*r - 0.291*g + 0.439*b + 128;
+            Cr = 0.439*r - 0.368*g - 0.071*b + 128;
+            pict->data[1][y/2 * pict->linesize[1] + x] = Cr;
+            pict->data[2][y/2 * pict->linesize[2] + x] = Cb;
         }
     }
 }
@@ -649,10 +694,16 @@ AVFrame* VideoCaptureClass::GetAudioFrame(OutputStream *ost)
     AVFrame *frame = ost->tmp_frame;
     int j, i, v;
     int16_t *q = (int16_t*)frame->data[0];
+
     /* check if we want to generate more frames */
+    /*
     if (av_compare_ts(ost->next_pts, ost->enc->time_base,
                       STREAM_DURATION, (AVRational){ 1, 1 }) >= 0)
         return NULL;
+    */
+
+    cout << "nb_samples: " << frame->nb_samples << endl;
+
     for (j = 0; j <frame->nb_samples; j++) {
         v = (int)(sin(ost->t) * 10000);
         for (i = 0; i < ost->enc->channels; i++)

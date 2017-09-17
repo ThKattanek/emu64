@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.09.2017                //
+// Letzte Änderung am 17.09.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -57,9 +57,11 @@ public:
     ~VideoCaptureClass();
 
     const char *GetAVVersion();
+    void SetVideoBitrate(int video_bitrate);
+    void SetAudioBitrate(int audio_bitrate);
     bool StartCapture(const char *filename, const char *codec_name, int xw, int yw);
     void StopCapture();
-    void WriteFrame(uint8_t *data, int linesize);
+    void AddFrame(uint8_t *data, int linesize);
 
 private:
     void AddStream(OutputStream *ost, AVFormatContext *oc, AVCodec **codec, enum AVCodecID codec_id);
@@ -83,11 +85,17 @@ private:
     bool HaveVideo, HaveAudio;
     int EncodeVideo, EncodeAudio;
 
+    int AudioBitrate, VideoBitrate;
+
     AVFormatContext *FormatCtx;
     AVOutputFormat  *OutputFormat;
     OutputStream VideoStream, AudioStream;
     AVCodec *AudioCodec, *VideoCodec;
     AVDictionary *Options;
+
+    unsigned char* SourceVideoData;
+    int SourceVideoLineSize;
+
 };
 
 #endif // VIDEO_CAPTURE_CLASS_H

@@ -67,8 +67,7 @@ SOURCES += \
     crt_new_easyflash_window.cpp \
     command_line_class.cpp \
     savepng.c \
-    video_capture_class.cpp \
-    video_encoder_class.cpp
+    video_capture_class.cpp
 
 HEADERS  += \
     info_window.h \
@@ -135,8 +134,7 @@ HEADERS  += \
     command_line_class.h \
     emu64_commands.h \
     savepng.h \
-    video_capture_class.h \
-    video_encoder_class.h
+    video_capture_class.h
 
 FORMS    += \
     info_window.ui \

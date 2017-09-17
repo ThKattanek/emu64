@@ -709,7 +709,7 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
 
     ///////////////////////////////////
 
-    VideoCapture->WriteFrame((uint8_t*)C64Screen->pixels,C64Screen->pitch);
+    VideoCapture->AddFrame((uint8_t*)C64Screen->pixels,C64Screen->pitch);
 
     ///////////////////////////////////
 
@@ -3232,6 +3232,8 @@ bool C64Class::StartVideoRecord(const char *filename)
 {
     if(VideoCapture != NULL)
     {
+        VideoCapture->SetAudioBitrate(128000);
+        VideoCapture->SetVideoBitrate(1000000);
         return VideoCapture->StartCapture(filename,"mp4",AktC64ScreenXW,AktC64ScreenYW);
     }
     return false;
