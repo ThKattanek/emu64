@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.09.2017                //
+// Letzte Änderung am 18.09.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,9 +16,18 @@
 #ifndef VIDEO_CAPTURE_CLASS_H
 #define VIDEO_CAPTURE_CLASS_H
 
+#define __STDC_FORMAT_MACROS
+
 #include <iostream>
 
 using namespace std;
+
+#define PRId64 "I64d"
+
+#ifndef INT64_C
+#define INT64_C(c) (c ## LL)
+#define UINT64_C(c) (c ## ULL)
+#endif
 
 extern "C"
 {

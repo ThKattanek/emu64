@@ -217,7 +217,6 @@ DEFINES += QUAZIP_STATIC
 RC_FILE = emu64.rc
 
 win32:contains(QMAKE_HOST.os,Linux):{
-    QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS
     LIBS += $$system($$ARCH-w64-mingw32.$$LINKTYP-sdl2-config --libs) $$system($$ARCH-w64-mingw32.$$LINKTYP-pkg-config SDL2_image gl glu --libs)
     LIBS += -lpng -lquazip
     LIBS += -lavutil -lavcodec -lavformat -lswscale -lswresample
