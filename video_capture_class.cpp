@@ -161,6 +161,8 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
 
 void VideoCaptureClass::StopCapture()
 {
+    if(!CaptureIsActive) return;
+
     cout << "VideoCapture wird gestoppt" << endl;
 
     CaptureIsActive = false;

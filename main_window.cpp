@@ -331,7 +331,7 @@ void MainWindow::OnInit()
     LogText(trUtf8(">> ShowC64KeyMapWindow wurde erzeugt\n").toLatin1().data());
 
     SplashMessage(trUtf8("VideoCaptureWindow wird erstellt."),Qt::darkBlue);
-    video_capture_window = new VideoCaptureWindow(this);
+    video_capture_window = new VideoCaptureWindow(this, c64);
     LogText(trUtf8(">> VideoCaptureWindow wurde erzeugt\n").toLatin1().data());
 
     ini->beginGroup("MainWindow");
@@ -666,6 +666,7 @@ void MainWindow::RetranslateUi()
     debugger_window->RetranslateUi();
     setup_window->RetranslateUi();
     speed_window->RetranslateUi();
+    video_capture_window->RetranslateUi();
 
     SetC64ScreenTitle();
 }
