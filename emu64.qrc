@@ -74,5 +74,9 @@
         <file>grafik/delete.png</file>
         <file>grafik/go-home.png</file>
         <file>grafik/qt_sdl_ffmpeg_logo_300x200.png</file>
+        <file>grafik/video_rec_pause_off.png</file>
+        <file>grafik/video_rec_pause_on.png</file>
+        <file>grafik/video_rec_start.png</file>
+        <file>grafik/video_rec_stop.png</file>
     </qresource>
 </RCC>
