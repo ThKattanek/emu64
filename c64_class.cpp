@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.09.2017                //
+// Letzte Änderung am 24.09.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -3242,12 +3242,22 @@ bool C64Class::StartVideoRecord(const char *filename)
     return false;
 }
 
-void C64Class::StopVideoRecord()
+void C64Class::SetPauseVideoRecord(bool status)
+{
+    VideoCapture->SetCapturePause(status);
+}
+
+void C64Class::StopVideoRecord(void)
 {
     if(VideoCapture != NULL)
     {
         VideoCapture->StopCapture();
     }
+}
+
+int C64Class::GetRecordedFrameCount()
+{
+    return VideoCapture->GetRecordedFrameCount();
 }
 
 bool C64Class::StartIECDump(const char *filename)

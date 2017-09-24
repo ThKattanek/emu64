@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.06.2017                //
+// Letzte Änderung am 24.09.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -178,7 +178,9 @@ public:
 
     const char *GetAVVersion();
     bool StartVideoRecord(const char *filename);
-    void StopVideoRecord();
+    void SetPauseVideoRecord(bool status);
+    void StopVideoRecord(void);
+    int GetRecordedFrameCount(void);
 
     bool StartIECDump(const char *filename);
     void StopIECDump();
