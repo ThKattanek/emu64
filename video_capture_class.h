@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.09.2017                //
+// Letzte Änderung am 24.09.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -71,6 +71,7 @@ public:
     void SetAudioBitrate(int audio_bitrate);
     bool StartCapture(const char *filename, const char *codec_name, int xw, int yw);
     void StopCapture();
+    void SetCapturePause(bool cpt_pause);
     void AddFrame(uint8_t *data, int linesize);
     void FillSourceAudioBuffer(uint16_t *data, int len);
 
@@ -91,6 +92,7 @@ private:
     AVFrame* GetAudioFrame(OutputStream *ost);
 
     bool CaptureIsActive;
+    bool CaptureIsPause;
     int VideoXW, VideoYW;
 
     bool HaveVideo, HaveAudio;

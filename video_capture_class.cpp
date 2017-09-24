@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.09.2017                //
+// Letzte Änderung am 24.09.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,6 +19,7 @@
 VideoCaptureClass::VideoCaptureClass()
 {
     CaptureIsActive = false;
+    CaptureIsPause = false;
 
     FormatCtx = NULL;
     AudioCodec = VideoCodec = NULL;
@@ -189,9 +190,14 @@ void VideoCaptureClass::StopCapture()
     delete[] FrameAudioDataR;
 }
 
+void VideoCaptureClass::SetCapturePause(bool cpt_pause)
+{
+    CaptureIsPause = cpt_pause;
+}
+
 void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
 {
-    if(!CaptureIsActive) return;
+    if(!CaptureIsActive || CaptureIsPause) return;
 
     SourceVideoData = data;
     SourceVideoLineSize = linesize;
