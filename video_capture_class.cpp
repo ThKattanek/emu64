@@ -30,6 +30,8 @@ VideoCaptureClass::VideoCaptureClass()
     AudioBitrate = 64000;
     VideoBitrate = 400000;
 
+    RecordedFrames = 0;
+
     cout << "FFMPEG Version: " << GetAVVersion() << endl;
 }
 
@@ -62,6 +64,8 @@ void VideoCaptureClass::SetAudioBitrate(int audio_bitrate)
 bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_name, int xw, int yw)
 {
     if(CaptureIsActive) return false;
+
+    RecordedFrames = 0;
 
     VideoXW = xw;
     VideoYW = yw;
@@ -224,6 +228,8 @@ void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
         }
         AvailableAudioData = false;
     }
+
+    RecordedFrames++;
 }
 
 void VideoCaptureClass::FillSourceAudioBuffer(uint16_t *data, int len)
@@ -245,6 +251,11 @@ void VideoCaptureClass::FillSourceAudioBuffer(uint16_t *data, int len)
     SourceAudioDataLength = len;
 
     AvailableAudioData = true;
+}
+
+int VideoCaptureClass::GetRecordedFrameCount()
+{
+    return RecordedFrames;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

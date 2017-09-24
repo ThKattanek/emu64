@@ -74,6 +74,7 @@ public:
     void SetCapturePause(bool cpt_pause);
     void AddFrame(uint8_t *data, int linesize);
     void FillSourceAudioBuffer(uint16_t *data, int len);
+    int GetRecordedFrameCount();
 
 private:
     void AddStream(OutputStream *ost, AVFormatContext *oc, AVCodec **codec, enum AVCodecID codec_id);
@@ -116,6 +117,8 @@ private:
 
     unsigned short* FrameAudioDataL;
     unsigned short* FrameAudioDataR;
+
+    int RecordedFrames;
 
 };
 
