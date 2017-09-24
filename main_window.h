@@ -42,6 +42,7 @@
 #include "./c64_speed_window.h"
 #include "./tape_window.h"
 #include "./show_c64_key_mapping_window.h"
+#include "./video_capture_window.h"
 
 #include "./command_line_class.h"
 #include "./emu64_commands.h"
@@ -127,6 +128,8 @@ private slots:
 
     void on_actionC64_Tastenbelegung_Show_triggered();
 
+    void on_actionVideo_Capture_triggered();
+
 private:
     /// Funktionen ///
     void changeEvent(QEvent *event);  
@@ -168,7 +171,8 @@ private:
     DebuggerWindow *debugger_window;                // Debugger / Disassembler Fenster
     SetupWindow *setup_window;                      // Setup Fenster
     C64SpeedWindow *speed_window;                   // C64 Speed Window
-    ShowC64KeyMappingWindow *show_c64keymap_window; //C64 Key Map Window
+    ShowC64KeyMappingWindow *show_c64keymap_window; // C64 Key Map Window
+    VideoCaptureWindow *video_capture_window;       // Window zum Video Aufzeichnen
 
     //QStringList commandLine;                        // Enthält den an Emu64 übergebenen String
 

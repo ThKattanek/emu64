@@ -109,6 +109,7 @@ MainWindow::~MainWindow()
     delete debugger_window;
     delete speed_window;
     delete show_c64keymap_window;
+    delete video_capture_window;
 
     delete ui;
     delete ini;
@@ -328,6 +329,10 @@ void MainWindow::OnInit()
     SplashMessage(trUtf8("ShowC64KeyMapWindow wird erstellt."),Qt::darkBlue);
     show_c64keymap_window = new ShowC64KeyMappingWindow(this,c64);
     LogText(trUtf8(">> ShowC64KeyMapWindow wurde erzeugt\n").toLatin1().data());
+
+    SplashMessage(trUtf8("VideoCaptureWindow wird erstellt."),Qt::darkBlue);
+    video_capture_window = new VideoCaptureWindow(this);
+    LogText(trUtf8(">> VideoCaptureWindow wurde erzeugt\n").toLatin1().data());
 
     ini->beginGroup("MainWindow");
     SplashMessage(trUtf8("Screenshotnummer wird geladen."),Qt::darkBlue);
@@ -1150,4 +1155,9 @@ void MainWindow::on_actionC64_Tastenbelegung_Show_triggered()
 {
     show_c64keymap_window->UpdateText();
     show_c64keymap_window->show();
+}
+
+void MainWindow::on_actionVideo_Capture_triggered()
+{
+    video_capture_window->show();
 }

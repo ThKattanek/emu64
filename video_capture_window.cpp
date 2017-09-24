@@ -27,3 +27,9 @@ VideoCaptureWindow::~VideoCaptureWindow()
 {
     delete ui;
 }
+
+void VideoCaptureWindow::RetranslateUi()
+{
+    ui->retranslateUi(this);
+    this->update();
+}

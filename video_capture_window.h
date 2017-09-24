@@ -29,6 +29,7 @@ class VideoCaptureWindow : public QDialog
 public:
     explicit VideoCaptureWindow(QWidget *parent = 0);
     ~VideoCaptureWindow();
+    void RetranslateUi();
 
 private:
     Ui::VideoCaptureWindow *ui;
