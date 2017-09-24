@@ -67,7 +67,8 @@ SOURCES += \
     crt_new_easyflash_window.cpp \
     command_line_class.cpp \
     savepng.c \
-    video_capture_class.cpp
+    video_capture_class.cpp \
+    video_capture_window.cpp
 
 HEADERS  += \
     info_window.h \
@@ -134,7 +135,8 @@ HEADERS  += \
     command_line_class.h \
     emu64_commands.h \
     savepng.h \
-    video_capture_class.h
+    video_capture_class.h \
+    video_capture_window.h
 
 FORMS    += \
     info_window.ui \
@@ -161,7 +163,8 @@ FORMS    += \
     tape_new_window.ui \
     new_romset_window.ui \
     show_c64_key_mapping_window.ui \
-    crt_new_easyflash_window.ui
+    crt_new_easyflash_window.ui \
+    video_capture_window.ui
 
 RESOURCES += \
     emu64.qrc
