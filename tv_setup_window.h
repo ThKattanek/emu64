@@ -19,8 +19,8 @@
 #include <QDialog>
 #include <QSettings>
 #include <qmainwindow.h>
-#include <c64_class.h>
-#include "videopal_class.h"
+#include "./c64_class.h"
+#include "./videopal_class.h"
 
 #define MAX_DISTORTION 0.33f
 
