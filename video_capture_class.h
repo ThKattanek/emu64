@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.09.2017                //
+// Letzte Änderung am 25.09.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -119,6 +119,8 @@ private:
     unsigned short* FrameAudioDataR;
 
     int RecordedFrames;
+
+    bool Mutex1;
 
 };
 

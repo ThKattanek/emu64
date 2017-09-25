@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.09.2017                //
+// Letzte Änderung am 25.09.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,6 +18,8 @@
 
 VideoCaptureClass::VideoCaptureClass()
 {
+    Mutex1 = false;
+
     CaptureIsActive = false;
     CaptureIsPause = false;
 
@@ -64,6 +66,10 @@ void VideoCaptureClass::SetAudioBitrate(int audio_bitrate)
 bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_name, int xw, int yw)
 {
     if(CaptureIsActive) return false;
+
+    while(Mutex1){};   // Warten bis Mutex1 Unlocked (false)
+    Mutex1 = true;      // Mutex1 Locken (true)
+
 
     RecordedFrames = 0;
 
@@ -156,6 +162,9 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
     FrameAudioDataR = new unsigned short[AudioStream.enc->frame_size];
 
     CaptureIsActive = true;
+
+    Mutex1 = false;      // Mutex1 Unlocken (false)
+
     return true;
 }
 
@@ -164,6 +173,9 @@ void VideoCaptureClass::StopCapture()
     if(!CaptureIsActive) return;
 
     cout << "VideoCapture wird gestoppt" << endl;
+
+    while(Mutex1){};   // Warten bis Mutex1 Unlocked (false)
+    Mutex1 = true;      // Mutex1 Locken (true)
 
     CaptureIsActive = false;
 
@@ -194,6 +206,8 @@ void VideoCaptureClass::StopCapture()
 
     delete[] FrameAudioDataL;
     delete[] FrameAudioDataR;
+
+    Mutex1 = false;      // Mutex1 Unlocken (false)
 }
 
 void VideoCaptureClass::SetCapturePause(bool cpt_pause)
@@ -204,6 +218,9 @@ void VideoCaptureClass::SetCapturePause(bool cpt_pause)
 void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
 {
     if(!CaptureIsActive || CaptureIsPause) return;
+
+    while(Mutex1){};   // Warten bis Mutex1 Unlocked (false)
+    Mutex1 = true;      // Mutex1 Locken (true)
 
     SourceVideoData = data;
     SourceVideoLineSize = linesize;
@@ -232,6 +249,8 @@ void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
     }
 
     RecordedFrames++;
+
+    Mutex1 = false;      // Mutex1 Unlocken (false)
 }
 
 void VideoCaptureClass::FillSourceAudioBuffer(uint16_t *data, int len)
