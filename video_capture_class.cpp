@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.09.2017                //
+// Letzte Änderung am 26.09.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -29,8 +29,8 @@ VideoCaptureClass::VideoCaptureClass()
 
     SourceAudioData = new unsigned short[SOURCE_SAMPLE_BUFFER_LEN];
 
-    AudioBitrate = 64000;
-    VideoBitrate = 400000;
+    AudioBitrate = 128000;
+    VideoBitrate = 4000000;
 
     RecordedFrames = 0;
 
@@ -99,6 +99,7 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
     if (!FormatCtx)
     {
         cerr << "Es konnte kein FormatContext erstellt werden." << endl;
+        Mutex1 = false;      // Mutex1 Unlocken (false)
         return false;
     }
 
@@ -137,6 +138,7 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
         {
             char err_msg[AV_ERROR_MAX_STRING_SIZE];
             cerr << "Ausgabedatei kann nicht geöffnet werden: [" << filename << "[  -- " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
+            Mutex1 = false;      // Mutex1 Unlocken (false)
             StopCapture();
             return false;
         }
@@ -148,6 +150,7 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
     {
         char err_msg[AV_ERROR_MAX_STRING_SIZE];
         cerr << "Beim öffnen der Ausgabedatei ist ein Fehler aufgetreten.  -- " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
+        Mutex1 = false;      // Mutex1 Unlocken (false)
         StopCapture();
         return false;
     }
@@ -164,7 +167,6 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
     CaptureIsActive = true;
 
     Mutex1 = false;      // Mutex1 Unlocken (false)
-
     return true;
 }
 
@@ -208,6 +210,8 @@ void VideoCaptureClass::StopCapture()
     delete[] FrameAudioDataR;
 
     Mutex1 = false;      // Mutex1 Unlocken (false)
+
+    cout << "VideoCapture wurde gestoppt" << endl;
 }
 
 void VideoCaptureClass::SetCapturePause(bool cpt_pause)

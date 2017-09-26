@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.09.2017                //
+// Letzte Änderung am 26.09.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -22,10 +22,27 @@ VideoCaptureWindow::VideoCaptureWindow(QWidget *parent, C64Class *c64) :
 {
     ui->setupUi(this);
     this->c64 = c64;
+
+    ui->CaptureStop->setEnabled(false);
+    ui->AudioBitrate->setMinimum(16);
+    ui->AudioBitrate->setMaximum(1024);
+    ui->AudioBitrate->setValue(128);
+
+    ui->VideoBitrate->setMinimum(100);
+    ui->VideoBitrate->setMaximum(16000);
+    ui->VideoBitrate->setValue(4000);
+
+    counter_pause = 0;
+    isPause = false;
+
+    timer1 = new QTimer(this);
+    timer1->setInterval(10);
+    connect(timer1,SIGNAL(timeout()),this,SLOT(OnTimer1()));
 }
 
 VideoCaptureWindow::~VideoCaptureWindow()
 {
+    delete timer1;
     delete ui;
 }
 
@@ -46,19 +63,68 @@ void VideoCaptureWindow::on_CaptureStart_clicked()
         return;
     }
 
-    c64->StartVideoRecord(filename.toLatin1().data());
+    if(c64->StartVideoRecord(filename.toLatin1().data(),ui->AudioBitrate->value()*1000,ui->VideoBitrate->value()*1000))
+    {
+        ui->CaptureStart->setEnabled(false);
+        ui->CaptureStop->setEnabled(true);
+        timer1->start();
+    }
 }
 
 void VideoCaptureWindow::on_CaptureStop_clicked()
 {
     if(c64 == 0) return;
+
+    ui->CaptureStart->setEnabled(true);
+    ui->CaptureStop->setEnabled(false);
+
     c64->StopVideoRecord();
+    timer1->stop();
 }
 
 void VideoCaptureWindow::on_CapturePause_clicked(bool checked)
 {
     if(c64 == 0) return;
     c64->SetPauseVideoRecord(checked);
+
+    isPause = checked;
+    if(isPause)
+        counter_pause = 0;
+    else
+        ui->TimeOutput->setVisible(true);
+}
+
+void VideoCaptureWindow::OnTimer1()
+{
+    if(c64 == 0) return;
+
+    if(!isPause)
+    {
+        int time = c64->GetRecordedFrameCount();
+        int hour = time / (50*60*60);
+        time %= (50*60*60);
+        int minutes = time / (50*60);
+        time %= (50*60);
+        int seconds = time / 50;
+        int frames = time % 50;
+
+        char out_str[16];
+
+        sprintf(out_str,"%.2d:%.2d:%.2d-%.2d",hour,minutes,seconds,frames);
+        ui->TimeOutput->setText(out_str);
+    }
+    else
+    {
+        counter_pause++;
+        if(counter_pause == 25)
+        {
+            counter_pause = 0;
+            if(ui->TimeOutput->isVisible())
+                ui->TimeOutput->setVisible(false);
+            else
+                ui->TimeOutput->setVisible(true);
+        }
+    }
 }
 
 bool VideoCaptureWindow::getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt)
@@ -103,6 +169,7 @@ bool VideoCaptureWindow::getSaveFileName(QWidget *parent, QString caption, QStri
       fileInfo.setFile(tmpFileName);
    }
 
+   /*
    // Does the file already exist?
    if (QFile::exists(tmpFileName)) {
 
@@ -127,6 +194,7 @@ bool VideoCaptureWindow::getSaveFileName(QWidget *parent, QString caption, QStri
       fileInfo.setFile(tmpFileName);
       }
    }
+    */
 
    *fileName = tmpFileName;
    *fileExt = extension;

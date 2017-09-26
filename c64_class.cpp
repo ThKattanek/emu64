@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.09.2017                //
+// Letzte Änderung am 26.09.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -3231,12 +3231,13 @@ const char *C64Class::GetAVVersion()
     return VideoCapture->GetAVVersion();
 }
 
-bool C64Class::StartVideoRecord(const char *filename)
+bool C64Class::StartVideoRecord(const char *filename, int audio_bitrate, int video_bitrate)
 {
     if(VideoCapture != NULL)
     {
-        VideoCapture->SetAudioBitrate(128000);
-        VideoCapture->SetVideoBitrate(1000000);
+        VideoCapture->SetAudioBitrate(audio_bitrate);
+        VideoCapture->SetVideoBitrate(video_bitrate);
+
         return VideoCapture->StartCapture(filename,"mp4",AktC64ScreenXW,AktC64ScreenYW);
     }
     return false;

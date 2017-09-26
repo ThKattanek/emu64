@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.09.2017                //
+// Letzte Änderung am 26.09.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -177,7 +177,7 @@ public:
     void SetExitScreenshot(const char *filename);
 
     const char *GetAVVersion();
-    bool StartVideoRecord(const char *filename);
+    bool StartVideoRecord(const char *filename, int audio_bitrate=128000, int video_bitrate=4000000);
     void SetPauseVideoRecord(bool status);
     void StopVideoRecord(void);
     int GetRecordedFrameCount(void);
