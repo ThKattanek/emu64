@@ -71,6 +71,7 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
     Mutex1 = true;      // Mutex1 Locken (true)
 
 
+    AudioDelayCounter = 12;
     RecordedFrames = 0;
 
     VideoXW = xw;
@@ -228,7 +229,10 @@ void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
 
     SourceVideoData = data;
     SourceVideoLineSize = linesize;
-    EncodeVideo = !WriteVideoFrame(FormatCtx, &VideoStream);
+
+    if(AudioDelayCounter >0) AudioDelayCounter--;
+    if(AudioDelayCounter == 0)
+        EncodeVideo = !WriteVideoFrame(FormatCtx, &VideoStream);
 
     int n_sample = AudioStream.enc->frame_size;
 

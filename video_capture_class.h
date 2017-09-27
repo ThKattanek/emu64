@@ -120,6 +120,8 @@ private:
 
     int RecordedFrames;
 
+    int AudioDelayCounter;
+
     bool Mutex1;
 
 };
