@@ -67,7 +67,9 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
 {
     if(CaptureIsActive) return false;
 
-    while(Mutex1){};   // Warten bis Mutex1 Unlocked (false)
+    while(Mutex1){
+        SDL_Delay(1);
+    };   // Warten bis Mutex1 Unlocked (false)
     Mutex1 = true;      // Mutex1 Locken (true)
 
 
@@ -177,10 +179,13 @@ void VideoCaptureClass::StopCapture()
 
     cout << "VideoCapture wird gestoppt" << endl;
 
-    while(Mutex1){};   // Warten bis Mutex1 Unlocked (false)
+    CaptureIsActive = false;
+
+    while(Mutex1){
+        SDL_Delay(1);
+    };   // Warten bis Mutex1 Unlocked (false)
     Mutex1 = true;      // Mutex1 Locken (true)
 
-    CaptureIsActive = false;
 
     // Trailer schreiben
     av_write_trailer(FormatCtx);
@@ -224,7 +229,9 @@ void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
 {
     if(!CaptureIsActive || CaptureIsPause) return;
 
-    while(Mutex1){};   // Warten bis Mutex1 Unlocked (false)
+    while(Mutex1){
+        SDL_Delay(1);
+    };   // Warten bis Mutex1 Unlocked (false)
     Mutex1 = true;      // Mutex1 Locken (true)
 
     SourceVideoData = data;

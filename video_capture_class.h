@@ -19,6 +19,7 @@
 #define __STDC_FORMAT_MACROS
 
 #include <iostream>
+#include <SDL2/SDL.h>
 
 using namespace std;
 
