@@ -73,7 +73,7 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
     Mutex1 = true;      // Mutex1 Locken (true)
 
 
-    AudioDelayCounter = 12;
+    AudioDelayCounter = 0;     // 12
     RecordedFrames = 0;
 
     VideoXW = xw;
@@ -249,7 +249,7 @@ void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
 
         if(SourceAudioDataLength/2 < n_sample)
         {
-           for(int i=0; i<SourceAudioDataLength/2; i++)
+           for(int i=0; i<(SourceAudioDataLength)/2; i++)
            {
                 FrameAudioDataL[FrameSamplesPt] = *src++;
                 FrameAudioDataR[FrameSamplesPt++] = *src++;
@@ -285,6 +285,10 @@ void VideoCaptureClass::FillSourceAudioBuffer(uint16_t *data, int len)
         SourceAudioData[i] = data[i];
 
     SourceAudioDataLength = len;
+
+    /// TEST -- Pro Frame 2 Samples mehr ///
+    SourceAudioData[len] = SourceAudioData[len+1] = SourceAudioData[len+2] = SourceAudioData[len+3] = SourceAudioData[len-1];
+    SourceAudioDataLength += 4;
 
     AvailableAudioData = true;
 }
