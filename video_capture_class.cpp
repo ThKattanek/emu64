@@ -287,8 +287,8 @@ void VideoCaptureClass::FillSourceAudioBuffer(uint16_t *data, int len)
     SourceAudioDataLength = len;
 
     /// TEST -- Pro Frame 2 Samples mehr ///
-    SourceAudioData[len] = SourceAudioData[len+1] = SourceAudioData[len+2] = SourceAudioData[len+3] = SourceAudioData[len-1];
-    SourceAudioDataLength += 4;
+    SourceAudioData[len] = SourceAudioData[len+1] = SourceAudioData[len+2] = SourceAudioData[len+3] = SourceAudioData[len+4] = SourceAudioData[len-1];
+    SourceAudioDataLength += 5;
 
     AvailableAudioData = true;
 }
