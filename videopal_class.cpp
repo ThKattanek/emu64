@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.07.2017                //
+// Letzte Änderung am 03.10.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,6 +16,8 @@
 #include "videopal_class.h"
 #include "c64_colors.h"
 #include <math.h>
+
+#include <iostream>
 
 #define VIC_SATURATION	48.0f		//48.0f
 #define VIC_PHASE	-4.5f
@@ -215,6 +217,8 @@ inline void VideoPalClass::CreateVicIIColors(void)
                 }
         }
 
+        std::cout << "HoBlurWY: " << HoBlurWY << std::endl;
+
         int x[4];
         for(x[0]=0;x[0]<16;x[0]++)
                 for(x[1]=0;x[1]<16;x[1]++)
@@ -235,13 +239,17 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 _u /= HoBlurWUV;
                                                 _v /= HoBlurWUV;
 
-                                                /// Y BLUR
-                                                for(int i=1; i<HoBlurWY ; i++)
+                                                // Y BLUR
+                                                float HoBlurWYIntension = 0.75f;
+                                                if(HoBlurWY > 1)
                                                 {
-                                                        _y += C64YUVPalette1[x[i]*3];
-
+                                                    _y *= HoBlurWYIntension;
+                                                    float intension_add = (1.0f - HoBlurWYIntension) / (HoBlurWY-1);
+                                                    for(int i=1; i<HoBlurWY ; i++)
+                                                    {
+                                                         _y += C64YUVPalette1[x[i]*3] * i * intension_add;
+                                                    }
                                                 }
-                                                _y /= HoBlurWY;
 
                                                 r = (short)(_y+0.000*_u+1.140*_v);
                                                 g = (short)(_y-0.396*_u-0.581*_v);
@@ -329,12 +337,16 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                                 _u /= HoBlurWUV;
                                                 _v /= HoBlurWUV;
 
-                                                /// Y BLUR
-                                                for(int i=1; i<HoBlurWY ; i++)
+                                                // Y BLUR
+                                                if(HoBlurWY > 1)
                                                 {
-                                                        _y += C64YUVPalette2[x[i]*3];
+                                                    _y *= HoBlurWYIntension;
+                                                    float intension_add = (1.0f - HoBlurWYIntension) / (HoBlurWY-1);
+                                                    for(int i=1; i<HoBlurWY ; i++)
+                                                    {
+                                                         _y += C64YUVPalette1[x[i]*3] * i * intension_add;
+                                                    }
                                                 }
-                                                _y /= HoBlurWY;
 
                                                 r = (short)(_y+0.000*_u+1.140*_v);
                                                 g = (short)(_y-0.396*_u-0.581*_v);
