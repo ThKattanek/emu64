@@ -217,8 +217,6 @@ inline void VideoPalClass::CreateVicIIColors(void)
                 }
         }
 
-        std::cout << "HoBlurWY: " << HoBlurWY << std::endl;
-
         int x[4];
         for(x[0]=0;x[0]<16;x[0]++)
                 for(x[1]=0;x[1]<16;x[1]++)
