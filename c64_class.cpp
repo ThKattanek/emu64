@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.09.2017                //
+// Letzte Änderung am 04.10.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -441,7 +441,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     SIDVolume = 1.0;
 
     sid1->RESET = &RESET;
-    sid1->SetC64Zyklen(985248);     // 985248
+    sid1->SetC64Zyklen(982800);     // PAL 63*312*50 = 982800
     sid1->SetChipType(MOS_8580);
     sid1->SoundOutputEnable = true;
     sid1->CycleExact = true;
@@ -450,7 +450,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     sid1->SetPotXY(POT_X, POT_Y);
 
     sid2->RESET = &RESET;
-    sid2->SetC64Zyklen(985248);     // 985248
+    sid2->SetC64Zyklen(982800);     // PAL 63*312*50 = 982800
     sid2->SetChipType(MOS_8580);
     sid2->SoundOutputEnable = true;
     sid2->CycleExact = true;
