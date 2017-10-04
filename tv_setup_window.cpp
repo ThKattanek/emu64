@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 04.10.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -50,7 +50,7 @@ TVSetupWindow::TVSetupWindow(QWidget *parent, C64Class *_c64, VideoPalClass *_vi
         value = ini->value("PhaseLineOffset",840).toInt();
         ui->phase_scroll->setValue(value);
         if(ui->phase_scroll->value() == value) on_phase_scroll_valueChanged(value);
-        value = ini->value("Scanline",60).toInt();
+        value = ini->value("Scanline",75).toInt();
         ui->scanline_scroll->setValue(value);
         if(ui->scanline_scroll->value() == value) on_scanline_scroll_valueChanged(value);
 
@@ -155,10 +155,11 @@ void TVSetupWindow::on_distortion_scroll_valueChanged(int value)
 void TVSetupWindow::on_Reset_clicked()
 {
     ui->saettigung_scroll->setValue(75);
-    ui->helligkeit_scroll->setValue(50);
-    ui->kontrast_scroll->setValue(85);
+    ui->helligkeit_scroll->setValue(40);
+    ui->kontrast_scroll->setValue(50);
     ui->horblurY_scroll->setValue(2);
     ui->horblurUV_scroll->setValue(4);
     ui->phase_scroll->setValue(840);
-    ui->scanline_scroll->setValue(85);
+    ui->scanline_scroll->setValue(75);
+    ui->distortion_scroll->setValue(100);
 }
