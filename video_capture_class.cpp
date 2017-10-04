@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.09.2017                //
+// Letzte Änderung am 04.10.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -32,7 +32,8 @@ VideoCaptureClass::VideoCaptureClass()
     AudioBitrate = 128000;
     VideoBitrate = 4000000;
 
-    RecordedFrames = 0;
+    VideoPackageCounter = 0;
+    AudioPackageCounter = 0;
 
     cout << "FFMPEG Version: " << GetAVVersion() << endl;
 }
@@ -72,19 +73,17 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
     };   // Warten bis Mutex1 Unlocked (false)
     Mutex1 = true;      // Mutex1 Locken (true)
 
-
-    AudioDelayCounter = 0;     // 12
-    RecordedFrames = 0;
-
     VideoXW = xw;
     VideoYW = yw;
 
     HaveVideo = HaveAudio = false;
     EncodeVideo = EncodeAudio = 0;
 
-    AvailableAudioData = false;
     SourceAudioDataLength = 0;
     FrameSamplesPt = 0;
+
+    AudioPackageCounter = 0;
+    VideoPackageCounter = 0;
 
     Options = NULL;
 
@@ -218,6 +217,8 @@ void VideoCaptureClass::StopCapture()
     Mutex1 = false;      // Mutex1 Unlocken (false)
 
     cout << "VideoCapture wurde gestoppt" << endl;
+    cout << "VideoFrames: " << VideoPackageCounter << endl;
+    cout << "AudioPackages: " << AudioPackageCounter << endl;
 }
 
 void VideoCaptureClass::SetCapturePause(bool cpt_pause)
@@ -237,34 +238,7 @@ void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
     SourceVideoData = data;
     SourceVideoLineSize = linesize;
 
-    if(AudioDelayCounter >0) AudioDelayCounter--;
-    if(AudioDelayCounter == 0)
-        EncodeVideo = !WriteVideoFrame(FormatCtx, &VideoStream);
-
-    int n_sample = AudioStream.enc->frame_size;
-
-    if(AvailableAudioData)
-    {
-        unsigned short* src = SourceAudioData;
-
-        if(SourceAudioDataLength/2 < n_sample)
-        {
-           for(int i=0; i<(SourceAudioDataLength)/2; i++)
-           {
-                FrameAudioDataL[FrameSamplesPt] = *src++;
-                FrameAudioDataR[FrameSamplesPt++] = *src++;
-                if(FrameSamplesPt == n_sample)
-                {
-                    FrameSamplesPt = 0;
-                    EncodeAudio = !WriteAudioFrame(FormatCtx, &AudioStream);
-                }
-           }
-        }
-        AvailableAudioData = false;
-    }
-
-    RecordedFrames++;
-
+    EncodeVideo = !WriteVideoFrame(FormatCtx, &VideoStream);
     Mutex1 = false;      // Mutex1 Unlocken (false)
 }
 
@@ -272,30 +246,32 @@ void VideoCaptureClass::FillSourceAudioBuffer(uint16_t *data, int len)
 {
     if(!CaptureIsActive) return;
 
-    if(AvailableAudioData)
-        cout << "Error: Audio Buffer Overflow !!" << endl;
-
     if(len > SOURCE_SAMPLE_BUFFER_LEN)
     {
         cerr << "Error: Sampledaten größer als Buffer !!" << endl;
         return;
     }
 
-    for(int i=0; i<len; i++)
-        SourceAudioData[i] = data[i];
+    int n_sample = AudioStream.enc->frame_size;
 
-    SourceAudioDataLength = len;
-
-    /// TEST -- Pro Frame 2 Samples mehr ///
-    SourceAudioData[len] = SourceAudioData[len+1] = SourceAudioData[len+2] = SourceAudioData[len+3] = SourceAudioData[len+4] = SourceAudioData[len-1];
-    SourceAudioDataLength += 5;
-
-    AvailableAudioData = true;
+    if(len/2 <= n_sample)
+    {
+       for(int i=0; i<len/2; i++)
+       {
+            FrameAudioDataL[FrameSamplesPt] = *data++;
+            FrameAudioDataR[FrameSamplesPt++] = *data++;
+            if(FrameSamplesPt == n_sample)
+            {
+                FrameSamplesPt = 0;
+                EncodeAudio = !WriteAudioFrame(FormatCtx, &AudioStream);
+            }
+       }
+    }
 }
 
 int VideoCaptureClass::GetRecordedFrameCount()
 {
-    return RecordedFrames;
+    return VideoPackageCounter;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -591,6 +567,8 @@ int VideoCaptureClass::WriteVideoFrame(AVFormatContext *oc, OutputStream *ost)
         char err_msg[AV_ERROR_MAX_STRING_SIZE];
         cerr << "Error while writing video frame: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
     }
+    else
+        VideoPackageCounter++;
 
     return (frame || got_packet) ? 0 : 1;
 }
@@ -649,6 +627,10 @@ int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
         {
             char err_msg[AV_ERROR_MAX_STRING_SIZE];
             cerr << "Error while writing audio frame: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
+        }
+        else
+        {
+            AudioPackageCounter++;
         }
     }
     return (frame || got_packet) ? 0 : 1;

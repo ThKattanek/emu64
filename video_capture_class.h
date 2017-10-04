@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.09.2017                //
+// Letzte Änderung am 04.10.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -111,7 +111,6 @@ private:
     unsigned char* SourceVideoData;
     int SourceVideoLineSize;
 
-    bool AvailableAudioData;
     unsigned short* SourceAudioData;
     int SourceAudioDataLength;
     int FrameSamplesPt;
@@ -119,11 +118,13 @@ private:
     unsigned short* FrameAudioDataL;
     unsigned short* FrameAudioDataR;
 
-    int RecordedFrames;
-
-    int AudioDelayCounter;
-
     bool Mutex1;
+
+    int AudioPackageCounter;
+    int VideoPackageCounter;
+
+//    int NSamples;
+//    int WSamples;
 
 };
 
