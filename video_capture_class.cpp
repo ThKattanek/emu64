@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.10.2017                //
+// Letzte Änderung am 05.10.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -244,7 +244,7 @@ void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
 
 void VideoCaptureClass::FillSourceAudioBuffer(uint16_t *data, int len)
 {
-    if(!CaptureIsActive) return;
+    if(!CaptureIsActive || CaptureIsPause) return;
 
     if(len > SOURCE_SAMPLE_BUFFER_LEN)
     {
