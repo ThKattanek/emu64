@@ -2552,7 +2552,7 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         StartAdresse=temp[0]|(temp[1]<<8);
         if(ret_startadresse != 0) *ret_startadresse = StartAdresse;
 
-        reading_bytes=fread (RAM+StartAdresse,1,0xFFFF,file);
+        reading_bytes=fread (RAM+StartAdresse,1,0xFFFF-StartAdresse,file);
 
         RAM[0x2B] = 0x01;
         RAM[0x2C] = 0x08;
