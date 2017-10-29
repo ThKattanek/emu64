@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.05.2016                //
+// Letzte Änderung am 29.10.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -52,7 +52,6 @@ public:
 
 /// Variablen ///
     bool            *BA;
-    bool            *RESET;
     unsigned char   *CIA2_PA;
     unsigned char   *CIA1_PB;
     unsigned char   *FarbRam;
@@ -69,7 +68,6 @@ public:
 
 
 private:
-    void Reset(void);
     void RasterIRQ(void);
     void SetBALow(void);
     void cZugriff(void);

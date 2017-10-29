@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.05.2016                //
+// Letzte Änderung am 29.10.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1174,29 +1174,11 @@ inline void VICII::DrawBorder(void)
 	}
 }
 
-inline void VICII::Reset(void)
-{
-    //WriteIO(0x11,0);
-    //WriteIO(0x12,0);
-    Write_xd011 = false;
-}
-
 void VICII::OneZyklus(void)
 {
-    static bool OLD_RESET = *RESET;
     unsigned char SpriteBit = 0x01;
 
     AktXKoordinate = XKoordTbl[AktZyklus];
-
-    if(!*RESET)
-	{
-		CTRL2 = 5;
-		CSEL = false;
-		X_SCROLL = CTRL2 & 7;
-		GrafikMode = ((CTRL1 & 0x60) | (CTRL2 & 0x10)) >> 4;
-	}
-	else if(!OLD_RESET) Reset();
-        OLD_RESET = *RESET;
 
     // Prüfen ob Badlines zugelassen sind
     if(AktRZ == 0x30) BadLineEnable = DEN;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.10.2017                //
+// Letzte Änderung am 29.10.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -397,7 +397,6 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     cia2->PA = &CIA2_PA;
     cia2->PB = &CIA2_PB;
     vic->BA = &RDY_BA;
-    vic->RESET = &RESET;
     vic->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
     vic->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
     vic->FarbRam = mmu->GetFarbramPointer();
@@ -461,7 +460,6 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     Sid2Adresse = 0xD420;
     Sid6ChannelMode = false;
 
-    vic->RESET = &RESET;
     vic->BA = &RDY_BA;
     vic->CIA2_PA = cia2->PA->GetOutputBitsPointer();
 
