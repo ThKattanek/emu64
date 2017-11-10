@@ -2655,207 +2655,207 @@ Do you want it to overwrite?</translation>
         <translation>Contact GameBase64 and instantly play every game in GameBase64.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="274"/>
+        <location filename="main_window.cpp" line="275"/>
         <source>&gt;&gt; VideoPal Klasse wurde installiert
 </source>
         <translation>&gt;&gt; VideoPal class successfully installed
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="293"/>
+        <location filename="main_window.cpp" line="294"/>
         <source>&gt;&gt; InfoWindow wurde erzeugt
 </source>
         <translation>&gt;&gt; AboutWindow successfully created
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="297"/>
+        <location filename="main_window.cpp" line="298"/>
         <source>&gt;&gt; TVSetupWindow wurde erzeugt
 </source>
         <translation>&gt;&gt; TVSetupWindow successfully created
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="301"/>
+        <location filename="main_window.cpp" line="302"/>
         <source>&gt;&gt; FloppyWindow wurde erzeugt
 </source>
         <translation>&gt;&gt; FloppyWindow successfully created
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="309"/>
+        <location filename="main_window.cpp" line="310"/>
         <source>&gt;&gt; C64KeyboardWindow wurde erzeugt
 </source>
         <translation>&gt;&gt; C64KeyboardWindow successfully created
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="313"/>
+        <location filename="main_window.cpp" line="314"/>
         <source>&gt;&gt; CrtWindow wurde erzeugt
 </source>
         <translation>&gt;&gt; CrtWindow successfully created
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="317"/>
+        <location filename="main_window.cpp" line="318"/>
         <source>&gt;&gt; DebuggerWindow wurde erzeugt
 </source>
         <translation>&gt;&gt; DebuggerWindow successfully created
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="322"/>
+        <location filename="main_window.cpp" line="323"/>
         <source>&gt;&gt; SetupWindow wurde erzeugt
 </source>
         <translation>&gt;&gt; SetupWindow successfully created
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="282"/>
+        <location filename="main_window.cpp" line="283"/>
         <source>Fehler beim Installieren der C64 Klasse</source>
         <translation>Error while installing C64 class</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="326"/>
+        <location filename="main_window.cpp" line="327"/>
         <source>&gt;&gt; C64SpeedWindow wurde erzeugt
 </source>
         <oldsource>CRT Window wird mit CRT Klasee verbunden.</oldsource>
         <translation>&gt;&gt; Creating c64 window</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="361"/>
+        <location filename="main_window.cpp" line="366"/>
         <source>C64 Systemroms werden geladen.</source>
         <translation>Loading C64 System ROMS.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="372"/>
+        <location filename="main_window.cpp" line="377"/>
         <source>C64 Key-Matrix wird mit Virtual Keyboard verbunden.</source>
         <translation>C64 Key-Matrix connecting to Virtual Keyboard.</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="379"/>
+        <location filename="main_window.cpp" line="384"/>
         <source>Tabelle für Floppy&apos;s wird erstellt.</source>
         <translation>Creating Floppy Table.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="386"/>
+        <location filename="main_window.cpp" line="391"/>
         <source>Floppy: </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="416"/>
+        <location filename="main_window.cpp" line="421"/>
         <source>Einstellungen werden von INI geladen und gesetzt.</source>
         <translation>Loading settings from INI and set&apos;em.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="508"/>
+        <location filename="main_window.cpp" line="513"/>
         <source>C64 EMULATION WIRD NUN GESTARET.</source>
         <translation>C64 Emulation starts now.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="619"/>
+        <location filename="main_window.cpp" line="624"/>
         <source>Wechseln zur Sprache: </source>
         <translation>Change to language: </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="196"/>
+        <location filename="main_window.cpp" line="197"/>
         <source>&gt;&gt; Translator wurde intsalliert: Systemsprache = </source>
         <translation>&gt;&gt; Translator was installed: System language = </translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="185"/>
+        <location filename="main_window.cpp" line="186"/>
         <source>Sprachmenü wir erstellt.</source>
         <oldsource>SprachmenÃ¼ wir erstellt.</oldsource>
         <translation>Creating language menu.</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="192"/>
+        <location filename="main_window.cpp" line="193"/>
         <source>&gt;&gt; Sprachmenü wurde erstellt.</source>
         <oldsource>&gt;&gt; SprachmenÃ¼ wurde erstellt.</oldsource>
         <translation>&gt;&gt; Languagemenu successfully created.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="195"/>
+        <location filename="main_window.cpp" line="196"/>
         <source>Translator wurde installiert.</source>
         <translation>Translator installed.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="240"/>
+        <location filename="main_window.cpp" line="241"/>
         <source>Screenshotverzeichnis wird gesucht.</source>
         <translation>Searching for screenshot directory.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="243"/>
+        <location filename="main_window.cpp" line="244"/>
         <source>&gt;&gt; Ein Screenshot Verzeichnis ist vorhanden
 </source>
         <translation>&gt;&gt; Screenshot directory is available
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="248"/>
+        <location filename="main_window.cpp" line="249"/>
         <source>Screenshotverzeichnis wird erstellt.</source>
         <translation>Creating screenshot directory.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="249"/>
+        <location filename="main_window.cpp" line="250"/>
         <source>&lt;&lt; Ein Screenshot Verzeichnis ist nicht vorhanden
 </source>
         <translation>&lt;&lt; No screenshot directory availabe</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="252"/>
+        <location filename="main_window.cpp" line="253"/>
         <source>&gt;&gt; Ein neues Screenshot Verzeichnis wurde erstellt
 </source>
         <translation>&gt;&gt; successfully created new screenshot directory
 </translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="257"/>
+        <location filename="main_window.cpp" line="258"/>
         <source>&lt;&lt; Ein neues Screenshot Verzeichnis konnte nicht erstellt werden
 &lt;&lt; Keine Screenshots möglich !!</source>
         <translation>&lt;&lt; Couldn&apos;t create new screenshot directory
 &lt;&lt; No screenshots possible !!</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="272"/>
+        <location filename="main_window.cpp" line="273"/>
         <source>VideoPal Klasse wird initialisiert.</source>
         <translation>Initializing VideoPAL class.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="178"/>
+        <location filename="main_window.cpp" line="179"/>
         <source>INI Dateiverwaltung wird initialisiert.</source>
         <translation>initialising filemanagement INI.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="204"/>
+        <location filename="main_window.cpp" line="205"/>
         <source>RomSet-Verzeichnis wird gesucht.</source>
         <translation>Searching RomSet directory.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="207"/>
+        <location filename="main_window.cpp" line="208"/>
         <source>&gt;&gt; Ein RomSet Verzeichnis ist vorhanden
 </source>
         <translation>&gt;&gt; A RomSet exists</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="212"/>
+        <location filename="main_window.cpp" line="213"/>
         <source>RomSet-Verzeichnis wird erstellt.</source>
         <translation>RomSet directory going to be created.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="213"/>
+        <location filename="main_window.cpp" line="214"/>
         <source>&lt;&lt; Ein RomSet-Verzeichnis ist nicht vorhanden
 </source>
         <translation>&lt;&lt; A RomSet directory does not exist</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="216"/>
+        <location filename="main_window.cpp" line="217"/>
         <source>&gt;&gt; Ein neues RomSet-Verzeichnis wurde erstellt
 </source>
         <translation>&gt;&gt; A new RomSet directory created</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="221"/>
+        <location filename="main_window.cpp" line="222"/>
         <source>&lt;&lt; Ein neues RomSet-Verzeichnis konnte nicht erstellt werden
 </source>
         <oldsource>&lt;&lt; Ein neues RomSet-Verzeichnis konnte nicht erstellt werden
@@ -2863,329 +2863,340 @@ Do you want it to overwrite?</translation>
         <translation>&lt;&lt; A new RomSet directory could not be created</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="291"/>
+        <location filename="main_window.cpp" line="292"/>
         <source>InfoWindow wird erstellt.</source>
         <translation>Creating InfoWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="295"/>
+        <location filename="main_window.cpp" line="296"/>
         <source>TVSetupWindow wird erstellt.</source>
         <translation>Creating TVSetupWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="299"/>
+        <location filename="main_window.cpp" line="300"/>
         <source>FloppyWindow wird erstellt.</source>
         <translation>Creating FloppyWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="303"/>
+        <location filename="main_window.cpp" line="304"/>
         <source>TapeWindow wird erstellt.</source>
         <translation>TapeWindow will be created.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="305"/>
+        <location filename="main_window.cpp" line="306"/>
         <source>&gt;&gt; TapeWindow wurde erzeugt
 </source>
         <translation>&gt;&gt; TapeWindow created</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="307"/>
+        <location filename="main_window.cpp" line="308"/>
         <source>C64KeyboardWindow wird erstellt.</source>
         <translation>Creating C64KeyboardWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="311"/>
+        <location filename="main_window.cpp" line="312"/>
         <source>CRTWindow wird erstellt.</source>
         <translation>Creating CRTWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="315"/>
+        <location filename="main_window.cpp" line="316"/>
         <source>DebuggerWindow wird erstellt.</source>
         <translation>Creating DebuggerWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="319"/>
+        <location filename="main_window.cpp" line="320"/>
         <source>SetupWindow wird erstellt.</source>
         <translation>Creating SetupWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="324"/>
+        <location filename="main_window.cpp" line="325"/>
         <source>C64SpeedWindow wird erstellt.</source>
         <translation>Creating C64SpeedWindow.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="328"/>
+        <location filename="main_window.cpp" line="329"/>
         <source>ShowC64KeyMapWindow wird erstellt.</source>
         <translation>ShowC64KeyMapWindow going to be craeted.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="330"/>
+        <location filename="main_window.cpp" line="331"/>
         <source>&gt;&gt; ShowC64KeyMapWindow wurde erzeugt
 </source>
         <translation>&gt;&gt; ShowC64KeyMapWindow created </translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="333"/>
+        <source>VideoCaptureWindow wird erstellt.</source>
+        <translation>Creating VideoCaptureWindow</translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="335"/>
+        <source>&gt;&gt; VideoCaptureWindow wurde erzeugt
+</source>
+        <translation>VideoCaptureWindow created</translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="338"/>
         <source>Screenshotnummer wird geladen.</source>
         <translation>loading Screenshotnumber.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="336"/>
+        <location filename="main_window.cpp" line="341"/>
         <source>&gt;&gt; Aktuelle Screenshotnummer wurde geladen
 </source>
         <translation>&gt;&gt; Screenshotnumber has been loadet</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="340"/>
+        <location filename="main_window.cpp" line="345"/>
         <source>&gt;&gt; SetupWindow ReSetup wurde durchgeführt
 </source>
         <translation>&gt;&gt; SetupWindow Resetup has been performed</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="348"/>
+        <location filename="main_window.cpp" line="353"/>
         <source>&gt;&gt; DebuggerWindow wurde mit C64 Klasse verbunden
 </source>
         <translation>&gt;&gt; DebuggerWindow has been connected with C64 Class</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="353"/>
+        <location filename="main_window.cpp" line="358"/>
         <source>&gt;&gt; C64SpeedWindow wurde mit C64 Klasse verbunden
 </source>
         <translation>&gt;&gt; C64SpeedWindow has been connected with C64 Class</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="356"/>
+        <location filename="main_window.cpp" line="361"/>
         <source>CRT LED mit CRT Window verbunden.</source>
         <translation>CRT LED connected to CRT Window.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="358"/>
+        <location filename="main_window.cpp" line="363"/>
         <source>&gt;&gt; CRT LED wurde mit CrtWindow verbunden
 </source>
         <translation>&gt;&gt; CRT LED has been connected with CrtWindow</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="369"/>
+        <location filename="main_window.cpp" line="374"/>
         <source>&gt;&gt; Alle C64 Roms geladen
 </source>
         <translation>&gt;&gt; All c64 roms loaded</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="375"/>
+        <location filename="main_window.cpp" line="380"/>
         <source>&gt;&gt; C64 Key-Matrix wurde mit Virtual Keyboard verbunden
 </source>
         <translation>&gt;&gt; C64 Key Matrix has been connected with virtual keyboard</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="382"/>
+        <location filename="main_window.cpp" line="387"/>
         <source>&gt;&gt; Tabelle für alle Floppy Laufwerke wurde erzeugt
 </source>
         <translation>&gt;&gt; table for all floppy drives has been created</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="396"/>
+        <location filename="main_window.cpp" line="401"/>
         <source>&gt;&gt; Alle Floppy Lauferke in Tabelle eingetragen
 </source>
         <translation>&gt;&gt; All floppy drives were entered in the table</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="400"/>
+        <location filename="main_window.cpp" line="405"/>
         <source>&gt;&gt; SDL Window Close Event mit MainWindow verknüpft
 </source>
         <translation>&gt;&gt; SDL Window Close Event associated with MainWindow</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="405"/>
+        <location filename="main_window.cpp" line="410"/>
         <source>&gt;&gt; C64Class LimitCycelsEvent mit MainWindow verknüpft
 </source>
         <translation>&gt;&gt; C64Class LimitCyclesEvent associated with MainWindow</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="410"/>
+        <location filename="main_window.cpp" line="415"/>
         <source>&gt;&gt; C64Class DebugCartEvent mit MainWindow verknüpft
 </source>
         <translation>&gt;&gt; C64Class DebugCartEvent associated with MainWindow</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="413"/>
+        <location filename="main_window.cpp" line="418"/>
         <source>&gt;&gt; ChangeFloppyImage Event mit MainWindow verknüpft
 </source>
         <translation>&gt;&gt; ChangeFloppyImage Event associated with MainWindow</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="420"/>
+        <location filename="main_window.cpp" line="425"/>
         <source>&gt;&gt; FloppyWindow LoadIni wurde ausgeführt
 </source>
         <translation>&gt;&gt; FloppyWindow LoadIni was executed</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="445"/>
+        <location filename="main_window.cpp" line="450"/>
         <source>&gt;&gt; SetupWindow LoadIni wurde ausgeführt
 </source>
         <translation>&gt;&gt; SetupWindow LoadIni was executed</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="449"/>
+        <location filename="main_window.cpp" line="454"/>
         <source>&gt;&gt; CrtWindow LoadIni wurde ausgeführt
 </source>
         <translation>&gt;&gt; CrtWindow LoadIni was executed</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="453"/>
+        <location filename="main_window.cpp" line="458"/>
         <source>&gt;&gt; TapeWindow LoadIni wurde ausgeführt
 </source>
         <translation>&gt;&gt; TapeWindow LoadIni was executed</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="473"/>
+        <location filename="main_window.cpp" line="478"/>
         <source>&gt;&gt; C64 Tastatur Mapping aus INI geladen
 </source>
         <translation>&gt;&gt; C64 Key Mapping loaded from ini</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="915"/>
-        <location filename="main_window.cpp" line="938"/>
+        <location filename="main_window.cpp" line="925"/>
+        <location filename="main_window.cpp" line="948"/>
         <source>C64 Dateien öffnen </source>
         <oldsource>C64 Dateien Ã¶ffnen </oldsource>
         <translation>Open C64 files</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="915"/>
-        <location filename="main_window.cpp" line="938"/>
+        <location filename="main_window.cpp" line="925"/>
+        <location filename="main_window.cpp" line="948"/>
         <source>C64 Programm Dateien </source>
         <translation>C64 program files</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="915"/>
-        <location filename="main_window.cpp" line="938"/>
+        <location filename="main_window.cpp" line="925"/>
+        <location filename="main_window.cpp" line="948"/>
         <source>Alle Dateien </source>
         <translation>All files</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1062"/>
+        <location filename="main_window.cpp" line="1072"/>
         <source>REU Inhalt laden</source>
         <translation>Load REU content</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1062"/>
-        <location filename="main_window.cpp" line="1075"/>
+        <location filename="main_window.cpp" line="1072"/>
+        <location filename="main_window.cpp" line="1085"/>
         <source>REU Image Dateien</source>
         <translation>REU image file</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1066"/>
-        <location filename="main_window.cpp" line="1079"/>
+        <location filename="main_window.cpp" line="1076"/>
+        <location filename="main_window.cpp" line="1089"/>
         <source>Beim laden des REU Images trat ein Fehler auf!</source>
         <translation>While loading the REU image an error occured!</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1075"/>
+        <location filename="main_window.cpp" line="1085"/>
         <source>REU Inhalt speichern</source>
         <translation>Save REU content</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="1084"/>
+        <location filename="main_window.cpp" line="1094"/>
         <source>REU Speicher löschen ...</source>
         <oldsource>REU Speicher lÃ¶schen ...</oldsource>
         <translation>Delete REU content ...</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="1084"/>
+        <location filename="main_window.cpp" line="1094"/>
         <source>Möchten Sie den Inhalt des REU Speichers wirklich löschen?</source>
         <translation>Are you sure you want to delete the REU content?</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="1128"/>
+        <location filename="main_window.cpp" line="1138"/>
         <source>GEORAM Speicher löschen ...</source>
         <oldsource>GEORAM Speicher lÃ¶schen ...</oldsource>
         <translation>Delete GEO-RAM content ...</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="1128"/>
+        <location filename="main_window.cpp" line="1138"/>
         <source>Möchten Sie den Inhalt des GEORAM Speichers wirklich löschen?</source>
         <translation>Are you sure you want to delete the GEO-RAM content?</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1106"/>
+        <location filename="main_window.cpp" line="1116"/>
         <source>GEORAM Inhalt laden</source>
         <translation>Load GEO-RAM content</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1106"/>
-        <location filename="main_window.cpp" line="1119"/>
+        <location filename="main_window.cpp" line="1116"/>
+        <location filename="main_window.cpp" line="1129"/>
         <source>GEORAM Image Dateien</source>
         <translation>GEO-RAM image files</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1110"/>
-        <location filename="main_window.cpp" line="1123"/>
+        <location filename="main_window.cpp" line="1120"/>
+        <location filename="main_window.cpp" line="1133"/>
         <source>Beim laden des GEORAM Images trat ein Fehler auf!</source>
         <translation>While loading the GEO-RAM image an error occured!</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1119"/>
+        <location filename="main_window.cpp" line="1129"/>
         <source>GEORAM Inhalt speichern</source>
         <translation>Save GEO-RAM content</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="277"/>
+        <location filename="main_window.cpp" line="278"/>
         <source>C64 Klasse wird initialisiert.</source>
         <translation>Initializing C64 class.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="282"/>
-        <location filename="main_window.cpp" line="1037"/>
-        <location filename="main_window.cpp" line="1066"/>
-        <location filename="main_window.cpp" line="1079"/>
-        <location filename="main_window.cpp" line="1110"/>
-        <location filename="main_window.cpp" line="1123"/>
+        <location filename="main_window.cpp" line="283"/>
+        <location filename="main_window.cpp" line="1047"/>
+        <location filename="main_window.cpp" line="1076"/>
+        <location filename="main_window.cpp" line="1089"/>
+        <location filename="main_window.cpp" line="1120"/>
+        <location filename="main_window.cpp" line="1133"/>
         <source>Emu64 Fehler ...</source>
         <translation>Emu64 Error ...</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="338"/>
+        <location filename="main_window.cpp" line="343"/>
         <source>SetupWindow wird mit INI abgeglichen.</source>
         <translation>comparing SetupWindow with INI.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="670"/>
+        <location filename="main_window.cpp" line="676"/>
         <source>C64 Bildschirm</source>
         <translation>C64 Screen</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="115"/>
+        <location filename="main_window.cpp" line="116"/>
         <source>&gt;&gt; Es wurden alle Klassen wieder entfernt
 </source>
         <translation>&gt;&gt; All classes have been removed
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="117"/>
+        <location filename="main_window.cpp" line="118"/>
         <source>
 &gt;&gt; Emu64 wurde sauber beendet...</source>
         <translation>
 &gt;&gt; Emu64 did shut down without errors...</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="346"/>
+        <location filename="main_window.cpp" line="351"/>
         <source>Debugger Window wird mit C64 Klasse verbunden.</source>
         <translation>Debugger window connected to C64 Class.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="351"/>
+        <location filename="main_window.cpp" line="356"/>
         <source>C64 Speed Window wird mit C64 Klasse verbunden.</source>
         <translation>C64 speed window connected to C64 Class.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1062"/>
-        <location filename="main_window.cpp" line="1075"/>
-        <location filename="main_window.cpp" line="1106"/>
-        <location filename="main_window.cpp" line="1119"/>
+        <location filename="main_window.cpp" line="1072"/>
+        <location filename="main_window.cpp" line="1085"/>
+        <location filename="main_window.cpp" line="1116"/>
+        <location filename="main_window.cpp" line="1129"/>
         <source>Alle Dateien</source>
         <translation>All files</translation>
     </message>
     <message utf8="true">
-        <location filename="main_window.cpp" line="1037"/>
+        <location filename="main_window.cpp" line="1047"/>
         <source>Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.
 Überprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !</source>
         <translation>No Screenshots possible as Emu64 couldn&apos;t create a screenshot directory.
@@ -3329,13 +3340,13 @@ Please check the file access rights of the directory!</translation>
     <name>QObject</name>
     <message utf8="true">
         <location filename="debugger_window.cpp" line="949"/>
-        <location filename="main_window.cpp" line="723"/>
+        <location filename="main_window.cpp" line="729"/>
         <source>Überschreiben?</source>
         <translation>Overwrite?</translation>
     </message>
     <message utf8="true">
         <location filename="debugger_window.cpp" line="950"/>
-        <location filename="main_window.cpp" line="724"/>
+        <location filename="main_window.cpp" line="730"/>
         <source>Soll die Datei &quot;%1&quot; überschrieben werden?</source>
         <translation>Do you want to overwrite File &quot;%1&quot;?</translation>
     </message>
@@ -3865,6 +3876,54 @@ Recording wont start!</translation>
         <location filename="tape_window.cpp" line="262"/>
         <source>Datasette Lautsprecher ist auf laut gestellt.</source>
         <translation>Speaker from datasette is set to high volume.</translation>
+    </message>
+</context>
+<context>
+    <name>VideoCaptureWindow</name>
+    <message>
+        <location filename="video_capture_window.ui" line="20"/>
+        <source>Video Aufnahme</source>
+        <translation>Video capture</translation>
+    </message>
+    <message>
+        <location filename="video_capture_window.ui" line="130"/>
+        <source>00:00:00-00</source>
+        <translation>00:00:00-00</translation>
+    </message>
+    <message>
+        <location filename="video_capture_window.ui" line="143"/>
+        <source> Audio Bitrate [kbit/s]</source>
+        <translation> Audio bitrate [kbit/s]</translation>
+    </message>
+    <message>
+        <location filename="video_capture_window.ui" line="156"/>
+        <source>Video Bitrate [kbit/s]</source>
+        <translation>Video bitrate [kbit/s]</translation>
+    </message>
+    <message>
+        <location filename="video_capture_window.cpp" line="61"/>
+        <source>Video Aufzeichen ...</source>
+        <translation>Recording Video ...</translation>
+    </message>
+    <message>
+        <location filename="video_capture_window.cpp" line="61"/>
+        <source>MPEG-4</source>
+        <translation>MPEG-4</translation>
+    </message>
+    <message>
+        <location filename="video_capture_window.cpp" line="61"/>
+        <source>MKV (Matroschka)</source>
+        <translation>MKV (Matroschka)</translation>
+    </message>
+    <message>
+        <location filename="video_capture_window.cpp" line="61"/>
+        <source>AVI</source>
+        <translation>AVI</translation>
+    </message>
+    <message>
+        <location filename="video_capture_window.cpp" line="61"/>
+        <source>QuickTime</source>
+        <translation>QuickTime</translation>
     </message>
 </context>
 <context>
