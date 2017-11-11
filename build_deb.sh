@@ -8,14 +8,14 @@ checkinstall -D \
     --pkglicense="LGPL" \
     --deldesc=no \
     --nodoc \
-    --maintainer="Thorsten Kattanek\\<thorsten.Kattanek@emu64.de\\>" \
+    --maintainer="Thorsten Kattanek\\<thorsten.kattanek@emu64-projekt.de\\>" \
     --pkgarch=$(dpkg \
     --print-architecture) \
     --pkgversion="5.0.16" \
     --pkgrelease="0" \
     --pkgname=emu64 \
-    --requires="libc6 \(\>= 2.4\),libgcc1 \(\>= 1:4.1.1\),libncurses5 \(\>= 5.5-5~\),libpcap0.8 \(\>= 0.9.8\),libstdc++6 \(\>= 4.1.1\),libtinfo5, \
-		libqtcore4, libqtgui4, libsdl2-2.0-0 \(\>= 2-2.0-0\), libsdl2-image-2.0-0 \(\>= 2.0-0\), libquazip1, libpng12-0, libx11-6"
+    --requires="libc6, libx11-6, libsdl2-2.0-0, libsdl2-image-2.0-0, libpng16-16, libquazip1, libglu1-mesa, libavutil55, libavcodec57, libavformat57, libswscale4, libswresample2"
+    
 
 alien -r *.deb
 alien -t *.deb
