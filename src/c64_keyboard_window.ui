@@ -32,7 +32,7 @@
    <string>Virtuelle C64 Tastatur</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">border-image: url(:/grafik/c64_tastatur.png);</string>
+   <string notr="true">border-image: url(:/graphics/c64_tastatur.png);</string>
   </property>
  </widget>
  <resources/>
