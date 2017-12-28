@@ -1,3 +1,5 @@
 *.qm 
 *.pro.user*
 *.directory
+*.txt.user
+build/*
