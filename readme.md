@@ -1,4 +1,4 @@
-Emu64 build under Linux
+## Emu64 build under Linux
 
 ### Required Packages 
 - qt-sdk
