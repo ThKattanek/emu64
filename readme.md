@@ -1,24 +1,7 @@
-Es wird ein Makefile mittels qmake erstellt:
+Emu64 build under Linux
 
-    >> qmake -o Makefile emu64_projekt.pro -r -spec linux-g++
-    
-    oder für 64Bit
-    >> qmake -o Makefile emu64_projekt.pro -r -spec linux-g++-64
-
-Nun kann das Projekt mittels make kompiliert werden
-
-    >> make -j8
-
-Was gehört in den Emu64 Arbeitsordner:
-
-- ausführbare emu64 Datei für das jeweilige System
-- 1 Verzeichnis "languages" mit den Sprachdateien qt_de.qm / qt_en.qm / emu64_de.qm / emu64_en.qm
-                            und dann noch die Bilder aus dem Verzeichnis grafik/flaggen/
-                            Sollten noch mehr Sprachen dazu kommen, jeweils die qt_*.qm / emu64_*.qm und emu64_*.png
-                            mit rein packen.
-
-- 1 Verzeichnis "roms" welcher einfach aus dem emu64_source Verzeichnis kopiert werden kann
-- 1 Verzeichnis "floppy_sounds" welcher auch einfach aus dem emu64_source Verzeichnis kopiert werden kann
-- 1 Verzeichnis "gfx" welches folgende Dateien aus dem grafik Verzeichnis enthalten muss
-                            kreis0.png / kreis1.png / pfeil0.png / pfeil1.png / sdl_icon.png
-- Lizenstexte ""
+- git clone https://github.com/ThKattanek/emu64.git
+- cd emu64
+- mkdir build
+- cd build
+- cmake CMAKE_BUILD_TYPE=Release ..
