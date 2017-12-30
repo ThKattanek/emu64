@@ -209,7 +209,7 @@ install(FILES "roms/basic.rom" DESTINATION share/emu64/roms)
 install(FILES "roms/1541.rom" DESTINATION share/emu64/roms)
 
 # Install Floppysounds
-install(FILES "floppy_sounds/FloppySound Hinweis.txt" DESTINATION share/emu64/floppy_sounds)
+install(FILES "floppy_sounds/hinweis.txt" DESTINATION share/emu64/floppy_sounds)
 install(FILES "floppy_sounds/stepper_inc.raw" DESTINATION share/emu64/floppy_sounds)
 install(FILES "floppy_sounds/stepper_dec.raw" DESTINATION share/emu64/floppy_sounds)
 install(FILES "floppy_sounds/motor_on.raw" DESTINATION share/emu64/floppy_sounds)
@@ -223,3 +223,7 @@ install(FILES "grafik/kreis1.png" DESTINATION share/emu64/gfx)
 install(FILES "grafik/pfeil0.png" DESTINATION share/emu64/gfx)
 install(FILES "grafik/pfeil1.png" DESTINATION share/emu64/gfx)
 install(FILES "grafik/sdl_icon.png" DESTINATION share/emu64/gfx)
+
+# Install Startmenü Eintrag
+install(FILES "emu64.desktop" DESTINATION share/applications)
+install(FILES "grafik/emu64.png" DESTINATION share/icons/hicolor/64x64/apps)
