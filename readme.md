@@ -27,3 +27,9 @@ make
 make install
 ```
 Optional kann noch -DCMAKE_INSTALL_PREFIX=[InstallPfad] verwendet werden.
+
+### Deinstallieren
+```bash
+xargs rm < install_manifest.txt
+```
+Achtung! Erstellte Verzeichnisse die durch die Installation erstellt wurden werden hiermit nicht entfernt, jedoch alle Dateien die erstellt wurden.
