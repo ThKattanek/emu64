@@ -24,5 +24,6 @@ mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
+make install
 ```
 Optional kann noch -DCMAKE_INSTALL_PREFIX=[InstallPfad] verwendet werden.
