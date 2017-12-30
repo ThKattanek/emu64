@@ -22,6 +22,7 @@ git clone https://github.com/ThKattanek/emu64.git
 cd emu64
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 ```
+Optional kann noch -DCMAKE_INSTALL_PREFIX=[InstallPfad] verwendet werden.
