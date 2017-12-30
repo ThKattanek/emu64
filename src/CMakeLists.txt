@@ -146,12 +146,18 @@ set(RESOURCES
                 emu64.qrc
 )
 
+SET(TRANS
+                emu64_de.ts
+                emu64_en.ts
+)
+
 # Qt4
 find_package( Qt4 REQUIRED )
 include( ${QT_USE_FILE} )
 add_definitions( ${QT_DEFINITIONS} )
 include_directories( ${CMAKE_BINARY_DIR} )   
 
+QT4_ADD_TRANSLATION(QM ${TRANS})
 QT4_ADD_RESOURCES( RES_SOURCES ${PROJECT_SOURCE_DIR}/${RESOURCES} )
 QT4_WRAP_UI( UI_HEADERS ${UIS} )
 QT4_WRAP_CPP( MOC_SRCS ${MOC_HEADERS} )  
@@ -189,7 +195,7 @@ include_directories(${PNG_INCLUDE_DIR})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)   
             
-add_executable(emu64 ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
+add_executable(emu64 ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} ${QM})
 target_link_libraries(emu64 ${QT_LIBRARIES} ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QUAZIP_LIBRARIES} ${FFMPEG_LIBRARIES} ${PNG_LIBRARIES})
               
 if (UNIX)
@@ -223,6 +229,12 @@ install(FILES "grafik/kreis1.png" DESTINATION share/emu64/gfx)
 install(FILES "grafik/pfeil0.png" DESTINATION share/emu64/gfx)
 install(FILES "grafik/pfeil1.png" DESTINATION share/emu64/gfx)
 install(FILES "grafik/sdl_icon.png" DESTINATION share/emu64/gfx)
+
+# Install Languages
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/emu64_de.qm" DESTINATION share/emu64/languages)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/emu64_en.qm" DESTINATION share/emu64/languages)
+install(FILES "grafik/flaggen/emu64_de.png" DESTINATION share/emu64/languages)
+install(FILES "grafik/flaggen/emu64_en.png" DESTINATION share/emu64/languages)
 
 # Install Startmenü Eintrag
 install(FILES "emu64.desktop" DESTINATION share/applications)
