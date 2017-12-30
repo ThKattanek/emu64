@@ -14,10 +14,6 @@
 - libavformat-dev
 - libswscale-dev
 
-´jksdfjkhskdf´
-
-`dsklfjlksdjkfl`
-
 ### Build
 ```bash
 git clone https://github.com/ThKattanek/emu64.git
