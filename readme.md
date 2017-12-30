@@ -1,3 +1,5 @@
+![Logo](http://francky.me/images/quora001.png)
+
 ## Emu64 build under Linux
 
 ### Required Packages 
