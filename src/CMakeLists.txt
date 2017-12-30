@@ -195,3 +195,7 @@ target_link_libraries(emu64 ${QT_LIBRARIES} ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY
 if (UNIX)
     target_link_libraries(emu64 ${X11_LIBRARIES})
 endif (UNIX)
+
+# Install
+
+install(TARGETS emu64 DESTINATION bin)
