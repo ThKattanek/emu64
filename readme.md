@@ -14,10 +14,16 @@
 - libavformat-dev
 - libswscale-dev
 
+´jksdfjkhskdf´
+
+`dsklfjlksdjkfl`
+
 ### Build
-- git clone https://github.com/ThKattanek/emu64.git
-- cd emu64
-- mkdir build
-- cd build
-- cmake -DCMAKE_BUILD_TYPE=Release ..
-- make
+```bash
+git clone https://github.com/ThKattanek/emu64.git
+cd emu64
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make
+```
