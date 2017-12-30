@@ -19,5 +19,5 @@
 - cd emu64
 - mkdir build
 - cd build
-- cmake CMAKE_BUILD_TYPE=Release ..
+- cmake -DCMAKE_BUILD_TYPE=Release ..
 - make
