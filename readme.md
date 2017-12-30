@@ -1,4 +1,4 @@
-![Logo](https://github.com/ThKattanek/emu64/tree/master/src/grafik/emu64_logo_120_120.png)
+![Logo](http://www.emu64-projekt.de/images/emu64_logo_120_120.png)
 
 ## Emu64 build under Linux
 
