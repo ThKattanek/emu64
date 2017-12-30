@@ -8,13 +8,14 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.06.2017                //
+// Letzte Änderung am 30.12.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "main_window.h"
-#include "ui_main_window.h"
+#include "./version.h"
+#include "./main_window.h"
+#include "./ui_main_window.h"
 
 MainWindow::MainWindow(QWidget *parent,customSplashScreen* splash,QTextStream *log) :
     QMainWindow(parent),
@@ -34,11 +35,11 @@ MainWindow::MainWindow(QWidget *parent,customSplashScreen* splash,QTextStream *l
     ui->setupUi(this);
 
 #ifdef _WIN32
-    setWindowTitle("Emu64 Version " + QString(str_emu64_version) + " --- [Windows " + QString(str_system_arch) + "]");
+    setWindowTitle("Emu64 Version " + QString(VERSION_STRING) + " --- [Windows " + QString(str_system_arch) + "]");
 #endif
 
 #ifdef __linux__
-    setWindowTitle("Emu64 Version " + QString(str_emu64_version) + " --- [Linux " + QString(str_system_arch) + "]");
+    setWindowTitle("Emu64 Version " + QString(VERSION_STRING) + " --- [Linux " + QString(str_system_arch) + "]");
 #endif
 }
 
@@ -887,7 +888,7 @@ void MainWindow::on_menu_main_info_triggered()
     SDL_VERSION(&compiled);
 
     QString sdl_version = QVariant(compiled.major).toString() + "." + QVariant(compiled.minor).toString() + "." + QVariant(compiled.patch).toString();
-    QString emu64_version = QString("Emu64 V") + QString(str_emu64_version);
+    QString emu64_version = QString("Emu64 V") + QString(VERSION_STRING);
 
     info_window->SetEmu64VersionText(emu64_version);
     info_window->SetMoreInfoText("Qt Version: " + QString(qVersion()) + " / SDL Version: " + sdl_version + " / FFMpeg Version: " + QString(c64->GetAVVersion()));

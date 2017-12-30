@@ -8,11 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.03.2017                //
+// Letzte Änderung am 30.12.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
+#include "./version.h"
 #include "./single_application.h"
 #include "./main_window.h"
 
@@ -73,7 +74,7 @@ int main(int argc, char *argv[])
         }
         if(cmd_line->GetCommand(0) == CMD_VERSION)
         {
-            printf("Version: %s\n\n",str_emu64_version);
+            printf("Version: %s\n\n",VERSION_STRING);
             return(0x0);
         }
     }
@@ -133,7 +134,7 @@ int main(int argc, char *argv[])
     if(log) *log << "*** Emu64 Linux Binary File ***\n\n";
 #endif
 
-    if(log!=0) *log << "Emu64 Version: " << str_emu64_version << "\n\n";
+    if(log!=0) *log << "Emu64 Version: " << VERSION_STRING << "\n\n";
 
     MainWindow *w;
 
