@@ -196,6 +196,30 @@ if (UNIX)
     target_link_libraries(emu64 ${X11_LIBRARIES})
 endif (UNIX)
 
-# Install
+# Set DataPath
+add_definitions("-DDATA_PATH=\"${CMAKE_INSTALL_PREFIX}\"")
 
+# Install Binary
 install(TARGETS emu64 DESTINATION bin)
+
+# Install C64 Roms
+install(FILES "roms/kernal.rom" DESTINATION share/emu64/roms)
+install(FILES "roms/char.rom" DESTINATION share/emu64/roms)
+install(FILES "roms/basic.rom" DESTINATION share/emu64/roms)
+install(FILES "roms/1541.rom" DESTINATION share/emu64/roms)
+
+# Install Floppysounds
+install(FILES "floppy_sounds/FloppySound Hinweis.txt" DESTINATION share/emu64/floppy_sounds)
+install(FILES "floppy_sounds/stepper_inc.raw" DESTINATION share/emu64/floppy_sounds)
+install(FILES "floppy_sounds/stepper_dec.raw" DESTINATION share/emu64/floppy_sounds)
+install(FILES "floppy_sounds/motor_on.raw" DESTINATION share/emu64/floppy_sounds)
+install(FILES "floppy_sounds/motor_off.raw" DESTINATION share/emu64/floppy_sounds)
+install(FILES "floppy_sounds/motor.raw" DESTINATION share/emu64/floppy_sounds)
+install(FILES "floppy_sounds/anschlag.raw" DESTINATION share/emu64/floppy_sounds)
+
+# Install GFX
+install(FILES "grafik/kreis0.png" DESTINATION share/emu64/gfx)
+install(FILES "grafik/kreis1.png" DESTINATION share/emu64/gfx)
+install(FILES "grafik/pfeil0.png" DESTINATION share/emu64/gfx)
+install(FILES "grafik/pfeil1.png" DESTINATION share/emu64/gfx)
+install(FILES "grafik/sdl_icon.png" DESTINATION share/emu64/gfx)

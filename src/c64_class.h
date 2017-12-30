@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.09.2017                //
+// Letzte Änderung am 30.12.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -355,8 +355,8 @@ private:
     function<void(unsigned short,unsigned char)> *WriteProcTbl;
 
     const char* GfxPath;
-    const char* RomPath;
-    const char* FloppySoundPath;
+    char* RomPath;
+    char* FloppySoundPath;
 
     char window_title[MAX_C64_SCREEN_TITLE_LENGTH];
 

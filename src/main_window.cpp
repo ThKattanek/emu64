@@ -150,8 +150,12 @@ void MainWindow::OnInit()
 #endif
 
 #ifdef __linux__
-    dataPath = "/usr/share/emu64";
+    dataPath = DATA_PATH;
+    dataPath += "/share/emu64";
 #endif
+
+    LogText((QString(">> Data Path = ") + dataPath + QString("\n")).toAscii());
+
 
     tmpPath = QDir::tempPath();
     LogText((QString(">> TEMP Path = ") + tmpPath + QString("\n")).toAscii());

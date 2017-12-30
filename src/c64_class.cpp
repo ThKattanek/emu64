@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.10.2017                //
+// Letzte Änderung am 30.12.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -74,6 +74,9 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     LogText = log_function;
     GfxPath = gfx_path;
 
+    FloppySoundPath = NULL;
+    RomPath = NULL;
+
     Mouse1351Enable = false;
     MouseXRel = MouseYRel = 0;
 
@@ -91,8 +94,12 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
 #endif
 
 #ifdef __linux__
-    FloppySoundPath = "/usr/share/emu64/floppy_sounds/";
-    RomPath = "/usr/share/emu64/roms/";
+    FloppySoundPath = new char[1024];
+    RomPath = new char[1024];
+
+    sprintf(FloppySoundPath,"%s%s",DATA_PATH,"/share/emu64/floppy_sounds/");
+    sprintf(RomPath,"%s%s",DATA_PATH,"/share/emu64/roms/");
+
 #endif
 
     LogText((char*)">> C64 Klasse wurde gestartet...\n");
@@ -500,6 +507,9 @@ C64Class::~C64Class()
     if(geo != NULL) delete geo;
 
     if(VideoCapture != NULL) delete VideoCapture;
+
+    if(FloppySoundPath != NULL) delete[] FloppySoundPath;
+    if(RomPath != NULL) delete[] RomPath;
 }
 
 void C64Class::StartEmulation()
