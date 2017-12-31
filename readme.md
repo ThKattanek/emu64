@@ -34,7 +34,7 @@ xargs rm < install_manifest.txt
 ```
 Achtung! Erstellte Verzeichnisse die durch die Installation erstellt wurden werden hiermit nicht entfernt, jedoch alle Dateien die erstellt wurden.
 
-### Detailierte Beschreibung für Verschiedene Linux Distributionen
+### Detailierte Beschreibungen für verschiedene Linux Distributionen
 
 [Kompilieren unter Fedora 27](https://github.com/ThKattanek/emu64/wiki/Emu64-auf-Fedora-27-kompilieren)
 
