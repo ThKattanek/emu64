@@ -2,19 +2,20 @@
 
 ## Emu64 erstellen unter Linux
 
-### Benötigte Pakete 
-- qt-sdk
+### Benötigte Dev Pakete 
+- qt4
 - git
 - cmake
-- libsdl2-dev
-- libsdl2-image-dev
-- libquazip-dev
-- libpng-dev
-- libavcodec-dev
-- libavutil-dev
-- libswresample-dev
-- libavformat-dev
-- libswscale-dev
+- sdl2
+- sdl2-image
+- quazip
+- png
+- ffmpeg
+  - avcodec
+  - avutil
+  - swresample
+  - avformat
+  - swscale
 
 ### Build
 ```bash
