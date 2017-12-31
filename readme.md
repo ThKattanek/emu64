@@ -1,8 +1,8 @@
 ![Logo](http://www.emu64-projekt.de/images/emu64_logo_120_120.png)
 
-## Emu64 build under Linux
+## Emu64 erstellen unter Linux
 
-### Required Packages 
+### Benötigte Pakete 
 - qt-sdk
 - git
 - cmake
@@ -33,3 +33,8 @@ Optional kann noch -DCMAKE_INSTALL_PREFIX=[InstallPfad] verwendet werden.
 xargs rm < install_manifest.txt
 ```
 Achtung! Erstellte Verzeichnisse die durch die Installation erstellt wurden werden hiermit nicht entfernt, jedoch alle Dateien die erstellt wurden.
+
+### Detailierte Beschreibung für Verschiedene Linux Distributionen
+
+[Kompilieren unter Fedora 27](https://github.com/ThKattanek/emu64/wiki/Emu64-auf-Fedora-27-kompilieren)
+
