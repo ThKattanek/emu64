@@ -8,12 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 30.12.2017                //
+// Letzte Änderung am 02.01.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "c64_class.h"
+#include "version.h"
 #include "c64_keys.h"
 
 #include <QDebug>
@@ -3187,7 +3188,7 @@ bool C64Class::ExportASM(char *filename, unsigned short start_adresse, unsigned 
         break;
     }
 
-    fprintf(file,"Disassembler Listing wurde mit Emu64 %s erzeugt\n",str_emu64_version);
+    fprintf(file,"Disassembler Listing wurde mit Emu64 %s erzeugt\n",VERSION_STRING);
     fprintf(file,"-------------------------------------------------\n");
     fprintf(file,"Von: $%4.4X Bis: $%4.4X Quelle: %s",start_adresse,end_adresse,source_str);
     fprintf(file,"\n");
@@ -3273,7 +3274,7 @@ bool C64Class::StartIECDump(const char *filename)
 {
     char VersionString[256];
 
-    sprintf(VersionString,"Emu64 Version %s",str_emu64_version);
+    sprintf(VersionString,"Emu64 Version %s",VERSION_STRING);
 
     IecVcdExport.SetVersionString(VersionString);
     IecVcdExport.SetTimeScaleString("989 ns");

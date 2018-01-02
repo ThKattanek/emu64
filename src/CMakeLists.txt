@@ -5,17 +5,45 @@ cmake_minimum_required (VERSION 3.7)
 
 project (emu64) 
 
-# VersionString
-add_definitions(-Dstr_emu64_version="\\"5.0.16\\"")
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+
+# Holen des aktuellen Arbeitsbranches
+execute_process(
+  COMMAND git rev-parse --abbrev-ref HEAD
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE GIT_BRANCH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Holen des Hashecodes vom letzten Commits
+execute_process(
+  COMMAND git log -1 --format=%h
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE GIT_COMMIT_HASH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Version aus dem Tag ermitteln
+execute_process(
+  COMMAND git describe --always --tags
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE VERSION_STRING
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+add_definitions("-DGIT_COMMIT_HASH=${GIT_COMMIT_HASH}")
+add_definitions("-DGIT_BRANCH=${GIT_BRANCH}")
+add_definitions("-DVERSION_STRING=${VERSION_STRING}")
 
 # ArchitectureString
 add_definitions(-Dstr_system_arch="\\"LINUX\\"")
 
-# add_subdirectory(src)
-
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+configure_file(
+  ${CMAKE_SOURCE_DIR}/src/version.h.in
+  ${CMAKE_BINARY_DIR}/src/version.h
+)
 
 if(COMPILER_SUPPORTS_CXX11)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -197,7 +225,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
             
 add_executable(emu64 ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} ${QM})
 target_link_libraries(emu64 ${QT_LIBRARIES} ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QUAZIP_LIBRARIES} ${FFMPEG_LIBRARIES} ${PNG_LIBRARIES})
-              
+
 if (UNIX)
     target_link_libraries(emu64 ${X11_LIBRARIES})
 endif (UNIX)
