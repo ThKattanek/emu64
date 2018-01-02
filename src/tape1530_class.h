@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.10.2016                //
+// Letzte Änderung am 02.01.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -20,6 +20,10 @@
 #include <fstream>
 #include <iostream>
 #include <math.h>
+
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
 
 #include "mos6510_class.h"
 
