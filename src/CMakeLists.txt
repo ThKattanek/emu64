@@ -37,8 +37,15 @@ add_definitions("-DGIT_COMMIT_HASH=${GIT_COMMIT_HASH}")
 add_definitions("-DGIT_BRANCH=${GIT_BRANCH}")
 add_definitions("-DVERSION_STRING=${VERSION_STRING}")
 
+
+
 # ArchitectureString
-add_definitions(-Dstr_system_arch="\\"LINUX\\"")
+
+if ( "${CMAKE_SIZEOF_VOID_P}" EQUAL 4)
+        add_definitions(-Dstr_system_arch="32Bit")
+elseif ( "${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
+        add_definitions(-Dstr_system_arch="64Bit")
+endif()
 
 configure_file(
   ${CMAKE_SOURCE_DIR}/src/version.h.in
