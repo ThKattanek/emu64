@@ -12,7 +12,6 @@ ELSE (QUAZIP_INCLUDE_DIRS AND QUAZIP_LIBRARIES)
     IF (Qt5Core_FOUND)
         set(QUAZIP_LIB_VERSION_SUFFIX 5)
     ENDIF()
-	
 		FIND_PACKAGE(PkgConfig)
 #     pkg_check_modules(PC_QCA2 QUIET qca2)
 		pkg_check_modules(PC_QUAZIP quazip)
