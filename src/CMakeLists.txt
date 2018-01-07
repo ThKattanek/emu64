@@ -33,8 +33,6 @@ add_definitions("-DGIT_COMMIT_HASH=${GIT_COMMIT_HASH}")
 add_definitions("-DGIT_BRANCH=${GIT_BRANCH}")
 add_definitions("-DVERSION_STRING=${VERSION_STRING}")
 
-
-
 # ArchitectureString
 
 if ( "${CMAKE_SIZEOF_VOID_P}" EQUAL 4)
@@ -184,54 +182,93 @@ SET(TRANS
 
 # Qt4
 find_package( Qt4 REQUIRED )
-include( ${QT_USE_FILE} )
-add_definitions( ${QT_DEFINITIONS} )
-include_directories( ${CMAKE_BINARY_DIR} )   
+if(QT4_FOUND)
+    message(STATUS "Qt4 wurde gefunden.")
+    include( ${QT_USE_FILE} )
+    add_definitions( ${QT_DEFINITIONS} )
+    include_directories( ${CMAKE_BINARY_DIR})
 
-QT4_ADD_TRANSLATION(QM ${TRANS})
-QT4_ADD_RESOURCES( RES_SOURCES ${PROJECT_SOURCE_DIR}/${RESOURCES} )
-QT4_WRAP_UI( UI_HEADERS ${UIS} )
-QT4_WRAP_CPP( MOC_SRCS ${MOC_HEADERS} )  
+    QT4_ADD_TRANSLATION(QM ${TRANS})
+    QT4_ADD_RESOURCES( RES_SOURCES ${PROJECT_SOURCE_DIR}/${RESOURCES} )
+    QT4_WRAP_UI( UI_HEADERS ${UIS} )
+    QT4_WRAP_CPP( MOC_SRCS ${MOC_HEADERS} )
 
-# includes cmake/FindSDL2.cmake cmake/FindSDL2_image.cmake cmake/FindSDL2_ttf.cmake
+endif()
+
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../cmake)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+add_executable(emu64 ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} ${QM})
 
 # SDL2
 find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIR})
+if(SDL2_FOUND)
+    message(STATUS "SDL2 wurde gefunden.")
+    include_directories(${SDL2_INCLUDE_DIR})
+    target_link_libraries(emu64 ${SDL2_LIBRARY})
+    #add_definitions(${SDL2_CFLAGS} ${SDL2_CFLAGS_OTHER})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SDL2_CFLAGS} ${SDL2_CFLAGS_OTHER}")
+endif()
 
 # SDL2 Image
 find_package(SDL2_image REQUIRED)
-include_directories(${SDL2_IMAGE_INCLUDE_DIR})
+if(SDL2_IMAGE_FOUND)
+    message(STATUS "SDL2_image wurde gefunden.")
+    include_directories(${SDL2_IMAGE_INCLUDE_DIR})
+    target_link_libraries(emu64 ${SDL2_IMAGE_LIBRARY})
+    #add_definitions(${SDL2_IMAGE_CFLAGS} ${SDL2_IMAGE_CFLAGS_OTHER})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SDL2_IMAGE_CFLAGS} ${SDL2_IMAGE_CFLAGS_OTHER}")
+endif()
 
-# X11
-find_package(X11 REQUIRED)
-include_directories(${X11_INCLUDE_DIR})
+if (UNIX)
+    # X11
+    find_package(X11 REQUIRED)
+    if(X11_FOUND)
+        message(STATUS "X11 wurde gefunden.")
+        include_directories(${X11_INCLUDE_DIR})
+        target_link_libraries(emu64 ${X11_LIBRARIES})
+    endif()
+endif (UNIX)
 
 # OpenGL
 find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIR})
+if(OPENGL_FOUND)
+    message(STATUS "OpenGL wurde gefunden.")
+    include_directories(${OPENGL_INCLUDE_DIR})
+    target_link_libraries(emu64 ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPENGL_gl_CFLAGS} ${OPENGL_gl_CFLAGS_OTHER}")
+endif()
 
 # Quazip
 find_package(QuaZip REQUIRED)
-include_directories(${QUAZIP_INCLUDE_DIR})
+if(QUAZIP_FOUND)
+    message(STATUS "Quazip wurde gefunden.")
+    include_directories(${QUAZIP_INCLUDE_DIR})
+    target_link_libraries(emu64 ${QUAZIP_LIBRARIES})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QUAZIP_CFLAGS} ${QUAZIP_CFLAGS_OTHER}")
+endif()
 
 # AVFormat
 find_package(FFMPEG REQUIRED)
-include_directories(${FFMPEG_INCLUDE_DIR})
+if(FFMPEG_FOUND)
+    message(STATUS "FFMPEG wurde gefunden.")
+    include_directories(${FFMPEG_INCLUDE_DIR})
+    target_link_libraries(emu64 ${FFMPEG_LIBRARIES})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FFMPEG_CFLAGS} ${FFMPEG_CFLAGS_OTHER}")
+endif()
 
 # PNG
 find_package(PNG REQUIRED)
-include_directories(${PNG_INCLUDE_DIR})
+if(PNG_FOUND)
+    message(STATUS "PNG wurde gefunden.")
+    include_directories(${PNG_INCLUDE_DIR})
+    target_link_libraries(emu64 ${PNG_LIBRARIES})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PNG_CFLAGS} ${PNG_CFLAGS_OTHER}")
+endif()
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)   
-            
-add_executable(emu64 ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} ${QM})
-target_link_libraries(emu64 ${QT_LIBRARIES} ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${QUAZIP_LIBRARIES} ${FFMPEG_LIBRARIES} ${PNG_LIBRARIES})
+message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
 
-if (UNIX)
-    target_link_libraries(emu64 ${X11_LIBRARIES})
-endif (UNIX)
+target_link_libraries(emu64 ${QT_LIBRARIES})
 
 # Set DataPath
 add_definitions("-DDATA_PATH=\"${CMAKE_INSTALL_PREFIX}\"")
