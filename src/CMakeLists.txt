@@ -180,6 +180,12 @@ SET(TRANS
                 emu64_en.ts
 )
 
+if(WIN32)
+    set(WIN_RC
+                emu64.rc
+        )
+endif()
+
 # Qt4
 find_package( Qt4 REQUIRED )
 if(QT4_FOUND)
@@ -198,7 +204,7 @@ endif()
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../cmake)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-add_executable(emu64 ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} ${QM})
+add_executable(emu64 ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} ${QM} ${WIN_RC})
 
 # SDL2
 find_package(SDL2 REQUIRED)
