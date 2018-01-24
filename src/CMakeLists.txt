@@ -214,6 +214,8 @@ if(SDL2_FOUND)
     target_link_libraries(emu64 ${SDL2_LIBRARY})
     #add_definitions(${SDL2_CFLAGS} ${SDL2_CFLAGS_OTHER})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SDL2_CFLAGS} ${SDL2_CFLAGS_OTHER}")
+else()
+    message(FATAL_ERROR "SDL2 wurde nicht gefunden.")
 endif()
 
 # SDL2 Image
@@ -224,6 +226,8 @@ if(SDL2_IMAGE_FOUND)
     target_link_libraries(emu64 ${SDL2_IMAGE_LIBRARY})
     #add_definitions(${SDL2_IMAGE_CFLAGS} ${SDL2_IMAGE_CFLAGS_OTHER})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SDL2_IMAGE_CFLAGS} ${SDL2_IMAGE_CFLAGS_OTHER}")
+else()
+    message(FATAL_ERROR "SDL2_IMAGE wurde nicht gefunden.")
 endif()
 
 if (UNIX)
@@ -243,6 +247,8 @@ if(OPENGL_FOUND)
     include_directories(${OPENGL_INCLUDE_DIR})
     target_link_libraries(emu64 ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPENGL_gl_CFLAGS} ${OPENGL_gl_CFLAGS_OTHER}")
+else()
+    message(FATAL_ERROR "OPENGL wurde nicht gefunden.")
 endif()
 
 # Quazip
@@ -252,15 +258,19 @@ if(QUAZIP_FOUND)
     include_directories(${QUAZIP_INCLUDE_DIR})
     target_link_libraries(emu64 ${QUAZIP_LIBRARIES})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QUAZIP_CFLAGS} ${QUAZIP_CFLAGS_OTHER}")
+else()
+    message(FATAL_ERROR "QUAZIP wurde nicht gefunden.")
 endif()
 
-# AVFormat
+# FFMPEG
 find_package(FFMPEG REQUIRED)
 if(FFMPEG_FOUND)
     message(STATUS "FFMPEG wurde gefunden.")
     include_directories(${FFMPEG_INCLUDE_DIR})
     target_link_libraries(emu64 ${FFMPEG_LIBRARIES})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FFMPEG_CFLAGS} ${FFMPEG_CFLAGS_OTHER}")
+else()
+    message(FATAL_ERROR "FFMPEG wurde nicht gefunden.")
 endif()
 
 # PNG
@@ -270,6 +280,8 @@ if(PNG_FOUND)
     include_directories(${PNG_INCLUDE_DIR})
     target_link_libraries(emu64 ${PNG_LIBRARIES})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PNG_CFLAGS} ${PNG_CFLAGS_OTHER}")
+else()
+    message(FATAL_ERROR "PNG wurde nicht gefunden.")
 endif()
 
 message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
