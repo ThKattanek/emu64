@@ -14,7 +14,7 @@ ELSE (QUAZIP_INCLUDE_DIRS AND QUAZIP_LIBRARIES)
     ENDIF()
 		FIND_PACKAGE(PkgConfig)
 #     pkg_check_modules(PC_QCA2 QUIET qca2)
-		pkg_check_modules(PC_QUAZIP quazip)
+                pkg_check_modules(PC_QUAZIP QUIET quazip)
 		FIND_LIBRARY(QUAZIP_LIBRARIES
 			WIN32_DEBUG_POSTFIX d
             NAMES quazip${QUAZIP_LIB_VERSION_SUFFIX}
