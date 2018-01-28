@@ -5,6 +5,10 @@ cmake_minimum_required (VERSION 3.7)
 
 project (emu64) 
 
+if(WIN32)
+    add_definitions(-DQUAZIP_STATIC)
+endif()
+
 # Holen des aktuellen Arbeitsbranches
 execute_process(
   COMMAND git rev-parse --abbrev-ref HEAD
@@ -287,6 +291,17 @@ endif()
 message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
 
 target_link_libraries(emu64 ${QT_LIBRARIES})
+
+if(WIN32)
+    message(STATUS ">>>> --- Windows Build ---")
+    # mingw32 SDL2main SDL2 m dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 version uuid
+    # target_link_libraries(emu64 mingw32 secur32 avcodec avformat avutil version     user32 gdi32 winmm imm32 ole32 oleaut32 shell32 uuid  quazip  -lxml2 -lz   -llzma     -liconv    bluray bz2 freetype glib-2.0 harfbuzz iconv intl jpeg mp3lame ogg opencore-amrnb opencore-amrwb opus pcre pcre2-16 png16 samplerate speex theoradec theoraenc tiff vo-amrwbenc vorbis vorbisenc vpx webp x264 xvidcore z)
+    target_link_libraries(emu64 avcodec avformat avutil SDL2 quazip mingw32 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 uuid version iconv samplerate jpeg z png webp tiff bz2 gmp gnurx unistring idn2 nettle gnutls expat fontconfig glib-2.0 lzo2 pixman-1 cairo harfbuzz freetype fribidi xml2 bluray bs2b ncurses caca pthread yasm vpx opencore-amrnb opencore-amrwb opus SDL speex ogg vorbis theora vidstab vo-amrwbenc lsmash x264 xvidcore mp3lame)
+
+
+    # pcre x86_64-pc-linux-gnu~glib libtool x86_64-pc-linux-gnu~pkgconf pkgconf autotools glib lzo pixman cairo icu4c harfbuzz freetype fribidi libass xz libxml2 libbluray libbs2b freeglut ncurses libcaca pthreads x86_64-pc-linux-gnu~yasm yasm libvpx opencore-amr opus sdl speex ogg vorbis theora vidstab vo-amrwbenc liblsmash x86_64-pc-linux-gnu~nasm x264 xvidcore
+
+endif()
 
 # Set DataPath
 add_definitions("-DDATA_PATH=\"${CMAKE_INSTALL_PREFIX}\"")
