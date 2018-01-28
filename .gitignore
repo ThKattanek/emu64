@@ -2,5 +2,6 @@
 *.pro.user*
 *.directory
 *.txt.user
-build/*
+build*
+install*
 *.autosave
