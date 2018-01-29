@@ -8,12 +8,11 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 30.12.2017                //
+// Letzte Änderung am 29.01.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "./version.h"
 #include "./single_application.h"
 #include "./main_window.h"
 

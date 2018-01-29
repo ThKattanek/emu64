@@ -8,12 +8,11 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 30.12.2017                //
+// Letzte Änderung am 29.01.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "./version.h"
 #include "./main_window.h"
 #include "./ui_main_window.h"
 
@@ -35,11 +34,11 @@ MainWindow::MainWindow(QWidget *parent,customSplashScreen* splash,QTextStream *l
     ui->setupUi(this);
 
 #ifdef _WIN32
-    setWindowTitle("Emu64 Version " + QString(VERSION_STRING) + " --- [Windows " + QString(str_system_arch) + "]");
+    setWindowTitle("Emu64 Version " + QString(VERSION_STRING) + " --- [Windows " + QString(ARCHITECTURE_STRING) + "]");
 #endif
 
 #ifdef __linux__
-    setWindowTitle("Emu64 Version " + QString(VERSION_STRING) + " --- [Linux " + QString(str_system_arch) + "]");
+    setWindowTitle("Emu64 Version " + QString(VERSION_STRING) + " --- [Linux " + QString(ARCHITECTURE_STRING) + "]");
 #endif
 }
 

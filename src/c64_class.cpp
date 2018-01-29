@@ -8,13 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.01.2018                //
+// Letzte Änderung am 29.01.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "c64_class.h"
-#include "version.h"
 #include "c64_keys.h"
 
 #include <QDebug>
