@@ -346,66 +346,76 @@ target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 
 ################### INSTALL #######################
 
+# Set DataPath
+add_definitions("-DDATA_PATH=\"${CMAKE_INSTALL_PREFIX}\"")
+
+############ Install Binary und Daten #############
 if(WIN32)
-    #### Windows ####
 
-    # Set DATA_PATH definition
-    #add_definitions("-DDATA_PATH=\"${DATA_DIRECTORY_NAME}\"")
-
-    # Executable
-    #install(TARGETS ${PROJECT_NAME} DESTINATION ./)
-
-    # Files
-    #install(FILES "data/arial.ttf" DESTINATION "./${DATA_DIRECTORY_NAME}")
-    #install(FILES "license.txt" DESTINATION ./)
-else()
-    #### Linux ####
-
-    # Set DataPath
-    add_definitions("-DDATA_PATH=\"${CMAKE_INSTALL_PREFIX}\"")
-
+    ################## Windows #################
     # Install Binary
-    install(TARGETS emu64 DESTINATION bin)
+    install(TARGETS ${PROJECT_NAME} DESTINATION ./)
 
     # Install all Datas
     # Install C64 Roms
-    install(FILES "roms/kernal.rom" DESTINATION share/emu64/roms)
-    install(FILES "roms/char.rom" DESTINATION share/emu64/roms)
-    install(FILES "roms/basic.rom" DESTINATION share/emu64/roms)
-    install(FILES "roms/1541.rom" DESTINATION share/emu64/roms)
+    install(DIRECTORY "roms" DESTINATION ./)
 
     # Install Floppysounds
-    install(FILES "floppy_sounds/hinweis.txt" DESTINATION share/emu64/floppy_sounds)
-    install(FILES "floppy_sounds/stepper_inc.raw" DESTINATION share/emu64/floppy_sounds)
-    install(FILES "floppy_sounds/stepper_dec.raw" DESTINATION share/emu64/floppy_sounds)
-    install(FILES "floppy_sounds/motor_on.raw" DESTINATION share/emu64/floppy_sounds)
-    install(FILES "floppy_sounds/motor_off.raw" DESTINATION share/emu64/floppy_sounds)
-    install(FILES "floppy_sounds/motor.raw" DESTINATION share/emu64/floppy_sounds)
-    install(FILES "floppy_sounds/anschlag.raw" DESTINATION share/emu64/floppy_sounds)
+    install(DIRECTORY "floppy_sounds" DESTINATION ./)
 
     # Install GFX
-    install(FILES "grafik/kreis0.png" DESTINATION share/emu64/gfx)
-    install(FILES "grafik/kreis1.png" DESTINATION share/emu64/gfx)
-    install(FILES "grafik/pfeil0.png" DESTINATION share/emu64/gfx)
-    install(FILES "grafik/pfeil1.png" DESTINATION share/emu64/gfx)
-    install(FILES "grafik/sdl_icon.png" DESTINATION share/emu64/gfx)
+    install(FILES "grafik/kreis0.png" DESTINATION ./gfx)
+    install(FILES "grafik/kreis1.png" DESTINATION ./gfx)
+    install(FILES "grafik/pfeil0.png" DESTINATION ./gfx)
+    install(FILES "grafik/pfeil1.png" DESTINATION ./gfx)
+    install(FILES "grafik/sdl_icon.png" DESTINATION ./gfx)
 
     # Install Languages
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/emu64_de.qm" DESTINATION share/emu64/languages)
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/emu64_en.qm" DESTINATION share/emu64/languages)
-    install(FILES "grafik/flaggen/emu64_de.png" DESTINATION share/emu64/languages)
-    install(FILES "grafik/flaggen/emu64_en.png" DESTINATION share/emu64/languages)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/emu64_de.qm" DESTINATION ./languages)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/emu64_en.qm" DESTINATION ./languages)
+    install(FILES "grafik/flaggen/emu64_de.png" DESTINATION ./languages)
+    install(FILES "grafik/flaggen/emu64_en.png" DESTINATION ./languages)
+
+    # Lincense txt
+    install(FILES "LICENSE" DESTINATION ./)
+
+else()
+    ################## Linux #################
+    # Install Binary
+    install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+
+    # Install all Datas
+    # Install C64 Roms
+    install(DIRECTORY "roms" DESTINATION share/${PROJECT_NAME})
+
+    # Install Floppysounds
+    install(DIRECTORY "floppy_sounds" DESTINATION share/${PROJECT_NAME})
+
+    # Install GFX
+    install(FILES "grafik/kreis0.png" DESTINATION share/${PROJECT_NAME}/gfx)
+    install(FILES "grafik/kreis1.png" DESTINATION share/${PROJECT_NAME}/gfx)
+    install(FILES "grafik/pfeil0.png" DESTINATION share/${PROJECT_NAME}/gfx)
+    install(FILES "grafik/pfeil1.png" DESTINATION share/${PROJECT_NAME}/gfx)
+    install(FILES "grafik/sdl_icon.png" DESTINATION share/${PROJECT_NAME}/gfx)
+
+    # Install Languages
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/emu64_de.qm" DESTINATION share/${PROJECT_NAME}/languages)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/emu64_en.qm" DESTINATION share/${PROJECT_NAME}/languages)
+    install(FILES "grafik/flaggen/emu64_de.png" DESTINATION share/${PROJECT_NAME}/languages)
+    install(FILES "grafik/flaggen/emu64_en.png" DESTINATION share/${PROJECT_NAME}/languages)
 
     # Install Startmenü Eintrag
     install(FILES "src/emu64.desktop" DESTINATION share/applications)
     install(FILES "grafik/emu64.png" DESTINATION share/icons/hicolor/64x64/apps)
 
+    # Lincense txt
+    install(FILES "LICENSE" DESTINATION share/${PROJECT_NAME})
+
 endif()
 
-
-
-
-
-
-
-
+############ Install DLL für Windows Shared #############
+if(WIN32)
+    if(NOT WIN32_STATIC_BUILD)
+        message(STATUS "...........DIES IST EIN TEST............")
+    endif()
+endif()
