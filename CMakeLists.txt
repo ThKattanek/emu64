@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 29.01.2018                //
+# // Letzte Änderung am 30.01.2018                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -49,9 +49,6 @@ endif()
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-# Data Directory
-add_definitions("-DDATA_PATH=\"${CMAKE_INSTALL_PREFIX}\"")
 
 ############### COMPILER OPTIONEN #################
 
@@ -346,3 +343,69 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
+
+################### INSTALL #######################
+
+if(WIN32)
+    #### Windows ####
+
+    # Set DATA_PATH definition
+    #add_definitions("-DDATA_PATH=\"${DATA_DIRECTORY_NAME}\"")
+
+    # Executable
+    #install(TARGETS ${PROJECT_NAME} DESTINATION ./)
+
+    # Files
+    #install(FILES "data/arial.ttf" DESTINATION "./${DATA_DIRECTORY_NAME}")
+    #install(FILES "license.txt" DESTINATION ./)
+else()
+    #### Linux ####
+
+    # Set DataPath
+    add_definitions("-DDATA_PATH=\"${CMAKE_INSTALL_PREFIX}\"")
+
+    # Install Binary
+    install(TARGETS emu64 DESTINATION bin)
+
+    # Install all Datas
+    # Install C64 Roms
+    install(FILES "roms/kernal.rom" DESTINATION share/emu64/roms)
+    install(FILES "roms/char.rom" DESTINATION share/emu64/roms)
+    install(FILES "roms/basic.rom" DESTINATION share/emu64/roms)
+    install(FILES "roms/1541.rom" DESTINATION share/emu64/roms)
+
+    # Install Floppysounds
+    install(FILES "floppy_sounds/hinweis.txt" DESTINATION share/emu64/floppy_sounds)
+    install(FILES "floppy_sounds/stepper_inc.raw" DESTINATION share/emu64/floppy_sounds)
+    install(FILES "floppy_sounds/stepper_dec.raw" DESTINATION share/emu64/floppy_sounds)
+    install(FILES "floppy_sounds/motor_on.raw" DESTINATION share/emu64/floppy_sounds)
+    install(FILES "floppy_sounds/motor_off.raw" DESTINATION share/emu64/floppy_sounds)
+    install(FILES "floppy_sounds/motor.raw" DESTINATION share/emu64/floppy_sounds)
+    install(FILES "floppy_sounds/anschlag.raw" DESTINATION share/emu64/floppy_sounds)
+
+    # Install GFX
+    install(FILES "grafik/kreis0.png" DESTINATION share/emu64/gfx)
+    install(FILES "grafik/kreis1.png" DESTINATION share/emu64/gfx)
+    install(FILES "grafik/pfeil0.png" DESTINATION share/emu64/gfx)
+    install(FILES "grafik/pfeil1.png" DESTINATION share/emu64/gfx)
+    install(FILES "grafik/sdl_icon.png" DESTINATION share/emu64/gfx)
+
+    # Install Languages
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/emu64_de.qm" DESTINATION share/emu64/languages)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/emu64_en.qm" DESTINATION share/emu64/languages)
+    install(FILES "grafik/flaggen/emu64_de.png" DESTINATION share/emu64/languages)
+    install(FILES "grafik/flaggen/emu64_en.png" DESTINATION share/emu64/languages)
+
+    # Install Startmenü Eintrag
+    install(FILES "src/emu64.desktop" DESTINATION share/applications)
+    install(FILES "grafik/emu64.png" DESTINATION share/icons/hicolor/64x64/apps)
+
+endif()
+
+
+
+
+
+
+
+
