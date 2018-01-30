@@ -43,7 +43,7 @@ endif()
 if(WIN32)
     if(WIN32_STATIC_BUILD)
         message(STATUS "BUILD A W32 STATIC BINARY")
-        add_definitions(-DQUAZIP_STATIC)
+        add_definitions("-DQUAZIP_STATIC")
     endif()
 endif()
 
@@ -320,10 +320,17 @@ else()
     message(FATAL_ERROR "FFMPEG wurde nicht gefunden.")
 endif()
 
-# For Windows Static
+# Für Windows
 if(WIN32)
+    set(LIBRARIES ${LIBRARIES} -mwindows)  # Damit kein Konsolenfenster geöffnet wird
     if(WIN32_STATIC_BUILD)
-        # set(LIBRARIES ${LIBRARIES} -mmwin)
+        set(LIBRARIES ${LIBRARIES}
+            avcodec avformat swresample swscale avutil quazip
+            secur32 version  bluray bz2 freetype harfbuzz
+            glib-2.0 iconv intl jpeg mp3lame ogg
+            opencore-amrnb opencore-amrwb opus pcre samplerate
+            speex theoradec theoraenc tiff vo-amrwbenc vorbis vorbisenc
+            webp x264 xvidcore z vpx xml2)
     endif()
 endif()
 
@@ -411,11 +418,4 @@ else()
     # Lincense txt
     install(FILES "LICENSE" DESTINATION share/${PROJECT_NAME})
 
-endif()
-
-############ Install DLL für Windows Shared #############
-if(WIN32)
-    if(NOT WIN32_STATIC_BUILD)
-        message(STATUS "...........DIES IST EIN TEST............")
-    endif()
 endif()
