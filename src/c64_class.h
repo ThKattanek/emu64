@@ -227,7 +227,6 @@ public:
     int             win_size_h;
 
     SDL_AudioSpec want,have;
-    SDL_AudioDeviceID audio_dev;
 
     SDL_Surface     *C64Screen;
     SDL_Surface     *C64ScreenIcon;
