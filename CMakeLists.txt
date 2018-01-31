@@ -240,6 +240,7 @@ endif()
 SET(TRANS
     src/emu64_de.ts
     src/emu64_en.ts
+    src/qt_de.ts
 )
 
 ##################### LIBRARY #####################
@@ -380,11 +381,13 @@ if(WIN32)
     # Install Languages
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/emu64_de.qm" DESTINATION ./languages)
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/emu64_en.qm" DESTINATION ./languages)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/qt_de.qm" DESTINATION ./languages)
     install(FILES "grafik/flaggen/emu64_de.png" DESTINATION ./languages)
     install(FILES "grafik/flaggen/emu64_en.png" DESTINATION ./languages)
 
-    # Lincense txt
+    # Sonstiges
     install(FILES "LICENSE" DESTINATION ./)
+    install(FILES "kommandozeilenparameter.txt" DESTINATION ./)
 
 else()
     ################## Linux #################
@@ -408,6 +411,7 @@ else()
     # Install Languages
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/emu64_de.qm" DESTINATION share/${PROJECT_NAME}/languages)
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/emu64_en.qm" DESTINATION share/${PROJECT_NAME}/languages)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/qt_de.qm" DESTINATION share/${PROJECT_NAME}/languages)
     install(FILES "grafik/flaggen/emu64_de.png" DESTINATION share/${PROJECT_NAME}/languages)
     install(FILES "grafik/flaggen/emu64_en.png" DESTINATION share/${PROJECT_NAME}/languages)
 
@@ -415,7 +419,8 @@ else()
     install(FILES "src/emu64.desktop" DESTINATION share/applications)
     install(FILES "grafik/emu64.png" DESTINATION share/icons/hicolor/64x64/apps)
 
-    # Lincense txt
+    # Sonstiges
     install(FILES "LICENSE" DESTINATION share/${PROJECT_NAME})
+    install(FILES "kommandozeilenparameter.txt" DESTINATION share/${PROJECT_NAME})
 
 endif()
