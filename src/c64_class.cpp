@@ -229,6 +229,50 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
 
     VideoCapture = new VideoCaptureClass();
 
+    //////////////////////////////////////////////
+
+    char* audio_formats_str[18]={"AUDIO_S8", "AUDIO_U8", "AUDIO_S16LSB", "AUDIO_S16MSB", "AUDIO_S16SYS", "AUDIO_S16", "AUDIO_U16LSB", "AUDIO_U16MSB", "AUDIO_U16SYS", "AUDIO_U16", "AUDIO_S32LSB", "AUDIO_S32MSB", "AUDIO_S32SYS", "AUDIO_S32", "AUDIO_F32LSB", "AUDIO_F32MSB", "AUDIO_F32SYS", "AUDIO_F32"};
+    SDL_AudioFormat check_audio_formats[18]={AUDIO_S8, AUDIO_U8, AUDIO_S16LSB, AUDIO_S16MSB, AUDIO_S16SYS, AUDIO_S16, AUDIO_U16LSB, AUDIO_U16MSB, AUDIO_U16SYS, AUDIO_U16, AUDIO_S32LSB, AUDIO_S32MSB, AUDIO_S32SYS, AUDIO_S32, AUDIO_F32LSB, AUDIO_F32MSB, AUDIO_F32SYS, AUDIO_F32};
+
+    SDL_AudioSpec audio_spec;
+    SDL_AudioSpec have_audio_spec;
+    SDL_memset(&audio_spec, 0, sizeof(audio_spec));
+    audio_spec.freq = AudioSampleRate;
+    audio_spec.format = AUDIO_S16;
+    audio_spec.channels = 2;
+    audio_spec.samples = AudioPufferSize;
+    audio_spec.callback = AudioMix;
+    audio_spec.userdata = this;
+
+    for(int i=0; i<18; i++)
+    {
+        audio_spec.format=check_audio_formats[i];
+        printf("%d-%s [%4.4X]",i,audio_formats_str[i],audio_spec.format);
+
+        SDL_memset(&have_audio_spec, 0, sizeof(have_audio_spec));
+
+        SDL_AudioDeviceID dev = SDL_OpenAudioDevice(NULL,0,&audio_spec,&have_audio_spec, SDL_AUDIO_ALLOW_FORMAT_CHANGE);
+
+        if(dev == 0)
+        {
+            printf("EROOOOR\n");
+            break;
+        }
+
+        if(audio_spec.format != have_audio_spec.format)
+        {
+            printf(" - [%4.4X] Not supportet!\n",have_audio_spec.format);
+        }
+        else
+        {
+            printf(" - [%4.4X] Is OK!\n",have_audio_spec.format);
+        }
+
+        SDL_CloseAudioDevice(dev);
+    }
+
+    //////////////////////////////////////////////
+
     /// SLD Audio Installieren (C64 Emulation) ///
 
     SDL_memset(&want, 0, sizeof(want));
@@ -239,7 +283,9 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     want.callback = AudioMix;
     want.userdata = this;
 
-    if(SDL_OpenAudio(&want,&have) < 0)
+    //audio_dev = SDL_OpenAudioDevice(NULL,0,&want,&have,SDL_AUDIO_ALLOW_FORMAT_CHANGE);
+    audio_dev = SDL_OpenAudio(&want,&have);
+    if( audio_dev == 0)
     {
         LogText((char*)"<< ERROR: Fehler beim installieren von SDL_Audio\n");
         *ret_error = -6;
@@ -533,7 +579,7 @@ void C64Class::EndEmulation()
         SDL_Delay(1);
 
     SDL_PauseAudio(1);
-    SDL_CloseAudio();
+    SDL_CloseAudioDevice(audio_dev);
 
     CloseSDLJoystick();
     SDL_Quit();

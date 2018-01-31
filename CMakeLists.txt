@@ -322,7 +322,7 @@ endif()
 
 # Für Windows
 if(WIN32)
-    set(LIBRARIES ${LIBRARIES} -mwindows)  # Damit kein Konsolenfenster geöffnet wird
+    #set(LIBRARIES ${LIBRARIES} -mwindows)  # Damit kein Konsolenfenster geöffnet wird
     if(WIN32_STATIC_BUILD)
         set(LIBRARIES ${LIBRARIES}
             avcodec avformat swresample swscale avutil quazip
