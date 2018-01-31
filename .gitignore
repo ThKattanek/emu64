@@ -4,4 +4,5 @@
 *.txt.user
 build*
 install*
+public_release
 *.autosave
