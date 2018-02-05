@@ -60,6 +60,11 @@ else()
         message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
+if(WIN32)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s -O2 -g2 -Wall")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s -O2 -g2 -Wall")
+endif()
+
 ############ VERSIONSNUMMER via GIT ###############
 
 # Holen des aktuellen Arbeitsbranches
@@ -329,7 +334,7 @@ if(WIN32)
             avcodec avformat swresample swscale avutil quazip
             secur32 version  bluray bz2 freetype harfbuzz
             glib-2.0 iconv intl jpeg mp3lame ogg
-            opencore-amrnb opencore-amrwb opus pcre samplerate
+            opencore-amrnb opencore-amrwb opus pcre
             speex theoradec theoraenc tiff vo-amrwbenc vorbis vorbisenc
             webp x264 xvidcore z vpx xml2)
     endif()
