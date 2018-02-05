@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 30.01.2018                //
+# // Letzte Änderung am 05.02.2018                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -328,15 +328,18 @@ endif()
 
 # Für Windows
 if(WIN32)
-    #set(LIBRARIES ${LIBRARIES} -mwindows)  # Damit kein Konsolenfenster geöffnet wird
+    set(LIBRARIES ${LIBRARIES} -mwindows)  # Damit kein Konsolenfenster geöffnet wird
     if(WIN32_STATIC_BUILD)
         set(LIBRARIES ${LIBRARIES}
-            avcodec avformat swresample swscale avutil quazip
-            secur32 version  bluray bz2 freetype harfbuzz
-            glib-2.0 iconv intl jpeg mp3lame ogg
-            opencore-amrnb opencore-amrwb opus pcre
-            speex theoradec theoraenc tiff vo-amrwbenc vorbis vorbisenc
-            webp x264 xvidcore z vpx xml2)
+            -pthread -lversion -lsecur32 -lbluray -lfreetype -lharfbuzz -lmp3lame -logg -liconv -lopus -lopencore-amrnb -lopencore-amrwb -lspeex -lvo-amrwbenc -lvpx -lx264 -lxml2 -lz -lxvidcore -lwebp)
+
+        #avcodec avformat swresample swscale avutil quazip
+        #secur32 version  bluray bz2 freetype harfbuzz
+        #glib-2.0 iconv intl jpeg mp3lame ogg
+        #opencore-amrnb opencore-amrwb opus pcre
+        #speex theoradec theoraenc tiff vo-amrwbenc vorbis vorbisenc
+        #webp x264 xvidcore z vpx xml2
+
     endif()
 endif()
 
