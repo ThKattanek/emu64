@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 05.02.2018                //
+# // Letzte Änderung am 06.02.2018                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -328,18 +328,51 @@ endif()
 
 # Für Windows
 if(WIN32)
-    set(LIBRARIES ${LIBRARIES} -mwindows)  # Damit kein Konsolenfenster geöffnet wird
-    if(WIN32_STATIC_BUILD)
-        set(LIBRARIES ${LIBRARIES}
-            -pthread -lversion -lsecur32 -lbluray -lfreetype -lharfbuzz -lmp3lame -logg -liconv -lopus -lopencore-amrnb -lopencore-amrwb -lspeex -lvo-amrwbenc -lvpx -lx264 -lxml2 -lz -lxvidcore -lwebp)
+    if(CMAKE_CROSSCOMPILING)
+        message(STATUS "Windows Crosscompiling ...")
 
-        #avcodec avformat swresample swscale avutil quazip
-        #secur32 version  bluray bz2 freetype harfbuzz
-        #glib-2.0 iconv intl jpeg mp3lame ogg
-        #opencore-amrnb opencore-amrwb opus pcre
-        #speex theoradec theoraenc tiff vo-amrwbenc vorbis vorbisenc
-        #webp x264 xvidcore z vpx xml2
+        # QT
+        execute_process(
+          COMMAND ${PKG_CONFIG_EXECUTABLE} QtCore QtGui --libs
+          OUTPUT_VARIABLE QT4_LIBS
+          OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
 
+        # OpenGL
+        execute_process(
+          COMMAND ${PKG_CONFIG_EXECUTABLE} gl glu --libs
+          OUTPUT_VARIABLE OPENGL_LIBS
+          OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+
+        # SDL2
+        execute_process(
+          COMMAND ${PKG_CONFIG_EXECUTABLE} sdl2 --libs
+          OUTPUT_VARIABLE SDL2_LIBS
+          OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+
+        # SDL2 Image
+        execute_process(
+          COMMAND ${PKG_CONFIG_EXECUTABLE} SDL2_image --libs
+          OUTPUT_VARIABLE SDL2_IMAGE_LIBS
+          OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+
+        # FFMPEG
+        execute_process(
+          COMMAND ${PKG_CONFIG_EXECUTABLE} libavcodec libavformat libswscale --libs
+          OUTPUT_VARIABLE FFMPEG_LIBS
+          OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+
+    #message(STATUS "QT4 Libs: " ${QT4_LIBS})
+    #message(STATUS "OpenGL Libs: " ${OPENGL_LIBS})
+    #message(STATUS "SDL2 Libs: " ${SDL2_LIBS})
+    #message(STATUS "SDL2 Image Libs: " ${SDL2_IMAGE_LIBS})
+    #message(STATUS "FFMPEG Libs: " ${FFMPEG_LIBS})
+
+    set(WIN_LIBRARIES ${WIN_LIBRARIES} ${QT4_LIBS} ${OPENGL_LIBS} ${SDL2_LIBS} ${SDL2_IMAGE_LIBS} ${FFMPEG_LIBS} -lquazip)
     endif()
 endif()
 
@@ -354,11 +387,13 @@ QT4_WRAP_CPP(MOC_SRCS ${MOC_HEADERS})
 
 if(NOT WIN32)
     add_executable(${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} ${QM})
+    target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 else()
     add_executable(${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} ${QM} ${WIN_RC})
+    target_link_libraries(${PROJECT_NAME} ${WIN_LIBRARIES})
 endif()
 
-target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
+
 
 ################### INSTALL #######################
 
