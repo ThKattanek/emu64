@@ -1,4 +1,8 @@
+# EMU64 - Der C64 Emulator
 ![Logo](http://www.emu64-projekt.de/images/emu64_logo_120_120.png)
+
+## Screenshot
+![Screenshot](screenshot.png)
 
 ## Emu64 erstellen unter Linux
 
