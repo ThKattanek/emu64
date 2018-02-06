@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 31.01.2018                //
+# // Letzte Änderung am 06.02.2018                //
 # // www.emu64-projekt.de                         //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -16,7 +16,7 @@
 #!/bin/bash
 
 # script by thorsten kattanek
-# excample: crossbuild-win-releases.sh ~/MXE
+# excample: crossbuild-win-releases.sh ~/mxe
 
 declare project_name=emu64
 
@@ -32,7 +32,7 @@ if [ $1 ]; then
         exit
     fi
 else
-    echo "Please specify the MXE path (excample: crossbuild-win-releases.sh ~/MXE)"
+    echo "Please specify the MXE path (excample: crossbuild-win-releases.sh ~/mxe)"
     exit
 fi    
 
