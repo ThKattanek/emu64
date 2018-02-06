@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.10.2017                //
+// Letzte Änderung am 06.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -254,18 +254,15 @@ void VideoCaptureClass::FillSourceAudioBuffer(uint16_t *data, int len)
 
     int n_sample = AudioStream.enc->frame_size;
 
-    if(len/2 <= n_sample)
+    for(int i=0; i<len/2; i++)
     {
-       for(int i=0; i<len/2; i++)
-       {
-            FrameAudioDataL[FrameSamplesPt] = *data++;
-            FrameAudioDataR[FrameSamplesPt++] = *data++;
-            if(FrameSamplesPt == n_sample)
-            {
-                FrameSamplesPt = 0;
-                EncodeAudio = !WriteAudioFrame(FormatCtx, &AudioStream);
-            }
-       }
+        FrameAudioDataL[FrameSamplesPt] = *data++;
+        FrameAudioDataR[FrameSamplesPt++] = *data++;
+        if(FrameSamplesPt == n_sample)
+        {
+            FrameSamplesPt = 0;
+            EncodeAudio = !WriteAudioFrame(FormatCtx, &AudioStream);
+        }
     }
 }
 
