@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 07.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -43,7 +43,11 @@ int GEORAMClass::LoadRAM(char *filename)
     {
         return 1;
     }
-    fread(RAM,1,2097152,file);
+
+    size_t reading_bytes = fread(RAM,1,2097152,file);
+    if(reading_bytes < 2097152)
+        printf("GeoRam Image kleiner als 2Mb.\n");
+
     fclose(file);
     return 0;
 }

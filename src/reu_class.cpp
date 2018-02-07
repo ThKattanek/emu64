@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 07.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -50,7 +50,19 @@ int REUClass::LoadRAM(char *filename)
     {
         return 1;
     }
-    for(int i=0;i<256;i++) fread(RamBaenke[i],1,0x10000,file);
+
+    size_t reading_bytes;
+
+    for(int i=0;i<256;i++)
+    {
+        reading_bytes = fread(RamBaenke[i],1,0x10000,file);
+        if(reading_bytes < 0x10000)
+        {
+            printf("Fehler beim laden der %d. REU RamBank\n",i);
+            return 1;
+        }
+    }
+
     fclose(file);
     return 0;
 }
