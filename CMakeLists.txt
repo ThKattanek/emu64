@@ -30,14 +30,14 @@ message(STATUS "Project Name: " ${PROJECT_NAME})
 
 # Standard Build Typ = Release
 if(NOT CMAKE_BUILD_TYPE)
-        set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
-        message(STATUS "CMAKE_BUILD_TYPE NOT FOUND -- Default setting to Release")
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
+    message(STATUS "CMAKE_BUILD_TYPE NOT FOUND -- Default setting to Release")
 endif()
 
 # Standard WIN32_STATIC_BUILD = FALSE
 if(NOT WIN32_STATIC_BUILD)
-        set(WIN32_STATIC_BUILD FALSE CACHE STRING "Choose a static or shared win32 build (TRUE or FALSE)" FORCE)
-        message(STATUS "WIN32_STATIC_BUILD NOT FOUND -- Default setting to FALSE")
+    set(WIN32_STATIC_BUILD FALSE CACHE STRING "Choose a static or shared win32 build (TRUE or FALSE)" FORCE)
+    message(STATUS "WIN32_STATIC_BUILD NOT FOUND -- Default setting to FALSE")
 endif()
 
 if(WIN32)
@@ -60,9 +60,20 @@ else()
         message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
+# Verschärfte Fehlerbehandlung beim kompilieren
+if(NOT ALL_ERRORS)
+    set(ALL_ERRORS FALSE CACHE STRING "For all error messages (TRUE)" FORCE)
+    message(STATUS "ALL_ERRORS NOT FOUND -- Default setting to FALSE")
+endif()
+
+if(ALL_ERRORS)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
+endif()
+
 if(WIN32)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s -O2 -g2 -Wall")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s -O2 -g2 -Wall")
+       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s -O2 -g2")
+       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s -O2 -g2")
 endif()
 
 ############ VERSIONSNUMMER via GIT ###############
