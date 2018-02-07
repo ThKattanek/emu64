@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.12.2016                //
+// Letzte Änderung am 07.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -112,6 +112,8 @@ bool TAPE1530::LoadTapeImage(char *filename)
         }
 
         reading_elements = fread(Kennung,1,12,file);
+        if(reading_elements){}
+
         Kennung[12]=0;
         if(0!=strcmp("C64-TAPE-RAW",Kennung))
         {
@@ -379,6 +381,8 @@ void TAPE1530::OneCycle()
     static int WaveStatus;
     static int OldWaveStatus;
 
+    size_t reading_bytes;
+
     switch (TapeType)
     {
     case WAV:
@@ -397,7 +401,7 @@ void TAPE1530::OneCycle()
                         switch(WAVEBitPerSample)
                         {
                             case 8:
-                            fread(&ReadByte,1,1,file);
+                            reading_bytes = fread(&ReadByte,1,1,file);
                             if((i == WAVEDataChannel) || (WAVEChannels == 1))
                             {
                                 if(ReadByte < WAVELowPeek8Bit) WaveStatus = Low;
@@ -413,7 +417,7 @@ void TAPE1530::OneCycle()
                             break;
 
                             case 16:
-                            fread(&ReadWord,1,2,file);
+                            reading_bytes = fread(&ReadWord,1,2,file);
                             if((i == WAVEDataChannel) || (WAVEChannels == 1))
                             {
                                 ReadWord += 0x8000;

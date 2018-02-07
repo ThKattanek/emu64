@@ -446,11 +446,17 @@ bool REUClass::SaveFreez(FILE *File)
 
 bool REUClass::LoadFreez(FILE *File,unsigned short Version)
 {
+    size_t reading_bytes;
+
     switch(Version)
     {
     case 0x0101:
         /// REU Inhalt laden ...
-        for(int i=0;i<32;i++) fread(RamBaenke[i],1,0x10000,File);
+        for(int i=0;i<32;i++)
+        {
+            reading_bytes = fread(RamBaenke[i],1,0x10000,File);
+            if(reading_bytes < 0x10000){}
+        }
         break;
     }
     return true;

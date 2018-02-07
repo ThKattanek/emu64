@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.10.2017                //
+// Letzte Änderung am 07.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -101,31 +101,31 @@ void VideoCaptureWindow::OnTimer1()
     if(!isPause)
     {
         int time = c64->GetRecordedFrameCount();
-        int hour = time / (50*60*60);
+        unsigned  hour = time / (50*60*60);
         time %= (50*60*60);
-        int minutes = time / (50*60);
+        unsigned  minutes = time / (50*60);
         time %= (50*60);
-        int seconds = time / 50;
-        int frames = time % 50;
+        unsigned  seconds = time / 50;
+        unsigned  frames = time % 50;
 
         char out_str[16];
 
-        sprintf(out_str,"%.2d:%.2d:%.2d-%.2d",hour,minutes,seconds,frames);
+        sprintf(out_str,"%02d:%02d:%02d-%02d",hour,minutes,seconds,frames);
         ui->TimeOutput->setText(out_str);
     }
     else
     {
         int time = c64->GetRecordedFrameCount();
-        int hour = time / (50*60*60);
+        unsigned int hour = time / (50*60*60);
         time %= (50*60*60);
-        int minutes = time / (50*60);
+        unsigned int minutes = time / (50*60);
         time %= (50*60);
-        int seconds = time / 50;
-        int frames = time % 50;
+        unsigned int seconds = time / 50;
+        unsigned int frames = time % 50;
 
         char out_str[16];
 
-        sprintf(out_str,"%.2d:%.2d:%.2d-%.2d",hour,minutes,seconds,frames);
+        sprintf(out_str,"%02d:%02d:%02d-%02d",hour,minutes,seconds,frames);
         ui->TimeOutput->setText(out_str);
 
 
