@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.03.2017                //
+// Letzte Änderung am 07.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -76,6 +76,9 @@ int D64Class::LoadD64(char* Filename)
 
     reading_elements = fread (D64Image,1,174848,file);
     fclose(file);
+
+    if(reading_elements != 174848)
+        return 0;
 
     ReadBlock(18,0,Block);
 

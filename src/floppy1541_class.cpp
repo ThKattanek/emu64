@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.03.2017        		//
+// Letzte Änderung am 07.02.2018        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -223,6 +223,12 @@ bool Floppy1541::LoadDiskImage(char* filename)
         for(int i=0;i<(665952);i++) GCRImage[i]=0x00;
 
         reading_elements = fread (D64Image,1,174848,file);
+        if(reading_elements != 174848)
+        {
+            fclose(file);
+            return false;
+        }
+
         fclose(file);
         D64ImageToGCRImage();
 
@@ -593,6 +599,9 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     FloppySound00 = new unsigned short[FloppySound00Size];
     reading_elements = fread(FloppySound00,2,FloppySound00Size,File);
     fclose(File);
+
+    if(reading_elements != (unsigned int)FloppySound00Size)
+        return 0x01;
 
     File = fopen(motor_sound, "rb");
     if (File == NULL)
@@ -1099,6 +1108,9 @@ int Floppy1541::LoadBreakGroups(char *filename)
 
     /// Groupanzahl ///
     reading_elements = fread(&Groupanzahl,sizeof(Groupanzahl),1,file);
+    if(reading_elements != 1)
+        return -5;
+
     if(Groupanzahl == 0) return -4;
 
     /// Groups ///

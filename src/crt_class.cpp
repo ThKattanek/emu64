@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.12.2016                //
+// Letzte Änderung am 07.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -158,6 +158,7 @@ int CRTClass::LoadCRTImage(char* filename)
         }
 
         reading_elements = fread(Kennung,1,16,file);
+
         Kennung[16] = 0;
 
         if(0!=strcmp("C64 CARTRIDGE   ",Kennung))
@@ -192,7 +193,8 @@ int CRTClass::LoadCRTImage(char* filename)
         Bank1Pos = Bank2Pos = Bank3Pos = 0;
 L1:
         fseek(file,akt_pos,SEEK_SET);
-        if(4 > fread(Kennung,1,4,file)) goto L2;
+        reading_elements = fread(Kennung,1,4,file);
+        if(4 > reading_elements) goto L2;
         Kennung[4] = 0;
         if(0==strcmp("CHIP",Kennung))
         {
@@ -486,6 +488,9 @@ int CRTClass::GetCRTInfo(char* filename,CRT_INFO_STRUCT* crtinfo)
         }
 
         reading_elements = fread(Kennung,1,16,File);
+        if(reading_elements != 16)
+            return 0x01;
+
         Kennung[16] = 0;
 
         if(0!=strcmp("C64 CARTRIDGE   ",Kennung))

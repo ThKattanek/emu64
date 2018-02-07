@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.01.2018                //
+// Letzte Änderung am 07.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -2998,7 +2998,6 @@ int C64Class::LoadBreakGroups(char *filename)
     unsigned char Groupanzahl;
     size_t reading_elements;
 
-
     DeleteAllBreakGroups();
 
     file = fopen (filename, "rb");
@@ -3010,6 +3009,7 @@ int C64Class::LoadBreakGroups(char *filename)
 
     /// Kennung ///
     reading_elements = fread(Kennung,sizeof(Kennung),1,file);
+
     if(0 != strcmp("EMU64_BPT",Kennung))
     {
         /// Kein Emu64 Format ///
@@ -3019,10 +3019,14 @@ int C64Class::LoadBreakGroups(char *filename)
 
     /// Version ///
     reading_elements = fread(&Version,sizeof(Version),1,file);
+
     if(Version > 1) return -3;
 
     /// Groupanzahl ///
     reading_elements = fread(&Groupanzahl,sizeof(Groupanzahl),1,file);
+    if(reading_elements != 1)
+        return -5;
+
     if(Groupanzahl == 0) return -4;
 
     /// Groups ///
