@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.10.2017                //
+// Letzte Änderung am 07.02.2017                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -23,11 +23,12 @@
 
 using namespace std;
 
-#define PRId64 "I64d"
-
-#ifndef INT64_C
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
+#ifdef _WIN32
+    #define PRId64 "I64d"
+    #ifndef INT64_C
+        #define INT64_C(c) (c ## LL)
+        #define UINT64_C(c) (c ## ULL)
+    #endif
 #endif
 
 extern "C"
