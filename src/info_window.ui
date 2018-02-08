@@ -7,35 +7,17 @@
     <x>0</x>
     <y>0</y>
     <width>371</width>
-    <height>507</height>
+    <height>524</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Emu64 Information</string>
   </property>
-  <widget class="QWidget" name="widget" native="true">
-   <property name="geometry">
-    <rect>
-     <x>188</x>
-     <y>56</y>
-     <width>106</width>
-     <height>76</height>
-    </rect>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">border-image: url(:/grafik/thorsten.png);
-
-</string>
-   </property>
-  </widget>
   <widget class="QWidget" name="widget_2" native="true">
    <property name="geometry">
     <rect>
      <x>5</x>
-     <y>285</y>
+     <y>305</y>
      <width>361</width>
      <height>200</height>
     </rect>
@@ -47,8 +29,8 @@
   <widget class="QLabel" name="moreinfosOut">
    <property name="geometry">
     <rect>
-     <x>5</x>
-     <y>487</y>
+     <x>10</x>
+     <y>505</y>
      <width>351</width>
      <height>17</height>
     </rect>
@@ -67,7 +49,7 @@
     <rect>
      <x>130</x>
      <y>4</y>
-     <width>211</width>
+     <width>221</width>
      <height>25</height>
     </rect>
    </property>
@@ -91,9 +73,9 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>152</x>
+     <x>132</x>
      <y>24</y>
-     <width>177</width>
+     <width>216</width>
      <height>16</height>
     </rect>
    </property>
@@ -118,9 +100,9 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>152</x>
-     <y>36</y>
-     <width>177</width>
+     <x>130</x>
+     <y>35</y>
+     <width>221</width>
      <height>16</height>
     </rect>
    </property>
@@ -130,7 +112,7 @@
     </font>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.emu64-projekt.de&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;www.emu64-projekt.de&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forum: &lt;a href=&quot;http://www.emu64-projekt.de&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;www.emu64-projekt.de&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -139,78 +121,11 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QListWidget" name="listWidget">
-   <property name="geometry">
-    <rect>
-     <x>4</x>
-     <y>144</y>
-     <width>361</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>7</pointsize>
-    </font>
-   </property>
-   <property name="selectionMode">
-    <enum>QAbstractItemView::NoSelection</enum>
-   </property>
-   <item>
-    <property name="text">
-     <string>Thomas Daden (+ Emu64 Handbuch, Emu64-Wiki, Emu64 Webspace)</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Selmiak (+ Emu64 Logo, engl. Übersetzung, Emu64-Wiki)</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Tobias Kattanek (engl. Übersetzung)</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Peggy</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Andreas Goller</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Hoeppi</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>4</x>
-     <y>128</y>
-     <width>165</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Besonderen Dank an ...</string>
-   </property>
-  </widget>
   <widget class="QWidget" name="widget_3" native="true">
    <property name="geometry">
     <rect>
-     <x>4</x>
-     <y>4</y>
+     <x>10</x>
+     <y>65</y>
      <width>120</width>
      <height>120</height>
     </rect>
@@ -222,8 +137,8 @@
   <widget class="QWidget" name="widget_4" native="true">
    <property name="geometry">
     <rect>
-     <x>5</x>
-     <y>230</y>
+     <x>7</x>
+     <y>249</y>
      <width>108</width>
      <height>51</height>
     </rect>
@@ -236,7 +151,7 @@
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>245</y>
+     <y>285</y>
      <width>91</width>
      <height>16</height>
     </rect>
@@ -260,13 +175,53 @@
    <property name="geometry">
     <rect>
      <x>125</x>
-     <y>230</y>
+     <y>270</y>
      <width>236</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
     <string>Emu64 benutzt C64-Pro-Style TTF von Style64</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>50</y>
+     <width>221</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;GitHub: &lt;a href=&quot;https://github.com/ThKattanek/emu64&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;www.github.com/ThKattanek/emu64&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+   <property name="openExternalLinks">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QWidget" name="widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>70</y>
+     <width>198</width>
+     <height>190</height>
+    </rect>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border-image: url(:/grafik/thorsten.png);</string>
    </property>
   </widget>
  </widget>
