@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.03.2017                //
+// Letzte Änderung am 08.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -225,7 +225,7 @@ void SetupWindow::LoadINI(C64Class *c64)
 
         ini->beginGroup("SetupFullscreen");
 
-        bvalue = ini->value("FullscreenAspectRatio",0).toBool();
+        bvalue = ini->value("FullscreenAspectRatio",true).toBool();
         ui->FAspectRatio->setChecked(bvalue);
         c64->SetFullscreenAspectRatio(bvalue);
 
