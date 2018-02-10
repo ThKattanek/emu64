@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.02.2018                //
+// Letzte Änderung am 10.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -44,7 +44,7 @@ int SDLThreadWarp(void *userdat);
 
 static const char *ScreenschotFormatName[SCREENSHOT_FORMATS_COUNT]{"BMP","PNG"};
 
-C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> log_function, const char* gfx_path):
+C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> log_function, const char* data_path):
     mmu(NULL),cpu(NULL),vic(NULL),sid1(NULL),sid2(NULL),cia1(NULL),cia2(NULL),crt(NULL)
 {
     ChangeGrafikModi = false;
@@ -72,10 +72,6 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     WarpMode = false;
 
     LogText = log_function;
-    GfxPath = gfx_path;
-
-    FloppySoundPath = NULL;
-    RomPath = NULL;
 
     Mouse1351Enable = false;
     MouseXRel = MouseYRel = 0;
@@ -88,19 +84,13 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     MouseHiddenCounter = 0;
     MouseHiddenTime = 3000;
 
-#ifdef _WIN32
-    FloppySoundPath = "floppy_sounds/";
-    RomPath = "roms/";
-#endif
-
-#ifdef __linux__
     FloppySoundPath = new char[1024];
+    GfxPath = new char [1024];
     RomPath = new char[1024];
 
-    sprintf(FloppySoundPath,"%s%s",DATA_PATH,"/share/emu64/floppy_sounds/");
-    sprintf(RomPath,"%s%s",DATA_PATH,"/share/emu64/roms/");
-
-#endif
+    sprintf(FloppySoundPath,"%s%s",data_path,"/floppy_sounds/");
+    sprintf(GfxPath,"%s%s",data_path,"/gfx/");
+    sprintf(RomPath,"%s%s",data_path,"/roms/");
 
     LogText((char*)">> C64 Klasse wurde gestartet...\n");
     LogText((char*)">> GfxPath = ");

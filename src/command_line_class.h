@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.02.2017                //
+// Letzte Änderung am 09.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -43,6 +43,7 @@ public:
     CommandLineClass(int argc, char *argv[], const char* app_name, const CMD_STRUCT *command_list, int command_list_count);
     int GetCommandCount();
     int GetCommand(int number);
+    const char *GetCommandLongString(int command);
     int GetCommandArgCount(int command);
     bool CheckArg(int number);
     char* GetArg(int number);

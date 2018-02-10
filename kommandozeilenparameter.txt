@@ -61,6 +61,9 @@ emu64 [PARAMETER]
 --video-capture <Dateiname>
     Startet die Aufzeichnung des C64 Screens.
 
+--data-path <Pfad>
+    Angabe eines Benutzerdefinierten Pfads für roms, floppysounds, gxf und languages.
+
 -?, --help
     Ein Hilfe Text wird angezeigt und Emu64 wird nicht gestartet.
 

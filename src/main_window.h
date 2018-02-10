@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.03.2017                //
+// Letzte Änderung am 09.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -87,6 +87,9 @@ public:
     bool IsDebugCartEvent;
     unsigned char DebugCartValue;
 
+    /// CustomDataPath setzen
+    void SetCustomDataPath(QString path);
+
 public slots:
     void OnMessage(QStringList msg);
     void OnInit();
@@ -146,6 +149,7 @@ private:
 
     QString configPath;          // Pfad für emu64.ini und emu64.log
     QString dataPath;            // Pfad für alle Emu64 Daten
+    QString custom_dataPath;     // Pfad für alle Emu64 Daten -> Wenn er per Komandozeile angegeben wurde (--data-path)
 
     //QString appPath;             // Pfad der emu64 Datei
     QString langPath;            // Pfad für alle Sprachfiles
