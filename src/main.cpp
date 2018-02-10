@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.01.2018                //
+// Letzte Änderung am 09.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -153,6 +153,15 @@ int main(int argc, char *argv[])
     }
 
     QObject::connect(app,SIGNAL(messageAvailable(QStringList)),w,SLOT(OnMessage(QStringList)));
+
+    w->SetCustomDataPath("");
+    for(int i=0; i<cmd_line->GetCommandCount(); i++)
+    {
+        if(cmd_line->GetCommand(i) == CMD_DATA_PATH)
+        {
+            w->SetCustomDataPath(QString(cmd_line->GetArg(i+1)));
+        }
+    }
 
     w->log = log;
     w->OnInit();

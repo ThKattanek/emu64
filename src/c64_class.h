@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 30.12.2017                //
+// Letzte Änderung am 10.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -61,7 +61,7 @@ class C64Class
 {
 
 public:
-    C64Class(int *ret_error,VideoPalClass *_pal, function<void(char*)> log_function, const char* gfx_path);
+    C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> log_function, const char* data_path);
     ~C64Class();
     void StartEmulation(void);
     void EndEmulation(void);
@@ -354,9 +354,9 @@ private:
     function<unsigned char(unsigned short)> *ReadProcTbl;
     function<void(unsigned short,unsigned char)> *WriteProcTbl;
 
-    const char* GfxPath;
-    char* RomPath;
+    char* GfxPath;
     char* FloppySoundPath;
+    char* RomPath;
 
     char window_title[MAX_C64_SCREEN_TITLE_LENGTH];
 

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.01.2018                //
+// Letzte Änderung am 10.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -145,19 +145,24 @@ void MainWindow::OnInit()
     configPath = QDir::homePath() + "/.config/emu64";
 
 #ifdef _WIN32
-    dataPath = QApplication::applicationDirPath();
+    if(custom_dataPath == "")
+        dataPath = QApplication::applicationDirPath();
+    else
+        dataPath = custom_dataPath;
 #endif
-
 #ifdef __linux__
-    dataPath = DATA_PATH;
-    dataPath += "/share/emu64";
+    if(custom_dataPath == "")
+    {
+        dataPath = DATA_PATH;
+        dataPath += "/share/emu64";
+    }
+    else
+        dataPath = custom_dataPath;
 #endif
-
-    LogText((QString(">> Data Path = ") + dataPath + QString("\n")).toAscii());
-
+    LogText((QString(">> Data Path = ") + dataPath + QString("\n")).toUtf8().data());
 
     tmpPath = QDir::tempPath();
-    LogText((QString(">> TEMP Path = ") + tmpPath + QString("\n")).toAscii());
+    LogText((QString(">> TEMP Path = ") + tmpPath + QString("\n")).toUtf8().data());
 
     if(splash != NULL)
     {
@@ -281,7 +286,7 @@ void MainWindow::OnInit()
     /// C64 Klasse Installieren ... Das HERZ ///
     SplashMessage(trUtf8("C64 Klasse wird initialisiert."),Qt::darkBlue);
     int ret_error;
-    c64 = new C64Class(&ret_error,videopal,bind(&MainWindow::LogText,this,_1),QString(dataPath + "/gfx/").toLatin1().data());
+    c64 = new C64Class(&ret_error,videopal,bind(&MainWindow::LogText,this,_1),QString(dataPath).toLatin1().data());
     if(ret_error != 0)
     {
         ErrorMsg(trUtf8("Emu64 Fehler ..."),trUtf8("Fehler beim Installieren der C64 Klasse"))
@@ -569,6 +574,11 @@ void MainWindow::DebugCartEvent(unsigned char value)
     DebugCartValue = value;
     IsDebugCartEvent = true;
     on_actionBeenden_triggered();
+}
+
+void MainWindow::SetCustomDataPath(QString path)
+{
+    custom_dataPath = path;
 }
 
 void MainWindow::changeEvent(QEvent *event)

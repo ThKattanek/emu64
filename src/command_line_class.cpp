@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.02.2017                //
+// Letzte Änderung am 09.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -117,6 +117,19 @@ int CommandLineClass::GetCommand(int number)
     }
 
     return -1;
+}
+
+const char *CommandLineClass::GetCommandLongString(int command)
+{
+    for(int i=0; i<all_commands_list_count; i++)
+    {
+        if(all_commands_list[i].cmdCommand == command)
+        {
+            return all_commands_list[i].longCommand;
+            break;
+        }
+    }
+    return "";
 }
 
 bool CommandLineClass::CheckArg(int number)
