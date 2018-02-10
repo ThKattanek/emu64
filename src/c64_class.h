@@ -431,7 +431,7 @@ private:
     unsigned short  BreakStatus;
     bool            FloppyFoundBreakpoint;
 
-    unsigned short   BreakGroupAnz;
+    unsigned char   BreakGroupAnz;
     BREAK_GROUP     *BreakGroup[MAX_BREAK_GROUPS];
 
     ////////////////////////////////////////////////////////////

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.08.2016        		//
+// Letzte Änderung am 10.02.2018        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -230,7 +230,7 @@ private:
     unsigned short  BreakStatus;
     bool            *FoundBreakpoint;
 
-    unsigned short  BreakGroupAnz;
+    unsigned char   BreakGroupAnz;
     BREAK_GROUP     *BreakGroup[MAX_BREAK_GROUPS];
 
     ////////////////////////////////////////////////////////////
