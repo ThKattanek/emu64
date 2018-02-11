@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.02.2018                //
+// Letzte Änderung am 11.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -148,7 +148,6 @@ int CRTClass::LoadCRTImage(char* filename)
         int ChipCount;
         unsigned short chip_adr;
         unsigned short chip_size;
-        int Bank1Pos,Bank2Pos,Bank3Pos;
         size_t reading_elements;
 
         file = fopen (filename, "rb");
@@ -190,7 +189,6 @@ int CRTClass::LoadCRTImage(char* filename)
 
         akt_pos = 0x40;
         ChipCount = 0;
-        Bank1Pos = Bank2Pos = Bank3Pos = 0;
 L1:
         fseek(file,akt_pos,SEEK_SET);
         reading_elements = fread(Kennung,1,4,file);
@@ -207,7 +205,13 @@ L1:
                 HeaderLength = conv_dword(HeaderLength);
                 akt_pos += HeaderLength;
 
-                fseek(file,4,SEEK_CUR);
+                fseek(file,2,SEEK_CUR);
+
+                unsigned short BankPos;
+                reading_elements = fread(&BankPos,1,2,file);
+                BankPos = BankPos<<8 | BankPos>>8;
+                BankPos &= 0xFF;    // Maximal 256 Bänke je CRT_ROM_BANK1 + CRT_ROM_BANK2
+
                 reading_elements = fread(&chip_adr,1,2,file);
                 chip_adr = chip_adr<<8 | chip_adr>>8;
                 reading_elements = fread(&chip_size,1,2,file);
@@ -216,21 +220,17 @@ L1:
                 switch(chip_adr)
                 {
                 case 0x8000:
-                        reading_elements = fread(CRT_ROM_BANK1 + Bank1Pos,1,0x2000,file);
-                        Bank1Pos += 0x2000;
+                        reading_elements = fread(CRT_ROM_BANK1 + (BankPos * 0x2000),1,0x2000,file);
                         if(chip_size == 0x4000)
                         {
-                                reading_elements = fread(CRT_ROM_BANK2 + Bank2Pos,1,0x2000,file);
-                                Bank2Pos += 0x2000;
+                            reading_elements = fread(CRT_ROM_BANK2 + (BankPos * 0x2000),1,0x2000,file);
                         }
                         break;
                 case 0xA000:
-                        reading_elements = fread(CRT_ROM_BANK2 + Bank2Pos,1,0x2000,file);
-                        Bank2Pos += 0x2000;
+                        reading_elements = fread(CRT_ROM_BANK2 + (BankPos * 0x2000),1,0x2000,file);
                         break;
                 case 0xE000:
-                                reading_elements = fread(CRT_ROM_BANK2 + Bank2Pos,1,0x2000,file);
-                                Bank2Pos += 0x2000;
+                        reading_elements = fread(CRT_ROM_BANK2 + (BankPos * 0x2000),1,0x2000,file);
                         break;
                 }
                 ChipCount ++;
