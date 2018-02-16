@@ -749,13 +749,13 @@ void CRTClass::WriteIO1(unsigned short adresse,unsigned char wert)
                 ROM_LO = CRT_ROM_BANK1 + (wert * 0x2000);
                 break;
         case 32:	// EasyFlash
-                if(adresse == 0xDE00)
+                if((adresse & 0x02) == 0x00)
                 {
                         EasyFlashBankReg = wert & 0x3F;
                         ROM_LO = CRT_ROM_BANK1 + ((wert & 0x3F) * 0x2000);
                         ROM_HI = CRT_ROM_BANK2 + ((wert & 0x3F) * 0x2000);
                 }
-                if(adresse == 0xDE02)
+                if((adresse & 0x02) == 0x02)
                 {
                         LED_01 = !!(wert & 0x80);
                         if(LED_01 != LED_01_OLD) if(ChangeLED != 0) ChangeLED(1,LED_01);
