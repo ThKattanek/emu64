@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.02.2018                //
+// Letzte Änderung am 18.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -704,13 +704,47 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
     vic->SwitchVideoPuffer();
     SDL_UnlockSurface(C64Screen);
 
-
     ///////////////////////////////////
 
     VideoCapture->AddFrame((uint8_t*)C64Screen->pixels,C64Screen->pitch);
 
     ///////////////////////////////////
 
+    ///////////////////////////////////
+    /// Auf Screenshot Start prüfen ///
+    if(StartScreenshot)
+    {
+        int xw=C64Screen->w;
+        int yw=C64Screen->h;
+
+        cout << "Screenshot x:" << xw << " , y:" << yw << endl;
+
+        SDL_LockSurface(C64Screen);
+        for(int y=0; y<yw; y++)
+        {
+            Uint32* data = (Uint32*)C64Screen->pixels+(C64Screen->pitch/4)*y;
+            for(int x=0; x<xw; x++)
+            {
+                // R <--> B
+                data[x] = (data[x] & 0xff00ff00) | (data[x]>>16)&0xff | (data[x]<<16)&0xff0000;
+            }
+        }
+        SDL_UnlockSurface(C64Screen);
+
+        switch (ScreenshotFormat) {
+        case SCREENSHOT_FORMAT_BMP:
+            SDL_SaveBMP(C64Screen,ScreenshotFilename);
+            break;
+        case SCREENSHOT_FORMAT_PNG:
+            SDL_SavePNG(C64Screen,ScreenshotFilename);
+            break;
+        default:
+
+            break;
+        }
+        StartScreenshot = false;
+    }
+    ////////////////////////////////////
 
     if(Mouse1351Enable) UpdateMouse();
 
@@ -1601,24 +1635,6 @@ void C64Class::ReleaseGrafik()
 
 void C64Class::DrawC64Screen()
 {
-    /// Auf Screenshot Start prüfen ///
-    if(StartScreenshot)
-    {
-        StartScreenshot = false;
-
-        switch (ScreenshotFormat) {
-        case SCREENSHOT_FORMAT_BMP:
-            SDL_SaveBMP(C64Screen,ScreenshotFilename);
-            break;
-        case SCREENSHOT_FORMAT_PNG:
-            SDL_SavePNG(C64Screen,ScreenshotFilename);
-            break;
-        default:
-
-            break;
-        }
-    }
-
     /// Fensterinhalt löschen
     glClearColor(0.0f, 0.0f, 0.0f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
