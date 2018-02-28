@@ -8,10 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.02.2018                //
+// Letzte Änderung am 28.02.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
+
+#define _WIN32_WINNT 0x0500
 
 #include "./single_application.h"
 #include "./main_window.h"
@@ -27,10 +29,10 @@
 #include <X11/Xlib.h>
 #endif
 
-#undef main
+//#undef main
+
 int main(int argc, char *argv[])
 {
-
 #if (!defined(SINGLE_THREADED_PLAYBACK) and defined(Q_WS_X11))
     XInitThreads();
 #endif

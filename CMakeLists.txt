@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 07.02.2018                //
+# // Letzte Änderung am 28.02.2018                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -72,8 +72,8 @@ if(ALL_ERRORS)
 endif()
 
 if(WIN32)
-       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s -O2 -g2")
-       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s -O2 -g2")
+       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s -O2 -g2 -Wl,-subsystem,windows")
+       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s -O2 -g2 -Wl,-subsystem,windows")
 endif()
 
 ############ VERSIONSNUMMER via GIT ###############
@@ -383,7 +383,7 @@ if(WIN32)
     #message(STATUS "SDL2 Image Libs: " ${SDL2_IMAGE_LIBS})
     #message(STATUS "FFMPEG Libs: " ${FFMPEG_LIBS})
 
-    set(WIN_LIBRARIES ${WIN_LIBRARIES} ${QT4_LIBS} ${OPENGL_LIBS} ${SDL2_LIBS} ${SDL2_IMAGE_LIBS} ${FFMPEG_LIBS} -lquazip)
+    set(WIN_LIBRARIES ${WIN_LIBRARIES} ${QT4_LIBS} ${OPENGL_LIBS} ${SDL2_LIBS} ${SDL2_IMAGE_LIBS} ${FFMPEG_LIBS} -lquazip -lqtmain)
     endif()
 endif()
 
@@ -400,7 +400,7 @@ if(NOT WIN32)
     add_executable(${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} ${QM})
     target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 else()
-    add_executable(${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} ${QM} ${WIN_RC})
+    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} ${QM} ${WIN_RC})
     target_link_libraries(${PROJECT_NAME} ${WIN_LIBRARIES})
 endif()
 
