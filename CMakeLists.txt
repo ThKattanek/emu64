@@ -72,8 +72,13 @@ if(ALL_ERRORS)
 endif()
 
 if(WIN32)
-       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s -O2 -g2 -Wl,-subsystem,windows")
-       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s -O2 -g2 -Wl,-subsystem,windows")
+       # Ohne Konsole aber auch ohne Ausgabe in Bash !!
+       #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s -O2 -g2 -Wl,-subsystem,windows")
+       #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s -O2 -g2 -Wl,-subsystem,windows")
+
+       # Mit Konsole und Ausgabe ... Die Konsole wird aber immer geöffnet
+       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s -O2 -g2")
+       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s -O2 -g2")
 endif()
 
 ############ VERSIONSNUMMER via GIT ###############

@@ -87,6 +87,15 @@ if [ $i686_ok ]; then
     
     rm -rf $build_i686_dir
 
+    # Convert Unicode to Windows
+    echo "Convert Unicode TXT to Windows with awk..."
+    mv $install_i686_dir/kommandozeilenparameter.txt $install_i686_dir/kommandozeilenparameter_unicode.txt
+    awk 'sub("$", "\r")' $install_i686_dir/kommandozeilenparameter_unicode.txt > $install_i686_dir/kommandozeilenparameter.txt
+    rm -f $install_i686_dir/kommandozeilenparameter_unicode.txt
+    
+    awk 'sub("$", "\r")' $install_i686_dir/LICENSE > $install_i686_dir/LICENSE.txt
+    rm -f $install_i686_dir/LICENSE
+    
     # compress as 7z
     echo "Release 32bit as 7z kompressed..."
     7z a -t7z -m0=LZMA -mmt=on -mx=9 -md=96m -mfb=256 $install_i686_dir".7z" $install_i686_dir
@@ -120,6 +129,15 @@ if [ $x86_64_ok ]; then
 
     rm -rf $build_x86_64_dir
 
+    # Convert Unicode to Windows
+    echo "Convert Unicode TXT to Windows with awk..."
+    mv $install_x86_64_dir/kommandozeilenparameter.txt $install_x86_64_dir/kommandozeilenparameter_unicode.txt
+    awk 'sub("$", "\r")' $install_x86_64_dir/kommandozeilenparameter_unicode.txt > $install_x86_64_dir/kommandozeilenparameter.txt
+    rm -f $install_x86_64_dir/kommandozeilenparameter_unicode.txt
+    
+    awk 'sub("$", "\r")' $install_x86_64_dir/LICENSE > $install_x86_64_dir/LICENSE.txt
+    rm -f $install_x86_64_dir/LICENSE
+    
     # compress as 7z
     echo "Release 64bit as 7z kompressed..."
     7z a -t7z -m0=LZMA -mmt=on -mx=9 -md=96m -mfb=256 $install_x86_64_dir".7z" $install_x86_64_dir
