@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.05.2016                //
+// Letzte Änderung am 22.03.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1288,6 +1288,7 @@ void DebuggerWindow::on_AssMnemonicIn_textChanged(const QString &arg1)
 
 bool DebuggerWindow::FindMnemonic(QString mnemonic, unsigned char *opcode, int *opcode_anzahl)
 {
+
     bool found = false;
     int count = 0;
 
@@ -1517,7 +1518,7 @@ void DebuggerWindow::on_AssAdressierungIn_returnPressed()
 bool DebuggerWindow::Assemble(QString adresse, QString mnemonic, QString adressierung, unsigned short *ass_adress, unsigned short *new_adress)
 {
     unsigned int start_adr;
-    unsigned char opc[16];
+    unsigned char opc[32];
     int opc_anz;
     unsigned char adr_typ;
     unsigned short adr_wert;
