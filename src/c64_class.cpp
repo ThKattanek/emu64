@@ -1781,7 +1781,7 @@ void C64Class::SetFullscreenAspectRatio(bool enabled)
 void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 {
     static bool joy_center_flag = true;
-    static char joy_axis_tbl[5] = {1,1,0,0,-1};
+    static char joy_axis_tbl[5] = {1,1,0,0,(char)-1};
 
     SDL_Keymod keymod;
 
