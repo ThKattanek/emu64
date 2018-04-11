@@ -200,7 +200,8 @@ bool Floppy1541::LoadDiskImage(char* filename)
     size_t reading_elements;
 
     int len = (int)strlen(filename);
-    strcpy(EXT,filename+len-3);
+
+    strcpy(EXT,filename+len-3); /* FIXME: crash if len < 3 */
 
     EXT[0]=toupper(EXT[0]);
     EXT[1]=toupper(EXT[1]);
@@ -249,8 +250,8 @@ bool Floppy1541::LoadDiskImage(char* filename)
         char  version;
         char  trackanzahl;
         unsigned short  tracksize;
-        unsigned short trackpos[84];
-        unsigned short trackspeed[84];
+        unsigned long trackpos[84];
+        unsigned long trackspeed[84];
 
         // Diskwechsel simulieren
         StartDiskChange();
