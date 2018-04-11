@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 28.02.2018                //
+# // Letzte Änderung am 11.04.2018                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -409,9 +409,11 @@ else()
     target_link_libraries(${PROJECT_NAME} ${WIN_LIBRARIES})
 endif()
 
-
-
 ################### INSTALL #######################
+
+IF(NOT CMAKE_INSTALL_PREFIX)
+    SET(CMAKE_INSTALL_PREFIX /usr)
+ENDIF(NOT CMAKE_INSTALL_PREFIX)
 
 # Set DataPath
 add_definitions("-DDATA_PATH=\"${CMAKE_INSTALL_PREFIX}\"")
