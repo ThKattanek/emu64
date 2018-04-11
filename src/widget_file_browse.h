@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.01.2017                //
+// Letzte Änderung am 11.04.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -21,8 +21,10 @@
 #include <QMessageBox>
 #include <QRegExp>
 
+#ifdef ZIP_SUPPORT
 #include "quazip/quazip.h"
 #include "quazip/quazipfile.h"
+#endif
 
 namespace Ui {
     class WidgetFileBrowse;
@@ -51,7 +53,9 @@ signals:
     void WriteProtectedChanged(bool status);    // true = Schreibgeschützt
 
 private slots:
+    #ifdef ZIP_SUPPORT
     void on_listWidget_zip_itemSelectionChanged();
+    #endif
     void on_listView_filebrowser_doubleClicked(const QModelIndex &index);
     void on_to_parent_clicked();
     void on_listView_filebrowser_clicked(const QModelIndex &index);

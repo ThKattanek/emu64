@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.01.2017                //
+// Letzte Änderung am 11.04.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -67,7 +67,9 @@ void WidgetFileBrowse::SetFileFilter(const QStringList &filters)
     ZIPExt = QStringList(filters);
 
     QStringList filters1(filters);
+#ifdef ZIP_SUPPORT
     filters1 << "*.zip";                        // ZIP Anhängen (Für Zip Unterstützung)
+#endif
     dirmodel->setNameFilterDisables(false);
     dirmodel->setNameFilters(filters1);
 }
@@ -148,6 +150,7 @@ bool WidgetFileBrowse::isFileWriteProtect(QString filename)
     return !permissions.testFlag(QFile::WriteOwner);
 }
 
+#ifdef ZIP_SUPPORT
 void WidgetFileBrowse::on_listWidget_zip_itemSelectionChanged()
 {
     QString AktZIPName = dirmodel->fileInfo(ui->listView_filebrowser->currentIndex()).absoluteFilePath();
@@ -179,6 +182,7 @@ void WidgetFileBrowse::on_listWidget_zip_itemSelectionChanged()
         emit SelectFile(OutFileName);
     }
 }
+#endif
 
 void WidgetFileBrowse::on_listView_filebrowser_doubleClicked(const QModelIndex &index)
 {
@@ -211,6 +215,7 @@ void WidgetFileBrowse::on_listView_filebrowser_clicked(const QModelIndex &index)
 
         emit SelectFile(AktFileName);
 
+#ifdef ZIP_SUPPORT
         if("ZIP" == AktFileName.right(3).toUpper())
         {
             ui->listWidget_zip->clear();
@@ -238,6 +243,7 @@ void WidgetFileBrowse::on_listView_filebrowser_clicked(const QModelIndex &index)
             }
         }
         else
+#endif
         {
             ui->listWidget_zip->setMaximumHeight(0);
             ui->listWidget_zip->setMinimumHeight(0);

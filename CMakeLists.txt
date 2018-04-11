@@ -297,12 +297,13 @@ else()
 endif()
 
 # Quazip
-find_package(QuaZip REQUIRED)
+find_package(QuaZip)
 if(QUAZIP_FOUND)
     include_directories(${QUAZIP_INCLUDE_DIR})
     set(LIBRARIES ${LIBRARIES} ${QUAZIP_LIBRARIES})
+    add_definitions(-DZIP_SUPPORT)
 else()
-    message(FATAL_ERROR "QUAZIP wurde nicht gefunden.")
+    message(STATUS "QUAZIP wurde nicht gefunden. Emu64 hat somit kein ZIP Support!")
 endif()
 
 # OpenGL
