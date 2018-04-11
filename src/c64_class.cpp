@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.02.2018                //
+// Letzte Änderung am 11.04.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -514,6 +514,7 @@ void C64Class::EndEmulation()
     EnableWarpMode(false);
     if(ExitScreenshotEnable)
     {
+        SwapRBSurface(C64Screen);
         SDL_SavePNG(C64Screen, ExitScreenshotFilename);
     }
 
@@ -714,22 +715,7 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
     /// Auf Screenshot Start prüfen ///
     if(StartScreenshot)
     {
-        int xw=C64Screen->w;
-        int yw=C64Screen->h;
-
-        cout << "Screenshot x:" << xw << " , y:" << yw << endl;
-
-        SDL_LockSurface(C64Screen);
-        for(int y=0; y<yw; y++)
-        {
-            Uint32* data = (Uint32*)C64Screen->pixels+(C64Screen->pitch/4)*y;
-            for(int x=0; x<xw; x++)
-            {
-                // R <--> B
-                data[x] = (data[x] & 0xff00ff00) | (data[x]>>16)&0xff | (data[x]<<16)&0xff0000;
-            }
-        }
-        SDL_UnlockSurface(C64Screen);
+        SwapRBSurface(C64Screen);
 
         switch (ScreenshotFormat) {
         case SCREENSHOT_FORMAT_BMP:
@@ -3928,4 +3914,22 @@ void C64Class::UpdateMouse()
     }
 
     ChangePOTSwitch();
+}
+
+void C64Class::SwapRBSurface(SDL_Surface *surface)
+{
+    int xw=surface->w;
+    int yw=surface->h;
+
+    SDL_LockSurface(surface);
+    for(int y=0; y<yw; y++)
+    {
+        Uint32* data = (Uint32*)surface->pixels+(surface->pitch/4)*y;
+        for(int x=0; x<xw; x++)
+        {
+            // R <--> B
+            data[x] = (data[x] & 0xff00ff00) | (data[x]>>16)&0xff | (data[x]<<16)&0xff0000;
+        }
+    }
+    SDL_UnlockSurface(surface);
 }

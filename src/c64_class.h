@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.02.2018                //
+// Letzte Änderung am 11.04.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -350,7 +350,7 @@ private:
     void UpdateMouse(void);
     int InitVideoCaptureSystem(void);
     void CloseVideoCaptureSystem(void);
-
+    void SwapRBSurface(SDL_Surface *surface); // swaps the color red with blue in sdl surface
     function<unsigned char(unsigned short)> *ReadProcTbl;
     function<void(unsigned short,unsigned char)> *WriteProcTbl;
 
