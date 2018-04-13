@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 11.04.2018                //
+# // Letzte Änderung am 13.04.2018                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -391,13 +391,18 @@ if(WIN32)
           OUTPUT_STRIP_TRAILING_WHITESPACE
         )
 
-    #message(STATUS "QT4 Libs: " ${QT4_LIBS})
-    #message(STATUS "OpenGL Libs: " ${OPENGL_LIBS})
-    #message(STATUS "SDL2 Libs: " ${SDL2_LIBS})
-    #message(STATUS "SDL2 Image Libs: " ${SDL2_IMAGE_LIBS})
-    #message(STATUS "FFMPEG Libs: " ${FFMPEG_LIBS})
+        #message(STATUS "QT4 Libs: " ${QT4_LIBS})
+        #message(STATUS "OpenGL Libs: " ${OPENGL_LIBS})
+        #message(STATUS "SDL2 Libs: " ${SDL2_LIBS})
+        #message(STATUS "SDL2 Image Libs: " ${SDL2_IMAGE_LIBS})
+        #message(STATUS "FFMPEG Libs: " ${FFMPEG_LIBS})
 
-    set(WIN_LIBRARIES ${WIN_LIBRARIES} ${QT4_LIBS} ${OPENGL_LIBS} ${SDL2_LIBS} ${SDL2_IMAGE_LIBS} ${FFMPEG_LIBS} -lquazip -lqtmain)
+        set(WIN_LIBRARIES ${WIN_LIBRARIES} ${QT4_LIBS} ${OPENGL_LIBS} ${SDL2_LIBS} ${SDL2_IMAGE_LIBS} ${FFMPEG_LIBS} -lqtmain)
+
+        if(QUAZIP_FOUND)
+            set(WIN_LIBRARIES ${WIN_LIBRARIES} -lquazip)
+        endif()
+
     endif()
 endif()
 
