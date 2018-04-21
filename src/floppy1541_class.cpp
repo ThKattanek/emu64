@@ -250,8 +250,8 @@ bool Floppy1541::LoadDiskImage(char* filename)
         char  version;
         char  trackanzahl;
         unsigned short  tracksize;
-        unsigned long trackpos[84];
-        unsigned long trackspeed[84];
+        uint32_t trackpos[84];
+        uint32_t trackspeed[84];
 
         // Diskwechsel simulieren
         StartDiskChange();
