@@ -118,8 +118,6 @@ FloppyWindow::~FloppyWindow()
     delete c64_font2;
 
     delete ui;
-
-
 }
 
 void FloppyWindow::showEvent(QShowEvent*)
@@ -212,6 +210,21 @@ void FloppyWindow::OnSelectFile(QString filename)
         {
             d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toLatin1().data());
             RefreshD64FileList();
+            emit ChangeFloppyImage(FloppyNr);
+        }
+
+        if("G64" == AktFileName[FloppyNr].right(3).toUpper())
+        {
+            //d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toLatin1().data());
+            //RefreshD64FileList();
+
+
+            // D64 File-Anzeige löschen
+            ui->D64FileTable->clear();
+
+            // D64 Name ermitteln und anzeigen
+            ui->DiskName->setText("G64 IMAGE");
+
             emit ChangeFloppyImage(FloppyNr);
         }
     }
