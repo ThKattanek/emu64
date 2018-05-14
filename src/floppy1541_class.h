@@ -39,7 +39,8 @@ const unsigned char D64_TRACK_ZONE[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
                    2,2,2,2,2,2,
                    3,3,3,3,3,3,3,3,3,3};
 
-const unsigned char D64_SECTOR_GAP[4] = {1,10,5,2};
+// const unsigned char D64_SECTOR_GAP[4] = {1,10,5,2}; //Meine Werte
+const unsigned char D64_SECTOR_GAP[4] = {12, 21, 16, 13}; // von GPZ Code übermommen imggen
 
 #define D64 0
 #define G64 1
