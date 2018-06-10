@@ -1,8 +1,15 @@
 # EMU64 - Der C64 Emulator
 ![Logo](http://www.emu64-projekt.de/images/emu64_logo_120_120.png)
 
+Emu64 Homepage: [http://www.emu64-projekt.de](http://www.emu64-projekt.de)
+
+Emu64 auf YouTube: [Emu64 News Playlist](https://www.youtube.com/playlist?list=PLPygkia21sCKyHtZ9DGkWhHrq3bF9fMhY) / [Emu64 Tutorial Playlist](https://www.youtube.com/playlist?list=PLPygkia21sCLN7UtYWqpuGRjmC6OTV8mY)
+
+Emu64 auf Facebook: [https://www.facebook.com/Emu64-103321833093172](https://www.facebook.com/Emu64-103321833093172)
+
 ## Screenshot
 ![Screenshot](screenshot.png)
+
 
 ## Emu64 erstellen unter Linux
 
