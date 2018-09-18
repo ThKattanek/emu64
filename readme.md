@@ -1,6 +1,6 @@
 # EMU64 - Der C64 Emulator
 ![Logo](http://www.emu64-projekt.de/images/emu64_logo_120_120.png)
-### [Latest version here](https://github.com/ThKattanek/mod-player/releases)
+### [Latest version here](https://github.com/ThKattanek/emu64/releases/latest)
 Emu64 Homepage: [http://www.emu64-projekt.de](http://www.emu64-projekt.de)
 
 Emu64 auf YouTube: [Emu64 News Playlist](https://www.youtube.com/playlist?list=PLPygkia21sCKyHtZ9DGkWhHrq3bF9fMhY) / [Emu64 Tutorial Playlist](https://www.youtube.com/playlist?list=PLPygkia21sCLN7UtYWqpuGRjmC6OTV8mY)
