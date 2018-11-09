@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.02.2017                //
+// Letzte Änderung am 09.11.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -55,6 +55,7 @@ private slots:
     void OnD64FileStart1(bool);
     void OnD64FileStart2(bool);
     void OnD64FileStart3(bool);
+    void OnD64FileStart4(bool);
     void OnPRGExport(bool);
     void OnPRGNameMMCKompatibel(bool);
     void OnWriteProtectedChanged(bool);

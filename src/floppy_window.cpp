@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.02.2017                //
+// Letzte Änderung am 09.11.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -267,6 +267,7 @@ void FloppyWindow::OnCustomMenuRequested(QPoint pos)
     menu->addAction(new QAction(trUtf8("Laden und Starten mit Reset ohne Kernal"), this));
     menu->addAction(new QAction(trUtf8("Laden und Starten mit Reset"), this));
     menu->addAction(new QAction(trUtf8("Laden und Starten"), this));
+    menu->addAction(new QAction(trUtf8("Laden ohne Kernal"), this));
     menu->addAction(new QAction(trUtf8("Laden"), this));
 
     QMenu *menu_export = new QMenu(this);
@@ -288,6 +289,7 @@ void FloppyWindow::OnCustomMenuRequested(QPoint pos)
     connect(menu->actions().at(1),SIGNAL(triggered(bool)),this,SLOT(OnD64FileStart1(bool)));
     connect(menu->actions().at(2),SIGNAL(triggered(bool)),this,SLOT(OnD64FileStart2(bool)));
     connect(menu->actions().at(3),SIGNAL(triggered(bool)),this,SLOT(OnD64FileStart3(bool)));
+    connect(menu->actions().at(4),SIGNAL(triggered(bool)),this,SLOT(OnD64FileStart4(bool)));
     connect(menu_export->actions().at(0),SIGNAL(triggered(bool)),this,SLOT(OnPRGExport(bool)));
     connect(menu_export->actions().at(1),SIGNAL(triggered(bool)),this,SLOT(OnPRGNameMMCKompatibel(bool)));
 }
@@ -319,6 +321,18 @@ void FloppyWindow::OnD64FileStart2(bool)
 }
 
 void FloppyWindow::OnD64FileStart3(bool)
+{
+    int file_index = ui->D64FileTable->currentIndex().row();
+    int floppy_nr = ui->FloppySelect->currentIndex();
+    QString FileName = TmpPath + "/tmp.prg";
+
+    if(d64[floppy_nr].ExportPrg(file_index,FileName.toAscii().data()))
+    {
+        c64->LoadPRG(FileName.toAscii().data(),NULL);
+    }
+}
+
+void FloppyWindow::OnD64FileStart4(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
     int floppy_nr = ui->FloppySelect->currentIndex();
