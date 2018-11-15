@@ -278,11 +278,14 @@ bool MOS6502::OneZyklus(void)
 
             PC++;
 
+            // for microcode 71
+            /*
             if(LastOPC_CLI)
             {
                 LastOPC_CLI=false;
                 SR &= 0xFB;
             }
+            */
 
             return false;
         }
@@ -831,8 +834,8 @@ bool MOS6502::OneZyklus(void)
     //R // TMPByte von Adresse lesen // InterruptFalg=0
     case 71:
         TMPByte = Read(PC);
-        //SR &= 0xFB;
-        LastOPC_CLI = true;
+        SR &= 0xFB;
+        //LastOPC_CLI = true;
         break;
     //R // TMPByte von Adresse lesen // OverflowFalg=0
     case 72:
