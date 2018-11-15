@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.03.2017                //
+// Letzte Änderung am 15.11.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -455,6 +455,13 @@ bool MOS6510::OneZyklus(void)
             History[*HistoryPointer] = AktOpcodePC;
 
             PC++;
+
+            if(LastOPC_CLI)
+            {
+                LastOPC_CLI=false;
+                SR &= 0xFB;
+            }
+
             return false;
         break;
 
@@ -1059,7 +1066,7 @@ bool MOS6510::OneZyklus(void)
         case 71:
                 CHK_RDY
                 TMPByte = Read(PC);
-                SR &= 0xFB;
+                //
                 LastOPC_CLI = true;
                 break;
         //R // TMPByte von Adresse lesen // OverflowFalg=0

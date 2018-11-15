@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 15.11.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -83,6 +83,7 @@ private:
     unsigned short  AktOpcodePC;
     bool            JAMFlag;
     unsigned char   TMPByte;
+    bool            LastOPC_CLI;
     unsigned short  PC;
     unsigned char   AC;
     unsigned char   XR;

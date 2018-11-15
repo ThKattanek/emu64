@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 15.11.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -28,6 +28,7 @@ MOS6502::MOS6502(void)
     AktOpcodePC = 0x0100;
     JAMFlag = false;
     TMPByte = 0;    
+    LastOPC_CLI = false;
     PC = 0;
     AC = 0;
     XR = 0;
@@ -276,8 +277,16 @@ bool MOS6502::OneZyklus(void)
             History[*HistoryPointer] = AktOpcodePC;
 
             PC++;
+
+            if(LastOPC_CLI)
+            {
+                LastOPC_CLI=false;
+                SR &= 0xFB;
+            }
+
             return false;
         }
+
         break;
 
     //R // Lesen von PC-Adresse und verwerfen // PC++
@@ -822,7 +831,8 @@ bool MOS6502::OneZyklus(void)
     //R // TMPByte von Adresse lesen // InterruptFalg=0
     case 71:
         TMPByte = Read(PC);
-        SR &= 0xFB;
+        //SR &= 0xFB;
+        LastOPC_CLI = true;
         break;
     //R // TMPByte von Adresse lesen // OverflowFalg=0
     case 72:
