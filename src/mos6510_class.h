@@ -102,7 +102,7 @@ private:
     unsigned char   IRQLinePuffer[5];
 
     bool            NMIState;
-    bool            isNMI;
+    unsigned char   NMIStatePuffer[5];
 
     bool            EnableDebugCart;
     unsigned char   DebugCartValue;

@@ -43,9 +43,13 @@ MOS6510::MOS6510(void)
 
     EnableExtInterrupts = false;
 
-    isNMI = false;
+    NMIState = false;
     IRQLine = 0;
-    for(int i=0;i<5;i++) IRQLinePuffer[i] = 0;
+    for(int i=0;i<5;i++)
+    {
+        NMIStatePuffer[i] = false;
+        IRQLinePuffer[i] = 0;
+    }
 
     EnableDebugCart = false;
     WRITE_DEBUG_CART = false;
@@ -424,6 +428,13 @@ bool MOS6510::OneZyklus(void)
     }
     RESET_OLD = *RESET;
 
+    // Unter Index 0 ist immer der aktuelle NMI Zustand in diesem Zyklus
+    // Unter Index 1 ist der Zustand 1 Zklus aus der Vergangenheit
+    // Unter Index 2 ist der Zustand 2 Zyklen aus der Vergangenheit
+    // usw...
+    for(int i=4;i>0;i--) NMIStatePuffer[i] = NMIStatePuffer[i-1];
+    NMIStatePuffer[0] = NMIState;
+
     // Unter Index 0 ist immer der aktuelle IRQ Zustand in diesem Zyklus
     // Unter Index 1 ist der Zustand 1 Zklus aus der Vergangenheit
     // Unter Index 2 ist der Zustand 2 Zyklen aus der Vergangenheit
@@ -441,14 +452,13 @@ bool MOS6510::OneZyklus(void)
 
             CHK_RDY
 
-            if(isNMI)
+            if((NMIStatePuffer[1] == true)) // NMIStatePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der NMI schon angelegen haben also vor dem letzten Zyklus des vorigen Befehls
             {
                 NMIState = false;
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x102*MCTItemSize));
                 AktOpcode = 0x102;
-                isNMI = false;
                 return false;
-            }else if((IRQLinePuffer[2] > 0) && ((SR&4)==0)) // IRQLinePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der IRQ schon anliegen also vor dem letzten Zyklus des vorigen Befehls
+            }else if((IRQLinePuffer[1] > 0) && ((SR&4)==0)) // IRQLinePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der IRQ schon anliegen also vor dem letzten Zyklus des vorigen Befehls
             {
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
                 AktOpcode = 0x101;
@@ -1668,12 +1678,12 @@ bool MOS6510::OneZyklus(void)
 
         if(*MCT == 0)
         {
+            /*
             if(NMIState == true)
             {
                 isNMI = true;
                 return false;
             }
-            /*
             else if((Interrupts[VIC_IRQ] || Interrupts[CIA_IRQ] || Interrupts[REU_IRQ]) && ((SR&4)==0))
             {
                 isIRQ = true;
