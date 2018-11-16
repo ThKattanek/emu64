@@ -256,13 +256,16 @@ bool MOS6502::OneZyklus(void)
         AktOpcode = 0x100;
     }
 
+    for(int i=4;i>0;i--) IRQLinePuffer[i] = IRQLinePuffer[i-1];
+    IRQLinePuffer[0] = IRQLine;
+
     switch(*MCT)
     {
     //R // Feetch Opcode
     case 0:
         if(JAMFlag) return false;
 
-        if(IRQLinePuffer[0] > 0 && ((SR&4)==0))
+        if(IRQLinePuffer[1] > 0 && ((SR&4)==0))
         {
             MCT = ((unsigned char*)MicroCodeTable6502 + (0x101*MCTItemSize));
             AktOpcode = 0x101;
@@ -1378,9 +1381,6 @@ bool MOS6502::OneZyklus(void)
         break;
     }
     MCT++;
-
-    for(int i=4;i>0;i--) IRQLinePuffer[i] = IRQLinePuffer[i-1];
-    IRQLinePuffer[0] = IRQLine;
 
     if(*MCT == 0)
     {
