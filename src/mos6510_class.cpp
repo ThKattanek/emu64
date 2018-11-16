@@ -424,6 +424,13 @@ bool MOS6510::OneZyklus(void)
     }
     RESET_OLD = *RESET;
 
+    // Unter Index 0 ist immer der aktuelle IRQ Zustand in diesem Zyklus
+    // Unter Index 1 ist der Zustand 1 Zklus aus der Vergangenheit
+    // Unter Index 2 ist der Zustand 2 Zyklen aus der Vergangenheit
+    // usw...
+    for(int i=4;i>0;i--) IRQLinePuffer[i] = IRQLinePuffer[i-1];
+    IRQLinePuffer[0] = IRQLine;
+
     if(!CpuWait)
     {
         switch(*MCT)
@@ -441,7 +448,7 @@ bool MOS6510::OneZyklus(void)
                 AktOpcode = 0x102;
                 isNMI = false;
                 return false;
-            }else if((IRQLinePuffer[0] > 0) && ((SR&4)==0))
+            }else if((IRQLinePuffer[2] > 0) && ((SR&4)==0)) // IRQLinePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der IRQ schon anliegen also vor dem letzten Zyklus des vorigen Befehls
             {
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
                 AktOpcode = 0x101;
@@ -1658,9 +1665,6 @@ bool MOS6510::OneZyklus(void)
                 break;
         }
         MCT++;
-
-        for(int i=4;i>0;i--) IRQLinePuffer[i] = IRQLinePuffer[i-1];
-        IRQLinePuffer[0] = IRQLine;
 
         if(*MCT == 0)
         {
