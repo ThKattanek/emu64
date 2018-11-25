@@ -88,7 +88,7 @@ class MOS6581_8085
     unsigned char       IO[32];
 
     unsigned char       LastWriteValue;
-    unsigned char       LastWriteCounter;
+    unsigned short      LastWriteCounter;
 
     bool                IODelayEnable;
     unsigned char       IODelayPuffer[1048576][2];
