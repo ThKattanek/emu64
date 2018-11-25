@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.12.2016                //
+// Letzte Änderung am 25.11.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -38,6 +38,8 @@ MOS6581_8085::MOS6581_8085(int nummer,int samplerate,int puffersize,int *error)
     IODelayEnable = false;
     IODelayRPos = 0;
     IODelayWPos = 1000;
+
+    LastWriteValue = 0;
 
     for(int i=0; i<1048576; i++)
     {
@@ -187,6 +189,13 @@ bool MOS6581_8085::OneZyklus(void)
     
     if(!*RESET) Reset();
 
+    if(LastWriteCounter > 0)
+    {
+        LastWriteCounter--;
+        if(LastWriteCounter == 0)
+            LastWriteValue = 0;
+    }
+
     if(CycleExact)
     {
     	OscZyklus();
@@ -304,7 +313,7 @@ unsigned char MOS6581_8085::ReadIO(unsigned short adresse)
         return EnvOutput(2);
 
     default:
-    	return 0;
+        return LastWriteValue;
     }
     return 0;
 }
@@ -316,6 +325,10 @@ void MOS6581_8085::SetIODelayEnable(bool enable)
 
 void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)
 {
+
+    LastWriteValue = wert;
+    LastWriteCounter = LAST_WRITE_COUNTER_START;
+
     static bool KeyNext;
 
     if(!IODelayEnable)

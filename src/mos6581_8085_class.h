@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.12.2016                //
+// Letzte Änderung am 25.11.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -28,6 +28,11 @@
 #define RELEASE		2
 
 #define	PUFFER_TIME	1
+
+//// Zyklen die vergehen müssen bis der letzte geschriebene Wert auf Null gesetzt wird
+//// Beim lesen eines NoneRead Registers wird immer der zuletzt in den SID geschriebene Wert gelesen.
+//// Nach ReSID ca. 2000- 4000 Zyklen
+#define LAST_WRITE_COUNTER_START 3000
 
 typedef int fc_point[2];
 
@@ -81,6 +86,9 @@ class MOS6581_8085
     double              Samplerate;
     VOICEClass          *Voice[3];
     unsigned char       IO[32];
+
+    unsigned char       LastWriteValue;
+    unsigned char       LastWriteCounter;
 
     bool                IODelayEnable;
     unsigned char       IODelayPuffer[1048576][2];
