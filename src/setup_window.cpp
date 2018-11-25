@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.02.2018                //
+// Letzte Änderung am 25.11.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -34,6 +34,13 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoPalClass *vid
 
     // VIC Farbmodi zur ComboBox hinzufügen
     ui->C64Farbmodus->addItems(QStringList()<<"Emu64"<<"Emu64 (bis 4.00)"<<"CCS64"<<"PC64"<<"C64S"<<"Vice"<<"Frodo"<<trUtf8("Pepto")<<trUtf8("Schwarz / Weiß"));
+
+    // VIC Emulation Default Einstellungen setzen
+    ui->VicSpriteViewEnable->setEnabled(true);
+    ui->VicBorderViewEnable->setEnabled(true);
+    ui->VicSprSprCollisionEnable->setEnabled(true);
+    ui->VicSprBgrCollisionEnable->setEnabled(true);
+
     // SID Typen zur ComboBox hinzufügen
     ui->FirstSidTyp->addItems(QStringList()<<"MOS-6581"<<"MOS-8580");
     ui->SecondSidTyp->addItems(QStringList()<<"MOS-6581"<<"MOS-8580");
@@ -287,6 +294,26 @@ void SetupWindow::LoadINI(C64Class *c64)
 
         ini->endGroup();
 
+        ini->beginGroup("VIC");
+
+        bvalue = ini->value("SpriteView",true).toBool();
+        ui->VicSpriteViewEnable->setChecked(bvalue);
+        on_VicSpriteViewEnable_toggled(bvalue);
+
+        bvalue = ini->value("BorderView",true).toBool();
+        ui->VicBorderViewEnable->setChecked(bvalue);
+        on_VicBorderViewEnable_toggled(bvalue);
+
+        bvalue = ini->value("SpriteSpriteCollision",true).toBool();
+        ui->VicSprSprCollisionEnable->setChecked(bvalue);
+        on_VicSprSprCollisionEnable_toggled(bvalue);
+
+        bvalue = ini->value("SpriteBackgroundCollision",true).toBool();
+        ui->VicSprBgrCollisionEnable->setChecked(bvalue);
+        on_VicSprBgrCollisionEnable_toggled(bvalue);
+
+        ini->endGroup();
+
         ini->beginGroup("MainWindow");
         value = ini->value("ScreenshotFormatNr",SCREENSHOT_FORMAT_PNG).toInt();
         ui->ScreenshotFormat->setCurrentIndex(value);
@@ -374,6 +401,13 @@ void SetupWindow::SaveINI()
         ini->setValue("6ChannelMode",ui->Sid6ChannelMode->isChecked());
         ini->setValue("CycleExact",ui->SidCycleExactEnable->isChecked());
         ini->setValue("Filter",ui->SidFilterEnable->isChecked());
+        ini->endGroup();
+
+        ini->beginGroup("VIC");
+        ini->setValue("SpriteView",ui->VicSpriteViewEnable->isChecked());
+        ini->setValue("BorderView",ui->VicBorderViewEnable->isChecked());
+        ini->setValue("SpriteSpriteCollision",ui->VicSprSprCollisionEnable->isChecked());
+        ini->setValue("SpriteBackgroundCollision",ui->VicSprBgrCollisionEnable->isChecked());
         ini->endGroup();
 
         ini->beginGroup("MainWindow");
@@ -834,4 +868,24 @@ void SetupWindow::on_NewRomSet_clicked()
     }
 
     delete new_romset_window;
+}
+
+void SetupWindow::on_VicSpriteViewEnable_toggled(bool checked)
+{
+    c64->SetVicConfig(VIC_SPRITES_ON, checked);
+}
+
+void SetupWindow::on_VicBorderViewEnable_toggled(bool checked)
+{
+    c64->SetVicConfig(VIC_BORDER_ON, checked);
+}
+
+void SetupWindow::on_VicSprSprCollisionEnable_toggled(bool checked)
+{
+    c64->SetVicConfig(VIC_SPR_SPR_COLL_ON, checked);
+}
+
+void SetupWindow::on_VicSprBgrCollisionEnable_toggled(bool checked)
+{
+    c64->SetVicConfig(VIC_SPR_BCK_COLL_ON, checked);
 }

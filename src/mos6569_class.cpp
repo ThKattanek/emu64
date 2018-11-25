@@ -152,7 +152,6 @@ VICII::VICII()
 	SpriteExpYFlipFlop = 0xFF;
 	SpriteDMA = 0;
 	SpriteView = 0;
-    SpriteCollisionEnable = true;
 
 	unsigned short spr_x_start = 0x194;
 	for(int x=0;x<0x200;x++)
@@ -235,11 +234,6 @@ void VICII::SetVicType(int system)
 		FIRST_DISP_LINE = FIRST_DISP_LINE_NTSC;
 		break;
 	}
-}
-
-void VICII::EnableSpriteCollision(bool enabled)
-{
-    SpriteCollisionEnable = enabled;
 }
 
 void VICII::EnableGreyDot(bool enabled)
@@ -668,10 +662,7 @@ inline void VICII::DrawSprites()
 	if(AktRZ < FIRST_DISP_LINE_PAL+1) return;
 
     // Spritekollisionspuffer löschen
-    if(SpriteCollisionEnable)
-    {
-        for (int i=0; i < 520; i++) SpriteCollisionsPuffer[i] = 0;
-    }
+    for (int i=0; i < 520; i++) SpriteCollisionsPuffer[i] = 0;
 
     int SpriteNr = 7;
     while(SpriteNr >= 0)
@@ -1119,45 +1110,51 @@ inline void VICII::DrawSprites()
     //////////////////////// Sprite Collision ///////////////////////////
 
     // Prüfe sprite-sprite kollisions
-    if(MM == 0)
+    if(VicConfig[VIC_SPR_SPR_COLL_ON])
     {
-        // IRQ kann ausgelöst werden
-        MM |= AktSpriteColl;
-        if(MM != 0)
+        if(MM == 0)
         {
-            IRQFlag |= 0x04;
-            if (IRQMask & 0x04)
+            // IRQ kann ausgelöst werden
+            MM |= AktSpriteColl;
+            if(MM != 0)
             {
-                IRQFlag |= 0x80;
-                CpuTriggerInterrupt(VIC_IRQ);
+                IRQFlag |= 0x04;
+                if (IRQMask & 0x04)
+                {
+                    IRQFlag |= 0x80;
+                    CpuTriggerInterrupt(VIC_IRQ);
+                }
             }
         }
-    }
-    else
-    {
-        // kein IRQ auslösen
-        MM |= AktSpriteColl;
+        else
+        {
+            // kein IRQ auslösen
+            MM |= AktSpriteColl;
+        }
     }
 
     // Prüfe sprite-gfx kollision
-    if(MD == 0)
+    if(VicConfig[VIC_SPR_BCK_COLL_ON])
     {
-        // IRQ kann ausgelöst werden
-        MD |= AktDataColl;
-        if(MD != 0)
+        if(MD == 0)
         {
-            IRQFlag |= 0x02;
-            if (IRQMask & 0x02)
+            // IRQ kann ausgelöst werden
+            MD |= AktDataColl;
+            if(MD != 0)
             {
-                IRQFlag |= 0x80;
-                CpuTriggerInterrupt(VIC_IRQ);
+                IRQFlag |= 0x02;
+                if (IRQMask & 0x02)
+                {
+                    IRQFlag |= 0x80;
+                    CpuTriggerInterrupt(VIC_IRQ);
+                }
             }
         }
-    }
-    else
-    {
-        // kein IRQ auslösen
-        MD |= AktDataColl;
+        else
+        {
+            // kein IRQ auslösen
+            MD |= AktDataColl;
+        }
     }
 }
 

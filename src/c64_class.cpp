@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.04.2018                //
+// Letzte Änderung am 25.11.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -3332,6 +3332,18 @@ void C64Class::SetSidFilter(bool enable)
 {
     sid1->FilterOn = enable;
     sid2->FilterOn = enable;
+}
+
+void C64Class::SetVicConfig(int var, bool enable)
+{
+    if(var >= VicConfigSizeof) return;
+    vic->VicConfig[var] = enable;
+}
+
+bool C64Class::GetVicConfig(int var)
+{
+    if(var >= VicConfigSizeof) return false;
+    return vic->VicConfig[var];
 }
 
 int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)

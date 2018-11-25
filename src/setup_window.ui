@@ -34,7 +34,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <property name="documentMode">
     <bool>false</bool>
@@ -179,7 +179,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>140</y>
+       <y>220</y>
        <width>381</width>
        <height>71</height>
       </rect>
@@ -226,6 +226,77 @@
       </property>
       <property name="text">
        <string>Löschen</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>139</y>
+       <width>381</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>VIC</string>
+     </property>
+     <widget class="QCheckBox" name="VicSpriteViewEnable">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>131</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Sprites anzeigen</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="VicBorderViewEnable">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>131</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Rahmen anzeigen</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="VicSprSprCollisionEnable">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>20</y>
+        <width>181</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Sprite - Sprite Kollision</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="VicSprBgrCollisionEnable">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>40</y>
+        <width>181</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Sprite - Hintergrund Kollision</string>
       </property>
      </widget>
     </widget>

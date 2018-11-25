@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.10.2017                //
+// Letzte Änderung am 25.11.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -36,7 +36,6 @@ public:
     void SwitchVideoPuffer();
     void GetRegister(VIC_STRUCT *vic_reg);
     void SetVicType(int system);
-    void EnableSpriteCollision(bool enabled);
     void EnableGreyDot(bool enabled);
     void OneZyklus(void);
     //bool SaveFreez(FILE* File);
@@ -60,7 +59,7 @@ public:
     unsigned short  *BreakStatus;
     unsigned short  *BreakWerte;
 
-    bool            VicConfig[4];
+    bool            VicConfig[VicConfigSizeof];
 
     unsigned char   *VideoPuffer;
     int             AktVideoPuffer;
@@ -173,7 +172,6 @@ private:
     unsigned long   SpriteSeq[8];
     unsigned long   SpriteSeqAktLine[8];
     bool            SpriteSeqOn[8];
-    bool            SpriteCollisionEnable;
     unsigned char	SpriteCollisionsPuffer[MAX_XW + 4*24];
 
     ///////////////////////////////////////////////////////////////////////////
