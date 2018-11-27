@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.12.2016                //
+// Letzte Änderung am 27.11.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -95,16 +95,6 @@ enum
 {
         VIA1_IRQ,
         VIA2_IRQ
-};
-
-#define VicConfigSizeof 4
-
-enum
-{
-        VIC_BORDER_ON,
-        VIC_SPRITES_ON,
-        VIC_SPR_SPR_COLL_ON,
-        VIC_SPR_BCK_COLL_ON
 };
 
 typedef enum KeyStatus

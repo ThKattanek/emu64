@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.10.2017                //
+// Letzte Änderung am 27.11.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -119,7 +119,6 @@ VICII::VICII()
 	DrawLineCounter = 0;
 	LPTriggered = DrawThisLine = VBlanking = false;
 
-    GreyDotEnable = false;
 	isWriteColorReg20 = false;
 	isWriteColorReg21 = false;
 
@@ -236,11 +235,6 @@ void VICII::SetVicType(int system)
 	}
 }
 
-void VICII::EnableGreyDot(bool enabled)
-{
-	GreyDotEnable = enabled;
-}
-
 inline void VICII::RasterIRQ(void)
 {
 	IRQFlag |= 0x01;
@@ -352,18 +346,27 @@ inline void VICII::CheckBorder(void)
         }
         else
         {
-            int i=8;
+            if(isWriteColorReg20)
+                BorderLine[BorderLinePos++] = 0x0f;
+            else
+                BorderLine[BorderLinePos++] = EC;
+
+            int i=7;
             do{
                 BorderLine[BorderLinePos++] = EC;
                 i--;
             } while(i>0);
+
         }
 	}
 	else
 	{
         if(CSEL==0 && AktZyklus == RAHMEN38_LINKS && BorderFlipFlop1 == true)
         {
-            BorderLine[BorderLinePos++] = EC;
+            if(isWriteColorReg20)
+                BorderLine[BorderLinePos++] = 0x0f;
+            else
+                BorderLine[BorderLinePos++] = EC;
             BorderLine[BorderLinePos++] = EC;
             BorderLine[BorderLinePos++] = EC;
             BorderLine[BorderLinePos++] = EC;
@@ -609,11 +612,18 @@ inline void VICII::DrawGraphics(void)
     /// Im Aktuellen Zyklus Prüfen ob B0C Color verwendet wurde (16 Pixel vorlauf)
     /// Wenn ja mit aktuellen B0C überschreiben
 
-        VideoPufferLine_XScroll = VideoPufferLine - 8;
-        for(int i=0;i<8;i++)
-        {
-            if(VideoPufferLine_XScroll[i] & 0x40) VideoPufferLine_XScroll[i] =  B0C;
-        }
+    VideoPufferLine_XScroll = VideoPufferLine - 8;
+
+    /// Grey Dot zeichnen
+    ///
+    if(isWriteColorReg21 && (VideoPufferLine_XScroll[0] & 0x40))
+        VideoPufferLine_XScroll[0] = 0x0f;
+
+
+    for(int i=0;i<8;i++)
+    {
+        if(VideoPufferLine_XScroll[i] & 0x40) VideoPufferLine_XScroll[i] =  B0C;
+    }
 
     ////////////////////////// Draw Border //////////////////////////
     CheckBorder();
@@ -1975,11 +1985,12 @@ void VICII::WriteIO(unsigned short adresse,unsigned char wert)
 		/// Rahmenfarbe
 		case 0x20:
                         EC = wert&15;
-                        if(GreyDotEnable)isWriteColorReg20 = true;
+                        if(VicConfig[VIC_GREY_DOTS_ON]) isWriteColorReg20 = true;
 			break;
 		/// Hintergrundfarbe 0
-                case 0x21: B0C = wert&15;
-                        if(GreyDotEnable)isWriteColorReg21 = true;
+        case 0x21:
+                        B0C = wert&15;
+                        if(VicConfig[VIC_GREY_DOTS_ON]) isWriteColorReg21 = true;
 			break;
 		/// Hintergrundfarbe 1
                 case 0x22: B1C	= wert&15;

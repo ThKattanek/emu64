@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.11.2018                //
+// Letzte Änderung am 27.11.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -27,6 +27,17 @@ using namespace std::tr1::placeholders;
 #define MAX_YW MAX_RASTER_ZEILEN
 #define VIDEO_PUFFER_SIZE MAX_XW*MAX_YW*4
 
+#define VicConfigSizeof 5
+
+enum
+{
+        VIC_BORDER_ON,
+        VIC_SPRITES_ON,
+        VIC_SPR_SPR_COLL_ON,
+        VIC_SPR_BCK_COLL_ON,
+        VIC_GREY_DOTS_ON
+};
+
 class VICII
 {
 public:
@@ -36,7 +47,6 @@ public:
     void SwitchVideoPuffer();
     void GetRegister(VIC_STRUCT *vic_reg);
     void SetVicType(int system);
-    void EnableGreyDot(bool enabled);
     void OneZyklus(void);
     //bool SaveFreez(FILE* File);
     //bool LoadFreez(FILE *file,unsigned short version);
@@ -148,7 +158,6 @@ private:
     unsigned char   CharData;
     unsigned char   ColorData;
 
-    bool            GreyDotEnable;
     bool            isWriteColorReg20;
     bool            isWriteColorReg21;
 
