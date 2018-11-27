@@ -616,7 +616,7 @@ inline void VICII::DrawGraphics(void)
 
     /// Grey Dot zeichnen
     ///
-    if(isWriteColorReg21 && (VideoPufferLine_XScroll[0] & 0x40))
+    if(isWriteColorReg21 && (VideoPufferLine_XScroll[0] & 0x40) && DisplayStatus)
         VideoPufferLine_XScroll[0] = 0x0f;
 
 
