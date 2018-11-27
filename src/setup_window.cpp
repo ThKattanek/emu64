@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.11.2018                //
+// Letzte Änderung am 27.11.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -40,6 +40,7 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoPalClass *vid
     ui->VicBorderViewEnable->setEnabled(true);
     ui->VicSprSprCollisionEnable->setEnabled(true);
     ui->VicSprBgrCollisionEnable->setEnabled(true);
+    ui->VicGreyDotsEnable->setEnabled(true);
 
     // SID Typen zur ComboBox hinzufügen
     ui->FirstSidTyp->addItems(QStringList()<<"MOS-6581"<<"MOS-8580");
@@ -312,6 +313,10 @@ void SetupWindow::LoadINI(C64Class *c64)
         ui->VicSprBgrCollisionEnable->setChecked(bvalue);
         on_VicSprBgrCollisionEnable_toggled(bvalue);
 
+        bvalue = ini->value("GreyDots",false).toBool();
+        ui->VicGreyDotsEnable->setChecked(bvalue);
+        on_VicGreyDotsEnable_toggled(bvalue);
+
         ini->endGroup();
 
         ini->beginGroup("MainWindow");
@@ -408,6 +413,7 @@ void SetupWindow::SaveINI()
         ini->setValue("BorderView",ui->VicBorderViewEnable->isChecked());
         ini->setValue("SpriteSpriteCollision",ui->VicSprSprCollisionEnable->isChecked());
         ini->setValue("SpriteBackgroundCollision",ui->VicSprBgrCollisionEnable->isChecked());
+        ini->setValue("GreyDots",ui->VicGreyDotsEnable->isChecked());
         ini->endGroup();
 
         ini->beginGroup("MainWindow");
@@ -888,4 +894,9 @@ void SetupWindow::on_VicSprSprCollisionEnable_toggled(bool checked)
 void SetupWindow::on_VicSprBgrCollisionEnable_toggled(bool checked)
 {
     c64->SetVicConfig(VIC_SPR_BCK_COLL_ON, checked);
+}
+
+void SetupWindow::on_VicGreyDotsEnable_toggled(bool checked)
+{
+    c64->SetVicConfig(VIC_GREY_DOTS_ON, checked);
 }
