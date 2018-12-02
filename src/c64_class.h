@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.11.2018                //
+// Letzte Änderung am 02.12.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -196,6 +196,14 @@ public:
 
     void SetVicConfig(int var, bool enable);    // var = VIC_BORDER_ON, VIC_SPRITES_ON, VIC_SPR_SPR_COLL_ON, VIC_SPR_BCK_COLL_ON
     bool GetVicConfig(int var);
+
+    void SetVicDisplaySizePal(int first_line, int last_line);
+    void SetVicDisplaySizeNtsc(int first_line, int last_line);
+
+    int GetVicFirstDisplayLinePal();
+    int GetVicLastDisplayLinePal();
+    int GetVicFirstDisplayLineNtsc();
+    int GetVicLastDisplayLineNtsc();
 
     int             AktWindowXW;
     int             AktWindowYW;

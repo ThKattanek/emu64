@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.11.2018                //
+// Letzte Änderung am 02.12.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -39,12 +39,6 @@
 // CSEL=1
 #define RAHMEN40_LINKS		17  // Eigtl XKoordinate 0x018  (17)
 #define RAHMEN40_RECHTS		57  // Eigtl XKoordinate 0x158  (57)
-
-// erste und letzte Display Zeile
-#define FIRST_DISP_LINE_PAL	16              //16
-#define FIRST_DISP_LINE_NTSC	0x10 + 14
-
-#define LAST_DISP_LINE	288                 //288
 
 // erste and letzte mögliche Rasterzeile für Bad Lines
 #define FIRST_DMA_LINE		0x30
@@ -164,6 +158,15 @@ VICII::VICII()
 	for(int i=0;i<VicConfigSizeof;i++) VicConfig[i] = true;
     Write_xd011 = false;
 
+    FirstDisplayLinePAL = 16;                       //VICE - 16, Emu64 - 26
+    LastDisplayLinePAL = 288;                       //VICE - 288, Emu64 - 292
+
+    FirstDisplayLineNTSC = 30;
+    LastDisplayLineNTSC = 288;
+
+    FirstDisplayLine = FirstDisplayLinePAL;
+    LastDisplayLine = LastDisplayLinePAL;
+
     HoBorderCMP_L[0]=RAHMEN38_LINKS;
     HoBorderCMP_R[0]=RAHMEN38_RECHTS;
     VeBorderCMP_O[0]=RAHMEN24_YSTART;
@@ -202,7 +205,57 @@ void VICII::GetRegister(VIC_STRUCT *vic_reg)
 	{
 		vic_reg->SpriteX[i] = MX[i];
 		vic_reg->SpriteY[i] = MY[i];
-	}
+    }
+}
+
+bool VICII::SetVicVDisplayPalSize(int first_line, int last_line)
+{
+    if(first_line < MAX_RASTER_ZEILEN && last_line < MAX_RASTER_ZEILEN && first_line <= last_line)
+    {
+        FirstDisplayLinePAL = first_line;
+        LastDisplayLinePAL = last_line;
+        SetVicType(System);
+    }
+}
+
+int VICII::GetVicFirstDisplayLinePal()
+{
+    return FirstDisplayLinePAL;
+}
+
+int VICII::GetVicLastDisplayLinePal()
+{
+    return LastDisplayLinePAL;
+}
+
+int VICII::GetAktVicDisplayFirstLine()
+{
+    return FirstDisplayLine;
+}
+
+int VICII::GetAktVicDisplayLastLine()
+{
+    return LastDisplayLine;
+}
+
+bool VICII::SetVicVDisplayNtscSize(int first_line, int last_line)
+{
+    if(first_line < MAX_RASTER_ZEILEN && last_line < MAX_RASTER_ZEILEN && first_line <= last_line)
+    {
+        FirstDisplayLineNTSC = first_line;
+        LastDisplayLineNTSC = last_line;
+        SetVicType(System);
+    }
+}
+
+int VICII::GetVicFirstDisplayLineNtsc()
+{
+    return FirstDisplayLineNTSC;
+}
+
+int VICII::GetVicLastDisplayLineNtsc()
+{
+    return LastDisplayLineNTSC;
 }
 
 void VICII::SetVicType(int system)
@@ -216,21 +269,24 @@ void VICII::SetVicType(int system)
 		TOTAL_ZYKLEN_LINE=63;
 		TOTAL_X=504;
 		RASTER_Y = TOTAL_RASTERS - 1;
-		FIRST_DISP_LINE = FIRST_DISP_LINE_PAL;
+        FirstDisplayLine = FirstDisplayLinePAL;
+        LastDisplayLine = LastDisplayLinePAL;
 		break;
 	case 1:
 		TOTAL_RASTERS=262;
 		TOTAL_ZYKLEN_LINE=64;
 		TOTAL_X=512;
 		RASTER_Y = TOTAL_RASTERS - 1;
-		FIRST_DISP_LINE = FIRST_DISP_LINE_NTSC;
+        FirstDisplayLine = FirstDisplayLineNTSC;
+        LastDisplayLine = LastDisplayLineNTSC;
 		break;
 	case 2:
 		TOTAL_RASTERS=263;
 		TOTAL_ZYKLEN_LINE=65;
 		TOTAL_X=520;
 		RASTER_Y = TOTAL_RASTERS - 1;
-		FIRST_DISP_LINE = FIRST_DISP_LINE_NTSC;
+        FirstDisplayLine = FirstDisplayLineNTSC;
+        LastDisplayLine = LastDisplayLineNTSC;
 		break;
 	}
 }
@@ -669,7 +725,7 @@ inline void VICII::DrawSprites()
     /////////////////////////////////////////
 
     if(!VicConfig[VIC_SPRITES_ON]) return;
-	if(AktRZ < FIRST_DISP_LINE_PAL+1) return;
+    if(AktRZ < FirstDisplayLine+1) return;
 
     // Spritekollisionspuffer löschen
     for (int i=0; i < 520; i++) SpriteCollisionsPuffer[i] = 0;
@@ -1171,7 +1227,7 @@ inline void VICII::DrawSprites()
 inline void VICII::DrawBorder(void)
 {
 	if(!VicConfig[VIC_BORDER_ON]) return;
-	if(AktRZ < FIRST_DISP_LINE_PAL) return;
+    if(AktRZ < FirstDisplayLine) return;
     BorderPufferLine = VideoPufferLine - 504;	/// Erstes Sichtbares Pixel
 
     for(int x=0;x<504;x++)
@@ -1217,7 +1273,7 @@ void VICII::OneZyklus(void)
 
 			// Prüfen auf Raster IRQ
             //if (AktRZ == IRQ_RASTER) RasterIRQ();
-			DrawThisLine = (AktRZ >= FIRST_DISP_LINE && AktRZ <= LAST_DISP_LINE);
+            DrawThisLine = (AktRZ >= FirstDisplayLine && AktRZ <= LastDisplayLine);
 		}
 
         if(DrawThisLine)

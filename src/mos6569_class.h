@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.11.2018                //
+// Letzte Änderung am 02.12.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -46,6 +46,19 @@ public:
     ~VICII();
     void SwitchVideoPuffer();
     void GetRegister(VIC_STRUCT *vic_reg);
+    bool SetVicVDisplayPalSize(int first_line, int last_line);
+
+    int GetVicFirstDisplayLinePal();
+    int GetVicLastDisplayLinePal();
+    int GetVicFirstDisplayLineNtsc();
+    int GetVicLastDisplayLineNtsc();
+
+    int GetAktVicDisplayFirstLine();
+    int GetAktVicDisplayLastLine();
+
+    bool SetVicVDisplayNtscSize(int first_line, int last_line);
+    int GetVicDisplayNtscFirstLine();
+    int GetVicDisplayNtscLastLine();
     void SetVicType(int system);
     void OneZyklus(void);
     //bool SaveFreez(FILE* File);
@@ -166,7 +179,12 @@ private:
     int             TOTAL_ZYKLEN_LINE;
     int             TOTAL_X;
     int             RASTER_Y;
-    int             FIRST_DISP_LINE;
+    int             FirstDisplayLinePAL;
+    int             FirstDisplayLineNTSC;
+    int             FirstDisplayLine;
+    int             LastDisplayLinePAL;
+    int             LastDisplayLineNTSC;
+    int             LastDisplayLine;
     bool            Write_xd011;
 
     //////////////////////////////// Sprites //////////////////////////////////

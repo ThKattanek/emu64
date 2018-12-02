@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.11.2018                //
+// Letzte Änderung am 02.12.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -34,13 +34,9 @@ int SDLThreadWarp(void *userdat);
     #define AudioPufferSize (882*2)    // 882 bei 44.100 Khz
 #endif
 
-
-
 #define RecPollingWaitStart 20
 
 #define C64ScreenXW 384         //384
-#define C64ScreenYW 272         //272
-#define C64FirstViewedPixel 104 //104
 
 static const char *ScreenschotFormatName[SCREENSHOT_FORMATS_COUNT]{"BMP","PNG"};
 
@@ -1435,8 +1431,12 @@ void C64Class::InitGrafik()
         isFullscreen  = true;
     else isFullscreen = false;
 
+
     AktWindowXW = AktC64ScreenXW = C64ScreenXW;
-    AktWindowYW = AktC64ScreenYW = C64ScreenYW;
+    AktWindowYW = AktC64ScreenYW = vic->GetAktVicDisplayLastLine() - vic->GetAktVicDisplayFirstLine();
+
+    //AktWindowXW = AktC64ScreenXW = C64ScreenXW;
+    //AktWindowYW = AktC64ScreenYW = C64ScreenYW;
 
     if(DoubleSize)
     {
@@ -3344,6 +3344,36 @@ bool C64Class::GetVicConfig(int var)
 {
     if(var >= VicConfigSizeof) return false;
     return vic->VicConfig[var];
+}
+
+void C64Class::SetVicDisplaySizePal(int first_line, int last_line)
+{
+    vic->SetVicVDisplayPalSize(first_line, last_line);
+}
+
+void C64Class::SetVicDisplaySizeNtsc(int first_line, int last_line)
+{
+    vic->SetVicVDisplayNtscSize(first_line, last_line);
+}
+
+int C64Class::GetVicFirstDisplayLinePal()
+{
+    return vic->GetVicFirstDisplayLinePal();
+}
+
+int C64Class::GetVicLastDisplayLinePal()
+{
+    return vic->GetVicLastDisplayLinePal();
+}
+
+int C64Class::GetVicFirstDisplayLineNtsc()
+{
+    return vic->GetVicFirstDisplayLineNtsc();
+}
+
+int C64Class::GetVicLastDisplayLineNtsc()
+{
+    return vic->GetVicLastDisplayLineNtsc();
 }
 
 int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)

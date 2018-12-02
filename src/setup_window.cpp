@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.11.2018                //
+// Letzte Änderung am 02.12.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -162,6 +162,8 @@ void SetupWindow::LoadINI(C64Class *c64)
         }
 
         int value;
+        int value1;
+        int value2;
         bool bvalue;
         QString svalue;
 
@@ -317,6 +319,16 @@ void SetupWindow::LoadINI(C64Class *c64)
         ui->VicGreyDotsEnable->setChecked(bvalue);
         on_VicGreyDotsEnable_toggled(bvalue);
 
+        //FirstLine: VICE - 16, Emu64 - 26
+        //LastLine:  VICE - 288, Emu64 - 292
+        value1 = ini->value("FirstDisplayLinePAL",26).toInt();
+        value2 = ini->value("LastDisplayLinePAL",292).toInt();
+        c64->SetVicDisplaySizePal(value1, value2);
+
+        value1 = ini->value("FirstDisplayLineNTSC",30).toInt();
+        value2 = ini->value("LastDisplayLineNTSC",288).toInt();
+        c64->SetVicDisplaySizeNtsc(value1, value2);
+
         ini->endGroup();
 
         ini->beginGroup("MainWindow");
@@ -414,6 +426,11 @@ void SetupWindow::SaveINI()
         ini->setValue("SpriteSpriteCollision",ui->VicSprSprCollisionEnable->isChecked());
         ini->setValue("SpriteBackgroundCollision",ui->VicSprBgrCollisionEnable->isChecked());
         ini->setValue("GreyDots",ui->VicGreyDotsEnable->isChecked());
+
+        ini->setValue("FirstDisplayLinePAL",c64->GetVicFirstDisplayLinePal());
+        ini->setValue("LastDisplayLinePAL",c64->GetVicLastDisplayLinePal());
+        ini->setValue("FirstDisplayLineNTSC",c64->GetVicFirstDisplayLineNtsc());
+        ini->setValue("LastDisplayLineNTSC",c64->GetVicLastDisplayLineNtsc());
         ini->endGroup();
 
         ini->beginGroup("MainWindow");
