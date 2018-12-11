@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.02.2018                //
+// Letzte Änderung am 11.12.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -110,6 +110,7 @@ MainWindow::~MainWindow()
     delete speed_window;
     delete show_c64keymap_window;
     delete video_capture_window;
+    delete sid_dump_window;
 
     delete ui;
     delete ini;
@@ -342,6 +343,10 @@ void MainWindow::OnInit()
     SplashMessage(trUtf8("VideoCaptureWindow wird erstellt."),Qt::darkBlue);
     video_capture_window = new VideoCaptureWindow(this, c64);
     LogText(trUtf8(">> VideoCaptureWindow wurde erzeugt\n").toLatin1().data());
+
+    SplashMessage(trUtf8("SidDumpWindow wird erstellt."),Qt::darkBlue);
+    sid_dump_window = new SidDumpWindow(this, c64);
+    LogText(trUtf8(">> SidDumpWindow wurde erzeugt\n").toLatin1().data());
 
     ini->beginGroup("MainWindow");
     SplashMessage(trUtf8("Screenshotnummer wird geladen."),Qt::darkBlue);
@@ -1175,4 +1180,9 @@ void MainWindow::on_actionC64_Tastenbelegung_Show_triggered()
 void MainWindow::on_actionVideo_Capture_triggered()
 {
     video_capture_window->show();
+}
+
+void MainWindow::on_actionSID_Dump_triggered()
+{
+    sid_dump_window->show();
 }

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte ï¿œnderung am 18.05.2014              //
+// Letzte ï¿œnderung am 11.12.2018              //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -28,8 +28,9 @@ class SIDDumpClass
 public:
     SIDDumpClass(unsigned char* sidio);
     ~SIDDumpClass(void);
-    bool StartCapture(char* filename);
+    bool StartCapture(const char *filename);
     void StopCapture(void);
+    int  GetCycleCounts(void);
     void CycleTickCapture(void);
     bool LoadDump(char* filename);
     void ClearDump(void);
@@ -49,6 +50,7 @@ private:
     bool  DumpIsLoaded;
     int   DumpSize;
     int	  CycleCounter;
+    int   CycleCounts;
     unsigned char* Dump;
     int	DumpPos;
 

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 11.12.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -21,6 +21,9 @@ SIDDumpClass::SIDDumpClass(unsigned char* sidio)
     SidIO = sidio;
     CaptureEnable = false;
     PlayEnable = false;
+
+    CycleCounter = 0;
+    CycleCounts = 0;
 }
 
 SIDDumpClass::~SIDDumpClass(void)
@@ -28,13 +31,14 @@ SIDDumpClass::~SIDDumpClass(void)
     StopCapture();
 }
 
-bool SIDDumpClass::StartCapture(char* filename)
+bool SIDDumpClass::StartCapture(const char* filename)
 {
     if(PlayEnable) return false;
     StopCapture();
 
     CaptureEnable = true;
     CycleCounter = 0;
+    CycleCounts = 0;
 
     CaptureFile = fopen (filename,"wb");
     if (CaptureFile == NULL)
@@ -58,6 +62,11 @@ void SIDDumpClass::StopCapture(void)
     fclose(CaptureFile);
 }
 
+int SIDDumpClass::GetCycleCounts()
+{
+    return CycleCounts;
+}
+
 void SIDDumpClass::CycleTickCapture(void)
 {
     static unsigned char Reg;
@@ -68,6 +77,8 @@ void SIDDumpClass::CycleTickCapture(void)
     static int CycleLong;
 
     if(!CaptureEnable) return;
+
+    CycleCounts++;
 
     if(*WriteReg == 0xFF)
     {

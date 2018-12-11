@@ -167,7 +167,7 @@ background-position: center
      <x>0</x>
      <y>0</y>
      <width>482</width>
-     <height>16</height>
+     <height>18</height>
     </rect>
    </property>
    <property name="font">
@@ -636,7 +636,7 @@ background-position: center
   </action>
   <action name="actionSID_Dump">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>SID Dump</string>

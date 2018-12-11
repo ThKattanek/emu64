@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.02.2018                //
+// Letzte Änderung am 11.12.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -43,6 +43,7 @@
 #include "./tape_window.h"
 #include "./show_c64_key_mapping_window.h"
 #include "./video_capture_window.h"
+#include "./sid_dump_window.h"
 
 #include "./command_line_class.h"
 #include "./emu64_commands.h"
@@ -133,6 +134,8 @@ private slots:
 
     void on_actionVideo_Capture_triggered();
 
+    void on_actionSID_Dump_triggered();
+
 private:
     /// Funktionen ///
     void changeEvent(QEvent *event);  
@@ -177,6 +180,7 @@ private:
     C64SpeedWindow *speed_window;                   // C64 Speed Window
     ShowC64KeyMappingWindow *show_c64keymap_window; // C64 Key Map Window
     VideoCaptureWindow *video_capture_window;       // Window zum Video Aufzeichnen
+    SidDumpWindow *sid_dump_window;                 // Window zum Aufzeichnen der geschriebene SID Werte
 
     //QStringList commandLine;                        // Enthält den an Emu64 übergebenen String
 

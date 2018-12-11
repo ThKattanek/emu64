@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.12.2018                //
+// Letzte Änderung am 11.12.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -3332,6 +3332,22 @@ void C64Class::SetSidFilter(bool enable)
 {
     sid1->FilterOn = enable;
     sid2->FilterOn = enable;
+}
+
+bool C64Class::StartSidDump(const char *filename)
+{
+    return sid1->IoDump->StartCapture(filename);
+}
+
+void C64Class::StopSidDump()
+{
+    sid1->IoDump->StopCapture();
+}
+
+int C64Class::GetSidDumpFrames()
+{
+    //This is PAL Only
+    return sid1->IoDump->GetCycleCounts() / (63*312); // a Frame in PAL is 63 Cycles with 312 rasterlines
 }
 
 void C64Class::SetVicConfig(int var, bool enable)

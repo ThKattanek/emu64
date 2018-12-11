@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.12.2018                //
+// Letzte Änderung am 11.12.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -193,6 +193,10 @@ public:
     void SetSid6ChannelMode(bool enable);
     void SetSidCycleExact(bool enable);
     void SetSidFilter(bool enable);
+
+    bool StartSidDump(const char *filename);
+    void StopSidDump(void);
+    int GetSidDumpFrames(void);
 
     void SetVicConfig(int var, bool enable);    // var = VIC_BORDER_ON, VIC_SPRITES_ON, VIC_SPR_SPR_COLL_ON, VIC_SPR_BCK_COLL_ON
     bool GetVicConfig(int var);

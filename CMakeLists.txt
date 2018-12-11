@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 13.04.2018                //
+# // Letzte Änderung am 11.12.2018                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -172,6 +172,7 @@ set(SOURCES
     src/savepng.c
     src/setup_window.cpp
     src/show_c64_key_mapping_window.cpp
+    src/sid_dump_window.cpp
     src/siddump.cpp
     src/single_application.cpp
     src/tape1530_class.cpp
@@ -212,6 +213,7 @@ set(MOC_HEADERS
     src/new_romset_window.h
     src/setup_window.h
     src/show_c64_key_mapping_window.h
+    src/sid_dump_window.h
     src/single_application.h
     src/tape_new_window.h
     src/tape_window.h
@@ -244,6 +246,7 @@ set(UIS
     src/new_romset_window.ui
     src/setup_window.ui
     src/show_c64_key_mapping_window.ui
+    src/sid_dump_window.ui
     src/tape_new_window.ui
     src/tape_window.ui
     src/tv_setup_window.ui
