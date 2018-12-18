@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.12.2018                //
+// Letzte Änderung am 18.12.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -195,17 +195,10 @@ void SIDDumpClass::StopDump(void)
 
 bool SIDDumpClass::CycleTickPlay(void)
 {
-    static unsigned char Reg;
-    static unsigned char RegWert;
-
     if(PlayEnable)
     {
         if(DumpPos == 0)
         {
-            RegOut = Reg = Dump[DumpPos++];
-            RegWertOut = RegWert = Dump[DumpPos++];
-            DumpPos++;
-
             Reg = Dump[DumpPos++];
             RegWert = Dump[DumpPos++];
             if((Reg>>5) == 0)
@@ -218,24 +211,9 @@ bool SIDDumpClass::CycleTickPlay(void)
                 CycleCounter |= Dump[DumpPos++]<<8;
             }
 
-            if(DumpPos>=DumpSize)
-            {
-                /// Neu Anfang ///
-                DumpPos = 0;
-                CycleCounter = 0;
-                PlayEnable = true;
-
-                ///  STOP ///
-                /*
-                RegOut = 24;
-                RegWertOut = 0;
-                PlayEnable = false;
-                */
-            }
             Reg &= 0x1F;
-            return true;
+            return false;
         }
-
 
         CycleCounter--;
         if(CycleCounter <= 0)

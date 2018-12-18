@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte ï¿œnderung am 11.12.2018              //
+// Letzte Änderung am 18.12.2018                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -53,6 +53,8 @@ private:
     int   CycleCounts;
     unsigned char* Dump;
     int	DumpPos;
+    unsigned char Reg;
+    unsigned char RegWert;
 
 public:
     unsigned char RegOut;
