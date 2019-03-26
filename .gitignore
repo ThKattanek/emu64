@@ -6,3 +6,4 @@ build*
 install*
 public_release
 *.autosave
+CMakeLists.txt.user.*
