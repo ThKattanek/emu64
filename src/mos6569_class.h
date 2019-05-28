@@ -46,7 +46,7 @@ public:
     ~VICII();
     void SwitchVideoPuffer();
     void GetRegister(VIC_STRUCT *vic_reg);
-    bool SetVicVDisplayPalSize(int first_line, int last_line);
+    void SetVicVDisplayPalSize(int first_line, int last_line);
 
     int GetVicFirstDisplayLinePal();
     int GetVicLastDisplayLinePal();
@@ -56,7 +56,7 @@ public:
     int GetAktVicDisplayFirstLine();
     int GetAktVicDisplayLastLine();
 
-    bool SetVicVDisplayNtscSize(int first_line, int last_line);
+    void SetVicVDisplayNtscSize(int first_line, int last_line);
     int GetVicDisplayNtscFirstLine();
     int GetVicDisplayNtscLastLine();
     void SetVicType(int system);
