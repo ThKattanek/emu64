@@ -33,7 +33,6 @@ SidDumpWindow::SidDumpWindow(QWidget *parent, C64Class *c64) :
 
 SidDumpWindow::~SidDumpWindow()
 {
-    c64->StopSidDump();
     timer1->stop();
     delete timer1;
     delete ui;

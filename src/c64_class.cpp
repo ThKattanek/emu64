@@ -484,7 +484,11 @@ C64Class::~C64Class()
     if(mmu != NULL) delete mmu;
     if(cpu != NULL) delete cpu;
     if(vic != NULL) delete vic;
-    if(sid1 != NULL) delete sid1;
+    if(sid1 != NULL)
+    {
+        StopSidDump();
+        delete sid1;
+    }
     if(sid2 != NULL) delete sid2;
     if(cia1 != NULL) delete cia1;
     if(cia2 != NULL) delete cia2;
