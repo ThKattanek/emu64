@@ -208,7 +208,7 @@ void VICII::GetRegister(VIC_STRUCT *vic_reg)
     }
 }
 
-bool VICII::SetVicVDisplayPalSize(int first_line, int last_line)
+void VICII::SetVicVDisplayPalSize(int first_line, int last_line)
 {
     if(first_line < MAX_RASTER_ZEILEN && last_line < MAX_RASTER_ZEILEN && first_line <= last_line)
     {
@@ -238,7 +238,7 @@ int VICII::GetAktVicDisplayLastLine()
     return LastDisplayLine;
 }
 
-bool VICII::SetVicVDisplayNtscSize(int first_line, int last_line)
+void VICII::SetVicVDisplayNtscSize(int first_line, int last_line)
 {
     if(first_line < MAX_RASTER_ZEILEN && last_line < MAX_RASTER_ZEILEN && first_line <= last_line)
     {
