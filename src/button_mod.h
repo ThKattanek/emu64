@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.08.2014                //
+// Letzte Änderung am 29.05.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -22,7 +22,7 @@ class ButtonMod : public QPushButton
 {
     Q_OBJECT
 public:
-    explicit ButtonMod(int idx,int idy, QWidget *parent = 0);
+    explicit ButtonMod(int idx,int idy, QWidget *parent = nullptr);
     
 signals:
     void Clicked(int idx, int idy);
