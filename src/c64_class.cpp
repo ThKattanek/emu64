@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.12.2018                //
+// Letzte Änderung am 29.05.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -40,15 +40,15 @@ int SDLThreadWarp(void *userdat);
 
 static const char *ScreenschotFormatName[SCREENSHOT_FORMATS_COUNT]{"BMP","PNG"};
 
-C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> log_function, const char* data_path):
-    mmu(NULL),cpu(NULL),vic(NULL),sid1(NULL),sid2(NULL),cia1(NULL),cia2(NULL),crt(NULL)
+C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> log_function, const char *data_path):
+    mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
 {
     ChangeGrafikModi = false;
     ChangeWindowPos = false;
     ChangeWindowSize = false;
 
-    JoyStickUdateIsStop = true,
-    RecJoyMapping = false,
+    JoyStickUdateIsStop = true;
+    RecJoyMapping = false;
     StopJoystickUpdate = true;
     SDLJoystickIsOpen = false;
     JoystickAnzahl = 0;
@@ -60,10 +60,6 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
 
     VPort1 = 0;
     VPort2 = 1;
-
-    CloseEventC64Screen = NULL;
-    LimitCyclesEvent = NULL;
-    DebugCartEvent = NULL;
 
     WarpMode = false;
 
@@ -88,10 +84,10 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     sprintf(GfxPath,"%s%s",data_path,"/gfx/");
     sprintf(RomPath,"%s%s",data_path,"/roms/");
 
-    LogText((char*)">> C64 Klasse wurde gestartet...\n");
-    LogText((char*)">> GfxPath = ");
-    LogText((char*)GfxPath);
-    LogText((char*)"\n");
+    LogText(const_cast<char*>(">> C64 Klasse wurde gestartet...\n"));
+    LogText(const_cast<char*>(">> GfxPath = "));
+    LogText(const_cast<char*>(GfxPath));
+    LogText(const_cast<char*>("\n"));
 
     pal = _pal;
     BreakGroupAnz = 0;
@@ -104,8 +100,8 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
 
     mutex1 = SDL_CreateMutex();
 
-    C64Window = NULL;
-    C64Screen = NULL;
+    C64Window = nullptr;
+    C64Screen = nullptr;
     C64ScreenTexture = 0;
     C64ScreenAspectRatio = SCREEN_RATIO_4_3;
     EnableWindowAspectRatio = true;
@@ -116,99 +112,99 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     FrameSkipCounter=1;
 
     DistortionEnable = true;
-    SetDistortion(-0.05);
+    SetDistortion(-0.05f);
 
-    VideoCapture = NULL;
+    VideoCapture = nullptr;
 
     /// SDL Installieren ///
 
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
-         LogText((char*)"<< ERROR: Fehler beim installieren von SDL2\n");
+         LogText(const_cast<char*>("<< ERROR: Fehler beim installieren von SDL2\n"));
         *ret_error = -1;
     }
     else
-        LogText((char*)">> SDL2 wurde installiert\n");
+        LogText(const_cast<char*>(">> SDL2 wurde installiert\n"));
 
     char filename[FILENAME_MAX];
     sprintf(filename,"%spfeil0.png",GfxPath);
     Pfeil0 = IMG_Load(filename);
     if(!Pfeil0)
     {
-        LogText((char*)"<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
+        LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
         LogText(filename);
-        LogText((char*)"\n");
+        LogText(const_cast<char*>("\n"));
 
         //*ret_error = -2;
     }
     else
     {
-        LogText((char*)">> Folgendes Bild wurde erfolgreich geladen --- ");
+        LogText(const_cast<char*>(">> Folgendes Bild wurde erfolgreich geladen --- "));
         LogText(filename);
-        LogText((char*)"\n");
+        LogText(const_cast<char*>("\n"));
 
-        if ( (Pfeil0->w & (Pfeil0->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-        if ( (Pfeil0->h & (Pfeil0->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
+        if ( (Pfeil0->w & (Pfeil0->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
+        if ( (Pfeil0->h & (Pfeil0->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n"));
     }
 
     sprintf(filename,"%spfeil1.png",GfxPath);
     Pfeil1 = IMG_Load(filename);
     if(!Pfeil1)
     {
-        LogText((char*)"<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
+        LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
         LogText(filename);
-        LogText((char*)"\n");
+        LogText(const_cast<char*>("\n"));
 
         //*ret_error = -3;
     }
     else
     {
-        LogText((char*)">> Folgendes Bild wurde erfolgreich geladen --- ");
+        LogText(const_cast<char*>(">> Folgendes Bild wurde erfolgreich geladen --- "));
         LogText(filename);
-        LogText((char*)"\n");
+        LogText(const_cast<char*>("\n"));
 
-        if ( (Pfeil1->w & (Pfeil1->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-        if ( (Pfeil1->h & (Pfeil1->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
+        if ( (Pfeil1->w & (Pfeil1->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
+        if ( (Pfeil1->h & (Pfeil1->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n"));
     }
 
     sprintf(filename,"%skreis0.png",GfxPath);
     Kreis0 = IMG_Load(filename);
     if(!Kreis0)
     {
-        LogText((char*)"<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
+        LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
         LogText(filename);
-        LogText((char*)"\n");
+        LogText(const_cast<char*>("\n"));
 
         //*ret_error = -4;
     }
     else
     {
-        LogText((char*)">> Folgendes Bild wurde erfolgreich geladen --- ");
+        LogText(const_cast<char*>(">> Folgendes Bild wurde erfolgreich geladen --- "));
         LogText(filename);
-        LogText((char*)"\n");
+        LogText(const_cast<char*>("\n"));
 
-        if ( (Kreis0->w & (Kreis0->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-        if ( (Kreis0->h & (Kreis0->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
+        if ( (Kreis0->w & (Kreis0->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
+        if ( (Kreis0->h & (Kreis0->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n"));
     }
 
     sprintf(filename,"%skreis1.png",GfxPath);
     Kreis1 = IMG_Load(filename);
     if(!Kreis1)
     {
-        LogText((char*)"<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
+        LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
         LogText(filename);
-        LogText((char*)"\n");
+        LogText(const_cast<char*>("\n"));
 
        // *ret_error = -5;
     }
     else
     {
-        LogText((char*)">> Folgendes Bild wurde erfolgreich geladen --- ");
+        LogText(const_cast<char*>(">> Folgendes Bild wurde erfolgreich geladen --- "));
         LogText(filename);
-        LogText((char*)"\n");
+        LogText(const_cast<char*>("\n"));
 
-        if ( (Kreis1->w & (Kreis1->w - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-        if ( (Kreis1->h & (Kreis1->h - 1)) != 0 ) LogText((char*)"<< WARNUNG: Die Hoehe ist keine Potenz von 2^n\n");
+        if ( (Kreis1->w & (Kreis1->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
+        if ( (Kreis1->h & (Kreis1->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Hoehe ist keine Potenz von 2^n\n"));
     }
 
     /// VideoCaptuer installieren ///
@@ -227,10 +223,10 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
 
     if( SDL_OpenAudio(&want,&have) > 0 )
     {
-        LogText((char*)"<< ERROR: Fehler beim installieren von SDL_Audio\n");
+        LogText(const_cast<char*>("<< ERROR: Fehler beim installieren von SDL_Audio\n"));
         *ret_error = -6;
     }
-    LogText((char*)">> SDL_Audio wurde installiert\n");
+    LogText(const_cast<char*>(">> SDL_Audio wurde installiert\n"));
 
     if (want.format != have.format)
     {
@@ -244,12 +240,12 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
 
     sprintf(filename,"%ssdl_icon.png",GfxPath);
     C64ScreenIcon = IMG_Load(filename);
-    if(C64ScreenIcon != NULL)
+    if(C64ScreenIcon != nullptr)
     {
         SDL_SetColorKey(C64ScreenIcon,SDL_TRUE,SDL_MapRGB(C64ScreenIcon->format,0,0,0));
     }
     else
-        LogText((char*)"<< ERROR: Fehler beim laden des SLDFenster Icons\n");
+        LogText(const_cast<char*>("<< ERROR: Fehler beim laden des SLDFenster Icons\n"));
 
     GamePort1 = 0;
     GamePort2 = 0;
@@ -301,7 +297,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
         floppy[i] = new Floppy1541(&RESET,have.freq,have.samples,&FloppyFoundBreakpoint);
         floppy[i]->SetResetReady(&FloppyResetReady[i],0xEBFF);
         floppy[i]->SetC64IEC(&C64IEC);
-        floppy[i]->SetDeviceNummer(8+i);
+        floppy[i]->SetDeviceNummer(static_cast<uint8_t>(8+i));
         floppy[i]->LoadDosRom(filename);
         //floppy[i]->LoadFloppySounds((char*)"floppy_sounds/motor.raw",(char*)"floppy_sounds/motor_on.raw",(char*)"floppy_sounds/motor_off.raw",(char*)"floppy_sounds/anschlag.raw",(char*)"floppy_sounds/stepper_inc.raw",(char*)"floppy_sounds/stepper_dec.raw");
         floppy[i]->LoadFloppySounds(motor_filename,motor_on_filename,motor_off_filename,anschlag_filename,stepper_inc_filename,stepper_dec_filename);
@@ -320,8 +316,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     CycleCounter = 0;
     LimitCylesCounter = 0;
     DebugAnimation = false;
-    AnimationRefreshProc = 0;
-    AnimationSpeedAdd = (double)AudioPufferSize/(double)AudioSampleRate;
+    AnimationSpeedAdd = AudioPufferSize/AudioSampleRate;
     AnimationSpeedCounter = 0;
 
     for(int i=0;i<8;i++)
@@ -457,7 +452,6 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     vic->CIA2_PA = cia2->PA->GetOutputBitsPointer();
 
     /// Breakpoints ///
-    BreakpointProc = 0;
     cpu->BreakStatus = &BreakStatus;
     cpu->BreakWerte = BreakWerte;
     cpu->Breakpoints = Breakpoints;
@@ -478,38 +472,38 @@ C64Class::~C64Class()
 
     for(int i=0;i<FloppyAnzahl;i++)
     {
-        if(floppy[i] != NULL) delete floppy[i];
+        if(floppy[i] != nullptr) delete floppy[i];
     }
 
-    if(mmu != NULL) delete mmu;
-    if(cpu != NULL) delete cpu;
-    if(vic != NULL) delete vic;
-    if(sid1 != NULL)
+    if(mmu != nullptr) delete mmu;
+    if(cpu != nullptr) delete cpu;
+    if(vic != nullptr) delete vic;
+    if(sid1 != nullptr)
     {
         StopSidDump();
         delete sid1;
     }
-    if(sid2 != NULL) delete sid2;
-    if(cia1 != NULL) delete cia1;
-    if(cia2 != NULL) delete cia2;
-    if(crt != NULL) delete crt;
-    if(reu != NULL) delete reu;
-    if(geo != NULL) delete geo;
+    if(sid2 != nullptr) delete sid2;
+    if(cia1 != nullptr) delete cia1;
+    if(cia2 != nullptr) delete cia2;
+    if(crt != nullptr) delete crt;
+    if(reu != nullptr) delete reu;
+    if(geo != nullptr) delete geo;
 
-    if(VideoCapture != NULL) delete VideoCapture;
+    if(VideoCapture != nullptr) delete VideoCapture;
 
-    if(FloppySoundPath != NULL) delete[] FloppySoundPath;
-    if(RomPath != NULL) delete[] RomPath;
+    if(FloppySoundPath != nullptr) delete[] FloppySoundPath;
+    if(RomPath != nullptr) delete[] RomPath;
 }
 
-void C64Class::StartEmulation()
+void C64Class::StartEmulation(void)
 {
     /// SLD Thread starten (ab hier startet auch die C64 Emulation ///
     sdl_thread = SDL_CreateThread(SDLThread, "C64Thread", this);
     SDL_PauseAudio(0);
 }
 
-void C64Class::EndEmulation()
+void C64Class::EndEmulation(void)
 {
     EnableWarpMode(false);
     if(ExitScreenshotEnable)
@@ -542,7 +536,7 @@ void C64Class::SetEnableDebugCart(bool enabled)
 
 void AudioMix(void *userdat, Uint8 *stream, int laenge)
 {
-    C64Class *c64 = (C64Class*)userdat;
+    C64Class *c64 = static_cast<C64Class*>(userdat);
     if(c64->RecPollingWait)
     {
         c64->RecPollingWaitCounter--;
@@ -556,7 +550,7 @@ void AudioMix(void *userdat, Uint8 *stream, int laenge)
 
 int SDLThreadWarp(void *userdat)
 {
-    C64Class *c64 = (C64Class*)userdat;
+    C64Class *c64 = static_cast<C64Class*>(userdat);
 
     while(!c64->warp_thread_end)
     {
@@ -565,27 +559,27 @@ int SDLThreadWarp(void *userdat)
     return 0;
 }
 
-void C64Class::SDLThreadPauseBegin()
+void C64Class::SDLThreadPauseBegin(void)
 {
     sdl_thread_is_paused = false;
     sdl_thread_pause = true;
     SDL_Delay(40);
 }
 
-void C64Class::SDLThreadPauseEnd()
+void C64Class::SDLThreadPauseEnd(void)
 {
     sdl_thread_pause = false;
 }
 
 int SDLThread(void *userdat)
 {
-    C64Class *c64 = (C64Class*)userdat;
+    C64Class *c64 = static_cast<C64Class*>(userdat);
     SDL_Event event;
     c64->LoopThreadEnd = false;
     c64->LoopThreadIsEnd = false;
     c64->sdl_thread_pause = false;
 
-    c64->C64ScreenBuffer = NULL;
+    c64->C64ScreenBuffer = nullptr;
 
     while (!c64->LoopThreadEnd)
     {
@@ -653,7 +647,7 @@ int SDLThread(void *userdat)
     return 0;
 }
 
-void C64Class::CalcDistortionGrid()
+void C64Class::CalcDistortionGrid(void)
 {
     float div = 2.0f / SUBDIVS_SCREEN;
     for(int y=0; y<SUBDIVS_SCREEN+1; y++)
@@ -688,7 +682,7 @@ void C64Class::CalcDistortionGrid()
         }
 }
 
-void C64Class::VicRefresh(unsigned char *vic_puffer)
+void C64Class::VicRefresh(uint8_t *vic_puffer)
 {
     if(HoldVicRefresh)
     {
@@ -696,10 +690,10 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
         return;
     }
 
-    if((pal == 0) || (sdl_thread_pause == true)) return;
+    if((pal == nullptr) || (sdl_thread_pause == true)) return;
 
     SDL_LockSurface(C64Screen);
-    pal->ConvertVideo((void*)C64Screen->pixels,C64Screen->pitch,vic_puffer,104,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
+    pal->ConvertVideo(static_cast<void*>(C64Screen->pixels),C64Screen->pitch,vic_puffer,104,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
 
     this->vic_puffer = vic_puffer;
     vic->SwitchVideoPuffer();
@@ -707,7 +701,7 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
 
     ///////////////////////////////////
 
-    VideoCapture->AddFrame((uint8_t*)C64Screen->pixels,C64Screen->pitch);
+    VideoCapture->AddFrame(static_cast<uint8_t*>(C64Screen->pixels),C64Screen->pitch);
 
     ///////////////////////////////////
 
@@ -737,7 +731,7 @@ void C64Class::VicRefresh(unsigned char *vic_puffer)
     IsC64ScreenObsolete = true;
 }
 
-void C64Class::WarpModeLoop()
+void C64Class::WarpModeLoop(void)
 {
     static unsigned int counter_plus=0;
 
@@ -750,7 +744,7 @@ void C64Class::WarpModeLoop()
         if(LimitCylesCounter == 0)
         {
             // Event auslösen
-            if(LimitCyclesEvent != 0) LimitCyclesEvent();
+            if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
         }
     }
 
@@ -758,7 +752,7 @@ void C64Class::WarpModeLoop()
     {
         // Event auslösen
         cpu->WRITE_DEBUG_CART = false;
-        if(DebugCartEvent != 0) DebugCartEvent(cpu->GetDebugCartValue());
+        if(DebugCartEvent != nullptr) DebugCartEvent(cpu->GetDebugCartValue());
     }
 
     /// Für Externe Erweiterungen ///
@@ -833,7 +827,7 @@ void C64Class::WarpModeLoop()
                 else
                 {
                     WriteC64Byte(0xC6,1);
-                    WriteC64Byte(0x277,ComandZeile[ComandZeileCount]);
+                    WriteC64Byte(0x277,static_cast<uint8_t>(ComandZeile[ComandZeileCount]));
                     ComandZeileCount++;
                 }
             }
@@ -847,10 +841,10 @@ void C64Class::WarpModeLoop()
 
 }
 
-void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
+void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 {
-    unsigned short* puffer = (unsigned short*) stream;
-    static unsigned int counter_plus=0;
+    uint16_t* puffer = reinterpret_cast<uint16_t*>(stream);
+    static uint32_t counter_plus=0;
 
     sid1->SoundBufferPos = 0;
     sid2->SoundBufferPos = 0;
@@ -871,7 +865,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                 if(LimitCylesCounter == 0)
                 {
                     // Event auslösen
-                    if(LimitCyclesEvent != 0) LimitCyclesEvent();
+                    if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
                 }
             }
 
@@ -879,7 +873,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
             {
                 // Event auslösen
                 cpu->WRITE_DEBUG_CART = false;
-                if(DebugCartEvent != 0) DebugCartEvent(cpu->GetDebugCartValue());
+                if(DebugCartEvent != nullptr) DebugCartEvent(cpu->GetDebugCartValue());
             }
 
             /// Für Externe Erweiterungen ///
@@ -955,7 +949,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                         else
                         {
                             WriteC64Byte(0xC6,1);
-                            WriteC64Byte(0x277,ComandZeile[ComandZeileCount]);
+                            WriteC64Byte(0x277,static_cast<uint8_t>(ComandZeile[ComandZeileCount]));
                             ComandZeileCount++;
                         }
                     }
@@ -989,8 +983,8 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                 int j=0;
                 for(int i=0; i<(laenge/2); i+=2)
                 {
-                    puffer[i] = short(sid1->SoundBuffer[j] * SIDVolume);
-                    puffer[i+1] = short(sid2->SoundBuffer[j] * SIDVolume);
+                    puffer[i] = static_cast<uint16_t>(sid1->SoundBuffer[j] * SIDVolume);
+                    puffer[i+1] = static_cast<uint16_t>(sid2->SoundBuffer[j] * SIDVolume);
                     j++;
                 }
             }
@@ -999,7 +993,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                 int j=0;
                 for(int i=0; i<(laenge/2); i+=2)
                 {
-                    puffer[i] = puffer[i+1] = ((short(sid1->SoundBuffer[j]) + short(sid2->SoundBuffer[j])) * SIDVolume * 0.75f);
+                    puffer[i] = puffer[i+1] = static_cast<uint16_t>((static_cast<uint16_t>(sid1->SoundBuffer[j]) + static_cast<uint16_t>(sid2->SoundBuffer[j])) * SIDVolume * 0.75f);
                     j++;
                 }
             }
@@ -1009,7 +1003,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
             int j=0;
             for(int i=0; i<(laenge/2); i+=2)
             {
-                puffer[i] = puffer[i+1] = short(sid1->SoundBuffer[j] * SIDVolume);
+                puffer[i] = puffer[i+1] = static_cast<uint16_t>(sid1->SoundBuffer[j] * SIDVolume);
                 j++;
             }
         }
@@ -1021,12 +1015,12 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
 
         for(int i=0; i< FloppyAnzahl; i++)
         {
-            if(floppy[i]->GetEnableFloppySound()) SDL_MixAudio((unsigned char*)puffer,(unsigned char*)floppy[i]->GetSoundBuffer(),laenge,255);
+            if(floppy[i]->GetEnableFloppySound()) SDL_MixAudio((uint8_t*)puffer,(uint8_t*)floppy[i]->GetSoundBuffer(),laenge,255);
         }
 
         /// Tapesound dazu mixen ///
 
-        SDL_MixAudio((unsigned char*)puffer,(unsigned char*)tape->GetSoundBuffer(),laenge,255);
+        SDL_MixAudio((uint8_t*)puffer,(uint8_t*)tape->GetSoundBuffer(),laenge,255);
     }
     else
     {
@@ -1035,7 +1029,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
             AnimationSpeedCounter += AnimationSpeedAdd;
             if(AnimationSpeedCounter >= 1)
             {
-                for(int i=0;i<(int)AnimationSpeedCounter;i++)
+                for(int i=0;i<static_cast<int>(AnimationSpeedCounter);i++)
                 {
                     CheckKeys();
                     CycleCounter++;
@@ -1087,7 +1081,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
                 }
                 AnimationSpeedCounter = 0;
             }
-            if(AnimationRefreshProc != 0) AnimationRefreshProc();
+            if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
         }
         else
         {
@@ -1132,7 +1126,7 @@ void C64Class::FillAudioBuffer(unsigned char *stream, int laenge)
 
                 if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) CheckBreakpoints();
 
-                if(AnimationRefreshProc != 0) AnimationRefreshProc();
+                if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
 
                 if(IecIsDumped)
                 {
@@ -1202,7 +1196,7 @@ loop_wait_next_opc:
 
                 if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) CheckBreakpoints();
 
-                if(AnimationRefreshProc != 0) AnimationRefreshProc();
+                if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
 
                 if(IecIsDumped)
                 {
@@ -1221,9 +1215,9 @@ loop_wait_next_opc:
     }
 }
 
-void C64Class::KeyEvent(unsigned char matrix_code,KeyStatus key_status, bool isAutoShift)
+void C64Class::KeyEvent(uint8_t matrix_code, KeyStatus key_status, bool isAutoShift)
 {
-    const unsigned char AutoShift = 0x17; // C64 Shift Links
+    const uint8_t AutoShift = 0x17; // C64 Shift Links
 
     switch(key_status)
     {
@@ -1244,7 +1238,7 @@ void C64Class::KeyEvent(unsigned char matrix_code,KeyStatus key_status, bool isA
     }
 }
 
-void C64Class::SoftReset()
+void C64Class::SoftReset(void)
 {
     WaitResetReady = false;
     SetReset(false,true);
@@ -1252,7 +1246,7 @@ void C64Class::SoftReset()
     SetReset(true,true);
 }
 
-void C64Class::HardReset()
+void C64Class::HardReset(void)
 {
     WaitResetReady = false;
     SetReset(false,false);
@@ -1274,15 +1268,15 @@ inline void C64Class::SetReset(int status, int hard_reset)
 
 inline void C64Class::CheckKeys(void)
 {
-    unsigned char OUT_PA, OUT_PB;
-    unsigned char IN_PA, IN_PB;
+    uint8_t OUT_PA, OUT_PB;
+    uint8_t IN_PA, IN_PB;
 
     OUT_PA = ~CIA1_PA.GetOutput();
     OUT_PB = ~CIA1_PB.GetOutput();
 
     IN_PA = IN_PB = 0;
 
-    unsigned char cbit = 1;
+    uint8_t cbit = 1;
     for(int i=0;i<8;i++)
     {
         if(OUT_PA & cbit) IN_PB |= (KeyboardMatrixToPB[i]|KeyboardMatrixToPBExt[i]);
@@ -1298,7 +1292,7 @@ void C64Class::ResetC64CycleCounter(void)
     CycleCounter = 0;
 }
 
-bool C64Class::LoadC64Roms(char *kernalrom,char *basicrom,char *charrom)
+bool C64Class::LoadC64Roms(char *kernalrom, char *basicrom, char *charrom)
 {
     if(!mmu->LoadKernalRom(kernalrom)) return false;
     if(!mmu->LoadBasicRom(basicrom)) return false;
@@ -1306,7 +1300,7 @@ bool C64Class::LoadC64Roms(char *kernalrom,char *basicrom,char *charrom)
     return true;
 }
 
-bool C64Class::LoadFloppyRom(int floppy_nr,char *dos1541rom)
+bool C64Class::LoadFloppyRom(uint8_t floppy_nr, char *dos1541rom)
 {
     if(floppy_nr < FloppyAnzahl)
     {
@@ -1316,7 +1310,7 @@ bool C64Class::LoadFloppyRom(int floppy_nr,char *dos1541rom)
     return false;
 }
 
-bool C64Class::LoadDiskImage(int floppy_nr, char *filename)
+bool C64Class::LoadDiskImage(uint8_t floppy_nr, char *filename)
 {
     if(floppy_nr < FloppyAnzahl)
     {
@@ -1325,7 +1319,7 @@ bool C64Class::LoadDiskImage(int floppy_nr, char *filename)
     return false;
 }
 
-void C64Class::LoadPRGFromD64(int floppy_nr, char *c64_filename, int command)
+void C64Class::LoadPRGFromD64(uint8_t floppy_nr, char *c64_filename, int command)
 {
     char str00[1024];
     KillCommandLine();
@@ -1349,14 +1343,14 @@ void C64Class::LoadPRGFromD64(int floppy_nr, char *c64_filename, int command)
     }
 }
 
-void C64Class::SetFloppyWriteProtect(int floppy_nr, bool status)
+void C64Class::SetFloppyWriteProtect(uint8_t floppy_nr, bool status)
 {
     if(floppy_nr < 0 || floppy_nr > 3) return;
 
     floppy[floppy_nr]->SetWriteProtect(status);
 }
 
-void C64Class::SetCommandLine(char* c64_command)
+void C64Class::SetCommandLine(char *c64_command)
 {
     strcpy(ComandZeile,c64_command);
     ComandZeileSize=(int)strlen(ComandZeile);
@@ -1372,22 +1366,22 @@ void C64Class::KillCommandLine(void)
     ComandZeileCountS=false;
 }
 
-unsigned char C64Class::ReadC64Byte(unsigned short adresse)
+uint8_t C64Class::ReadC64Byte(uint16_t adresse)
 {
     return ReadProcTbl[(adresse)>>8](adresse);
 }
 
-void C64Class::WriteC64Byte(unsigned short adresse,unsigned char wert)
+void C64Class::WriteC64Byte(uint16_t adresse, uint8_t wert)
 {
     WriteProcTbl[(adresse)>>8](adresse,wert);
 }
 
-unsigned char* C64Class::GetRAMPointer(unsigned short adresse)
+uint8_t* C64Class::GetRAMPointer(uint16_t adresse)
 {
     return mmu->GetRAMPointer() + adresse;
 }
 
-void C64Class::SetGrafikModi(bool colbits32, bool doublesize,bool pal_enable,bool filter_enable, int fullres_xw, int fullres_yw)
+void C64Class::SetGrafikModi(bool colbits32, bool doublesize, bool pal_enable, bool filter_enable, int fullres_xw, int fullres_yw)
 {
     ColBits32 = colbits32;
     DoubleSize = doublesize;
@@ -1411,7 +1405,7 @@ void C64Class::SetWindowTitle(char *title_name)
     SDL_SetWindowTitle(C64Window, title_name);
 }
 
-void C64Class::SetFullscreen()
+void C64Class::SetFullscreen(void)
 {
     isFullscreen = true;
     SDL_ShowCursor(false);
@@ -1419,7 +1413,7 @@ void C64Class::SetFullscreen()
     SetFocusToC64Window();
 }
 
-void C64Class::InitGrafik()
+void C64Class::InitGrafik(void)
 {
     /// VicRefresh stoppen und solange warten bis wirklich Stop ist ///
     HoldVicRefresh = true;
@@ -1454,27 +1448,27 @@ void C64Class::InitGrafik()
     if(ColBits32)
     {
         AktWindowColorBits = 32;
-        if(C64ScreenBuffer != 0)
+        if(C64ScreenBuffer != nullptr)
         {
             delete[] C64ScreenBuffer;
         }
-        C64ScreenBuffer = new unsigned char[AktC64ScreenXW*AktC64ScreenYW*4];
+        C64ScreenBuffer = new uint8_t[AktC64ScreenXW*AktC64ScreenYW*4];
     }
     else
     {
         AktWindowColorBits = 16;
-        if(C64ScreenBuffer != 0)
+        if(C64ScreenBuffer != nullptr)
         {
             delete[] C64ScreenBuffer;
         }
-        C64ScreenBuffer = new unsigned char[AktC64ScreenXW*AktC64ScreenYW*2];
+        C64ScreenBuffer = new uint8_t[AktC64ScreenXW*AktC64ScreenYW*2];
     }
 
     pal->SetDisplayMode(AktWindowColorBits);
     pal->EnablePALOutput(PalEnable);
     pal->EnableVideoDoubleSize(DoubleSize);
 
-    if(C64Window == NULL)
+    if(C64Window == nullptr)
     {
         C64Window = SDL_CreateWindow(window_title,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,AktWindowXW,AktWindowYW,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
@@ -1515,7 +1509,7 @@ void C64Class::InitGrafik()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-    if(C64Screen != NULL)
+    if(C64Screen != nullptr)
        SDL_FreeSurface(C64Screen);
     C64Screen = SDL_CreateRGBSurface(0,AktC64ScreenXW,AktC64ScreenYW,AktWindowColorBits,0,0,0,0);
 
@@ -1524,7 +1518,7 @@ void C64Class::InitGrafik()
     GLenum  TextureFormat = 0;
     GLint   NofColors = 0;
 
-    if(Pfeil0 != NULL)
+    if(Pfeil0 != nullptr)
     {
         NofColors = Pfeil0->format->BytesPerPixel;
 
@@ -1540,7 +1534,7 @@ void C64Class::InitGrafik()
 
     // Ich setze mal vorraus das alle 4 Images das selbe Format haben !! //
 
-    if(Pfeil0 != NULL)
+    if(Pfeil0 != nullptr)
     {
         glGenTextures(1,&Pfeil0Texture);
         glBindTexture( GL_TEXTURE_2D, Pfeil0Texture );
@@ -1552,7 +1546,7 @@ void C64Class::InitGrafik()
         gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, Pfeil0->w, Pfeil0->h,TextureFormat, GL_UNSIGNED_BYTE, Pfeil0->pixels );
     }
 
-    if(Pfeil1 != NULL)
+    if(Pfeil1 != nullptr)
     {
         glGenTextures(1,&Pfeil1Texture);
         glBindTexture( GL_TEXTURE_2D, Pfeil1Texture );
@@ -1564,7 +1558,7 @@ void C64Class::InitGrafik()
         gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, Pfeil1->w, Pfeil1->h,TextureFormat, GL_UNSIGNED_BYTE, Pfeil1->pixels );
     }
 
-    if(Kreis0 != NULL)
+    if(Kreis0 != nullptr)
     {
         glGenTextures(1,&Kreis0Texture);
         glBindTexture( GL_TEXTURE_2D, Kreis0Texture );
@@ -1576,7 +1570,7 @@ void C64Class::InitGrafik()
         gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, Kreis0->w, Kreis0->h,TextureFormat, GL_UNSIGNED_BYTE, Kreis0->pixels );
     }
 
-    if(Kreis1 != NULL)
+    if(Kreis1 != nullptr)
     {
         glGenTextures(1,&Kreis1Texture);
         glBindTexture( GL_TEXTURE_2D, Kreis1Texture );
@@ -1592,7 +1586,7 @@ void C64Class::InitGrafik()
     HoldVicRefresh = false;
 }
 
-void C64Class::ReleaseGrafik()
+void C64Class::ReleaseGrafik(void)
 {
     ChangeGrafikModi = false;
 
@@ -1604,26 +1598,26 @@ void C64Class::ReleaseGrafik()
           SDL_Delay(1);
     }
 
-    if(C64Screen != NULL)
+    if(C64Screen != nullptr)
     {
        SDL_FreeSurface(C64Screen);
-       C64Screen = NULL;
+       C64Screen = nullptr;
     }
 
-    if(C64Window != NULL)
+    if(C64Window != nullptr)
     {
         SDL_DestroyWindow(C64Window);
-        C64Window = NULL;
+        C64Window = nullptr;
     }
 
-    if(C64ScreenBuffer != NULL)
+    if(C64ScreenBuffer != nullptr)
     {
         delete[] C64ScreenBuffer;
-        C64ScreenBuffer = NULL;
+        C64ScreenBuffer = nullptr;
     }
 }
 
-void C64Class::DrawC64Screen()
+void C64Class::DrawC64Screen(void)
 {
     /// Fensterinhalt löschen
     glClearColor(0.0f, 0.0f, 0.0f, 1.f);
@@ -2279,7 +2273,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
         break;
 
         case SDL_QUIT:
-            if(CloseEventC64Screen != NULL) CloseEventC64Screen();
+            if(CloseEventC64Screen != nullptr) CloseEventC64Screen();
 
 #ifdef _WIN32
         //LoopThreadEnd = true;
@@ -2336,33 +2330,33 @@ bool C64Class::RecordTapeImage(char *filename)
     return tape->RecordTapeImage(filename);
 }
 
-unsigned char C64Class::SetTapeKeys(unsigned char pressed_key)
+uint8_t C64Class::SetTapeKeys(uint8_t pressed_key)
 {
     return tape->SetTapeKeys(pressed_key);
 }
 
-bool C64Class::GetTapeMotorStatus()
+bool C64Class::GetTapeMotorStatus(void)
 {
     return !(CPU_PORT.DATA_READ & 32);
 }
 
-bool C64Class::GetTapeRecordLedStatus()
+bool C64Class::GetTapeRecordLedStatus(void)
 {
     if((!(CPU_PORT.DATA_READ & 32)) && tape->IsPressedRecord()) return true;
     else return false;
 }
 
-unsigned int C64Class::GetTapeCounter()
+uint32_t C64Class::GetTapeCounter(void)
 {
     return tape->GetCounter();
 }
 
-float C64Class::GetTapeLenTime()
+float C64Class::GetTapeLenTime(void)
 {
     return tape->GetTapeLenTime();
 }
 
-unsigned int C64Class::GetTapeLenCount()
+uint32_t C64Class::GetTapeLenCount(void)
 {
     return tape->GetTapeLenCount();
 }
@@ -2403,7 +2397,7 @@ void C64Class::EnableWarpMode(bool enabled)
 
 int SDLThreadLoad(void *userdat)
 {
-    unsigned short PRGStartAdresse;
+    uint16_t PRGStartAdresse;
     C64Class *c64 = (C64Class*)userdat;
 
     switch(c64->AutoLoadMode)
@@ -2429,7 +2423,7 @@ int SDLThreadLoad(void *userdat)
 }
 
 // ret 0=OK 1=nicht unterstütztes Format 2=D64 n.IO 3=G64 n.IO 4=OK nur es war ein CRT
-int C64Class::LoadAutoRun(int floppy_nr, char *filename)
+int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
 {
     char EXT[4];
 
@@ -2522,9 +2516,9 @@ int C64Class::LoadAutoRun(int floppy_nr, char *filename)
     return 1;
 }
 
-int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
+int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
 {
-    unsigned char *RAM = mmu->GetRAMPointer();
+    uint8_t *RAM = mmu->GetRAMPointer();
     FILE *file;
     char EXT[4];
 
@@ -2543,18 +2537,18 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         LogText(filename);
         LogText((char*)"\n");
 
-        unsigned short StartAdresse;
+        uint16_t StartAdresse;
         int reading_bytes;
-        unsigned char temp[2];
+        uint8_t temp[2];
         file = fopen (filename, "rb");
-        if (file == NULL)
+        if (file == nullptr)
         {
             LogText((char*)"<< ERROR: Datei konnte nicht geöffnet werden");
             return 0x01;
         }
         reading_bytes = fread (&temp,1,2,file);
         StartAdresse=temp[0]|(temp[1]<<8);
-        if(ret_startadresse != 0) *ret_startadresse = StartAdresse;
+        if(ret_startadresse != nullptr) *ret_startadresse = StartAdresse;
 
         reading_bytes=fread (RAM+StartAdresse,1,0xFFFF-StartAdresse,file);
 
@@ -2564,11 +2558,11 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         sprintf(str00,">>   SartAdresse: $%4.4X(%d)",StartAdresse,StartAdresse);
         LogText(str00);
 
-        StartAdresse+=(unsigned short)reading_bytes;
-        RAM[0x2D] = (unsigned char)StartAdresse;
-        RAM[0x2E] = (unsigned char)(StartAdresse>>8);
-        RAM[0xAE] = (unsigned char)StartAdresse;
-        RAM[0xAF] = (unsigned char)(StartAdresse>>8);
+        StartAdresse+=static_cast<uint16_t>(reading_bytes);
+        RAM[0x2D] = static_cast<uint8_t>(StartAdresse);
+        RAM[0x2E] = static_cast<uint8_t>(StartAdresse>>8);
+        RAM[0xAE] = static_cast<uint8_t>(StartAdresse);
+        RAM[0xAF] = static_cast<uint8_t>(StartAdresse>>8);
 
         fclose(file);
 
@@ -2586,13 +2580,13 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
 
         char Kennung[32];
         int reading_bytes;
-        unsigned short T64Entries;
-        unsigned short StartAdresse;
-        unsigned short EndAdresse;
+        uint16_t T64Entries;
+        uint16_t StartAdresse;
+        uint16_t EndAdresse;
         int FileStartOffset;
 
         file = fopen (filename, "rb");
-        if (file == NULL)
+        if (file == nullptr)
         {
             LogText((char*)"<< ERROR: Datei konnte nicht geöffnet werden");
                 return 0x01;
@@ -2635,7 +2629,7 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
 
         fseek(file,0x42,SEEK_SET);
         reading_bytes = fread(&StartAdresse,1,2,file);
-        if(ret_startadresse != 0) *ret_startadresse = StartAdresse;
+        if(ret_startadresse != nullptr) *ret_startadresse = StartAdresse;
         reading_bytes = fread(&EndAdresse,1,2,file);
         fseek(file,2,SEEK_CUR);
         reading_bytes = fread(&FileStartOffset,1,4,file);
@@ -2647,10 +2641,10 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         RAM[0x2B] = 0x01;
         RAM[0x2C] = 0x08;
 
-        RAM[0x2D] = (unsigned char)EndAdresse;
-        RAM[0x2E] = (unsigned char)(EndAdresse>>8);
-        RAM[0xAE] = (unsigned char)EndAdresse;
-        RAM[0xAF] = (unsigned char)(EndAdresse>>8);
+        RAM[0x2D] = (uint8_t)EndAdresse;
+        RAM[0x2E] = (uint8_t)(EndAdresse>>8);
+        RAM[0xAE] = (uint8_t)EndAdresse;
+        RAM[0xAF] = (uint8_t)(EndAdresse>>8);
 
         sprintf(str00,">>   SartAdresse: $%4.4X(%d)",StartAdresse,StartAdresse);
         LogText(str00);
@@ -2667,11 +2661,11 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         LogText((char*)"\n");
 
         char Kennung[8];
-        unsigned short StartAdresse;
+        uint16_t StartAdresse;
         int reading_bytes;
-        unsigned char temp[2];
+        uint8_t temp[2];
         file = fopen (filename, "rb");
-        if (file == NULL)
+        if (file == nullptr)
         {
             LogText((char*)"<< ERROR: Datei konnte nicht geöffnet werden");
                 return 0x01;
@@ -2689,7 +2683,7 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
 
         reading_bytes = fread (&temp,1,2,file);
         StartAdresse=temp[0]|(temp[1]<<8);
-        if(ret_startadresse != 0) *ret_startadresse = StartAdresse;
+        if(ret_startadresse != nullptr) *ret_startadresse = StartAdresse;
 
         reading_bytes=fread (RAM+StartAdresse,1,0xFFFF,file);
 
@@ -2699,11 +2693,11 @@ int C64Class::LoadPRG(char *filename, unsigned short* ret_startadresse)
         sprintf(str00,">>   SartAdresse: $%4.4X(%d)",StartAdresse,StartAdresse);
         LogText(str00);
 
-        StartAdresse+=(unsigned short)reading_bytes;
-        RAM[0x2D] = (unsigned char)StartAdresse;
-        RAM[0x2E] = (unsigned char)(StartAdresse>>8);
-        RAM[0xAE] = (unsigned char)StartAdresse;
-        RAM[0xAF] = (unsigned char)(StartAdresse>>8);
+        StartAdresse+=(uint16_t)reading_bytes;
+        RAM[0x2D] = (uint8_t)StartAdresse;
+        RAM[0x2E] = (uint8_t)(StartAdresse>>8);
+        RAM[0xAE] = (uint8_t)StartAdresse;
+        RAM[0xAF] = (uint8_t)(StartAdresse>>8);
 
         fclose(file);
 
@@ -2779,7 +2773,7 @@ int C64Class::SaveREUImage(char *filename)
     return reu->SaveRAM(filename);
 }
 
-void C64Class::ClearREURam()
+void C64Class::ClearREURam(void)
 {
     reu->ClearRAM();
 }
@@ -2807,12 +2801,12 @@ void C64Class::RemoveGEORAM(void)
     HardReset();
 }
 
-int C64Class::LoadGEORAMImage(char* filename)
+int C64Class::LoadGEORAMImage(char *filename)
 {
     return geo->LoadRAM(filename);
 }
 
-int C64Class::SaveGEORAMImage(char* filename)
+int C64Class::SaveGEORAMImage(char *filename)
 {
     return geo->SaveRAM(filename);
 }
@@ -2822,7 +2816,7 @@ void C64Class::ClearGEORAMRam(void)
     geo->ClearRAM();
 }
 
-void C64Class::SetMouse1351Port(unsigned char port)
+void C64Class::SetMouse1351Port(uint8_t port)
 {
     MousePort = port;
 }
@@ -2891,7 +2885,7 @@ void C64Class::SetDebugAnimationSpeed(int cycle_sek)
     AnimationSpeedAdd = (double)AudioPufferSize/(double)AudioSampleRate*(double)cycle_sek;
 }
 
-void C64Class::GetC64CpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg)
+void C64Class::GetC64CpuReg(REG_STRUCT *reg, IREG_STRUCT *ireg)
 {
     cpu->GetInterneRegister(ireg);
     ireg->CycleCounter = CycleCounter;
@@ -2937,7 +2931,7 @@ void C64Class::DelBreakGroup(int index)
 
 BREAK_GROUP* C64Class::GetBreakGroup(int index)
 {
-    if(index >= BreakGroupAnz) return 0;
+    if(index >= BreakGroupAnz) return nullptr;
     return BreakGroup[index];
 }
 
@@ -2991,13 +2985,13 @@ int C64Class::LoadBreakGroups(char *filename)
     FILE *file;
     char Kennung[10];
     char Version;
-    unsigned char Groupanzahl;
+    uint8_t Groupanzahl;
     size_t reading_elements;
 
     DeleteAllBreakGroups();
 
     file = fopen (filename, "rb");
-    if (file == NULL)
+    if (file == nullptr)
     {
             /// Datei konnte nicht geöffnet werden ///
             return -1;
@@ -3062,7 +3056,7 @@ bool C64Class::SaveBreakGroups(char *filename)
     char Version    = 1;
 
     file = fopen (filename, "wb");
-    if (file == NULL)
+    if (file == nullptr)
     {
             return false;
     }
@@ -3107,10 +3101,10 @@ bool C64Class::SaveBreakGroups(char *filename)
     return true;
 }
 
-bool C64Class::ExportPRG(char *filename, unsigned short start_adresse, unsigned short end_adresse, int source)
+bool C64Class::ExportPRG(char *filename, uint16_t start_adresse, uint16_t end_adresse, int source)
 {
     FILE *file;
-    unsigned char *RAM;
+    uint8_t *RAM;
 
     if(source > 0)
     {
@@ -3118,10 +3112,10 @@ bool C64Class::ExportPRG(char *filename, unsigned short start_adresse, unsigned 
     }
     else RAM = mmu->GetRAMPointer();
 
-    if(RAM == 0) return false;
+    if(RAM == nullptr) return false;
 
     file = fopen (filename, "wb");
-    if (file == NULL)
+    if (file == nullptr)
     {
         return false;
     }
@@ -3132,10 +3126,10 @@ bool C64Class::ExportPRG(char *filename, unsigned short start_adresse, unsigned 
     return true;
 }
 
-bool C64Class::ExportRAW(char *filename, unsigned short start_adresse, unsigned short end_adresse, int source)
+bool C64Class::ExportRAW(char *filename, uint16_t start_adresse, uint16_t end_adresse, int source)
 {
     FILE *file;
-    unsigned char *RAM;
+    uint8_t *RAM;
 
     if(source > 0)
     {
@@ -3146,7 +3140,7 @@ bool C64Class::ExportRAW(char *filename, unsigned short start_adresse, unsigned 
     if(RAM == 0) return false;
 
     file = fopen (filename, "wb");
-    if (file == NULL)
+    if (file == nullptr)
     {
         return false;
     }
@@ -3156,12 +3150,12 @@ bool C64Class::ExportRAW(char *filename, unsigned short start_adresse, unsigned 
     return true;
 }
 
-bool C64Class::ExportASM(char *filename, unsigned short start_adresse, unsigned short end_adresse, int source)
+bool C64Class::ExportASM(char *filename, uint16_t start_adresse, uint16_t end_adresse, int source)
 {
     FILE *file;
 
     file = fopen (filename, "w");
-    if (file == NULL)
+    if (file == nullptr)
     {
         return false;
     }
@@ -3203,12 +3197,12 @@ L10:
     return true;
 }
 
-unsigned char C64Class::GetMapReadSource(unsigned char page)
+uint8_t C64Class::GetMapReadSource(uint8_t page)
 {
     return mmu->GetReadSource(page);
 }
 
-unsigned char C64Class::GetMapWriteDestination(unsigned char page)
+uint8_t C64Class::GetMapWriteDestination(uint8_t page)
 {
     return mmu->GetWriteDestination(page);
 }
@@ -3224,7 +3218,7 @@ void C64Class::SaveScreenshot(const char *filename, int format)
 const char *C64Class::GetScreenshotFormatName(int format)
 {
     if(format >= SCREENSHOT_FORMATS_COUNT)
-        return NULL;
+        return nullptr;
     return ScreenschotFormatName[format];
 }
 
@@ -3234,14 +3228,14 @@ void C64Class::SetExitScreenshot(const char *filename)
     ExitScreenshotEnable = true;
 }
 
-const char *C64Class::GetAVVersion()
+const char* C64Class::GetAVVersion(void)
 {
     return VideoCapture->GetAVVersion();
 }
 
 bool C64Class::StartVideoRecord(const char *filename, int audio_bitrate, int video_bitrate)
 {
-    if(VideoCapture != NULL)
+    if(VideoCapture != nullptr)
     {
         VideoCapture->SetAudioBitrate(audio_bitrate);
         VideoCapture->SetVideoBitrate(video_bitrate);
@@ -3258,13 +3252,13 @@ void C64Class::SetPauseVideoRecord(bool status)
 
 void C64Class::StopVideoRecord(void)
 {
-    if(VideoCapture != NULL)
+    if(VideoCapture != nullptr)
     {
         VideoCapture->StopCapture();
     }
 }
 
-int C64Class::GetRecordedFrameCount()
+int C64Class::GetRecordedFrameCount(void)
 {
     return VideoCapture->GetRecordedFrameCount();
 }
@@ -3286,7 +3280,7 @@ bool C64Class::StartIECDump(const char *filename)
     return true;
 }
 
-void C64Class::StopIECDump()
+void C64Class::StopIECDump(void)
 {
     IecIsDumped = false;
     IecVcdExport.Close();
@@ -3312,7 +3306,7 @@ void C64Class::EnableSecondSid(bool enable)
     StereoEnable = enable;
 }
 
-void C64Class::SetSecondSidAddress(unsigned short address)
+void C64Class::SetSecondSidAddress(uint16_t address)
 {
     Sid2Adresse = address;
     if(Sid2Adresse == 0xD400)
@@ -3376,22 +3370,22 @@ void C64Class::SetVicDisplaySizeNtsc(int first_line, int last_line)
     vic->SetVicVDisplayNtscSize(first_line, last_line);
 }
 
-int C64Class::GetVicFirstDisplayLinePal()
+int C64Class::GetVicFirstDisplayLinePal(void)
 {
     return vic->GetVicFirstDisplayLinePal();
 }
 
-int C64Class::GetVicLastDisplayLinePal()
+int C64Class::GetVicLastDisplayLinePal(void)
 {
     return vic->GetVicLastDisplayLinePal();
 }
 
-int C64Class::GetVicFirstDisplayLineNtsc()
+int C64Class::GetVicFirstDisplayLineNtsc(void)
 {
     return vic->GetVicFirstDisplayLineNtsc();
 }
 
-int C64Class::GetVicLastDisplayLineNtsc()
+int C64Class::GetVicLastDisplayLineNtsc(void)
 {
     return vic->GetVicLastDisplayLineNtsc();
 }
@@ -3407,13 +3401,13 @@ int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)
     int TMP;
     int OPC;
 
-    unsigned short int word;
-    unsigned short int A;
+    uint16_t word;
+    uint16_t A;
     char B;
 
-    unsigned char ram0;
-    unsigned char ram1;
-    unsigned char ram2;
+    uint8_t ram0;
+    uint8_t ram1;
+    uint8_t ram2;
 
     if(source > 0)
     {
@@ -3616,7 +3610,7 @@ bool C64Class::CheckBreakpoints(void)
             sid1->SoundOutputEnable = false;
             sid2->SoundOutputEnable = false;
             for(int i=0; i<FloppyAnzahl; i++) floppy[i]->SetEnableFloppySound(false);
-            if(BreakpointProc != NULL) BreakpointProc();
+            if(BreakpointProc != nullptr) BreakpointProc();
             return true;
         }
         else
@@ -3624,14 +3618,14 @@ bool C64Class::CheckBreakpoints(void)
             DebugAnimation = false;
             OneOpc = false;
             OneZyk = false;
-            if(BreakpointProc != NULL) BreakpointProc();
+            if(BreakpointProc != nullptr) BreakpointProc();
             return true;
         }
     }
     return false;
 }
 
-void C64Class::WriteSidIO(unsigned short adresse,unsigned char wert)
+void C64Class::WriteSidIO(uint16_t adresse, uint8_t wert)
 {
     if(StereoEnable)
     {
@@ -3644,7 +3638,7 @@ void C64Class::WriteSidIO(unsigned short adresse,unsigned char wert)
     }
 }
 
-unsigned char C64Class::ReadSidIO(unsigned short adresse)
+uint8_t C64Class::ReadSidIO(uint16_t adresse)
 {
     /*
     if(StereoEnable)
@@ -3669,7 +3663,7 @@ unsigned char C64Class::ReadSidIO(unsigned short adresse)
 }
 
 /// $DE00
-void C64Class::WriteIO1(unsigned short adresse,unsigned char wert)
+void C64Class::WriteIO1(uint16_t adresse, uint8_t wert)
 {
     switch(IOSource)
     {
@@ -3691,7 +3685,7 @@ void C64Class::WriteIO1(unsigned short adresse,unsigned char wert)
 }
 
 /// $DF00
-void C64Class::WriteIO2(unsigned short adresse,unsigned char wert)
+void C64Class::WriteIO2(uint16_t adresse, uint8_t wert)
 {
     switch(IOSource)
     {
@@ -3712,7 +3706,7 @@ void C64Class::WriteIO2(unsigned short adresse,unsigned char wert)
 }
 
 /// $DE00
-unsigned char C64Class::ReadIO1(unsigned short adresse)
+uint8_t C64Class::ReadIO1(uint16_t adresse)
 {
     switch(IOSource)
     {
@@ -3737,7 +3731,7 @@ unsigned char C64Class::ReadIO1(unsigned short adresse)
 
 /// $DF00
 
-unsigned char C64Class::ReadIO2(unsigned short adresse)
+uint8_t C64Class::ReadIO2(uint16_t adresse)
 {
     switch(IOSource)
     {
@@ -3760,7 +3754,7 @@ unsigned char C64Class::ReadIO2(unsigned short adresse)
     return 0;
 }
 
-void C64Class::JoystickNewScan()
+void C64Class::JoystickNewScan(void)
 {
     OpenSDLJoystick();
 }
@@ -3773,7 +3767,7 @@ void C64Class::StartRecJoystickMapping(int slot_nr)
     RecJoyMapping = true;
 }
 
-void C64Class::StopRecJoystickMapping()
+void C64Class::StopRecJoystickMapping(void)
 {
     if(RecJoyMapping)
         RecJoyMapping = false;
@@ -3799,7 +3793,7 @@ void C64Class::ClearJoystickMapping(int slot_nr)
     }
 }
 
-void C64Class::IncMouseHiddenCounter()
+void C64Class::IncMouseHiddenCounter(void)
 {
     if(!MouseIsHidden && (MouseHiddenTime > 0))
     {
@@ -3812,38 +3806,38 @@ void C64Class::IncMouseHiddenCounter()
     }
 }
 
-void C64Class::StartRecKeyMap(unsigned char keymatrix_code)
+void C64Class::StartRecKeyMap(uint8_t keymatrix_code)
 {
     RecMatrixCode = keymatrix_code;
     IsKeyMapRec = true;
 }
 
-void C64Class::StopRecKeyMap()
+void C64Class::StopRecKeyMap(void)
 {
     IsKeyMapRec = false;
 }
 
-bool C64Class::GetRecKeyMapStatus()
+bool C64Class::GetRecKeyMapStatus(void)
 {
     return IsKeyMapRec;
 }
 
-C64_KEYS *C64Class::GetC64KeyTable()
+C64_KEYS* C64Class::GetC64KeyTable(void)
 {
     return C64KeyTable;
 }
 
-const char **C64Class::GetC64KeyNameTable()
+const char** C64Class::GetC64KeyNameTable(void)
 {
     return C64KeyNames;
 }
 
-int C64Class::GetC64KeyTableSize()
+int C64Class::GetC64KeyTableSize(void)
 {
     return C64KeyNum;
 }
 
-void C64Class::OpenSDLJoystick()
+void C64Class::OpenSDLJoystick(void)
 {
     JoyStickUdateIsStop = false;
     StopJoystickUpdate = true;
@@ -3902,7 +3896,7 @@ void C64Class::OpenSDLJoystick()
     StopJoystickUpdate = true;
 }
 
-void C64Class::CloseSDLJoystick()
+void C64Class::CloseSDLJoystick(void)
 {
     JoyStickUdateIsStop = false;
     StopJoystickUpdate = true;
@@ -3924,7 +3918,7 @@ void C64Class::CloseSDLJoystick()
 /// \brief  Wird aufgerufen wenn der CIA1 Ausgang PA6 und PA7 sich ändert
 ///         Somit Schaltet IC 4066 POTX und POTY
 ///
-void C64Class::ChangePOTSwitch()
+void C64Class::ChangePOTSwitch(void)
 {
     if(!Mouse1351Enable)
     {
@@ -3956,7 +3950,7 @@ void C64Class::ChangePOTSwitch()
     sid1->SetPotXY(POT_X, POT_Y);
 }
 
-void C64Class::UpdateMouse()
+void C64Class::UpdateMouse(void)
 {
     switch(MousePort)
     {

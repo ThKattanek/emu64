@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.12.2018                //
+// Letzte Änderung am 29.05.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -51,9 +51,9 @@ using namespace std::tr1::placeholders;
 
 #define SUBDIVS_SCREEN 20            // Für Screenverzerrungen (Kissen etc.)
 
-#define SCREEN_RATIO_4_3 1.34        // Screenratio 4:3 (1,33333)
-#define SCREEN_RATIO_5_4 1.25        // Screenratio 5:4 (1,25)
-#define SCREEN_RATIO_16_9 1.777      // Screenratio 16:9 (1,777)
+#define SCREEN_RATIO_4_3 1.34f        // Screenratio 4:3 (1,33333)
+#define SCREEN_RATIO_5_4 1.25f        // Screenratio 5:4 (1,25)
+#define SCREEN_RATIO_16_9 1.777f      // Screenratio 16:9 (1,777)
 
 enum SCREENSHOT_FORMATS {SCREENSHOT_FORMAT_BMP, SCREENSHOT_FORMAT_PNG, SCREENSHOT_FORMATS_COUNT};
 
@@ -61,26 +61,26 @@ class C64Class
 {
 
 public:
-    C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> log_function, const char* data_path);
+    C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> log_function, const char *data_path);
     ~C64Class();
     void StartEmulation(void);
     void EndEmulation(void);
     void SetLimitCycles(int nCycles);
     void SetEnableDebugCart(bool enabled);
     void WarpModeLoop(void);
-    void FillAudioBuffer(unsigned char *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
-    void KeyEvent(unsigned char  matrix_code,KeyStatus status, bool isAutoShift);
-    bool LoadC64Roms(char *kernalrom,char *basicrom,char *charrom);
-    bool LoadFloppyRom(int floppy_nr,char *dos1541rom);
-    bool LoadDiskImage(int floppy_nr,char *filename);
-    void LoadPRGFromD64(int floppy_nr,char *c64_filename,int command);
-    void SetFloppyWriteProtect(int floppy_nr, bool status);
+    void FillAudioBuffer(uint8_t *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
+    void KeyEvent(uint8_t  matrix_code, KeyStatus status, bool isAutoShift);
+    bool LoadC64Roms(char *kernalrom, char *basicrom, char *charrom);
+    bool LoadFloppyRom(uint8_t floppy_nr, char *dos1541rom);
+    bool LoadDiskImage(uint8_t floppy_nr, char *filename);
+    void LoadPRGFromD64(uint8_t floppy_nr, char *c64_filename, int command);
+    void SetFloppyWriteProtect(uint8_t floppy_nr, bool status);
     void SetCommandLine(char *c64_command);
     void KillCommandLine(void);
-    unsigned char ReadC64Byte(unsigned short adresse);
-    void WriteC64Byte(unsigned short adresse,unsigned char wert);
-    unsigned char* GetRAMPointer(unsigned short adresse);
-    void SetGrafikModi(bool colbits32, bool doublesize,bool enable_pal,bool filter_enable, int fullres_xw = 0, int fullres_yw = 0);
+    uint8_t ReadC64Byte(uint16_t adresse);
+    void WriteC64Byte(uint16_t adresse, uint8_t wert);
+    uint8_t* GetRAMPointer(uint16_t adresse);
+    void SetGrafikModi(bool colbits32, bool doublesize, bool enable_pal, bool filter_enable, int fullres_xw = 0, int fullres_yw = 0);
     void SetWindowTitle(char *title_name);
     void SetFullscreen(void);
     void InitGrafik(void);
@@ -101,34 +101,34 @@ public:
 
     bool LoadTapeImage(char *filename);
     bool RecordTapeImage(char* filename);
-    unsigned char SetTapeKeys(unsigned char pressed_key);
-    bool GetTapeMotorStatus();
-    bool GetTapeRecordLedStatus();
-    unsigned int GetTapeCounter();
-    float GetTapeLenTime();
-    unsigned int GetTapeLenCount();
+    uint8_t SetTapeKeys(uint8_t pressed_key);
+    bool GetTapeMotorStatus(void);
+    bool GetTapeRecordLedStatus(void);
+    uint32_t GetTapeCounter(void);
+    float GetTapeLenTime(void);
+    uint32_t GetTapeLenCount(void);
     void SetTapeSoundVolume(float volume);
 
     void SoftReset(void);
     void HardReset(void);
     void SetReset(int status, int hard_reset);
-    int LoadAutoRun(int floppy_nr, char *filename);
-    int LoadPRG(char *filename, unsigned short* ret_startadresse);
+    int LoadAutoRun(uint8_t floppy_nr, char *filename);
+    int LoadPRG(char *filename, uint16_t *ret_startadresse);
 
     int LoadCRT(char *filename);
     void RemoveCRT(void);
-    int CreateNewEasyFlashImage(char* filename,char* crt_name);
+    int CreateNewEasyFlashImage(char *filename, char *crt_name);
 
     void InsertREU(void);
     void RemoveREU(void);
-    int LoadREUImage(char* filename);
-    int SaveREUImage(char* filename);
+    int LoadREUImage(char *filename);
+    int SaveREUImage(char *filename);
     void ClearREURam(void);
 
     void InsertGEORAM(void);
     void RemoveGEORAM(void);
-    int LoadGEORAMImage(char* filename);
-    int SaveGEORAMImage(char* filename);
+    int LoadGEORAMImage(char *filename);
+    int SaveGEORAMImage(char *filename);
     void ClearGEORAMRam(void);
 
     void SetMouse1351Port(unsigned char port);
@@ -153,43 +153,43 @@ public:
     int GetBreakGroupAnz(void);
     int LoadBreakGroups(char *filename);
     bool SaveBreakGroups(char *filename);
-    bool ExportPRG(char *filename, unsigned short start_adresse, unsigned short end_adresse, int source);
-    bool ExportRAW(char *filename, unsigned short start_adresse, unsigned short end_adresse, int source);
-    bool ExportASM(char* filename, unsigned short start_adresse, unsigned short end_adresse, int source);
+    bool ExportPRG(char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
+    bool ExportRAW(char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
+    bool ExportASM(char* filename, uint16_t start_adresse, uint16_t end_adresse, int source);
     void JoystickNewScan(void);
     void StartRecJoystickMapping(int slot_nr);
     void StopRecJoystickMapping(void);
     void ClearJoystickMapping(int slot_nr);
     void IncMouseHiddenCounter(void);
 
-    void StartRecKeyMap(unsigned char keymatrix_code);
-    void StopRecKeyMap();
-    bool GetRecKeyMapStatus();
-    C64_KEYS* GetC64KeyTable();
-    const char **GetC64KeyNameTable();
-    int GetC64KeyTableSize();
+    void StartRecKeyMap(uint8_t keymatrix_code);
+    void StopRecKeyMap(void);
+    bool GetRecKeyMapStatus(void);
+    C64_KEYS* GetC64KeyTable(void);
+    const char** GetC64KeyNameTable(void);
+    int GetC64KeyTableSize(void);
 
-    unsigned char GetMapReadSource(unsigned char page);
-    unsigned char GetMapWriteDestination(unsigned char page);
+    uint8_t GetMapReadSource(uint8_t page);
+    uint8_t GetMapWriteDestination(uint8_t page);
 
     void SaveScreenshot(const char *filename, int format = SCREENSHOT_FORMAT_PNG);
-    const char *GetScreenshotFormatName(int format);
+    const char* GetScreenshotFormatName(int format);
     void SetExitScreenshot(const char *filename);
 
-    const char *GetAVVersion();
+    const char* GetAVVersion(void);
     bool StartVideoRecord(const char *filename, int audio_bitrate=128000, int video_bitrate=4000000);
     void SetPauseVideoRecord(bool status);
     void StopVideoRecord(void);
     int GetRecordedFrameCount(void);
 
     bool StartIECDump(const char *filename);
-    void StopIECDump();
+    void StopIECDump(void);
 
     void SetSIDVolume(float volume);    // Lautstärke der SID's (0.0f - 1.0f)
     void SetFirstSidTyp(int sid_typ);   // SID Typ des 1. SID (MOS_6581 oder MOS_8580)
     void SetSecondSidTyp(int sid_typ);  // SID Typ des 2. SID (MOS_6581 oder MOS_8580)
     void EnableSecondSid(bool enable);  // 2. SID aktivieren
-    void SetSecondSidAddress(unsigned short address);
+    void SetSecondSidAddress(uint16_t address);
     void SetSid6ChannelMode(bool enable);
     void SetSidCycleExact(bool enable);
     void SetSidFilter(bool enable);
@@ -204,16 +204,16 @@ public:
     void SetVicDisplaySizePal(int first_line, int last_line);
     void SetVicDisplaySizeNtsc(int first_line, int last_line);
 
-    int GetVicFirstDisplayLinePal();
-    int GetVicLastDisplayLinePal();
-    int GetVicFirstDisplayLineNtsc();
-    int GetVicLastDisplayLineNtsc();
+    int GetVicFirstDisplayLinePal(void);
+    int GetVicLastDisplayLinePal(void);
+    int GetVicFirstDisplayLineNtsc(void);
+    int GetVicLastDisplayLineNtsc(void);
 
     int             AktWindowXW;
     int             AktWindowYW;
     int             AktWindowColorBits;
-    unsigned short  AktC64ScreenXW;
-    unsigned short  AktC64ScreenYW;
+    uint16_t        AktC64ScreenXW;
+    uint16_t        AktC64ScreenYW;
     bool            ColBits32;
     bool            DoubleSize;
     bool            PalEnable;
@@ -246,7 +246,7 @@ public:
     SDL_Surface     *C64Screen;
     SDL_Surface     *C64ScreenIcon;
     GLuint          C64ScreenTexture;
-    unsigned char   *C64ScreenBuffer;
+    uint8_t         *C64ScreenBuffer;
     bool            IsC64ScreenObsolete;
     bool            DistortionEnable;
     float           Distortion;
@@ -279,8 +279,8 @@ public:
     int                 VPort1;
     int                 VPort2;
 
-    unsigned char   GamePort1;
-    unsigned char   GamePort2;
+    uint8_t         GamePort1;
+    uint8_t         GamePort2;
 
     SDL_Thread      *sdl_thread;
     bool            sdl_thread_pause;
@@ -289,7 +289,7 @@ public:
     SDL_Thread      *warp_thread;
     bool            warp_thread_end;
 
-    unsigned char   *vic_puffer;
+    uint8_t         *vic_puffer;
     VideoPalClass   *pal;
 
     MMU             *mmu;
@@ -308,11 +308,11 @@ public:
     bool RESET;     // Reset Leitung -> Für Alle Module mit Reset Eingang
 
     bool            StereoEnable;
-    unsigned short  Sid2Adresse;
+    uint16_t        Sid2Adresse;
     bool            Sid6ChannelMode;
 
-    unsigned char   KeyboardMatrixToPBExt[8];
-    unsigned char   KeyboardMatrixToPAExt[8];
+    uint8_t         KeyboardMatrixToPBExt[8];
+    uint8_t         KeyboardMatrixToPAExt[8];
 
     int             IOSource;
 
@@ -331,8 +331,8 @@ public:
     function<void(void)> LimitCyclesEvent;
     function<void(unsigned char)> DebugCartEvent;
 
-    unsigned short	C64History[256];
-    unsigned char	C64HistoryPointer;
+    uint16_t        C64History[256];
+    uint8_t         C64HistoryPointer;
 
     bool StartScreenshot;
     char ScreenshotFilename[1024];
@@ -346,17 +346,17 @@ public:
     VideoCaptureClass *VideoCapture;
 
 private:
-    void CalcDistortionGrid();
-    void VicRefresh(unsigned char *vic_puffer);
+    void CalcDistortionGrid(void);
+    void VicRefresh(uint8_t *vic_puffer);
     void CheckKeys(void);
     int DisAss(FILE *file, int pc, bool line_draw, int source);
     bool CheckBreakpoints(void);
-    void WriteSidIO(unsigned short adresse,unsigned char wert);
-    unsigned char ReadSidIO(unsigned short adresse);
-    void WriteIO1(unsigned short adresse,unsigned char wert);
-    void WriteIO2(unsigned short adresse,unsigned char wert);
-    unsigned char ReadIO1(unsigned short adresse);
-    unsigned char ReadIO2(unsigned short adresse);
+    void WriteSidIO(uint16_t adresse, uint8_t wert);
+    uint8_t ReadSidIO(uint16_t adresse);
+    void WriteIO1(uint16_t adresse, uint8_t wert);
+    void WriteIO2(uint16_t adresse, uint8_t wert);
+    uint8_t ReadIO1(uint16_t adresse);
+    uint8_t ReadIO2(uint16_t adresse);
     void SDLThreadPauseBegin(void);
     void SDLThreadPauseEnd(void);
     void OpenSDLJoystick(void);
@@ -366,8 +366,8 @@ private:
     int InitVideoCaptureSystem(void);
     void CloseVideoCaptureSystem(void);
     void SwapRBSurface(SDL_Surface *surface); // swaps the color red with blue in sdl surface
-    function<unsigned char(unsigned short)> *ReadProcTbl;
-    function<void(unsigned short,unsigned char)> *WriteProcTbl;
+    function<uint8_t(uint16_t)> *ReadProcTbl;
+    function<void(uint16_t, uint8_t)> *WriteProcTbl;
 
     char* GfxPath;
     char* FloppySoundPath;
@@ -393,15 +393,15 @@ private:
     bool EnableExtLines;
     bool ExtRDY;
 
-    unsigned char   C64IEC;     // Leitungen vom C64 zur Floppy Bit 4=ATN 6=CLK 7=DATA
-    unsigned char   FloppyIEC;	// Leitungen von Floppy zur c64 Bit 6=CLK 7=DATA
+    uint8_t         C64IEC;     // Leitungen vom C64 zur Floppy Bit 4=ATN 6=CLK 7=DATA
+    uint8_t         FloppyIEC;	// Leitungen von Floppy zur c64 Bit 6=CLK 7=DATA
 
     VCDClass IecVcdExport;      // Klasse zum Exportieren der IEC Signale
     bool IecIsDumped;
 
     /// Temporär ///
     int             EasyFlashDirty;
-    unsigned char   EasyFlashByte;
+    uint8_t         EasyFlashByte;
 
     PORT CIA1_PA;
     PORT CIA1_PB;
@@ -413,16 +413,16 @@ private:
     int MouseYRel;
 
     int MousePort;
-    unsigned char POT_AX;
-    unsigned char POT_AY;
-    unsigned char POT_BX;
-    unsigned char POT_BY;
+    uint8_t     POT_AX;
+    uint8_t     POT_AY;
+    uint8_t     POT_BX;
+    uint8_t     POT_BY;
 
-    unsigned char POT_X;
-    unsigned char POT_Y;
+    uint8_t     POT_X;
+    uint8_t     POT_Y;
 
-    unsigned char   KeyboardMatrixToPB[8];
-    unsigned char   KeyboardMatrixToPA[8];
+    uint8_t     KeyboardMatrixToPB[8];
+    uint8_t     KeyboardMatrixToPA[8];
 
     bool isReturnKeyDown;
 
@@ -441,12 +441,12 @@ private:
     // Bit 8 = Beim erreichen einer bestommten Raster Zeile
     // Bit 9 = Beim erreichen eines Zyklus in einer Rasterzeile
 
-    unsigned short  Breakpoints[0x10000];
-    unsigned short  BreakWerte[16];
-    unsigned short  BreakStatus;
+    uint16_t        Breakpoints[0x10000];
+    uint16_t        BreakWerte[16];
+    uint16_t        BreakStatus;
     bool            FloppyFoundBreakpoint;
 
-    unsigned char   BreakGroupAnz;
+    uint8_t         BreakGroupAnz;
     BREAK_GROUP     *BreakGroup[MAX_BREAK_GROUPS];
 
     ////////////////////////////////////////////////////////////
@@ -465,8 +465,8 @@ private:
                                     // Wechselt er von 1 auf 0 wird die Emulation angehalten und ein Ergeignis ausgelöst
     bool    DebugMode;
     bool	DebugAnimation;
-    double  AnimationSpeedAdd;
-    double	AnimationSpeedCounter;
+    float_t AnimationSpeedAdd;
+    float_t	AnimationSpeedCounter;
     bool	OneZyk;
     bool	OneOpc;
     int     OneOpcSource;
@@ -477,8 +477,8 @@ private:
     int     MouseHiddenCounter;
     int     MouseHiddenTime;
 
-    bool            IsKeyMapRec;
-    unsigned char   RecMatrixCode;
+    bool    IsKeyMapRec;
+    uint8_t RecMatrixCode;
 };
 
 #endif // C64CLASS_H
