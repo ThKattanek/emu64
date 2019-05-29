@@ -240,7 +240,7 @@ void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
     Mutex1 = false;      // Mutex1 Unlocken (false)
 }
 
-void VideoCaptureClass::FillSourceAudioBuffer(uint16_t *data, int len)
+void VideoCaptureClass::FillSourceAudioBuffer(int16_t *data, int len)
 {
     if(!CaptureIsActive || CaptureIsPause) return;
 

@@ -75,7 +75,7 @@ public:
     void StopCapture();
     void SetCapturePause(bool cpt_pause);
     void AddFrame(uint8_t *data, int linesize);
-    void FillSourceAudioBuffer(uint16_t *data, int len);
+    void FillSourceAudioBuffer(int16_t *data, int len);
     int GetRecordedFrameCount();
 
 private:
