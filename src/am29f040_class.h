@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 29.05.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,15 +16,17 @@
 #ifndef AM29F040_CLASS_H
 #define AM29F040_CLASS_H
 
+#include <cstdint>
+
 struct FLASH_TYPES_STRUCT
 {
-    unsigned char ManufacturID;
-    unsigned char DeviceID;
-    unsigned int  Size;
-    unsigned int  Magic1Addr;
-    unsigned int  Magic2Addr;
-    unsigned int  Magic1Mask;
-    unsigned int  Magic2Mask;
+    uint8_t     ManufacturID;
+    uint8_t     DeviceID;
+    uint32_t    Size;
+    uint32_t    Magic1Addr;
+    uint32_t    Magic2Addr;
+    uint32_t    Magic1Mask;
+    uint32_t    Magic2Mask;
 };
 
 const FLASH_TYPES_STRUCT FlashTypes[2] =
@@ -52,28 +54,28 @@ class AM29F040Class
     };
 
 public:
-    AM29F040Class(unsigned char* flashbank,int flashtype);
+    AM29F040Class(uint8_t* flashbank,int flashtype);
     ~AM29F040Class();
 
-    unsigned char Read(unsigned int adresse);
-    void Write(unsigned int adresse, unsigned char wert);
+    uint8_t Read(uint32_t adresse);
+    void Write(uint32_t adresse, uint8_t wert);
 
-    unsigned char ProgrammByte;
+    uint8_t ProgrammByte;
     int	Dirty;
 
 private:
         int	FlashType;
         int	Status;
 
-        unsigned char* Data;
-        unsigned char LastRead;
+        uint8_t* Data;
+        uint8_t LastRead;
 
         int WriteOperationStatus(void);
-        int FlashMagic1(unsigned int adresse);
-        int FlashMagic2(unsigned int adresse);
-        void FlashEraseSector(unsigned int adresse);
+        int FlashMagic1(uint32_t adresse);
+        int FlashMagic2(uint32_t adresse);
+        void FlashEraseSector(uint32_t adresse);
         void FlashEraseChip(void);
-        int FlashProgramByte(unsigned int adresse,unsigned char wert);
+        int FlashProgramByte(uint32_t adresse, uint8_t wert);
 };
 
 #endif // AM29F040_CLASS_H

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 29.05.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,7 +16,7 @@
 #include "am29f040_class.h"
 #include <cstring>
 
-AM29F040Class::AM29F040Class(unsigned char* flashbank,int flashtype)
+AM29F040Class::AM29F040Class(uint8_t *flashbank, int flashtype)
 {
     Data = flashbank;
     FlashType = flashtype;
@@ -28,9 +28,9 @@ AM29F040Class::~AM29F040Class(void)
 {
 }
 
-unsigned char AM29F040Class::Read(unsigned int adresse)
+uint8_t AM29F040Class::Read(uint32_t adresse)
 {
-    static unsigned char wert;
+    static uint8_t wert;
 
         switch (Status)
         {
@@ -53,7 +53,7 @@ unsigned char AM29F040Class::Read(unsigned int adresse)
             break;
 
         case STATUS_BYTE_PROGRAMM_ERROR:
-            wert = WriteOperationStatus();
+            wert = static_cast<uint8_t>(WriteOperationStatus());
             break;
 
         case STATUS_SECTOR_ERASE_SUSPEND:
@@ -63,7 +63,7 @@ unsigned char AM29F040Class::Read(unsigned int adresse)
             /* TODO return write operation status. Until alarms are introduced, just reset the state and fall through */
             Status = STATUS_READ;
 
-        default:
+        [[clang::fallthrough]]; default:
             /* The state doesn't reset if a read occurs during a command sequence */
             /* fall through */
         case STATUS_READ:
@@ -75,7 +75,7 @@ unsigned char AM29F040Class::Read(unsigned int adresse)
     return wert;
 }
 
-void AM29F040Class::Write(unsigned int adresse, unsigned char wert)
+void AM29F040Class::Write(uint32_t adresse, uint8_t wert)
 {
     switch (Status)
         {
@@ -199,19 +199,19 @@ void AM29F040Class::Write(unsigned int adresse, unsigned char wert)
     }
 }
 
-inline int AM29F040Class::FlashMagic1(unsigned int adresse)
+inline int AM29F040Class::FlashMagic1(uint32_t adresse)
 {
     return ((adresse & FlashTypes[FlashType].Magic1Mask) == FlashTypes[FlashType].Magic1Addr);
 }
 
-inline int AM29F040Class::FlashMagic2(unsigned int adresse)
+inline int AM29F040Class::FlashMagic2(uint32_t adresse)
 {
     return ((adresse & FlashTypes[FlashType].Magic2Mask) == FlashTypes[FlashType].Magic2Addr);
 }
 
-inline void AM29F040Class::FlashEraseSector(unsigned int adresse)
+inline void AM29F040Class::FlashEraseSector(uint32_t adresse)
 {
-    unsigned int sector_addr = adresse & 0xF0000;
+    uint32_t sector_addr = adresse & 0xF0000;
 
     memset(&(Data[sector_addr]), 0xFF, 0x10000);
     Dirty = 1;
@@ -223,10 +223,10 @@ inline void AM29F040Class::FlashEraseChip(void)
     Dirty = 1;
 }
 
-inline int AM29F040Class::FlashProgramByte(unsigned int adresse,unsigned char wert)
+inline int AM29F040Class::FlashProgramByte(uint32_t adresse, uint8_t wert)
 {
-    unsigned char old_data = Data[adresse];
-    unsigned char new_data = old_data & wert;
+    uint8_t old_data = Data[adresse];
+    uint8_t new_data = old_data & wert;
 
     ProgrammByte = wert;
     Data[adresse] = new_data;
@@ -240,7 +240,7 @@ inline int AM29F040Class::WriteOperationStatus(void)
         static int maincpu_clk = 0;
 
     return ((ProgrammByte ^ 0x80) & 0x80)   /* DQ7 = inverse of programmed data */
-         | ((maincpu_clk & 2) << 5)                           /* DQ6 = toggle bit (2 us) */
-         | (1 << 5)                                           /* DQ5 = timeout */
+         | ((maincpu_clk & 2) << 5)         /* DQ6 = toggle bit (2 us) */
+         | (1 << 5)                         /* DQ5 = timeout */
          ;
 }
