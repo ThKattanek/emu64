@@ -34,8 +34,6 @@ VideoCaptureClass::VideoCaptureClass()
 
     VideoPackageCounter = 0;
     AudioPackageCounter = 0;
-
-    cout << "FFMPEG Version: " << GetAVVersion() << endl;
 }
 
 VideoCaptureClass::~VideoCaptureClass()
