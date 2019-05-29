@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.02.2018                //
+// Letzte Änderung am 29.05.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -84,7 +84,8 @@ void WidgetFloppyStatus::RetranslateUi()
 void WidgetFloppyStatus::onTimer()
 {
     FLOPPY_INFO info;
-    char str[10];
+    #define MAX_STRLEN 16
+    char str[MAX_STRLEN+1] = "";
 
     floppy->GetFloppyInfo(&info);
 
@@ -104,14 +105,14 @@ void WidgetFloppyStatus::onTimer()
 
     if(old_Spur != (info.Spur))
     {
-        sprintf(str,"%02d",(unsigned int)(info.Spur+1));
+        snprintf(str,MAX_STRLEN,"%02d",static_cast<unsigned int>(info.Spur+1));
         ui->TrackOut->setText(str);
         old_Spur = info.Spur;
     }
 
     if(old_Sektor != info.Sektor)
     {
-        sprintf(str,"%02d",(unsigned int)info.Sektor);
+        snprintf(str,MAX_STRLEN,"%02d",static_cast<unsigned int>(info.Sektor));
         ui->SekcorOut->setText(str);
         old_Sektor = info.Sektor;
     }
