@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.12.2018                //
+// Letzte Änderung am 29.05.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,6 +16,7 @@
 #ifndef MOS_6569_CLASS_H
 #define MOS_6569_CLASS_H
 
+#include <cstdint>
 #include "structs.h"
 #include "tr1/functional"
 using namespace std::tr1;
@@ -48,17 +49,17 @@ public:
     void GetRegister(VIC_STRUCT *vic_reg);
     void SetVicVDisplayPalSize(int first_line, int last_line);
 
-    int GetVicFirstDisplayLinePal();
-    int GetVicLastDisplayLinePal();
-    int GetVicFirstDisplayLineNtsc();
-    int GetVicLastDisplayLineNtsc();
+    uint16_t GetVicFirstDisplayLinePal();
+    uint16_t GetVicLastDisplayLinePal();
+    uint16_t GetVicFirstDisplayLineNtsc();
+    uint16_t GetVicLastDisplayLineNtsc();
 
-    int GetAktVicDisplayFirstLine();
-    int GetAktVicDisplayLastLine();
+    uint16_t GetAktVicDisplayFirstLine();
+    uint16_t GetAktVicDisplayLastLine();
 
     void SetVicVDisplayNtscSize(int first_line, int last_line);
-    int GetVicDisplayNtscFirstLine();
-    int GetVicDisplayNtscLastLine();
+    uint16_t GetVicDisplayNtscFirstLine();
+    uint16_t GetVicDisplayNtscLastLine();
     void SetVicType(int system);
     void OneZyklus(void);
     //bool SaveFreez(FILE* File);

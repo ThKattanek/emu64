@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.12.2018                //
+// Letzte Änderung am 29.05.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -218,22 +218,22 @@ void VICII::SetVicVDisplayPalSize(int first_line, int last_line)
     }
 }
 
-int VICII::GetVicFirstDisplayLinePal()
+uint16_t VICII::GetVicFirstDisplayLinePal()
 {
     return FirstDisplayLinePAL;
 }
 
-int VICII::GetVicLastDisplayLinePal()
+uint16_t VICII::GetVicLastDisplayLinePal()
 {
     return LastDisplayLinePAL;
 }
 
-int VICII::GetAktVicDisplayFirstLine()
+uint16_t VICII::GetAktVicDisplayFirstLine()
 {
     return FirstDisplayLine;
 }
 
-int VICII::GetAktVicDisplayLastLine()
+uint16_t VICII::GetAktVicDisplayLastLine()
 {
     return LastDisplayLine;
 }
@@ -248,12 +248,12 @@ void VICII::SetVicVDisplayNtscSize(int first_line, int last_line)
     }
 }
 
-int VICII::GetVicFirstDisplayLineNtsc()
+uint16_t VICII::GetVicFirstDisplayLineNtsc()
 {
     return FirstDisplayLineNTSC;
 }
 
-int VICII::GetVicLastDisplayLineNtsc()
+uint16_t VICII::GetVicLastDisplayLineNtsc()
 {
     return LastDisplayLineNTSC;
 }
