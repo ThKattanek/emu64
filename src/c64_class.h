@@ -45,7 +45,7 @@ using namespace std::tr1::placeholders;
 #define MAX_C64_SCREEN_TITLE_LENGTH 100
 
 #define FloppyAnzahl 4
-#define MAX_BREAK_GROUPS 256
+#define MAX_BREAK_GROUPS 255
 #define MAX_JOYSTICKS 16
 #define MAX_VJOYS 16
 
@@ -209,8 +209,8 @@ public:
     int GetVicFirstDisplayLineNtsc(void);
     int GetVicLastDisplayLineNtsc(void);
 
-    int             AktWindowXW;
-    int             AktWindowYW;
+    uint16_t        AktWindowXW;
+    uint16_t        AktWindowYW;
     int             AktWindowColorBits;
     uint16_t        AktC64ScreenXW;
     uint16_t        AktC64ScreenYW;
@@ -241,7 +241,7 @@ public:
     int             win_size_w;
     int             win_size_h;
 
-    SDL_AudioSpec want,have;
+    SDL_AudioSpec   want,have;
 
     SDL_Surface     *C64Screen;
     SDL_Surface     *C64ScreenIcon;
@@ -349,7 +349,7 @@ private:
     void CalcDistortionGrid(void);
     void VicRefresh(uint8_t *vic_puffer);
     void CheckKeys(void);
-    int DisAss(FILE *file, int pc, bool line_draw, int source);
+    uint16_t DisAss(FILE *file, uint16_t pc, bool line_draw, int source);
     bool CheckBreakpoints(void);
     void WriteSidIO(uint16_t adresse, uint8_t wert);
     uint8_t ReadSidIO(uint16_t adresse);
@@ -451,34 +451,34 @@ private:
 
     ////////////////////////////////////////////////////////////
 
-    bool C64ResetReady;
-    bool FloppyResetReady[FloppyAnzahl];
+    bool        C64ResetReady;
+    bool        FloppyResetReady[FloppyAnzahl];
 
-    char	ComandZeile[256];
-    int		ComandZeileSize;
-    int		ComandZeileCount;
-    bool	ComandZeileStatus;
-    bool	ComandZeileCountS;
+    char        ComandZeile[256];
+    int         ComandZeileSize;
+    int         ComandZeileCount;
+    bool        ComandZeileStatus;
+    bool        ComandZeileCountS;
 
-    int     CycleCounter;
-    int     LimitCylesCounter;      // Dieser Counter wird wenn er > 0 ist bei jeden Zyklus um 1 runtergezählt
+    uint32_t    CycleCounter;
+    int         LimitCylesCounter;      // Dieser Counter wird wenn er > 0 ist bei jeden Zyklus um 1 runtergezählt
                                     // Wechselt er von 1 auf 0 wird die Emulation angehalten und ein Ergeignis ausgelöst
-    bool    DebugMode;
-    bool	DebugAnimation;
-    float_t AnimationSpeedAdd;
-    float_t	AnimationSpeedCounter;
-    bool	OneZyk;
-    bool	OneOpc;
-    int     OneOpcSource;
+    bool        DebugMode;
+    bool        DebugAnimation;
+    float_t     AnimationSpeedAdd;
+    float_t     AnimationSpeedCounter;
+    bool        OneZyk;
+    bool        OneOpc;
+    int         OneOpcSource;
 
-    bool    WarpMode;
+    bool        WarpMode;
 
-    bool    MouseIsHidden;
-    int     MouseHiddenCounter;
-    int     MouseHiddenTime;
+    bool        MouseIsHidden;
+    int         MouseHiddenCounter;
+    int         MouseHiddenTime;
 
-    bool    IsKeyMapRec;
-    uint8_t RecMatrixCode;
+    bool        IsKeyMapRec;
+    uint8_t     RecMatrixCode;
 };
 
 #endif // C64CLASS_H

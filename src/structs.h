@@ -8,13 +8,15 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.11.2018                //
+// Letzte Änderung am 29.05.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #ifndef STRUCTS_H
 #define STRUCTS_H
+
+#include <cstdint>
 
 #define REG_MASK_ALL 255
 #define REG_MASK_PC 1
@@ -171,7 +173,7 @@ struct IREG_STRUCT
     bool            RESET;
     bool            CpuWait;
     bool            JAMFlag;
-    unsigned long   CycleCounter;
+    uint32_t        CycleCounter;
     bool            EXROM;
     bool            GAME;
 };

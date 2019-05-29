@@ -28,10 +28,13 @@ int SDLThreadWarp(void *userdat);
 
 #define AudioSampleRate 44100
 
+//#define C64Takt 982800  // Genau 50Hz
+#define C64Takt 985248  // 50,124542Hz (Original C64 PAL)
+
 #ifdef _WIN32
     #define AudioPufferSize (882)    // 882 bei 44.100 Khz
 #else
-    #define AudioPufferSize (882*2)    // 882 bei 44.100 Khz
+    #define AudioPufferSize (880*2)    // 882 bei 44.100 Khz
 #endif
 
 #define RecPollingWaitStart 20
@@ -261,7 +264,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     crt = new CRTClass();
     reu = new REUClass();
     geo = new GEORAMClass();
-    tape = new TAPE1530(have.freq,have.samples);
+    tape = new TAPE1530(have.freq,have.samples,C64Takt);
 
     vic_puffer = vic->VideoPuffer;
 
@@ -428,7 +431,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     SIDVolume = 1.0;
 
     sid1->RESET = &RESET;
-    sid1->SetC64Zyklen(982800);     // PAL 63*312*50 = 982800
+    sid1->SetC64Zyklen(C64Takt);     // PAL 63*312*50 = 982800
     sid1->SetChipType(MOS_8580);
     sid1->SoundOutputEnable = true;
     sid1->CycleExact = true;
@@ -437,7 +440,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     sid1->SetPotXY(POT_X, POT_Y);
 
     sid2->RESET = &RESET;
-    sid2->SetC64Zyklen(982800);     // PAL 63*312*50 = 982800
+    sid2->SetC64Zyklen(C64Takt);     // PAL 63*312*50 = 982800
     sid2->SetChipType(MOS_8580);
     sid2->SoundOutputEnable = true;
     sid2->CycleExact = true;
@@ -843,7 +846,7 @@ void C64Class::WarpModeLoop(void)
 
 void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 {
-    uint16_t* puffer = reinterpret_cast<uint16_t*>(stream);
+    int16_t* puffer = reinterpret_cast<int16_t*>(stream);
     static uint32_t counter_plus=0;
 
     sid1->SoundBufferPos = 0;
@@ -983,8 +986,8 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 int j=0;
                 for(int i=0; i<(laenge/2); i+=2)
                 {
-                    puffer[i] = static_cast<uint16_t>(sid1->SoundBuffer[j] * SIDVolume);
-                    puffer[i+1] = static_cast<uint16_t>(sid2->SoundBuffer[j] * SIDVolume);
+                    puffer[i] = static_cast<int16_t>(sid1->SoundBuffer[j] * SIDVolume);
+                    puffer[i+1] = static_cast<int16_t>(sid2->SoundBuffer[j] * SIDVolume);
                     j++;
                 }
             }
@@ -993,7 +996,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 int j=0;
                 for(int i=0; i<(laenge/2); i+=2)
                 {
-                    puffer[i] = puffer[i+1] = static_cast<uint16_t>((static_cast<uint16_t>(sid1->SoundBuffer[j]) + static_cast<uint16_t>(sid2->SoundBuffer[j])) * SIDVolume * 0.75f);
+                    puffer[i] = puffer[i+1] = static_cast<int16_t>(static_cast<float>(sid1->SoundBuffer[j] + sid2->SoundBuffer[j]) * SIDVolume * 0.75f);
                     j++;
                 }
             }
@@ -1003,7 +1006,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             int j=0;
             for(int i=0; i<(laenge/2); i+=2)
             {
-                puffer[i] = puffer[i+1] = static_cast<uint16_t>(sid1->SoundBuffer[j] * SIDVolume);
+                puffer[i] = puffer[i+1] = static_cast<int16_t>(sid1->SoundBuffer[j] * SIDVolume);
                 j++;
             }
         }
@@ -1012,15 +1015,13 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
         VideoCapture->FillSourceAudioBuffer(puffer, laenge/2);
 
         /// Floppysound dazu mixen ///
-
         for(int i=0; i< FloppyAnzahl; i++)
         {
-            if(floppy[i]->GetEnableFloppySound()) SDL_MixAudio((uint8_t*)puffer,(uint8_t*)floppy[i]->GetSoundBuffer(),laenge,255);
+            if(floppy[i]->GetEnableFloppySound()) SDL_MixAudio(reinterpret_cast<uint8_t*>(puffer),reinterpret_cast<uint8_t*>(floppy[i]->GetSoundBuffer()),static_cast<uint32_t>(laenge),255);
         }
 
         /// Tapesound dazu mixen ///
-
-        SDL_MixAudio((uint8_t*)puffer,(uint8_t*)tape->GetSoundBuffer(),laenge,255);
+        SDL_MixAudio(reinterpret_cast<uint8_t*>(puffer),reinterpret_cast<uint8_t*>(tape->GetSoundBuffer()),static_cast<uint32_t>(laenge),255);
     }
     else
     {
@@ -1211,7 +1212,7 @@ loop_wait_next_opc:
         }
 
         // Audiopuffer mit 0 füllen ();
-        memset(puffer,0,laenge);
+        memset(puffer,0,static_cast<size_t>(laenge));
     }
 }
 
@@ -1345,18 +1346,17 @@ void C64Class::LoadPRGFromD64(uint8_t floppy_nr, char *c64_filename, int command
 
 void C64Class::SetFloppyWriteProtect(uint8_t floppy_nr, bool status)
 {
-    if(floppy_nr < 0 || floppy_nr > 3) return;
-
-    floppy[floppy_nr]->SetWriteProtect(status);
+    if(floppy_nr < 4)
+        floppy[floppy_nr]->SetWriteProtect(status);
 }
 
 void C64Class::SetCommandLine(char *c64_command)
 {
     strcpy(ComandZeile,c64_command);
-    ComandZeileSize=(int)strlen(ComandZeile);
-    ComandZeileCount=0;
-    ComandZeileStatus=true;
-    ComandZeileCountS=true;
+    ComandZeileSize = static_cast<int>(strlen(ComandZeile));
+    ComandZeileCount = 0;
+    ComandZeileStatus = true;
+    ComandZeileCountS = true;
 }
 
 void C64Class::KillCommandLine(void)
@@ -1395,7 +1395,7 @@ void C64Class::SetGrafikModi(bool colbits32, bool doublesize, bool pal_enable, b
     char str00[255];
     sprintf(str00,">>   32Bit = %d\n>>   Doublesize = %d\n>>   PAL = %d\n>>   Filter = %d\n>>   FullResXW = %d\n>>   FullResrYW = %d\n",ColBits32,DoubleSize,PalEnable,FilterEnable,FullResXW,FullResYW);
 
-    LogText((char*)">> Grafikmodus wurde gesetzt:\n");
+    LogText(const_cast<char*>(">> Grafikmodus wurde gesetzt:\n"));
     LogText(str00);
 }
 
@@ -1432,9 +1432,6 @@ void C64Class::InitGrafik(void)
 
     AktWindowXW = AktC64ScreenXW = C64ScreenXW;
     AktWindowYW = AktC64ScreenYW = vic->GetAktVicDisplayLastLine() - vic->GetAktVicDisplayFirstLine();
-
-    //AktWindowXW = AktC64ScreenXW = C64ScreenXW;
-    //AktWindowYW = AktC64ScreenYW = C64ScreenYW;
 
     if(DoubleSize)
     {
@@ -1638,7 +1635,7 @@ void C64Class::DrawC64Screen(void)
     }
     else
     {
-        if(((float)AktWindowXW / (float)AktWindowYW) >= C64ScreenAspectRatio)
+        if((static_cast<float>(AktWindowXW) / static_cast<float>(AktWindowYW)) >= C64ScreenAspectRatio)
         {
             scale_y = 1.0f;
             int xw = int(AktWindowYW * C64ScreenAspectRatio);
@@ -1678,13 +1675,13 @@ void C64Class::DrawC64Screen(void)
         else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
         glBegin(GL_QUADS);
         glTexCoord2i(1,0);
-        glVertex3f(0.3,1,0.0);
+        glVertex3f(0.3f,1.0f,0.0f);
         glTexCoord2i(1,1);
-        glVertex3f(0.3,0.1,0);
+        glVertex3f(0.3f,0.1f,0.0f);
         glTexCoord2i(0,1);
-        glVertex3f(-0.3,0.1,0);
+        glVertex3f(-0.3f,0.1f,0.0f);
         glTexCoord2i(0,0);
-        glVertex3f(-0.3,1,0);
+        glVertex3f(-0.3f,1.0f,0.0f);
         glEnd();
 
         /// Nach Unten ///
@@ -1692,13 +1689,13 @@ void C64Class::DrawC64Screen(void)
         else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
         glBegin(GL_QUADS);
         glTexCoord2i(1,0);
-        glVertex3f(0.3,-1,0.0);
+        glVertex3f(0.3f,-1.0f,0.0f);
         glTexCoord2i(1,1);
-        glVertex3f(0.3,-0.1,0);
+        glVertex3f(0.3f,-0.1f,0.0f);
         glTexCoord2i(0,1);
-        glVertex3f(-0.3,-0.1,0);
+        glVertex3f(-0.3f,-0.1f,0.0f);
         glTexCoord2i(0,0);
-        glVertex3f(-0.3,-1,0);
+        glVertex3f(-0.3f,-1.0f,0.0f);
         glEnd();
 
         /// Nach Links ///
@@ -1706,13 +1703,13 @@ void C64Class::DrawC64Screen(void)
         else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
         glBegin(GL_QUADS);
         glTexCoord2i(1,0);
-        glVertex3f(-0.75,-0.4,0);
+        glVertex3f(-0.75f,-0.4f,0.0f);
         glTexCoord2i(1,1);
-        glVertex3f(-0.08,-0.4,0.0);
+        glVertex3f(-0.08f,-0.4f,0.0f);
         glTexCoord2i(0,1);
-        glVertex3f(-0.08,0.4,0);
+        glVertex3f(-0.08f,0.4f,0.0f);
         glTexCoord2i(0,0);
-        glVertex3f(-0.75,0.4,0);
+        glVertex3f(-0.75f,0.4f,0.0f);
         glEnd();
 
         /// Nach Rechts ///
@@ -1720,13 +1717,13 @@ void C64Class::DrawC64Screen(void)
         else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
         glBegin(GL_QUADS);
         glTexCoord2i(1,0);
-        glVertex3f(0.75,-0.4,0);
+        glVertex3f(0.75f,-0.4f,0.0f);
         glTexCoord2i(1,1);
-        glVertex3f(0.08,-0.4,0.0);
+        glVertex3f(0.08f,-0.4f,0.0f);
         glTexCoord2i(0,1);
-        glVertex3f(0.08,0.4,0);
+        glVertex3f(0.08f,0.4f,0.0f);
         glTexCoord2i(0,0);
-        glVertex3f(0.75,0.4,0);
+        glVertex3f(0.75f,0.4f,0.0f);
         glEnd();
 
         /// Fire ///
@@ -1734,13 +1731,13 @@ void C64Class::DrawC64Screen(void)
         else glBindTexture(GL_TEXTURE_2D,Kreis0Texture);
         glBegin(GL_QUADS);
         glTexCoord2i(1,0);
-        glVertex3f(0.11,-0.15,0);
+        glVertex3f(0.11f,-0.15f,0.0f);
         glTexCoord2i(1,1);
-        glVertex3f(0.11,0.15,0.0);
+        glVertex3f(0.11f,0.15f,0.0f);
         glTexCoord2i(0,1);
-        glVertex3f(-0.11,0.15,0);
+        glVertex3f(-0.11f,0.15f,0.0f);
         glTexCoord2i(0,0);
-        glVertex3f(-0.11,-0.15,0);
+        glVertex3f(-0.11f,-0.15f,0.0f);
         glEnd();
     }
 
@@ -1765,7 +1762,7 @@ void C64Class::SetFullscreenAspectRatio(bool enabled)
 void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 {
     static bool joy_center_flag = true;
-    static char joy_axis_tbl[5] = {1,1,0,0,(char)-1};
+    static char joy_axis_tbl[5] = {1,1,0,0,-1};
 
     SDL_Keymod keymod;
 
@@ -1777,8 +1774,8 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
         {
             case SDL_WINDOWEVENT_RESIZED:
 
-                AktWindowXW = event->window.data1;
-                AktWindowYW = event->window.data2;
+                AktWindowXW = static_cast<uint16_t>(event->window.data1);
+                AktWindowYW = static_cast<uint16_t>(event->window.data2);
                 glViewport(0,0,AktWindowXW,AktWindowYW);
                 glMatrixMode(GL_PROJECTION);
                 glOrtho(0,AktWindowXW,AktWindowYW,0,-1,1);
@@ -1796,7 +1793,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             if((RecJoyMapping == true) && (event->jbutton.type == SDL_JOYBUTTONDOWN))
             {
                 VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_BUTTON;
-                VJoys[RecJoySlotNr].JoyIndex[RecJoyMappingPos] = event->jbutton.which;
+                VJoys[RecJoySlotNr].JoyIndex[RecJoyMappingPos] = static_cast<uint8_t>(event->jbutton.which);
                 VJoys[RecJoySlotNr].ButtonNr[RecJoyMappingPos] = event->jbutton.button;
             }
             else if((RecJoyMapping == true) && (event->jbutton.type == SDL_JOYBUTTONUP) && (RecPollingWait == false))
@@ -1856,7 +1853,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                 if(event->jhat.value > 0)
                 {
                     VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_HAT;
-                    VJoys[RecJoySlotNr].JoyIndex[RecJoyMappingPos] = event->jhat.which;
+                    VJoys[RecJoySlotNr].JoyIndex[RecJoyMappingPos] = static_cast<uint8_t>(event->jhat.which);
                     VJoys[RecJoySlotNr].HatNr[RecJoyMappingPos] = event->jhat.hat;
                     VJoys[RecJoySlotNr].HatValue[RecJoyMappingPos] = event->jhat.value;
                 }
@@ -1922,7 +1919,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                     joy_center_flag = false;
 
                     VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_AXIS;
-                    VJoys[RecJoySlotNr].JoyIndex[RecJoyMappingPos] = event->jaxis.which;
+                    VJoys[RecJoySlotNr].JoyIndex[RecJoyMappingPos] = static_cast<uint8_t>(event->jaxis.which);
                     VJoys[RecJoySlotNr].AxisNr[RecJoyMappingPos] = event->jaxis.axis;
                     if(event->jaxis.value > 0) VJoys[RecJoySlotNr].AxisValue[RecJoyMappingPos] = 0;
                     else VJoys[RecJoySlotNr].AxisValue[RecJoyMappingPos] = 1;
@@ -2057,7 +2054,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             if(RecJoyMapping == true)
             {
                 VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_KEY;
-                VJoys[RecJoySlotNr].KeyDown[RecJoyMappingPos] = event->key.keysym.scancode;
+                VJoys[RecJoySlotNr].KeyDown[RecJoyMappingPos] = static_cast<uint8_t>(event->key.keysym.scancode);
             }
             else
             {
@@ -2138,7 +2135,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             if(RecJoyMapping == true)
             {
                 VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_KEY;
-                VJoys[RecJoySlotNr].KeyUp[RecJoyMappingPos] = event->key.keysym.scancode;
+                VJoys[RecJoySlotNr].KeyUp[RecJoyMappingPos] = static_cast<uint8_t>(event->key.keysym.scancode);
 
                 RecJoyMappingPos++;
                 if(RecJoyMappingPos == 5)
@@ -2266,8 +2263,8 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
         if(Mouse1351Enable)
         {
-            MouseXRel += (short)event->motion.xrel;
-            MouseYRel += (short)event->motion.yrel;
+            MouseXRel += event->motion.xrel;
+            MouseYRel += event->motion.yrel;
         }
 
         break;
@@ -2368,7 +2365,9 @@ void C64Class::SetTapeSoundVolume(float volume)
 
 void C64Class::SetC64Speed(int speed)
 {
-    sid1->SetC64Zyklen(985248.f*(float)speed/100.f);
+    sid1->SetC64Zyklen(C64Takt*(speed/100.f));
+    sid2->SetC64Zyklen(C64Takt*(speed/100.f));
+    tape->SetC64Zyklen(C64Takt*(speed/100.f));
 }
 
 void C64Class::EnableWarpMode(bool enabled)
@@ -2398,7 +2397,7 @@ void C64Class::EnableWarpMode(bool enabled)
 int SDLThreadLoad(void *userdat)
 {
     uint16_t PRGStartAdresse;
-    C64Class *c64 = (C64Class*)userdat;
+    C64Class *c64 = static_cast<C64Class*>(userdat);
 
     switch(c64->AutoLoadMode)
     {
@@ -2427,12 +2426,12 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
 {
     char EXT[4];
 
-    int len = (int)strlen(filename);
+    size_t len = strlen(filename);
     strcpy(EXT,filename+len-3);
 
-    EXT[0]=toupper(EXT[0]);
-    EXT[1]=toupper(EXT[1]);
-    EXT[2]=toupper(EXT[2]);
+    EXT[0]=static_cast<char>(toupper(EXT[0]));
+    EXT[1]=static_cast<char>(toupper(EXT[1]));
+    EXT[2]=static_cast<char>(toupper(EXT[2]));
 
     if(0==strcmp("D64",EXT))
     {
@@ -2522,32 +2521,32 @@ int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
     FILE *file;
     char EXT[4];
 
-    int len = (int)strlen(filename);
+    size_t len = strlen(filename);
     strcpy(EXT,filename+len-3);
 
-    EXT[0]=toupper(EXT[0]);
-    EXT[1]=toupper(EXT[1]);
-    EXT[2]=toupper(EXT[2]);
+    EXT[0]=static_cast<char>(toupper(EXT[0]));
+    EXT[1]=static_cast<char>(toupper(EXT[1]));
+    EXT[2]=static_cast<char>(toupper(EXT[2]));
 
     char str00[256];
 
     if(0==strcmp("PRG",EXT) || 0==strcmp("C64",EXT))
     {
-        LogText((char*)">> PRG laden: ");
+        LogText(const_cast<char*>(">> PRG laden: "));
         LogText(filename);
-        LogText((char*)"\n");
+        LogText(const_cast<char*>("\n"));
 
         uint16_t StartAdresse;
-        int reading_bytes;
+        size_t reading_bytes;
         uint8_t temp[2];
         file = fopen (filename, "rb");
         if (file == nullptr)
         {
-            LogText((char*)"<< ERROR: Datei konnte nicht geöffnet werden");
+            LogText(const_cast<char*>("<< ERROR: Datei konnte nicht geöffnet werden"));
             return 0x01;
         }
         reading_bytes = fread (&temp,1,2,file);
-        StartAdresse=temp[0]|(temp[1]<<8);
+        StartAdresse = static_cast<uint16_t>(temp[0]|(temp[1]<<8));
         if(ret_startadresse != nullptr) *ret_startadresse = StartAdresse;
 
         reading_bytes=fread (RAM+StartAdresse,1,0xFFFF-StartAdresse,file);
@@ -2574,12 +2573,12 @@ int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
 
     if(0==strcmp("T64",EXT))
     {
-        LogText((char*)">> T64 laden: ");
+        LogText(const_cast<char*>(">> T64 laden: "));
         LogText(filename);
-        LogText((char*)"\n");
+        LogText(const_cast<char*>("\n"));
 
         char Kennung[32];
-        int reading_bytes;
+        size_t reading_bytes;
         uint16_t T64Entries;
         uint16_t StartAdresse;
         uint16_t EndAdresse;
@@ -2588,7 +2587,7 @@ int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
         file = fopen (filename, "rb");
         if (file == nullptr)
         {
-            LogText((char*)"<< ERROR: Datei konnte nicht geöffnet werden");
+            LogText(const_cast<char*>("<< ERROR: Datei konnte nicht geöffnet werden"));
                 return 0x01;
         }
 
@@ -2641,10 +2640,10 @@ int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
         RAM[0x2B] = 0x01;
         RAM[0x2C] = 0x08;
 
-        RAM[0x2D] = (uint8_t)EndAdresse;
-        RAM[0x2E] = (uint8_t)(EndAdresse>>8);
-        RAM[0xAE] = (uint8_t)EndAdresse;
-        RAM[0xAF] = (uint8_t)(EndAdresse>>8);
+        RAM[0x2D] = static_cast<uint8_t>(EndAdresse);
+        RAM[0x2E] = static_cast<uint8_t>(EndAdresse>>8);
+        RAM[0xAE] = static_cast<uint8_t>(EndAdresse);
+        RAM[0xAF] = static_cast<uint8_t>(EndAdresse>>8);
 
         sprintf(str00,">>   SartAdresse: $%4.4X(%d)",StartAdresse,StartAdresse);
         LogText(str00);
@@ -2656,18 +2655,18 @@ int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
 
     if(0==strcmp("P00",EXT))
     {
-        LogText((char*)">> P00 laden: ");
+        LogText(const_cast<char*>(">> P00 laden: "));
         LogText(filename);
-        LogText((char*)"\n");
+        LogText(const_cast<char*>("\n"));
 
         char Kennung[8];
         uint16_t StartAdresse;
-        int reading_bytes;
+        size_t reading_bytes;
         uint8_t temp[2];
         file = fopen (filename, "rb");
         if (file == nullptr)
         {
-            LogText((char*)"<< ERROR: Datei konnte nicht geöffnet werden");
+            LogText(const_cast<char*>("<< ERROR: Datei konnte nicht geöffnet werden"));
                 return 0x01;
         }
 
@@ -2682,7 +2681,7 @@ int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
         fseek(file,0x1A,SEEK_SET);
 
         reading_bytes = fread (&temp,1,2,file);
-        StartAdresse=temp[0]|(temp[1]<<8);
+        StartAdresse = static_cast<uint16_t>(temp[0]|(temp[1]<<8));
         if(ret_startadresse != nullptr) *ret_startadresse = StartAdresse;
 
         reading_bytes=fread (RAM+StartAdresse,1,0xFFFF,file);
@@ -2693,11 +2692,11 @@ int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
         sprintf(str00,">>   SartAdresse: $%4.4X(%d)",StartAdresse,StartAdresse);
         LogText(str00);
 
-        StartAdresse+=(uint16_t)reading_bytes;
-        RAM[0x2D] = (uint8_t)StartAdresse;
-        RAM[0x2E] = (uint8_t)(StartAdresse>>8);
-        RAM[0xAE] = (uint8_t)StartAdresse;
-        RAM[0xAF] = (uint8_t)(StartAdresse>>8);
+        StartAdresse += static_cast<uint16_t>(reading_bytes);
+        RAM[0x2D] = static_cast<uint8_t>(StartAdresse);
+        RAM[0x2E] = static_cast<uint8_t>(StartAdresse>>8);
+        RAM[0xAE] = static_cast<uint8_t>(StartAdresse);
+        RAM[0xAF] = static_cast<uint8_t>(StartAdresse>>8);
 
         fclose(file);
 
@@ -2882,7 +2881,7 @@ void C64Class::SetDebugAnimation(bool status)
 void C64Class::SetDebugAnimationSpeed(int cycle_sek)
 {
     AnimationSpeedCounter = 0;
-    AnimationSpeedAdd = (double)AudioPufferSize/(double)AudioSampleRate*(double)cycle_sek;
+    AnimationSpeedAdd = static_cast<float>(AudioPufferSize) / static_cast<float>(AudioSampleRate) * static_cast<float>(cycle_sek);
 }
 
 void C64Class::GetC64CpuReg(REG_STRUCT *reg, IREG_STRUCT *ireg)
@@ -2902,11 +2901,11 @@ void C64Class::GetVicReg(VIC_STRUCT *vic_reg)
 
 void C64Class::GetIECStatus(IEC_STRUCT *iec)
 {
-    iec->ATN_OUT = (bool)!!(C64IEC & 16);
-    iec->CLOCK_OUT = (bool)!!(C64IEC & 64);
-    iec->DATA_OUT = (bool)!!(C64IEC & 128);
-    iec->CLOCK_IN = (bool)!!(FloppyIEC & 64);
-    iec->DATA_IN = (bool)!!(FloppyIEC & 128);
+    iec->ATN_OUT = !!(C64IEC & 16);
+    iec->CLOCK_OUT = !!(C64IEC & 64);
+    iec->DATA_OUT = !!(C64IEC & 128);
+    iec->CLOCK_IN = !!(FloppyIEC & 64);
+    iec->DATA_IN = !!(FloppyIEC & 128);
 }
 
 int C64Class::AddBreakGroup(void)
@@ -3137,7 +3136,7 @@ bool C64Class::ExportRAW(char *filename, uint16_t start_adresse, uint16_t end_ad
     }
     else RAM = mmu->GetRAMPointer();
 
-    if(RAM == 0) return false;
+    if(RAM == nullptr) return false;
 
     file = fopen (filename, "wb");
     if (file == nullptr)
@@ -3160,24 +3159,24 @@ bool C64Class::ExportASM(char *filename, uint16_t start_adresse, uint16_t end_ad
         return false;
     }
 
-    char *source_str = (char*)"";
+    char *source_str = const_cast<char*>("");
 
     switch(source)
     {
     case 0:
-        source_str = (char*)"C64";
+        source_str = const_cast<char*>("C64");
         break;
     case 1:
-        source_str = (char*)"Floppy #08";
+        source_str = const_cast<char*>("Floppy #08");
         break;
     case 2:
-        source_str = (char*)"Floppy #09";
+        source_str = const_cast<char*>("Floppy #09");
         break;
     case 3:
-        source_str = (char*)"Floppy #10";
+        source_str = const_cast<char*>("Floppy #10");
         break;
     case 4:
-        source_str = (char*)"Floppy #11";
+        source_str = const_cast<char*>("Floppy #11");
         break;
     }
 
@@ -3187,7 +3186,7 @@ bool C64Class::ExportASM(char *filename, uint16_t start_adresse, uint16_t end_ad
     fprintf(file,"\n");
     fprintf(file,"\n");
 
-    int pc = start_adresse;
+    uint16_t pc = start_adresse;
 L10:
     pc = DisAss(file,pc,true,source);
     if(pc < end_adresse) goto L10;
@@ -3390,7 +3389,7 @@ int C64Class::GetVicLastDisplayLineNtsc(void)
     return vic->GetVicLastDisplayLineNtsc();
 }
 
-int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)
+uint16_t C64Class::DisAss(FILE *file, uint16_t PC, bool line_draw, int source)
 {
     char Ausgabe[36];Ausgabe[0]=0;
     char Adresse[7];Adresse[0]=0;
@@ -3484,10 +3483,11 @@ int C64Class::DisAss(FILE *file, int PC, bool line_draw, int source)
         sprintf(Anhang,"($%2.2X),Y",ram1);
         PC+=2;
         break;
-    case 9:
+    case 9:                                 // Branch
         sprintf(Speicher,"$%2.2X $%2.2X      ",ram0,ram1);
-        B=ram1;
-        A=(PC+2)+B;
+        B = static_cast<char>(ram1);
+        A = static_cast<uint16_t>(PC + 2 + B);
+
         sprintf(Anhang,"$%4.4X",A);
         PC+=2;
         break;
@@ -3678,7 +3678,6 @@ void C64Class::WriteIO1(uint16_t adresse, uint8_t wert)
     case 3:	// GEORAM
         geo->WriteIO1(adresse,wert);
         break;
-
     default:
         break;
     }
@@ -3712,21 +3711,15 @@ uint8_t C64Class::ReadIO1(uint16_t adresse)
     {
     case 0: // NO_MODUL
         return 0;
-        break;
     case 1: // CRT
         return crt->ReadIO1(adresse);
-        break;
     case 2: // REU
         return reu->ReadIO1(adresse);
-        break;
     case 3: // GEORAM
         return geo->ReadIO1(adresse);
-        break;
     default:
         return 0;
-        break;
     }
-    return 0;
 }
 
 /// $DF00
@@ -3737,21 +3730,15 @@ uint8_t C64Class::ReadIO2(uint16_t adresse)
     {
     case 0: // NO_MODUL
         return 0;
-        break;
     case 1: // CRT
         return crt->ReadIO2(adresse);
-        break;
     case 2: // REU
         return reu->ReadIO2(adresse);
-        break;
     case 3: // GEORAM
         return geo->ReadIO2(adresse);
-        break;
     default:
         return 0;
-        break;
     }
-    return 0;
 }
 
 void C64Class::JoystickNewScan(void)
@@ -3851,18 +3838,18 @@ void C64Class::OpenSDLJoystick(void)
     {
         SDLJoystickIsOpen = false;
         SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-        LogText((char*)">> SDL Subsystem Joystick wurde geschlossen\n");
+        LogText(const_cast<char*>(">> SDL Subsystem Joystick wurde geschlossen\n"));
     }
 
     if(SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
     {
         SDLJoystickIsOpen = false;
-        LogText((char*)"<< ERROR: SDL Subsystem Joystick konnte nicht geöffnet werden\n");
+        LogText(const_cast<char*>("<< ERROR: SDL Subsystem Joystick konnte nicht geöffnet werden\n"));
     }
     else
     {
         SDLJoystickIsOpen = true;
-        LogText((char*)">> SDL Subsytem Joystick wurde erfolgreich geoeffnet\n");
+        LogText(const_cast<char*>(">> SDL Subsytem Joystick wurde erfolgreich geoeffnet\n"));
         JoystickAnzahl = SDL_NumJoysticks();
         if(JoystickAnzahl > MAX_JOYSTICKS) JoystickAnzahl = MAX_JOYSTICKS;
 
@@ -3870,10 +3857,10 @@ void C64Class::OpenSDLJoystick(void)
         switch(JoystickAnzahl)
         {
         case 0:
-            LogText((char*)"<< SDL konnte keinen Joystick/Gamepad erkennen\n");
+            LogText(const_cast<char*>("<< SDL konnte keinen Joystick/Gamepad erkennen\n"));
             break;
         case 1:
-            LogText((char*)">> SDL konnte 1 Joystick/Gamepad erkennen\n");
+            LogText(const_cast<char*>(">> SDL konnte 1 Joystick/Gamepad erkennen\n"));
             break;
         default:
             sprintf(str00,">> SDL konnte %d Joysticks/Gamepads erkennen\n",JoystickAnzahl);
@@ -3909,7 +3896,7 @@ void C64Class::CloseSDLJoystick(void)
     {
         SDLJoystickIsOpen = false;
         SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-        LogText((char*)">> SDL Subsystem Joystick wurde geschlossen\n");
+        LogText(const_cast<char*>(">> SDL Subsystem Joystick wurde geschlossen\n"));
     }
     StopJoystickUpdate = true;
 }
@@ -3980,11 +3967,11 @@ void C64Class::SwapRBSurface(SDL_Surface *surface)
     SDL_LockSurface(surface);
     for(int y=0; y<yw; y++)
     {
-        Uint32* data = (Uint32*)surface->pixels+(surface->pitch/4)*y;
+        uint32_t* data = static_cast<uint32_t*>(surface->pixels) + (surface->pitch/4)*y;
         for(int x=0; x<xw; x++)
         {
             // R <--> B
-            data[x] = (data[x] & 0xff00ff00) | (data[x]>>16)&0xff | (data[x]<<16)&0xff0000;
+            data[x] = (data[x] & 0xff00ff00) | ((data[x]>>16) & 0xff) | ((data[x]<<16) & 0xff0000);
         }
     }
     SDL_UnlockSurface(surface);
