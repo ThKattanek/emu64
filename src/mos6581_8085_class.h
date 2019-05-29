@@ -66,7 +66,7 @@ class MOS6581_8085
     void ChangeSampleRate(int samplerate,int puffersize);
     void Reset(void);
     void SetChipType(int type);
-    void SetC64Zyklen(double ZyklenSek);
+    void SetC64Zyklen(float ZyklenSek);
     void SetVoiceEnable(int nr, bool enable);
     void SetPotXY(unsigned char pot_x, unsigned char pot_y);
     bool OneZyklus(void);

@@ -166,7 +166,7 @@ void MOS6581_8085::SetChipType(int type)
     SetQ();
 }
 
-void MOS6581_8085::SetC64Zyklen(double C64ZyklenSek)
+void MOS6581_8085::SetC64Zyklen(float C64ZyklenSek)
 {
     this->C64ZyklenSek = C64ZyklenSek;
     FreqConvAddWert=((double)1.0)/((double)C64ZyklenSek/Samplerate);
