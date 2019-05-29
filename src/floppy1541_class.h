@@ -44,7 +44,7 @@ const unsigned char D64_SECTOR_GAP[4] = {12, 21, 16, 13}; // von GPZ Code überm
 
 #define D64 0
 #define G64 1
-#define MAX_BREAK_GROUPS 256
+#define MAX_BREAK_GROUPS 255
 
 #define DISK_CHANGE_STATE_COUNTS 4
 #define DISK_CHANGE_STATE_CYCLES 1000
