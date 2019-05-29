@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.01.2018                //
+// Letzte Änderung am 29.05.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -41,8 +41,9 @@ enum TAPE_IMAGE_TYP
 class TAPE1530
 {
 public:
-    TAPE1530(int samplerate, int puffersize);
+    TAPE1530(int samplerate, int puffersize, float cycles_per_second);
     ~TAPE1530();
+    void SetC64Zyklen(float cycles_per_second);
     bool LoadTapeImage(char* filename);
     bool RecordTapeImage(char* filename);
     void StopRecordImage();
@@ -67,6 +68,8 @@ private:
 
     FILE            *file;
     FILE            *recfile;
+
+    float           cycles_per_second;
 
     unsigned char   *TapeBuffer;
     unsigned int    TapeBufferSize;

@@ -8,22 +8,25 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.02.2018                //
+// Letzte Änderung am 29.05.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "tape1530_class.h"
 
-TAPE1530::TAPE1530(int samplerate, int puffersize)
+TAPE1530::TAPE1530(int samplerate, int puffersize, float cycles_per_second)
 {
     CPU_PORT = NULL;
 
+    this->cycles_per_second = cycles_per_second;
+
     Samplerate = (float)samplerate;
-    FreqConvAddWert = 1.0/(985248.0/Samplerate);
+    FreqConvAddWert = 1.0/(cycles_per_second/Samplerate);
     FreqConvCounter = 0.0;
 
-    PlayFrequenzFaktor = 4294967296.0 / 985248.0;     // 2^32 / Samplerate;
+    PlayFrequenzFaktor = 4294967296.0 / cycles_per_second;     // 2^32 / Samplerate;
+
     PlayCounter = 0;
     PlayAddWert = 0;
 
@@ -69,6 +72,13 @@ TAPE1530::~TAPE1530()
 {
     StopRecordImage();
     if(SoundBuffer != NULL) delete[] SoundBuffer;
+}
+
+void TAPE1530::SetC64Zyklen(float cycles_per_second)
+{
+    this->cycles_per_second = cycles_per_second;
+    FreqConvAddWert = 1.0/(cycles_per_second/Samplerate);
+    PlayFrequenzFaktor = 4294967296.0 / cycles_per_second;     // 2^32 / Samplerate;
 }
 
 bool TAPE1530::LoadTapeImage(char *filename)
@@ -223,7 +233,7 @@ bool TAPE1530::LoadTapeImage(char *filename)
         TapePosIsEnd = false;
 
         WaveCounter = 0.0f;
-        AddWaveWert = (double)WAVESampleRate / 985248.0f;
+        AddWaveWert = (double)WAVESampleRate / cycles_per_second;
 
         return true;
     }
@@ -472,7 +482,7 @@ void TAPE1530::OneCycle()
                     }
                     else WaitCounter = (TapeBuffer[TapeBufferPos++]<<3);
 
-                    float Frequenz = 1.0 / (WaitCounter / 985248.0);
+                    float Frequenz = 1.0 / (WaitCounter / cycles_per_second);
                     PlayCounter = 0;
                     PlayAddWert = (unsigned long)(Frequenz * PlayFrequenzFaktor);
 
@@ -664,7 +674,7 @@ unsigned int TAPE1530::GetCounter()
 {
     if((signed int)TapePosCycles < 0)
         TapePosCycles = 0;
-    float time = TapePosCycles / 985248.0;
+    float time = TapePosCycles / cycles_per_second;
 
     int time_sek = roundf(time);
     float conv_wert;
@@ -734,7 +744,7 @@ void TAPE1530::CalcTapeLenTime()
         else sum_cycles += (TapeBuffer[i++]<<3);
     }
 
-    TapeLenTime = sum_cycles / 985248.0;
+    TapeLenTime = sum_cycles / cycles_per_second;
 
     unsigned int TapeLenTimeInt = roundf(TapeLenTime);
 
