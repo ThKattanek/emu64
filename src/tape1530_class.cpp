@@ -391,8 +391,6 @@ void TAPE1530::OneCycle()
     static int WaveStatus;
     static int OldWaveStatus;
 
-    size_t reading_bytes;
-
     switch (TapeType)
     {
     case WAV:
@@ -411,7 +409,7 @@ void TAPE1530::OneCycle()
                         switch(WAVEBitPerSample)
                         {
                             case 8:
-                            reading_bytes = fread(&ReadByte,1,1,file);
+                            fread(&ReadByte,1,1,file);
                             if((i == WAVEDataChannel) || (WAVEChannels == 1))
                             {
                                 if(ReadByte < WAVELowPeek8Bit) WaveStatus = Low;
@@ -427,7 +425,7 @@ void TAPE1530::OneCycle()
                             break;
 
                             case 16:
-                            reading_bytes = fread(&ReadWord,1,2,file);
+                            fread(&ReadWord,1,2,file);
                             if((i == WAVEDataChannel) || (WAVEChannels == 1))
                             {
                                 ReadWord += 0x8000;
