@@ -652,12 +652,12 @@ int SDLThread(void *userdat)
 
 void C64Class::CalcDistortionGrid(void)
 {
-    float div = 2.0f / SUBDIVS_SCREEN;
+    float_t div = 2.0f / SUBDIVS_SCREEN;
     for(int y=0; y<SUBDIVS_SCREEN+1; y++)
         for(int x=0; x<SUBDIVS_SCREEN+1; x++)
         {
-            float X = x*div-1.0f;
-            float Y = y*div-1.0f;
+            float_t X = x*div-1.0f;
+            float_t Y = y*div-1.0f;
             DistortionGridPoints[y*(SUBDIVS_SCREEN+1)+x].y = X*X*(Distortion*Y)+Y;
             DistortionGridPoints[y*(SUBDIVS_SCREEN+1)+x].x = Y*Y*(Distortion*X)+X;
         }
@@ -996,7 +996,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 int j=0;
                 for(int i=0; i<(laenge/2); i+=2)
                 {
-                    puffer[i] = puffer[i+1] = static_cast<int16_t>(static_cast<float>(sid1->SoundBuffer[j] + sid2->SoundBuffer[j]) * SIDVolume * 0.75f);
+                    puffer[i] = puffer[i+1] = static_cast<int16_t>(static_cast<float_t>(sid1->SoundBuffer[j] + sid2->SoundBuffer[j]) * SIDVolume * 0.75f);
                     j++;
                 }
             }
@@ -1625,8 +1625,8 @@ void C64Class::DrawC64Screen(void)
     glTexSubImage2D(GL_TEXTURE_2D,0,0,0, AktC64ScreenXW, AktC64ScreenYW,GL_RGBA, GL_UNSIGNED_BYTE, C64Screen->pixels);
 
     /// Aspect Ratio berechnen
-    float scale_x;
-    float scale_y;
+    float_t scale_x;
+    float_t scale_y;
 
     if((EnableWindowAspectRatio == false && isFullscreen == false) || (EnableFullscreenAspectRatio == false && isFullscreen == true))
     {
@@ -1635,7 +1635,7 @@ void C64Class::DrawC64Screen(void)
     }
     else
     {
-        if((static_cast<float>(AktWindowXW) / static_cast<float>(AktWindowYW)) >= C64ScreenAspectRatio)
+        if((static_cast<float_t>(AktWindowXW) / static_cast<float_t>(AktWindowYW)) >= C64ScreenAspectRatio)
         {
             scale_y = 1.0f;
             int xw = int(AktWindowYW * C64ScreenAspectRatio);
@@ -2282,7 +2282,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
     }
 }
 
-void C64Class::SetDistortion(float value)
+void C64Class::SetDistortion(float_t value)
 {
     Distortion = value;
     CalcDistortionGrid();
@@ -2348,7 +2348,7 @@ uint32_t C64Class::GetTapeCounter(void)
     return tape->GetCounter();
 }
 
-float C64Class::GetTapeLenTime(void)
+float_t C64Class::GetTapeLenTime(void)
 {
     return tape->GetTapeLenTime();
 }
@@ -2358,7 +2358,7 @@ uint32_t C64Class::GetTapeLenCount(void)
     return tape->GetTapeLenCount();
 }
 
-void C64Class::SetTapeSoundVolume(float volume)
+void C64Class::SetTapeSoundVolume(float_t volume)
 {
     tape->SetTapeSoundVolume(volume);
 }
@@ -2881,7 +2881,7 @@ void C64Class::SetDebugAnimation(bool status)
 void C64Class::SetDebugAnimationSpeed(int cycle_sek)
 {
     AnimationSpeedCounter = 0;
-    AnimationSpeedAdd = static_cast<float>(AudioPufferSize) / static_cast<float>(AudioSampleRate) * static_cast<float>(cycle_sek);
+    AnimationSpeedAdd = static_cast<float_t>(AudioPufferSize) / static_cast<float_t>(AudioSampleRate) * static_cast<float_t>(cycle_sek);
 }
 
 void C64Class::GetC64CpuReg(REG_STRUCT *reg, IREG_STRUCT *ireg)
@@ -3285,7 +3285,7 @@ void C64Class::StopIECDump(void)
     IecVcdExport.Close();
 }
 
-void C64Class::SetSIDVolume(float volume)
+void C64Class::SetSIDVolume(float_t volume)
 {
     SIDVolume = volume;
 }

@@ -92,7 +92,7 @@ public:
     void AnalyzeSDLEvent(SDL_Event *event);
     void SetC64Speed(int speed);
     void EnableWarpMode(bool enabled);
-    void SetDistortion(float value);
+    void SetDistortion(float_t value);
     void SetMouseHiddenTime(int time);  // Time in ms // Bei 0 Wird der Cursor nicht mehr ausgeblendet
     void GetWindowPos(int *x, int *y);
     void SetWindowPos(int x, int y);
@@ -105,9 +105,9 @@ public:
     bool GetTapeMotorStatus(void);
     bool GetTapeRecordLedStatus(void);
     uint32_t GetTapeCounter(void);
-    float GetTapeLenTime(void);
+    float_t GetTapeLenTime(void);
     uint32_t GetTapeLenCount(void);
-    void SetTapeSoundVolume(float volume);
+    void SetTapeSoundVolume(float_t volume);
 
     void SoftReset(void);
     void HardReset(void);
@@ -185,7 +185,7 @@ public:
     bool StartIECDump(const char *filename);
     void StopIECDump(void);
 
-    void SetSIDVolume(float volume);    // Lautstärke der SID's (0.0f - 1.0f)
+    void SetSIDVolume(float_t volume);  // Lautstärke der SID's (0.0f - 1.0f)
     void SetFirstSidTyp(int sid_typ);   // SID Typ des 1. SID (MOS_6581 oder MOS_8580)
     void SetSecondSidTyp(int sid_typ);  // SID Typ des 2. SID (MOS_6581 oder MOS_8580)
     void EnableSecondSid(bool enable);  // 2. SID aktivieren
@@ -227,7 +227,7 @@ public:
     bool            HoldVicRefresh;
     bool            VicRefreshIsHold;
 
-    float           C64ScreenAspectRatio;
+    float_t         C64ScreenAspectRatio;
     bool            EnableWindowAspectRatio;
     bool            EnableFullscreenAspectRatio;
 
@@ -249,7 +249,7 @@ public:
     uint8_t         *C64ScreenBuffer;
     bool            IsC64ScreenObsolete;
     bool            DistortionEnable;
-    float           Distortion;
+    float_t         Distortion;
 
     /// Distortion (Verzzerung) ///
     POINT_STRUCT    DistortionGridPoints[(SUBDIVS_SCREEN+1)*(SUBDIVS_SCREEN+1)];
@@ -341,7 +341,7 @@ public:
     bool ExitScreenshotEnable;
     char ExitScreenshotFilename[1024];
 
-    float SIDVolume;
+    float_t SIDVolume;
 
     VideoCaptureClass *VideoCapture;
 
