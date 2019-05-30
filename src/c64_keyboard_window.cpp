@@ -217,7 +217,7 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
         {
             if(AKT_X_KEY == 0xFF || AKT_Y_KEY == 0xFF) return;
 
-            unsigned short C64Key = VK_TO_C64[AKT_Y_KEY][AKT_X_KEY];
+            uint16_t C64Key = VK_TO_C64[AKT_Y_KEY][AKT_X_KEY];
 
             //// RESTORE TASTE ---> NMI C64 ///
             if((C64Key & 0x0100) == 0x0100)
@@ -238,7 +238,9 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
 
         if((event->buttons() & Qt::RightButton) == Qt::RightButton)
         {
-            unsigned short C64Key = VK_TO_C64[AKT_Y_KEY][AKT_X_KEY];
+            if(AKT_X_KEY == 0xFF || AKT_Y_KEY == 0xFF) return;
+
+            uint16_t C64Key = VK_TO_C64[AKT_Y_KEY][AKT_X_KEY];
 
             if(VK_RAST[AKT_Y_KEY][AKT_X_KEY])
             {
