@@ -217,7 +217,7 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
         {
             if(AKT_X_KEY == 0xFF || AKT_Y_KEY == 0xFF) return;
 
-            uint16_t C64Key = VK_TO_C64[AKT_Y_KEY][AKT_X_KEY];
+            uint8_t C64Key = VK_TO_C64[AKT_Y_KEY][AKT_X_KEY];
 
             //// RESTORE TASTE ---> NMI C64 ///
             if((C64Key & 0x0100) == 0x0100)
@@ -227,21 +227,39 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
             }
             ///////////////////////////////////
 
-
             VK_RAST[AKT_Y_KEY][AKT_X_KEY] = false;
 
-            KeyMatrixToPB_RM[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
-            KeyMatrixToPB_LM[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
+            if(C64Key < 128)
+            {
+                KeyMatrixToPB_RM[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
+                KeyMatrixToPB_LM[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
 
-            KeyMatrixToPA_RM[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
-            KeyMatrixToPA_LM[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
+                KeyMatrixToPA_RM[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
+                KeyMatrixToPA_LM[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
+            }
+            else
+            {
+                C64Key &= ~128;
+                KeyMatrixToPB_RM[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
+                KeyMatrixToPB_LM[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
+
+                KeyMatrixToPA_RM[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
+                KeyMatrixToPA_LM[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
+
+                C64Key = 23;    // linke Shiftaste (100 = rechte)
+                KeyMatrixToPB_RM[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
+                KeyMatrixToPB_LM[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
+
+                KeyMatrixToPA_RM[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
+                KeyMatrixToPA_LM[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
+            }
         }
 
         if((event->buttons() & Qt::RightButton) == Qt::RightButton)
         {
             if(AKT_X_KEY == 0xFF || AKT_Y_KEY == 0xFF) return;
 
-            uint16_t C64Key = VK_TO_C64[AKT_Y_KEY][AKT_X_KEY];
+            uint8_t C64Key = VK_TO_C64[AKT_Y_KEY][AKT_X_KEY];
 
             if(VK_RAST[AKT_Y_KEY][AKT_X_KEY])
             {
