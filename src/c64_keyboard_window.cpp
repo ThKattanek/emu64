@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek       	//
 //                                              //
-// Letzte Änderung am 18.12.2016                //
+// Letzte Änderung am 30.05.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -44,10 +44,10 @@ static unsigned short VK_TO_C64[7][18] = {{0x71,0x70,0x73,0x10,0x13,0x20,0x23,0x
                                          {0x74}};
 static bool VK_RAST[7][18];
 
-static unsigned char KeyMatrixToPA_LM[8];
-static unsigned char KeyMatrixToPB_LM[8];
-static unsigned char KeyMatrixToPA_RM[8];
-static unsigned char KeyMatrixToPB_RM[8];
+static uint8_t KeyMatrixToPA_LM[8];
+static uint8_t KeyMatrixToPB_LM[8];
+static uint8_t KeyMatrixToPA_RM[8];
+static uint8_t KeyMatrixToPB_RM[8];
 
 C64KeyboardWindow::C64KeyboardWindow(QWidget *parent, QSettings *ini, C64Class *c64) :
     QDialog(parent),
@@ -69,8 +69,8 @@ C64KeyboardWindow::C64KeyboardWindow(QWidget *parent, QSettings *ini, C64Class *
     RecKeyAktX = 0xFF;
     RecKeyAktY = 0xFF;
 
-    KeyMatrixToPA = NULL;
-    KeyMatrixToPB = NULL;
+    KeyMatrixToPA = nullptr;
+    KeyMatrixToPB = nullptr;
 
     Recording = false;
 
@@ -87,7 +87,7 @@ C64KeyboardWindow::C64KeyboardWindow(QWidget *parent, QSettings *ini, C64Class *
     timer->start(200);
 
     ////////// Load from INI ///////////
-    if(ini != 0)
+    if(ini != nullptr)
     {
         ini->beginGroup("C64KeyboardWindow");
         if(ini->contains("Geometry")) restoreGeometry(ini->value("Geometry").toByteArray());
@@ -97,10 +97,10 @@ C64KeyboardWindow::C64KeyboardWindow(QWidget *parent, QSettings *ini, C64Class *
     ////////////////////////////////////
 }
 
-C64KeyboardWindow::~C64KeyboardWindow()
+C64KeyboardWindow::~C64KeyboardWindow(void)
 {
     ////////// Save to INI ///////////
-    if(ini != 0)
+    if(ini != nullptr)
     {
         ini->beginGroup("C64KeyboardWindow");
         if(isOneShowed) ini->setValue("Geometry",saveGeometry());
@@ -113,7 +113,7 @@ C64KeyboardWindow::~C64KeyboardWindow()
     delete ui;
 }
 
-void C64KeyboardWindow::RetranslateUi()
+void C64KeyboardWindow::RetranslateUi(void)
 {
     ui->retranslateUi(this);
     this->update();
@@ -121,8 +121,8 @@ void C64KeyboardWindow::RetranslateUi()
 
 void C64KeyboardWindow::resizeEvent(QResizeEvent *event)
 {
-    scaling_x = (float)event->size().width() / 880.0f;
-    scaling_y = (float)event->size().height() / 260.0f;   
+    scaling_x = static_cast<float_t>(event->size().width()) / 880.0f;
+    scaling_y = static_cast<float_t>(event->size().height()) / 260.0f;
 }
 
 void C64KeyboardWindow::showEvent(QShowEvent*)
@@ -194,8 +194,8 @@ Lend:
 
                     for(int i=0;i<8;i++)
                     {
-                        if (KeyMatrixToPA != NULL) KeyMatrixToPA[i] = KeyMatrixToPA_LM[i] | KeyMatrixToPA_RM[i];
-                        if (KeyMatrixToPB != NULL) KeyMatrixToPB[i] = KeyMatrixToPB_LM[i] | KeyMatrixToPB_RM[i];
+                        if (KeyMatrixToPA != nullptr) KeyMatrixToPA[i] = KeyMatrixToPA_LM[i] | KeyMatrixToPA_RM[i];
+                        if (KeyMatrixToPB != nullptr) KeyMatrixToPB[i] = KeyMatrixToPB_LM[i] | KeyMatrixToPB_RM[i];
                     }
                 }
             }
@@ -215,7 +215,7 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
     {
         if((event->buttons() & Qt::LeftButton) == Qt::LeftButton)
         {
-            if(AKT_X_KEY == 0xFF) return;
+            if(AKT_X_KEY == 0xFF || AKT_Y_KEY == 0xFF) return;
 
             unsigned short C64Key = VK_TO_C64[AKT_Y_KEY][AKT_X_KEY];
 
@@ -226,13 +226,14 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
                     return;
             }
             ///////////////////////////////////
-
             VK_RAST[AKT_Y_KEY][AKT_X_KEY] = false;
             KeyMatrixToPB_RM[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
             KeyMatrixToPB_LM[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
 
             KeyMatrixToPA_RM[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
             KeyMatrixToPA_LM[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
+
+
         }
 
         if((event->buttons() & Qt::RightButton) == Qt::RightButton)
@@ -263,7 +264,7 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
     {
         if((event->buttons() & Qt::LeftButton) == Qt::LeftButton)
         {
-            if(AKT_X_KEY == 0xFF) return;
+            if(AKT_X_KEY == 0xFF || AKT_Y_KEY == 0xFF) return;
 
             RecKeyPress = true;
             blink_flip = true;
@@ -273,7 +274,7 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
             /*
             if((AKT_Y_KEY == 1) && (AKT_X_KEY == 14))
             {
-                if(c64 != NULL) c64->StopRecKeyMap();
+                if(c64 != nullptr) c64->StopRecKeyMap();
                 RecKeyPress = false;
                 blink_flip = false;
                 return;
@@ -283,7 +284,7 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
             // Shift Lock Taste
             if((AKT_Y_KEY == 2) && (AKT_X_KEY == 1))
             {
-                if(c64 != NULL) c64->StopRecKeyMap();
+                if(c64 != nullptr) c64->StopRecKeyMap();
                 RecKeyPress = false;
                 blink_flip = false;
                 return;
@@ -293,7 +294,7 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
             RecKeyAktY = AKT_Y_KEY;
             update();
 
-            unsigned char matrix_code = VK_TO_C64[RecKeyAktY][RecKeyAktX];
+            uint8_t matrix_code = VK_TO_C64[RecKeyAktY][RecKeyAktX];
 
             c64->SetFocusToC64Window();
             c64->StartRecKeyMap(matrix_code);
@@ -364,7 +365,7 @@ void C64KeyboardWindow::paintEvent(QPaintEvent*)
     painter.end();
 }
 
-void C64KeyboardWindow::timer_event()
+void C64KeyboardWindow::timer_event(void)
 {
     RecTimeOut--;
     if(RecTimeOut == 0 || c64->GetRecKeyMapStatus() == false)
