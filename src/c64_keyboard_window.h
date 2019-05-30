@@ -8,13 +8,15 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.12.2016                //
+// Letzte Änderung am 30.05.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #ifndef C64_KEYBOARD_WINDOW_H
 #define C64_KEYBOARD_WINDOW_H
+
+#include <cstdint>
 
 #include <QDialog>
 #include <QPainter>
@@ -33,9 +35,9 @@ class C64KeyboardWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit C64KeyboardWindow(QWidget *parent = 0, QSettings *ini = 0, C64Class *c64 = 0);
-    ~C64KeyboardWindow();
-    void RetranslateUi();
+    explicit C64KeyboardWindow(QWidget *parent = nullptr, QSettings *ini = nullptr, C64Class *c64 = nullptr);
+    ~C64KeyboardWindow(void);
+    void RetranslateUi(void);
     void resizeEvent(QResizeEvent *event);
     void showEvent(QShowEvent *event);
     void paintEvent(QPaintEvent *event);
@@ -44,11 +46,11 @@ public:
     void mouseReleaseEvent(QMouseEvent *event);
 
     bool Recording;
-    unsigned char* KeyMatrixToPA;
-    unsigned char* KeyMatrixToPB;
+    uint8_t *KeyMatrixToPA;
+    uint8_t *KeyMatrixToPB;
 
 public slots:
-    void timer_event();
+    void timer_event(void);
 
 private:
 
@@ -56,10 +58,10 @@ private:
     Ui::C64KeyboardWindow *ui;
     QTimer *timer;
 
-    int AKT_Y_KEY_OLD;
-    int AKT_Y_KEY;
-    int AKT_X_KEY_OLD;
-    int AKT_X_KEY;
+    uint8_t AKT_Y_KEY_OLD;
+    uint8_t AKT_Y_KEY;
+    uint8_t AKT_X_KEY_OLD;
+    uint8_t AKT_X_KEY;
 
     QPoint mouse_offset;
 
@@ -68,16 +70,16 @@ private:
     int cm_x;
     int cm_y;
 
-    float scaling_x;
-    float scaling_y;
+    float_t scaling_x;
+    float_t scaling_y;
 
     bool blink_flip;
 
-    unsigned char* KeyboardTrans;
+    uint8_t *KeyboardTrans;
 
     bool RecKeyPress;
-    unsigned char RecKeyAktX;
-    unsigned char RecKeyAktY;
+    uint8_t RecKeyAktX;
+    uint8_t RecKeyAktY;
 
     int RecTimeOut;
 

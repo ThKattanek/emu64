@@ -35,7 +35,7 @@ static const int X_MAX[7][18] = {{66,113,160,207,254,302,349,396,443,491,538,584
                                 {561}};
 
 /// TansTabelle von LeyLayout zu C64Matrix
-static unsigned short VK_TO_C64[7][18] = {{0x71,0x70,0x73,0x10,0x13,0x20,0x23,0x30,0x33,0x40,0x43,0x50,0x53,0x60,0x63,0x00,0x04,0x84},
+static uint8_t VK_TO_C64[7][18] = {{0x71,0x70,0x73,0x10,0x13,0x20,0x23,0x30,0x33,0x40,0x43,0x50,0x53,0x60,0x63,0x00,0x04,0x84},
                                          {0x72,0x76,0x11,0x16,0x21,0x26,0x31,0x36,0x41,0x46,0x51,0x56,0x61,0x66,0x80,0x05,0x85},
                                          {0x77,0x17,0x12,0x15,0x22,0x25,0x32,0x35,0x42,0x45,0x52,0x55,0x62,0x65,0x01,0x06,0x86},
                                          {0x75,0x17,0x14,0x27,0x24,0x37,0x34,0x47,0x44,0x57,0x54,0x67,0x64,0x03,0x83},
@@ -58,8 +58,8 @@ C64KeyboardWindow::C64KeyboardWindow(QWidget *parent, QSettings *ini, C64Class *
 
     ui->setupUi(this);
 
-    for(int i=0;i<7;i++)
-        for(int j=0;j<18;j++)
+    for(int i=0; i<7; i++)
+        for(int j=0; j<18; j++)
             VK_RAST[i][j] = false;
 
     ws_x = width();
@@ -139,7 +139,7 @@ void C64KeyboardWindow::mouseMoveEvent(QMouseEvent *event)
     int mx = mousePos.x();
     int my = mousePos.y();
 
-    for(int i=0;i<7;i++)
+    for(uint8_t i=0;i<7;i++)
     {
         ymin = int(Y_MIN[i] * scaling_y);
         ymax = int(Y_MAX[i] * scaling_y);
@@ -148,14 +148,14 @@ void C64KeyboardWindow::mouseMoveEvent(QMouseEvent *event)
         {
             AKT_Y_KEY = i;
 
-            for(int i=0;i<KEYS_Y[AKT_Y_KEY];i++)
+            for(uint8_t j=0; j<KEYS_Y[AKT_Y_KEY]; j++)
             {
-                xmin = int(X_MIN[AKT_Y_KEY][i] * scaling_x);
-                xmax = int(X_MAX[AKT_Y_KEY][i] * scaling_x);
+                xmin = int(X_MIN[AKT_Y_KEY][j] * scaling_x);
+                xmax = int(X_MAX[AKT_Y_KEY][j] * scaling_x);
 
                 if(mx>=xmin && mx<=xmax)
                 {
-                    AKT_X_KEY = i;
+                    AKT_X_KEY = j;
                     goto Lend;
                 }
                 else AKT_X_KEY = 0xFF;
@@ -178,12 +178,12 @@ Lend:
             {                
                 if(!Recording)
                 {
-                    for(int i=0;i<8;i++)
+                    for(uint8_t i=0; i<8; i++)
                     {
                         KeyMatrixToPA_LM[i]=0;
                         KeyMatrixToPB_LM[i]=0;
                     }
-                    unsigned short C64Key = VK_TO_C64[AKT_Y_KEY][AKT_X_KEY];
+                    uint8_t C64Key = VK_TO_C64[AKT_Y_KEY][AKT_X_KEY];
 
                     VK_RAST[AKT_Y_KEY][AKT_X_KEY] = false;
                     KeyMatrixToPB_RM[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
@@ -192,7 +192,7 @@ Lend:
                     KeyMatrixToPA_RM[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
                     KeyMatrixToPA_LM[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
 
-                    for(int i=0;i<8;i++)
+                    for(uint8_t i=0; i<8; i++)
                     {
                         if (KeyMatrixToPA != nullptr) KeyMatrixToPA[i] = KeyMatrixToPA_LM[i] | KeyMatrixToPA_RM[i];
                         if (KeyMatrixToPB != nullptr) KeyMatrixToPB[i] = KeyMatrixToPB_LM[i] | KeyMatrixToPB_RM[i];
@@ -226,14 +226,15 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
                     return;
             }
             ///////////////////////////////////
+
+
             VK_RAST[AKT_Y_KEY][AKT_X_KEY] = false;
+
             KeyMatrixToPB_RM[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
             KeyMatrixToPB_LM[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
 
             KeyMatrixToPA_RM[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
             KeyMatrixToPA_LM[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
-
-
         }
 
         if((event->buttons() & Qt::RightButton) == Qt::RightButton)
@@ -328,10 +329,10 @@ void C64KeyboardWindow::paintEvent(QPaintEvent*)
     if((AKT_Y_KEY != 0xFF) && (AKT_X_KEY != 0xFF))
     {
         painter.setPen(pen3);
-        painter.drawRect(X_MIN[AKT_Y_KEY][AKT_X_KEY] * scaling_x,
-                         Y_MIN[AKT_Y_KEY] * scaling_y,
-                         (X_MAX[AKT_Y_KEY][AKT_X_KEY]* scaling_x) - (X_MIN[AKT_Y_KEY][AKT_X_KEY] * scaling_x),
-                         (Y_MAX[AKT_Y_KEY] * scaling_y) - (Y_MIN[AKT_Y_KEY] * scaling_y));
+        painter.drawRect(static_cast<int>(X_MIN[AKT_Y_KEY][AKT_X_KEY] * scaling_x),
+                         static_cast<int>(Y_MIN[AKT_Y_KEY] * scaling_y),
+                         static_cast<int>((X_MAX[AKT_Y_KEY][AKT_X_KEY]* scaling_x) - (X_MIN[AKT_Y_KEY][AKT_X_KEY] * scaling_x)),
+                         static_cast<int>((Y_MAX[AKT_Y_KEY] * scaling_y) - (Y_MIN[AKT_Y_KEY] * scaling_y)));
     }
 
     for(int y=0;y<7;y++)
@@ -341,10 +342,10 @@ void C64KeyboardWindow::paintEvent(QPaintEvent*)
             if(VK_RAST[y][x])
             {
                 painter.setPen(pen1);
-                painter.drawRect(X_MIN[y][x] * scaling_x,
-                               Y_MIN[y] * scaling_y,
-                               (X_MAX[y][x]* scaling_x) - (X_MIN[y][x] * scaling_x),
-                               (Y_MAX[y] * scaling_y) - (Y_MIN[y] * scaling_y));
+                painter.drawRect(static_cast<int>(X_MIN[y][x] * scaling_x),
+                                 static_cast<int>(Y_MIN[y] * scaling_y),
+                                 static_cast<int>((X_MAX[y][x]* scaling_x) - (X_MIN[y][x] * scaling_x)),
+                                 static_cast<int>((Y_MAX[y] * scaling_y) - (Y_MIN[y] * scaling_y)));
             }
         }
     }
@@ -357,10 +358,10 @@ void C64KeyboardWindow::paintEvent(QPaintEvent*)
             if(blink_flip)
             {
                 painter.setPen(pen2);
-                painter.drawRect(X_MIN[RecKeyAktY][RecKeyAktX] * scaling_x,
-                               Y_MIN[RecKeyAktY] * scaling_y,
-                               (X_MAX[RecKeyAktY][RecKeyAktX]* scaling_x) - (X_MIN[RecKeyAktY][RecKeyAktX] * scaling_x),
-                               (Y_MAX[RecKeyAktY] * scaling_y) - (Y_MIN[RecKeyAktY] * scaling_y));
+                painter.drawRect(static_cast<int>(X_MIN[RecKeyAktY][RecKeyAktX] * scaling_x),
+                                 static_cast<int>(Y_MIN[RecKeyAktY] * scaling_y),
+                                 static_cast<int>((X_MAX[RecKeyAktY][RecKeyAktX]* scaling_x) - (X_MIN[RecKeyAktY][RecKeyAktX] * scaling_x)),
+                                 static_cast<int>((Y_MAX[RecKeyAktY] * scaling_y) - (Y_MIN[RecKeyAktY] * scaling_y)));
             }
         }
     }
