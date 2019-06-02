@@ -49,7 +49,7 @@ using namespace std::tr1::placeholders;
 #define MAX_JOYSTICKS 16
 #define MAX_VJOYS 16
 
-#define SUBDIVS_SCREEN 20            // Für Screenverzerrungen (Kissen etc.)
+#define SUBDIVS_SCREEN 20             // Für Screenverzerrungen (Kissen etc.)
 
 #define SCREEN_RATIO_4_3 1.34f        // Screenratio 4:3 (1,33333)
 #define SCREEN_RATIO_5_4 1.25f        // Screenratio 5:4 (1,25)
@@ -66,7 +66,7 @@ public:
     void StartEmulation();
     void EndEmulation();
     void SetLimitCycles(int nCycles);
-    void SetEnableDebugCart(bool enabled);
+    void SetEnableDebugCart(bool enable);
     void WarpModeLoop();
     void FillAudioBuffer(uint8_t *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
     void KeyEvent(uint8_t  matrix_code, KeyStatus status, bool isAutoShift);
@@ -77,18 +77,18 @@ public:
     void SetFloppyWriteProtect(uint8_t floppy_nr, bool status);
     void SetCommandLine(char *c64_command);
     void KillCommandLine();
-    uint8_t ReadC64Byte(uint16_t adresse);
-    void WriteC64Byte(uint16_t adresse, uint8_t wert);
-    uint8_t* GetRAMPointer(uint16_t adresse);
-    void SetGrafikModi(bool enable_32bit_colors, bool enable_screen_doublesize, bool enable_screen_crt_output, bool filter_enable, int fullres_xw = 0, int fullres_yw = 0);
+    uint8_t ReadC64Byte(uint16_t address);
+    void WriteC64Byte(uint16_t address, uint8_t value);
+    uint8_t* GetRAMPointer(uint16_t address);
+    void SetGrafikModi(bool enable_32bit_colors, bool enable_screen_doublesize, bool enable_screen_crt_output, bool filter_enable, uint16_t fullscreen_width = 0, uint16_t fullscreen_height = 0);
     void SetWindowTitle(char *title_name);
     void SetFullscreen();
     void InitGrafik();
     void ReleaseGrafik();
     void DrawC64Screen();
     void SetFocusToC64Window();
-    void SetWindowAspectRatio(bool enabled);
-    void SetFullscreenAspectRatio(bool enabled);
+    void SetWindowAspectRatio(bool enable);
+    void SetFullscreenAspectRatio(bool enable);
     void AnalyzeSDLEvent(SDL_Event *event);
     void SetC64Speed(int speed);
     void EnableWarpMode(bool enabled);
@@ -113,7 +113,7 @@ public:
     void HardReset();
     void SetReset(int status, int hard_reset);
     int LoadAutoRun(uint8_t floppy_nr, char *filename);
-    int LoadPRG(char *filename, uint16_t *ret_startadresse);
+    int LoadPRG(char *filename, uint16_t *return_start_address);
 
     int LoadCRT(char *filename);
     void RemoveCRT();
@@ -188,9 +188,9 @@ public:
     void SetSIDVolume(float_t volume);  // Lautstärke der SID's (0.0f - 1.0f)
     void SetFirstSidTyp(int sid_typ);   // SID Typ des 1. SID (MOS_6581 oder MOS_8580)
     void SetSecondSidTyp(int sid_typ);  // SID Typ des 2. SID (MOS_6581 oder MOS_8580)
-    void EnableSecondSid(bool enable);  // 2. SID aktivieren
-    void SetSecondSidAddress(uint16_t address);
-    void SetSid6ChannelMode(bool enable);
+    void EnableStereoSid(bool enable);  // 2. SID aktivieren
+    void SetStereoSidAddress(uint16_t address);
+    void SetStereoSid6ChannelMode(bool enable);
     void SetSidCycleExact(bool enable);
     void SetSidFilter(bool enable);
 
@@ -217,47 +217,48 @@ public:
     bool            enable_screen_32bit_colors;
     bool            enable_screen_doublesize;
     bool            enable_screen_crt_output;
-    bool            FilterEnable;
-    int             FullResXW;
-    int             FullResYW;
-    bool            isFullscreen;
-    bool            ChangeGrafikModi;
-    bool            ChangeWindowPos;
-    bool            ChangeWindowSize;
-    bool            HoldVicRefresh;
-    bool            VicRefreshIsHold;
+    bool            enable_screen_filter;
+    uint16_t        fullscreen_width;
+    uint16_t        fullscreen_height;
+    bool            enable_fullscreen;
+    bool            changed_graphic_modi;
+    bool            changed_window_pos;
+    bool            changed_window_size;
+    bool            enable_hold_vic_refresh;
+    bool            vic_refresh_is_holded;
 
-    float_t         C64ScreenAspectRatio;
-    bool            EnableWindowAspectRatio;
-    bool            EnableFullscreenAspectRatio;
+    float_t         screen_aspect_ratio;
+    bool            enable_window_aspect_ratio;
+    bool            enable_fullscreen_aspect_ratio;
 
-    SDL_Window      *C64Window;
-    SDL_GLContext   GLContext;
+    SDL_Window      *sdl_window;
+    SDL_Surface     *sdl_window_icon;
+    SDL_GLContext   gl_context;
+
+    int             sdl_window_pos_x;
+    int             sdl_window_pos_y;
+    int             sdl_window_size_width;
+    int             sdl_window_size_height;
 
     SDL_mutex       *mutex1;  // Dient für das füllen des Soundbuffers
 
-    int             win_pos_x;
-    int             win_pos_y;
-    int             win_size_w;
-    int             win_size_h;
+    SDL_AudioSpec   audio_spec_want;
+    SDL_AudioSpec   audio_spec_have;
 
-    SDL_AudioSpec   want,have;
+    SDL_Surface     *c64_screen;
+    GLuint          c64_screen_texture;
+    uint8_t         *c64_screen_buffer;
+    bool            c64_screen_is_obselete;
 
-    SDL_Surface     *C64Screen;
-    SDL_Surface     *C64ScreenIcon;
-    GLuint          C64ScreenTexture;
-    uint8_t         *C64ScreenBuffer;
-    bool            IsC64ScreenObsolete;
-    bool            DistortionEnable;
-    float_t         Distortion;
+    bool            enable_distortion;
+    float_t         distortion_value;
 
-    /// Distortion (Verzzerung) ///
-    POINT_STRUCT    DistortionGridPoints[(SUBDIVS_SCREEN+1)*(SUBDIVS_SCREEN+1)];
-    POINT_STRUCT    DistortionGrid[(SUBDIVS_SCREEN)*(SUBDIVS_SCREEN)*4];
-    POINT_STRUCT    DistortionGridTex[(SUBDIVS_SCREEN)*(SUBDIVS_SCREEN)*4];
+    /// Distortion (Verzerrung) ///
+    POINT_STRUCT    distortion_grid_points[(SUBDIVS_SCREEN+1)*(SUBDIVS_SCREEN+1)];
+    POINT_STRUCT    distortion_grid[(SUBDIVS_SCREEN)*(SUBDIVS_SCREEN)*4];
+    POINT_STRUCT    distortion_grid_texture_coordinates[(SUBDIVS_SCREEN)*(SUBDIVS_SCREEN)*4];
 
-    int				FrameSkip;
-    int				FrameSkipCounter;
+    int				frame_skip_counter;
 
     SDL_Surface     *Pfeil0;
     SDL_Surface     *Pfeil1;
@@ -307,9 +308,9 @@ public:
 
     bool RESET;     // Reset Leitung -> Für Alle Module mit Reset Eingang
 
-    bool            StereoEnable;
-    uint16_t        Sid2Adresse;
-    bool            Sid6ChannelMode;
+    bool            enable_stereo_sid;
+    bool            enable_stereo_sid_6channel_mode;
+    uint16_t        stereo_sid_address;
 
     uint8_t         KeyboardMatrixToPBExt[8];
     uint8_t         KeyboardMatrixToPAExt[8];

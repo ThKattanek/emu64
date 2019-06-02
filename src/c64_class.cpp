@@ -46,9 +46,9 @@ static const char *ScreenschotFormatName[SCREENSHOT_FORMATS_COUNT]{"BMP","PNG"};
 C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<void(char*)> log_function, const char *data_path):
     mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
 {
-    ChangeGrafikModi = false;
-    ChangeWindowPos = false;
-    ChangeWindowSize = false;
+    changed_graphic_modi = false;
+    changed_window_pos = false;
+    changed_window_size = false;
 
     JoyStickUdateIsStop = true;
     RecJoyMapping = false;
@@ -103,18 +103,18 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     mutex1 = SDL_CreateMutex();
 
-    C64Window = nullptr;
-    C64Screen = nullptr;
-    C64ScreenTexture = 0;
-    C64ScreenAspectRatio = SCREEN_RATIO_4_3;
-    EnableWindowAspectRatio = true;
-    EnableFullscreenAspectRatio = true;
-    IsC64ScreenObsolete = false;
+    sdl_window = nullptr;
+    c64_screen = nullptr;
+    c64_screen_texture = 0;
+    screen_aspect_ratio = SCREEN_RATIO_4_3;
+    enable_window_aspect_ratio = true;
+    enable_fullscreen_aspect_ratio = true;
+    c64_screen_is_obselete = false;
     StartScreenshot = false;
     ExitScreenshotEnable = false;
-    FrameSkipCounter=1;
+    frame_skip_counter = 1;
 
-    DistortionEnable = true;
+    enable_distortion = true;
     SetDistortion(-0.05f);
 
     VideoCapture = nullptr;
@@ -216,22 +216,22 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     /// SLD Audio Installieren (C64 Emulation) ///
 
-    SDL_memset(&want, 0, sizeof(want));
-    want.freq = AudioSampleRate;
-    want.format = AUDIO_S16;
-    want.channels = 2;
-    want.samples = AudioPufferSize;
-    want.callback = AudioMix;
-    want.userdata = this;
+    SDL_memset(&audio_spec_want, 0, sizeof(audio_spec_want));
+    audio_spec_want.freq = AudioSampleRate;
+    audio_spec_want.format = AUDIO_S16;
+    audio_spec_want.channels = 2;
+    audio_spec_want.samples = AudioPufferSize;
+    audio_spec_want.callback = AudioMix;
+    audio_spec_want.userdata = this;
 
-    if( SDL_OpenAudio(&want,&have) > 0 )
+    if( SDL_OpenAudio(&audio_spec_want, &audio_spec_have) > 0 )
     {
         LogText(const_cast<char*>("<< ERROR: Fehler beim installieren von SDL_Audio\n"));
         *ret_error = -6;
     }
     LogText(const_cast<char*>(">> SDL_Audio wurde installiert\n"));
 
-    if (want.format != have.format)
+    if (audio_spec_want.format != audio_spec_have.format)
     {
         printf("Audio Format \"AUDIO_S16 wird nicht unterstuetzt.\n");
         *ret_error = -6;
@@ -242,10 +242,10 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     SetGrafikModi(video_crt_output->StartC64isColorBit32, video_crt_output->StartC64isDoublesize, video_crt_output->StartC64isPalmode, false);
 
     sprintf(filename,"%ssdl_icon.png",GfxPath);
-    C64ScreenIcon = IMG_Load(filename);
-    if(C64ScreenIcon != nullptr)
+    sdl_window_icon = IMG_Load(filename);
+    if(sdl_window_icon != nullptr)
     {
-        SDL_SetColorKey(C64ScreenIcon,SDL_TRUE,SDL_MapRGB(C64ScreenIcon->format,0,0,0));
+        SDL_SetColorKey(sdl_window_icon,SDL_TRUE,SDL_MapRGB(sdl_window_icon->format,0,0,0));
     }
     else
         LogText(const_cast<char*>("<< ERROR: Fehler beim laden des SLDFenster Icons\n"));
@@ -257,14 +257,14 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     mmu = new MMU();
     cpu = new MOS6510();
     vic = new VICII();
-    sid1 = new MOS6581_8085(0,have.freq,have.samples,ret_error);
-    sid2 = new MOS6581_8085(1,have.freq,have.samples,ret_error);
+    sid1 = new MOS6581_8085(0,audio_spec_have.freq,audio_spec_have.samples,ret_error);
+    sid2 = new MOS6581_8085(1,audio_spec_have.freq,audio_spec_have.samples,ret_error);
     cia1 = new MOS6526(0);
     cia2 = new MOS6526(1);
     crt = new CRTClass();
     reu = new REUClass();
     geo = new GEORAMClass();
-    tape = new TAPE1530(have.freq,have.samples,C64Takt);
+    tape = new TAPE1530(audio_spec_have.freq,audio_spec_have.samples,C64Takt);
 
     vic_puffer = vic->VideoPuffer;
 
@@ -284,26 +284,26 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     char motor_filename[FILENAME_MAX];
     char motor_on_filename[FILENAME_MAX];
     char motor_off_filename[FILENAME_MAX];
-    char anschlag_filename[FILENAME_MAX];
+    char bumper_filename[FILENAME_MAX];
     char stepper_inc_filename[FILENAME_MAX];
     char stepper_dec_filename[FILENAME_MAX];
 
     sprintf(motor_filename,"%smotor.raw",FloppySoundPath);
     sprintf(motor_on_filename,"%smotor_on.raw",FloppySoundPath);
     sprintf(motor_off_filename,"%smotor_off.raw",FloppySoundPath);
-    sprintf(anschlag_filename,"%sanschlag.raw",FloppySoundPath);
+    sprintf(bumper_filename,"%sanschlag.raw",FloppySoundPath);
     sprintf(stepper_inc_filename,"%sstepper_inc.raw",FloppySoundPath);
     sprintf(stepper_dec_filename,"%sstepper_dec.raw",FloppySoundPath);
 
     for(int i=0; i<FLOPPY_COUNT; i++)
     {
-        floppy[i] = new Floppy1541(&RESET,have.freq,have.samples,&FloppyFoundBreakpoint);
+        floppy[i] = new Floppy1541(&RESET,audio_spec_have.freq,audio_spec_have.samples,&FloppyFoundBreakpoint);
         floppy[i]->SetResetReady(&FloppyResetReady[i],0xEBFF);
         floppy[i]->SetC64IEC(&C64IEC);
         floppy[i]->SetDeviceNummer(static_cast<uint8_t>(8+i));
         floppy[i]->LoadDosRom(filename);
         //floppy[i]->LoadFloppySounds((char*)"floppy_sounds/motor.raw",(char*)"floppy_sounds/motor_on.raw",(char*)"floppy_sounds/motor_off.raw",(char*)"floppy_sounds/anschlag.raw",(char*)"floppy_sounds/stepper_inc.raw",(char*)"floppy_sounds/stepper_dec.raw");
-        floppy[i]->LoadFloppySounds(motor_filename,motor_on_filename,motor_off_filename,anschlag_filename,stepper_inc_filename,stepper_dec_filename);
+        floppy[i]->LoadFloppySounds(motor_filename,motor_on_filename,motor_off_filename,bumper_filename,stepper_inc_filename,stepper_dec_filename);
         floppy[i]->SetEnableFloppy(false);
         floppy[i]->SetEnableFloppySound(true);
     }
@@ -447,9 +447,9 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     sid2->FilterOn = true;
     sid2->Reset();
 
-    StereoEnable = false;
-    Sid2Adresse = 0xD420;
-    Sid6ChannelMode = false;
+    enable_stereo_sid = false;
+    enable_stereo_sid_6channel_mode = false;
+    stereo_sid_address = 0xD420;
 
     vic->BA = &RDY_BA;
     vic->CIA2_PA = cia2->PA->GetOutputBitsPointer();
@@ -511,8 +511,8 @@ void C64Class::EndEmulation()
     EnableWarpMode(false);
     if(ExitScreenshotEnable)
     {
-        SwapRBSurface(C64Screen);
-        SDL_SavePNG(C64Screen, ExitScreenshotFilename);
+        SwapRBSurface(c64_screen);
+        SDL_SavePNG(c64_screen, ExitScreenshotFilename);
     }
 
     /// Loop Thread beenden ///
@@ -532,9 +532,9 @@ void C64Class::SetLimitCycles(int nCycles)
     LimitCylesCounter = nCycles;
 }
 
-void C64Class::SetEnableDebugCart(bool enabled)
+void C64Class::SetEnableDebugCart(bool enable)
 {
-    cpu->SetEnableDebugCart(enabled);
+    cpu->SetEnableDebugCart(enable);
 }
 
 void AudioMix(void *userdat, Uint8 *stream, int laenge)
@@ -582,27 +582,27 @@ int SDLThread(void *userdat)
     c64->LoopThreadIsEnd = false;
     c64->sdl_thread_pause = false;
 
-    c64->C64ScreenBuffer = nullptr;
+    c64->c64_screen_buffer = nullptr;
 
     while (!c64->LoopThreadEnd)
     {
         /// Wird immer ausgeführt wenn die Funktion SetGrafikModi ausgefürt wurde ///
-        if(c64->ChangeGrafikModi)
+        if(c64->changed_graphic_modi)
         {
-            c64->ChangeGrafikModi = false;
+            c64->changed_graphic_modi = false;
             c64->InitGrafik();
         }
 
-        if(c64->ChangeWindowPos)
+        if(c64->changed_window_pos)
         {
-            c64->ChangeWindowPos = false;
-            SDL_SetWindowPosition(c64->C64Window, c64->win_pos_x, c64->win_pos_y);
+            c64->changed_window_pos = false;
+            SDL_SetWindowPosition(c64->sdl_window, c64->sdl_window_pos_x, c64->sdl_window_pos_y);
         }
 
-        if(c64->ChangeWindowSize)
+        if(c64->changed_window_size)
         {
-            c64->ChangeWindowSize = false;
-            SDL_SetWindowSize(c64->C64Window, c64->win_size_w, c64->win_size_h);
+            c64->changed_window_size = false;
+            SDL_SetWindowSize(c64->sdl_window, c64->sdl_window_size_width, c64->sdl_window_size_height);
 
 #ifdef _WIN32
             c64->current_window_width = c64->win_size_w;
@@ -627,10 +627,10 @@ int SDLThread(void *userdat)
             /// Wenn der Thread noch nicht beendet wurde ///
             if(!c64->LoopThreadEnd)
             {
-                if(c64->IsC64ScreenObsolete)
+                if(c64->c64_screen_is_obselete)
                 {
                     c64->DrawC64Screen();
-                    c64->IsC64ScreenObsolete = false;
+                    c64->c64_screen_is_obselete = false;
                 }
                 else SDL_Delay(1);
             }
@@ -658,53 +658,53 @@ void C64Class::CalcDistortionGrid()
         {
             float_t X = x*div-1.0f;
             float_t Y = y*div-1.0f;
-            DistortionGridPoints[y*(SUBDIVS_SCREEN+1)+x].y = X*X*(Distortion*Y)+Y;
-            DistortionGridPoints[y*(SUBDIVS_SCREEN+1)+x].x = Y*Y*(Distortion*X)+X;
+            distortion_grid_points[y*(SUBDIVS_SCREEN+1)+x].y = X*X*(distortion_value*Y)+Y;
+            distortion_grid_points[y*(SUBDIVS_SCREEN+1)+x].x = Y*Y*(distortion_value*X)+X;
         }
 
     div = 1.0f / SUBDIVS_SCREEN;
     for(int y=0; y<SUBDIVS_SCREEN; y++)
         for(int x=0; x<SUBDIVS_SCREEN; x++)
         {
-            DistortionGrid[y*SUBDIVS_SCREEN*4+x*4+0] = DistortionGridPoints[(y)*(SUBDIVS_SCREEN+1)+x];
-            DistortionGrid[y*SUBDIVS_SCREEN*4+x*4+1] = DistortionGridPoints[(y)*(SUBDIVS_SCREEN+1)+x+1];
-            DistortionGrid[y*SUBDIVS_SCREEN*4+x*4+2] = DistortionGridPoints[(y+1)*(SUBDIVS_SCREEN+1)+x+1];
-            DistortionGrid[y*SUBDIVS_SCREEN*4+x*4+3] = DistortionGridPoints[(y+1)*(SUBDIVS_SCREEN+1)+x];
+            distortion_grid[y*SUBDIVS_SCREEN*4+x*4+0] = distortion_grid_points[(y)*(SUBDIVS_SCREEN+1)+x];
+            distortion_grid[y*SUBDIVS_SCREEN*4+x*4+1] = distortion_grid_points[(y)*(SUBDIVS_SCREEN+1)+x+1];
+            distortion_grid[y*SUBDIVS_SCREEN*4+x*4+2] = distortion_grid_points[(y+1)*(SUBDIVS_SCREEN+1)+x+1];
+            distortion_grid[y*SUBDIVS_SCREEN*4+x*4+3] = distortion_grid_points[(y+1)*(SUBDIVS_SCREEN+1)+x];
 
-            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+0].x = x*div;
-            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+0].y = (y+1)*div;
+            distortion_grid_texture_coordinates[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+0].x = x*div;
+            distortion_grid_texture_coordinates[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+0].y = (y+1)*div;
 
-            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+1].x = (x+1)*div;
-            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+1].y = (y+1)*div;
+            distortion_grid_texture_coordinates[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+1].x = (x+1)*div;
+            distortion_grid_texture_coordinates[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+1].y = (y+1)*div;
 
-            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+2].x = (x+1)*div;
-            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+2].y = (y)*div;
+            distortion_grid_texture_coordinates[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+2].x = (x+1)*div;
+            distortion_grid_texture_coordinates[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+2].y = (y)*div;
 
-            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+3].x = x*div;
-            DistortionGridTex[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+3].y = y*div;
+            distortion_grid_texture_coordinates[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+3].x = x*div;
+            distortion_grid_texture_coordinates[(SUBDIVS_SCREEN-y-1)*SUBDIVS_SCREEN*4+x*4+3].y = y*div;
         }
 }
 
 void C64Class::VicRefresh(uint8_t *vic_puffer)
 {
-    if(HoldVicRefresh)
+    if(enable_hold_vic_refresh)
     {
-        VicRefreshIsHold = true;
+        vic_refresh_is_holded = true;
         return;
     }
 
     if((video_crt_output == nullptr) || (sdl_thread_pause == true)) return;
 
-    SDL_LockSurface(C64Screen);
-    video_crt_output->ConvertVideo(static_cast<void*>(C64Screen->pixels),C64Screen->pitch,vic_puffer,104,current_c64_screen_width,current_c64_screen_height,504,312,false);
+    SDL_LockSurface(c64_screen);
+    video_crt_output->ConvertVideo(static_cast<void*>(c64_screen->pixels),c64_screen->pitch,vic_puffer,104,current_c64_screen_width,current_c64_screen_height,504,312,false);
 
     this->vic_puffer = vic_puffer;
     vic->SwitchVideoPuffer();
-    SDL_UnlockSurface(C64Screen);
+    SDL_UnlockSurface(c64_screen);
 
     ///////////////////////////////////
 
-    VideoCapture->AddFrame(static_cast<uint8_t*>(C64Screen->pixels),C64Screen->pitch);
+    VideoCapture->AddFrame(static_cast<uint8_t*>(c64_screen->pixels),c64_screen->pitch);
 
     ///////////////////////////////////
 
@@ -712,14 +712,14 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
     /// Auf Screenshot Start prüfen ///
     if(StartScreenshot)
     {
-        SwapRBSurface(C64Screen);
+        SwapRBSurface(c64_screen);
 
         switch (ScreenshotFormat) {
         case SCREENSHOT_FORMAT_BMP:
-            SDL_SaveBMP(C64Screen,ScreenshotFilename);
+            SDL_SaveBMP(c64_screen,ScreenshotFilename);
             break;
         case SCREENSHOT_FORMAT_PNG:
-            SDL_SavePNG(C64Screen,ScreenshotFilename);
+            SDL_SavePNG(c64_screen,ScreenshotFilename);
             break;
         default:
 
@@ -731,12 +731,12 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
 
     if(Mouse1351Enable) UpdateMouse();
 
-    IsC64ScreenObsolete = true;
+    c64_screen_is_obselete = true;
 }
 
 void C64Class::WarpModeLoop()
 {
-    static unsigned int counter_plus=0;
+    static uint32_t counter_plus = 0;
 
     CheckKeys();
     CycleCounter++;
@@ -784,7 +784,7 @@ void C64Class::WarpModeLoop()
     cia2->OneZyklus();
 
     sid1->OneZyklus();
-    if(StereoEnable) sid2->OneZyklus();
+    if(enable_stereo_sid) sid2->OneZyklus();
 
     reu->OneZyklus();
     tape->OneCycle();
@@ -904,7 +904,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             cia1->OneZyklus();
             cia2->OneZyklus();
             sid1->OneZyklus();
-            if(StereoEnable) sid2->OneZyklus();
+            if(enable_stereo_sid) sid2->OneZyklus();
             reu->OneZyklus();
             tape->OneCycle();
 
@@ -979,9 +979,9 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
 
 
-        if(StereoEnable)
+        if(enable_stereo_sid)
         {
-            if(!Sid6ChannelMode)
+            if(!enable_stereo_sid_6channel_mode)
             {
                 int j=0;
                 for(int i=0; i<(laenge/2); i+=2)
@@ -1061,7 +1061,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     cia1->OneZyklus();
                     cia2->OneZyklus();
                     sid1->OneZyklus();
-                    if(StereoEnable) sid2->OneZyklus();
+                    if(enable_stereo_sid) sid2->OneZyklus();
                     reu->OneZyklus();
                     tape->OneCycle();
 
@@ -1118,7 +1118,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 cia1->OneZyklus();
                 cia2->OneZyklus();
                 sid1->OneZyklus();
-                if(StereoEnable) sid2->OneZyklus();
+                if(enable_stereo_sid) sid2->OneZyklus();
                 reu->OneZyklus();
                 tape->OneCycle();
 
@@ -1156,7 +1156,7 @@ loop_wait_next_opc:
                 cia1->OneZyklus();
                 cia2->OneZyklus();
                 sid1->OneZyklus();
-                if(StereoEnable) sid2->OneZyklus();
+                if(enable_stereo_sid) sid2->OneZyklus();
                 reu->OneZyklus();
                 tape->OneCycle();
 
@@ -1366,34 +1366,34 @@ void C64Class::KillCommandLine()
     ComandZeileCountS=false;
 }
 
-uint8_t C64Class::ReadC64Byte(uint16_t adresse)
+uint8_t C64Class::ReadC64Byte(uint16_t address)
 {
-    return ReadProcTbl[(adresse)>>8](adresse);
+    return ReadProcTbl[(address)>>8](address);
 }
 
-void C64Class::WriteC64Byte(uint16_t adresse, uint8_t wert)
+void C64Class::WriteC64Byte(uint16_t address, uint8_t value)
 {
-    WriteProcTbl[(adresse)>>8](adresse,wert);
+    WriteProcTbl[(address)>>8](address,value);
 }
 
-uint8_t* C64Class::GetRAMPointer(uint16_t adresse)
+uint8_t* C64Class::GetRAMPointer(uint16_t address)
 {
-    return mmu->GetRAMPointer() + adresse;
+    return mmu->GetRAMPointer() + address;
 }
 
-void C64Class::SetGrafikModi(bool enable_32bit_colors, bool enable_screen_doublesize, bool enable_screen_crt_output, bool filter_enable, int fullres_xw, int fullres_yw)
+void C64Class::SetGrafikModi(bool enable_32bit_colors, bool enable_screen_doublesize, bool enable_screen_crt_output, bool enable_screen_filter, uint16_t fullscreen_width, uint16_t fullscreen_height)
 {
     this->enable_screen_32bit_colors = enable_32bit_colors;
     this->enable_screen_doublesize = enable_screen_doublesize;
     this->enable_screen_crt_output =  enable_screen_crt_output;
-    FilterEnable = filter_enable;
-    FullResXW = fullres_xw;
-    FullResYW = fullres_yw;
+    this->enable_screen_filter = enable_screen_filter;
+    this->fullscreen_width = fullscreen_width;
+    this->fullscreen_height = fullscreen_height;
 
-    ChangeGrafikModi = true;
+    changed_graphic_modi = true;
 
     char str00[255];
-    sprintf(str00,">>   32Bit = %d\n>>   Doublesize = %d\n>>   PAL = %d\n>>   Filter = %d\n>>   FullResXW = %d\n>>   FullResrYW = %d\n", enable_32bit_colors, enable_screen_doublesize, enable_screen_crt_output,FilterEnable,FullResXW,FullResYW);
+    sprintf(str00,">>   32Bit = %d\n>>   Doublesize = %d\n>>   PAL = %d\n>>   Filter = %d\n>>   FullResXW = %d\n>>   FullResrYW = %d\n", enable_32bit_colors, enable_screen_doublesize, enable_screen_crt_output, enable_screen_filter, fullscreen_width, fullscreen_height);
 
     LogText(const_cast<char*>(">> Grafikmodus wurde gesetzt:\n"));
     LogText(str00);
@@ -1402,32 +1402,33 @@ void C64Class::SetGrafikModi(bool enable_32bit_colors, bool enable_screen_double
 void C64Class::SetWindowTitle(char *title_name)
 {
     strcpy(window_title, title_name);
-    SDL_SetWindowTitle(C64Window, title_name);
+    SDL_SetWindowTitle(sdl_window, title_name);
 }
 
 void C64Class::SetFullscreen()
 {
-    isFullscreen = true;
+    enable_fullscreen = true;
     SDL_ShowCursor(false);
-    SDL_SetWindowFullscreen(C64Window,SDL_WINDOW_FULLSCREEN_DESKTOP);
+    SDL_SetWindowFullscreen(sdl_window,SDL_WINDOW_FULLSCREEN_DESKTOP);
     SetFocusToC64Window();
 }
 
 void C64Class::InitGrafik()
 {
     /// VicRefresh stoppen und solange warten bis wirklich Stop ist ///
-    HoldVicRefresh = true;
-    VicRefreshIsHold = false;
-    while(!VicRefreshIsHold)
+    enable_hold_vic_refresh = true;
+    vic_refresh_is_holded = false;
+
+    while(!vic_refresh_is_holded)
     {
           SDL_Delay(1);
     }
 
     /// Allegmeine Einstellungen ///
 
-    if((FullResXW != 0) && (FullResYW != 0))
-        isFullscreen  = true;
-    else isFullscreen = false;
+    if((fullscreen_width != 0) && (fullscreen_height != 0))
+        enable_fullscreen  = true;
+    else enable_fullscreen = false;
 
 
     current_window_width = current_c64_screen_width = C64ScreenXW;
@@ -1445,35 +1446,35 @@ void C64Class::InitGrafik()
     if(enable_screen_32bit_colors)
     {
         current_window_color_bits = 32;
-        if(C64ScreenBuffer != nullptr)
+        if(c64_screen_buffer != nullptr)
         {
-            delete[] C64ScreenBuffer;
+            delete[] c64_screen_buffer;
         }
-        C64ScreenBuffer = new uint8_t[current_c64_screen_width*current_c64_screen_height*4];
+        c64_screen_buffer = new uint8_t[current_c64_screen_width*current_c64_screen_height*4];
     }
     else
     {
         current_window_color_bits = 16;
-        if(C64ScreenBuffer != nullptr)
+        if(c64_screen_buffer != nullptr)
         {
-            delete[] C64ScreenBuffer;
+            delete[] c64_screen_buffer;
         }
-        C64ScreenBuffer = new uint8_t[current_c64_screen_width * current_c64_screen_height * 2];
+        c64_screen_buffer = new uint8_t[current_c64_screen_width * current_c64_screen_height * 2];
     }
 
     video_crt_output->SetDisplayMode(current_window_color_bits);
     video_crt_output->EnableCrtOutput(enable_screen_crt_output);
     video_crt_output->EnableVideoDoubleSize(enable_screen_doublesize);
 
-    if(C64Window == nullptr)
+    if(sdl_window == nullptr)
     {
-        C64Window = SDL_CreateWindow(window_title,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+        sdl_window = SDL_CreateWindow(window_title,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
-        SDL_SetWindowIcon(C64Window,C64ScreenIcon);
+        SDL_SetWindowIcon(sdl_window,sdl_window_icon);
     }
-    else SDL_SetWindowSize(C64Window,current_window_width,current_window_height);
+    else SDL_SetWindowSize(sdl_window,current_window_width,current_window_height);
 
-    GLContext = SDL_GL_CreateContext(C64Window);
+    gl_context = SDL_GL_CreateContext(sdl_window);
 
     // OpenGL Initialisieren //
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,1);
@@ -1488,11 +1489,11 @@ void C64Class::InitGrafik()
     glOrtho(0,current_window_width,current_window_height,0,-1,1);
     glLoadIdentity();
 
-    glGenTextures(1,&C64ScreenTexture);
-    glBindTexture( GL_TEXTURE_2D, C64ScreenTexture);
+    glGenTextures(1,&c64_screen_texture);
+    glBindTexture( GL_TEXTURE_2D, c64_screen_texture);
 
     // Textur Stretching Parameter setzen
-    if(FilterEnable)
+    if(enable_screen_filter)
     {
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -1506,11 +1507,11 @@ void C64Class::InitGrafik()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-    if(C64Screen != nullptr)
-       SDL_FreeSurface(C64Screen);
-    C64Screen = SDL_CreateRGBSurface(0, current_c64_screen_width, current_c64_screen_height, current_window_color_bits, 0, 0, 0, 0);
+    if(c64_screen != nullptr)
+       SDL_FreeSurface(c64_screen);
+    c64_screen = SDL_CreateRGBSurface(0, current_c64_screen_width, current_c64_screen_height, current_window_color_bits, 0, 0, 0, 0);
 
-    glTexImage2D( GL_TEXTURE_2D, 0, 4, current_c64_screen_width, current_c64_screen_height, 0,GL_RGBA, GL_UNSIGNED_BYTE, C64ScreenBuffer );
+    glTexImage2D( GL_TEXTURE_2D, 0, 4, current_c64_screen_width, current_c64_screen_height, 0,GL_RGBA, GL_UNSIGNED_BYTE, c64_screen_buffer);
 
     GLenum  TextureFormat = 0;
     GLint   NofColors = 0;
@@ -1580,37 +1581,38 @@ void C64Class::InitGrafik()
     }
 
     /// VicRefresh wieder zulassen ///
-    HoldVicRefresh = false;
+    enable_hold_vic_refresh = false;
 }
 
 void C64Class::ReleaseGrafik()
 {
-    ChangeGrafikModi = false;
+    changed_graphic_modi = false;
 
     /// VicRefresh stoppen und solange warten bis wirklich Stop ist ///
-    HoldVicRefresh = true;
-    VicRefreshIsHold = false;
-    while(!VicRefreshIsHold)
+    enable_hold_vic_refresh = true;
+    vic_refresh_is_holded = false;
+
+    while(!vic_refresh_is_holded)
     {
           SDL_Delay(1);
     }
 
-    if(C64Screen != nullptr)
+    if(c64_screen != nullptr)
     {
-       SDL_FreeSurface(C64Screen);
-       C64Screen = nullptr;
+       SDL_FreeSurface(c64_screen);
+       c64_screen = nullptr;
     }
 
-    if(C64Window != nullptr)
+    if(sdl_window != nullptr)
     {
-        SDL_DestroyWindow(C64Window);
-        C64Window = nullptr;
+        SDL_DestroyWindow(sdl_window);
+        sdl_window = nullptr;
     }
 
-    if(C64ScreenBuffer != nullptr)
+    if(c64_screen_buffer != nullptr)
     {
-        delete[] C64ScreenBuffer;
-        C64ScreenBuffer = nullptr;
+        delete[] c64_screen_buffer;
+        c64_screen_buffer = nullptr;
     }
 }
 
@@ -1621,30 +1623,30 @@ void C64Class::DrawC64Screen()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     /// Texture auswählen und mit aktuellen C64 Bilddaten füllen
-    glBindTexture(GL_TEXTURE_2D,C64ScreenTexture);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, current_c64_screen_width, current_c64_screen_height,GL_RGBA, GL_UNSIGNED_BYTE, C64Screen->pixels);
+    glBindTexture(GL_TEXTURE_2D,c64_screen_texture);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, current_c64_screen_width, current_c64_screen_height,GL_RGBA, GL_UNSIGNED_BYTE, c64_screen->pixels);
 
     /// Aspect Ratio berechnen
     float_t scale_x;
     float_t scale_y;
 
-    if((EnableWindowAspectRatio == false && isFullscreen == false) || (EnableFullscreenAspectRatio == false && isFullscreen == true))
+    if((enable_window_aspect_ratio == false && enable_fullscreen == false) || (enable_fullscreen_aspect_ratio == false && enable_fullscreen == true))
     {
         scale_x = 1.0f;
         scale_y = 1.0f;
     }
     else
     {
-        if((static_cast<float_t>(current_window_width) / static_cast<float_t>(current_window_height)) >= C64ScreenAspectRatio)
+        if((static_cast<float_t>(current_window_width) / static_cast<float_t>(current_window_height)) >= screen_aspect_ratio)
         {
             scale_y = 1.0f;
-            int xw = int(current_window_height * C64ScreenAspectRatio);
+            int xw = int(current_window_height * screen_aspect_ratio);
             scale_x = (1.0f * xw) / current_window_width;
         }
         else
         {
             scale_x = 1.0f;
-            int yw = int(current_window_width / C64ScreenAspectRatio);
+            int yw = int(current_window_width / screen_aspect_ratio);
             scale_y = (1.0f * yw) / current_window_height;
         }
     }
@@ -1653,17 +1655,17 @@ void C64Class::DrawC64Screen()
     glBegin(GL_QUADS);
     for(int i=0; i < SUBDIVS_SCREEN*SUBDIVS_SCREEN*4; i+=4)
     {
-        glTexCoord2f(DistortionGridTex[i+0].x,DistortionGridTex[i+0].y);
-        glVertex3f(DistortionGrid[i+0].x*scale_x,DistortionGrid[i+0].y*scale_y,0.0);
+        glTexCoord2f(distortion_grid_texture_coordinates[i+0].x,distortion_grid_texture_coordinates[i+0].y);
+        glVertex3f(distortion_grid[i+0].x*scale_x,distortion_grid[i+0].y*scale_y,0.0);
 
-        glTexCoord2f(DistortionGridTex[i+1].x,DistortionGridTex[i+1].y);
-        glVertex3f(DistortionGrid[i+1].x*scale_x,DistortionGrid[i+1].y*scale_y,0.0);
+        glTexCoord2f(distortion_grid_texture_coordinates[i+1].x,distortion_grid_texture_coordinates[i+1].y);
+        glVertex3f(distortion_grid[i+1].x*scale_x,distortion_grid[i+1].y*scale_y,0.0);
 
-        glTexCoord2f(DistortionGridTex[i+2].x,DistortionGridTex[i+2].y);
-        glVertex3f(DistortionGrid[i+2].x*scale_x,DistortionGrid[i+2].y*scale_y,0.0);
+        glTexCoord2f(distortion_grid_texture_coordinates[i+2].x,distortion_grid_texture_coordinates[i+2].y);
+        glVertex3f(distortion_grid[i+2].x*scale_x,distortion_grid[i+2].y*scale_y,0.0);
 
-        glTexCoord2f(DistortionGridTex[i+3].x,DistortionGridTex[i+3].y);
-        glVertex3f(DistortionGrid[i+3].x*scale_x,DistortionGrid[i+3].y*scale_y,0.0);
+        glTexCoord2f(distortion_grid_texture_coordinates[i+3].x,distortion_grid_texture_coordinates[i+3].y);
+        glVertex3f(distortion_grid[i+3].x*scale_x,distortion_grid[i+3].y*scale_y,0.0);
     }
     glEnd();
 
@@ -1741,22 +1743,22 @@ void C64Class::DrawC64Screen()
         glEnd();
     }
 
-    SDL_GL_SwapWindow(C64Window);
+    SDL_GL_SwapWindow(sdl_window);
 }
 
 void C64Class::SetFocusToC64Window()
 {
-    SDL_RaiseWindow(C64Window);
+    SDL_RaiseWindow(sdl_window);
 }
 
-void C64Class::SetWindowAspectRatio(bool enabled)
+void C64Class::SetWindowAspectRatio(bool enable)
 {
-    EnableWindowAspectRatio = enabled;
+    enable_window_aspect_ratio = enable;
 }
 
-void C64Class::SetFullscreenAspectRatio(bool enabled)
+void C64Class::SetFullscreenAspectRatio(bool enable)
 {
-    EnableFullscreenAspectRatio = enabled;
+    enable_fullscreen_aspect_ratio = enable;
 }
 
 void C64Class::AnalyzeSDLEvent(SDL_Event *event)
@@ -2030,16 +2032,16 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
                 if((KMOD_MODE == (keymod & KMOD_MODE) || KMOD_LALT == (keymod & KMOD_LALT) || KMOD_RALT == (keymod & KMOD_RALT)) && (isReturnKeyDown == false))
                 {
-                    isFullscreen = !isFullscreen;
-                    if(isFullscreen)
+                    enable_fullscreen = ! enable_fullscreen;
+                    if(enable_fullscreen)
                     {
                         SDL_ShowCursor(false);
-                        SDL_SetWindowFullscreen(C64Window,SDL_WINDOW_FULLSCREEN_DESKTOP);
+                        SDL_SetWindowFullscreen(sdl_window,SDL_WINDOW_FULLSCREEN_DESKTOP);
                     }
                     else
                     {
                         SDL_ShowCursor(true);
-                        SDL_SetWindowFullscreen(C64Window,0);
+                        SDL_SetWindowFullscreen(sdl_window,0);
                     }
 
                 }
@@ -2254,7 +2256,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
         case SDL_MOUSEMOTION:
 
-        if(!isFullscreen)
+        if(!enable_fullscreen)
         {
             MouseHiddenCounter = 0;
             MouseIsHidden = false;
@@ -2284,7 +2286,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
 void C64Class::SetDistortion(float_t value)
 {
-    Distortion = value;
+    distortion_value = value;
     CalcDistortionGrid();
 }
 
@@ -2295,26 +2297,26 @@ void C64Class::SetMouseHiddenTime(int time)
 
 void C64Class::GetWindowPos(int *x, int *y)
 {
-    SDL_GetWindowPosition(C64Window, x, y);
+    SDL_GetWindowPosition(sdl_window, x, y);
 }
 
 void C64Class::SetWindowPos(int x, int y)
 {
-    this->win_pos_x = x;
-    this->win_pos_y = y;
-    ChangeWindowPos = true;
+    sdl_window_pos_x = x;
+    sdl_window_pos_y = y;
+    changed_window_pos = true;
 }
 
 void C64Class::GetWindowSize(int *w, int *h)
 {
-    SDL_GetWindowSize(C64Window, w, h);
+    SDL_GetWindowSize(sdl_window, w, h);
 }
 
 void C64Class::SetWindowSize(int w, int h)
 {
-    this->win_size_w = w;
-    this->win_size_h = h;
-    ChangeWindowSize = true;
+    sdl_window_size_width = w;
+    sdl_window_size_height = h;
+    changed_window_size = true;
 }
 
 bool C64Class::LoadTapeImage(char *filename)
@@ -2515,7 +2517,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
     return 1;
 }
 
-int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
+int C64Class::LoadPRG(char *filename, uint16_t *return_start_address)
 {
     uint8_t *RAM = mmu->GetRAMPointer();
     FILE *file;
@@ -2536,7 +2538,7 @@ int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
         LogText(filename);
         LogText(const_cast<char*>("\n"));
 
-        uint16_t StartAdresse;
+        uint16_t start_address;
         size_t reading_bytes;
         uint8_t temp[2];
         file = fopen (filename, "rb");
@@ -2546,26 +2548,26 @@ int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
             return 0x01;
         }
         reading_bytes = fread (&temp,1,2,file);
-        StartAdresse = static_cast<uint16_t>(temp[0]|(temp[1]<<8));
-        if(ret_startadresse != nullptr) *ret_startadresse = StartAdresse;
+        start_address = static_cast<uint16_t>(temp[0]|(temp[1]<<8));
+        if(return_start_address != nullptr) *return_start_address = start_address;
 
-        reading_bytes=fread (RAM+StartAdresse,1,0xFFFF-StartAdresse,file);
+        reading_bytes=fread (RAM+start_address,1,0xFFFF-start_address,file);
 
         RAM[0x2B] = 0x01;
         RAM[0x2C] = 0x08;
 
-        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",StartAdresse,StartAdresse);
+        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",start_address,start_address);
         LogText(str00);
 
-        StartAdresse+=static_cast<uint16_t>(reading_bytes);
-        RAM[0x2D] = static_cast<uint8_t>(StartAdresse);
-        RAM[0x2E] = static_cast<uint8_t>(StartAdresse>>8);
-        RAM[0xAE] = static_cast<uint8_t>(StartAdresse);
-        RAM[0xAF] = static_cast<uint8_t>(StartAdresse>>8);
+        start_address += static_cast<uint16_t>(reading_bytes);
+        RAM[0x2D] = static_cast<uint8_t>(start_address);
+        RAM[0x2E] = static_cast<uint8_t>(start_address>>8);
+        RAM[0xAE] = static_cast<uint8_t>(start_address);
+        RAM[0xAF] = static_cast<uint8_t>(start_address>>8);
 
         fclose(file);
 
-        sprintf(str00,"EndAdresse: $%4.4X(%d)\n",StartAdresse,StartAdresse);
+        sprintf(str00,"EndAdresse: $%4.4X(%d)\n", start_address, start_address);
         LogText(str00);
 
         return 0x00;
@@ -2577,11 +2579,11 @@ int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
         LogText(filename);
         LogText(const_cast<char*>("\n"));
 
-        char Kennung[32];
+        char signature[32];
         size_t reading_bytes;
         uint16_t T64Entries;
-        uint16_t StartAdresse;
-        uint16_t EndAdresse;
+        uint16_t start_address;
+        uint16_t end_address;
         int FileStartOffset;
 
         file = fopen (filename, "rb");
@@ -2591,7 +2593,7 @@ int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
                 return 0x01;
         }
 
-        reading_bytes = fread(Kennung,1,32,file);
+        reading_bytes = fread(signature,1,32,file);
         if(reading_bytes != 32)
         {
             cout << "Error T64 0x02" << endl;
@@ -2627,27 +2629,27 @@ int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
         */
 
         fseek(file,0x42,SEEK_SET);
-        reading_bytes = fread(&StartAdresse,1,2,file);
-        if(ret_startadresse != nullptr) *ret_startadresse = StartAdresse;
-        reading_bytes = fread(&EndAdresse,1,2,file);
+        reading_bytes = fread(&start_address,1,2,file);
+        if(return_start_address != nullptr) *return_start_address = start_address;
+        reading_bytes = fread(&end_address,1,2,file);
         fseek(file,2,SEEK_CUR);
         reading_bytes = fread(&FileStartOffset,1,4,file);
 
         fseek(file,FileStartOffset,SEEK_SET);
-        reading_bytes = fread(RAM+StartAdresse,1,EndAdresse-StartAdresse,file);
+        reading_bytes = fread(RAM + start_address,1,end_address - start_address,file);
         fclose(file);
 
         RAM[0x2B] = 0x01;
         RAM[0x2C] = 0x08;
 
-        RAM[0x2D] = static_cast<uint8_t>(EndAdresse);
-        RAM[0x2E] = static_cast<uint8_t>(EndAdresse>>8);
-        RAM[0xAE] = static_cast<uint8_t>(EndAdresse);
-        RAM[0xAF] = static_cast<uint8_t>(EndAdresse>>8);
+        RAM[0x2D] = static_cast<uint8_t>(end_address);
+        RAM[0x2E] = static_cast<uint8_t>(end_address>>8);
+        RAM[0xAE] = static_cast<uint8_t>(end_address);
+        RAM[0xAF] = static_cast<uint8_t>(end_address>>8);
 
-        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",StartAdresse,StartAdresse);
+        sprintf(str00,">>   SartAdresse: $%4.4X(%d)", start_address, start_address);
         LogText(str00);
-        sprintf(str00,"EndAdresse: $%4.4X(%d)\n",EndAdresse,EndAdresse);
+        sprintf(str00,"EndAdresse: $%4.4X(%d)\n", end_address, end_address);
         LogText(str00);
 
         return 0x00;
@@ -2659,8 +2661,8 @@ int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
         LogText(filename);
         LogText(const_cast<char*>("\n"));
 
-        char Kennung[8];
-        uint16_t StartAdresse;
+        char signature[8];
+        uint16_t start_address;
         size_t reading_bytes;
         uint8_t temp[2];
         file = fopen (filename, "rb");
@@ -2670,9 +2672,9 @@ int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
                 return 0x01;
         }
 
-        reading_bytes = fread(Kennung,1,7,file);
-        Kennung[7]=0;
-        if(0!=strcmp("C64File",Kennung))
+        reading_bytes = fread(signature,1,7,file);
+        signature[7]=0;
+        if(0!=strcmp("C64File",signature))
         {
                 fclose(file);
                 return 0x06;
@@ -2681,26 +2683,26 @@ int C64Class::LoadPRG(char *filename, uint16_t *ret_startadresse)
         fseek(file,0x1A,SEEK_SET);
 
         reading_bytes = fread (&temp,1,2,file);
-        StartAdresse = static_cast<uint16_t>(temp[0]|(temp[1]<<8));
-        if(ret_startadresse != nullptr) *ret_startadresse = StartAdresse;
+        start_address = static_cast<uint16_t>(temp[0]|(temp[1]<<8));
+        if(return_start_address != nullptr) *return_start_address = start_address;
 
-        reading_bytes=fread (RAM+StartAdresse,1,0xFFFF,file);
+        reading_bytes=fread (RAM+start_address,1,0xFFFF,file);
 
         RAM[0x2B] = 0x01;
         RAM[0x2C] = 0x08;
 
-        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",StartAdresse,StartAdresse);
+        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",start_address,start_address);
         LogText(str00);
 
-        StartAdresse += static_cast<uint16_t>(reading_bytes);
-        RAM[0x2D] = static_cast<uint8_t>(StartAdresse);
-        RAM[0x2E] = static_cast<uint8_t>(StartAdresse>>8);
-        RAM[0xAE] = static_cast<uint8_t>(StartAdresse);
-        RAM[0xAF] = static_cast<uint8_t>(StartAdresse>>8);
+        start_address += static_cast<uint16_t>(reading_bytes);
+        RAM[0x2D] = static_cast<uint8_t>(start_address);
+        RAM[0x2E] = static_cast<uint8_t>(start_address>>8);
+        RAM[0xAE] = static_cast<uint8_t>(start_address);
+        RAM[0xAF] = static_cast<uint8_t>(start_address>>8);
 
         fclose(file);
 
-        sprintf(str00,"EndAdresse: $%4.4X(%d)\n",StartAdresse,StartAdresse);
+        sprintf(str00,"EndAdresse: $%4.4X(%d)\n",start_address,start_address);
         LogText(str00);
 
         return 0x00;
@@ -3300,23 +3302,23 @@ void C64Class::SetSecondSidTyp(int sid_typ)
     sid2->SetChipType(sid_typ);
 }
 
-void C64Class::EnableSecondSid(bool enable)
+void C64Class::EnableStereoSid(bool enable)
 {
-    StereoEnable = enable;
+    enable_stereo_sid = enable;
 }
 
-void C64Class::SetSecondSidAddress(uint16_t address)
+void C64Class::SetStereoSidAddress(uint16_t address)
 {
-    Sid2Adresse = address;
-    if(Sid2Adresse == 0xD400)
+    stereo_sid_address = address;
+    if(stereo_sid_address == 0xD400)
         sid2->SetIODelayEnable(true);
     else
         sid2->SetIODelayEnable(false);
 }
 
-void C64Class::SetSid6ChannelMode(bool enable)
+void C64Class::SetStereoSid6ChannelMode(bool enable)
 {
-    Sid6ChannelMode = enable;
+    enable_stereo_sid_6channel_mode = enable;
 }
 
 void C64Class::SetSidCycleExact(bool enable)
@@ -3627,10 +3629,10 @@ bool C64Class::CheckBreakpoints()
 
 void C64Class::WriteSidIO(uint16_t adresse, uint8_t wert)
 {
-    if(StereoEnable)
+    if(enable_stereo_sid)
     {
         if((adresse & 0xFFE0) == 0xD400) sid1->WriteIO(adresse,wert);
-        if((adresse & 0xFFE0) == Sid2Adresse) sid2->WriteIO(adresse,wert);
+        if((adresse & 0xFFE0) == stereo_sid_address) sid2->WriteIO(adresse,wert);
     }
     else
     {

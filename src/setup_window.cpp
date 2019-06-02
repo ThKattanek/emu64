@@ -692,13 +692,13 @@ void SetupWindow::on_SecondSidAddress_currentIndexChanged(int index)
     if(c64 == NULL) return;
 
     unsigned short sid_address = index * 0x20 + 0xd400;
-    c64->SetSecondSidAddress(sid_address);
+    c64->SetStereoSidAddress(sid_address);
 }
 
 void SetupWindow::on_SecondSidEnable_toggled(bool checked)
 {
     if(c64 != NULL)
-        c64->EnableSecondSid(checked);
+        c64->EnableStereoSid(checked);
 
     ui->SecondSidTyp->setEnabled(checked);
     ui->SecondSidAddress->setEnabled(checked);
@@ -740,7 +740,7 @@ void SetupWindow::on_SidFilterEnable_toggled(bool checked)
 void SetupWindow::on_Sid6ChannelMode_toggled(bool checked)
 {
     if(c64 != NULL)
-        c64->SetSid6ChannelMode(checked);
+        c64->SetStereoSid6ChannelMode(checked);
 
     if(!ui->SecondSidEnable->isChecked()) return;
 
