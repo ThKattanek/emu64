@@ -3,17 +3,17 @@
 // Emu64                                        //
 // von Thorsten Kattanek                        //
 //                                              //
-// #file: videopal_class.cpp                    //
+// #file: video_crt_class.cpp                   //
 //                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.10.2017                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "videopal_class.h"
+#include "video_crt_class.h"
 #include "c64_colors.h"
 #include <math.h>
 

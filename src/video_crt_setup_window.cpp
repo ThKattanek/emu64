@@ -3,28 +3,29 @@
 // Emu64                                        //
 // von Thorsten Kattanek                        //
 //                                              //
-// #file: tv_setup_window.cpp                   //
+// #file: video_crt_setup_window.cpp            //
 //                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.10.2017                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "tv_setup_window.h"
-#include "ui_tv_setup_window.h"
+#include "video_crt_setup_window.h"
+#include "ui_video_crt_setup_window.h"
 
-TVSetupWindow::TVSetupWindow(QWidget *parent, C64Class *_c64, VideoPalClass *_videopal, QSettings *_ini) :
+VideoCrtSetupWindow::VideoCrtSetupWindow(QWidget *parent, C64Class *c64, VideoCrtClass *video_crt_output, QSettings *ini) :
     QDialog(parent),
-    ui(new Ui::TVSetupWindow),
+    ui(new Ui::VideoCrtSetupWindow),
     isOneShowed(false)
 {
-    ini = _ini;
+    this->ini = ini;
     ui->setupUi(this);
-    c64 = _c64;
-    videopal = _videopal;
+
+    this->c64 = c64;
+    this->video_crt_output = video_crt_output;
 
     ////////// Load from INI ///////////
     if(ini != 0)
@@ -61,10 +62,10 @@ TVSetupWindow::TVSetupWindow(QWidget *parent, C64Class *_c64, VideoPalClass *_vi
         ini->endGroup();
     }
     ////////////////////////////////////
-    videopal->UpdateParameter();
+    video_crt_output->UpdateParameter();
 }
 
-TVSetupWindow::~TVSetupWindow()
+VideoCrtSetupWindow::~VideoCrtSetupWindow()
 {
     ///////// Save to INI /////////
     if(ini != 0)
@@ -85,74 +86,74 @@ TVSetupWindow::~TVSetupWindow()
     delete ui;
 }
 
-void TVSetupWindow::showEvent(QShowEvent*)
+void VideoCrtSetupWindow::showEvent(QShowEvent*)
 {
     isOneShowed = true;
 }
 
-void TVSetupWindow::RetranslateUi()
+void VideoCrtSetupWindow::RetranslateUi()
 {
     ui->retranslateUi(this);
     this->update();
 }
 
-void TVSetupWindow::on_saettigung_scroll_valueChanged(int value)
+void VideoCrtSetupWindow::on_saettigung_scroll_valueChanged(int value)
 {
     ui->saettigung_out->setText(QVariant(value).toString());
-    videopal->SetSaturation((float)value/100.0f);
-    videopal->UpdateParameter();
+    video_crt_output->SetSaturation((float)value/100.0f);
+    video_crt_output->UpdateParameter();
 }
 
-void TVSetupWindow::on_helligkeit_scroll_valueChanged(int value)
+void VideoCrtSetupWindow::on_helligkeit_scroll_valueChanged(int value)
 {
     ui->helligkeit_out->setText(QVariant(value).toString());
-    videopal->SetHelligkeit((value+50)/100.0f);
-    videopal->UpdateParameter();
+    video_crt_output->SetHelligkeit((value+50)/100.0f);
+    video_crt_output->UpdateParameter();
 }
 
-void TVSetupWindow::on_kontrast_scroll_valueChanged(int value)
+void VideoCrtSetupWindow::on_kontrast_scroll_valueChanged(int value)
 {
     ui->kontrast_out->setText(QVariant(value).toString());
-    videopal->SetKontrast((float)value/100.0f);
-    videopal->UpdateParameter();
+    video_crt_output->SetKontrast((float)value/100.0f);
+    video_crt_output->UpdateParameter();
 }
 
-void TVSetupWindow::on_horblurY_scroll_valueChanged(int value)
+void VideoCrtSetupWindow::on_horblurY_scroll_valueChanged(int value)
 {
     ui->horblurY_out->setText(QVariant(value-1).toString() + " Pixel");
-    videopal->SetHorizontalBlurY(value);
-    videopal->UpdateParameter();
+    video_crt_output->SetHorizontalBlurY(value);
+    video_crt_output->UpdateParameter();
 }
 
-void TVSetupWindow::on_horblurUV_scroll_valueChanged(int value)
+void VideoCrtSetupWindow::on_horblurUV_scroll_valueChanged(int value)
 {
     ui->horblurUV_out->setText(QVariant(value-1).toString() + " Pixel");
-    videopal->SetHorizontalBlurUV(value);
-    videopal->UpdateParameter();
+    video_crt_output->SetHorizontalBlurUV(value);
+    video_crt_output->UpdateParameter();
 }
 
-void TVSetupWindow::on_phase_scroll_valueChanged(int value)
+void VideoCrtSetupWindow::on_phase_scroll_valueChanged(int value)
 {
     float winkel = (value - 1000) * 0.045f;
     ui->phase_out->setText(QVariant(winkel).toString() + trUtf8("°"));
-    videopal->SetPhaseAltLineOffset(value);
-    videopal->UpdateParameter();
+    video_crt_output->SetPhaseAltLineOffset(value);
+    video_crt_output->UpdateParameter();
 }
 
-void TVSetupWindow::on_scanline_scroll_valueChanged(int value)
+void VideoCrtSetupWindow::on_scanline_scroll_valueChanged(int value)
 {
     ui->scanline_out->setText((QVariant(value).toString() + " %"));
-    videopal->SetScanline(value);
-    videopal->UpdateParameter();
+    video_crt_output->SetScanline(value);
+    video_crt_output->UpdateParameter();
 }
 
-void TVSetupWindow::on_distortion_scroll_valueChanged(int value)
+void VideoCrtSetupWindow::on_distortion_scroll_valueChanged(int value)
 {
     ui->distortion_out->setText(QVariant(value-100).toString());
     c64->SetDistortion((0.01f*(value-100))*MAX_DISTORTION);
 }
 
-void TVSetupWindow::on_Reset_clicked()
+void VideoCrtSetupWindow::on_Reset_clicked()
 {
     ui->saettigung_scroll->setValue(75);
     ui->helligkeit_scroll->setValue(40);

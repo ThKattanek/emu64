@@ -3,12 +3,12 @@
 // Emu64                                        //
 // von Thorsten Kattanek                        //
 //                                              //
-// #file: videopal_class.h                      //
+// #file: video_crt_class.h                     //
 //                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////

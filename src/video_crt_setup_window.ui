@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TVSetupWindow</class>
- <widget class="QDialog" name="TVSetupWindow">
+ <class>VideoCrtSetupWindow</class>
+ <widget class="QDialog" name="VideoCrtSetupWindow">
   <property name="windowModality">
    <enum>Qt::NonModal</enum>
   </property>
@@ -43,7 +43,7 @@
    <bool>false</bool>
   </property>
   <property name="windowTitle">
-   <string>TV/Video Einstellungen</string>
+   <string>Video CRT Einstellungen</string>
   </property>
   <property name="windowOpacity">
    <double>1.000000000000000</double>

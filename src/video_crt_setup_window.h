@@ -8,33 +8,33 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.09.2017        		//
+// Letzte Änderung am 02.06.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#ifndef TV_SETUP_WINDOW_H
-#define TV_SETUP_WINDOW_H
+#ifndef CRT_SETUP_WINDOW_H
+#define CRT_SETUP_WINDOW_H
 
 #include <QDialog>
 #include <QSettings>
 #include <qmainwindow.h>
 #include "./c64_class.h"
-#include "./videopal_class.h"
+#include "./video_crt_class.h"
 
 #define MAX_DISTORTION 0.33f
 
 namespace Ui {
-    class TVSetupWindow;
+    class VideoCrtSetupWindow;
 }
 
-class TVSetupWindow : public QDialog
+class VideoCrtSetupWindow : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit TVSetupWindow(QWidget *parent = 0, C64Class *_c64 = 0, VideoPalClass *_videopal = 0, QSettings *_ini = 0);
-    ~TVSetupWindow();
+    explicit VideoCrtSetupWindow(QWidget *parent = nullptr, C64Class *c64 = nullptr, VideoCrtClass *video_crt_output = nullptr, QSettings *ini = nullptr);
+    ~VideoCrtSetupWindow();
     void RetranslateUi();
 
 private slots:
@@ -52,10 +52,10 @@ private:
     void showEvent(QShowEvent* event);
 
     QSettings *ini;
-    Ui::TVSetupWindow *ui;
+    Ui::VideoCrtSetupWindow *ui;
     C64Class *c64;
-    VideoPalClass *videopal;
+    VideoCrtClass *video_crt_output;
     bool isOneShowed;
 };
 
-#endif // TV_SETUP_WINDOW_H
+#endif // CRT_SETUP_WINDOW_H
