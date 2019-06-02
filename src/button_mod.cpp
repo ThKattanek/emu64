@@ -8,14 +8,14 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.05.2019                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "button_mod.h"
 
-ButtonMod::ButtonMod(int idx,int idy, QWidget *parent) :
+ButtonMod::ButtonMod(int idx, int idy, QWidget *parent) :
     QPushButton(parent)
 {
     idX = idx;
