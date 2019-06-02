@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.05.2019                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -44,7 +44,7 @@ using namespace std::tr1::placeholders;
 
 #define MAX_C64_SCREEN_TITLE_LENGTH 100
 
-#define FloppyAnzahl 4
+#define FLOPPY_ANZAHL 4
 #define MAX_BREAK_GROUPS 255
 #define MAX_JOYSTICKS 16
 #define MAX_VJOYS 16
@@ -63,11 +63,11 @@ class C64Class
 public:
     C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> log_function, const char *data_path);
     ~C64Class();
-    void StartEmulation(void);
-    void EndEmulation(void);
+    void StartEmulation();
+    void EndEmulation();
     void SetLimitCycles(int nCycles);
     void SetEnableDebugCart(bool enabled);
-    void WarpModeLoop(void);
+    void WarpModeLoop();
     void FillAudioBuffer(uint8_t *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
     void KeyEvent(uint8_t  matrix_code, KeyStatus status, bool isAutoShift);
     bool LoadC64Roms(char *kernalrom, char *basicrom, char *charrom);
@@ -76,17 +76,17 @@ public:
     void LoadPRGFromD64(uint8_t floppy_nr, char *c64_filename, int command);
     void SetFloppyWriteProtect(uint8_t floppy_nr, bool status);
     void SetCommandLine(char *c64_command);
-    void KillCommandLine(void);
+    void KillCommandLine();
     uint8_t ReadC64Byte(uint16_t adresse);
     void WriteC64Byte(uint16_t adresse, uint8_t wert);
     uint8_t* GetRAMPointer(uint16_t adresse);
     void SetGrafikModi(bool colbits32, bool doublesize, bool enable_pal, bool filter_enable, int fullres_xw = 0, int fullres_yw = 0);
     void SetWindowTitle(char *title_name);
-    void SetFullscreen(void);
-    void InitGrafik(void);
-    void ReleaseGrafik(void);
-    void DrawC64Screen(void);
-    void SetFocusToC64Window(void);
+    void SetFullscreen();
+    void InitGrafik();
+    void ReleaseGrafik();
+    void DrawC64Screen();
+    void SetFocusToC64Window();
     void SetWindowAspectRatio(bool enabled);
     void SetFullscreenAspectRatio(bool enabled);
     void AnalyzeSDLEvent(SDL_Event *event);
@@ -102,42 +102,42 @@ public:
     bool LoadTapeImage(char *filename);
     bool RecordTapeImage(char* filename);
     uint8_t SetTapeKeys(uint8_t pressed_key);
-    bool GetTapeMotorStatus(void);
-    bool GetTapeRecordLedStatus(void);
-    uint32_t GetTapeCounter(void);
-    float_t GetTapeLenTime(void);
-    uint32_t GetTapeLenCount(void);
+    bool GetTapeMotorStatus();
+    bool GetTapeRecordLedStatus();
+    uint32_t GetTapeCounter();
+    float_t GetTapeLenTime();
+    uint32_t GetTapeLenCount();
     void SetTapeSoundVolume(float_t volume);
 
-    void SoftReset(void);
-    void HardReset(void);
+    void SoftReset();
+    void HardReset();
     void SetReset(int status, int hard_reset);
     int LoadAutoRun(uint8_t floppy_nr, char *filename);
     int LoadPRG(char *filename, uint16_t *ret_startadresse);
 
     int LoadCRT(char *filename);
-    void RemoveCRT(void);
+    void RemoveCRT();
     int CreateNewEasyFlashImage(char *filename, char *crt_name);
 
-    void InsertREU(void);
-    void RemoveREU(void);
+    void InsertREU();
+    void RemoveREU();
     int LoadREUImage(char *filename);
     int SaveREUImage(char *filename);
-    void ClearREURam(void);
+    void ClearREURam();
 
-    void InsertGEORAM(void);
-    void RemoveGEORAM(void);
+    void InsertGEORAM();
+    void RemoveGEORAM();
     int LoadGEORAMImage(char *filename);
     int SaveGEORAMImage(char *filename);
-    void ClearGEORAMRam(void);
+    void ClearGEORAMRam();
 
     void SetMouse1351Port(unsigned char port);
 
-    void ResetC64CycleCounter(void);
+    void ResetC64CycleCounter();
     void SetDebugMode(bool status);
     void SetCpuExtLines(bool status);
     void SetExtRDY(bool status);
-    void OneZyklus(void);
+    void OneZyklus();
     void OneOpcode(int source);
     void SetDebugAnimation(bool status);
     void SetDebugAnimationSpeed(int cycle_sek);
@@ -145,29 +145,29 @@ public:
     void GetVicReg(VIC_STRUCT *vic_reg);
     void GetIECStatus(IEC_STRUCT *iec);
 
-    int AddBreakGroup(void);
+    int AddBreakGroup();
     void DelBreakGroup(int index);
     BREAK_GROUP* GetBreakGroup(int index);
-    void UpdateBreakGroup(void);
-    void DeleteAllBreakGroups(void);
-    int GetBreakGroupAnz(void);
+    void UpdateBreakGroup();
+    void DeleteAllBreakGroups();
+    int GetBreakGroupAnz();
     int LoadBreakGroups(char *filename);
     bool SaveBreakGroups(char *filename);
     bool ExportPRG(char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
     bool ExportRAW(char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
     bool ExportASM(char* filename, uint16_t start_adresse, uint16_t end_adresse, int source);
-    void JoystickNewScan(void);
+    void JoystickNewScan();
     void StartRecJoystickMapping(int slot_nr);
-    void StopRecJoystickMapping(void);
+    void StopRecJoystickMapping();
     void ClearJoystickMapping(int slot_nr);
-    void IncMouseHiddenCounter(void);
+    void IncMouseHiddenCounter();
 
     void StartRecKeyMap(uint8_t keymatrix_code);
-    void StopRecKeyMap(void);
-    bool GetRecKeyMapStatus(void);
-    C64_KEYS* GetC64KeyTable(void);
-    const char** GetC64KeyNameTable(void);
-    int GetC64KeyTableSize(void);
+    void StopRecKeyMap();
+    bool GetRecKeyMapStatus();
+    C64_KEYS* GetC64KeyTable();
+    const char** GetC64KeyNameTable();
+    int GetC64KeyTableSize();
 
     uint8_t GetMapReadSource(uint8_t page);
     uint8_t GetMapWriteDestination(uint8_t page);
@@ -176,14 +176,14 @@ public:
     const char* GetScreenshotFormatName(int format);
     void SetExitScreenshot(const char *filename);
 
-    const char* GetAVVersion(void);
+    const char* GetAVVersion();
     bool StartVideoRecord(const char *filename, int audio_bitrate=128000, int video_bitrate=4000000);
     void SetPauseVideoRecord(bool status);
-    void StopVideoRecord(void);
-    int GetRecordedFrameCount(void);
+    void StopVideoRecord();
+    int GetRecordedFrameCount();
 
     bool StartIECDump(const char *filename);
-    void StopIECDump(void);
+    void StopIECDump();
 
     void SetSIDVolume(float_t volume);  // Lautstärke der SID's (0.0f - 1.0f)
     void SetFirstSidTyp(int sid_typ);   // SID Typ des 1. SID (MOS_6581 oder MOS_8580)
@@ -195,8 +195,8 @@ public:
     void SetSidFilter(bool enable);
 
     bool StartSidDump(const char *filename);
-    void StopSidDump(void);
-    int GetSidDumpFrames(void);
+    void StopSidDump();
+    int GetSidDumpFrames();
 
     void SetVicConfig(int var, bool enable);    // var = VIC_BORDER_ON, VIC_SPRITES_ON, VIC_SPR_SPR_COLL_ON, VIC_SPR_BCK_COLL_ON
     bool GetVicConfig(int var);
@@ -204,10 +204,10 @@ public:
     void SetVicDisplaySizePal(int first_line, int last_line);
     void SetVicDisplaySizeNtsc(int first_line, int last_line);
 
-    int GetVicFirstDisplayLinePal(void);
-    int GetVicLastDisplayLinePal(void);
-    int GetVicFirstDisplayLineNtsc(void);
-    int GetVicLastDisplayLineNtsc(void);
+    int GetVicFirstDisplayLinePal();
+    int GetVicLastDisplayLinePal();
+    int GetVicFirstDisplayLineNtsc();
+    int GetVicLastDisplayLineNtsc();
 
     uint16_t        AktWindowXW;
     uint16_t        AktWindowYW;
@@ -302,7 +302,7 @@ public:
     CRTClass        *crt;
     REUClass        *reu;
     GEORAMClass     *geo;
-    Floppy1541      *floppy[FloppyAnzahl];
+    Floppy1541      *floppy[FLOPPY_ANZAHL];
     TAPE1530        *tape;
 
     bool RESET;     // Reset Leitung -> Für Alle Module mit Reset Eingang
@@ -346,25 +346,25 @@ public:
     VideoCaptureClass *VideoCapture;
 
 private:
-    void CalcDistortionGrid(void);
+    void CalcDistortionGrid();
     void VicRefresh(uint8_t *vic_puffer);
-    void CheckKeys(void);
+    void CheckKeys();
     uint16_t DisAss(FILE *file, uint16_t pc, bool line_draw, int source);
-    bool CheckBreakpoints(void);
+    bool CheckBreakpoints();
     void WriteSidIO(uint16_t adresse, uint8_t wert);
     uint8_t ReadSidIO(uint16_t adresse);
     void WriteIO1(uint16_t adresse, uint8_t wert);
     void WriteIO2(uint16_t adresse, uint8_t wert);
     uint8_t ReadIO1(uint16_t adresse);
     uint8_t ReadIO2(uint16_t adresse);
-    void SDLThreadPauseBegin(void);
-    void SDLThreadPauseEnd(void);
-    void OpenSDLJoystick(void);
-    void CloseSDLJoystick(void);
-    void ChangePOTSwitch(void);
-    void UpdateMouse(void);
-    int InitVideoCaptureSystem(void);
-    void CloseVideoCaptureSystem(void);
+    void SDLThreadPauseBegin();
+    void SDLThreadPauseEnd();
+    void OpenSDLJoystick();
+    void CloseSDLJoystick();
+    void ChangePOTSwitch();
+    void UpdateMouse();
+    int InitVideoCaptureSystem();
+    void CloseVideoCaptureSystem();
     void SwapRBSurface(SDL_Surface *surface); // swaps the color red with blue in sdl surface
     function<uint8_t(uint16_t)> *ReadProcTbl;
     function<void(uint16_t, uint8_t)> *WriteProcTbl;
@@ -452,7 +452,7 @@ private:
     ////////////////////////////////////////////////////////////
 
     bool        C64ResetReady;
-    bool        FloppyResetReady[FloppyAnzahl];
+    bool        FloppyResetReady[FLOPPY_ANZAHL];
 
     char        ComandZeile[256];
     int         ComandZeileSize;

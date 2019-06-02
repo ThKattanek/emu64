@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.05.2019                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -295,7 +295,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     sprintf(stepper_inc_filename,"%sstepper_inc.raw",FloppySoundPath);
     sprintf(stepper_dec_filename,"%sstepper_dec.raw",FloppySoundPath);
 
-    for(int i=0;i<FloppyAnzahl;i++)
+    for(int i=0; i<FLOPPY_ANZAHL; i++)
     {
         floppy[i] = new Floppy1541(&RESET,have.freq,have.samples,&FloppyFoundBreakpoint);
         floppy[i]->SetResetReady(&FloppyResetReady[i],0xEBFF);
@@ -473,7 +473,7 @@ C64Class::~C64Class()
 {
     EndEmulation();
 
-    for(int i=0;i<FloppyAnzahl;i++)
+    for(int i=0; i<FLOPPY_ANZAHL; i++)
     {
         if(floppy[i] != nullptr) delete floppy[i];
     }
@@ -499,14 +499,14 @@ C64Class::~C64Class()
     if(RomPath != nullptr) delete[] RomPath;
 }
 
-void C64Class::StartEmulation(void)
+void C64Class::StartEmulation()
 {
     /// SLD Thread starten (ab hier startet auch die C64 Emulation ///
     sdl_thread = SDL_CreateThread(SDLThread, "C64Thread", this);
     SDL_PauseAudio(0);
 }
 
-void C64Class::EndEmulation(void)
+void C64Class::EndEmulation()
 {
     EnableWarpMode(false);
     if(ExitScreenshotEnable)
@@ -562,14 +562,14 @@ int SDLThreadWarp(void *userdat)
     return 0;
 }
 
-void C64Class::SDLThreadPauseBegin(void)
+void C64Class::SDLThreadPauseBegin()
 {
     sdl_thread_is_paused = false;
     sdl_thread_pause = true;
     SDL_Delay(40);
 }
 
-void C64Class::SDLThreadPauseEnd(void)
+void C64Class::SDLThreadPauseEnd()
 {
     sdl_thread_pause = false;
 }
@@ -650,7 +650,7 @@ int SDLThread(void *userdat)
     return 0;
 }
 
-void C64Class::CalcDistortionGrid(void)
+void C64Class::CalcDistortionGrid()
 {
     float_t div = 2.0f / SUBDIVS_SCREEN;
     for(int y=0; y<SUBDIVS_SCREEN+1; y++)
@@ -734,7 +734,7 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
     IsC64ScreenObsolete = true;
 }
 
-void C64Class::WarpModeLoop(void)
+void C64Class::WarpModeLoop()
 {
     static unsigned int counter_plus=0;
 
@@ -762,7 +762,7 @@ void C64Class::WarpModeLoop(void)
     //if(ExtZyklus) ZyklusProcExt();
 
     FloppyIEC = 0;
-    for(int i=0; i<FloppyAnzahl; i++)
+    for(int i=0; i<FLOPPY_ANZAHL; i++)
     {
         floppy[i]->OneZyklus();
 
@@ -851,7 +851,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
     sid1->SoundBufferPos = 0;
     sid2->SoundBufferPos = 0;
-    for(int i=0; i< FloppyAnzahl; i++)
+    for(int i=0; i<FLOPPY_ANZAHL; i++)
         floppy[i]->ZeroSoundBufferPos();
     tape->ZeroSoundBufferPos();
 
@@ -883,7 +883,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             //if(ExtZyklus) ZyklusProcExt();
 
             FloppyIEC = 0;
-            for(int i=0; i<FloppyAnzahl; i++)
+            for(int i=0; i<FLOPPY_ANZAHL; i++)
             {
                 floppy[i]->OneZyklus();
 
@@ -1015,7 +1015,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
         VideoCapture->FillSourceAudioBuffer(puffer, laenge/2);
 
         /// Floppysound dazu mixen ///
-        for(int i=0; i< FloppyAnzahl; i++)
+        for(int i=0; i<FLOPPY_ANZAHL; i++)
         {
             if(floppy[i]->GetEnableFloppySound()) SDL_MixAudio(reinterpret_cast<uint8_t*>(puffer),reinterpret_cast<uint8_t*>(floppy[i]->GetSoundBuffer()),static_cast<uint32_t>(laenge),255);
         }
@@ -1039,7 +1039,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     //if(ExtZyklus) ZyklusProcExt();
 
                     FloppyIEC = 0;
-                    for(int i=0; i<FloppyAnzahl; i++)
+                    for(int i=0; i<FLOPPY_ANZAHL; i++)
                     {
                         floppy[i]->OneZyklus();
 
@@ -1097,7 +1097,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 //if(ExtZyklus) ZyklusProcExt();
 
                 FloppyIEC = 0;
-                for(int i=0; i<FloppyAnzahl; i++)
+                for(int i=0; i<FLOPPY_ANZAHL; i++)
                 {
                     floppy[i]->OneZyklus();
 
@@ -1166,7 +1166,7 @@ loop_wait_next_opc:
                 {
                     int FloppyNr = OneOpcSource - 1;
                     FloppyIEC = 0;
-                    for(int i=0; i<FloppyAnzahl; i++)
+                    for(int i=0; i<FLOPPY_ANZAHL; i++)
                     {
                         if(i != FloppyNr)
                         {
@@ -1239,7 +1239,7 @@ void C64Class::KeyEvent(uint8_t matrix_code, KeyStatus key_status, bool isAutoSh
     }
 }
 
-void C64Class::SoftReset(void)
+void C64Class::SoftReset()
 {
     WaitResetReady = false;
     SetReset(false,true);
@@ -1247,7 +1247,7 @@ void C64Class::SoftReset(void)
     SetReset(true,true);
 }
 
-void C64Class::HardReset(void)
+void C64Class::HardReset()
 {
     WaitResetReady = false;
     SetReset(false,false);
@@ -1267,7 +1267,7 @@ inline void C64Class::SetReset(int status, int hard_reset)
     }
 }
 
-inline void C64Class::CheckKeys(void)
+inline void C64Class::CheckKeys()
 {
     uint8_t OUT_PA, OUT_PB;
     uint8_t IN_PA, IN_PB;
@@ -1288,7 +1288,7 @@ inline void C64Class::CheckKeys(void)
     CIA1_PB.SetInput(~(IN_PB|GamePort1));
 }
 
-void C64Class::ResetC64CycleCounter(void)
+void C64Class::ResetC64CycleCounter()
 {
     CycleCounter = 0;
 }
@@ -1303,7 +1303,7 @@ bool C64Class::LoadC64Roms(char *kernalrom, char *basicrom, char *charrom)
 
 bool C64Class::LoadFloppyRom(uint8_t floppy_nr, char *dos1541rom)
 {
-    if(floppy_nr < FloppyAnzahl)
+    if(floppy_nr < FLOPPY_ANZAHL)
     {
         if(!floppy[floppy_nr]->LoadDosRom(dos1541rom)) return false;
         return true;
@@ -1313,7 +1313,7 @@ bool C64Class::LoadFloppyRom(uint8_t floppy_nr, char *dos1541rom)
 
 bool C64Class::LoadDiskImage(uint8_t floppy_nr, char *filename)
 {
-    if(floppy_nr < FloppyAnzahl)
+    if(floppy_nr < FLOPPY_ANZAHL)
     {
         return floppy[floppy_nr]->LoadDiskImage(filename);
     }
@@ -1359,7 +1359,7 @@ void C64Class::SetCommandLine(char *c64_command)
     ComandZeileCountS = true;
 }
 
-void C64Class::KillCommandLine(void)
+void C64Class::KillCommandLine()
 {
     ComandZeileSize=0;
     ComandZeileStatus=false;
@@ -1405,7 +1405,7 @@ void C64Class::SetWindowTitle(char *title_name)
     SDL_SetWindowTitle(C64Window, title_name);
 }
 
-void C64Class::SetFullscreen(void)
+void C64Class::SetFullscreen()
 {
     isFullscreen = true;
     SDL_ShowCursor(false);
@@ -1413,7 +1413,7 @@ void C64Class::SetFullscreen(void)
     SetFocusToC64Window();
 }
 
-void C64Class::InitGrafik(void)
+void C64Class::InitGrafik()
 {
     /// VicRefresh stoppen und solange warten bis wirklich Stop ist ///
     HoldVicRefresh = true;
@@ -1583,7 +1583,7 @@ void C64Class::InitGrafik(void)
     HoldVicRefresh = false;
 }
 
-void C64Class::ReleaseGrafik(void)
+void C64Class::ReleaseGrafik()
 {
     ChangeGrafikModi = false;
 
@@ -1614,7 +1614,7 @@ void C64Class::ReleaseGrafik(void)
     }
 }
 
-void C64Class::DrawC64Screen(void)
+void C64Class::DrawC64Screen()
 {
     /// Fensterinhalt löschen
     glClearColor(0.0f, 0.0f, 0.0f, 1.f);
@@ -2332,28 +2332,28 @@ uint8_t C64Class::SetTapeKeys(uint8_t pressed_key)
     return tape->SetTapeKeys(pressed_key);
 }
 
-bool C64Class::GetTapeMotorStatus(void)
+bool C64Class::GetTapeMotorStatus()
 {
     return !(CPU_PORT.DATA_READ & 32);
 }
 
-bool C64Class::GetTapeRecordLedStatus(void)
+bool C64Class::GetTapeRecordLedStatus()
 {
     if((!(CPU_PORT.DATA_READ & 32)) && tape->IsPressedRecord()) return true;
     else return false;
 }
 
-uint32_t C64Class::GetTapeCounter(void)
+uint32_t C64Class::GetTapeCounter()
 {
     return tape->GetCounter();
 }
 
-float_t C64Class::GetTapeLenTime(void)
+float_t C64Class::GetTapeLenTime()
 {
     return tape->GetTapeLenTime();
 }
 
-uint32_t C64Class::GetTapeLenCount(void)
+uint32_t C64Class::GetTapeLenCount()
 {
     return tape->GetTapeLenCount();
 }
@@ -2724,7 +2724,7 @@ int C64Class::LoadCRT(char *filename)
     return ret;
 }
 
-void C64Class::RemoveCRT(void)
+void C64Class::RemoveCRT()
 {
     crt->RemoveCRTImage();
     IOSource = 0;
@@ -2737,7 +2737,7 @@ int C64Class::CreateNewEasyFlashImage(char *filename, char *crt_name)
     return crt->CreateNewEasyFlashImage(filename, crt_name);
 }
 
-void C64Class::InsertREU(void)
+void C64Class::InsertREU()
 {
     IOSource = 2;
 
@@ -2751,7 +2751,7 @@ void C64Class::InsertREU(void)
     HardReset();
 }
 
-void C64Class::RemoveREU(void)
+void C64Class::RemoveREU()
 {
     reu->Remove();
     IOSource = 0;
@@ -2772,12 +2772,12 @@ int C64Class::SaveREUImage(char *filename)
     return reu->SaveRAM(filename);
 }
 
-void C64Class::ClearREURam(void)
+void C64Class::ClearREURam()
 {
     reu->ClearRAM();
 }
 
-void C64Class::InsertGEORAM(void)
+void C64Class::InsertGEORAM()
 {
     IOSource = 3;
 
@@ -2791,7 +2791,7 @@ void C64Class::InsertGEORAM(void)
     HardReset();
 }
 
-void C64Class::RemoveGEORAM(void)
+void C64Class::RemoveGEORAM()
 {
     geo->Remove();
     IOSource = 0;
@@ -2810,7 +2810,7 @@ int C64Class::SaveGEORAMImage(char *filename)
     return geo->SaveRAM(filename);
 }
 
-void C64Class::ClearGEORAMRam(void)
+void C64Class::ClearGEORAMRam()
 {
     geo->ClearRAM();
 }
@@ -2829,7 +2829,7 @@ void C64Class::SetDebugMode(bool status)
         OneOpc = false;
         sid1->SoundOutputEnable = false;
         sid2->SoundOutputEnable = false;
-        for(int i=0; i<FloppyAnzahl; i++) floppy[i]->SetEnableFloppySound(false);
+        for(int i=0; i<FLOPPY_ANZAHL; i++) floppy[i]->SetEnableFloppySound(false);
     }
     else
     {
@@ -2837,7 +2837,7 @@ void C64Class::SetDebugMode(bool status)
         OneOpc = false;
         sid1->SoundOutputEnable = true;
         sid2->SoundOutputEnable = true;
-        for(int i=0; i<FloppyAnzahl; i++) floppy[i]->SetEnableFloppySound(true);
+        for(int i=0; i<FLOPPY_ANZAHL; i++) floppy[i]->SetEnableFloppySound(true);
     }
 }
 
@@ -2860,7 +2860,7 @@ void C64Class::SetExtRDY(bool status)
     ExtRDY = status;
 }
 
-void C64Class::OneZyklus(void)
+void C64Class::OneZyklus()
 {
     DebugAnimation = false;
     OneZyk = true;
@@ -2908,7 +2908,7 @@ void C64Class::GetIECStatus(IEC_STRUCT *iec)
     iec->DATA_IN = !!(FloppyIEC & 128);
 }
 
-int C64Class::AddBreakGroup(void)
+int C64Class::AddBreakGroup()
 {
     if(BreakGroupAnz == MAX_BREAK_GROUPS) return -1;
 
@@ -2934,7 +2934,7 @@ BREAK_GROUP* C64Class::GetBreakGroup(int index)
     return BreakGroup[index];
 }
 
-void C64Class::UpdateBreakGroup(void)
+void C64Class::UpdateBreakGroup()
 {
     for(int i=0; i<0x10000;i++) Breakpoints[i] = 0;
     for(int i=0;i<BreakGroupAnz;i++)
@@ -2955,7 +2955,7 @@ void C64Class::UpdateBreakGroup(void)
         }
     }
 
-    for(int i=0;i<FloppyAnzahl;i++)
+    for(int i=0;i<FLOPPY_ANZAHL;i++)
     {
         if(floppy[i]->GetEnableFloppy())
         {
@@ -2964,7 +2964,7 @@ void C64Class::UpdateBreakGroup(void)
     }
 }
 
-void C64Class::DeleteAllBreakGroups(void)
+void C64Class::DeleteAllBreakGroups()
 {
     for(int i=0;i<BreakGroupAnz;i++)
     {
@@ -2974,7 +2974,7 @@ void C64Class::DeleteAllBreakGroups(void)
     UpdateBreakGroup();
 }
 
-int C64Class::GetBreakGroupAnz(void)
+int C64Class::GetBreakGroupAnz()
 {
     return BreakGroupAnz;
 }
@@ -3227,7 +3227,7 @@ void C64Class::SetExitScreenshot(const char *filename)
     ExitScreenshotEnable = true;
 }
 
-const char* C64Class::GetAVVersion(void)
+const char* C64Class::GetAVVersion()
 {
     return VideoCapture->GetAVVersion();
 }
@@ -3249,7 +3249,7 @@ void C64Class::SetPauseVideoRecord(bool status)
     VideoCapture->SetCapturePause(status);
 }
 
-void C64Class::StopVideoRecord(void)
+void C64Class::StopVideoRecord()
 {
     if(VideoCapture != nullptr)
     {
@@ -3257,7 +3257,7 @@ void C64Class::StopVideoRecord(void)
     }
 }
 
-int C64Class::GetRecordedFrameCount(void)
+int C64Class::GetRecordedFrameCount()
 {
     return VideoCapture->GetRecordedFrameCount();
 }
@@ -3279,7 +3279,7 @@ bool C64Class::StartIECDump(const char *filename)
     return true;
 }
 
-void C64Class::StopIECDump(void)
+void C64Class::StopIECDump()
 {
     IecIsDumped = false;
     IecVcdExport.Close();
@@ -3369,22 +3369,22 @@ void C64Class::SetVicDisplaySizeNtsc(int first_line, int last_line)
     vic->SetVicVDisplayNtscSize(first_line, last_line);
 }
 
-int C64Class::GetVicFirstDisplayLinePal(void)
+int C64Class::GetVicFirstDisplayLinePal()
 {
     return vic->GetVicFirstDisplayLinePal();
 }
 
-int C64Class::GetVicLastDisplayLinePal(void)
+int C64Class::GetVicLastDisplayLinePal()
 {
     return vic->GetVicLastDisplayLinePal();
 }
 
-int C64Class::GetVicFirstDisplayLineNtsc(void)
+int C64Class::GetVicFirstDisplayLineNtsc()
 {
     return vic->GetVicFirstDisplayLineNtsc();
 }
 
-int C64Class::GetVicLastDisplayLineNtsc(void)
+int C64Class::GetVicLastDisplayLineNtsc()
 {
     return vic->GetVicLastDisplayLineNtsc();
 }
@@ -3517,7 +3517,7 @@ uint16_t C64Class::DisAss(FILE *file, uint16_t PC, bool line_draw, int source)
     return PC;
 }
 
-bool C64Class::CheckBreakpoints(void)
+bool C64Class::CheckBreakpoints()
 {
     int BreaksIO = 0;
 
@@ -3591,7 +3591,7 @@ bool C64Class::CheckBreakpoints(void)
 
     FloppyFoundBreakpoint = false;
     int floppy_break = 0;
-    for(int i=0;i<FloppyAnzahl;i++)
+    for(int i=0; i<FLOPPY_ANZAHL; i++)
     {
         if(floppy[i]->GetEnableFloppy())
         {
@@ -3609,7 +3609,7 @@ bool C64Class::CheckBreakpoints(void)
             OneOpc = false;
             sid1->SoundOutputEnable = false;
             sid2->SoundOutputEnable = false;
-            for(int i=0; i<FloppyAnzahl; i++) floppy[i]->SetEnableFloppySound(false);
+            for(int i=0; i<FLOPPY_ANZAHL; i++) floppy[i]->SetEnableFloppySound(false);
             if(BreakpointProc != nullptr) BreakpointProc();
             return true;
         }
@@ -3741,7 +3741,7 @@ uint8_t C64Class::ReadIO2(uint16_t adresse)
     }
 }
 
-void C64Class::JoystickNewScan(void)
+void C64Class::JoystickNewScan()
 {
     OpenSDLJoystick();
 }
@@ -3754,7 +3754,7 @@ void C64Class::StartRecJoystickMapping(int slot_nr)
     RecJoyMapping = true;
 }
 
-void C64Class::StopRecJoystickMapping(void)
+void C64Class::StopRecJoystickMapping()
 {
     if(RecJoyMapping)
         RecJoyMapping = false;
@@ -3780,7 +3780,7 @@ void C64Class::ClearJoystickMapping(int slot_nr)
     }
 }
 
-void C64Class::IncMouseHiddenCounter(void)
+void C64Class::IncMouseHiddenCounter()
 {
     if(!MouseIsHidden && (MouseHiddenTime > 0))
     {
@@ -3799,32 +3799,32 @@ void C64Class::StartRecKeyMap(uint8_t keymatrix_code)
     IsKeyMapRec = true;
 }
 
-void C64Class::StopRecKeyMap(void)
+void C64Class::StopRecKeyMap()
 {
     IsKeyMapRec = false;
 }
 
-bool C64Class::GetRecKeyMapStatus(void)
+bool C64Class::GetRecKeyMapStatus()
 {
     return IsKeyMapRec;
 }
 
-C64_KEYS* C64Class::GetC64KeyTable(void)
+C64_KEYS* C64Class::GetC64KeyTable()
 {
     return C64KeyTable;
 }
 
-const char** C64Class::GetC64KeyNameTable(void)
+const char** C64Class::GetC64KeyNameTable()
 {
     return C64KeyNames;
 }
 
-int C64Class::GetC64KeyTableSize(void)
+int C64Class::GetC64KeyTableSize()
 {
     return C64KeyNum;
 }
 
-void C64Class::OpenSDLJoystick(void)
+void C64Class::OpenSDLJoystick()
 {
     JoyStickUdateIsStop = false;
     StopJoystickUpdate = true;
@@ -3883,7 +3883,7 @@ void C64Class::OpenSDLJoystick(void)
     StopJoystickUpdate = true;
 }
 
-void C64Class::CloseSDLJoystick(void)
+void C64Class::CloseSDLJoystick()
 {
     JoyStickUdateIsStop = false;
     StopJoystickUpdate = true;
@@ -3905,7 +3905,7 @@ void C64Class::CloseSDLJoystick(void)
 /// \brief  Wird aufgerufen wenn der CIA1 Ausgang PA6 und PA7 sich ändert
 ///         Somit Schaltet IC 4066 POTX und POTY
 ///
-void C64Class::ChangePOTSwitch(void)
+void C64Class::ChangePOTSwitch()
 {
     if(!Mouse1351Enable)
     {
