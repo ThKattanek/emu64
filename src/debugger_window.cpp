@@ -872,7 +872,7 @@ void DebuggerWindow::on_OneZyklus_clicked()
 {
     ui->EingabeFeld->hide();
     ClearAllBreakpointBackcolors();
-    c64->OneZyklus();
+    c64->OneCycle();
 }
 
 void DebuggerWindow::on_OneOpcode_clicked()
