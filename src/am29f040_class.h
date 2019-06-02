@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.05.2019                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -60,17 +60,17 @@ public:
     uint8_t Read(uint32_t adresse);
     void Write(uint32_t adresse, uint8_t wert);
 
-    uint8_t ProgrammByte;
-    int	Dirty;
+    uint8_t programm_byte;
+    int	dirty;
 
 private:
-        int	FlashType;
-        int	Status;
+        int	flash_type;
+        int	status;
 
-        uint8_t* Data;
-        uint8_t LastRead;
+        uint8_t* data;
+        uint8_t last_read;
 
-        int WriteOperationStatus(void);
+        int WriteOperationStatus();
         int FlashMagic1(uint32_t adresse);
         int FlashMagic2(uint32_t adresse);
         void FlashEraseSector(uint32_t adresse);

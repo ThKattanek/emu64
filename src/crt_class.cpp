@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.02.2018                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -112,10 +112,10 @@ int* CRTClass::GetFlash040Dirty(int nr)
         switch (nr)
         {
         case 0:
-                return &am29f040Lo->Dirty;
+                return &am29f040Lo->dirty;
                 break;
         case 1:
-                return &am29f040Hi->Dirty;
+                return &am29f040Hi->dirty;
                 break;
         default:
                 return 0;
@@ -127,10 +127,10 @@ unsigned char* CRTClass::GetFlash040Byte(int nr)
         switch (nr)
         {
         case 0:
-                return &am29f040Lo->ProgrammByte;
+                return &am29f040Lo->programm_byte;
                 break;
         case 1:
-                return &am29f040Hi->ProgrammByte;
+                return &am29f040Hi->programm_byte;
                 break;
         default:
                 return 0;
