@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 30.05.2019                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,9 +19,9 @@
 #include <SDL2/SDL_keycode.h>
 #include "./structs.h"
 
-#define C64KeyNum 72
+#define C64_KEY_COUNT 72
 
-C64_KEYS C64KeyTable[C64KeyNum] ={
+C64_KEYS c64_key_table[C64_KEY_COUNT] ={
                                             // C64 Keys //
     {0x00,SDLK_BACKSPACE,false},            /// DEL
     {0x01,SDLK_RETURN,false},               /// RETURN
@@ -106,7 +106,7 @@ C64_KEYS C64KeyTable[C64KeyNum] ={
     {0x07,SDLK_UP,true},                    /// CRSR_U
 };
 
-const char *C64KeyNames[C64KeyNum]={
+const char *c64_key_names[C64_KEY_COUNT]={
     "DEL",
     "RETURN",
     "CRSR_RIGHT",

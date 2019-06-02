@@ -389,8 +389,8 @@ void MainWindow::OnInit()
 
     /// C64 Keyboard Matrix mit dem Virtual Keyboard verbinden ///
     SplashMessage(trUtf8("C64 Key-Matrix wird mit Virtual Keyboard verbunden."),Qt::darkBlue);
-    c64_keyboard_window->KeyMatrixToPA = c64->KeyboardMatrixToPAExt;
-    c64_keyboard_window->KeyMatrixToPB = c64->KeyboardMatrixToPBExt;
+    c64_keyboard_window->key_matrix_to_pa = c64->KeyboardMatrixToPAExt;
+    c64_keyboard_window->key_matrix_to_pb = c64->KeyboardMatrixToPBExt;
     LogText(trUtf8(">> C64 Key-Matrix wurde mit Virtual Keyboard verbunden\n").toLatin1().data());
 
 
@@ -984,14 +984,14 @@ void MainWindow::on_actionFloppy_1541_II_triggered()
 
 void MainWindow::on_actionVirtuelle_C64_Tastatur_triggered()
 {
-    c64_keyboard_window->Recording = false;
+    c64_keyboard_window->recording = false;
     c64_keyboard_window->show();
     c64_keyboard_window->update();
 }
 
 void MainWindow::on_actionC64_Tastaturbelegung_ndern_triggered()
 {
-    c64_keyboard_window->Recording = true;
+    c64_keyboard_window->recording = true;
     c64_keyboard_window->show();
     c64_keyboard_window->update();
 }

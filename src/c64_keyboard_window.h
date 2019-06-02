@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 30.05.2019                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -45,12 +45,12 @@ public:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
-    bool Recording;
-    uint8_t *KeyMatrixToPA;
-    uint8_t *KeyMatrixToPB;
+    bool recording;
+    uint8_t *key_matrix_to_pa;
+    uint8_t *key_matrix_to_pb;
 
 public slots:
-    void timer_event(void);
+    void TimerEvent();
 
 private:
 
@@ -58,10 +58,10 @@ private:
     Ui::C64KeyboardWindow *ui;
     QTimer *timer;
 
-    uint8_t AKT_Y_KEY_OLD;
-    uint8_t AKT_Y_KEY;
-    uint8_t AKT_X_KEY_OLD;
-    uint8_t AKT_X_KEY;
+    uint8_t current_y_key_old;
+    uint8_t current_y_key;
+    uint8_t current_x_key_old;
+    uint8_t current_x_key;
 
     QPoint mouse_offset;
 
@@ -75,15 +75,14 @@ private:
 
     bool blink_flip;
 
-    uint8_t *KeyboardTrans;
+    uint8_t *keyboard_trans;
 
-    bool RecKeyPress;
-    uint8_t RecKeyAktX;
-    uint8_t RecKeyAktY;
+    bool rec_key_press;
+    uint8_t rec_key_curr_x;
+    uint8_t rec_key_curr_y;
 
-    int RecTimeOut;
-
-    bool isOneShowed;
+    int rec_time_out;
+    bool is_one_showed;
 
     C64Class *c64;
 };

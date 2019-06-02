@@ -57,7 +57,7 @@ private:
     QSettings *ini;
     Ui::C64SpeedWindow *ui;
     C64Class *c64;
-    bool isOneShowed;
+    bool is_one_showed;
     bool pause_status;
 };
 

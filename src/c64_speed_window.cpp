@@ -26,7 +26,7 @@ C64SpeedWindow::C64SpeedWindow(QWidget *parent, QSettings *ini) :
     ui->setupUi(this);
     ui->C64Speed->setValue(100);
 
-    isOneShowed = false;
+    is_one_showed = false;
 
     ////////// Load from INI ///////////
     if(ini != nullptr)
@@ -45,7 +45,7 @@ C64SpeedWindow::~C64SpeedWindow()
     if(ini != nullptr)
     {
         ini->beginGroup("C64SpeedWindow");
-        if(isOneShowed) ini->setValue("Geometry", geometry());
+        if(is_one_showed) ini->setValue("Geometry", geometry());
         ini->endGroup();
     }
     ///////////////////////////////
@@ -67,7 +67,7 @@ void C64SpeedWindow::SetC64Pointer(C64Class *c64)
 
 void C64SpeedWindow::showEvent(QShowEvent*)
 {
-    isOneShowed = true;
+    is_one_showed = true;
 }
 
 void C64SpeedWindow::on_C64Speed_valueChanged(int arg1)

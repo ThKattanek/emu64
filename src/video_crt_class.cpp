@@ -132,21 +132,21 @@ void VideoCrtClass::SetC64Palette(int palnr)
     int ij = 0;
     for(int j=0;j<16;j++)
     {
-        uint8_t *COLOR_RGBA1 = (uint8_t*)&C64_FARBEN[palnr*16*4];
+        uint8_t *color_rgba = (uint8_t*)&c64_colors[palnr*16*4];
 
         for(int i=0;i<16;i++)
         {
             /// Für 32Bit Video Display ///
-            Palette32Bit[ij] = 0xFF000000 | COLOR_RGBA1[2]<<16 | COLOR_RGBA1[1]<<8 | COLOR_RGBA1[0];
+            Palette32Bit[ij] = 0xFF000000 | color_rgba[2]<<16 | color_rgba[1]<<8 | color_rgba[0];
 
             /// Für 16Bit Video Display ///
             /// RGB-565
-            unsigned char r = (COLOR_RGBA1[0] * 31) / 255;
-            unsigned char g = (COLOR_RGBA1[1] * 63) / 255;
-            unsigned char b = (COLOR_RGBA1[2] * 31) / 255;
+            unsigned char r = (color_rgba[0] * 31) / 255;
+            unsigned char g = (color_rgba[1] * 63) / 255;
+            unsigned char b = (color_rgba[2] * 31) / 255;
             Palette16Bit[ij] = r<<11 | g<<5 | b;
 
-            COLOR_RGBA1+=4;
+            color_rgba+=4;
             ij++;
         }
     }
