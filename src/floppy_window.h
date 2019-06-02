@@ -79,10 +79,10 @@ private:
     QSettings *ini;
     C64Class *c64;
     bool isOneShowed;
-    QString AktDir[FLOPPY_ANZAHL];
-    QString AktFile[FLOPPY_ANZAHL];
-    QString AktFileName[FLOPPY_ANZAHL];
-    D64Class d64[FLOPPY_ANZAHL];
+    QString AktDir[FLOPPY_COUNT];
+    QString AktFile[FLOPPY_COUNT];
+    QString AktFileName[FLOPPY_COUNT];
+    D64Class d64[FLOPPY_COUNT];
 
     QIcon *green_led ;
     QIcon *yellow_led;

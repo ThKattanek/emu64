@@ -784,7 +784,7 @@ void SetupWindow::on_SelectRomSet_currentIndexChanged(const QString &arg1)
     {
         c64->LoadC64Roms(kernal_rom.toLatin1().data(),basic_rom.toLatin1().data(),char_rom.toLatin1().data());
 
-        for(int i=0; i<FLOPPY_ANZAHL; i++)
+        for(int i=0; i<FLOPPY_COUNT; i++)
         {
             c64->LoadFloppyRom(i,dos1541_rom.toLatin1().data());
         }
