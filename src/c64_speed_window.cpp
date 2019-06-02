@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.03.2017                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,11 +16,11 @@
 #include "c64_speed_window.h"
 #include "ui_c64_speed_window.h"
 
-C64SpeedWindow::C64SpeedWindow(QWidget *parent, QSettings *_ini) :
+C64SpeedWindow::C64SpeedWindow(QWidget *parent, QSettings *ini) :
     QDialog(parent),
-    ini(NULL),c64(NULL),PauseStatus(false)
+    ini(nullptr),c64(nullptr),pause_status(false)
 {
-    ini = _ini;
+    this->ini = ini;
 
     ui = new Ui::C64SpeedWindow();
     ui->setupUi(this);
@@ -29,11 +29,11 @@ C64SpeedWindow::C64SpeedWindow(QWidget *parent, QSettings *_ini) :
     isOneShowed = false;
 
     ////////// Load from INI ///////////
-    if(ini != NULL)
+    if(ini != nullptr)
     {
         ini->beginGroup("C64SpeedWindow");
         if(ini->contains("Geometry")) setGeometry(ini->value("Geometry").toRect());
-        else ini->setValue("Geometry",geometry());
+        else ini->setValue("Geometry", geometry());
         ini->endGroup();
     }
     ////////////////////////////////////
@@ -42,10 +42,10 @@ C64SpeedWindow::C64SpeedWindow(QWidget *parent, QSettings *_ini) :
 C64SpeedWindow::~C64SpeedWindow()
 {
     ///////// Save to INI /////////
-    if(ini != NULL)
+    if(ini != nullptr)
     {
         ini->beginGroup("C64SpeedWindow");
-        if(isOneShowed) ini->setValue("Geometry",geometry());
+        if(isOneShowed) ini->setValue("Geometry", geometry());
         ini->endGroup();
     }
     ///////////////////////////////
@@ -60,9 +60,9 @@ void C64SpeedWindow::RetranslateUi()
     SetPauseTooltip();
 }
 
-void C64SpeedWindow::SetC64Pointer(C64Class *_c64)
+void C64SpeedWindow::SetC64Pointer(C64Class *c64)
 {
-    c64 = _c64;
+    this->c64 = c64;
 }
 
 void C64SpeedWindow::showEvent(QShowEvent*)
@@ -73,7 +73,7 @@ void C64SpeedWindow::showEvent(QShowEvent*)
 void C64SpeedWindow::on_C64Speed_valueChanged(int arg1)
 {
     ui->ScrollC64Speed->setValue(arg1);
-    if(c64 == NULL) return;
+    if(c64 == nullptr) return;
 
     c64->SetC64Speed(arg1);
 }
@@ -126,26 +126,31 @@ void C64SpeedWindow::on_Set500_clicked()
 
 void C64SpeedWindow::on_Pause_clicked()
 {
-    if(c64 == NULL) return;
+    if(c64 == nullptr) return;
 
-    if(!PauseStatus)
+    if(pause_status)
     {
-        PauseStatus = true;
+        pause_status = true;
         ui->Pause->setText(trUtf8("Weiter"));
         c64->SetDebugMode(true);
     }
     else
     {
-        PauseStatus = false;
+        pause_status = false;
         ui->Pause->setText(trUtf8("Pause"));
         c64->SetDebugMode(false);
     }
     SetPauseTooltip();
 }
 
+void C64SpeedWindow::on_WarpMode_clicked(bool checked)
+{
+    c64->EnableWarpMode(checked);
+}
+
 void C64SpeedWindow::SetPauseTooltip()
 {
-    if(PauseStatus)
+    if(pause_status)
     {
         ui->Pause->setToolTip(trUtf8("Lässt den C64, mit der eingestellten Geschwindigkeit, weiterlaufen."));
     }
@@ -153,9 +158,4 @@ void C64SpeedWindow::SetPauseTooltip()
     {
         ui->Pause->setToolTip(trUtf8("Hält den C64 komplett an."));
     }
-}
-
-void C64SpeedWindow::on_WarpMode_clicked(bool checked)
-{
-    c64->EnableWarpMode(checked);
 }
