@@ -41,8 +41,6 @@ int SDLThreadWarp(void *userdat);
 
 #define C64ScreenXW 384         //384
 
-static const char *ScreenschotFormatName[SCREENSHOT_FORMATS_COUNT]{"BMP","PNG"};
-
 C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<void(char*)> log_function, const char *data_path):
     mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
 {
@@ -110,14 +108,14 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     enable_window_aspect_ratio = true;
     enable_fullscreen_aspect_ratio = true;
     c64_screen_is_obselete = false;
-    StartScreenshot = false;
-    ExitScreenshotEnable = false;
+    start_screenshot = false;
+    enable_exit_screenshot = false;
     frame_skip_counter = 1;
 
     enable_distortion = true;
     SetDistortion(-0.05f);
 
-    VideoCapture = nullptr;
+    video_capture = nullptr;
 
     /// SDL Installieren ///
 
@@ -212,7 +210,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     /// VideoCaptuer installieren ///
 
-    VideoCapture = new VideoCaptureClass();
+    video_capture = new VideoCaptureClass();
 
     /// SLD Audio Installieren (C64 Emulation) ///
 
@@ -309,7 +307,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     }
 
     /// Init Vars ///
-    C64HistoryPointer = 0;
+    cpu_pc_history_pos = 0;
     io_source = 0;
     ComandZeileSize = 0;
     ComandZeileCount = 0;
@@ -428,7 +426,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     cia1->Reset();
     cia2->Reset();
 
-    SIDVolume = 1.0;
+    sid_volume = 1.0f;
 
     sid1->RESET = &RESET;
     sid1->SetC64Zyklen(C64Takt);     // PAL 63*312*50 = 982800
@@ -463,8 +461,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     vic->BreakWerte = BreakWerte;
     vic->Breakpoints = Breakpoints;
 
-    cpu->History = C64History;
-    cpu->HistoryPointer = &C64HistoryPointer;
+    cpu->History = cpu_pc_history;
+    cpu->HistoryPointer = &cpu_pc_history_pos;
 
     for(int i=0;i<0x10000;i++) Breakpoints[i] = 0;
 }
@@ -493,7 +491,7 @@ C64Class::~C64Class()
     if(reu != nullptr) delete reu;
     if(geo != nullptr) delete geo;
 
-    if(VideoCapture != nullptr) delete VideoCapture;
+    if(video_capture != nullptr) delete video_capture;
 
     if(FloppySoundPath != nullptr) delete[] FloppySoundPath;
     if(RomPath != nullptr) delete[] RomPath;
@@ -509,15 +507,15 @@ void C64Class::StartEmulation()
 void C64Class::EndEmulation()
 {
     EnableWarpMode(false);
-    if(ExitScreenshotEnable)
+    if(enable_exit_screenshot)
     {
         SwapRBSurface(c64_screen);
-        SDL_SavePNG(c64_screen, ExitScreenshotFilename);
+        SDL_SavePNG(c64_screen, exit_screenshot_filename);
     }
 
     /// Loop Thread beenden ///
-    LoopThreadEnd = true;
-    while (!LoopThreadIsEnd)
+    loop_thread_end = true;
+    while (!loop_thread_is_end)
         SDL_Delay(1);
 
     SDL_PauseAudio(1);
@@ -578,13 +576,13 @@ int SDLThread(void *userdat)
 {
     C64Class *c64 = static_cast<C64Class*>(userdat);
     SDL_Event event;
-    c64->LoopThreadEnd = false;
-    c64->LoopThreadIsEnd = false;
+    c64->loop_thread_end = false;
+    c64->loop_thread_is_end = false;
     c64->sdl_thread_pause = false;
 
     c64->c64_screen_buffer = nullptr;
 
-    while (!c64->LoopThreadEnd)
+    while (!c64->loop_thread_end)
     {
         /// Wird immer ausgeführt wenn die Funktion SetGrafikModi ausgefürt wurde ///
         if(c64->changed_graphic_modi)
@@ -625,7 +623,7 @@ int SDLThread(void *userdat)
             }
 
             /// Wenn der Thread noch nicht beendet wurde ///
-            if(!c64->LoopThreadEnd)
+            if(!c64->loop_thread_end)
             {
                 if(c64->c64_screen_is_obselete)
                 {
@@ -645,7 +643,7 @@ int SDLThread(void *userdat)
     }
 
     c64->ReleaseGrafik();
-    c64->LoopThreadIsEnd = true;
+    c64->loop_thread_is_end = true;
 
     return 0;
 }
@@ -704,28 +702,28 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
 
     ///////////////////////////////////
 
-    VideoCapture->AddFrame(static_cast<uint8_t*>(c64_screen->pixels),c64_screen->pitch);
+    video_capture->AddFrame(static_cast<uint8_t*>(c64_screen->pixels),c64_screen->pitch);
 
     ///////////////////////////////////
 
     ///////////////////////////////////
     /// Auf Screenshot Start prüfen ///
-    if(StartScreenshot)
+    if(start_screenshot)
     {
         SwapRBSurface(c64_screen);
 
-        switch (ScreenshotFormat) {
+        switch (screenshot_format) {
         case SCREENSHOT_FORMAT_BMP:
-            SDL_SaveBMP(c64_screen,ScreenshotFilename);
+            SDL_SaveBMP(c64_screen, screenshot_filename);
             break;
         case SCREENSHOT_FORMAT_PNG:
-            SDL_SavePNG(c64_screen,ScreenshotFilename);
+            SDL_SavePNG(c64_screen, screenshot_filename);
             break;
         default:
 
             break;
         }
-        StartScreenshot = false;
+        start_screenshot = false;
     }
     ////////////////////////////////////
 
@@ -986,8 +984,8 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 int j=0;
                 for(int i=0; i<(laenge/2); i+=2)
                 {
-                    puffer[i] = static_cast<int16_t>(sid1->SoundBuffer[j] * SIDVolume);
-                    puffer[i+1] = static_cast<int16_t>(sid2->SoundBuffer[j] * SIDVolume);
+                    puffer[i] = static_cast<int16_t>(sid1->SoundBuffer[j] * sid_volume);
+                    puffer[i+1] = static_cast<int16_t>(sid2->SoundBuffer[j] * sid_volume);
                     j++;
                 }
             }
@@ -996,7 +994,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 int j=0;
                 for(int i=0; i<(laenge/2); i+=2)
                 {
-                    puffer[i] = puffer[i+1] = static_cast<int16_t>(static_cast<float_t>(sid1->SoundBuffer[j] + sid2->SoundBuffer[j]) * SIDVolume * 0.75f);
+                    puffer[i] = puffer[i+1] = static_cast<int16_t>(static_cast<float_t>(sid1->SoundBuffer[j] + sid2->SoundBuffer[j]) * sid_volume * 0.75f);
                     j++;
                 }
             }
@@ -1006,13 +1004,13 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             int j=0;
             for(int i=0; i<(laenge/2); i+=2)
             {
-                puffer[i] = puffer[i+1] = static_cast<int16_t>(sid1->SoundBuffer[j] * SIDVolume);
+                puffer[i] = puffer[i+1] = static_cast<int16_t>(sid1->SoundBuffer[j] * sid_volume);
                 j++;
             }
         }
 
         /// Capture Audio
-        VideoCapture->FillSourceAudioBuffer(puffer, laenge/2);
+        video_capture->FillSourceAudioBuffer(puffer, laenge/2);
 
         /// Floppysound dazu mixen ///
         for(int i=0; i<MAX_FLOPPY_COUNT; i++)
@@ -1399,10 +1397,10 @@ void C64Class::SetGrafikModi(bool enable_32bit_colors, bool enable_screen_double
     LogText(str00);
 }
 
-void C64Class::SetWindowTitle(char *title_name)
+void C64Class::SetSDLWindowName(char *name)
 {
-    strcpy(window_title, title_name);
-    SDL_SetWindowTitle(sdl_window, title_name);
+    strcpy(sdl_window_name, name);
+    SDL_SetWindowTitle(sdl_window, name);
 }
 
 void C64Class::SetFullscreen()
@@ -1468,7 +1466,7 @@ void C64Class::InitGrafik()
 
     if(sdl_window == nullptr)
     {
-        sdl_window = SDL_CreateWindow(window_title,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+        sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
         SDL_SetWindowIcon(sdl_window,sdl_window_icon);
     }
@@ -2404,20 +2402,20 @@ int SDLThreadLoad(void *userdat)
     switch(c64->auto_load_mode)
     {
     case 0:
-        c64->SetCommandLine(c64->AutoLoadCommandLine);
+        c64->SetCommandLine(c64->auto_load_command_line);
         break;
     case 1:
-        c64->LoadPRG(c64->AutoLoadFilename,&PRGStartAdresse);
-        if(PRGStartAdresse <= 0x0801) sprintf(c64->AutoLoadCommandLine,"RUN%c",13);
-        else sprintf(c64->AutoLoadCommandLine,"SYS %d%c",PRGStartAdresse,13);
-        c64->SetCommandLine(c64->AutoLoadCommandLine);
+        c64->LoadPRG(c64->auto_load_filename,&PRGStartAdresse);
+        if(PRGStartAdresse <= 0x0801) sprintf(c64->auto_load_command_line,"RUN%c",13);
+        else sprintf(c64->auto_load_command_line,"SYS %d%c",PRGStartAdresse,13);
+        c64->SetCommandLine(c64->auto_load_command_line);
         break;
     case 2:
-        c64->LoadPRG(c64->AutoLoadFilename,&PRGStartAdresse);
+        c64->LoadPRG(c64->auto_load_filename,&PRGStartAdresse);
         //if(LoadPRG(c64->AutoLoadFilename,&PRGStartAdresse) == 5) return 4; Behandlung wenn mehr als 1 File in T64
-        if(PRGStartAdresse <= 0x0801) sprintf(c64->AutoLoadCommandLine,"RUN%c",13);
-        else sprintf(c64->AutoLoadCommandLine,"SYS %d%c",PRGStartAdresse,13);
-        c64->SetCommandLine(c64->AutoLoadCommandLine);
+        if(PRGStartAdresse <= 0x0801) sprintf(c64->auto_load_command_line,"RUN%c",13);
+        else sprintf(c64->auto_load_command_line,"SYS %d%c",PRGStartAdresse,13);
+        c64->SetCommandLine(c64->auto_load_command_line);
         break;
     }
     return 0;
@@ -2441,7 +2439,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
 
         KillCommandLine();
         auto_load_mode = 0;
-        sprintf(AutoLoadCommandLine,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
+        sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
         HardReset();
         wait_reset_ready = true;
         C64ResetReady = false;
@@ -2455,7 +2453,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
 
         KillCommandLine();
         auto_load_mode = 0;
-        sprintf(AutoLoadCommandLine,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
+        sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
         HardReset();
         wait_reset_ready = true;
         C64ResetReady = false;
@@ -2467,7 +2465,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
     {
         KillCommandLine();
         auto_load_mode = 1;
-        strcpy(AutoLoadFilename,filename);
+        strcpy(auto_load_filename,filename);
         HardReset();
         wait_reset_ready = true;
         C64ResetReady = false;
@@ -2479,7 +2477,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
     {
         KillCommandLine();
         auto_load_mode = 2;
-        strcpy(AutoLoadFilename,filename);
+        strcpy(auto_load_filename,filename);
         HardReset();
         wait_reset_ready = true;
         C64ResetReady = false;
@@ -2491,7 +2489,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
     {
         KillCommandLine();
         auto_load_mode = 1;
-        strcpy(AutoLoadFilename,filename);
+        strcpy(auto_load_filename,filename);
         HardReset();
         wait_reset_ready = true;
         C64ResetReady = false;
@@ -3208,60 +3206,60 @@ uint8_t C64Class::GetMapWriteDestination(uint8_t page)
     return mmu->GetWriteDestination(page);
 }
 
-void C64Class::SaveScreenshot(const char *filename, int format)
+void C64Class::SaveScreenshot(const char *filename, uint8_t format)
 {
 
-    strcpy(ScreenshotFilename,filename);
-    ScreenshotFormat = format;
-    StartScreenshot = true;
+    strcpy(screenshot_filename, filename);
+    screenshot_format = format;
+    start_screenshot = true;
 }
 
-const char *C64Class::GetScreenshotFormatName(int format)
+const char *C64Class::GetScreenshotFormatName(uint8_t format)
 {
     if(format >= SCREENSHOT_FORMATS_COUNT)
         return nullptr;
-    return ScreenschotFormatName[format];
+    return screenshot_format_name[format];
 }
 
 void C64Class::SetExitScreenshot(const char *filename)
 {
-    strcpy(ExitScreenshotFilename,filename);
-    ExitScreenshotEnable = true;
+    strcpy(exit_screenshot_filename,filename);
+    enable_exit_screenshot = true;
 }
 
 const char* C64Class::GetAVVersion()
 {
-    return VideoCapture->GetAVVersion();
+    return video_capture->GetAVVersion();
 }
 
 bool C64Class::StartVideoRecord(const char *filename, int audio_bitrate, int video_bitrate)
 {
-    if(VideoCapture != nullptr)
+    if(video_capture != nullptr)
     {
-        VideoCapture->SetAudioBitrate(audio_bitrate);
-        VideoCapture->SetVideoBitrate(video_bitrate);
+        video_capture->SetAudioBitrate(audio_bitrate);
+        video_capture->SetVideoBitrate(video_bitrate);
 
-        return VideoCapture->StartCapture(filename, "mp4", current_c64_screen_width, current_c64_screen_height);
+        return video_capture->StartCapture(filename, "mp4", current_c64_screen_width, current_c64_screen_height);
     }
     return false;
 }
 
 void C64Class::SetPauseVideoRecord(bool status)
 {
-    VideoCapture->SetCapturePause(status);
+    video_capture->SetCapturePause(status);
 }
 
 void C64Class::StopVideoRecord()
 {
-    if(VideoCapture != nullptr)
+    if(video_capture != nullptr)
     {
-        VideoCapture->StopCapture();
+        video_capture->StopCapture();
     }
 }
 
 int C64Class::GetRecordedFrameCount()
 {
-    return VideoCapture->GetRecordedFrameCount();
+    return video_capture->GetRecordedFrameCount();
 }
 
 bool C64Class::StartIECDump(const char *filename)
@@ -3289,7 +3287,7 @@ void C64Class::StopIECDump()
 
 void C64Class::SetSIDVolume(float_t volume)
 {
-    SIDVolume = volume;
+    sid_volume = volume;
 }
 
 void C64Class::SetFirstSidTyp(int sid_typ)

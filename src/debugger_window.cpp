@@ -1193,10 +1193,10 @@ void DebuggerWindow::FillHistoryList(unsigned char index)
     }
     else
     {
-        hp = c64->C64HistoryPointer - index;
+        hp = c64->cpu_pc_history_pos - index;
         for(int i=0;i<HistoryZeilen;i++)
         {
-            sprintf(str00,"$%4.4X",c64->C64History[hp--]);
+            sprintf(str00,"$%4.4X",c64->cpu_pc_history[hp--]);
             ui->HistoryList->item(i)->setText(QString(str00));
         }
     }

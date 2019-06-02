@@ -42,7 +42,7 @@
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
 
-#define MAX_C64_SCREEN_TITLE_LENGTH 100
+#define MAX_STRING_LENGTH 1024
 
 #define MAX_FLOPPY_COUNT 4
 #define MAX_BREAK_GROUPS 255
@@ -56,6 +56,7 @@ using namespace std::tr1::placeholders;
 #define SCREEN_RATIO_16_9 1.777f      // Screenratio 16:9 (1,777)
 
 enum SCREENSHOT_FORMATS {SCREENSHOT_FORMAT_BMP, SCREENSHOT_FORMAT_PNG, SCREENSHOT_FORMATS_COUNT};
+static const char *screenshot_format_name[SCREENSHOT_FORMATS_COUNT]{"BMP","PNG"};
 
 class C64Class
 {
@@ -81,7 +82,7 @@ public:
     void WriteC64Byte(uint16_t address, uint8_t value);
     uint8_t* GetRAMPointer(uint16_t address);
     void SetGrafikModi(bool enable_32bit_colors, bool enable_screen_doublesize, bool enable_screen_crt_output, bool filter_enable, uint16_t fullscreen_width = 0, uint16_t fullscreen_height = 0);
-    void SetWindowTitle(char *title_name);
+    void SetSDLWindowName(char *name);
     void SetFullscreen();
     void InitGrafik();
     void ReleaseGrafik();
@@ -172,8 +173,8 @@ public:
     uint8_t GetMapReadSource(uint8_t page);
     uint8_t GetMapWriteDestination(uint8_t page);
 
-    void SaveScreenshot(const char *filename, int format = SCREENSHOT_FORMAT_PNG);
-    const char* GetScreenshotFormatName(int format);
+    void SaveScreenshot(const char *filename, uint8_t format = SCREENSHOT_FORMAT_PNG);
+    const char* GetScreenshotFormatName(uint8_t format);
     void SetExitScreenshot(const char *filename);
 
     const char* GetAVVersion();
@@ -319,11 +320,11 @@ public:
 
     bool            wait_reset_ready;
     uint8_t         auto_load_mode;
-    char            AutoLoadCommandLine[1024];
-    char            AutoLoadFilename[1024];
+    char            auto_load_command_line[MAX_STRING_LENGTH];
+    char            auto_load_filename[MAX_STRING_LENGTH];
 
-    bool            LoopThreadEnd;
-    bool            LoopThreadIsEnd;
+    bool            loop_thread_end;
+    bool            loop_thread_is_end;
 
     function<void(void)> AnimationRefreshProc;
     function<void(void)> BreakpointProc;
@@ -332,19 +333,20 @@ public:
     function<void(void)> LimitCyclesEvent;
     function<void(unsigned char)> DebugCartEvent;
 
-    uint16_t        C64History[256];
-    uint8_t         C64HistoryPointer;
+    uint16_t        cpu_pc_history[256];
+    uint8_t         cpu_pc_history_pos;
 
-    bool StartScreenshot;
-    char ScreenshotFilename[1024];
-    int  ScreenshotFormat;
+    uint8_t         screenshot_format;
 
-    bool ExitScreenshotEnable;
-    char ExitScreenshotFilename[1024];
+    bool            start_screenshot;
+    char            screenshot_filename[MAX_STRING_LENGTH];
 
-    float_t SIDVolume;
+    bool            enable_exit_screenshot;
+    char            exit_screenshot_filename[MAX_STRING_LENGTH];
 
-    VideoCaptureClass *VideoCapture;
+    float_t         sid_volume;
+
+    VideoCaptureClass *video_capture;
 
 private:
     void CalcDistortionGrid();
@@ -367,6 +369,7 @@ private:
     int InitVideoCaptureSystem();
     void CloseVideoCaptureSystem();
     void SwapRBSurface(SDL_Surface *surface); // swaps the color red with blue in sdl surface
+
     function<uint8_t(uint16_t)> *ReadProcTbl;
     function<void(uint16_t, uint8_t)> *WriteProcTbl;
 
@@ -374,7 +377,7 @@ private:
     char* FloppySoundPath;
     char* RomPath;
 
-    char window_title[MAX_C64_SCREEN_TITLE_LENGTH];
+    char sdl_window_name[MAX_STRING_LENGTH];
 
     bool SDLJoystickIsOpen;
     int  JoystickAnzahl;

@@ -692,7 +692,7 @@ void MainWindow::RetranslateUi()
 
 void MainWindow::SetC64ScreenTitle()
 {
-    c64->SetWindowTitle(trUtf8("C64 Bildschirm").toLatin1().data());
+    c64->SetSDLWindowName(trUtf8("C64 Bildschirm").toLatin1().data());
 }
 
 bool MainWindow::getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt)
