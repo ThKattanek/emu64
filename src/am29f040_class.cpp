@@ -28,26 +28,26 @@ AM29F040Class::~AM29F040Class(void)
 {
 }
 
-uint8_t AM29F040Class::Read(uint32_t adresse)
+uint8_t AM29F040Class::Read(uint32_t address)
 {
     static uint8_t wert;
 
         switch (status)
         {
         case STATUS_AUTOSELECT:
-            switch (adresse & 0xFF)
+            switch (address & 0xFF)
                         {
                 case 0x00:
-                    wert = FlashTypes[flash_type].ManufacturID;
+                    wert = FlashTypes[flash_type].manufactur_id;
                     break;
                 case 0x01:
-                    wert = FlashTypes[flash_type].DeviceID;
+                    wert = FlashTypes[flash_type].device_id;
                     break;
                 case 0x02:
                     wert = 0;
                     break;
                 default:
-                    wert = data[adresse];
+                    wert = data[address];
                     break;
             }
             break;
@@ -67,7 +67,7 @@ uint8_t AM29F040Class::Read(uint32_t adresse)
             /* The state doesn't reset if a read occurs during a command sequence */
             /* fall through */
         case STATUS_READ:
-            wert = data[adresse];
+            wert = data[address];
             break;
     }
 
@@ -75,19 +75,19 @@ uint8_t AM29F040Class::Read(uint32_t adresse)
     return wert;
 }
 
-void AM29F040Class::Write(uint32_t adresse, uint8_t wert)
+void AM29F040Class::Write(uint32_t address, uint8_t value)
 {
     switch (status)
         {
         case STATUS_READ:
-            if (FlashMagic1(adresse) && (wert == 0xAA))
+            if (FlashMagic1(address) && (value == 0xAA))
                         {
                 status = STATUS_MAGIC1;
             }
             break;
 
         case STATUS_MAGIC1:
-            if (FlashMagic2(adresse) && (wert == 0x55))
+            if (FlashMagic2(address) && (value == 0x55))
                         {
                 status = STATUS_MAGIC2;
             }
@@ -98,9 +98,9 @@ void AM29F040Class::Write(uint32_t adresse, uint8_t wert)
             break;
 
         case STATUS_MAGIC2:
-            if (FlashMagic1(adresse))
+            if (FlashMagic1(address))
                         {
-                switch (wert)
+                switch (value)
                                 {
                     case 0x90:
                         status = STATUS_AUTOSELECT;
@@ -124,7 +124,7 @@ void AM29F040Class::Write(uint32_t adresse, uint8_t wert)
 
         case STATUS_BYTE_PROGRAMM:
             /* TODO setup alarm to not have the operation complete instantly */
-            if (FlashProgramByte(adresse, wert))
+            if (FlashProgramByte(address, value))
                         {
                 status = STATUS_BYTE_PROGRAMM_HAPPENING;
             } else {
@@ -133,7 +133,7 @@ void AM29F040Class::Write(uint32_t adresse, uint8_t wert)
             break;
 
         case STATUS_ERASE_MAGIC1:
-            if (FlashMagic1(adresse) && (wert == 0xAA))
+            if (FlashMagic1(address) && (value == 0xAA))
                         {
                 status = STATUS_ERASE_MAGIC2;
             } else
@@ -143,7 +143,7 @@ void AM29F040Class::Write(uint32_t adresse, uint8_t wert)
             break;
 
         case STATUS_ERASE_MAGIC2:
-            if (FlashMagic2(adresse) && (wert == 0x55))
+            if (FlashMagic2(address) && (value == 0x55))
                         {
                 status = STATUS_ERASE_SELECT;
             } else
@@ -153,16 +153,16 @@ void AM29F040Class::Write(uint32_t adresse, uint8_t wert)
             break;
 
         case STATUS_ERASE_SELECT:
-            if (FlashMagic1(adresse) && (wert == 0x10))
+            if (FlashMagic1(address) && (value == 0x10))
                         {
                 /* TODO setup alarm to not have the operation complete instantly */
                 FlashEraseChip();
                 status = STATUS_CHIP_ERASE;
             }
-                        else if (wert == 0x30)
+                        else if (value == 0x30)
                         {
                 /* TODO setup alarm to not have the operation complete instantly */
-                FlashEraseSector(adresse);
+                FlashEraseSector(address);
                 status = STATUS_SECTOR_ERASE;
             } else
                         {
@@ -171,14 +171,14 @@ void AM29F040Class::Write(uint32_t adresse, uint8_t wert)
             break;
 
         case STATUS_SECTOR_ERASE:
-            if (wert == 0xB0)
+            if (value == 0xB0)
                         {
                 status = STATUS_SECTOR_ERASE_SUSPEND;
             }
             break;
 
         case STATUS_SECTOR_ERASE_SUSPEND:
-            if (wert == 0x30)
+            if (value == 0x30)
                         {
                 status = STATUS_SECTOR_ERASE;
             }
@@ -186,7 +186,7 @@ void AM29F040Class::Write(uint32_t adresse, uint8_t wert)
 
         case STATUS_BYTE_PROGRAMM_ERROR:
         case STATUS_AUTOSELECT:
-            if (wert == 0xF0)
+            if (value == 0xF0)
                         {
                 status = STATUS_READ;
             }
@@ -199,40 +199,40 @@ void AM29F040Class::Write(uint32_t adresse, uint8_t wert)
     }
 }
 
-inline int AM29F040Class::FlashMagic1(uint32_t adresse)
+inline int AM29F040Class::FlashMagic1(uint32_t address)
 {
-    return ((adresse & FlashTypes[flash_type].Magic1Mask) == FlashTypes[flash_type].Magic1Addr);
+    return ((address & FlashTypes[flash_type].magic1_mask) == FlashTypes[flash_type].magic1_addr);
 }
 
-inline int AM29F040Class::FlashMagic2(uint32_t adresse)
+inline int AM29F040Class::FlashMagic2(uint32_t address)
 {
-    return ((adresse & FlashTypes[flash_type].Magic2Mask) == FlashTypes[flash_type].Magic2Addr);
+    return ((address & FlashTypes[flash_type].magic2_mask) == FlashTypes[flash_type].magic2_addr);
 }
 
-inline void AM29F040Class::FlashEraseSector(uint32_t adresse)
+inline void AM29F040Class::FlashEraseSector(uint32_t address)
 {
-    uint32_t sector_addr = adresse & 0xF0000;
+    uint32_t sector_addr = address & 0xF0000;
 
     memset(&(data[sector_addr]), 0xFF, 0x10000);
     dirty = 1;
 }
 
-inline void AM29F040Class::FlashEraseChip(void)
+inline void AM29F040Class::FlashEraseChip()
 {
-    memset(data, 0xFF, FlashTypes[flash_type].Size);
+    memset(data, 0xFF, FlashTypes[flash_type].size);
     dirty = 1;
 }
 
-inline int AM29F040Class::FlashProgramByte(uint32_t adresse, uint8_t wert)
+inline int AM29F040Class::FlashProgramByte(uint32_t address, uint8_t value)
 {
-    uint8_t old_data = data[adresse];
-    uint8_t new_data = old_data & wert;
+    uint8_t old_data = data[address];
+    uint8_t new_data = old_data & value;
 
-    programm_byte = wert;
-    data[adresse] = new_data;
+    programm_byte = value;
+    data[address] = new_data;
     dirty = 1;
 
-    return (new_data == wert) ? 1 : 0;
+    return (new_data == value) ? 1 : 0;
 }
 
 inline int AM29F040Class::WriteOperationStatus()
