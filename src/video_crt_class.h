@@ -13,8 +13,8 @@
 //                                              //
 //////////////////////////////////////////////////
 
-#ifndef VIDEOPAL_CLASS_H
-#define VIDEOPAL_CLASS_H
+#ifndef VIDEOCRT_CLASS_H
+#define VIDEOCRT_CLASS_H
 
 #include "structs.h"
 #include <stdint.h>
@@ -37,12 +37,12 @@ typedef struct COLOR_STRUCT
 
 } COLOR_STRUCT, *LPCOLOR_STRUCT;
 
-class VideoPalClass
+class VideoCrtClass
 {
 
 public:
-        VideoPalClass(void);
-        ~VideoPalClass(void);
+        VideoCrtClass();
+        ~VideoCrtClass();
         //void SetPixelFormat(SDL_PixelFormat *format);
         void ConvertVideo(void* Outpuffer, long Pitch, unsigned char* VICOutPuffer, int VICOutPufferOffset, int OutXW, int OutYW, int InXW, int InYW, bool FlipTex);
         void SetDisplayMode(int DisplayMode);
@@ -56,7 +56,7 @@ public:
         void SetKontrast(float wert);
         void SetC64Palette(int palnr);
         void EnableVideoDoubleSize(bool enabled);
-        void EnablePALOutput(bool enabled);
+        void EnableCrtOutput(bool enabled);
         float *GetC64YUVPalette();
         unsigned long YHistogramm[256];
 
@@ -70,7 +70,7 @@ private:
         //SDL_PixelFormat     *pixel_format;
 
         bool                Double2x;
-        bool                PALOutput;
+        bool                enable_crt_output;
         uint32_t            DestDisplayMode;
         uint16_t            *Outpuffer16;
         uint16_t            *Outpuffer16Scanline;
@@ -124,4 +124,4 @@ private:
         uint32_t BlurTable0S[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
         uint32_t BlurTable1S[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
 };
-#endif // VIDEOPAL_CLASS_H
+#endif // VIDEOCRT_CLASS_H

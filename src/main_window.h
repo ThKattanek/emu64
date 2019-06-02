@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.12.2018                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -33,7 +33,7 @@
 #include "./custom_splashscreen.h"
 #include "./widget_floppy_status.h"
 #include "./info_window.h"
-#include "./tv_setup_window.h"
+#include "./video_crt_setup_window.h"
 #include "./floppy_window.h"
 #include "./c64_keyboard_window.h"
 #include "./crt_window.h"
@@ -74,7 +74,7 @@ public:
 
     /// C64 Klasse ///
     C64Class *c64;
-    VideoPalClass *videopal;
+    VideoCrtClass *video_crt_output;
 
     /// Close Event von der C64 Klasse
     void CloseC64Screeen(void);
@@ -101,7 +101,7 @@ private slots:
     void on_actionBeenden_triggered();
     void on_actionSoftreset_triggered();
     void on_actionAutostart_triggered();
-    void on_actionTV_Video_Einstellungen_triggered();
+    void on_actionVideo_Crt_Setup_triggered();
     void on_actionFloppy_1541_II_triggered();
     void on_actionC64_Tastaturbelegung_ndern_triggered();
     void on_actionVirtuelle_C64_Tastatur_triggered();
@@ -170,7 +170,7 @@ private:
     bool RomSetEnable;            // False wenn kein RomSet-Verzeichnis existiert und keins erstellt werden konnte
 
     InfoWindow *info_window;                        // Info Fenster Klasse (wird vom MainWindow als Modal gestartet)
-    TVSetupWindow *tv_setup_window;                 // TV Einstellungsfenster
+    VideoCrtSetupWindow *video_crt_setup_window;    // Video CRT Einstellungsfenster
     FloppyWindow *floppy_window;                    // Floppy Editor / Auswahl
     TapeWindow *tape_window;                        // Datasette
     C64KeyboardWindow *c64_keyboard_window;         // Virtuelle C64 Tastatur

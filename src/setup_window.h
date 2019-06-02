@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.11.2018                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -26,7 +26,7 @@
 #include <QDebug>
 
 #include "button_mod.h"
-#include "videopal_class.h"
+#include "video_crt_class.h"
 #include "c64_class.h"
 #include "new_romset_window.h"
 
@@ -39,7 +39,7 @@ class SetupWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit SetupWindow(QWidget *parent = 0, const char *member = 0, VideoPalClass *videopal = 0, QSettings *ini = 0, QString *romsetPath = 0, QString *dataPath = 0);
+    explicit SetupWindow(QWidget *parent = 0, const char *member = 0, VideoCrtClass *video_crt_output = 0, QSettings *ini = 0, QString *romsetPath = 0, QString *dataPath = 0);
     ~SetupWindow();
     void RetranslateUi();
     void LoadINI(C64Class *c64);
@@ -100,7 +100,7 @@ private:
 
     QString *romsetPath;
     QString *dataPath;
-    VideoPalClass *videopal;
+    VideoCrtClass *video_crt_output;
     QSettings *ini;
     C64Class *c64;
 };

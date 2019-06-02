@@ -34,7 +34,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <property name="documentMode">
     <bool>false</bool>
@@ -462,10 +462,10 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Schaltet die PAL Emulation der Grafikausgabe ein. (Sollte vorrangig benutzt werden)</string>
+       <string>Schaltet die Video CRT Emulation der Grafikausgabe ein. (Sollte vorrangig benutzt werden)</string>
       </property>
       <property name="text">
-       <string>PAL Videoemulation</string>
+       <string>Video CRT Ausgabe</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="WDouble">

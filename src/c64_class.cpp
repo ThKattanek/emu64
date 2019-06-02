@@ -43,7 +43,7 @@ int SDLThreadWarp(void *userdat);
 
 static const char *ScreenschotFormatName[SCREENSHOT_FORMATS_COUNT]{"BMP","PNG"};
 
-C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> log_function, const char *data_path):
+C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<void(char*)> log_function, const char *data_path):
     mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
 {
     ChangeGrafikModi = false;
@@ -92,14 +92,14 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     LogText(const_cast<char*>(GfxPath));
     LogText(const_cast<char*>("\n"));
 
-    pal = _pal;
+    this->video_crt_output = video_crt_output;
     BreakGroupAnz = 0;
     FloppyFoundBreakpoint = false;
     EnableExtLines = false;
 
     IecIsDumped = false;
 
-    AktC64ScreenXW = AktWindowXW = AktC64ScreenYW = AktWindowYW = 0;
+    current_c64_screen_width = current_window_width = current_c64_screen_height = current_window_height = 0;
 
     mutex1 = SDL_CreateMutex();
 
@@ -239,7 +239,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
 
     OpenSDLJoystick();
 
-    SetGrafikModi(pal->StartC64isColorBit32,pal->StartC64isDoublesize,pal->StartC64isPalmode,false);
+    SetGrafikModi(video_crt_output->StartC64isColorBit32, video_crt_output->StartC64isDoublesize, video_crt_output->StartC64isPalmode, false);
 
     sprintf(filename,"%ssdl_icon.png",GfxPath);
     C64ScreenIcon = IMG_Load(filename);
@@ -295,7 +295,7 @@ C64Class::C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> lo
     sprintf(stepper_inc_filename,"%sstepper_inc.raw",FloppySoundPath);
     sprintf(stepper_dec_filename,"%sstepper_dec.raw",FloppySoundPath);
 
-    for(int i=0; i<FLOPPY_ANZAHL; i++)
+    for(int i=0; i<FLOPPY_COUNT; i++)
     {
         floppy[i] = new Floppy1541(&RESET,have.freq,have.samples,&FloppyFoundBreakpoint);
         floppy[i]->SetResetReady(&FloppyResetReady[i],0xEBFF);
@@ -473,7 +473,7 @@ C64Class::~C64Class()
 {
     EndEmulation();
 
-    for(int i=0; i<FLOPPY_ANZAHL; i++)
+    for(int i=0; i<FLOPPY_COUNT; i++)
     {
         if(floppy[i] != nullptr) delete floppy[i];
     }
@@ -605,11 +605,11 @@ int SDLThread(void *userdat)
             SDL_SetWindowSize(c64->C64Window, c64->win_size_w, c64->win_size_h);
 
 #ifdef _WIN32
-            c64->AktWindowXW = c64->win_size_w;
-            c64->AktWindowYW = c64->win_size_h;
-            glViewport(0,0,c64->AktWindowXW, c64->AktWindowYW);
+            c64->current_window_width = c64->win_size_w;
+            c64->current_window_height = c64->win_size_h;
+            glViewport(0,0,c64->current_window_width, c64->current_window_height);
             glMatrixMode(GL_PROJECTION);
-            glOrtho(0,c64->AktWindowXW, c64->AktWindowYW,0,-1,1);
+            glOrtho(0,c64->current_window_width, c64->current_window_height,0,-1,1);
             glLoadIdentity();
 #endif
         }
@@ -693,10 +693,10 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
         return;
     }
 
-    if((pal == nullptr) || (sdl_thread_pause == true)) return;
+    if((video_crt_output == nullptr) || (sdl_thread_pause == true)) return;
 
     SDL_LockSurface(C64Screen);
-    pal->ConvertVideo(static_cast<void*>(C64Screen->pixels),C64Screen->pitch,vic_puffer,104,AktC64ScreenXW,AktC64ScreenYW,504,312,false);
+    video_crt_output->ConvertVideo(static_cast<void*>(C64Screen->pixels),C64Screen->pitch,vic_puffer,104,current_c64_screen_width,current_c64_screen_height,504,312,false);
 
     this->vic_puffer = vic_puffer;
     vic->SwitchVideoPuffer();
@@ -762,7 +762,7 @@ void C64Class::WarpModeLoop()
     //if(ExtZyklus) ZyklusProcExt();
 
     FloppyIEC = 0;
-    for(int i=0; i<FLOPPY_ANZAHL; i++)
+    for(int i=0; i<FLOPPY_COUNT; i++)
     {
         floppy[i]->OneZyklus();
 
@@ -851,7 +851,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
     sid1->SoundBufferPos = 0;
     sid2->SoundBufferPos = 0;
-    for(int i=0; i<FLOPPY_ANZAHL; i++)
+    for(int i=0; i<FLOPPY_COUNT; i++)
         floppy[i]->ZeroSoundBufferPos();
     tape->ZeroSoundBufferPos();
 
@@ -883,7 +883,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             //if(ExtZyklus) ZyklusProcExt();
 
             FloppyIEC = 0;
-            for(int i=0; i<FLOPPY_ANZAHL; i++)
+            for(int i=0; i<FLOPPY_COUNT; i++)
             {
                 floppy[i]->OneZyklus();
 
@@ -1015,7 +1015,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
         VideoCapture->FillSourceAudioBuffer(puffer, laenge/2);
 
         /// Floppysound dazu mixen ///
-        for(int i=0; i<FLOPPY_ANZAHL; i++)
+        for(int i=0; i<FLOPPY_COUNT; i++)
         {
             if(floppy[i]->GetEnableFloppySound()) SDL_MixAudio(reinterpret_cast<uint8_t*>(puffer),reinterpret_cast<uint8_t*>(floppy[i]->GetSoundBuffer()),static_cast<uint32_t>(laenge),255);
         }
@@ -1039,7 +1039,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     //if(ExtZyklus) ZyklusProcExt();
 
                     FloppyIEC = 0;
-                    for(int i=0; i<FLOPPY_ANZAHL; i++)
+                    for(int i=0; i<FLOPPY_COUNT; i++)
                     {
                         floppy[i]->OneZyklus();
 
@@ -1097,7 +1097,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 //if(ExtZyklus) ZyklusProcExt();
 
                 FloppyIEC = 0;
-                for(int i=0; i<FLOPPY_ANZAHL; i++)
+                for(int i=0; i<FLOPPY_COUNT; i++)
                 {
                     floppy[i]->OneZyklus();
 
@@ -1166,7 +1166,7 @@ loop_wait_next_opc:
                 {
                     int FloppyNr = OneOpcSource - 1;
                     FloppyIEC = 0;
-                    for(int i=0; i<FLOPPY_ANZAHL; i++)
+                    for(int i=0; i<FLOPPY_COUNT; i++)
                     {
                         if(i != FloppyNr)
                         {
@@ -1303,7 +1303,7 @@ bool C64Class::LoadC64Roms(char *kernalrom, char *basicrom, char *charrom)
 
 bool C64Class::LoadFloppyRom(uint8_t floppy_nr, char *dos1541rom)
 {
-    if(floppy_nr < FLOPPY_ANZAHL)
+    if(floppy_nr < FLOPPY_COUNT)
     {
         if(!floppy[floppy_nr]->LoadDosRom(dos1541rom)) return false;
         return true;
@@ -1313,7 +1313,7 @@ bool C64Class::LoadFloppyRom(uint8_t floppy_nr, char *dos1541rom)
 
 bool C64Class::LoadDiskImage(uint8_t floppy_nr, char *filename)
 {
-    if(floppy_nr < FLOPPY_ANZAHL)
+    if(floppy_nr < FLOPPY_COUNT)
     {
         return floppy[floppy_nr]->LoadDiskImage(filename);
     }
@@ -1381,11 +1381,11 @@ uint8_t* C64Class::GetRAMPointer(uint16_t adresse)
     return mmu->GetRAMPointer() + adresse;
 }
 
-void C64Class::SetGrafikModi(bool colbits32, bool doublesize, bool pal_enable, bool filter_enable, int fullres_xw, int fullres_yw)
+void C64Class::SetGrafikModi(bool enable_32bit_colors, bool enable_screen_doublesize, bool enable_screen_crt_output, bool filter_enable, int fullres_xw, int fullres_yw)
 {
-    ColBits32 = colbits32;
-    DoubleSize = doublesize;
-    PalEnable =  pal_enable;
+    this->enable_screen_32bit_colors = enable_32bit_colors;
+    this->enable_screen_doublesize = enable_screen_doublesize;
+    this->enable_screen_crt_output =  enable_screen_crt_output;
     FilterEnable = filter_enable;
     FullResXW = fullres_xw;
     FullResYW = fullres_yw;
@@ -1393,7 +1393,7 @@ void C64Class::SetGrafikModi(bool colbits32, bool doublesize, bool pal_enable, b
     ChangeGrafikModi = true;
 
     char str00[255];
-    sprintf(str00,">>   32Bit = %d\n>>   Doublesize = %d\n>>   PAL = %d\n>>   Filter = %d\n>>   FullResXW = %d\n>>   FullResrYW = %d\n",ColBits32,DoubleSize,PalEnable,FilterEnable,FullResXW,FullResYW);
+    sprintf(str00,">>   32Bit = %d\n>>   Doublesize = %d\n>>   PAL = %d\n>>   Filter = %d\n>>   FullResXW = %d\n>>   FullResrYW = %d\n", enable_32bit_colors, enable_screen_doublesize, enable_screen_crt_output,FilterEnable,FullResXW,FullResYW);
 
     LogText(const_cast<char*>(">> Grafikmodus wurde gesetzt:\n"));
     LogText(str00);
@@ -1430,48 +1430,48 @@ void C64Class::InitGrafik()
     else isFullscreen = false;
 
 
-    AktWindowXW = AktC64ScreenXW = C64ScreenXW;
-    AktWindowYW = AktC64ScreenYW = vic->GetAktVicDisplayLastLine() - vic->GetAktVicDisplayFirstLine();
+    current_window_width = current_c64_screen_width = C64ScreenXW;
+    current_window_height = current_c64_screen_height = vic->GetAktVicDisplayLastLine() - vic->GetAktVicDisplayFirstLine();
 
-    if(DoubleSize)
+    if(enable_screen_doublesize)
     {
-        AktWindowXW *=2;
-        AktWindowYW *=2;
+        current_window_width *=2;
+        current_window_height *=2;
 
-        AktC64ScreenXW *=2;
-        AktC64ScreenYW *=2;
+        current_c64_screen_width *=2;
+        current_c64_screen_height *=2;
     }
 
-    if(ColBits32)
+    if(enable_screen_32bit_colors)
     {
-        AktWindowColorBits = 32;
+        current_window_color_bits = 32;
         if(C64ScreenBuffer != nullptr)
         {
             delete[] C64ScreenBuffer;
         }
-        C64ScreenBuffer = new uint8_t[AktC64ScreenXW*AktC64ScreenYW*4];
+        C64ScreenBuffer = new uint8_t[current_c64_screen_width*current_c64_screen_height*4];
     }
     else
     {
-        AktWindowColorBits = 16;
+        current_window_color_bits = 16;
         if(C64ScreenBuffer != nullptr)
         {
             delete[] C64ScreenBuffer;
         }
-        C64ScreenBuffer = new uint8_t[AktC64ScreenXW*AktC64ScreenYW*2];
+        C64ScreenBuffer = new uint8_t[current_c64_screen_width * current_c64_screen_height * 2];
     }
 
-    pal->SetDisplayMode(AktWindowColorBits);
-    pal->EnablePALOutput(PalEnable);
-    pal->EnableVideoDoubleSize(DoubleSize);
+    video_crt_output->SetDisplayMode(current_window_color_bits);
+    video_crt_output->EnableCrtOutput(enable_screen_crt_output);
+    video_crt_output->EnableVideoDoubleSize(enable_screen_doublesize);
 
     if(C64Window == nullptr)
     {
-        C64Window = SDL_CreateWindow(window_title,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,AktWindowXW,AktWindowYW,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+        C64Window = SDL_CreateWindow(window_title,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
         SDL_SetWindowIcon(C64Window,C64ScreenIcon);
     }
-    else SDL_SetWindowSize(C64Window,AktWindowXW,AktWindowYW);
+    else SDL_SetWindowSize(C64Window,current_window_width,current_window_height);
 
     GLContext = SDL_GL_CreateContext(C64Window);
 
@@ -1483,9 +1483,9 @@ void C64Class::InitGrafik()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glViewport(0,0,AktWindowXW,AktWindowYW);
+    glViewport(0,0,current_window_width,current_window_height);
     glMatrixMode(GL_PROJECTION);
-    glOrtho(0,AktWindowXW,AktWindowYW,0,-1,1);
+    glOrtho(0,current_window_width,current_window_height,0,-1,1);
     glLoadIdentity();
 
     glGenTextures(1,&C64ScreenTexture);
@@ -1508,9 +1508,9 @@ void C64Class::InitGrafik()
 
     if(C64Screen != nullptr)
        SDL_FreeSurface(C64Screen);
-    C64Screen = SDL_CreateRGBSurface(0,AktC64ScreenXW,AktC64ScreenYW,AktWindowColorBits,0,0,0,0);
+    C64Screen = SDL_CreateRGBSurface(0, current_c64_screen_width, current_c64_screen_height, current_window_color_bits, 0, 0, 0, 0);
 
-    glTexImage2D( GL_TEXTURE_2D, 0, 4, AktC64ScreenXW,AktC64ScreenYW, 0,GL_RGBA, GL_UNSIGNED_BYTE, C64ScreenBuffer );
+    glTexImage2D( GL_TEXTURE_2D, 0, 4, current_c64_screen_width, current_c64_screen_height, 0,GL_RGBA, GL_UNSIGNED_BYTE, C64ScreenBuffer );
 
     GLenum  TextureFormat = 0;
     GLint   NofColors = 0;
@@ -1622,7 +1622,7 @@ void C64Class::DrawC64Screen()
 
     /// Texture auswählen und mit aktuellen C64 Bilddaten füllen
     glBindTexture(GL_TEXTURE_2D,C64ScreenTexture);
-    glTexSubImage2D(GL_TEXTURE_2D,0,0,0, AktC64ScreenXW, AktC64ScreenYW,GL_RGBA, GL_UNSIGNED_BYTE, C64Screen->pixels);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, current_c64_screen_width, current_c64_screen_height,GL_RGBA, GL_UNSIGNED_BYTE, C64Screen->pixels);
 
     /// Aspect Ratio berechnen
     float_t scale_x;
@@ -1635,17 +1635,17 @@ void C64Class::DrawC64Screen()
     }
     else
     {
-        if((static_cast<float_t>(AktWindowXW) / static_cast<float_t>(AktWindowYW)) >= C64ScreenAspectRatio)
+        if((static_cast<float_t>(current_window_width) / static_cast<float_t>(current_window_height)) >= C64ScreenAspectRatio)
         {
             scale_y = 1.0f;
-            int xw = int(AktWindowYW * C64ScreenAspectRatio);
-            scale_x = (1.0f * xw) / AktWindowXW;
+            int xw = int(current_window_height * C64ScreenAspectRatio);
+            scale_x = (1.0f * xw) / current_window_width;
         }
         else
         {
             scale_x = 1.0f;
-            int yw = int(AktWindowXW / C64ScreenAspectRatio);
-            scale_y = (1.0f * yw) / AktWindowYW;
+            int yw = int(current_window_width / C64ScreenAspectRatio);
+            scale_y = (1.0f * yw) / current_window_height;
         }
     }
 
@@ -1774,11 +1774,11 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
         {
             case SDL_WINDOWEVENT_RESIZED:
 
-                AktWindowXW = static_cast<uint16_t>(event->window.data1);
-                AktWindowYW = static_cast<uint16_t>(event->window.data2);
-                glViewport(0,0,AktWindowXW,AktWindowYW);
+                current_window_width = static_cast<uint16_t>(event->window.data1);
+                current_window_height = static_cast<uint16_t>(event->window.data2);
+                glViewport(0,0,current_window_width,current_window_height);
                 glMatrixMode(GL_PROJECTION);
-                glOrtho(0,AktWindowXW,AktWindowYW,0,-1,1);
+                glOrtho(0,current_window_width,current_window_height,0,-1,1);
                 glLoadIdentity();
                 break;
 
@@ -2829,7 +2829,7 @@ void C64Class::SetDebugMode(bool status)
         OneOpc = false;
         sid1->SoundOutputEnable = false;
         sid2->SoundOutputEnable = false;
-        for(int i=0; i<FLOPPY_ANZAHL; i++) floppy[i]->SetEnableFloppySound(false);
+        for(int i=0; i<FLOPPY_COUNT; i++) floppy[i]->SetEnableFloppySound(false);
     }
     else
     {
@@ -2837,7 +2837,7 @@ void C64Class::SetDebugMode(bool status)
         OneOpc = false;
         sid1->SoundOutputEnable = true;
         sid2->SoundOutputEnable = true;
-        for(int i=0; i<FLOPPY_ANZAHL; i++) floppy[i]->SetEnableFloppySound(true);
+        for(int i=0; i<FLOPPY_COUNT; i++) floppy[i]->SetEnableFloppySound(true);
     }
 }
 
@@ -2860,7 +2860,7 @@ void C64Class::SetExtRDY(bool status)
     ExtRDY = status;
 }
 
-void C64Class::OneZyklus()
+void C64Class::OneCycle()
 {
     DebugAnimation = false;
     OneZyk = true;
@@ -2955,7 +2955,7 @@ void C64Class::UpdateBreakGroup()
         }
     }
 
-    for(int i=0;i<FLOPPY_ANZAHL;i++)
+    for(int i=0;i<FLOPPY_COUNT;i++)
     {
         if(floppy[i]->GetEnableFloppy())
         {
@@ -3239,7 +3239,7 @@ bool C64Class::StartVideoRecord(const char *filename, int audio_bitrate, int vid
         VideoCapture->SetAudioBitrate(audio_bitrate);
         VideoCapture->SetVideoBitrate(video_bitrate);
 
-        return VideoCapture->StartCapture(filename,"mp4",AktC64ScreenXW,AktC64ScreenYW);
+        return VideoCapture->StartCapture(filename, "mp4", current_c64_screen_width, current_c64_screen_height);
     }
     return false;
 }
@@ -3591,7 +3591,7 @@ bool C64Class::CheckBreakpoints()
 
     FloppyFoundBreakpoint = false;
     int floppy_break = 0;
-    for(int i=0; i<FLOPPY_ANZAHL; i++)
+    for(int i=0; i<FLOPPY_COUNT; i++)
     {
         if(floppy[i]->GetEnableFloppy())
         {
@@ -3609,7 +3609,7 @@ bool C64Class::CheckBreakpoints()
             OneOpc = false;
             sid1->SoundOutputEnable = false;
             sid2->SoundOutputEnable = false;
-            for(int i=0; i<FLOPPY_ANZAHL; i++) floppy[i]->SetEnableFloppySound(false);
+            for(int i=0; i<FLOPPY_COUNT; i++) floppy[i]->SetEnableFloppySound(false);
             if(BreakpointProc != nullptr) BreakpointProc();
             return true;
         }

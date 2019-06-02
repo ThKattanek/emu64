@@ -18,13 +18,13 @@
 
 #define DEFAULT_ROMSET_NAME "Original C64 II"
 
-SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoPalClass *videopal, QSettings *ini, QString *romsetPath, QString *dataPath) :
+SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoCrtClass *video_crt_output, QSettings *ini, QString *romsetPath, QString *dataPath) :
     QDialog(parent),
     ui(new Ui::SetupWindow),
-    videopal(0),
-    c64(0)
+    video_crt_output(nullptr),
+    c64(nullptr)
 {
-    this->videopal = videopal;
+    this->video_crt_output = video_crt_output;
     this->ini = ini;
     connect(this,SIGNAL(ChangeGrafikModi(bool,bool,bool,bool,bool)),parent,member);
     this->romsetPath = romsetPath;
@@ -174,7 +174,7 @@ void SetupWindow::LoadINI(C64Class *c64)
 
         bvalue = ini->value("WindowPalMode",0).toBool();
         ui->WPal->setChecked(bvalue);
-        videopal->StartC64isPalmode = bvalue;
+        video_crt_output->StartC64isPalmode = bvalue;
 
         bvalue = ini->value("WindowColor32BitMode",1).toBool();
 
@@ -183,11 +183,11 @@ void SetupWindow::LoadINI(C64Class *c64)
         else
             ui->W32Bit->setChecked(true);
 
-        videopal->StartC64isColorBit32 = bvalue;
+        video_crt_output->StartC64isColorBit32 = bvalue;
 
         bvalue = ini->value("WindowDoubleSizeMode",0).toBool();
         ui->WDouble->setChecked(bvalue);
-        videopal->StartC64isDoublesize = bvalue;
+        video_crt_output->StartC64isDoublesize = bvalue;
 
         bvalue = ini->value("WindowFilter",0).toBool();
         ui->WFilter->setChecked(bvalue);
@@ -441,7 +441,7 @@ void SetupWindow::SaveINI()
 
 void SetupWindow::on_C64Farbmodus_currentIndexChanged(int index)
 {
-    videopal->SetC64Palette(index);
+    video_crt_output->SetC64Palette(index);
 }
 
 void SetupWindow::on_WPal_toggled(bool)

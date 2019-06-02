@@ -60,70 +60,70 @@ static VIC_COLOR_STRUCT VicFarben[16] =
 
 #define MATH_PI	3.141592653589793238462643383279
 
-VideoPalClass::VideoPalClass(void)
+VideoCrtClass::VideoCrtClass()
 {
     AktFarbMode = 0;
     Double2x = false;
     Kontrast = 0.8;
 }
 
-VideoPalClass::~VideoPalClass(void)
+VideoCrtClass::~VideoCrtClass(void)
 {
 }
 
-void VideoPalClass::SetDisplayMode(int DisplayMode)
+void VideoCrtClass::SetDisplayMode(int DisplayMode)
 {
     DestDisplayMode = DisplayMode;
     UpdateParameter();
 }
 
-void VideoPalClass::UpdateParameter(void)
+void VideoCrtClass::UpdateParameter(void)
 {
     CreateVicIIColors();
 }
 
-void VideoPalClass::SetPhaseAltLineOffset(int offset)
+void VideoCrtClass::SetPhaseAltLineOffset(int offset)
 {
     if(offset < 0) offset = 0;
     if(offset > 2000) offset = 2000;
     PhaseAlternatingLine = offset;
 }
 
-void VideoPalClass::SetHorizontalBlurY(int wblur)
+void VideoCrtClass::SetHorizontalBlurY(int wblur)
 {
     if(wblur > 5) wblur = 5;
     HoBlurWY = wblur;
     blur_y_mul = 1.0f/(HoBlurWY);
 }
 
-void VideoPalClass::SetHorizontalBlurUV(int wblur)
+void VideoCrtClass::SetHorizontalBlurUV(int wblur)
 {
     if(wblur > 5) wblur = 5;
     HoBlurWUV = wblur;
     blur_uv_mul = 1.0f/(HoBlurWUV);
 }
 
-void VideoPalClass::SetScanline(int wert)
+void VideoCrtClass::SetScanline(int wert)
 {
     Scanline = wert/100.0f;
 }
 
-void VideoPalClass::SetSaturation(float wert)
+void VideoCrtClass::SetSaturation(float wert)
 {
     Saturation = wert*1.2f;
 }
 
-void VideoPalClass::SetHelligkeit(float wert)
+void VideoCrtClass::SetHelligkeit(float wert)
 {
     Helligkeit = wert;
 }
 
-void VideoPalClass::SetKontrast(float wert)
+void VideoCrtClass::SetKontrast(float wert)
 {
     Kontrast = wert+0.5f;
 }
 
-void VideoPalClass::SetC64Palette(int palnr)
+void VideoCrtClass::SetC64Palette(int palnr)
 {
     AktFarbMode = palnr;
 
@@ -152,29 +152,29 @@ void VideoPalClass::SetC64Palette(int palnr)
     }
 }
 
-void VideoPalClass::EnableVideoDoubleSize(bool enabled)
+void VideoCrtClass::EnableVideoDoubleSize(bool enabled)
 {
         Double2x = enabled;
 }
 
-void VideoPalClass::EnablePALOutput(bool enabled)
+void VideoCrtClass::EnableCrtOutput(bool enabled)
 {
-        PALOutput = enabled;
+        enable_crt_output = enabled;
 }
 
-float *VideoPalClass::GetC64YUVPalette()
+float *VideoCrtClass::GetC64YUVPalette()
 {
     return C64YUVPalette1;
 }
 
-inline void VideoPalClass::RGB_To_YUV(float rgb[3], float yuv[3])
+inline void VideoCrtClass::RGB_To_YUV(float rgb[3], float yuv[3])
 {
         yuv[0] = float(0.299*rgb[0]+0.587*rgb[1]+0.114*rgb[2]);  // Y
         yuv[1] = float(-0.147*rgb[0]-0.289*rgb[1]+0.436*rgb[2]); // U
         yuv[2] = float(0.615*rgb[0]-0.515*rgb[1]-0.100*rgb[2]);  // V
 }
 
-inline void VideoPalClass::YUV_To_RGB(float yuv[3], float rgb[3])
+inline void VideoCrtClass::YUV_To_RGB(float yuv[3], float rgb[3])
 {
         rgb[0] = float(yuv[0]+0.000*yuv[1]+1.140*yuv[2]); // Rot
         rgb[1] = float(yuv[0]-0.396*yuv[1]-0.581*yuv[2]); // Grün
@@ -183,7 +183,7 @@ inline void VideoPalClass::YUV_To_RGB(float yuv[3], float rgb[3])
 
 const float PI = 3.14159265358979323846264338327950288419716939937510;
 
-inline void VideoPalClass::CreateVicIIColors(void)
+inline void VideoCrtClass::CreateVicIIColors(void)
 {
         COLOR_STRUCT ColorOut;
         COLOR_STRUCT ColorIn;
@@ -458,13 +458,13 @@ inline void VideoPalClass::CreateVicIIColors(void)
                                         }
 }
 
-void VideoPalClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOutPuffer,int VICOutPufferOffset,int OutXW,int OutYW,int InXW,int,bool)
+void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOutPuffer,int VICOutPufferOffset,int OutXW,int OutYW,int InXW,int,bool)
 {
     static uint8_t w0,w1,w2,w3;
     VideoSource8 = (uint8_t*)VICOutPuffer;
     VideoSource8 += VICOutPufferOffset;
 
-    if(PALOutput)
+    if(enable_crt_output)
     {
         if(Double2x)
         {
@@ -700,7 +700,7 @@ void VideoPalClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
     }
 }
 
-void VideoPalClass::ChangeSaturation(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float wert)
+void VideoCrtClass::ChangeSaturation(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float wert)
 {
     float R = col_in->r;
     float G = col_in->g;
@@ -721,7 +721,7 @@ void VideoPalClass::ChangeSaturation(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out
     else if(col_out->b < 0.0f) col_out->b = 0.0f;
 }
 
-void VideoPalClass::ChangeContrast(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float wert)
+void VideoCrtClass::ChangeContrast(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float wert)
 {
     float R = col_in->r;
     float G = col_in->g;

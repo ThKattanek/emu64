@@ -99,9 +99,9 @@ MainWindow::~MainWindow()
     delete setup_window;
     delete c64;
 
-    delete videopal;
+    delete video_crt_output;
     delete info_window;
-    delete tv_setup_window;
+    delete video_crt_setup_window;
     delete floppy_window;
     delete tape_window;
     delete c64_keyboard_window;
@@ -281,13 +281,13 @@ void MainWindow::OnInit()
 
     /// Klassen installieren ///
     SplashMessage(trUtf8("VideoPal Klasse wird initialisiert."),Qt::darkBlue);
-    videopal = new VideoPalClass();
+    video_crt_output = new VideoCrtClass();
     LogText(trUtf8(">> VideoPal Klasse wurde installiert\n").toLatin1().data());
 
     /// C64 Klasse Installieren ... Das HERZ ///
     SplashMessage(trUtf8("C64 Klasse wird initialisiert."),Qt::darkBlue);
     int ret_error;
-    c64 = new C64Class(&ret_error,videopal,bind(&MainWindow::LogText,this,_1),QString(dataPath).toLatin1().data());
+    c64 = new C64Class(&ret_error,video_crt_output,bind(&MainWindow::LogText,this,_1),QString(dataPath).toLatin1().data());
     if(ret_error != 0)
     {
         ErrorMsg(trUtf8("Emu64 Fehler ..."),trUtf8("Fehler beim Installieren der C64 Klasse"))
@@ -303,9 +303,9 @@ void MainWindow::OnInit()
     info_window = new InfoWindow(this);
     LogText(trUtf8(">> InfoWindow wurde erzeugt\n").toLatin1().data());
 
-    SplashMessage(trUtf8("TVSetupWindow wird erstellt."),Qt::darkBlue);
-    tv_setup_window = new TVSetupWindow(this,c64,videopal,ini);
-    LogText(trUtf8(">> TVSetupWindow wurde erzeugt\n").toLatin1().data());
+    SplashMessage(trUtf8("CrtSetupWindow wird erstellt."),Qt::darkBlue);
+    video_crt_setup_window = new VideoCrtSetupWindow(this,c64,video_crt_output,ini);
+    LogText(trUtf8(">> CrtSetupWindow wurde erzeugt\n").toLatin1().data());
 
     SplashMessage(trUtf8("FloppyWindow wird erstellt."),Qt::darkBlue);
     floppy_window = new FloppyWindow(this,ini,c64,tmpPath);
@@ -328,7 +328,7 @@ void MainWindow::OnInit()
     LogText(trUtf8(">> DebuggerWindow wurde erzeugt\n").toLatin1().data());
 
     SplashMessage(trUtf8("SetupWindow wird erstellt."),Qt::darkBlue);
-    setup_window = new SetupWindow(this,SLOT(OnChangeGrafikModi(bool,bool,bool,bool,bool)),videopal,ini,&romsetPath,&dataPath);
+    setup_window = new SetupWindow(this,SLOT(OnChangeGrafikModi(bool,bool,bool,bool,bool)),video_crt_output,ini,&romsetPath,&dataPath);
     connect(setup_window,SIGNAL(finished(int)),this,SLOT(OnSetupFished(int)));
     LogText(trUtf8(">> SetupWindow wurde erzeugt\n").toLatin1().data());
 
@@ -677,7 +677,7 @@ void MainWindow::RetranslateUi()
     }
 
     info_window->RetranslateUi();
-    tv_setup_window->RetranslateUi();
+    video_crt_setup_window->RetranslateUi();
     c64_keyboard_window->RetranslateUi();
     floppy_window->RetranslateUi();
     tape_window->RetranslateUi();
@@ -971,9 +971,9 @@ void MainWindow::on_actionC64_Programme_direkt_laden_triggered()
     }
 }
 
-void MainWindow::on_actionTV_Video_Einstellungen_triggered()
+void MainWindow::on_actionVideo_Crt_Setup_triggered()
 {
-    tv_setup_window->show();
+    video_crt_setup_window->show();
 }
 
 void MainWindow::on_actionFloppy_1541_II_triggered()

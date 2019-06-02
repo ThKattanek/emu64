@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 11.12.2018                //
+# // Letzte Änderung am 02.06.2019                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -179,11 +179,11 @@ set(SOURCES
     src/tape_new_window.cpp
     src/tape_window.cpp
     src/tree_widget_mod.cpp
-    src/tv_setup_window.cpp
+    src/video_crt_setup_window.cpp
     src/vcd_class.cpp
     src/video_capture_class.cpp
     src/video_capture_window.cpp
-    src/videopal_class.cpp
+    src/video_crt_class.cpp
     src/widget_bit_leiste.cpp
     src/widget_file_browse.cpp
     src/widget_floppy_status.cpp
@@ -218,7 +218,7 @@ set(MOC_HEADERS
     src/tape_new_window.h
     src/tape_window.h
     src/tree_widget_mod.h
-    src/tv_setup_window.h
+    src/video_crt_setup_window.h
     src/video_capture_window.h
     src/widget_bit_leiste.h
     src/widget_file_browse.h
@@ -249,7 +249,7 @@ set(UIS
     src/sid_dump_window.ui
     src/tape_new_window.ui
     src/tape_window.ui
-    src/tv_setup_window.ui
+    src/video_crt_setup_window.ui
     src/video_capture_window.ui
     src/widget_bit_leiste.ui
     src/widget_file_browse.ui

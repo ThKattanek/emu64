@@ -167,7 +167,7 @@ background-position: center
      <x>0</x>
      <y>0</y>
      <width>482</width>
-     <height>18</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="font">
@@ -279,7 +279,8 @@ background-position: center
      <string>Einstellungen</string>
     </property>
     <addaction name="actionEmu64_Einstellungen"/>
-    <addaction name="actionTV_Video_Einstellungen"/>
+    <addaction name="separator"/>
+    <addaction name="actionVideo_Crt_Setup"/>
     <addaction name="actionVollbild"/>
     <addaction name="actionC64_Tastaturbelegung_ndern"/>
     <addaction name="actionC64_Tastaturbelegung_zur_cksetzen"/>
@@ -832,12 +833,15 @@ background-position: center
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionTV_Video_Einstellungen">
+  <action name="actionVideo_Crt_Setup">
    <property name="enabled">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>TV/Video Einstellungen</string>
+    <string>Video CRT Einstellungen</string>
+   </property>
+   <property name="toolTip">
+    <string>Video CRT Einstellungen</string>
    </property>
    <property name="statusTip">
     <string>Hiermit kann man das Aussehen der Videoausgabe verändern. Z.B.: Sättigung, Helligkeit und Kontrast.</string>

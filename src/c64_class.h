@@ -16,7 +16,7 @@
 #ifndef C64CLASS_H
 #define C64CLASS_H
 
-#include "./videopal_class.h"
+#include "./video_crt_class.h"
 #include "./mmu_class.h"
 #include "./mos6510_class.h"
 #include "./mos6569_class.h"
@@ -44,7 +44,7 @@ using namespace std::tr1::placeholders;
 
 #define MAX_C64_SCREEN_TITLE_LENGTH 100
 
-#define FLOPPY_ANZAHL 4
+#define FLOPPY_COUNT 4
 #define MAX_BREAK_GROUPS 255
 #define MAX_JOYSTICKS 16
 #define MAX_VJOYS 16
@@ -61,7 +61,7 @@ class C64Class
 {
 
 public:
-    C64Class(int *ret_error, VideoPalClass *_pal, function<void(char*)> log_function, const char *data_path);
+    C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<void(char*)> log_function, const char *data_path);
     ~C64Class();
     void StartEmulation();
     void EndEmulation();
@@ -80,7 +80,7 @@ public:
     uint8_t ReadC64Byte(uint16_t adresse);
     void WriteC64Byte(uint16_t adresse, uint8_t wert);
     uint8_t* GetRAMPointer(uint16_t adresse);
-    void SetGrafikModi(bool colbits32, bool doublesize, bool enable_pal, bool filter_enable, int fullres_xw = 0, int fullres_yw = 0);
+    void SetGrafikModi(bool enable_32bit_colors, bool enable_screen_doublesize, bool enable_screen_crt_output, bool filter_enable, int fullres_xw = 0, int fullres_yw = 0);
     void SetWindowTitle(char *title_name);
     void SetFullscreen();
     void InitGrafik();
@@ -137,7 +137,7 @@ public:
     void SetDebugMode(bool status);
     void SetCpuExtLines(bool status);
     void SetExtRDY(bool status);
-    void OneZyklus();
+    void OneCycle();
     void OneOpcode(int source);
     void SetDebugAnimation(bool status);
     void SetDebugAnimationSpeed(int cycle_sek);
@@ -209,14 +209,14 @@ public:
     int GetVicFirstDisplayLineNtsc();
     int GetVicLastDisplayLineNtsc();
 
-    uint16_t        AktWindowXW;
-    uint16_t        AktWindowYW;
-    int             AktWindowColorBits;
-    uint16_t        AktC64ScreenXW;
-    uint16_t        AktC64ScreenYW;
-    bool            ColBits32;
-    bool            DoubleSize;
-    bool            PalEnable;
+    uint16_t        current_window_width;
+    uint16_t        current_window_height;
+    int             current_window_color_bits;
+    uint16_t        current_c64_screen_width;
+    uint16_t        current_c64_screen_height;
+    bool            enable_screen_32bit_colors;
+    bool            enable_screen_doublesize;
+    bool            enable_screen_crt_output;
     bool            FilterEnable;
     int             FullResXW;
     int             FullResYW;
@@ -290,7 +290,7 @@ public:
     bool            warp_thread_end;
 
     uint8_t         *vic_puffer;
-    VideoPalClass   *pal;
+    VideoCrtClass   *video_crt_output;
 
     MMU             *mmu;
     MOS6510         *cpu;
@@ -302,7 +302,7 @@ public:
     CRTClass        *crt;
     REUClass        *reu;
     GEORAMClass     *geo;
-    Floppy1541      *floppy[FLOPPY_ANZAHL];
+    Floppy1541      *floppy[FLOPPY_COUNT];
     TAPE1530        *tape;
 
     bool RESET;     // Reset Leitung -> Für Alle Module mit Reset Eingang
@@ -452,7 +452,7 @@ private:
     ////////////////////////////////////////////////////////////
 
     bool        C64ResetReady;
-    bool        FloppyResetReady[FLOPPY_ANZAHL];
+    bool        FloppyResetReady[FLOPPY_COUNT];
 
     char        ComandZeile[256];
     int         ComandZeileSize;
