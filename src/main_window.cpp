@@ -57,7 +57,7 @@ MainWindow::~MainWindow()
         char group_name[32];
         bool value;
 
-        for(int i=0; i<FLOPPY_COUNT; i++)
+        for(int i=0; i<MAX_FLOPPY_COUNT; i++)
         {
             sprintf(group_name,"Floppy1541_%2.2X",i+8);
             ini->beginGroup(group_name);
@@ -389,18 +389,18 @@ void MainWindow::OnInit()
 
     /// C64 Keyboard Matrix mit dem Virtual Keyboard verbinden ///
     SplashMessage(trUtf8("C64 Key-Matrix wird mit Virtual Keyboard verbunden."),Qt::darkBlue);
-    c64_keyboard_window->key_matrix_to_pa = c64->KeyboardMatrixToPAExt;
-    c64_keyboard_window->key_matrix_to_pb = c64->KeyboardMatrixToPBExt;
+    c64_keyboard_window->key_matrix_to_pa = c64->keyboard_matrix_to_pa_ext;
+    c64_keyboard_window->key_matrix_to_pb = c64->keyboard_matrix_to_pb_ext;
     LogText(trUtf8(">> C64 Key-Matrix wurde mit Virtual Keyboard verbunden\n").toLatin1().data());
 
 
     /// Tabelle für Floppy's Ertsellen ///
     SplashMessage(trUtf8("Tabelle für Floppy's wird erstellt."),Qt::darkBlue);
-    ui->FloppyTabel->setRowCount(FLOPPY_COUNT);
+    ui->FloppyTabel->setRowCount(MAX_FLOPPY_COUNT);
     ui->FloppyTabel->setColumnCount(1);
     LogText(trUtf8(">> Tabelle für alle Floppy Laufwerke wurde erzeugt\n").toLatin1().data());
 
-    for(int i=0; i<FLOPPY_COUNT; i++)
+    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
     {
         SplashMessage(trUtf8("Floppy: ") + QVariant(i).toString() + "wird in Tabelle eingefügt",Qt::darkBlue);
         ui->FloppyTabel->setRowHeight(i,24);
@@ -445,7 +445,7 @@ void MainWindow::OnInit()
 
         char group_name[32];
 
-        for(int i=0; i<FLOPPY_COUNT; i++)
+        for(int i=0; i<MAX_FLOPPY_COUNT; i++)
         {
             sprintf(group_name,"Floppy1541_%2.2X",i+8);
             ini->beginGroup(group_name);
@@ -670,7 +670,7 @@ void MainWindow::RetranslateUi()
 {
     ui->retranslateUi(this);
 
-    for(int i=0; i<FLOPPY_COUNT; i++)
+    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
     {
         WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(i,0);
         if(w != NULL) w->RetranslateUi();

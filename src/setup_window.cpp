@@ -132,31 +132,31 @@ void SetupWindow::LoadINI(C64Class *c64)
             ui->VJoySlots->setCellWidget(i,4,button);
 
             QByteArray array = ini->value("Type",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].Type[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].Type[j] = array[j];
 
             array = ini->value("JoyIndex",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].JoyIndex[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].JoyIndex[j] = array[j];
 
             array = ini->value("KeyDown",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].KeyDown[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].KeyDown[j] = array[j];
 
             array = ini->value("KeyUp",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].KeyUp[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].KeyUp[j] = array[j];
 
             array = ini->value("ButtonNr",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].ButtonNr[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].ButtonNr[j] = array[j];
 
             array = ini->value("HatNr",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].HatNr[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].HatNr[j] = array[j];
 
             array = ini->value("HatValue",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].HatValue[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].HatValue[j] = array[j];
 
             array = ini->value("AxisNr",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].AxisNr[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].AxisNr[j] = array[j];
 
             array = ini->value("AxisValue",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->VJoys[i].AxisValue[j] = array[j];
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].AxisValue[j] = array[j];
 
             ini->endGroup();
         }
@@ -200,12 +200,12 @@ void SetupWindow::LoadINI(C64Class *c64)
         value = ini->value("Port1",0).toInt();
         ui->VJoySlots->item(value,1)->setBackground(QBrush(QColor(50,255,50)));
         ui->VJoySlots->item(value,1)->setText("Port 1");
-        c64->VPort1 = value;
+        c64->virtual_port1 = value;
 
         value = ini->value("Port2",0).toInt();
         ui->VJoySlots->item(value,2)->setBackground(QBrush(QColor(50,255,50)));
         ui->VJoySlots->item(value,2)->setText("Port 2");
-        c64->VPort2 = value;
+        c64->virtual_port2 = value;
 
         value = ini->value("MousePort",0).toInt();
         ui->MausPort->setCurrentIndex(value);
@@ -353,8 +353,8 @@ void SetupWindow::SaveINI()
         ini->setValue("WindowDoubleSizeMode",ui->WDouble->isChecked());
         ini->setValue("WindowFilter",ui->WFilter->isChecked());
         ini->setValue("WindowAspectRatio",ui->WAspectRatio->isChecked());
-        ini->setValue("Port1",c64->VPort1);
-        ini->setValue("Port2",c64->VPort2);
+        ini->setValue("Port1",c64->virtual_port1);
+        ini->setValue("Port2",c64->virtual_port2);
         ini->setValue("MousePort",ui->MausPort->currentIndex());
         ini->setValue("AutoMouseHide",ui->AutoMouseHide->isChecked());
         ini->setValue("AutoMouseHideTime",ui->AutoMouseHideTime->value());
@@ -370,16 +370,16 @@ void SetupWindow::SaveINI()
         {
             sprintf(group_name,"VJSlot_%2.2d",i);
             ini->beginGroup(group_name);
-            ini->setValue("Name",c64->VJoys[i].Name);
-            ini->setValue("Type",QByteArray((const char*)c64->VJoys[i].Type,5));
-            ini->setValue("JoyIndex",QByteArray((const char*)c64->VJoys[i].JoyIndex,5));
-            ini->setValue("KeyDown",QByteArray((const char*)c64->VJoys[i].KeyDown,5));
-            ini->setValue("KeyUp",QByteArray((const char*)c64->VJoys[i].KeyUp,5));
-            ini->setValue("ButtonNr",QByteArray((const char*)c64->VJoys[i].ButtonNr,5));
-            ini->setValue("HatNr",QByteArray((const char*)c64->VJoys[i].HatNr,5));
-            ini->setValue("HatValue",QByteArray((const char*)c64->VJoys[i].HatValue,5));
-            ini->setValue("AxisNr",QByteArray((const char*)c64->VJoys[i].AxisNr,5));
-            ini->setValue("AxisValue",QByteArray((const char*)c64->VJoys[i].AxisValue,5));
+            ini->setValue("Name",c64->virtual_joys[i].Name);
+            ini->setValue("Type",QByteArray((const char*)c64->virtual_joys[i].Type,5));
+            ini->setValue("JoyIndex",QByteArray((const char*)c64->virtual_joys[i].JoyIndex,5));
+            ini->setValue("KeyDown",QByteArray((const char*)c64->virtual_joys[i].KeyDown,5));
+            ini->setValue("KeyUp",QByteArray((const char*)c64->virtual_joys[i].KeyUp,5));
+            ini->setValue("ButtonNr",QByteArray((const char*)c64->virtual_joys[i].ButtonNr,5));
+            ini->setValue("HatNr",QByteArray((const char*)c64->virtual_joys[i].HatNr,5));
+            ini->setValue("HatValue",QByteArray((const char*)c64->virtual_joys[i].HatValue,5));
+            ini->setValue("AxisNr",QByteArray((const char*)c64->virtual_joys[i].AxisNr,5));
+            ini->setValue("AxisValue",QByteArray((const char*)c64->virtual_joys[i].AxisValue,5));
             ini->endGroup();
         }
 
@@ -497,7 +497,7 @@ void SetupWindow::onClickButton(int idx, int idy)
     {
         /// Löschen ///
         c64->ClearJoystickMapping(idy);
-        ui->VJoySlots->item(idy,0)->setText(c64->VJoys[idy].Name);
+        ui->VJoySlots->item(idy,0)->setText(c64->virtual_joys[idy].Name);
     }
 }
 
@@ -505,7 +505,7 @@ void SetupWindow::on_VJoySlots_cellChanged(int row, int column)
 {
     if(column == 0)
     {
-        strcpy(c64->VJoys[row].Name,ui->VJoySlots->item(row,column)->text().toLatin1().data());
+        strcpy(c64->virtual_joys[row].Name,ui->VJoySlots->item(row,column)->text().toLatin1().data());
     }
 }
 
@@ -523,7 +523,7 @@ void SetupWindow::on_VJoySlots_cellClicked(int row, int column)
         }
         ui->VJoySlots->item(row,column)->setBackground(QBrush(QColor(50,255,50)));
         ui->VJoySlots->item(row,column)->setText("Port 1");
-        c64->VPort1 = row;
+        c64->virtual_port1 = row;
         break;
 
     case 2:
@@ -534,7 +534,7 @@ void SetupWindow::on_VJoySlots_cellClicked(int row, int column)
         }
         ui->VJoySlots->item(row,column)->setBackground(QBrush(QColor(50,255,50)));
         ui->VJoySlots->item(row,column)->setText("Port 2");
-        c64->VPort2 = row;
+        c64->virtual_port2 = row;
         break;
     }
 }
@@ -784,7 +784,7 @@ void SetupWindow::on_SelectRomSet_currentIndexChanged(const QString &arg1)
     {
         c64->LoadC64Roms(kernal_rom.toLatin1().data(),basic_rom.toLatin1().data(),char_rom.toLatin1().data());
 
-        for(int i=0; i<FLOPPY_COUNT; i++)
+        for(int i=0; i<MAX_FLOPPY_COUNT; i++)
         {
             c64->LoadFloppyRom(i,dos1541_rom.toLatin1().data());
         }

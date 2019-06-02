@@ -215,7 +215,7 @@ void DebuggerWindow::onTimerAnimationRefresh(void)
             }
         }
 
-        for(int i=0;i<FLOPPY_COUNT;i++)
+        for(int i=0;i<MAX_FLOPPY_COUNT;i++)
         {
             if(c64->floppy[i]->GetEnableFloppy())
             {
@@ -1683,7 +1683,7 @@ void DebuggerWindow::on_DisAssScroll_valueChanged(int value)
 
 void DebuggerWindow::on_AddBreakpoint_clicked()
 {
-    static int auto_num[FLOPPY_COUNT+1] = {1,1,1,1,1};
+    static int auto_num[MAX_FLOPPY_COUNT+1] = {1,1,1,1,1};
     BREAK_GROUP *bg;
     int index;
 

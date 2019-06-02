@@ -51,7 +51,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     changed_window_size = false;
 
     JoyStickUdateIsStop = true;
-    RecJoyMapping = false;
+    rec_joy_mapping = false;
     StopJoystickUpdate = true;
     SDLJoystickIsOpen = false;
     JoystickAnzahl = 0;
@@ -61,8 +61,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     IsKeyMapRec = false;
     RecMatrixCode = false;
 
-    VPort1 = 0;
-    VPort2 = 1;
+    virtual_port1 = 0;
+    virtual_port2 = 1;
 
     WarpMode = false;
 
@@ -131,8 +131,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     char filename[FILENAME_MAX];
     sprintf(filename,"%spfeil0.png",GfxPath);
-    Pfeil0 = IMG_Load(filename);
-    if(!Pfeil0)
+    img_joy_arrow0 = IMG_Load(filename);
+    if(!img_joy_arrow0)
     {
         LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
         LogText(filename);
@@ -146,13 +146,13 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
         LogText(filename);
         LogText(const_cast<char*>("\n"));
 
-        if ( (Pfeil0->w & (Pfeil0->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
-        if ( (Pfeil0->h & (Pfeil0->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n"));
+        if ( (img_joy_arrow0->w & (img_joy_arrow0->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
+        if ( (img_joy_arrow0->h & (img_joy_arrow0->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n"));
     }
 
     sprintf(filename,"%spfeil1.png",GfxPath);
-    Pfeil1 = IMG_Load(filename);
-    if(!Pfeil1)
+    img_joy_arrow1 = IMG_Load(filename);
+    if(!img_joy_arrow1)
     {
         LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
         LogText(filename);
@@ -166,13 +166,13 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
         LogText(filename);
         LogText(const_cast<char*>("\n"));
 
-        if ( (Pfeil1->w & (Pfeil1->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
-        if ( (Pfeil1->h & (Pfeil1->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n"));
+        if ( (img_joy_arrow1->w & (img_joy_arrow1->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
+        if ( (img_joy_arrow1->h & (img_joy_arrow1->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n"));
     }
 
     sprintf(filename,"%skreis0.png",GfxPath);
-    Kreis0 = IMG_Load(filename);
-    if(!Kreis0)
+    img_joy_button0 = IMG_Load(filename);
+    if(!img_joy_button0)
     {
         LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
         LogText(filename);
@@ -186,13 +186,13 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
         LogText(filename);
         LogText(const_cast<char*>("\n"));
 
-        if ( (Kreis0->w & (Kreis0->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
-        if ( (Kreis0->h & (Kreis0->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n"));
+        if ( (img_joy_button0->w & (img_joy_button0->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
+        if ( (img_joy_button0->h & (img_joy_button0->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n"));
     }
 
     sprintf(filename,"%skreis1.png",GfxPath);
-    Kreis1 = IMG_Load(filename);
-    if(!Kreis1)
+    img_joy_button1 = IMG_Load(filename);
+    if(!img_joy_button1)
     {
         LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
         LogText(filename);
@@ -206,8 +206,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
         LogText(filename);
         LogText(const_cast<char*>("\n"));
 
-        if ( (Kreis1->w & (Kreis1->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
-        if ( (Kreis1->h & (Kreis1->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Hoehe ist keine Potenz von 2^n\n"));
+        if ( (img_joy_button1->w & (img_joy_button1->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
+        if ( (img_joy_button1->h & (img_joy_button1->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Hoehe ist keine Potenz von 2^n\n"));
     }
 
     /// VideoCaptuer installieren ///
@@ -250,8 +250,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     else
         LogText(const_cast<char*>("<< ERROR: Fehler beim laden des SLDFenster Icons\n"));
 
-    GamePort1 = 0;
-    GamePort2 = 0;
+    game_port1 = 0;
+    game_port2 = 0;
 
     /// Init Classes ///
     mmu = new MMU();
@@ -295,7 +295,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     sprintf(stepper_inc_filename,"%sstepper_inc.raw",FloppySoundPath);
     sprintf(stepper_dec_filename,"%sstepper_dec.raw",FloppySoundPath);
 
-    for(int i=0; i<FLOPPY_COUNT; i++)
+    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
     {
         floppy[i] = new Floppy1541(&RESET,audio_spec_have.freq,audio_spec_have.samples,&FloppyFoundBreakpoint);
         floppy[i]->SetResetReady(&FloppyResetReady[i],0xEBFF);
@@ -310,7 +310,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     /// Init Vars ///
     C64HistoryPointer = 0;
-    IOSource = 0;
+    io_source = 0;
     ComandZeileSize = 0;
     ComandZeileCount = 0;
     ComandZeileStatus = false;
@@ -324,8 +324,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     for(int i=0;i<8;i++)
     {
-        KeyboardMatrixToPAExt[i] = KeyboardMatrixToPA[i] = 0;
-        KeyboardMatrixToPBExt[i] = KeyboardMatrixToPB[i] = 0;
+        keyboard_matrix_to_pa_ext[i] = KeyboardMatrixToPA[i] = 0;
+        keyboard_matrix_to_pb_ext[i] = KeyboardMatrixToPB[i] = 0;
     }
 
     /// Callbackroutinen setzen ///
@@ -422,7 +422,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     GAME = true;
     EXROM = true;
 
-    WaitResetReady = false;
+    wait_reset_ready = false;
 
     mmu->Reset();
     cia1->Reset();
@@ -473,7 +473,7 @@ C64Class::~C64Class()
 {
     EndEmulation();
 
-    for(int i=0; i<FLOPPY_COUNT; i++)
+    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
     {
         if(floppy[i] != nullptr) delete floppy[i];
     }
@@ -540,10 +540,10 @@ void C64Class::SetEnableDebugCart(bool enable)
 void AudioMix(void *userdat, Uint8 *stream, int laenge)
 {
     C64Class *c64 = static_cast<C64Class*>(userdat);
-    if(c64->RecPollingWait)
+    if(c64->rec_polling_wait)
     {
-        c64->RecPollingWaitCounter--;
-        if(c64->RecPollingWaitCounter == 0) c64->RecPollingWait = false;
+        c64->rec_polling_wait_counter--;
+        if(c64->rec_polling_wait_counter == 0) c64->rec_polling_wait = false;
     }
 
     SDL_LockMutex(c64->mutex1);
@@ -762,7 +762,7 @@ void C64Class::WarpModeLoop()
     //if(ExtZyklus) ZyklusProcExt();
 
     FloppyIEC = 0;
-    for(int i=0; i<FLOPPY_COUNT; i++)
+    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
     {
         floppy[i]->OneZyklus();
 
@@ -798,14 +798,14 @@ void C64Class::WarpModeLoop()
     if(++zyklen_counter == 19656)
     {
         zyklen_counter = 0;
-        if(WaitResetReady)
+        if(wait_reset_ready)
         {
             if(!floppy[0]->GetEnableFloppy())
             {
                 if(C64ResetReady)
                 {
                     SDL_CreateThread(SDLThreadLoad ,"C64Thread",this);
-                    WaitResetReady = false;
+                    wait_reset_ready = false;
                 }
             }
             else
@@ -813,7 +813,7 @@ void C64Class::WarpModeLoop()
                 if((C64ResetReady == true) && (FloppyResetReady[0] == true))
                 {
                     SDL_CreateThread(SDLThreadLoad ,"C64Thread" ,this);
-                    WaitResetReady = false;
+                    wait_reset_ready = false;
                 }
             }
         }
@@ -851,7 +851,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
     sid1->SoundBufferPos = 0;
     sid2->SoundBufferPos = 0;
-    for(int i=0; i<FLOPPY_COUNT; i++)
+    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
         floppy[i]->ZeroSoundBufferPos();
     tape->ZeroSoundBufferPos();
 
@@ -883,7 +883,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             //if(ExtZyklus) ZyklusProcExt();
 
             FloppyIEC = 0;
-            for(int i=0; i<FLOPPY_COUNT; i++)
+            for(int i=0; i<MAX_FLOPPY_COUNT; i++)
             {
                 floppy[i]->OneZyklus();
 
@@ -920,14 +920,14 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             if(++zyklen_counter == 19656)
             {
                 zyklen_counter = 0;
-                if(WaitResetReady)
+                if(wait_reset_ready)
                 {
                     if(!floppy[0]->GetEnableFloppy())
                     {
                         if(C64ResetReady)
                         {
                             SDL_CreateThread(SDLThreadLoad ,"C64Thread",this);
-                            WaitResetReady = false;
+                            wait_reset_ready = false;
                         }
                     }
                     else
@@ -935,7 +935,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                         if((C64ResetReady == true) && (FloppyResetReady[0] == true))
                         {
                             SDL_CreateThread(SDLThreadLoad ,"C64Thread" ,this);
-                            WaitResetReady = false;
+                            wait_reset_ready = false;
                         }
                     }
                 }
@@ -1015,7 +1015,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
         VideoCapture->FillSourceAudioBuffer(puffer, laenge/2);
 
         /// Floppysound dazu mixen ///
-        for(int i=0; i<FLOPPY_COUNT; i++)
+        for(int i=0; i<MAX_FLOPPY_COUNT; i++)
         {
             if(floppy[i]->GetEnableFloppySound()) SDL_MixAudio(reinterpret_cast<uint8_t*>(puffer),reinterpret_cast<uint8_t*>(floppy[i]->GetSoundBuffer()),static_cast<uint32_t>(laenge),255);
         }
@@ -1039,7 +1039,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     //if(ExtZyklus) ZyklusProcExt();
 
                     FloppyIEC = 0;
-                    for(int i=0; i<FLOPPY_COUNT; i++)
+                    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
                     {
                         floppy[i]->OneZyklus();
 
@@ -1097,7 +1097,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 //if(ExtZyklus) ZyklusProcExt();
 
                 FloppyIEC = 0;
-                for(int i=0; i<FLOPPY_COUNT; i++)
+                for(int i=0; i<MAX_FLOPPY_COUNT; i++)
                 {
                     floppy[i]->OneZyklus();
 
@@ -1166,7 +1166,7 @@ loop_wait_next_opc:
                 {
                     int FloppyNr = OneOpcSource - 1;
                     FloppyIEC = 0;
-                    for(int i=0; i<FLOPPY_COUNT; i++)
+                    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
                     {
                         if(i != FloppyNr)
                         {
@@ -1241,7 +1241,7 @@ void C64Class::KeyEvent(uint8_t matrix_code, KeyStatus key_status, bool isAutoSh
 
 void C64Class::SoftReset()
 {
-    WaitResetReady = false;
+    wait_reset_ready = false;
     SetReset(false,true);
     SDL_Delay(40);
     SetReset(true,true);
@@ -1249,7 +1249,7 @@ void C64Class::SoftReset()
 
 void C64Class::HardReset()
 {
-    WaitResetReady = false;
+    wait_reset_ready = false;
     SetReset(false,false);
     SDL_Delay(40);
     SetReset(true,true);
@@ -1269,23 +1269,23 @@ inline void C64Class::SetReset(int status, int hard_reset)
 
 inline void C64Class::CheckKeys()
 {
-    uint8_t OUT_PA, OUT_PB;
-    uint8_t IN_PA, IN_PB;
+    uint8_t out_pa, out_pb;
+    uint8_t in_pa, in_pb;
 
-    OUT_PA = ~CIA1_PA.GetOutput();
-    OUT_PB = ~CIA1_PB.GetOutput();
+    out_pa = ~CIA1_PA.GetOutput();
+    out_pb = ~CIA1_PB.GetOutput();
 
-    IN_PA = IN_PB = 0;
+    in_pa = in_pb = 0;
 
     uint8_t cbit = 1;
     for(int i=0;i<8;i++)
     {
-        if(OUT_PA & cbit) IN_PB |= (KeyboardMatrixToPB[i]|KeyboardMatrixToPBExt[i]);
-        if(OUT_PB & cbit) IN_PA |= (KeyboardMatrixToPA[i]|KeyboardMatrixToPAExt[i]);
+        if(out_pa & cbit) in_pb |= (KeyboardMatrixToPB[i]|keyboard_matrix_to_pb_ext[i]);
+        if(out_pb & cbit) in_pa |= (KeyboardMatrixToPA[i]|keyboard_matrix_to_pa_ext[i]);
         cbit <<= 1;
     }
-    CIA1_PA.SetInput(~(IN_PA|GamePort2));
-    CIA1_PB.SetInput(~(IN_PB|GamePort1));
+    CIA1_PA.SetInput(~(in_pa|game_port2));
+    CIA1_PB.SetInput(~(in_pb|game_port1));
 }
 
 void C64Class::ResetC64CycleCounter()
@@ -1303,7 +1303,7 @@ bool C64Class::LoadC64Roms(char *kernalrom, char *basicrom, char *charrom)
 
 bool C64Class::LoadFloppyRom(uint8_t floppy_nr, char *dos1541rom)
 {
-    if(floppy_nr < FLOPPY_COUNT)
+    if(floppy_nr < MAX_FLOPPY_COUNT)
     {
         if(!floppy[floppy_nr]->LoadDosRom(dos1541rom)) return false;
         return true;
@@ -1313,7 +1313,7 @@ bool C64Class::LoadFloppyRom(uint8_t floppy_nr, char *dos1541rom)
 
 bool C64Class::LoadDiskImage(uint8_t floppy_nr, char *filename)
 {
-    if(floppy_nr < FLOPPY_COUNT)
+    if(floppy_nr < MAX_FLOPPY_COUNT)
     {
         return floppy[floppy_nr]->LoadDiskImage(filename);
     }
@@ -1516,9 +1516,9 @@ void C64Class::InitGrafik()
     GLenum  TextureFormat = 0;
     GLint   NofColors = 0;
 
-    if(Pfeil0 != nullptr)
+    if(img_joy_arrow0 != nullptr)
     {
-        NofColors = Pfeil0->format->BytesPerPixel;
+        NofColors = img_joy_arrow0->format->BytesPerPixel;
 
         if(NofColors == 4)
         {
@@ -1532,52 +1532,52 @@ void C64Class::InitGrafik()
 
     // Ich setze mal vorraus das alle 4 Images das selbe Format haben !! //
 
-    if(Pfeil0 != nullptr)
+    if(img_joy_arrow0 != nullptr)
     {
-        glGenTextures(1,&Pfeil0Texture);
-        glBindTexture( GL_TEXTURE_2D, Pfeil0Texture );
+        glGenTextures(1,&texture_joy_arrow0);
+        glBindTexture( GL_TEXTURE_2D, texture_joy_arrow0 );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
         //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, Pfeil0->w, Pfeil0->h, 0,TextureFormat, GL_UNSIGNED_BYTE, Pfeil0->pixels );
-        gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, Pfeil0->w, Pfeil0->h,TextureFormat, GL_UNSIGNED_BYTE, Pfeil0->pixels );
+        gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, img_joy_arrow0->w, img_joy_arrow0->h,TextureFormat, GL_UNSIGNED_BYTE, img_joy_arrow0->pixels );
     }
 
-    if(Pfeil1 != nullptr)
+    if(img_joy_arrow1 != nullptr)
     {
-        glGenTextures(1,&Pfeil1Texture);
-        glBindTexture( GL_TEXTURE_2D, Pfeil1Texture );
+        glGenTextures(1,&texture_joy_arrow1);
+        glBindTexture( GL_TEXTURE_2D, texture_joy_arrow1 );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
         //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, Pfeil1->w, Pfeil1->h, 0,TextureFormat, GL_UNSIGNED_BYTE, Pfeil1->pixels );
-        gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, Pfeil1->w, Pfeil1->h,TextureFormat, GL_UNSIGNED_BYTE, Pfeil1->pixels );
+        gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, img_joy_arrow1->w, img_joy_arrow1->h,TextureFormat, GL_UNSIGNED_BYTE, img_joy_arrow1->pixels );
     }
 
-    if(Kreis0 != nullptr)
+    if(img_joy_button0 != nullptr)
     {
-        glGenTextures(1,&Kreis0Texture);
-        glBindTexture( GL_TEXTURE_2D, Kreis0Texture );
+        glGenTextures(1,&texture_joy_button0);
+        glBindTexture( GL_TEXTURE_2D, texture_joy_button0 );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
         //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, Kreis0->w, Kreis0->h, 0,TextureFormat, GL_UNSIGNED_BYTE, Kreis0->pixels );
-        gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, Kreis0->w, Kreis0->h,TextureFormat, GL_UNSIGNED_BYTE, Kreis0->pixels );
+        gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, img_joy_button0->w, img_joy_button0->h,TextureFormat, GL_UNSIGNED_BYTE, img_joy_button0->pixels );
     }
 
-    if(Kreis1 != nullptr)
+    if(img_joy_button1 != nullptr)
     {
-        glGenTextures(1,&Kreis1Texture);
-        glBindTexture( GL_TEXTURE_2D, Kreis1Texture );
+        glGenTextures(1,&texture_joy_button1);
+        glBindTexture( GL_TEXTURE_2D, texture_joy_button1 );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
         //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, Kreis1->w, Kreis1->h, 0,TextureFormat, GL_UNSIGNED_BYTE, Kreis1->pixels );
-        gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, Kreis1->w, Kreis1->h,TextureFormat, GL_UNSIGNED_BYTE, Kreis1->pixels );
+        gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, img_joy_button1->w, img_joy_button1->h,TextureFormat, GL_UNSIGNED_BYTE, img_joy_button1->pixels );
     }
 
     /// VicRefresh wieder zulassen ///
@@ -1670,11 +1670,11 @@ void C64Class::DrawC64Screen()
     glEnd();
 
     /// Pfeile für Joymapping darstenn
-    if(RecJoyMapping)
+    if(rec_joy_mapping)
     {
         /// Nach Oben ///
-        if(RecJoyMappingPos == 0) glBindTexture(GL_TEXTURE_2D,Pfeil1Texture);
-        else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
+        if(rec_joy_mapping_pos == 0) glBindTexture(GL_TEXTURE_2D,texture_joy_arrow1);
+        else glBindTexture(GL_TEXTURE_2D,texture_joy_arrow0);
         glBegin(GL_QUADS);
         glTexCoord2i(1,0);
         glVertex3f(0.3f,1.0f,0.0f);
@@ -1687,8 +1687,8 @@ void C64Class::DrawC64Screen()
         glEnd();
 
         /// Nach Unten ///
-        if(RecJoyMappingPos == 1) glBindTexture(GL_TEXTURE_2D,Pfeil1Texture);
-        else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
+        if(rec_joy_mapping_pos == 1) glBindTexture(GL_TEXTURE_2D,texture_joy_arrow1);
+        else glBindTexture(GL_TEXTURE_2D,texture_joy_arrow0);
         glBegin(GL_QUADS);
         glTexCoord2i(1,0);
         glVertex3f(0.3f,-1.0f,0.0f);
@@ -1701,8 +1701,8 @@ void C64Class::DrawC64Screen()
         glEnd();
 
         /// Nach Links ///
-        if(RecJoyMappingPos == 2) glBindTexture(GL_TEXTURE_2D,Pfeil1Texture);
-        else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
+        if(rec_joy_mapping_pos == 2) glBindTexture(GL_TEXTURE_2D,texture_joy_arrow1);
+        else glBindTexture(GL_TEXTURE_2D,texture_joy_arrow0);
         glBegin(GL_QUADS);
         glTexCoord2i(1,0);
         glVertex3f(-0.75f,-0.4f,0.0f);
@@ -1715,8 +1715,8 @@ void C64Class::DrawC64Screen()
         glEnd();
 
         /// Nach Rechts ///
-        if(RecJoyMappingPos == 3) glBindTexture(GL_TEXTURE_2D,Pfeil1Texture);
-        else glBindTexture(GL_TEXTURE_2D,Pfeil0Texture);
+        if(rec_joy_mapping_pos == 3) glBindTexture(GL_TEXTURE_2D,texture_joy_arrow1);
+        else glBindTexture(GL_TEXTURE_2D,texture_joy_arrow0);
         glBegin(GL_QUADS);
         glTexCoord2i(1,0);
         glVertex3f(0.75f,-0.4f,0.0f);
@@ -1729,8 +1729,8 @@ void C64Class::DrawC64Screen()
         glEnd();
 
         /// Fire ///
-        if(RecJoyMappingPos == 4) glBindTexture(GL_TEXTURE_2D,Kreis1Texture);
-        else glBindTexture(GL_TEXTURE_2D,Kreis0Texture);
+        if(rec_joy_mapping_pos == 4) glBindTexture(GL_TEXTURE_2D,texture_joy_button1);
+        else glBindTexture(GL_TEXTURE_2D,texture_joy_button0);
         glBegin(GL_QUADS);
         glTexCoord2i(1,0);
         glVertex3f(0.11f,-0.15f,0.0f);
@@ -1792,55 +1792,55 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
         case SDL_JOYBUTTONDOWN:
         case SDL_JOYBUTTONUP:
         {
-            if((RecJoyMapping == true) && (event->jbutton.type == SDL_JOYBUTTONDOWN))
+            if((rec_joy_mapping == true) && (event->jbutton.type == SDL_JOYBUTTONDOWN))
             {
-                VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_BUTTON;
-                VJoys[RecJoySlotNr].JoyIndex[RecJoyMappingPos] = static_cast<uint8_t>(event->jbutton.which);
-                VJoys[RecJoySlotNr].ButtonNr[RecJoyMappingPos] = event->jbutton.button;
+                virtual_joys[rec_joy_slot_nr].Type[rec_joy_mapping_pos] = VJOY_TYPE_BUTTON;
+                virtual_joys[rec_joy_slot_nr].JoyIndex[rec_joy_mapping_pos] = static_cast<uint8_t>(event->jbutton.which);
+                virtual_joys[rec_joy_slot_nr].ButtonNr[rec_joy_mapping_pos] = event->jbutton.button;
             }
-            else if((RecJoyMapping == true) && (event->jbutton.type == SDL_JOYBUTTONUP) && (RecPollingWait == false))
+            else if((rec_joy_mapping == true) && (event->jbutton.type == SDL_JOYBUTTONUP) && (rec_polling_wait == false))
             {
-                RecJoyMappingPos++;
-                if(RecJoyMappingPos == 5)
+                rec_joy_mapping_pos++;
+                if(rec_joy_mapping_pos == 5)
                 {
                     /// Rec Mapping ist fertig ///
-                    RecJoyMapping = false;
+                    rec_joy_mapping = false;
                 }
                 else
                 {
-                    RecPollingWait = true;
-                    RecPollingWaitCounter = RecPollingWaitStart;
+                    rec_polling_wait = true;
+                    rec_polling_wait_counter = RecPollingWaitStart;
                 }
             }
             else
             {
                 /// VJoyStick abfrage ///
                 /// Port1
-                if((VPort1 >= 0) && (VPort1 < MAX_VJOYS))
+                if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOYS))
                 {
                     for(int i=0;i<5;i++)
                     {
-                        if((VJoys[VPort1].ButtonNr[i] == event->jbutton.button) &&
-                                (VJoys[VPort1].Type[i] == VJOY_TYPE_BUTTON) &&
-                                (VJoys[VPort1].JoyIndex[i] == event->jbutton.which))
+                        if((virtual_joys[virtual_port1].ButtonNr[i] == event->jbutton.button) &&
+                                (virtual_joys[virtual_port1].Type[i] == VJOY_TYPE_BUTTON) &&
+                                (virtual_joys[virtual_port1].JoyIndex[i] == event->jbutton.which))
                         {
-                            if(event->jbutton.state == 1) GamePort1 |= 1<<i;
-                            else GamePort1 &= ~(1<<i);
+                            if(event->jbutton.state == 1) game_port1 |= 1<<i;
+                            else game_port1 &= ~(1<<i);
                         }
                     }
                 }
 
                 /// Port2
-                if((VPort2 >= 0) && (VPort2 < MAX_VJOYS))
+                if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOYS))
                 {
                     for(int i=0;i<5;i++)
                     {
-                        if((VJoys[VPort2].ButtonNr[i] == event->jbutton.button) &&
-                                (VJoys[VPort2].Type[i] == VJOY_TYPE_BUTTON) &&
-                                (VJoys[VPort2].JoyIndex[i] == event->jbutton.which))
+                        if((virtual_joys[virtual_port2].ButtonNr[i] == event->jbutton.button) &&
+                                (virtual_joys[virtual_port2].Type[i] == VJOY_TYPE_BUTTON) &&
+                                (virtual_joys[virtual_port2].JoyIndex[i] == event->jbutton.which))
                         {
-                            if(event->jbutton.state == 1) GamePort2 |= 1<<i;
-                            else GamePort2 &= ~(1<<i);
+                            if(event->jbutton.state == 1) game_port2 |= 1<<i;
+                            else game_port2 &= ~(1<<i);
                         }
                     }
                 }
@@ -1850,27 +1850,27 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
         case SDL_JOYHATMOTION:
         {
-            if((RecJoyMapping == true) && (RecPollingWait == false))
+            if((rec_joy_mapping == true) && (rec_polling_wait == false))
             {
                 if(event->jhat.value > 0)
                 {
-                    VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_HAT;
-                    VJoys[RecJoySlotNr].JoyIndex[RecJoyMappingPos] = static_cast<uint8_t>(event->jhat.which);
-                    VJoys[RecJoySlotNr].HatNr[RecJoyMappingPos] = event->jhat.hat;
-                    VJoys[RecJoySlotNr].HatValue[RecJoyMappingPos] = event->jhat.value;
+                    virtual_joys[rec_joy_slot_nr].Type[rec_joy_mapping_pos] = VJOY_TYPE_HAT;
+                    virtual_joys[rec_joy_slot_nr].JoyIndex[rec_joy_mapping_pos] = static_cast<uint8_t>(event->jhat.which);
+                    virtual_joys[rec_joy_slot_nr].HatNr[rec_joy_mapping_pos] = event->jhat.hat;
+                    virtual_joys[rec_joy_slot_nr].HatValue[rec_joy_mapping_pos] = event->jhat.value;
                 }
                 else
                 {
-                    RecJoyMappingPos++;
-                    if(RecJoyMappingPos == 5)
+                    rec_joy_mapping_pos++;
+                    if(rec_joy_mapping_pos == 5)
                     {
                         /// Rec Mapping ist fertig ///
-                        RecJoyMapping = false;
+                        rec_joy_mapping = false;
                     }
                     else
                     {
-                        RecPollingWait = true;
-                        RecPollingWaitCounter = RecPollingWaitStart;
+                        rec_polling_wait = true;
+                        rec_polling_wait_counter = RecPollingWaitStart;
                     }
                 }
             }
@@ -1878,32 +1878,32 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             {
                 /// VJoyStick abfrage ///
                 /// Port1
-                if((VPort1 >= 0) && (VPort1 < MAX_VJOYS))
+                if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOYS))
                 {
                     for(int i=0;i<5;i++)
                     {
-                        if((VJoys[VPort1].HatNr[i] == event->jhat.hat) &&
-                                (VJoys[VPort1].Type[i] == VJOY_TYPE_HAT) &&
-                                (VJoys[VPort1].JoyIndex[i] == event->jhat.which))
+                        if((virtual_joys[virtual_port1].HatNr[i] == event->jhat.hat) &&
+                                (virtual_joys[virtual_port1].Type[i] == VJOY_TYPE_HAT) &&
+                                (virtual_joys[virtual_port1].JoyIndex[i] == event->jhat.which))
                         {
-                            if((event->jhat.value & VJoys[VPort1].HatValue[i]) == VJoys[VPort1].HatValue[i]) GamePort1 |= 1<<i;
-                            else GamePort1 &= ~(1<<i);
+                            if((event->jhat.value & virtual_joys[virtual_port1].HatValue[i]) == virtual_joys[virtual_port1].HatValue[i]) game_port1 |= 1<<i;
+                            else game_port1 &= ~(1<<i);
                         }
                     }
                 }
 
                 /// VJoyStick abfrage ///
                 /// Port2
-                if((VPort2 >= 0) && (VPort2 < MAX_VJOYS))
+                if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOYS))
                 {
                     for(int i=0;i<5;i++)
                     {
-                        if((VJoys[VPort2].HatNr[i] == event->jhat.hat) &&
-                                (VJoys[VPort2].Type[i] == VJOY_TYPE_HAT) &&
-                                (VJoys[VPort2].JoyIndex[i] == event->jhat.which))
+                        if((virtual_joys[virtual_port2].HatNr[i] == event->jhat.hat) &&
+                                (virtual_joys[virtual_port2].Type[i] == VJOY_TYPE_HAT) &&
+                                (virtual_joys[virtual_port2].JoyIndex[i] == event->jhat.which))
                         {
-                            if((event->jhat.value & VJoys[VPort2].HatValue[i]) == VJoys[VPort2].HatValue[i]) GamePort2 |= 1<<i;
-                            else GamePort2 &= ~(1<<i);
+                            if((event->jhat.value & virtual_joys[virtual_port2].HatValue[i]) == virtual_joys[virtual_port2].HatValue[i]) game_port2 |= 1<<i;
+                            else game_port2 &= ~(1<<i);
                         }
                     }
                 }
@@ -1914,28 +1914,28 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
         case SDL_JOYAXISMOTION:
         {
-            if((RecJoyMapping == true) && (RecPollingWait == false))
+            if((rec_joy_mapping == true) && (rec_polling_wait == false))
             {
-                if(((event->jaxis.value < -16000) || (event->jaxis.value > 16000)) && (joy_center_flag == true) && ((event->jaxis.axis & 1) == joy_axis_tbl[RecJoyMappingPos]))
+                if(((event->jaxis.value < -16000) || (event->jaxis.value > 16000)) && (joy_center_flag == true) && ((event->jaxis.axis & 1) == joy_axis_tbl[rec_joy_mapping_pos]))
                 {
                     joy_center_flag = false;
 
-                    VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_AXIS;
-                    VJoys[RecJoySlotNr].JoyIndex[RecJoyMappingPos] = static_cast<uint8_t>(event->jaxis.which);
-                    VJoys[RecJoySlotNr].AxisNr[RecJoyMappingPos] = event->jaxis.axis;
-                    if(event->jaxis.value > 0) VJoys[RecJoySlotNr].AxisValue[RecJoyMappingPos] = 0;
-                    else VJoys[RecJoySlotNr].AxisValue[RecJoyMappingPos] = 1;
+                    virtual_joys[rec_joy_slot_nr].Type[rec_joy_mapping_pos] = VJOY_TYPE_AXIS;
+                    virtual_joys[rec_joy_slot_nr].JoyIndex[rec_joy_mapping_pos] = static_cast<uint8_t>(event->jaxis.which);
+                    virtual_joys[rec_joy_slot_nr].AxisNr[rec_joy_mapping_pos] = event->jaxis.axis;
+                    if(event->jaxis.value > 0) virtual_joys[rec_joy_slot_nr].AxisValue[rec_joy_mapping_pos] = 0;
+                    else virtual_joys[rec_joy_slot_nr].AxisValue[rec_joy_mapping_pos] = 1;
 
-                    RecJoyMappingPos++;
-                    if(RecJoyMappingPos == 5)
+                    rec_joy_mapping_pos++;
+                    if(rec_joy_mapping_pos == 5)
                     {
                         /// Rec Mapping ist fertig ///
-                        RecJoyMapping = false;
+                        rec_joy_mapping = false;
                     }
                     else
                     {
-                        RecPollingWait = true;
-                        RecPollingWaitCounter = RecPollingWaitStart;
+                        rec_polling_wait = true;
+                        rec_polling_wait_counter = RecPollingWaitStart;
                     }
                 }
 
@@ -1948,52 +1948,52 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             {
                 /// VJoyStick abfrage ///
                 /// Port1
-                if((VPort1 >= 0) && (VPort1 < MAX_VJOYS))
+                if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOYS))
                 {
                     for(int i=0;i<5;i++)
                     {
-                        if((VJoys[VPort1].AxisNr[i] == event->jaxis.axis) &&
-                                (VJoys[VPort1].Type[i] == VJOY_TYPE_AXIS) &&
-                                (VJoys[VPort1].JoyIndex[i] == event->jaxis.which))
+                        if((virtual_joys[virtual_port1].AxisNr[i] == event->jaxis.axis) &&
+                                (virtual_joys[virtual_port1].Type[i] == VJOY_TYPE_AXIS) &&
+                                (virtual_joys[virtual_port1].JoyIndex[i] == event->jaxis.which))
                         {
                             if(!((event->jaxis.value >= -14000) && (event->jaxis.value <= 14000)))
                             {
                                 if(event->jaxis.value > 16000)
                                 {
-                                    if(VJoys[VPort1].AxisValue[i] == 0) GamePort1 |= 1<<i;
+                                    if(virtual_joys[virtual_port1].AxisValue[i] == 0) game_port1 |= 1<<i;
                                 }
                                 else if(event->jaxis.value < -16000)
                                 {
-                                    if(VJoys[VPort1].AxisValue[i] == 1) GamePort1 |= 1<<i;
+                                    if(virtual_joys[virtual_port1].AxisValue[i] == 1) game_port1 |= 1<<i;
                                 }
                             }
-                            else GamePort1 &= ~(1<<i);
+                            else game_port1 &= ~(1<<i);
                         }
                     }
                 }
 
                 /// VJoyStick abfrage ///
                 /// Port2
-                if((VPort2 >= 0) && (VPort2 < MAX_VJOYS))
+                if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOYS))
                 {
                     for(int i=0;i<5;i++)
                     {
-                        if((VJoys[VPort2].AxisNr[i] == event->jaxis.axis) &&
-                                (VJoys[VPort2].Type[i] == VJOY_TYPE_AXIS) &&
-                                (VJoys[VPort2].JoyIndex[i] == event->jaxis.which))
+                        if((virtual_joys[virtual_port2].AxisNr[i] == event->jaxis.axis) &&
+                                (virtual_joys[virtual_port2].Type[i] == VJOY_TYPE_AXIS) &&
+                                (virtual_joys[virtual_port2].JoyIndex[i] == event->jaxis.which))
                         {
                             if(!((event->jaxis.value >= -14000) && (event->jaxis.value <= 14000)))
                             {
                                 if(event->jaxis.value > 16000)
                                 {
-                                    if(VJoys[VPort2].AxisValue[i] == 0) GamePort2 |= 1<<i;
+                                    if(virtual_joys[virtual_port2].AxisValue[i] == 0) game_port2 |= 1<<i;
                                 }
                                 else if(event->jaxis.value < -16000)
                                 {
-                                    if(VJoys[VPort2].AxisValue[i] == 1) GamePort2 |= 1<<i;
+                                    if(virtual_joys[virtual_port2].AxisValue[i] == 1) game_port2 |= 1<<i;
                                 }
                             }
-                            else GamePort2 &= ~(1<<i);
+                            else game_port2 &= ~(1<<i);
                         }
                     }
                 }
@@ -2006,9 +2006,9 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             switch(event->key.keysym.sym)
             {
             case SDLK_F12:
-                if(RecJoyMapping)
+                if(rec_joy_mapping)
                 {
-                    RecJoyMapping = false;
+                    rec_joy_mapping = false;
                 }
                 else
                 {
@@ -2019,7 +2019,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                     }
                     else
                     {
-                        WaitResetReady = false;
+                        wait_reset_ready = false;
                         RESET = false;
                     }
                 }
@@ -2053,10 +2053,10 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                 break;
             }
 
-            if(RecJoyMapping == true)
+            if(rec_joy_mapping == true)
             {
-                VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_KEY;
-                VJoys[RecJoySlotNr].KeyDown[RecJoyMappingPos] = static_cast<uint8_t>(event->key.keysym.scancode);
+                virtual_joys[rec_joy_slot_nr].Type[rec_joy_mapping_pos] = VJOY_TYPE_KEY;
+                virtual_joys[rec_joy_slot_nr].KeyDown[rec_joy_mapping_pos] = static_cast<uint8_t>(event->key.keysym.scancode);
             }
             else
             {
@@ -2094,24 +2094,24 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
             /// VJoyStick abfrage ///
             /// Port1
-            if((VPort1 >= 0) && (VPort1 < MAX_VJOYS))
+            if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOYS))
             {
                 for(int i=0;i<5;i++)
                 {
-                    if((VJoys[VPort1].KeyDown[i] == event->key.keysym.scancode) &&
-                            (VJoys[VPort1].Type[i] == VJOY_TYPE_KEY))
-                        GamePort1 |= 1<<i;
+                    if((virtual_joys[virtual_port1].KeyDown[i] == event->key.keysym.scancode) &&
+                            (virtual_joys[virtual_port1].Type[i] == VJOY_TYPE_KEY))
+                        game_port1 |= 1<<i;
                 }
             }
 
             /// Port2
-            if((VPort2 >= 0) && (VPort2 < MAX_VJOYS))
+            if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOYS))
             {
                 for(int i=0;i<5;i++)
                 {
-                    if((VJoys[VPort2].KeyDown[i] == event->key.keysym.scancode) &&
-                            (VJoys[VPort2].Type[i] == VJOY_TYPE_KEY))
-                        GamePort2 |= 1<<i;
+                    if((virtual_joys[virtual_port2].KeyDown[i] == event->key.keysym.scancode) &&
+                            (virtual_joys[virtual_port2].Type[i] == VJOY_TYPE_KEY))
+                        game_port2 |= 1<<i;
                 }
             }
             break;
@@ -2134,16 +2134,16 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                 break;
             }
 
-            if(RecJoyMapping == true)
+            if(rec_joy_mapping == true)
             {
-                VJoys[RecJoySlotNr].Type[RecJoyMappingPos] = VJOY_TYPE_KEY;
-                VJoys[RecJoySlotNr].KeyUp[RecJoyMappingPos] = static_cast<uint8_t>(event->key.keysym.scancode);
+                virtual_joys[rec_joy_slot_nr].Type[rec_joy_mapping_pos] = VJOY_TYPE_KEY;
+                virtual_joys[rec_joy_slot_nr].KeyUp[rec_joy_mapping_pos] = static_cast<uint8_t>(event->key.keysym.scancode);
 
-                RecJoyMappingPos++;
-                if(RecJoyMappingPos == 5)
+                rec_joy_mapping_pos++;
+                if(rec_joy_mapping_pos == 5)
                 {
                     /// Rec Mapping ist fertig ///
-                    RecJoyMapping = false;
+                    rec_joy_mapping = false;
                 }
             }
             else
@@ -2165,24 +2165,24 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
             /// VJoyStick abfrage ///
             /// Port1
-            if((VPort1 >= 0) && (VPort1 < MAX_VJOYS))
+            if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOYS))
             {
                 for(int i=0;i<5;i++)
                 {
-                    if((VJoys[VPort1].KeyUp[i] == event->key.keysym.scancode) &&
-                            (VJoys[VPort1].Type[i] == VJOY_TYPE_KEY))
-                        GamePort1 &= ~(1<<i);
+                    if((virtual_joys[virtual_port1].KeyUp[i] == event->key.keysym.scancode) &&
+                            (virtual_joys[virtual_port1].Type[i] == VJOY_TYPE_KEY))
+                        game_port1 &= ~(1<<i);
                 }
             }
 
             /// Port2
-            if((VPort2 >= 0) && (VPort2 < MAX_VJOYS))
+            if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOYS))
             {
                 for(int i=0;i<5;i++)
                 {
-                    if((VJoys[VPort2].KeyUp[i] == event->key.keysym.scancode) &&
-                            (VJoys[VPort2].Type[i] == VJOY_TYPE_KEY))
-                        GamePort2 &= ~(1<<i);
+                    if((virtual_joys[virtual_port2].KeyUp[i] == event->key.keysym.scancode) &&
+                            (virtual_joys[virtual_port2].Type[i] == VJOY_TYPE_KEY))
+                        game_port2 &= ~(1<<i);
                 }
             }
             break;
@@ -2204,9 +2204,9 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                 if(Mouse1351Enable)
                 {
                     if(MousePort == 0)
-                        GamePort1 |= 0x10;
+                        game_port1 |= 0x10;
                     else
-                        GamePort2 |= 0x10;
+                        game_port2 |= 0x10;
                 }
                 break;
 
@@ -2215,9 +2215,9 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                 if(Mouse1351Enable)
                 {
                     if(MousePort == 0)
-                        GamePort1 |= 0x01;
+                        game_port1 |= 0x01;
                     else
-                        GamePort2 |= 0x01;
+                        game_port2 |= 0x01;
                 }
                 break;
 
@@ -2234,8 +2234,8 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             if(Mouse1351Enable)
             {
                 if(MousePort == 0)
-                    GamePort1 &= ~0x10;
-                else GamePort2 &= ~0x10;
+                    game_port1 &= ~0x10;
+                else game_port2 &= ~0x10;
             }
             break;
 
@@ -2244,8 +2244,8 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             if(Mouse1351Enable)
             {
                 if(MousePort == 0)
-                    GamePort1 &= ~0x01;
-                else GamePort2 &= ~0x01;
+                    game_port1 &= ~0x01;
+                else game_port2 &= ~0x01;
             }
             break;
 
@@ -2401,7 +2401,7 @@ int SDLThreadLoad(void *userdat)
     uint16_t PRGStartAdresse;
     C64Class *c64 = static_cast<C64Class*>(userdat);
 
-    switch(c64->AutoLoadMode)
+    switch(c64->auto_load_mode)
     {
     case 0:
         c64->SetCommandLine(c64->AutoLoadCommandLine);
@@ -2440,10 +2440,10 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
         if(!LoadDiskImage(floppy_nr,filename)) return 2;
 
         KillCommandLine();
-        AutoLoadMode = 0;
+        auto_load_mode = 0;
         sprintf(AutoLoadCommandLine,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
         HardReset();
-        WaitResetReady = true;
+        wait_reset_ready = true;
         C64ResetReady = false;
         FloppyResetReady[0] = false;
         return 0;
@@ -2454,10 +2454,10 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
         if(!LoadDiskImage(floppy_nr,filename)) return 3;
 
         KillCommandLine();
-        AutoLoadMode = 0;
+        auto_load_mode = 0;
         sprintf(AutoLoadCommandLine,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
         HardReset();
-        WaitResetReady = true;
+        wait_reset_ready = true;
         C64ResetReady = false;
         FloppyResetReady[0] = false;
         return 0;
@@ -2466,10 +2466,10 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
     if(0==strcmp("PRG",EXT) || 0==strcmp("C64",EXT))
     {
         KillCommandLine();
-        AutoLoadMode = 1;
+        auto_load_mode = 1;
         strcpy(AutoLoadFilename,filename);
         HardReset();
-        WaitResetReady = true;
+        wait_reset_ready = true;
         C64ResetReady = false;
         FloppyResetReady[0] = false;
         return 0;
@@ -2478,10 +2478,10 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
     if(0==strcmp("T64",EXT))
     {
         KillCommandLine();
-        AutoLoadMode = 2;
+        auto_load_mode = 2;
         strcpy(AutoLoadFilename,filename);
         HardReset();
-        WaitResetReady = true;
+        wait_reset_ready = true;
         C64ResetReady = false;
         FloppyResetReady[0] = false;
         return 0;
@@ -2490,10 +2490,10 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
     if(0==strcmp("P00",EXT))
     {
         KillCommandLine();
-        AutoLoadMode = 1;
+        auto_load_mode = 1;
         strcpy(AutoLoadFilename,filename);
         HardReset();
-        WaitResetReady = true;
+        wait_reset_ready = true;
         C64ResetReady = false;
         FloppyResetReady[0] = false;
         return 0;
@@ -2718,7 +2718,7 @@ int C64Class::LoadCRT(char *filename)
     int ret = crt->LoadCRTImage(filename);
     if(ret == 0)
     {
-        IOSource = 1;
+        io_source = 1;
 
         KillCommandLine();
         HardReset();
@@ -2729,7 +2729,7 @@ int C64Class::LoadCRT(char *filename)
 void C64Class::RemoveCRT()
 {
     crt->RemoveCRTImage();
-    IOSource = 0;
+    io_source = 0;
     KillCommandLine();
     HardReset();
 }
@@ -2741,7 +2741,7 @@ int C64Class::CreateNewEasyFlashImage(char *filename, char *crt_name)
 
 void C64Class::InsertREU()
 {
-    IOSource = 2;
+    io_source = 2;
 
     crt->RemoveCRTImage();
     geo->Remove();
@@ -2756,7 +2756,7 @@ void C64Class::InsertREU()
 void C64Class::RemoveREU()
 {
     reu->Remove();
-    IOSource = 0;
+    io_source = 0;
 
     ReuIsInsert = false;
 
@@ -2781,7 +2781,7 @@ void C64Class::ClearREURam()
 
 void C64Class::InsertGEORAM()
 {
-    IOSource = 3;
+    io_source = 3;
 
     crt->RemoveCRTImage();
     reu->Remove();
@@ -2796,7 +2796,7 @@ void C64Class::InsertGEORAM()
 void C64Class::RemoveGEORAM()
 {
     geo->Remove();
-    IOSource = 0;
+    io_source = 0;
 
     KillCommandLine();
     HardReset();
@@ -2831,7 +2831,7 @@ void C64Class::SetDebugMode(bool status)
         OneOpc = false;
         sid1->SoundOutputEnable = false;
         sid2->SoundOutputEnable = false;
-        for(int i=0; i<FLOPPY_COUNT; i++) floppy[i]->SetEnableFloppySound(false);
+        for(int i=0; i<MAX_FLOPPY_COUNT; i++) floppy[i]->SetEnableFloppySound(false);
     }
     else
     {
@@ -2839,7 +2839,7 @@ void C64Class::SetDebugMode(bool status)
         OneOpc = false;
         sid1->SoundOutputEnable = true;
         sid2->SoundOutputEnable = true;
-        for(int i=0; i<FLOPPY_COUNT; i++) floppy[i]->SetEnableFloppySound(true);
+        for(int i=0; i<MAX_FLOPPY_COUNT; i++) floppy[i]->SetEnableFloppySound(true);
     }
 }
 
@@ -2957,7 +2957,7 @@ void C64Class::UpdateBreakGroup()
         }
     }
 
-    for(int i=0;i<FLOPPY_COUNT;i++)
+    for(int i=0;i<MAX_FLOPPY_COUNT;i++)
     {
         if(floppy[i]->GetEnableFloppy())
         {
@@ -3593,7 +3593,7 @@ bool C64Class::CheckBreakpoints()
 
     FloppyFoundBreakpoint = false;
     int floppy_break = 0;
-    for(int i=0; i<FLOPPY_COUNT; i++)
+    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
     {
         if(floppy[i]->GetEnableFloppy())
         {
@@ -3611,7 +3611,7 @@ bool C64Class::CheckBreakpoints()
             OneOpc = false;
             sid1->SoundOutputEnable = false;
             sid2->SoundOutputEnable = false;
-            for(int i=0; i<FLOPPY_COUNT; i++) floppy[i]->SetEnableFloppySound(false);
+            for(int i=0; i<MAX_FLOPPY_COUNT; i++) floppy[i]->SetEnableFloppySound(false);
             if(BreakpointProc != nullptr) BreakpointProc();
             return true;
         }
@@ -3627,20 +3627,20 @@ bool C64Class::CheckBreakpoints()
     return false;
 }
 
-void C64Class::WriteSidIO(uint16_t adresse, uint8_t wert)
+void C64Class::WriteSidIO(uint16_t address, uint8_t value)
 {
     if(enable_stereo_sid)
     {
-        if((adresse & 0xFFE0) == 0xD400) sid1->WriteIO(adresse,wert);
-        if((adresse & 0xFFE0) == stereo_sid_address) sid2->WriteIO(adresse,wert);
+        if((address & 0xFFE0) == 0xD400) sid1->WriteIO(address,value);
+        if((address & 0xFFE0) == stereo_sid_address) sid2->WriteIO(address,value);
     }
     else
     {
-        sid1->WriteIO(adresse,wert);
+        sid1->WriteIO(address,value);
     }
 }
 
-uint8_t C64Class::ReadSidIO(uint16_t adresse)
+uint8_t C64Class::ReadSidIO(uint16_t address)
 {
     /*
     if(StereoEnable)
@@ -3661,24 +3661,24 @@ uint8_t C64Class::ReadSidIO(uint16_t adresse)
     }
     */
 
-    return sid1->ReadIO(adresse);
+    return sid1->ReadIO(address);
 }
 
 /// $DE00
-void C64Class::WriteIO1(uint16_t adresse, uint8_t wert)
+void C64Class::WriteIO1(uint16_t address, uint8_t value)
 {
-    switch(IOSource)
+    switch(io_source)
     {
     case 0: // NO_MODUL
         break;
     case 1:	// CRT
-        crt->WriteIO1(adresse,wert);
+        crt->WriteIO1(address,value);
         break;
     case 2:	// REU
-        reu->WriteIO1(adresse,wert);
+        reu->WriteIO1(address,value);
         break;
     case 3:	// GEORAM
-        geo->WriteIO1(adresse,wert);
+        geo->WriteIO1(address,value);
         break;
     default:
         break;
@@ -3686,20 +3686,20 @@ void C64Class::WriteIO1(uint16_t adresse, uint8_t wert)
 }
 
 /// $DF00
-void C64Class::WriteIO2(uint16_t adresse, uint8_t wert)
+void C64Class::WriteIO2(uint16_t address, uint8_t value)
 {
-    switch(IOSource)
+    switch(io_source)
     {
     case 0: // NO_MODUL
         break;
     case 1: // CRT
-        crt->WriteIO2(adresse,wert);
+        crt->WriteIO2(address,value);
         break;
     case 2: // REU
-        reu->WriteIO2(adresse,wert);
+        reu->WriteIO2(address,value);
         break;
     case 3: // GEORAM
-        geo->WriteIO2(adresse,wert);
+        geo->WriteIO2(address,value);
         break;
     default:
         break;
@@ -3707,18 +3707,18 @@ void C64Class::WriteIO2(uint16_t adresse, uint8_t wert)
 }
 
 /// $DE00
-uint8_t C64Class::ReadIO1(uint16_t adresse)
+uint8_t C64Class::ReadIO1(uint16_t address)
 {
-    switch(IOSource)
+    switch(io_source)
     {
     case 0: // NO_MODUL
         return 0;
     case 1: // CRT
-        return crt->ReadIO1(adresse);
+        return crt->ReadIO1(address);
     case 2: // REU
-        return reu->ReadIO1(adresse);
+        return reu->ReadIO1(address);
     case 3: // GEORAM
-        return geo->ReadIO1(adresse);
+        return geo->ReadIO1(address);
     default:
         return 0;
     }
@@ -3726,18 +3726,18 @@ uint8_t C64Class::ReadIO1(uint16_t adresse)
 
 /// $DF00
 
-uint8_t C64Class::ReadIO2(uint16_t adresse)
+uint8_t C64Class::ReadIO2(uint16_t address)
 {
-    switch(IOSource)
+    switch(io_source)
     {
     case 0: // NO_MODUL
         return 0;
     case 1: // CRT
-        return crt->ReadIO2(adresse);
+        return crt->ReadIO2(address);
     case 2: // REU
-        return reu->ReadIO2(adresse);
+        return reu->ReadIO2(address);
     case 3: // GEORAM
-        return geo->ReadIO2(adresse);
+        return geo->ReadIO2(address);
     default:
         return 0;
     }
@@ -3750,35 +3750,35 @@ void C64Class::JoystickNewScan()
 
 void C64Class::StartRecJoystickMapping(int slot_nr)
 {
-    RecPollingWait = false;
-    RecJoySlotNr = slot_nr;
-    RecJoyMappingPos = 0;
-    RecJoyMapping = true;
+    rec_polling_wait = false;
+    rec_joy_slot_nr = slot_nr;
+    rec_joy_mapping_pos = 0;
+    rec_joy_mapping = true;
 }
 
 void C64Class::StopRecJoystickMapping()
 {
-    if(RecJoyMapping)
-        RecJoyMapping = false;
+    if(rec_joy_mapping)
+        rec_joy_mapping = false;
 }
 
 void C64Class::ClearJoystickMapping(int slot_nr)
 {
     char str00[32];
     sprintf(str00,"Slot %d",slot_nr+1);
-    strcpy(VJoys[slot_nr].Name, str00);
+    strcpy(virtual_joys[slot_nr].Name, str00);
 
     for(int i=0;i<5;i++)
     {
-        VJoys[slot_nr].Type[i] = 0;
-        VJoys[slot_nr].JoyIndex[i] = 0;
-        VJoys[slot_nr].KeyDown[i] = 0;
-        VJoys[slot_nr].KeyUp[i] = 0;
-        VJoys[slot_nr].ButtonNr[i] = 0;
-        VJoys[slot_nr].HatNr[i] = 0;
-        VJoys[slot_nr].HatValue[i] = 0;
-        VJoys[slot_nr].AxisNr[i] = 0;
-        VJoys[slot_nr].AxisValue[i] = 0;
+        virtual_joys[slot_nr].Type[i] = 0;
+        virtual_joys[slot_nr].JoyIndex[i] = 0;
+        virtual_joys[slot_nr].KeyDown[i] = 0;
+        virtual_joys[slot_nr].KeyUp[i] = 0;
+        virtual_joys[slot_nr].ButtonNr[i] = 0;
+        virtual_joys[slot_nr].HatNr[i] = 0;
+        virtual_joys[slot_nr].HatValue[i] = 0;
+        virtual_joys[slot_nr].AxisNr[i] = 0;
+        virtual_joys[slot_nr].AxisValue[i] = 0;
     }
 }
 

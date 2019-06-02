@@ -44,7 +44,7 @@ using namespace std::tr1::placeholders;
 
 #define MAX_C64_SCREEN_TITLE_LENGTH 100
 
-#define FLOPPY_COUNT 4
+#define MAX_FLOPPY_COUNT 4
 #define MAX_BREAK_GROUPS 255
 #define MAX_JOYSTICKS 16
 #define MAX_VJOYS 16
@@ -260,28 +260,28 @@ public:
 
     int				frame_skip_counter;
 
-    SDL_Surface     *Pfeil0;
-    SDL_Surface     *Pfeil1;
-    SDL_Surface     *Kreis0;
-    SDL_Surface     *Kreis1;
+    SDL_Surface     *img_joy_arrow0;
+    SDL_Surface     *img_joy_arrow1;
+    SDL_Surface     *img_joy_button0;
+    SDL_Surface     *img_joy_button1;
 
-    GLuint          Pfeil0Texture;
-    GLuint          Pfeil1Texture;
-    GLuint          Kreis0Texture;
-    GLuint          Kreis1Texture;
+    GLuint          texture_joy_arrow0;
+    GLuint          texture_joy_arrow1;
+    GLuint          texture_joy_button0;
+    GLuint          texture_joy_button1;
 
-    bool            RecJoyMapping;
-    int             RecJoyMappingPos;          // 0-4 // Hoch - Runter - Links - Rechts - Feuer
-    int             RecJoySlotNr;              // 0 - (MAX_VJOYS-1)
-    int             RecPollingWait;
-    int             RecPollingWaitCounter;
+    bool            rec_joy_mapping;
+    int             rec_joy_mapping_pos;          // 0-4 // Hoch - Runter - Links - Rechts - Feuer
+    int             rec_joy_slot_nr;              // 0 - (MAX_VJOYS-1)
+    int             rec_polling_wait;
+    int             rec_polling_wait_counter;
 
-    VIRTUAL_JOY_STRUCT  VJoys[MAX_VJOYS];
-    int                 VPort1;
-    int                 VPort2;
+    VIRTUAL_JOY_STRUCT  virtual_joys[MAX_VJOYS];
+    int                 virtual_port1;
+    int                 virtual_port2;
 
-    uint8_t         GamePort1;
-    uint8_t         GamePort2;
+    uint8_t         game_port1;
+    uint8_t         game_port2;
 
     SDL_Thread      *sdl_thread;
     bool            sdl_thread_pause;
@@ -303,7 +303,7 @@ public:
     CRTClass        *crt;
     REUClass        *reu;
     GEORAMClass     *geo;
-    Floppy1541      *floppy[FLOPPY_COUNT];
+    Floppy1541      *floppy[MAX_FLOPPY_COUNT];
     TAPE1530        *tape;
 
     bool RESET;     // Reset Leitung -> Für Alle Module mit Reset Eingang
@@ -312,13 +312,13 @@ public:
     bool            enable_stereo_sid_6channel_mode;
     uint16_t        stereo_sid_address;
 
-    uint8_t         KeyboardMatrixToPBExt[8];
-    uint8_t         KeyboardMatrixToPAExt[8];
+    uint8_t         keyboard_matrix_to_pa_ext[8];
+    uint8_t         keyboard_matrix_to_pb_ext[8];
 
-    int             IOSource;
+    uint8_t         io_source;
 
-    bool            WaitResetReady;
-    int             AutoLoadMode;
+    bool            wait_reset_ready;
+    uint8_t         auto_load_mode;
     char            AutoLoadCommandLine[1024];
     char            AutoLoadFilename[1024];
 
@@ -352,12 +352,12 @@ private:
     void CheckKeys();
     uint16_t DisAss(FILE *file, uint16_t pc, bool line_draw, int source);
     bool CheckBreakpoints();
-    void WriteSidIO(uint16_t adresse, uint8_t wert);
-    uint8_t ReadSidIO(uint16_t adresse);
-    void WriteIO1(uint16_t adresse, uint8_t wert);
-    void WriteIO2(uint16_t adresse, uint8_t wert);
-    uint8_t ReadIO1(uint16_t adresse);
-    uint8_t ReadIO2(uint16_t adresse);
+    void WriteSidIO(uint16_t address, uint8_t value);
+    uint8_t ReadSidIO(uint16_t address);
+    void WriteIO1(uint16_t address, uint8_t value);
+    void WriteIO2(uint16_t address, uint8_t value);
+    uint8_t ReadIO1(uint16_t address);
+    uint8_t ReadIO2(uint16_t address);
     void SDLThreadPauseBegin();
     void SDLThreadPauseEnd();
     void OpenSDLJoystick();
@@ -453,7 +453,7 @@ private:
     ////////////////////////////////////////////////////////////
 
     bool        C64ResetReady;
-    bool        FloppyResetReady[FLOPPY_COUNT];
+    bool        FloppyResetReady[MAX_FLOPPY_COUNT];
 
     char        ComandZeile[256];
     int         ComandZeileSize;

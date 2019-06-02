@@ -51,8 +51,8 @@ public:
     REG_STRUCT C64CpuReg;
     IREG_STRUCT C64CpuIReg;
 
-    REG_STRUCT FloppyCpuReg[FLOPPY_COUNT];
-    IREG_STRUCT FloppyCpuIReg[FLOPPY_COUNT];
+    REG_STRUCT FloppyCpuReg[MAX_FLOPPY_COUNT];
+    IREG_STRUCT FloppyCpuIReg[MAX_FLOPPY_COUNT];
 
 private slots:
     void onShowContextMenu(const QPoint& pos);
