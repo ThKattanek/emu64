@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.11.2018                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -96,7 +96,7 @@ FloppyWindow::~FloppyWindow()
         ini->endGroup();
 
         char group_name[32];
-        for(int i=0; i<FloppyAnzahl; i++)
+        for(int i=0; i<FLOPPY_ANZAHL; i++)
         {
             sprintf(group_name,"Floppy1541_%2.2X",i+8);
             ini->beginGroup(group_name);
@@ -141,7 +141,7 @@ void FloppyWindow::LoadIni()
         SetD64BigSize(ui->D64FileTableBigSize->isChecked());
 
         char group_name[32];
-        for(int i=0; i<FloppyAnzahl; i++)
+        for(int i=0; i<FLOPPY_ANZAHL; i++)
         {
             sprintf(group_name,"Floppy1541_%2.2X",i+8);
             ini->beginGroup(group_name);
@@ -170,7 +170,7 @@ void FloppyWindow::LoadIni()
 
 bool FloppyWindow::SetDiskImage(int floppynr, QString filename)
 {
-    if(floppynr >= FloppyAnzahl) return false;
+    if(floppynr >= FLOPPY_ANZAHL) return false;
 
     QFileInfo fi = QFileInfo(filename);
 
@@ -201,7 +201,7 @@ void FloppyWindow::OnSelectFile(QString filename)
 {
     int FloppyNr = ui->FloppySelect->currentIndex();
 
-    if(FloppyNr < FloppyAnzahl)
+    if(FloppyNr < FLOPPY_ANZAHL)
     {
         AktFileName[FloppyNr] = filename;
         AktDir[FloppyNr] = ui->FileBrowser->GetAktDir();

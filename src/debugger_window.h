@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -51,8 +51,8 @@ public:
     REG_STRUCT C64CpuReg;
     IREG_STRUCT C64CpuIReg;
 
-    REG_STRUCT FloppyCpuReg[FloppyAnzahl];
-    IREG_STRUCT FloppyCpuIReg[FloppyAnzahl];
+    REG_STRUCT FloppyCpuReg[FLOPPY_ANZAHL];
+    IREG_STRUCT FloppyCpuIReg[FLOPPY_ANZAHL];
 
 private slots:
     void onShowContextMenu(const QPoint& pos);

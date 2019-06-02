@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.12.2018                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -784,7 +784,7 @@ void SetupWindow::on_SelectRomSet_currentIndexChanged(const QString &arg1)
     {
         c64->LoadC64Roms(kernal_rom.toLatin1().data(),basic_rom.toLatin1().data(),char_rom.toLatin1().data());
 
-        for(int i=0; i<FloppyAnzahl; i++)
+        for(int i=0; i<FLOPPY_ANZAHL; i++)
         {
             c64->LoadFloppyRom(i,dos1541_rom.toLatin1().data());
         }

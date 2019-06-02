@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.03.2018                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -215,7 +215,7 @@ void DebuggerWindow::onTimerAnimationRefresh(void)
             }
         }
 
-        for(int i=0;i<FloppyAnzahl;i++)
+        for(int i=0;i<FLOPPY_ANZAHL;i++)
         {
             if(c64->floppy[i]->GetEnableFloppy())
             {
@@ -1683,7 +1683,7 @@ void DebuggerWindow::on_DisAssScroll_valueChanged(int value)
 
 void DebuggerWindow::on_AddBreakpoint_clicked()
 {
-    static int auto_num[FloppyAnzahl+1] = {1,1,1,1,1};
+    static int auto_num[FLOPPY_ANZAHL+1] = {1,1,1,1,1};
     BREAK_GROUP *bg;
     int index;
 

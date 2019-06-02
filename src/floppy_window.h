@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.11.2018                //
+// Letzte Änderung am 02.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -79,10 +79,10 @@ private:
     QSettings *ini;
     C64Class *c64;
     bool isOneShowed;
-    QString AktDir[FloppyAnzahl];
-    QString AktFile[FloppyAnzahl];
-    QString AktFileName[FloppyAnzahl];
-    D64Class d64[FloppyAnzahl];
+    QString AktDir[FLOPPY_ANZAHL];
+    QString AktFile[FLOPPY_ANZAHL];
+    QString AktFileName[FLOPPY_ANZAHL];
+    D64Class d64[FLOPPY_ANZAHL];
 
     QIcon *green_led ;
     QIcon *yellow_led;
