@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 03.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -48,11 +48,11 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     changed_window_pos = false;
     changed_window_size = false;
 
-    JoyStickUdateIsStop = true;
+    sdl_joystick_update_is_stoped = true;
     rec_joy_mapping = false;
-    StopJoystickUpdate = true;
-    SDLJoystickIsOpen = false;
-    JoystickAnzahl = 0;
+    sdl_joystick_stop_update = true;
+    sdl_joystick_is_open = false;
+    sdl_joystick_count = 0;
 
     isReturnKeyDown = false;
 
@@ -77,17 +77,13 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     MouseHiddenCounter = 0;
     MouseHiddenTime = 3000;
 
-    FloppySoundPath = new char[1024];
-    GfxPath = new char [1024];
-    RomPath = new char[1024];
-
-    sprintf(FloppySoundPath,"%s%s",data_path,"/floppy_sounds/");
-    sprintf(GfxPath,"%s%s",data_path,"/gfx/");
-    sprintf(RomPath,"%s%s",data_path,"/roms/");
+    sprintf(floppy_sound_path,"%s%s",data_path,"/floppy_sounds/");
+    sprintf(gfx_path,"%s%s",data_path,"/gfx/");
+    sprintf(rom_path,"%s%s",data_path,"/roms/");
 
     LogText(const_cast<char*>(">> C64 Klasse wurde gestartet...\n"));
     LogText(const_cast<char*>(">> GfxPath = "));
-    LogText(const_cast<char*>(GfxPath));
+    LogText(const_cast<char*>(gfx_path));
     LogText(const_cast<char*>("\n"));
 
     this->video_crt_output = video_crt_output;
@@ -128,7 +124,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
         LogText(const_cast<char*>(">> SDL2 wurde installiert\n"));
 
     char filename[FILENAME_MAX];
-    sprintf(filename,"%spfeil0.png",GfxPath);
+    sprintf(filename,"%spfeil0.png",gfx_path);
     img_joy_arrow0 = IMG_Load(filename);
     if(!img_joy_arrow0)
     {
@@ -148,7 +144,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
         if ( (img_joy_arrow0->h & (img_joy_arrow0->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n"));
     }
 
-    sprintf(filename,"%spfeil1.png",GfxPath);
+    sprintf(filename,"%spfeil1.png",gfx_path);
     img_joy_arrow1 = IMG_Load(filename);
     if(!img_joy_arrow1)
     {
@@ -168,7 +164,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
         if ( (img_joy_arrow1->h & (img_joy_arrow1->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n"));
     }
 
-    sprintf(filename,"%skreis0.png",GfxPath);
+    sprintf(filename,"%skreis0.png",gfx_path);
     img_joy_button0 = IMG_Load(filename);
     if(!img_joy_button0)
     {
@@ -188,7 +184,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
         if ( (img_joy_button0->h & (img_joy_button0->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n"));
     }
 
-    sprintf(filename,"%skreis1.png",GfxPath);
+    sprintf(filename,"%skreis1.png",gfx_path);
     img_joy_button1 = IMG_Load(filename);
     if(!img_joy_button1)
     {
@@ -239,7 +235,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     SetGrafikModi(video_crt_output->StartC64isColorBit32, video_crt_output->StartC64isDoublesize, video_crt_output->StartC64isPalmode, false);
 
-    sprintf(filename,"%ssdl_icon.png",GfxPath);
+    sprintf(filename,"%ssdl_icon.png",gfx_path);
     sdl_window_icon = IMG_Load(filename);
     if(sdl_window_icon != nullptr)
     {
@@ -277,7 +273,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     /// Floppy mit C64 verbinden ///
 
-    sprintf(filename,"%s1541.rom",RomPath);
+    sprintf(filename,"%s1541.rom",rom_path);
 
     char motor_filename[FILENAME_MAX];
     char motor_on_filename[FILENAME_MAX];
@@ -286,14 +282,14 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     char stepper_inc_filename[FILENAME_MAX];
     char stepper_dec_filename[FILENAME_MAX];
 
-    sprintf(motor_filename,"%smotor.raw",FloppySoundPath);
-    sprintf(motor_on_filename,"%smotor_on.raw",FloppySoundPath);
-    sprintf(motor_off_filename,"%smotor_off.raw",FloppySoundPath);
-    sprintf(bumper_filename,"%sanschlag.raw",FloppySoundPath);
-    sprintf(stepper_inc_filename,"%sstepper_inc.raw",FloppySoundPath);
-    sprintf(stepper_dec_filename,"%sstepper_dec.raw",FloppySoundPath);
+    sprintf(motor_filename,"%smotor.raw",floppy_sound_path);
+    sprintf(motor_on_filename,"%smotor_on.raw",floppy_sound_path);
+    sprintf(motor_off_filename,"%smotor_off.raw",floppy_sound_path);
+    sprintf(bumper_filename,"%sanschlag.raw",floppy_sound_path);
+    sprintf(stepper_inc_filename,"%sstepper_inc.raw",floppy_sound_path);
+    sprintf(stepper_dec_filename,"%sstepper_dec.raw",floppy_sound_path);
 
-    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
+    for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
         floppy[i] = new Floppy1541(&RESET,audio_spec_have.freq,audio_spec_have.samples,&FloppyFoundBreakpoint);
         floppy[i]->SetResetReady(&FloppyResetReady[i],0xEBFF);
@@ -471,7 +467,7 @@ C64Class::~C64Class()
 {
     EndEmulation();
 
-    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
+    for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
         if(floppy[i] != nullptr) delete floppy[i];
     }
@@ -492,9 +488,6 @@ C64Class::~C64Class()
     if(geo != nullptr) delete geo;
 
     if(video_capture != nullptr) delete video_capture;
-
-    if(FloppySoundPath != nullptr) delete[] FloppySoundPath;
-    if(RomPath != nullptr) delete[] RomPath;
 }
 
 void C64Class::StartEmulation()
@@ -760,7 +753,7 @@ void C64Class::WarpModeLoop()
     //if(ExtZyklus) ZyklusProcExt();
 
     FloppyIEC = 0;
-    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
+    for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
         floppy[i]->OneZyklus();
 
@@ -849,7 +842,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
     sid1->SoundBufferPos = 0;
     sid2->SoundBufferPos = 0;
-    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
+    for(int i=0; i<MAX_FLOPPY_NUM; i++)
         floppy[i]->ZeroSoundBufferPos();
     tape->ZeroSoundBufferPos();
 
@@ -881,7 +874,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             //if(ExtZyklus) ZyklusProcExt();
 
             FloppyIEC = 0;
-            for(int i=0; i<MAX_FLOPPY_COUNT; i++)
+            for(int i=0; i<MAX_FLOPPY_NUM; i++)
             {
                 floppy[i]->OneZyklus();
 
@@ -1013,7 +1006,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
         video_capture->FillSourceAudioBuffer(puffer, laenge/2);
 
         /// Floppysound dazu mixen ///
-        for(int i=0; i<MAX_FLOPPY_COUNT; i++)
+        for(int i=0; i<MAX_FLOPPY_NUM; i++)
         {
             if(floppy[i]->GetEnableFloppySound()) SDL_MixAudio(reinterpret_cast<uint8_t*>(puffer),reinterpret_cast<uint8_t*>(floppy[i]->GetSoundBuffer()),static_cast<uint32_t>(laenge),255);
         }
@@ -1037,7 +1030,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     //if(ExtZyklus) ZyklusProcExt();
 
                     FloppyIEC = 0;
-                    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
+                    for(int i=0; i<MAX_FLOPPY_NUM; i++)
                     {
                         floppy[i]->OneZyklus();
 
@@ -1095,7 +1088,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 //if(ExtZyklus) ZyklusProcExt();
 
                 FloppyIEC = 0;
-                for(int i=0; i<MAX_FLOPPY_COUNT; i++)
+                for(int i=0; i<MAX_FLOPPY_NUM; i++)
                 {
                     floppy[i]->OneZyklus();
 
@@ -1164,7 +1157,7 @@ loop_wait_next_opc:
                 {
                     int FloppyNr = OneOpcSource - 1;
                     FloppyIEC = 0;
-                    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
+                    for(int i=0; i<MAX_FLOPPY_NUM; i++)
                     {
                         if(i != FloppyNr)
                         {
@@ -1301,7 +1294,7 @@ bool C64Class::LoadC64Roms(char *kernalrom, char *basicrom, char *charrom)
 
 bool C64Class::LoadFloppyRom(uint8_t floppy_nr, char *dos1541rom)
 {
-    if(floppy_nr < MAX_FLOPPY_COUNT)
+    if(floppy_nr < MAX_FLOPPY_NUM)
     {
         if(!floppy[floppy_nr]->LoadDosRom(dos1541rom)) return false;
         return true;
@@ -1311,7 +1304,7 @@ bool C64Class::LoadFloppyRom(uint8_t floppy_nr, char *dos1541rom)
 
 bool C64Class::LoadDiskImage(uint8_t floppy_nr, char *filename)
 {
-    if(floppy_nr < MAX_FLOPPY_COUNT)
+    if(floppy_nr < MAX_FLOPPY_NUM)
     {
         return floppy[floppy_nr]->LoadDiskImage(filename);
     }
@@ -1814,7 +1807,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             {
                 /// VJoyStick abfrage ///
                 /// Port1
-                if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOYS))
+                if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOY_NUM))
                 {
                     for(int i=0;i<5;i++)
                     {
@@ -1829,7 +1822,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                 }
 
                 /// Port2
-                if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOYS))
+                if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOY_NUM))
                 {
                     for(int i=0;i<5;i++)
                     {
@@ -1876,7 +1869,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             {
                 /// VJoyStick abfrage ///
                 /// Port1
-                if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOYS))
+                if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOY_NUM))
                 {
                     for(int i=0;i<5;i++)
                     {
@@ -1892,7 +1885,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
                 /// VJoyStick abfrage ///
                 /// Port2
-                if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOYS))
+                if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOY_NUM))
                 {
                     for(int i=0;i<5;i++)
                     {
@@ -1946,7 +1939,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             {
                 /// VJoyStick abfrage ///
                 /// Port1
-                if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOYS))
+                if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOY_NUM))
                 {
                     for(int i=0;i<5;i++)
                     {
@@ -1972,7 +1965,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
                 /// VJoyStick abfrage ///
                 /// Port2
-                if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOYS))
+                if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOY_NUM))
                 {
                     for(int i=0;i<5;i++)
                     {
@@ -2092,7 +2085,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
             /// VJoyStick abfrage ///
             /// Port1
-            if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOYS))
+            if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOY_NUM))
             {
                 for(int i=0;i<5;i++)
                 {
@@ -2103,7 +2096,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             }
 
             /// Port2
-            if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOYS))
+            if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOY_NUM))
             {
                 for(int i=0;i<5;i++)
                 {
@@ -2163,7 +2156,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
             /// VJoyStick abfrage ///
             /// Port1
-            if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOYS))
+            if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOY_NUM))
             {
                 for(int i=0;i<5;i++)
                 {
@@ -2174,7 +2167,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             }
 
             /// Port2
-            if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOYS))
+            if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOY_NUM))
             {
                 for(int i=0;i<5;i++)
                 {
@@ -2829,7 +2822,7 @@ void C64Class::SetDebugMode(bool status)
         OneOpc = false;
         sid1->SoundOutputEnable = false;
         sid2->SoundOutputEnable = false;
-        for(int i=0; i<MAX_FLOPPY_COUNT; i++) floppy[i]->SetEnableFloppySound(false);
+        for(int i=0; i<MAX_FLOPPY_NUM; i++) floppy[i]->SetEnableFloppySound(false);
     }
     else
     {
@@ -2837,7 +2830,7 @@ void C64Class::SetDebugMode(bool status)
         OneOpc = false;
         sid1->SoundOutputEnable = true;
         sid2->SoundOutputEnable = true;
-        for(int i=0; i<MAX_FLOPPY_COUNT; i++) floppy[i]->SetEnableFloppySound(true);
+        for(int i=0; i<MAX_FLOPPY_NUM; i++) floppy[i]->SetEnableFloppySound(true);
     }
 }
 
@@ -2955,7 +2948,7 @@ void C64Class::UpdateBreakGroup()
         }
     }
 
-    for(int i=0;i<MAX_FLOPPY_COUNT;i++)
+    for(int i=0;i<MAX_FLOPPY_NUM;i++)
     {
         if(floppy[i]->GetEnableFloppy())
         {
@@ -3591,7 +3584,7 @@ bool C64Class::CheckBreakpoints()
 
     FloppyFoundBreakpoint = false;
     int floppy_break = 0;
-    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
+    for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
         if(floppy[i]->GetEnableFloppy())
         {
@@ -3609,7 +3602,7 @@ bool C64Class::CheckBreakpoints()
             OneOpc = false;
             sid1->SoundOutputEnable = false;
             sid2->SoundOutputEnable = false;
-            for(int i=0; i<MAX_FLOPPY_COUNT; i++) floppy[i]->SetEnableFloppySound(false);
+            for(int i=0; i<MAX_FLOPPY_NUM; i++) floppy[i]->SetEnableFloppySound(false);
             if(BreakpointProc != nullptr) BreakpointProc();
             return true;
         }
@@ -3826,35 +3819,35 @@ int C64Class::GetC64KeyTableSize()
 
 void C64Class::OpenSDLJoystick()
 {
-    JoyStickUdateIsStop = false;
-    StopJoystickUpdate = true;
+    sdl_joystick_update_is_stoped = false;
+    sdl_joystick_stop_update = true;
     int AbbruchCounter = 1000;
-    while(!JoyStickUdateIsStop && (AbbruchCounter > 0))
+    while(!sdl_joystick_update_is_stoped && (AbbruchCounter > 0))
     {
         AbbruchCounter--;
     }
 
-    if(SDLJoystickIsOpen)
+    if(sdl_joystick_is_open)
     {
-        SDLJoystickIsOpen = false;
+        sdl_joystick_is_open = false;
         SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
         LogText(const_cast<char*>(">> SDL Subsystem Joystick wurde geschlossen\n"));
     }
 
     if(SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
     {
-        SDLJoystickIsOpen = false;
+        sdl_joystick_is_open = false;
         LogText(const_cast<char*>("<< ERROR: SDL Subsystem Joystick konnte nicht geöffnet werden\n"));
     }
     else
     {
-        SDLJoystickIsOpen = true;
+        sdl_joystick_is_open = true;
         LogText(const_cast<char*>(">> SDL Subsytem Joystick wurde erfolgreich geoeffnet\n"));
-        JoystickAnzahl = SDL_NumJoysticks();
-        if(JoystickAnzahl > MAX_JOYSTICKS) JoystickAnzahl = MAX_JOYSTICKS;
+        sdl_joystick_count = SDL_NumJoysticks();
+        if(sdl_joystick_count > MAX_SDL_JOYSTICK_NUM) sdl_joystick_count = MAX_SDL_JOYSTICK_NUM;
 
         char str00[256];
-        switch(JoystickAnzahl)
+        switch(sdl_joystick_count)
         {
         case 0:
             LogText(const_cast<char*>("<< SDL konnte keinen Joystick/Gamepad erkennen\n"));
@@ -3863,42 +3856,42 @@ void C64Class::OpenSDLJoystick()
             LogText(const_cast<char*>(">> SDL konnte 1 Joystick/Gamepad erkennen\n"));
             break;
         default:
-            sprintf(str00,">> SDL konnte %d Joysticks/Gamepads erkennen\n",JoystickAnzahl);
+            sprintf(str00,">> SDL konnte %d Joysticks/Gamepads erkennen\n",sdl_joystick_count);
             LogText(str00);
             break;
         }
 
-        if(JoystickAnzahl > 0)
+        if(sdl_joystick_count > 0)
         {
-            for(int i=0; i<JoystickAnzahl;i++)
+            for(int i=0; i<sdl_joystick_count; i++)
             {
-                Joystick[i] = SDL_JoystickOpen(i);
-                JoystickNamen[i] = SDL_JoystickName(Joystick[i]);
+                sdl_joystick[i] = SDL_JoystickOpen(i);
+                sdl_joystick_name[i] = SDL_JoystickName(sdl_joystick[i]);
 
-                sprintf(str00,">>   [%2.2d] %s\n",i,JoystickNamen[i]);
+                sprintf(str00,">>   [%2.2d] %s\n",i,sdl_joystick_name[i]);
                 LogText(str00);
             }
         }
     }
-    StopJoystickUpdate = true;
+    sdl_joystick_stop_update = true;
 }
 
 void C64Class::CloseSDLJoystick()
 {
-    JoyStickUdateIsStop = false;
-    StopJoystickUpdate = true;
+    sdl_joystick_update_is_stoped = false;
+    sdl_joystick_stop_update = true;
     int AbbruchCounter = 1000;
-    while(!JoyStickUdateIsStop && (AbbruchCounter > 0))
+    while(!sdl_joystick_update_is_stoped && (AbbruchCounter > 0))
     {
         AbbruchCounter--;
     }
-    if(SDLJoystickIsOpen)
+    if(sdl_joystick_is_open)
     {
-        SDLJoystickIsOpen = false;
+        sdl_joystick_is_open = false;
         SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
         LogText(const_cast<char*>(">> SDL Subsystem Joystick wurde geschlossen\n"));
     }
-    StopJoystickUpdate = true;
+    sdl_joystick_stop_update = true;
 }
 
 ///

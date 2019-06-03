@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 03.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -44,12 +44,12 @@ using namespace std::tr1::placeholders;
 
 #define MAX_STRING_LENGTH 1024
 
-#define MAX_FLOPPY_COUNT 4
+#define MAX_FLOPPY_NUM 4
 #define MAX_BREAK_GROUPS 255
-#define MAX_JOYSTICKS 16
-#define MAX_VJOYS 16
+#define MAX_SDL_JOYSTICK_NUM 16
+#define MAX_VJOY_NUM 16
 
-#define SUBDIVS_SCREEN 20             // Für Screenverzerrungen (Kissen etc.)
+#define SUBDIVS_SCREEN 20             // Für Screenverzerrungen (unterteilung des Bildschirms)
 
 #define SCREEN_RATIO_4_3 1.34f        // Screenratio 4:3 (1,33333)
 #define SCREEN_RATIO_5_4 1.25f        // Screenratio 5:4 (1,25)
@@ -277,7 +277,7 @@ public:
     int             rec_polling_wait;
     int             rec_polling_wait_counter;
 
-    VIRTUAL_JOY_STRUCT  virtual_joys[MAX_VJOYS];
+    VIRTUAL_JOY_STRUCT  virtual_joys[MAX_VJOY_NUM];
     int                 virtual_port1;
     int                 virtual_port2;
 
@@ -304,7 +304,7 @@ public:
     CRTClass        *crt;
     REUClass        *reu;
     GEORAMClass     *geo;
-    Floppy1541      *floppy[MAX_FLOPPY_COUNT];
+    Floppy1541      *floppy[MAX_FLOPPY_NUM];
     TAPE1530        *tape;
 
     bool RESET;     // Reset Leitung -> Für Alle Module mit Reset Eingang
@@ -373,18 +373,18 @@ private:
     function<uint8_t(uint16_t)> *ReadProcTbl;
     function<void(uint16_t, uint8_t)> *WriteProcTbl;
 
-    char* GfxPath;
-    char* FloppySoundPath;
-    char* RomPath;
+    char  gfx_path[MAX_STRING_LENGTH];
+    char  floppy_sound_path[MAX_STRING_LENGTH];
+    char  rom_path[MAX_STRING_LENGTH];
 
     char sdl_window_name[MAX_STRING_LENGTH];
 
-    bool SDLJoystickIsOpen;
-    int  JoystickAnzahl;
-    SDL_Joystick *Joystick[MAX_JOYSTICKS];
-    const char *JoystickNamen[MAX_JOYSTICKS];
-    bool StopJoystickUpdate;
-    bool JoyStickUdateIsStop;
+    bool sdl_joystick_is_open;
+    int  sdl_joystick_count;
+    SDL_Joystick *sdl_joystick[MAX_SDL_JOYSTICK_NUM];
+    const char *sdl_joystick_name[MAX_SDL_JOYSTICK_NUM];
+    bool sdl_joystick_stop_update;
+    bool sdl_joystick_update_is_stoped;
 
     bool RDY_BA;            // Leitung CPU <-- VIC
     bool HRESET;            // Zusatz Anzeige für MMU Reset
@@ -456,7 +456,7 @@ private:
     ////////////////////////////////////////////////////////////
 
     bool        C64ResetReady;
-    bool        FloppyResetReady[MAX_FLOPPY_COUNT];
+    bool        FloppyResetReady[MAX_FLOPPY_NUM];
 
     char        ComandZeile[256];
     int         ComandZeileSize;

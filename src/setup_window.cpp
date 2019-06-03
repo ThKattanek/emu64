@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 03.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -88,7 +88,7 @@ void SetupWindow::LoadINI(C64Class *c64)
     if(ini != 0)
     {
         char group_name[32];
-        ui->VJoySlots->setRowCount(MAX_VJOYS);
+        ui->VJoySlots->setRowCount(MAX_VJOY_NUM);
         ui->VJoySlots->setColumnCount(5);
         ui->VJoySlots->setColumnWidth(0,125);
         ui->VJoySlots->setColumnWidth(1,45);
@@ -100,7 +100,7 @@ void SetupWindow::LoadINI(C64Class *c64)
         //header_label << trUtf8("Bezeichnung") << "Port 1" << "Port 2" << "" << "";
         //ui->VJoySlots->setHorizontalHeaderLabels(header_label);
 
-        for(int i=0; i<MAX_VJOYS; i++)
+        for(int i=0; i<MAX_VJOY_NUM; i++)
         {
             sprintf(group_name,"VJSlot_%2.2d",i);
             ini->beginGroup(group_name);
@@ -366,7 +366,7 @@ void SetupWindow::SaveINI()
         ini->endGroup();
 
         char group_name[32];
-        for(int i=0; i<MAX_VJOYS; i++)
+        for(int i=0; i<MAX_VJOY_NUM; i++)
         {
             sprintf(group_name,"VJSlot_%2.2d",i);
             ini->beginGroup(group_name);
@@ -516,7 +516,7 @@ void SetupWindow::on_VJoySlots_cellClicked(int row, int column)
     switch(column)
     {
     case 1:
-        for(int i=0;i<MAX_VJOYS;i++)
+        for(int i=0;i<MAX_VJOY_NUM;i++)
         {
             ui->VJoySlots->item(i,1)->setBackground(QBrush(QColor(255,255,255)));
             ui->VJoySlots->item(i,1)->setText("");
@@ -527,7 +527,7 @@ void SetupWindow::on_VJoySlots_cellClicked(int row, int column)
         break;
 
     case 2:
-        for(int i=0;i<MAX_VJOYS;i++)
+        for(int i=0;i<MAX_VJOY_NUM;i++)
         {
             ui->VJoySlots->item(i,2)->setBackground(QBrush(QColor(255,255,255)));
             ui->VJoySlots->item(i,2)->setText("");
@@ -548,7 +548,7 @@ void SetupWindow::UpdateToolTips()
     header_label << trUtf8("Bezeichnung") << "Port 1" << "Port 2" << "" << "";
     ui->VJoySlots->setHorizontalHeaderLabels(header_label);
 
-    for(int i=0; i<MAX_VJOYS; i++)
+    for(int i=0; i<MAX_VJOY_NUM; i++)
     {
         item = ui->VJoySlots->item(i,0);
         if(item != NULL) item->setToolTip(trUtf8("Mit einem doppelklick kann man den Namen ändern."));
@@ -784,7 +784,7 @@ void SetupWindow::on_SelectRomSet_currentIndexChanged(const QString &arg1)
     {
         c64->LoadC64Roms(kernal_rom.toLatin1().data(),basic_rom.toLatin1().data(),char_rom.toLatin1().data());
 
-        for(int i=0; i<MAX_FLOPPY_COUNT; i++)
+        for(int i=0; i<MAX_FLOPPY_NUM; i++)
         {
             c64->LoadFloppyRom(i,dos1541_rom.toLatin1().data());
         }

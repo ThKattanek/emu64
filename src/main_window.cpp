@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 03.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -57,7 +57,7 @@ MainWindow::~MainWindow()
         char group_name[32];
         bool value;
 
-        for(int i=0; i<MAX_FLOPPY_COUNT; i++)
+        for(int i=0; i<MAX_FLOPPY_NUM; i++)
         {
             sprintf(group_name,"Floppy1541_%2.2X",i+8);
             ini->beginGroup(group_name);
@@ -396,11 +396,11 @@ void MainWindow::OnInit()
 
     /// Tabelle für Floppy's Ertsellen ///
     SplashMessage(trUtf8("Tabelle für Floppy's wird erstellt."),Qt::darkBlue);
-    ui->FloppyTabel->setRowCount(MAX_FLOPPY_COUNT);
+    ui->FloppyTabel->setRowCount(MAX_FLOPPY_NUM);
     ui->FloppyTabel->setColumnCount(1);
     LogText(trUtf8(">> Tabelle für alle Floppy Laufwerke wurde erzeugt\n").toLatin1().data());
 
-    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
+    for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
         SplashMessage(trUtf8("Floppy: ") + QVariant(i).toString() + "wird in Tabelle eingefügt",Qt::darkBlue);
         ui->FloppyTabel->setRowHeight(i,24);
@@ -445,7 +445,7 @@ void MainWindow::OnInit()
 
         char group_name[32];
 
-        for(int i=0; i<MAX_FLOPPY_COUNT; i++)
+        for(int i=0; i<MAX_FLOPPY_NUM; i++)
         {
             sprintf(group_name,"Floppy1541_%2.2X",i+8);
             ini->beginGroup(group_name);
@@ -670,7 +670,7 @@ void MainWindow::RetranslateUi()
 {
     ui->retranslateUi(this);
 
-    for(int i=0; i<MAX_FLOPPY_COUNT; i++)
+    for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
         WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(i,0);
         if(w != NULL) w->RetranslateUi();
