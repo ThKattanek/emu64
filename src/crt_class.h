@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.05.2019                //
+// Letzte Änderung am 03.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -31,7 +31,7 @@ public:
     ~CRTClass();
 
     // Funktionen
-    int* GetFlash040Dirty(int nr);
+    bool *GetFlash040Dirty(int nr);
     unsigned char* GetFlash040Byte(int nr);
     int LoadCRTImage(char* filename);
     void RemoveCRTImage(void);

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 03.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -107,7 +107,7 @@ inline unsigned long CRTClass::conv_dword(unsigned long wert)
         return wert;
 }
 
-int* CRTClass::GetFlash040Dirty(int nr)
+bool* CRTClass::GetFlash040Dirty(int nr)
 {
         switch (nr)
         {

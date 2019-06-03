@@ -89,9 +89,9 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     this->video_crt_output = video_crt_output;
     BreakGroupAnz = 0;
     FloppyFoundBreakpoint = false;
-    EnableExtLines = false;
+    enable_ext_wires = false;
 
-    IecIsDumped = false;
+    iec_is_dumped = false;
 
     current_c64_screen_width = current_window_width = current_c64_screen_height = current_window_height = 0;
 
@@ -262,14 +262,14 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     vic_puffer = vic->VideoPuffer;
 
-    cia2->FloppyIEC = &FloppyIEC;
-    cia2->C64IEC = &C64IEC;
+    cia2->FloppyIEC = &floppy_iec_wire;
+    cia2->C64IEC = &c64_iec_wire;
 
-    IecVcdExport.AddWire("c64_out_atn",false);
-    IecVcdExport.AddWire("c64_out_clk",false);
-    IecVcdExport.AddWire("c64_out_data",false);
-    IecVcdExport.AddWire("floppy_out_clk",false);
-    IecVcdExport.AddWire("floppy_out_data",false);
+    iec_export_vdc.AddWire("c64_out_atn",false);
+    iec_export_vdc.AddWire("c64_out_clk",false);
+    iec_export_vdc.AddWire("c64_out_data",false);
+    iec_export_vdc.AddWire("floppy_out_clk",false);
+    iec_export_vdc.AddWire("floppy_out_data",false);
 
     /// Floppy mit C64 verbinden ///
 
@@ -291,9 +291,9 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
-        floppy[i] = new Floppy1541(&RESET,audio_spec_have.freq,audio_spec_have.samples,&FloppyFoundBreakpoint);
+        floppy[i] = new Floppy1541(&reset_wire,audio_spec_have.freq,audio_spec_have.samples,&FloppyFoundBreakpoint);
         floppy[i]->SetResetReady(&FloppyResetReady[i],0xEBFF);
-        floppy[i]->SetC64IEC(&C64IEC);
+        floppy[i]->SetC64IEC(&c64_iec_wire);
         floppy[i]->SetDeviceNummer(static_cast<uint8_t>(8+i));
         floppy[i]->LoadDosRom(filename);
         //floppy[i]->LoadFloppySounds((char*)"floppy_sounds/motor.raw",(char*)"floppy_sounds/motor_on.raw",(char*)"floppy_sounds/motor_off.raw",(char*)"floppy_sounds/anschlag.raw",(char*)"floppy_sounds/stepper_inc.raw",(char*)"floppy_sounds/stepper_dec.raw");
@@ -355,49 +355,49 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     crt->ChangeMemMapProc = bind(&MMU::ChangeMemMap,mmu);
 
     /// Module mit Virtuellen Leitungen verbinden
-    mmu->GAME = &GAME;
-    mmu->EXROM = &EXROM;
-    mmu->RAM_H = &RAM_H;
-    mmu->RAM_L = &RAM_L;
-    mmu->CPU_PORT = &CPU_PORT;
-    crt->EXROM = &EXROM;
-    crt->GAME = &GAME;
+    mmu->GAME = &game_wire;
+    mmu->EXROM = &exrom_wire;
+    mmu->RAM_H = &hi_ram_wire;
+    mmu->RAM_L = &lo_ram_wire;
+    mmu->CPU_PORT = &cpu_port;
+    crt->EXROM = &exrom_wire;
+    crt->GAME = &game_wire;
     crt->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
     crt->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
-    cpu->RDY = &RDY_BA;
-    cpu->RESET = &RESET;
+    cpu->RDY = &rdy_ba_wire;
+    cpu->RESET = &reset_wire;
     cpu->ResetReady = &C64ResetReady;
     cpu->ResetReadyAdr = 0xE5CD;
-    cpu->EnableExtInterrupts = EnableExtLines;
-    cia1->RESET = &RESET;
+    cpu->EnableExtInterrupts = enable_ext_wires;
+    cia1->RESET = &reset_wire;
     cia1->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
     cia1->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
     cia1->VicTriggerLP = bind(&VICII::TriggerLightpen,vic);
     cia1->ChangePOTSwitch = bind(&C64Class::ChangePOTSwitch,this);
     cia1->PA = &CIA1_PA;
     cia1->PB = &CIA1_PB;
-    cia2->RESET = &RESET;
+    cia2->RESET = &reset_wire;
     cia2->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
     cia2->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
     cia2->PA = &CIA2_PA;
     cia2->PB = &CIA2_PB;
-    vic->BA = &RDY_BA;
+    vic->BA = &rdy_ba_wire;
     vic->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
     vic->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
     vic->FarbRam = mmu->GetFarbramPointer();
     vic->CIA2_PA = CIA2_PA.GetOutputBitsPointer();
-    sid1->RESET = &RESET;
-    sid2->RESET = &RESET;
-    reu->BA = &RDY_BA;
+    sid1->RESET = &reset_wire;
+    sid2->RESET = &reset_wire;
+    reu->BA = &rdy_ba_wire;
     reu->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
     reu->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
-    reu->RESET = &RESET;
+    reu->RESET = &reset_wire;
     reu->WRITE_FF00 = &cpu->WRITE_FF00;
 
     ReuIsInsert = false;
 
     /// Tape mit C64 verbinden ///
-    tape->CPU_PORT = &CPU_PORT;
+    tape->CPU_PORT = &cpu_port;
     cia1->FLAG_PIN = &tape->CassRead;
 
     /// CRT mit MMU verbinden ///
@@ -407,14 +407,14 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     mmu->EasyFlashByte1 = crt->GetFlash040Byte(0);
     mmu->EasyFlashByte2 = crt->GetFlash040Byte(1);
 
-    mmu->EasyFlashDirty1 = &EasyFlashDirty;
-    mmu->EasyFlashDirty2 = &EasyFlashDirty;
-    mmu->EasyFlashByte1 = &EasyFlashByte;
-    mmu->EasyFlashByte2 = &EasyFlashByte;
+    mmu->EasyFlashDirty1 = &easy_flash_dirty;
+    mmu->EasyFlashDirty2 = &easy_flash_dirty;
+    mmu->EasyFlashByte1 = &easy_flash_byte;
+    mmu->EasyFlashByte2 = &easy_flash_byte;
 
-    RDY_BA = true;
-    GAME = true;
-    EXROM = true;
+    rdy_ba_wire = true;
+    game_wire = true;
+    exrom_wire = true;
 
     wait_reset_ready = false;
 
@@ -424,7 +424,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     sid_volume = 1.0f;
 
-    sid1->RESET = &RESET;
+    sid1->RESET = &reset_wire;
     sid1->SetC64Zyklen(C64Takt);     // PAL 63*312*50 = 982800
     sid1->SetChipType(MOS_8580);
     sid1->SoundOutputEnable = true;
@@ -433,7 +433,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     sid1->Reset();
     sid1->SetPotXY(POT_X, POT_Y);
 
-    sid2->RESET = &RESET;
+    sid2->RESET = &reset_wire;
     sid2->SetC64Zyklen(C64Takt);     // PAL 63*312*50 = 982800
     sid2->SetChipType(MOS_8580);
     sid2->SoundOutputEnable = true;
@@ -445,7 +445,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     enable_stereo_sid_6channel_mode = false;
     stereo_sid_address = 0xD420;
 
-    vic->BA = &RDY_BA;
+    vic->BA = &rdy_ba_wire;
     vic->CIA2_PA = cia2->PA->GetOutputBitsPointer();
 
     /// Breakpoints ///
@@ -752,7 +752,7 @@ void C64Class::WarpModeLoop()
     /// Für Externe Erweiterungen ///
     //if(ExtZyklus) ZyklusProcExt();
 
-    FloppyIEC = 0;
+    floppy_iec_wire = 0;
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
         floppy[i]->OneZyklus();
@@ -766,9 +766,9 @@ void C64Class::WarpModeLoop()
         }
         #endif
 
-        FloppyIEC |= ~floppy[i]->FloppyIECLocal;
+        floppy_iec_wire |= ~floppy[i]->FloppyIECLocal;
     }
-    FloppyIEC = ~FloppyIEC;
+    floppy_iec_wire = ~floppy_iec_wire;
 
     vic->OneZyklus();
     cia1->OneZyklus();
@@ -780,7 +780,7 @@ void C64Class::WarpModeLoop()
     reu->OneZyklus();
     tape->OneCycle();
 
-    if(EnableExtLines) RDY_BA = ExtRDY;
+    if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
     cpu->OneZyklus();
 
     ////////////////////////// Testweise //////////////////////////
@@ -873,7 +873,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             /// Für Externe Erweiterungen ///
             //if(ExtZyklus) ZyklusProcExt();
 
-            FloppyIEC = 0;
+            floppy_iec_wire = 0;
             for(int i=0; i<MAX_FLOPPY_NUM; i++)
             {
                 floppy[i]->OneZyklus();
@@ -887,9 +887,9 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 }
                 #endif
 
-                FloppyIEC |= ~floppy[i]->FloppyIECLocal;
+                floppy_iec_wire |= ~floppy[i]->FloppyIECLocal;
             }
-            FloppyIEC = ~FloppyIEC;
+            floppy_iec_wire = ~floppy_iec_wire;
 
             vic->OneZyklus();
             cia1->OneZyklus();
@@ -899,7 +899,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             reu->OneZyklus();
             tape->OneCycle();
 
-            if(EnableExtLines) RDY_BA = ExtRDY;
+            if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
             cpu->OneZyklus();
 
             if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) if(CheckBreakpoints()) break;
@@ -956,14 +956,14 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             //////////////////////////////////////////////////////////////////////////////
 
 
-            if(IecIsDumped)
+            if(iec_is_dumped)
             {
-                IecVcdExport.NextStep();
-                IecVcdExport.SetWire(0,C64IEC & 16);
-                IecVcdExport.SetWire(1,C64IEC & 64);
-                IecVcdExport.SetWire(2,C64IEC & 128);
-                IecVcdExport.SetWire(3,FloppyIEC & 64);
-                IecVcdExport.SetWire(4,FloppyIEC & 128);
+                iec_export_vdc.NextStep();
+                iec_export_vdc.SetWire(0,c64_iec_wire & 16);
+                iec_export_vdc.SetWire(1,c64_iec_wire & 64);
+                iec_export_vdc.SetWire(2,c64_iec_wire & 128);
+                iec_export_vdc.SetWire(3,floppy_iec_wire & 64);
+                iec_export_vdc.SetWire(4,floppy_iec_wire & 128);
             }
 
         }
@@ -1029,7 +1029,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     /// Für Externe Erweiterungen ///
                     //if(ExtZyklus) ZyklusProcExt();
 
-                    FloppyIEC = 0;
+                    floppy_iec_wire = 0;
                     for(int i=0; i<MAX_FLOPPY_NUM; i++)
                     {
                         floppy[i]->OneZyklus();
@@ -1043,9 +1043,9 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                         }
                         #endif
 
-                        FloppyIEC |= ~floppy[i]->FloppyIECLocal;
+                        floppy_iec_wire |= ~floppy[i]->FloppyIECLocal;
                     }
-                    FloppyIEC = ~FloppyIEC;
+                    floppy_iec_wire = ~floppy_iec_wire;
 
                     vic->OneZyklus();
 
@@ -1056,19 +1056,19 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     reu->OneZyklus();
                     tape->OneCycle();
 
-                    if(EnableExtLines) RDY_BA = ExtRDY;
+                    if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
                     cpu->OneZyklus();
 
                     if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) if(CheckBreakpoints()) break;
 
-                    if(IecIsDumped)
+                    if(iec_is_dumped)
                     {
-                        IecVcdExport.NextStep();
-                        IecVcdExport.SetWire(0,C64IEC & 16);
-                        IecVcdExport.SetWire(1,C64IEC & 64);
-                        IecVcdExport.SetWire(2,C64IEC & 128);
-                        IecVcdExport.SetWire(3,FloppyIEC & 64);
-                        IecVcdExport.SetWire(4,FloppyIEC & 128);
+                        iec_export_vdc.NextStep();
+                        iec_export_vdc.SetWire(0,c64_iec_wire & 16);
+                        iec_export_vdc.SetWire(1,c64_iec_wire & 64);
+                        iec_export_vdc.SetWire(2,c64_iec_wire & 128);
+                        iec_export_vdc.SetWire(3,floppy_iec_wire & 64);
+                        iec_export_vdc.SetWire(4,floppy_iec_wire & 128);
                     }
                 }
                 AnimationSpeedCounter = 0;
@@ -1087,7 +1087,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 /// Für Externe Erweiterungen ///
                 //if(ExtZyklus) ZyklusProcExt();
 
-                FloppyIEC = 0;
+                floppy_iec_wire = 0;
                 for(int i=0; i<MAX_FLOPPY_NUM; i++)
                 {
                     floppy[i]->OneZyklus();
@@ -1101,9 +1101,9 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     }
                     #endif
 
-                    FloppyIEC |= ~floppy[i]->FloppyIECLocal;
+                    floppy_iec_wire |= ~floppy[i]->FloppyIECLocal;
                 }
-                FloppyIEC = ~FloppyIEC;
+                floppy_iec_wire = ~floppy_iec_wire;
 
                 vic->OneZyklus();
                 cia1->OneZyklus();
@@ -1113,21 +1113,21 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 reu->OneZyklus();
                 tape->OneCycle();
 
-                if(EnableExtLines) RDY_BA = ExtRDY;
+                if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
                 cpu->OneZyklus();
 
                 if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) CheckBreakpoints();
 
                 if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
 
-                if(IecIsDumped)
+                if(iec_is_dumped)
                 {
-                    IecVcdExport.NextStep();
-                    IecVcdExport.SetWire(0,C64IEC & 16);
-                    IecVcdExport.SetWire(1,C64IEC & 64);
-                    IecVcdExport.SetWire(2,C64IEC & 128);
-                    IecVcdExport.SetWire(3,FloppyIEC & 64);
-                    IecVcdExport.SetWire(4,FloppyIEC & 128);
+                    iec_export_vdc.NextStep();
+                    iec_export_vdc.SetWire(0,c64_iec_wire & 16);
+                    iec_export_vdc.SetWire(1,c64_iec_wire & 64);
+                    iec_export_vdc.SetWire(2,c64_iec_wire & 128);
+                    iec_export_vdc.SetWire(3,floppy_iec_wire & 64);
+                    iec_export_vdc.SetWire(4,floppy_iec_wire & 128);
                 }
             }
 
@@ -1156,7 +1156,7 @@ loop_wait_next_opc:
                 if(OneOpcSource > 0)
                 {
                     int FloppyNr = OneOpcSource - 1;
-                    FloppyIEC = 0;
+                    floppy_iec_wire = 0;
                     for(int i=0; i<MAX_FLOPPY_NUM; i++)
                     {
                         if(i != FloppyNr)
@@ -1172,17 +1172,17 @@ loop_wait_next_opc:
                             }
                             #endif
 
-                            FloppyIEC |= ~floppy[i]->FloppyIECLocal;
+                            floppy_iec_wire |= ~floppy[i]->FloppyIECLocal;
                         }
                     }
                     bool ret = floppy[FloppyNr]->OneZyklus();
-                    FloppyIEC |= ~floppy[FloppyNr]->FloppyIECLocal;
-                    FloppyIEC = ~FloppyIEC;
+                    floppy_iec_wire |= ~floppy[FloppyNr]->FloppyIECLocal;
+                    floppy_iec_wire = ~floppy_iec_wire;
                     if(!ret)  goto loop_wait_next_opc;
                 }
                 else
                 {
-                    if(EnableExtLines) RDY_BA = ExtRDY;
+                    if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
                     if(!cpu->OneZyklus()) goto loop_wait_next_opc;
                 }
 
@@ -1190,14 +1190,14 @@ loop_wait_next_opc:
 
                 if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
 
-                if(IecIsDumped)
+                if(iec_is_dumped)
                 {
-                    IecVcdExport.NextStep();
-                    IecVcdExport.SetWire(0,C64IEC & 16);
-                    IecVcdExport.SetWire(1,C64IEC & 64);
-                    IecVcdExport.SetWire(2,C64IEC & 128);
-                    IecVcdExport.SetWire(3,FloppyIEC & 64);
-                    IecVcdExport.SetWire(4,FloppyIEC & 128);
+                    iec_export_vdc.NextStep();
+                    iec_export_vdc.SetWire(0,c64_iec_wire & 16);
+                    iec_export_vdc.SetWire(1,c64_iec_wire & 64);
+                    iec_export_vdc.SetWire(2,c64_iec_wire & 128);
+                    iec_export_vdc.SetWire(3,floppy_iec_wire & 64);
+                    iec_export_vdc.SetWire(4,floppy_iec_wire & 128);
                 }
             }
         }
@@ -1248,11 +1248,11 @@ void C64Class::HardReset()
 
 inline void C64Class::SetReset(int status, int hard_reset)
 {
-    RESET = status;
+    reset_wire = status;
     if(!status)
     {
         crt->Reset();
-        RDY_BA = true;
+        rdy_ba_wire = true;
         if(!hard_reset) mmu->Reset();
         KillCommandLine();
     }
@@ -2006,12 +2006,12 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                     if(event->key.keysym.mod == KMOD_LSHIFT)
                     {
                         HardReset();
-                        RESET = false;
+                        reset_wire = false;
                     }
                     else
                     {
                         wait_reset_ready = false;
-                        RESET = false;
+                        reset_wire = false;
                     }
                 }
 
@@ -2118,7 +2118,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                 break;
 
             case SDLK_F12:
-               RESET = true;
+               reset_wire = true;
                 break;
 
             default:
@@ -2327,12 +2327,12 @@ uint8_t C64Class::SetTapeKeys(uint8_t pressed_key)
 
 bool C64Class::GetTapeMotorStatus()
 {
-    return !(CPU_PORT.DATA_READ & 32);
+    return !(cpu_port.DATA_READ & 32);
 }
 
 bool C64Class::GetTapeRecordLedStatus()
 {
-    if((!(CPU_PORT.DATA_READ & 32)) && tape->IsPressedRecord()) return true;
+    if((!(cpu_port.DATA_READ & 32)) && tape->IsPressedRecord()) return true;
     else return false;
 }
 
@@ -2836,7 +2836,7 @@ void C64Class::SetDebugMode(bool status)
 
 void C64Class::SetCpuExtLines(bool status)
 {
-    EnableExtLines = status;
+    enable_ext_wires = status;
     if(status)
     {
         cpu->ClearInterrupt(CIA_IRQ);
@@ -2850,7 +2850,7 @@ void C64Class::SetCpuExtLines(bool status)
 
 void C64Class::SetExtRDY(bool status)
 {
-    ExtRDY = status;
+    ext_rdy_wire = status;
 }
 
 void C64Class::OneCycle()
@@ -2881,8 +2881,8 @@ void C64Class::GetC64CpuReg(REG_STRUCT *reg, IREG_STRUCT *ireg)
 {
     cpu->GetInterneRegister(ireg);
     ireg->CycleCounter = CycleCounter;
-    ireg->GAME = GAME;
-    ireg->EXROM = EXROM;
+    ireg->GAME = game_wire;
+    ireg->EXROM = exrom_wire;
     cpu->GetRegister(reg);
 }
 
@@ -2894,11 +2894,11 @@ void C64Class::GetVicReg(VIC_STRUCT *vic_reg)
 
 void C64Class::GetIECStatus(IEC_STRUCT *iec)
 {
-    iec->ATN_OUT = !!(C64IEC & 16);
-    iec->CLOCK_OUT = !!(C64IEC & 64);
-    iec->DATA_OUT = !!(C64IEC & 128);
-    iec->CLOCK_IN = !!(FloppyIEC & 64);
-    iec->DATA_IN = !!(FloppyIEC & 128);
+    iec->ATN_OUT = !!(c64_iec_wire & 16);
+    iec->CLOCK_OUT = !!(c64_iec_wire & 64);
+    iec->DATA_OUT = !!(c64_iec_wire & 128);
+    iec->CLOCK_IN = !!(floppy_iec_wire & 64);
+    iec->DATA_IN = !!(floppy_iec_wire & 128);
 }
 
 int C64Class::AddBreakGroup()
@@ -3261,21 +3261,21 @@ bool C64Class::StartIECDump(const char *filename)
 
     sprintf(VersionString,"Emu64 Version %s",VERSION_STRING);
 
-    IecVcdExport.SetVersionString(VersionString);
-    IecVcdExport.SetTimeScaleString("989 ns");
-    IecVcdExport.SetModuleString("IEC-BUS");
+    iec_export_vdc.SetVersionString(VersionString);
+    iec_export_vdc.SetTimeScaleString("989 ns");
+    iec_export_vdc.SetModuleString("IEC-BUS");
 
-    if(!IecVcdExport.Open(filename)) return false;
+    if(!iec_export_vdc.Open(filename)) return false;
 
-    IecIsDumped = true;
+    iec_is_dumped = true;
 
     return true;
 }
 
 void C64Class::StopIECDump()
 {
-    IecIsDumped = false;
-    IecVcdExport.Close();
+    iec_is_dumped = false;
+    iec_export_vdc.Close();
 }
 
 void C64Class::SetSIDVolume(float_t volume)

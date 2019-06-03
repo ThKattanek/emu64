@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 03.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1020,9 +1020,9 @@ void MMU::WriteCRT3(unsigned short adresse, unsigned char wert)
 
 unsigned char MMU::ReadVicCharRomBank0(unsigned short adresse)
 {
-        if(*EasyFlashDirty1 > 0)
+        if(*EasyFlashDirty1)
 	{
-                *EasyFlashDirty1 = 0;
+                *EasyFlashDirty1 = false;
                 return *EasyFlashByte1;
 	}
         return CHAR_ROM[adresse-0x1000];
@@ -1030,9 +1030,9 @@ unsigned char MMU::ReadVicCharRomBank0(unsigned short adresse)
 
 unsigned char MMU::ReadVicCharRomBank2(unsigned short adresse)
 {
-        if(*EasyFlashDirty2 > 0)
+        if(*EasyFlashDirty2         )
 	{
-                *EasyFlashDirty2 = 0;
+                *EasyFlashDirty2 = false;
                 return *EasyFlashByte2;
 	}
         return CHAR_ROM[adresse-0x9000];

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 03.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -61,7 +61,7 @@ public:
     void Write(uint32_t address, uint8_t value);
 
     uint8_t programm_byte;
-    int	dirty;
+    bool	dirty;
 
 private:
         int	flash_type;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 03.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -21,7 +21,7 @@ AM29F040Class::AM29F040Class(uint8_t *flashbank, int flashtype)
     data = flashbank;
     flash_type = flashtype;
     status = STATUS_READ;
-    dirty = 0;
+    dirty = false;
 }
 
 AM29F040Class::~AM29F040Class(void)
@@ -214,13 +214,13 @@ inline void AM29F040Class::FlashEraseSector(uint32_t address)
     uint32_t sector_addr = address & 0xF0000;
 
     memset(&(data[sector_addr]), 0xFF, 0x10000);
-    dirty = 1;
+    dirty = true;
 }
 
 inline void AM29F040Class::FlashEraseChip()
 {
     memset(data, 0xFF, FlashTypes[flash_type].size);
-    dirty = 1;
+    dirty = true;
 }
 
 inline int AM29F040Class::FlashProgramByte(uint32_t address, uint8_t value)
@@ -230,7 +230,7 @@ inline int AM29F040Class::FlashProgramByte(uint32_t address, uint8_t value)
 
     programm_byte = value;
     data[address] = new_data;
-    dirty = 1;
+    dirty = true;
 
     return (new_data == value) ? 1 : 0;
 }

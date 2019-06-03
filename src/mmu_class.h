@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 03.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -83,9 +83,9 @@ public:
     unsigned char MEMORY_MAP;
     unsigned char MEMORY_MAP_OLD;
 
-    int	*EasyFlashDirty1;
+    bool	*EasyFlashDirty1;
     unsigned char *EasyFlashByte1;
-    int	*EasyFlashDirty2;
+    bool	*EasyFlashDirty2;
     unsigned char *EasyFlashByte2;
 
 private:

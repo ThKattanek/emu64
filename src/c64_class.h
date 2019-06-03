@@ -307,8 +307,6 @@ public:
     Floppy1541      *floppy[MAX_FLOPPY_NUM];
     TAPE1530        *tape;
 
-    bool RESET;     // Reset Leitung -> Für Alle Module mit Reset Eingang
-
     bool            enable_stereo_sid;
     bool            enable_stereo_sid_6channel_mode;
     uint16_t        stereo_sid_address;
@@ -386,26 +384,27 @@ private:
     bool sdl_joystick_stop_update;
     bool sdl_joystick_update_is_stoped;
 
-    bool RDY_BA;            // Leitung CPU <-- VIC
-    bool HRESET;            // Zusatz Anzeige für MMU Reset
-    bool GAME;              // Leitung Expansionsport --> MMU;
-    bool EXROM;             // Leitung Expansionsport --> MMU;
-    bool RAM_H;             // Leitung Expansionsport --> MMU;
-    bool RAM_L;             // Leitung Expansionsport --> MMU;
-    MOS6510_PORT CPU_PORT;  // Prozessor Port
+    bool reset_wire;        // Reset Leitung -> Für Alle Module mit Reset Eingang
+    bool rdy_ba_wire;       // Leitung CPU <-- VIC
+    bool game_wire;         // Leitung Expansionsport --> MMU;
+    bool exrom_wire;        // Leitung Expansionsport --> MMU;
+    bool hi_ram_wire;       // Leitung Expansionsport --> MMU;
+    bool lo_ram_wire;       // Leitung Expansionsport --> MMU;
 
-    bool EnableExtLines;
-    bool ExtRDY;
+    MOS6510_PORT cpu_port;  // Prozessor Port
 
-    uint8_t         C64IEC;     // Leitungen vom C64 zur Floppy Bit 4=ATN 6=CLK 7=DATA
-    uint8_t         FloppyIEC;	// Leitungen von Floppy zur c64 Bit 6=CLK 7=DATA
+    bool enable_ext_wires;
+    bool ext_rdy_wire;
 
-    VCDClass IecVcdExport;      // Klasse zum Exportieren der IEC Signale
-    bool IecIsDumped;
+    uint8_t c64_iec_wire;       // Leitungen vom C64 zur Floppy Bit 4=ATN 6=CLK 7=DATA
+    uint8_t floppy_iec_wire;    // Leitungen von Floppy zur c64 Bit 6=CLK 7=DATA
+
+    VCDClass iec_export_vdc;      // Klasse zum Exportieren der IEC Signale
+    bool iec_is_dumped;
 
     /// Temporär ///
-    int             EasyFlashDirty;
-    uint8_t         EasyFlashByte;
+    bool        easy_flash_dirty;
+    uint8_t     easy_flash_byte;
 
     PORT CIA1_PA;
     PORT CIA1_PB;
