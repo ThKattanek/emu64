@@ -596,8 +596,8 @@ int SDLThread(void *userdat)
             SDL_SetWindowSize(c64->sdl_window, c64->sdl_window_size_width, c64->sdl_window_size_height);
 
 #ifdef _WIN32
-            c64->current_window_width = c64->win_size_w;
-            c64->current_window_height = c64->win_size_h;
+            c64->current_window_width = c64->sdl_window_size_width;
+            c64->current_window_height = c64->sdl_window_size_height;
             glViewport(0,0,c64->current_window_width, c64->current_window_height);
             glMatrixMode(GL_PROJECTION);
             glOrtho(0,c64->current_window_width, c64->current_window_height,0,-1,1);
