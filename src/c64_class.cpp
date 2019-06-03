@@ -21,7 +21,7 @@
 #define floppy_asyncron                  // Schaltet die Floppy Asyncron
 #define more_one_floppy_cylce_count 66   // alle "more_one_floppy_cycle_counts" wird 1 FloppyZyklus doppelt ausgeführt
 
-void AudioMix(void *nichtVerwendet, Uint8 *stream, int laenge);
+void AudioMix(void *not_used, Uint8 *stream, int laenge);
 int SDLThread(void *userdat);
 int SDLThreadLoad(void *userdat);
 int SDLThreadWarp(void *userdat);
@@ -54,7 +54,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     sdl_joystick_is_open = false;
     sdl_joystick_count = 0;
 
-    isReturnKeyDown = false;
+    return_key_is_down = false;
 
     IsKeyMapRec = false;
     RecMatrixCode = false;
@@ -318,8 +318,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     for(int i=0;i<8;i++)
     {
-        key_matrix_to_port_a_ext[i] = KeyboardMatrixToPA[i] = 0;
-        key_matrix_to_port_b_ext[i] = KeyboardMatrixToPB[i] = 0;
+        key_matrix_to_port_a_ext[i] = key_matrix_to_port_a[i] = 0;
+        key_matrix_to_port_b_ext[i] = key_matrix_to_port_b[i] = 0;
     }
 
     /// Callbackroutinen setzen ///
@@ -394,7 +394,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     reu->RESET = &reset_wire;
     reu->WRITE_FF00 = &cpu->WRITE_FF00;
 
-    ReuIsInsert = false;
+    reu_is_insert = false;
 
     /// Tape mit C64 verbinden ///
     tape->CPU_PORT = &cpu_port;
@@ -528,9 +528,9 @@ void C64Class::SetEnableDebugCart(bool enable)
     cpu->SetEnableDebugCart(enable);
 }
 
-void AudioMix(void *userdat, Uint8 *stream, int laenge)
+void AudioMix(void *not_used, Uint8 *stream, int laenge)
 {
-    C64Class *c64 = static_cast<C64Class*>(userdat);
+    C64Class *c64 = static_cast<C64Class*>(not_used);
     if(c64->rec_polling_wait)
     {
         c64->rec_polling_wait_counter--;
@@ -1214,18 +1214,18 @@ void C64Class::KeyEvent(uint8_t matrix_code, KeyStatus key_status, bool isAutoSh
     switch(key_status)
     {
     case KEY_DOWN:
-        KeyboardMatrixToPB[matrix_code>>4]|=1<<(matrix_code&0x07);
-        if(isAutoShift) KeyboardMatrixToPB[AutoShift>>4]|=1<<(AutoShift&0x07);
+        key_matrix_to_port_b[matrix_code>>4]|=1<<(matrix_code&0x07);
+        if(isAutoShift) key_matrix_to_port_b[AutoShift>>4]|=1<<(AutoShift&0x07);
 
-        KeyboardMatrixToPA[matrix_code&0x07]|=(1<<(matrix_code>>4));
-        if(isAutoShift) KeyboardMatrixToPA[AutoShift&0x07]|=(1<<(AutoShift>>4));
+        key_matrix_to_port_a[matrix_code&0x07]|=(1<<(matrix_code>>4));
+        if(isAutoShift) key_matrix_to_port_a[AutoShift&0x07]|=(1<<(AutoShift>>4));
         break;
     case KEY_UP:
-        KeyboardMatrixToPB[matrix_code>>4]&=~(1<<(matrix_code&0x07));
-        if(isAutoShift) KeyboardMatrixToPB[AutoShift>>4]&=~(1<<(AutoShift&0x07));
+        key_matrix_to_port_b[matrix_code>>4]&=~(1<<(matrix_code&0x07));
+        if(isAutoShift) key_matrix_to_port_b[AutoShift>>4]&=~(1<<(AutoShift&0x07));
 
-        KeyboardMatrixToPA[matrix_code&0x07]&=~(1<<(matrix_code>>4));
-        if(isAutoShift) KeyboardMatrixToPA[AutoShift&0x07]&=~(1<<(AutoShift>>4));
+        key_matrix_to_port_a[matrix_code&0x07]&=~(1<<(matrix_code>>4));
+        if(isAutoShift) key_matrix_to_port_a[AutoShift&0x07]&=~(1<<(AutoShift>>4));
         break;
     }
 }
@@ -1271,8 +1271,8 @@ inline void C64Class::CheckKeys()
     uint8_t cbit = 1;
     for(int i=0;i<8;i++)
     {
-        if(out_pa & cbit) in_pb |= (KeyboardMatrixToPB[i]|key_matrix_to_port_b_ext[i]);
-        if(out_pb & cbit) in_pa |= (KeyboardMatrixToPA[i]|key_matrix_to_port_a_ext[i]);
+        if(out_pa & cbit) in_pb |= (key_matrix_to_port_b[i]|key_matrix_to_port_b_ext[i]);
+        if(out_pb & cbit) in_pa |= (key_matrix_to_port_a[i]|key_matrix_to_port_a_ext[i]);
         cbit <<= 1;
     }
     cia1_port_a.SetInput(~(in_pa|game_port2));
@@ -2021,7 +2021,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
                 keymod = SDL_GetModState();
 
-                if((KMOD_MODE == (keymod & KMOD_MODE) || KMOD_LALT == (keymod & KMOD_LALT) || KMOD_RALT == (keymod & KMOD_RALT)) && (isReturnKeyDown == false))
+                if((KMOD_MODE == (keymod & KMOD_MODE) || KMOD_LALT == (keymod & KMOD_LALT) || KMOD_RALT == (keymod & KMOD_RALT)) && (return_key_is_down == false))
                 {
                     enable_fullscreen = ! enable_fullscreen;
                     if(enable_fullscreen)
@@ -2037,7 +2037,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
                 }
 
-                isReturnKeyDown = true;
+                return_key_is_down = true;
                 break;
 
             default:
@@ -2114,7 +2114,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             {
 
             case SDLK_RETURN:
-                isReturnKeyDown = false;
+                return_key_is_down = false;
                 break;
 
             case SDLK_F12:
@@ -2738,7 +2738,7 @@ void C64Class::InsertREU()
     geo->Remove();
 
     reu->Insert();
-    ReuIsInsert = true;
+    reu_is_insert = true;
 
     KillCommandLine();
     HardReset();
@@ -2749,7 +2749,7 @@ void C64Class::RemoveREU()
     reu->Remove();
     io_source = 0;
 
-    ReuIsInsert = false;
+    reu_is_insert = false;
 
     KillCommandLine();
     HardReset();
@@ -2776,7 +2776,7 @@ void C64Class::InsertGEORAM()
 
     crt->RemoveCRTImage();
     reu->Remove();
-    ReuIsInsert = false;
+    reu_is_insert = false;
 
     geo->Insert();
 

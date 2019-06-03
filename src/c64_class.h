@@ -424,12 +424,12 @@ private:
     uint8_t     poti_x;
     uint8_t     poti_y;
 
-    uint8_t     KeyboardMatrixToPB[8];
-    uint8_t     KeyboardMatrixToPA[8];
+    uint8_t     key_matrix_to_port_a[8];
+    uint8_t     key_matrix_to_port_b[8];
 
-    bool isReturnKeyDown;
+    bool return_key_is_down;
 
-    bool ReuIsInsert;
+    bool reu_is_insert;
 
     /////////////////////// BREAKPOINTS ////////////////////////
 
@@ -458,8 +458,8 @@ private:
     bool        FloppyResetReady[MAX_FLOPPY_NUM];
 
     char        ComandZeile[256];
-    int         ComandZeileSize;
-    int         ComandZeileCount;
+    uint16_t    ComandZeileSize;
+    uint16_t    ComandZeileCount;
     bool        ComandZeileStatus;
     bool        ComandZeileCountS;
 
