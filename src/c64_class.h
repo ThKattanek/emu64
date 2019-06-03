@@ -311,8 +311,8 @@ public:
     bool            enable_stereo_sid_6channel_mode;
     uint16_t        stereo_sid_address;
 
-    uint8_t         keyboard_matrix_to_pa_ext[8];
-    uint8_t         keyboard_matrix_to_pb_ext[8];
+    uint8_t         key_matrix_to_port_a_ext[8];
+    uint8_t         key_matrix_to_port_b_ext[8];
 
     uint8_t         io_source;
 
@@ -406,23 +406,23 @@ private:
     bool        easy_flash_dirty;
     uint8_t     easy_flash_byte;
 
-    PORT CIA1_PA;
-    PORT CIA1_PB;
-    PORT CIA2_PA;
-    PORT CIA2_PB;
+    PORT cia1_port_a;
+    PORT cia1_port_b;
+    PORT cia2_port_a;
+    PORT cia2_port_b;
 
-    bool Mouse1351Enable;
-    int MouseXRel;
-    int MouseYRel;
+    bool        enable_mouse_1351;
+    uint16_t    mouse_1351_x_rel;
+    uint16_t    mouse_1351_y_rel;
 
-    int MousePort;
-    uint8_t     POT_AX;
-    uint8_t     POT_AY;
-    uint8_t     POT_BX;
-    uint8_t     POT_BY;
+    uint8_t     mouse_port;
+    uint8_t     poti_ax;
+    uint8_t     poti_ay;
+    uint8_t     poti_bx;
+    uint8_t     poti_by;
 
-    uint8_t     POT_X;
-    uint8_t     POT_Y;
+    uint8_t     poti_x;
+    uint8_t     poti_y;
 
     uint8_t     KeyboardMatrixToPB[8];
     uint8_t     KeyboardMatrixToPA[8];

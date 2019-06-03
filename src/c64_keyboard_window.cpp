@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek       	//
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 03.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -44,10 +44,10 @@ static uint8_t vk_to_c64[7][18] = {{0x71,0x70,0x73,0x10,0x13,0x20,0x23,0x30,0x33
                                          {0x74}};
 static bool vk_rast[7][18];
 
-static uint8_t key_matrix_to_pa_lm[8];
-static uint8_t key_matrix_to_pb_lm[8];
-static uint8_t key_matrix_to_pa_rm[8];
-static uint8_t key_matrix_to_pb_rm[8];
+static uint8_t key_matrix_to_port_a_lm[8];
+static uint8_t key_matrix_to_port_b_lm[8];
+static uint8_t key_matrix_to_port_a_rm[8];
+static uint8_t key_matrix_to_port_b_rm[8];
 
 C64KeyboardWindow::C64KeyboardWindow(QWidget *parent, QSettings *ini, C64Class *c64) :
     QDialog(parent),
@@ -69,8 +69,8 @@ C64KeyboardWindow::C64KeyboardWindow(QWidget *parent, QSettings *ini, C64Class *
     rec_key_curr_x = 0xFF;
     rec_key_curr_y = 0xFF;
 
-    key_matrix_to_pa = nullptr;
-    key_matrix_to_pb = nullptr;
+    key_matrix_to_port_a = nullptr;
+    key_matrix_to_port_b = nullptr;
 
     recording = false;
 
@@ -180,22 +180,22 @@ Lend:
                 {
                     for(uint8_t i=0; i<8; i++)
                     {
-                        key_matrix_to_pa_lm[i]=0;
-                        key_matrix_to_pb_lm[i]=0;
+                        key_matrix_to_port_a_lm[i]=0;
+                        key_matrix_to_port_b_lm[i]=0;
                     }
                     uint8_t C64Key = vk_to_c64[current_y_key][current_x_key];
 
                     vk_rast[current_y_key][current_x_key] = false;
-                    key_matrix_to_pb_rm[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
-                    key_matrix_to_pb_lm[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
+                    key_matrix_to_port_b_rm[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
+                    key_matrix_to_port_b_lm[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
 
-                    key_matrix_to_pa_rm[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
-                    key_matrix_to_pa_lm[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
+                    key_matrix_to_port_a_rm[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
+                    key_matrix_to_port_a_lm[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
 
                     for(uint8_t i=0; i<8; i++)
                     {
-                        if (key_matrix_to_pa != nullptr) key_matrix_to_pa[i] = key_matrix_to_pa_lm[i] | key_matrix_to_pa_rm[i];
-                        if (key_matrix_to_pb != nullptr) key_matrix_to_pb[i] = key_matrix_to_pb_lm[i] | key_matrix_to_pb_rm[i];
+                        if (key_matrix_to_port_a != nullptr) key_matrix_to_port_a[i] = key_matrix_to_port_a_lm[i] | key_matrix_to_port_a_rm[i];
+                        if (key_matrix_to_port_b != nullptr) key_matrix_to_port_b[i] = key_matrix_to_port_b_lm[i] | key_matrix_to_port_b_rm[i];
                     }
                 }
             }
@@ -231,27 +231,27 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
 
             if(C64Key < 128)
             {
-                key_matrix_to_pb_rm[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
-                key_matrix_to_pb_lm[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
+                key_matrix_to_port_b_rm[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
+                key_matrix_to_port_b_lm[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
 
-                key_matrix_to_pa_rm[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
-                key_matrix_to_pa_lm[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
+                key_matrix_to_port_a_rm[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
+                key_matrix_to_port_a_lm[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
             }
             else
             {
                 C64Key &= ~128;
-                key_matrix_to_pb_rm[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
-                key_matrix_to_pb_lm[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
+                key_matrix_to_port_b_rm[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
+                key_matrix_to_port_b_lm[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
 
-                key_matrix_to_pa_rm[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
-                key_matrix_to_pa_lm[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
+                key_matrix_to_port_a_rm[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
+                key_matrix_to_port_a_lm[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
 
                 C64Key = 23;    // linke Shiftaste (100 = rechte)
-                key_matrix_to_pb_rm[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
-                key_matrix_to_pb_lm[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
+                key_matrix_to_port_b_rm[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
+                key_matrix_to_port_b_lm[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
 
-                key_matrix_to_pa_rm[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
-                key_matrix_to_pa_lm[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
+                key_matrix_to_port_a_rm[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
+                key_matrix_to_port_a_lm[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
             }
         }
 
@@ -264,21 +264,21 @@ void C64KeyboardWindow::mousePressEvent(QMouseEvent *event)
             if(vk_rast[current_y_key][current_x_key])
             {
                 vk_rast[current_y_key][current_x_key] = false;
-                key_matrix_to_pb_rm[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
-                key_matrix_to_pa_rm[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
+                key_matrix_to_port_b_rm[(C64Key>>4)&0xF] &= ~(1<<(C64Key&0xF));
+                key_matrix_to_port_a_rm[C64Key&0xF] &= ~(1<<((C64Key>>4)&0xF));
             }
             else
             {
                 vk_rast[current_y_key][current_x_key] = true;
-                key_matrix_to_pb_rm[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
-                key_matrix_to_pa_rm[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
+                key_matrix_to_port_b_rm[(C64Key>>4)&0xF] |= 1<<(C64Key&0xF);
+                key_matrix_to_port_a_rm[C64Key&0xF] |= 1<<((C64Key>>4)&0xF);
             }
         }
 
         for(int i=0;i<8;i++)
         {
-            key_matrix_to_pa[i] = key_matrix_to_pa_lm[i] | key_matrix_to_pa_rm[i];
-            key_matrix_to_pb[i] = key_matrix_to_pb_lm[i] | key_matrix_to_pb_rm[i];
+            key_matrix_to_port_a[i] = key_matrix_to_port_a_lm[i] | key_matrix_to_port_a_rm[i];
+            key_matrix_to_port_b[i] = key_matrix_to_port_b_lm[i] | key_matrix_to_port_b_rm[i];
         }
     }
     else
@@ -330,9 +330,9 @@ void C64KeyboardWindow::mouseReleaseEvent(QMouseEvent*)
     {
         for(int i=0;i<8;i++)
         {
-            key_matrix_to_pb_lm[i]=0;
-            key_matrix_to_pb[i] = key_matrix_to_pb_lm[i] | key_matrix_to_pb_rm[i];
-            key_matrix_to_pa[i] = key_matrix_to_pa_lm[i] | key_matrix_to_pa_rm[i];
+            key_matrix_to_port_b_lm[i]=0;
+            key_matrix_to_port_b[i] = key_matrix_to_port_b_lm[i] | key_matrix_to_port_b_rm[i];
+            key_matrix_to_port_a[i] = key_matrix_to_port_a_lm[i] | key_matrix_to_port_a_rm[i];
         }
     }
 }

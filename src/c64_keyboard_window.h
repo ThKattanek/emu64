@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 03.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -46,8 +46,8 @@ public:
     void mouseReleaseEvent(QMouseEvent *event);
 
     bool recording;
-    uint8_t *key_matrix_to_pa;
-    uint8_t *key_matrix_to_pb;
+    uint8_t *key_matrix_to_port_a;
+    uint8_t *key_matrix_to_port_b;
 
 public slots:
     void TimerEvent();
@@ -75,7 +75,7 @@ private:
 
     bool blink_flip;
 
-    uint8_t *keyboard_trans;
+    uint8_t *key_trans;
 
     bool rec_key_press;
     uint8_t rec_key_curr_x;

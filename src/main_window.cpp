@@ -389,8 +389,8 @@ void MainWindow::OnInit()
 
     /// C64 Keyboard Matrix mit dem Virtual Keyboard verbinden ///
     SplashMessage(trUtf8("C64 Key-Matrix wird mit Virtual Keyboard verbunden."),Qt::darkBlue);
-    c64_keyboard_window->key_matrix_to_pa = c64->keyboard_matrix_to_pa_ext;
-    c64_keyboard_window->key_matrix_to_pb = c64->keyboard_matrix_to_pb_ext;
+    c64_keyboard_window->key_matrix_to_port_a = c64->key_matrix_to_port_a_ext;
+    c64_keyboard_window->key_matrix_to_port_b = c64->key_matrix_to_port_b_ext;
     LogText(trUtf8(">> C64 Key-Matrix wurde mit Virtual Keyboard verbunden\n").toLatin1().data());
 
 

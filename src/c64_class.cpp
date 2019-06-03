@@ -66,12 +66,12 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     LogText = log_function;
 
-    Mouse1351Enable = false;
-    MouseXRel = MouseYRel = 0;
+    enable_mouse_1351 = false;
+    mouse_1351_x_rel = mouse_1351_y_rel = 0;
 
-    MousePort = 0;  // Port1 = 0 ... Port2 = 1
-    POT_AX = POT_AY = POT_BX = POT_BY = 0xFF;    // HighZ zum Beginn (Keine Paddles / Maus angeschlossen)
-    POT_X = POT_Y = 0xFF;
+    mouse_port = 0;  // Port1 = 0 ... Port2 = 1
+    poti_ax = poti_ay = poti_bx = poti_by = 0xFF;    // HighZ zum Beginn (Keine Paddles / Maus angeschlossen)
+    poti_x = poti_y = 0xFF;
 
     MouseIsHidden = false;
     MouseHiddenCounter = 0;
@@ -318,8 +318,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     for(int i=0;i<8;i++)
     {
-        keyboard_matrix_to_pa_ext[i] = KeyboardMatrixToPA[i] = 0;
-        keyboard_matrix_to_pb_ext[i] = KeyboardMatrixToPB[i] = 0;
+        key_matrix_to_port_a_ext[i] = KeyboardMatrixToPA[i] = 0;
+        key_matrix_to_port_b_ext[i] = KeyboardMatrixToPB[i] = 0;
     }
 
     /// Callbackroutinen setzen ///
@@ -374,18 +374,18 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     cia1->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
     cia1->VicTriggerLP = bind(&VICII::TriggerLightpen,vic);
     cia1->ChangePOTSwitch = bind(&C64Class::ChangePOTSwitch,this);
-    cia1->PA = &CIA1_PA;
-    cia1->PB = &CIA1_PB;
+    cia1->PA = &cia1_port_a;
+    cia1->PB = &cia1_port_b;
     cia2->RESET = &reset_wire;
     cia2->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
     cia2->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
-    cia2->PA = &CIA2_PA;
-    cia2->PB = &CIA2_PB;
+    cia2->PA = &cia2_port_a;
+    cia2->PB = &cia2_port_b;
     vic->BA = &rdy_ba_wire;
     vic->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
     vic->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
     vic->FarbRam = mmu->GetFarbramPointer();
-    vic->CIA2_PA = CIA2_PA.GetOutputBitsPointer();
+    vic->CIA2_PA = cia2_port_a.GetOutputBitsPointer();
     sid1->RESET = &reset_wire;
     sid2->RESET = &reset_wire;
     reu->BA = &rdy_ba_wire;
@@ -431,7 +431,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     sid1->CycleExact = true;
     sid1->FilterOn = true;
     sid1->Reset();
-    sid1->SetPotXY(POT_X, POT_Y);
+    sid1->SetPotXY(poti_x, poti_y);
 
     sid2->RESET = &reset_wire;
     sid2->SetC64Zyklen(C64Takt);     // PAL 63*312*50 = 982800
@@ -720,7 +720,7 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
     }
     ////////////////////////////////////
 
-    if(Mouse1351Enable) UpdateMouse();
+    if(enable_mouse_1351) UpdateMouse();
 
     c64_screen_is_obselete = true;
 }
@@ -1263,20 +1263,20 @@ inline void C64Class::CheckKeys()
     uint8_t out_pa, out_pb;
     uint8_t in_pa, in_pb;
 
-    out_pa = ~CIA1_PA.GetOutput();
-    out_pb = ~CIA1_PB.GetOutput();
+    out_pa = ~cia1_port_a.GetOutput();
+    out_pb = ~cia1_port_b.GetOutput();
 
     in_pa = in_pb = 0;
 
     uint8_t cbit = 1;
     for(int i=0;i<8;i++)
     {
-        if(out_pa & cbit) in_pb |= (KeyboardMatrixToPB[i]|keyboard_matrix_to_pb_ext[i]);
-        if(out_pb & cbit) in_pa |= (KeyboardMatrixToPA[i]|keyboard_matrix_to_pa_ext[i]);
+        if(out_pa & cbit) in_pb |= (KeyboardMatrixToPB[i]|key_matrix_to_port_b_ext[i]);
+        if(out_pb & cbit) in_pa |= (KeyboardMatrixToPA[i]|key_matrix_to_port_a_ext[i]);
         cbit <<= 1;
     }
-    CIA1_PA.SetInput(~(in_pa|game_port2));
-    CIA1_PB.SetInput(~(in_pb|game_port1));
+    cia1_port_a.SetInput(~(in_pa|game_port2));
+    cia1_port_b.SetInput(~(in_pb|game_port1));
 }
 
 void C64Class::ResetC64CycleCounter()
@@ -2187,14 +2187,14 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                 // Wenn Linke STRG Taste gedrück dann Mouse 1351 umschalten
                 if(KMOD_LCTRL == SDL_GetModState())
                 {
-                    Mouse1351Enable = !Mouse1351Enable;
-                    SDL_SetRelativeMouseMode(SDL_bool(Mouse1351Enable));
-                    MouseXRel = MouseYRel = 0;
+                    enable_mouse_1351 = !enable_mouse_1351;
+                    SDL_SetRelativeMouseMode(SDL_bool(enable_mouse_1351));
+                    mouse_1351_x_rel = mouse_1351_y_rel = 0;
                 }
 
-                if(Mouse1351Enable)
+                if(enable_mouse_1351)
                 {
-                    if(MousePort == 0)
+                    if(mouse_port == 0)
                         game_port1 |= 0x10;
                     else
                         game_port2 |= 0x10;
@@ -2203,9 +2203,9 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
             case SDL_BUTTON_RIGHT:
 
-                if(Mouse1351Enable)
+                if(enable_mouse_1351)
                 {
-                    if(MousePort == 0)
+                    if(mouse_port == 0)
                         game_port1 |= 0x01;
                     else
                         game_port2 |= 0x01;
@@ -2222,9 +2222,9 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
         {
         case SDL_BUTTON_LEFT:
 
-            if(Mouse1351Enable)
+            if(enable_mouse_1351)
             {
-                if(MousePort == 0)
+                if(mouse_port == 0)
                     game_port1 &= ~0x10;
                 else game_port2 &= ~0x10;
             }
@@ -2232,9 +2232,9 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
         case SDL_BUTTON_RIGHT:
 
-            if(Mouse1351Enable)
+            if(enable_mouse_1351)
             {
-                if(MousePort == 0)
+                if(mouse_port == 0)
                     game_port1 &= ~0x01;
                 else game_port2 &= ~0x01;
             }
@@ -2254,10 +2254,10 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             SDL_ShowCursor(true);
         }
 
-        if(Mouse1351Enable)
+        if(enable_mouse_1351)
         {
-            MouseXRel += event->motion.xrel;
-            MouseYRel += event->motion.yrel;
+            mouse_1351_x_rel += event->motion.xrel;
+            mouse_1351_y_rel += event->motion.yrel;
         }
 
         break;
@@ -2810,7 +2810,7 @@ void C64Class::ClearGEORAMRam()
 
 void C64Class::SetMouse1351Port(uint8_t port)
 {
-    MousePort = port;
+    mouse_port = port;
 }
 
 void C64Class::SetDebugMode(bool status)
@@ -3900,52 +3900,52 @@ void C64Class::CloseSDLJoystick()
 ///
 void C64Class::ChangePOTSwitch()
 {
-    if(!Mouse1351Enable)
+    if(!enable_mouse_1351)
     {
-        POT_X = 0xFF;
-        POT_Y = 0xFF;
+        poti_x = 0xFF;
+        poti_y = 0xFF;
     }
     else
     {
-        switch(CIA1_PA.GetOutput() >> 6)
+        switch(cia1_port_a.GetOutput() >> 6)
         {
         case 0:
-            POT_X = POT_Y = 0xFF;
+            poti_x = poti_y = 0xFF;
             break;
         case 1:
-            POT_X = POT_AX;
-            POT_Y = POT_AY;
+            poti_x = poti_ax;
+            poti_y = poti_ay;
             break;
         case 2:
-            POT_X = POT_BX;
-            POT_Y = POT_BY;
+            poti_x = poti_bx;
+            poti_y = poti_by;
             break;
         case 3:
-            POT_X = POT_AX | POT_BX;
-            POT_Y = POT_AY | POT_BY;
+            poti_x = poti_ax | poti_bx;
+            poti_y = poti_ay | poti_by;
             break;
         }
     }
 
-    sid1->SetPotXY(POT_X, POT_Y);
+    sid1->SetPotXY(poti_x, poti_y);
 }
 
 void C64Class::UpdateMouse(void)
 {
-    switch(MousePort)
+    switch(mouse_port)
     {
     case 0: // Maus an Port 1 angeschlossen
-        POT_AX = (MouseXRel>>2) & 0x7F;
-        POT_AY = (~MouseYRel>>2) & 0x7F;
-        POT_BX = 0xFF;
-        POT_BY = 0xFF;
+        poti_ax = (mouse_1351_x_rel>>2) & 0x7F;
+        poti_ay = (~mouse_1351_y_rel>>2) & 0x7F;
+        poti_bx = 0xFF;
+        poti_by = 0xFF;
         break;
 
     case 1: // Maus an Port 2 angeschlossen
-        POT_AX = 0xFF;
-        POT_AY = 0xFF;
-        POT_BX = (MouseXRel>>2) & 0x7F;
-        POT_BY = (~MouseYRel>>2) & 0x7F;
+        poti_ax = 0xFF;
+        poti_ay = 0xFF;
+        poti_bx = (mouse_1351_x_rel>>2) & 0x7F;
+        poti_by = (~mouse_1351_y_rel>>2) & 0x7F;
         break;
     }
 
