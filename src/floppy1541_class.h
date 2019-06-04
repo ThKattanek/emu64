@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.02.2018        		//
+// Letzte Änderung am 04.06.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -44,7 +44,7 @@ const unsigned char D64_SECTOR_GAP[4] = {12, 21, 16, 13}; // von GPZ Code überm
 
 #define D64 0
 #define G64 1
-#define MAX_BREAK_GROUPS 255
+#define MAX_BREAK_GROUP_NUM 255
 
 #define DISK_CHANGE_STATE_COUNTS 4
 #define DISK_CHANGE_STATE_CYCLES 1000
@@ -232,7 +232,7 @@ private:
     bool            *FoundBreakpoint;
 
     unsigned char   BreakGroupAnz;
-    BREAK_GROUP     *BreakGroup[MAX_BREAK_GROUPS];
+    BREAK_GROUP     *BreakGroup[MAX_BREAK_GROUP_NUM];
 
     ////////////////////////////////////////////////////////////
 };

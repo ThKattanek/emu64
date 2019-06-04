@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.02.2018        		//
+// Letzte Änderung am 04.06.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1016,7 +1016,7 @@ void Floppy1541::StartDiskChange()
 
 int Floppy1541::AddBreakGroup(void)
 {
-    if(BreakGroupAnz == MAX_BREAK_GROUPS) return -1;
+    if(BreakGroupAnz == MAX_BREAK_GROUP_NUM) return -1;
 
     BreakGroup[BreakGroupAnz] = new BREAK_GROUP;
     memset(BreakGroup[BreakGroupAnz],0,sizeof(BREAK_GROUP));

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.06.2019                //
+// Letzte Änderung am 04.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -56,13 +56,13 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     return_key_is_down = false;
 
-    IsKeyMapRec = false;
-    RecMatrixCode = false;
+    key_map_is_rec = false;
+    rec_matrix_code = false;
 
     virtual_port1 = 0;
     virtual_port2 = 1;
 
-    WarpMode = false;
+    warp_mode = false;
 
     LogText = log_function;
 
@@ -73,9 +73,9 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     poti_ax = poti_ay = poti_bx = poti_by = 0xFF;    // HighZ zum Beginn (Keine Paddles / Maus angeschlossen)
     poti_x = poti_y = 0xFF;
 
-    MouseIsHidden = false;
-    MouseHiddenCounter = 0;
-    MouseHiddenTime = 3000;
+    mouse_is_hidden = false;
+    mouse_hide_counter = 0;
+    mouse_hide_time = 3000;
 
     sprintf(floppy_sound_path,"%s%s",data_path,"/floppy_sounds/");
     sprintf(gfx_path,"%s%s",data_path,"/gfx/");
@@ -87,8 +87,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     LogText(const_cast<char*>("\n"));
 
     this->video_crt_output = video_crt_output;
-    BreakGroupAnz = 0;
-    FloppyFoundBreakpoint = false;
+    breakgroup_count = 0;
+    floppy_found_breakpoint = false;
     enable_ext_wires = false;
 
     iec_is_dumped = false;
@@ -291,8 +291,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
 
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
-        floppy[i] = new Floppy1541(&reset_wire,audio_spec_have.freq,audio_spec_have.samples,&FloppyFoundBreakpoint);
-        floppy[i]->SetResetReady(&FloppyResetReady[i],0xEBFF);
+        floppy[i] = new Floppy1541(&reset_wire,audio_spec_have.freq,audio_spec_have.samples,&floppy_found_breakpoint);
+        floppy[i]->SetResetReady(&floppy_reset_ready[i],0xEBFF);
         floppy[i]->SetC64IEC(&c64_iec_wire);
         floppy[i]->SetDeviceNummer(static_cast<uint8_t>(8+i));
         floppy[i]->LoadDosRom(filename);
@@ -305,16 +305,16 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     /// Init Vars ///
     cpu_pc_history_pos = 0;
     io_source = 0;
-    ComandZeileSize = 0;
-    ComandZeileCount = 0;
-    ComandZeileStatus = false;
-    ComandZeileCountS = false;
-    DebugMode = OneZyk = OneOpc = false;
-    CycleCounter = 0;
-    LimitCylesCounter = 0;
-    DebugAnimation = false;
-    AnimationSpeedAdd = AudioPufferSize/AudioSampleRate;
-    AnimationSpeedCounter = 0;
+    c64_command_line_lenght = 0;
+    c64_command_line_current_pos = 0;
+    c64_command_line_status = false;
+    c64_command_line_count_s = false;
+    debug_mode = one_cycle = one_opcode = false;
+    cycle_counter = 0;
+    limit_cyles_counter = 0;
+    debug_animation = false;
+    animation_speed_add = AudioPufferSize/AudioSampleRate;
+    animation_speed_counter = 0;
 
     for(int i=0;i<8;i++)
     {
@@ -366,7 +366,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     crt->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
     cpu->RDY = &rdy_ba_wire;
     cpu->RESET = &reset_wire;
-    cpu->ResetReady = &C64ResetReady;
+    cpu->ResetReady = &c64_reset_ready;
     cpu->ResetReadyAdr = 0xE5CD;
     cpu->EnableExtInterrupts = enable_ext_wires;
     cia1->RESET = &reset_wire;
@@ -449,18 +449,18 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     vic->CIA2_PA = cia2->PA->GetOutputBitsPointer();
 
     /// Breakpoints ///
-    cpu->BreakStatus = &BreakStatus;
-    cpu->BreakWerte = BreakWerte;
-    cpu->Breakpoints = Breakpoints;
+    cpu->BreakStatus = &break_status;
+    cpu->BreakWerte = break_values;
+    cpu->Breakpoints = breakpoints;
 
-    vic->BreakStatus = &BreakStatus;
-    vic->BreakWerte = BreakWerte;
-    vic->Breakpoints = Breakpoints;
+    vic->BreakStatus = &break_status;
+    vic->BreakWerte = break_values;
+    vic->Breakpoints = breakpoints;
 
     cpu->History = cpu_pc_history;
     cpu->HistoryPointer = &cpu_pc_history_pos;
 
-    for(int i=0;i<0x10000;i++) Breakpoints[i] = 0;
+    for(int i=0;i<0x10000;i++) breakpoints[i] = 0;
 }
 
 C64Class::~C64Class()
@@ -520,7 +520,7 @@ void C64Class::EndEmulation()
 
 void C64Class::SetLimitCycles(int nCycles)
 {
-    LimitCylesCounter = nCycles;
+    limit_cyles_counter = nCycles;
 }
 
 void C64Class::SetEnableDebugCart(bool enable)
@@ -730,12 +730,12 @@ void C64Class::WarpModeLoop()
     static uint32_t counter_plus = 0;
 
     CheckKeys();
-    CycleCounter++;
+    cycle_counter++;
 
-    if(LimitCylesCounter > 0)
+    if(limit_cyles_counter > 0)
     {
-        LimitCylesCounter--;
-        if(LimitCylesCounter == 0)
+        limit_cyles_counter--;
+        if(limit_cyles_counter == 0)
         {
             // Event auslösen
             if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
@@ -793,7 +793,7 @@ void C64Class::WarpModeLoop()
         {
             if(!floppy[0]->GetEnableFloppy())
             {
-                if(C64ResetReady)
+                if(c64_reset_ready)
                 {
                     SDL_CreateThread(SDLThreadLoad ,"C64Thread",this);
                     wait_reset_ready = false;
@@ -801,7 +801,7 @@ void C64Class::WarpModeLoop()
             }
             else
             {
-                if((C64ResetReady == true) && (FloppyResetReady[0] == true))
+                if((c64_reset_ready == true) && (floppy_reset_ready[0] == true))
                 {
                     SDL_CreateThread(SDLThreadLoad ,"C64Thread" ,this);
                     wait_reset_ready = false;
@@ -809,26 +809,26 @@ void C64Class::WarpModeLoop()
             }
         }
 
-        if(ComandZeileCountS)
+        if(c64_command_line_count_s)
         {
-            ComandZeileCountS=false;
-            if(ComandZeileStatus)
+            c64_command_line_count_s=false;
+            if(c64_command_line_status)
             {
-                if(ComandZeileCount==ComandZeileSize)
+                if(c64_command_line_current_pos==c64_command_line_lenght)
                 {
-                    ComandZeileStatus=false;
+                    c64_command_line_status=false;
                 }
                 else
                 {
                     WriteC64Byte(0xC6,1);
-                    WriteC64Byte(0x277,static_cast<uint8_t>(ComandZeile[ComandZeileCount]));
-                    ComandZeileCount++;
+                    WriteC64Byte(0x277,static_cast<uint8_t>(c64_command_line[c64_command_line_current_pos]));
+                    c64_command_line_current_pos++;
                 }
             }
         }
         if(ReadC64Byte(0xC6)==0)
         {
-            ComandZeileCountS=true;
+            c64_command_line_count_s=true;
         }
     }
     //////////////////////////////////////////////////////////////////////////////
@@ -846,17 +846,17 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
         floppy[i]->ZeroSoundBufferPos();
     tape->ZeroSoundBufferPos();
 
-    if(!DebugMode)
+    if(!debug_mode)
     {
-        while((sid1->SoundBufferPos < (laenge/4) && (DebugMode == false)))
+        while((sid1->SoundBufferPos < (laenge/4) && (debug_mode == false)))
         {
             CheckKeys();
-            CycleCounter++;
+            cycle_counter++;
 
-            if(LimitCylesCounter > 0)
+            if(limit_cyles_counter > 0)
             {
-                LimitCylesCounter--;
-                if(LimitCylesCounter == 0)
+                limit_cyles_counter--;
+                if(limit_cyles_counter == 0)
                 {
                     // Event auslösen
                     if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
@@ -902,7 +902,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
             cpu->OneZyklus();
 
-            if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) if(CheckBreakpoints()) break;
+            if((break_status != 0) || (floppy_found_breakpoint == true )) if(CheckBreakpoints()) break;
 
 
             ////////////////////////// Testweise //////////////////////////
@@ -915,7 +915,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 {
                     if(!floppy[0]->GetEnableFloppy())
                     {
-                        if(C64ResetReady)
+                        if(c64_reset_ready)
                         {
                             SDL_CreateThread(SDLThreadLoad ,"C64Thread",this);
                             wait_reset_ready = false;
@@ -923,7 +923,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     }
                     else
                     {
-                        if((C64ResetReady == true) && (FloppyResetReady[0] == true))
+                        if((c64_reset_ready == true) && (floppy_reset_ready[0] == true))
                         {
                             SDL_CreateThread(SDLThreadLoad ,"C64Thread" ,this);
                             wait_reset_ready = false;
@@ -931,26 +931,26 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     }
                 }
 
-                if(ComandZeileCountS)
+                if(c64_command_line_count_s)
                 {
-                    ComandZeileCountS=false;
-                    if(ComandZeileStatus)
+                    c64_command_line_count_s=false;
+                    if(c64_command_line_status)
                     {
-                        if(ComandZeileCount==ComandZeileSize)
+                        if(c64_command_line_current_pos==c64_command_line_lenght)
                         {
-                            ComandZeileStatus=false;
+                            c64_command_line_status=false;
                         }
                         else
                         {
                             WriteC64Byte(0xC6,1);
-                            WriteC64Byte(0x277,static_cast<uint8_t>(ComandZeile[ComandZeileCount]));
-                            ComandZeileCount++;
+                            WriteC64Byte(0x277,static_cast<uint8_t>(c64_command_line[c64_command_line_current_pos]));
+                            c64_command_line_current_pos++;
                         }
                     }
                 }
                 if(ReadC64Byte(0xC6)==0)
                 {
-                    ComandZeileCountS=true;
+                    c64_command_line_count_s=true;
                 }
             }
             //////////////////////////////////////////////////////////////////////////////
@@ -1016,15 +1016,15 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
     }
     else
     {
-        if(DebugAnimation)
+        if(debug_animation)
         {
-            AnimationSpeedCounter += AnimationSpeedAdd;
-            if(AnimationSpeedCounter >= 1)
+            animation_speed_counter += animation_speed_add;
+            if(animation_speed_counter >= 1)
             {
-                for(int i=0;i<static_cast<int>(AnimationSpeedCounter);i++)
+                for(int i=0;i<static_cast<int>(animation_speed_counter);i++)
                 {
                     CheckKeys();
-                    CycleCounter++;
+                    cycle_counter++;
 
                     /// Für Externe Erweiterungen ///
                     //if(ExtZyklus) ZyklusProcExt();
@@ -1059,7 +1059,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
                     cpu->OneZyklus();
 
-                    if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) if(CheckBreakpoints()) break;
+                    if((break_status != 0) || (floppy_found_breakpoint == true )) if(CheckBreakpoints()) break;
 
                     if(iec_is_dumped)
                     {
@@ -1071,18 +1071,18 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                         iec_export_vdc.SetWire(4,floppy_iec_wire & 128);
                     }
                 }
-                AnimationSpeedCounter = 0;
+                animation_speed_counter = 0;
             }
             if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
         }
         else
         {
-            if(OneZyk)
+            if(one_cycle)
             {
-                OneZyk = false;
+                one_cycle = false;
 
                 CheckKeys();
-                CycleCounter++;
+                cycle_counter++;
 
                 /// Für Externe Erweiterungen ///
                 //if(ExtZyklus) ZyklusProcExt();
@@ -1116,7 +1116,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
                 cpu->OneZyklus();
 
-                if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) CheckBreakpoints();
+                if((break_status != 0) || (floppy_found_breakpoint == true )) CheckBreakpoints();
 
                 if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
 
@@ -1131,14 +1131,14 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 }
             }
 
-            if(OneOpc)
+            if(one_opcode)
             {
-                OneOpc = false;
+                one_opcode = false;
 
 loop_wait_next_opc:
 
                 CheckKeys();
-                CycleCounter++;
+                cycle_counter++;
 
                 /// Für Externe Erweiterungen ///
                 //if(ExtZyklus) ZyklusProcExt();
@@ -1153,9 +1153,9 @@ loop_wait_next_opc:
 
                 // Prüfen welches die aktuelle CPU ist (CPU,Floppy0,..1,..2,..3)
                 // Diese wird genau um ein Opcode ausgeführt
-                if(OneOpcSource > 0)
+                if(one_opcode_source > 0)
                 {
-                    int FloppyNr = OneOpcSource - 1;
+                    int FloppyNr = one_opcode_source - 1;
                     floppy_iec_wire = 0;
                     for(int i=0; i<MAX_FLOPPY_NUM; i++)
                     {
@@ -1186,7 +1186,7 @@ loop_wait_next_opc:
                     if(!cpu->OneZyklus()) goto loop_wait_next_opc;
                 }
 
-                if((BreakStatus != 0) || (FloppyFoundBreakpoint == true )) CheckBreakpoints();
+                if((break_status != 0) || (floppy_found_breakpoint == true )) CheckBreakpoints();
 
                 if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
 
@@ -1281,7 +1281,7 @@ inline void C64Class::CheckKeys()
 
 void C64Class::ResetC64CycleCounter()
 {
-    CycleCounter = 0;
+    cycle_counter = 0;
 }
 
 bool C64Class::LoadC64Roms(char *kernalrom, char *basicrom, char *charrom)
@@ -1343,18 +1343,18 @@ void C64Class::SetFloppyWriteProtect(uint8_t floppy_nr, bool status)
 
 void C64Class::SetCommandLine(char *c64_command)
 {
-    strcpy(ComandZeile,c64_command);
-    ComandZeileSize = static_cast<int>(strlen(ComandZeile));
-    ComandZeileCount = 0;
-    ComandZeileStatus = true;
-    ComandZeileCountS = true;
+    strcpy(c64_command_line,c64_command);
+    c64_command_line_lenght = static_cast<uint16_t>(strlen(c64_command_line));
+    c64_command_line_current_pos = 0;
+    c64_command_line_status = true;
+    c64_command_line_count_s = true;
 }
 
 void C64Class::KillCommandLine()
 {
-    ComandZeileSize=0;
-    ComandZeileStatus=false;
-    ComandZeileCountS=false;
+    c64_command_line_lenght=0;
+    c64_command_line_status=false;
+    c64_command_line_count_s=false;
 }
 
 uint8_t C64Class::ReadC64Byte(uint16_t address)
@@ -2051,7 +2051,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             }
             else
             {
-                if(IsKeyMapRec)
+                if(key_map_is_rec)
                 {
                     // Mappen der gedrückten Taste
                     for(int i=0;i<C64_KEY_COUNT;i++)
@@ -2062,8 +2062,8 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                         }
                     }
 
-                    c64_key_table[((RecMatrixCode & 0xF0)>>1) + (RecMatrixCode & 0x07)].SDLKeyCode = event->key.keysym.sym;
-                    IsKeyMapRec = false;
+                    c64_key_table[((rec_matrix_code & 0xF0)>>1) + (rec_matrix_code & 0x07)].SDLKeyCode = event->key.keysym.sym;
+                    key_map_is_rec = false;
                 }
                 else
                 {
@@ -2249,8 +2249,8 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
         if(!enable_fullscreen)
         {
-            MouseHiddenCounter = 0;
-            MouseIsHidden = false;
+            mouse_hide_counter = 0;
+            mouse_is_hidden = false;
             SDL_ShowCursor(true);
         }
 
@@ -2283,7 +2283,7 @@ void C64Class::SetDistortion(float_t value)
 
 void C64Class::SetMouseHiddenTime(int time)
 {
-    MouseHiddenTime = time;
+    mouse_hide_time = time;
 }
 
 void C64Class::GetWindowPos(int *x, int *y)
@@ -2365,12 +2365,12 @@ void C64Class::SetC64Speed(int speed)
 
 void C64Class::EnableWarpMode(bool enabled)
 {
-    if(enabled == WarpMode) return;
+    if(enabled == warp_mode) return;
 
     // WarpMode setzen
-    WarpMode = enabled;
+    warp_mode = enabled;
 
-    if(WarpMode)
+    if(warp_mode)
     {
         // WarpMode aktivieren
         SDL_PauseAudio(1);          // Audiostream pausieren
@@ -2435,8 +2435,8 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
         sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
         HardReset();
         wait_reset_ready = true;
-        C64ResetReady = false;
-        FloppyResetReady[0] = false;
+        c64_reset_ready = false;
+        floppy_reset_ready[0] = false;
         return 0;
     }
 
@@ -2449,8 +2449,8 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
         sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
         HardReset();
         wait_reset_ready = true;
-        C64ResetReady = false;
-        FloppyResetReady[0] = false;
+        c64_reset_ready = false;
+        floppy_reset_ready[0] = false;
         return 0;
     }
 
@@ -2461,8 +2461,8 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
         strcpy(auto_load_filename,filename);
         HardReset();
         wait_reset_ready = true;
-        C64ResetReady = false;
-        FloppyResetReady[0] = false;
+        c64_reset_ready = false;
+        floppy_reset_ready[0] = false;
         return 0;
     }
 
@@ -2473,8 +2473,8 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
         strcpy(auto_load_filename,filename);
         HardReset();
         wait_reset_ready = true;
-        C64ResetReady = false;
-        FloppyResetReady[0] = false;
+        c64_reset_ready = false;
+        floppy_reset_ready[0] = false;
         return 0;
     }
 
@@ -2485,8 +2485,8 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
         strcpy(auto_load_filename,filename);
         HardReset();
         wait_reset_ready = true;
-        C64ResetReady = false;
-        FloppyResetReady[0] = false;
+        c64_reset_ready = false;
+        floppy_reset_ready[0] = false;
         return 0;
     }
 
@@ -2815,19 +2815,19 @@ void C64Class::SetMouse1351Port(uint8_t port)
 
 void C64Class::SetDebugMode(bool status)
 {
-    DebugMode = status;
-    if(DebugMode)
+    debug_mode = status;
+    if(debug_mode)
     {
-        OneZyk = false;
-        OneOpc = false;
+        one_cycle = false;
+        one_opcode = false;
         sid1->SoundOutputEnable = false;
         sid2->SoundOutputEnable = false;
         for(int i=0; i<MAX_FLOPPY_NUM; i++) floppy[i]->SetEnableFloppySound(false);
     }
     else
     {
-        OneZyk = false;
-        OneOpc = false;
+        one_cycle = false;
+        one_opcode = false;
         sid1->SoundOutputEnable = true;
         sid2->SoundOutputEnable = true;
         for(int i=0; i<MAX_FLOPPY_NUM; i++) floppy[i]->SetEnableFloppySound(true);
@@ -2855,32 +2855,32 @@ void C64Class::SetExtRDY(bool status)
 
 void C64Class::OneCycle()
 {
-    DebugAnimation = false;
-    OneZyk = true;
+    debug_animation = false;
+    one_cycle = true;
 }
 
 void C64Class::OneOpcode(int source)
 {
-    DebugAnimation = false;
-    OneOpcSource = source;
-    OneOpc = true;
+    debug_animation = false;
+    one_opcode_source = source;
+    one_opcode = true;
 }
 
 void C64Class::SetDebugAnimation(bool status)
 {
-    DebugAnimation = status;
+    debug_animation = status;
 }
 
 void C64Class::SetDebugAnimationSpeed(int cycle_sek)
 {
-    AnimationSpeedCounter = 0;
-    AnimationSpeedAdd = static_cast<float_t>(AudioPufferSize) / static_cast<float_t>(AudioSampleRate) * static_cast<float_t>(cycle_sek);
+    animation_speed_counter = 0;
+    animation_speed_add = static_cast<float_t>(AudioPufferSize) / static_cast<float_t>(AudioSampleRate) * static_cast<float_t>(cycle_sek);
 }
 
 void C64Class::GetC64CpuReg(REG_STRUCT *reg, IREG_STRUCT *ireg)
 {
     cpu->GetInterneRegister(ireg);
-    ireg->CycleCounter = CycleCounter;
+    ireg->CycleCounter = cycle_counter;
     ireg->GAME = game_wire;
     ireg->EXROM = exrom_wire;
     cpu->GetRegister(reg);
@@ -2903,48 +2903,48 @@ void C64Class::GetIECStatus(IEC_STRUCT *iec)
 
 int C64Class::AddBreakGroup()
 {
-    if(BreakGroupAnz == MAX_BREAK_GROUPS) return -1;
+    if(breakgroup_count == MAX_BREAK_GROUP_NUM) return -1;
 
-    BreakGroup[BreakGroupAnz] = new BREAK_GROUP;
-    memset(BreakGroup[BreakGroupAnz],0,sizeof(BREAK_GROUP));
-    BreakGroup[BreakGroupAnz]->iRZZyklus = 1;
-    BreakGroupAnz ++;
-    return BreakGroupAnz - 1;
+    breakgroup[breakgroup_count] = new BREAK_GROUP;
+    memset(breakgroup[breakgroup_count],0,sizeof(BREAK_GROUP));
+    breakgroup[breakgroup_count]->iRZZyklus = 1;
+    breakgroup_count ++;
+    return breakgroup_count - 1;
 }
 
 void C64Class::DelBreakGroup(int index)
 {
-    if(index >= BreakGroupAnz) return;
-    delete BreakGroup[index];
-    BreakGroupAnz--;
-    for(int i = index; i < BreakGroupAnz; i++) BreakGroup[i] = BreakGroup[i+1];
+    if(index >= breakgroup_count) return;
+    delete breakgroup[index];
+    breakgroup_count--;
+    for(int i = index; i < breakgroup_count; i++) breakgroup[i] = breakgroup[i+1];
     UpdateBreakGroup();
 }
 
 BREAK_GROUP* C64Class::GetBreakGroup(int index)
 {
-    if(index >= BreakGroupAnz) return nullptr;
-    return BreakGroup[index];
+    if(index >= breakgroup_count) return nullptr;
+    return breakgroup[index];
 }
 
 void C64Class::UpdateBreakGroup()
 {
-    for(int i=0; i<0x10000;i++) Breakpoints[i] = 0;
-    for(int i=0;i<BreakGroupAnz;i++)
+    for(int i=0; i<0x10000;i++) breakpoints[i] = 0;
+    for(int i=0;i<breakgroup_count;i++)
     {
-        BREAK_GROUP* bg = BreakGroup[i];
+        BREAK_GROUP* bg = breakgroup[i];
         if(bg->Enable)
         {
-            if(bg->bPC) Breakpoints[bg->iPC] |= 1;
-            if(bg->bAC) Breakpoints[bg->iAC] |= 2;
-            if(bg->bXR) Breakpoints[bg->iXR] |= 4;
-            if(bg->bYR) Breakpoints[bg->iYR] |= 8;
-            if(bg->bRAdresse) Breakpoints[bg->iRAdresse] |= 16;
-            if(bg->bWAdresse) Breakpoints[bg->iWAdresse] |= 32;
-            if(bg->bRWert) Breakpoints[bg->iRWert] |= 64;
-            if(bg->bWWert) Breakpoints[bg->iWWert] |= 128;
-            if(bg->bRZ) Breakpoints[bg->iRZ] |= 256;
-            if(bg->bRZZyklus) Breakpoints[bg->iRZZyklus] |= 512;
+            if(bg->bPC) breakpoints[bg->iPC] |= 1;
+            if(bg->bAC) breakpoints[bg->iAC] |= 2;
+            if(bg->bXR) breakpoints[bg->iXR] |= 4;
+            if(bg->bYR) breakpoints[bg->iYR] |= 8;
+            if(bg->bRAdresse) breakpoints[bg->iRAdresse] |= 16;
+            if(bg->bWAdresse) breakpoints[bg->iWAdresse] |= 32;
+            if(bg->bRWert) breakpoints[bg->iRWert] |= 64;
+            if(bg->bWWert) breakpoints[bg->iWWert] |= 128;
+            if(bg->bRZ) breakpoints[bg->iRZ] |= 256;
+            if(bg->bRZZyklus) breakpoints[bg->iRZZyklus] |= 512;
         }
     }
 
@@ -2959,17 +2959,17 @@ void C64Class::UpdateBreakGroup()
 
 void C64Class::DeleteAllBreakGroups()
 {
-    for(int i=0;i<BreakGroupAnz;i++)
+    for(int i=0;i<breakgroup_count;i++)
     {
-        delete BreakGroup[i];
+        delete breakgroup[i];
     }
-    BreakGroupAnz = 0;
+    breakgroup_count = 0;
     UpdateBreakGroup();
 }
 
 int C64Class::GetBreakGroupAnz()
 {
-    return BreakGroupAnz;
+    return breakgroup_count;
 }
 
 int C64Class::LoadBreakGroups(char *filename)
@@ -3015,28 +3015,28 @@ int C64Class::LoadBreakGroups(char *filename)
     for(int ii=0;ii<Groupanzahl;ii++)
     {
         int i = AddBreakGroup();
-        reading_elements = fread(BreakGroup[i]->Name,sizeof(BreakGroup[i]->Name),1,file);
-        reading_elements = fread(&BreakGroup[i]->Enable,sizeof(BreakGroup[i]->Enable),1,file);
-        reading_elements = fread(&BreakGroup[i]->bPC,sizeof(BreakGroup[i]->bPC),1,file);
-        reading_elements = fread(&BreakGroup[i]->iPC,sizeof(BreakGroup[i]->iPC),1,file);
-        reading_elements = fread(&BreakGroup[i]->bAC,sizeof(BreakGroup[i]->bAC),1,file);
-        reading_elements = fread(&BreakGroup[i]->iAC,sizeof(BreakGroup[i]->iAC),1,file);
-        reading_elements = fread(&BreakGroup[i]->bXR,sizeof(BreakGroup[i]->bXR),1,file);
-        reading_elements = fread(&BreakGroup[i]->iXR,sizeof(BreakGroup[i]->iXR),1,file);
-        reading_elements = fread(&BreakGroup[i]->bYR,sizeof(BreakGroup[i]->bYR),1,file);
-        reading_elements = fread(&BreakGroup[i]->iYR,sizeof(BreakGroup[i]->iYR),1,file);
-        reading_elements = fread(&BreakGroup[i]->bRAdresse,sizeof(BreakGroup[i]->bRAdresse),1,file);
-        reading_elements = fread(&BreakGroup[i]->iRAdresse,sizeof(BreakGroup[i]->iRAdresse),1,file);
-        reading_elements = fread(&BreakGroup[i]->bWAdresse,sizeof(BreakGroup[i]->bWAdresse),1,file);
-        reading_elements = fread(&BreakGroup[i]->iWAdresse,sizeof(BreakGroup[i]->iWAdresse),1,file);
-        reading_elements = fread(&BreakGroup[i]->bRWert,sizeof(BreakGroup[i]->bRWert),1,file);
-        reading_elements = fread(&BreakGroup[i]->iRWert,sizeof(BreakGroup[i]->iRWert),1,file);
-        reading_elements = fread(&BreakGroup[i]->bWWert,sizeof(BreakGroup[i]->bWWert),1,file);
-        reading_elements = fread(&BreakGroup[i]->iWWert,sizeof(BreakGroup[i]->iWWert),1,file);
-        reading_elements = fread(&BreakGroup[i]->bRZ,sizeof(BreakGroup[i]->bRZ),1,file);
-        reading_elements = fread(&BreakGroup[i]->iRZ,sizeof(BreakGroup[i]->iRZ),1,file);
-        reading_elements = fread(&BreakGroup[i]->bRZZyklus,sizeof(BreakGroup[i]->bRZZyklus),1,file);
-        reading_elements = fread(&BreakGroup[i]->iRZZyklus,sizeof(BreakGroup[i]->iRZZyklus),1,file);
+        reading_elements = fread(breakgroup[i]->Name,sizeof(breakgroup[i]->Name),1,file);
+        reading_elements = fread(&breakgroup[i]->Enable,sizeof(breakgroup[i]->Enable),1,file);
+        reading_elements = fread(&breakgroup[i]->bPC,sizeof(breakgroup[i]->bPC),1,file);
+        reading_elements = fread(&breakgroup[i]->iPC,sizeof(breakgroup[i]->iPC),1,file);
+        reading_elements = fread(&breakgroup[i]->bAC,sizeof(breakgroup[i]->bAC),1,file);
+        reading_elements = fread(&breakgroup[i]->iAC,sizeof(breakgroup[i]->iAC),1,file);
+        reading_elements = fread(&breakgroup[i]->bXR,sizeof(breakgroup[i]->bXR),1,file);
+        reading_elements = fread(&breakgroup[i]->iXR,sizeof(breakgroup[i]->iXR),1,file);
+        reading_elements = fread(&breakgroup[i]->bYR,sizeof(breakgroup[i]->bYR),1,file);
+        reading_elements = fread(&breakgroup[i]->iYR,sizeof(breakgroup[i]->iYR),1,file);
+        reading_elements = fread(&breakgroup[i]->bRAdresse,sizeof(breakgroup[i]->bRAdresse),1,file);
+        reading_elements = fread(&breakgroup[i]->iRAdresse,sizeof(breakgroup[i]->iRAdresse),1,file);
+        reading_elements = fread(&breakgroup[i]->bWAdresse,sizeof(breakgroup[i]->bWAdresse),1,file);
+        reading_elements = fread(&breakgroup[i]->iWAdresse,sizeof(breakgroup[i]->iWAdresse),1,file);
+        reading_elements = fread(&breakgroup[i]->bRWert,sizeof(breakgroup[i]->bRWert),1,file);
+        reading_elements = fread(&breakgroup[i]->iRWert,sizeof(breakgroup[i]->iRWert),1,file);
+        reading_elements = fread(&breakgroup[i]->bWWert,sizeof(breakgroup[i]->bWWert),1,file);
+        reading_elements = fread(&breakgroup[i]->iWWert,sizeof(breakgroup[i]->iWWert),1,file);
+        reading_elements = fread(&breakgroup[i]->bRZ,sizeof(breakgroup[i]->bRZ),1,file);
+        reading_elements = fread(&breakgroup[i]->iRZ,sizeof(breakgroup[i]->iRZ),1,file);
+        reading_elements = fread(&breakgroup[i]->bRZZyklus,sizeof(breakgroup[i]->bRZZyklus),1,file);
+        reading_elements = fread(&breakgroup[i]->iRZZyklus,sizeof(breakgroup[i]->iRZZyklus),1,file);
     }
     return 0;
 }
@@ -3060,33 +3060,33 @@ bool C64Class::SaveBreakGroups(char *filename)
     fwrite(&Version,sizeof(Version),1,file);
 
     /// Groupanzahl ///
-    fwrite(&BreakGroupAnz,sizeof(BreakGroupAnz),1,file);
+    fwrite(&breakgroup_count,sizeof(breakgroup_count),1,file);
 
     /// Groups ///
-    for(int i=0;i<BreakGroupAnz;i++)
+    for(int i=0;i<breakgroup_count;i++)
     {
-        fwrite(BreakGroup[i]->Name,sizeof(BreakGroup[i]->Name),1,file);
-        fwrite(&BreakGroup[i]->Enable,sizeof(BreakGroup[i]->Enable),1,file);
-        fwrite(&BreakGroup[i]->bPC,sizeof(BreakGroup[i]->bPC),1,file);
-        fwrite(&BreakGroup[i]->iPC,sizeof(BreakGroup[i]->iPC),1,file);
-        fwrite(&BreakGroup[i]->bAC,sizeof(BreakGroup[i]->bAC),1,file);
-        fwrite(&BreakGroup[i]->iAC,sizeof(BreakGroup[i]->iAC),1,file);
-        fwrite(&BreakGroup[i]->bXR,sizeof(BreakGroup[i]->bXR),1,file);
-        fwrite(&BreakGroup[i]->iXR,sizeof(BreakGroup[i]->iXR),1,file);
-        fwrite(&BreakGroup[i]->bYR,sizeof(BreakGroup[i]->bYR),1,file);
-        fwrite(&BreakGroup[i]->iYR,sizeof(BreakGroup[i]->iYR),1,file);
-        fwrite(&BreakGroup[i]->bRAdresse,sizeof(BreakGroup[i]->bRAdresse),1,file);
-        fwrite(&BreakGroup[i]->iRAdresse,sizeof(BreakGroup[i]->iRAdresse),1,file);
-        fwrite(&BreakGroup[i]->bWAdresse,sizeof(BreakGroup[i]->bWAdresse),1,file);
-        fwrite(&BreakGroup[i]->iWAdresse,sizeof(BreakGroup[i]->iWAdresse),1,file);
-        fwrite(&BreakGroup[i]->bRWert,sizeof(BreakGroup[i]->bRWert),1,file);
-        fwrite(&BreakGroup[i]->iRWert,sizeof(BreakGroup[i]->iRWert),1,file);
-        fwrite(&BreakGroup[i]->bWWert,sizeof(BreakGroup[i]->bWWert),1,file);
-        fwrite(&BreakGroup[i]->iWWert,sizeof(BreakGroup[i]->iWWert),1,file);
-        fwrite(&BreakGroup[i]->bRZ,sizeof(BreakGroup[i]->bRZ),1,file);
-        fwrite(&BreakGroup[i]->iRZ,sizeof(BreakGroup[i]->iRZ),1,file);
-        fwrite(&BreakGroup[i]->bRZZyklus,sizeof(BreakGroup[i]->bRZZyklus),1,file);
-        fwrite(&BreakGroup[i]->iRZZyklus,sizeof(BreakGroup[i]->iRZZyklus),1,file);
+        fwrite(breakgroup[i]->Name,sizeof(breakgroup[i]->Name),1,file);
+        fwrite(&breakgroup[i]->Enable,sizeof(breakgroup[i]->Enable),1,file);
+        fwrite(&breakgroup[i]->bPC,sizeof(breakgroup[i]->bPC),1,file);
+        fwrite(&breakgroup[i]->iPC,sizeof(breakgroup[i]->iPC),1,file);
+        fwrite(&breakgroup[i]->bAC,sizeof(breakgroup[i]->bAC),1,file);
+        fwrite(&breakgroup[i]->iAC,sizeof(breakgroup[i]->iAC),1,file);
+        fwrite(&breakgroup[i]->bXR,sizeof(breakgroup[i]->bXR),1,file);
+        fwrite(&breakgroup[i]->iXR,sizeof(breakgroup[i]->iXR),1,file);
+        fwrite(&breakgroup[i]->bYR,sizeof(breakgroup[i]->bYR),1,file);
+        fwrite(&breakgroup[i]->iYR,sizeof(breakgroup[i]->iYR),1,file);
+        fwrite(&breakgroup[i]->bRAdresse,sizeof(breakgroup[i]->bRAdresse),1,file);
+        fwrite(&breakgroup[i]->iRAdresse,sizeof(breakgroup[i]->iRAdresse),1,file);
+        fwrite(&breakgroup[i]->bWAdresse,sizeof(breakgroup[i]->bWAdresse),1,file);
+        fwrite(&breakgroup[i]->iWAdresse,sizeof(breakgroup[i]->iWAdresse),1,file);
+        fwrite(&breakgroup[i]->bRWert,sizeof(breakgroup[i]->bRWert),1,file);
+        fwrite(&breakgroup[i]->iRWert,sizeof(breakgroup[i]->iRWert),1,file);
+        fwrite(&breakgroup[i]->bWWert,sizeof(breakgroup[i]->bWWert),1,file);
+        fwrite(&breakgroup[i]->iWWert,sizeof(breakgroup[i]->iWWert),1,file);
+        fwrite(&breakgroup[i]->bRZ,sizeof(breakgroup[i]->bRZ),1,file);
+        fwrite(&breakgroup[i]->iRZ,sizeof(breakgroup[i]->iRZ),1,file);
+        fwrite(&breakgroup[i]->bRZZyklus,sizeof(breakgroup[i]->bRZZyklus),1,file);
+        fwrite(&breakgroup[i]->iRZZyklus,sizeof(breakgroup[i]->iRZZyklus),1,file);
     }
 
     fclose(file);
@@ -3514,9 +3514,9 @@ bool C64Class::CheckBreakpoints()
 {
     int BreaksIO = 0;
 
-    for (int i=0;i<BreakGroupAnz;i++)
+    for (int i=0;i<breakgroup_count;i++)
     {
-        BREAK_GROUP* bg = BreakGroup[i];
+        BREAK_GROUP* bg = breakgroup[i];
         int count1 = 0;
         int count2 = 0;
 
@@ -3525,64 +3525,64 @@ bool C64Class::CheckBreakpoints()
             if(bg->bPC)
             {
                 count1++;
-                if((BreakStatus&1) && (BreakWerte[0] == bg->iPC)) count2++;
+                if((break_status&1) && (break_values[0] == bg->iPC)) count2++;
             }
             if(bg->bAC)
             {
                 count1++;
-                if((BreakStatus&2) && (BreakWerte[1] == bg->iAC)) count2++;
+                if((break_status&2) && (break_values[1] == bg->iAC)) count2++;
             }
             if(bg->bXR)
             {
                 count1++;
-                if((BreakStatus&4) && (BreakWerte[2] == bg->iXR)) count2++;
+                if((break_status&4) && (break_values[2] == bg->iXR)) count2++;
             }
             if(bg->bYR)
             {
                 count1++;
-                if((BreakStatus&8) && (BreakWerte[3] == bg->iYR)) count2++;
+                if((break_status&8) && (break_values[3] == bg->iYR)) count2++;
             }
             if(bg->bRAdresse)
             {
                 count1++;
-                if((BreakStatus&16) && (BreakWerte[4] == bg->iRAdresse)) count2++;
+                if((break_status&16) && (break_values[4] == bg->iRAdresse)) count2++;
             }
             if(bg->bWAdresse)
             {
                 count1++;
-                if((BreakStatus&32) && (BreakWerte[5] == bg->iWAdresse)) count2++;
+                if((break_status&32) && (break_values[5] == bg->iWAdresse)) count2++;
             }
             if(bg->bRWert)
             {
                 count1++;
-                if((BreakStatus&64) && (BreakWerte[6] == bg->iRWert)) count2++;
+                if((break_status&64) && (break_values[6] == bg->iRWert)) count2++;
             }
             if(bg->bWWert)
             {
                 count1++;
-                if((BreakStatus&128) && (BreakWerte[7] == bg->iWWert)) count2++;
+                if((break_status&128) && (break_values[7] == bg->iWWert)) count2++;
             }
             if(bg->bRZ)
             {
                 count1++;
-                if((BreakStatus&256) && (BreakWerte[8] == bg->iRZ)) count2++;
+                if((break_status&256) && (break_values[8] == bg->iRZ)) count2++;
             }
             if(bg->bRZZyklus)
             {
                 count1++;
-                if((BreakStatus&512) && (BreakWerte[9] == bg->iRZZyklus)) count2++;
+                if((break_status&512) && (break_values[9] == bg->iRZZyklus)) count2++;
             }
         }
         if((count1 == count2) && (count1 > 0))
         {
-            BreakGroup[i]->bTrue = true;
+            breakgroup[i]->bTrue = true;
             BreaksIO++;
         }
-        else BreakGroup[i]->bTrue = false;
+        else breakgroup[i]->bTrue = false;
     }
-    BreakStatus = 0;
+    break_status = 0;
 
-    FloppyFoundBreakpoint = false;
+    floppy_found_breakpoint = false;
     int floppy_break = 0;
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
@@ -3594,12 +3594,12 @@ bool C64Class::CheckBreakpoints()
 
     if((BreaksIO > 0) || (floppy_break == 1))
     {
-        if(!DebugMode)
+        if(!debug_mode)
         {
-            DebugMode = true;
-            DebugAnimation = false;
-            OneZyk = false;
-            OneOpc = false;
+            debug_mode = true;
+            debug_animation = false;
+            one_cycle = false;
+            one_opcode = false;
             sid1->SoundOutputEnable = false;
             sid2->SoundOutputEnable = false;
             for(int i=0; i<MAX_FLOPPY_NUM; i++) floppy[i]->SetEnableFloppySound(false);
@@ -3608,9 +3608,9 @@ bool C64Class::CheckBreakpoints()
         }
         else
         {
-            DebugAnimation = false;
-            OneOpc = false;
-            OneZyk = false;
+            debug_animation = false;
+            one_opcode = false;
+            one_cycle = false;
             if(BreakpointProc != nullptr) BreakpointProc();
             return true;
         }
@@ -3775,12 +3775,12 @@ void C64Class::ClearJoystickMapping(int slot_nr)
 
 void C64Class::IncMouseHiddenCounter()
 {
-    if(!MouseIsHidden && (MouseHiddenTime > 0))
+    if(!mouse_is_hidden && (mouse_hide_time > 0))
     {
-        MouseHiddenCounter++;
-        if(MouseHiddenCounter >= MouseHiddenTime)
+        mouse_hide_counter++;
+        if(mouse_hide_counter >= mouse_hide_time)
         {
-            MouseIsHidden = true;
+            mouse_is_hidden = true;
             SDL_ShowCursor(false);
         }
     }
@@ -3788,18 +3788,18 @@ void C64Class::IncMouseHiddenCounter()
 
 void C64Class::StartRecKeyMap(uint8_t keymatrix_code)
 {
-    RecMatrixCode = keymatrix_code;
-    IsKeyMapRec = true;
+    rec_matrix_code = keymatrix_code;
+    key_map_is_rec = true;
 }
 
 void C64Class::StopRecKeyMap()
 {
-    IsKeyMapRec = false;
+    key_map_is_rec = false;
 }
 
 bool C64Class::GetRecKeyMapStatus()
 {
-    return IsKeyMapRec;
+    return key_map_is_rec;
 }
 
 C64_KEYS* C64Class::GetC64KeyTable()

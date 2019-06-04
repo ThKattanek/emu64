@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.06.2019                //
+// Letzte Änderung am 04.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -45,7 +45,7 @@ using namespace std::tr1::placeholders;
 #define MAX_STRING_LENGTH 1024
 
 #define MAX_FLOPPY_NUM 4
-#define MAX_BREAK_GROUPS 255
+#define MAX_BREAK_GROUP_NUM 255
 #define MAX_SDL_JOYSTICK_NUM 16
 #define MAX_VJOY_NUM 16
 
@@ -444,44 +444,44 @@ private:
     // Bit 8 = Beim erreichen einer bestommten Raster Zeile
     // Bit 9 = Beim erreichen eines Zyklus in einer Rasterzeile
 
-    uint16_t        Breakpoints[0x10000];
-    uint16_t        BreakWerte[16];
-    uint16_t        BreakStatus;
-    bool            FloppyFoundBreakpoint;
+    uint16_t        breakpoints[0x10000];
+    uint16_t        break_values[16];
+    uint16_t        break_status;
+    bool            floppy_found_breakpoint;
 
-    uint8_t         BreakGroupAnz;
-    BREAK_GROUP     *BreakGroup[MAX_BREAK_GROUPS];
+    uint8_t         breakgroup_count;
+    BREAK_GROUP     *breakgroup[MAX_BREAK_GROUP_NUM];
 
     ////////////////////////////////////////////////////////////
 
-    bool        C64ResetReady;
-    bool        FloppyResetReady[MAX_FLOPPY_NUM];
+    bool        c64_reset_ready;
+    bool        floppy_reset_ready[MAX_FLOPPY_NUM];
 
-    char        ComandZeile[256];
-    uint16_t    ComandZeileSize;
-    uint16_t    ComandZeileCount;
-    bool        ComandZeileStatus;
-    bool        ComandZeileCountS;
+    char        c64_command_line[MAX_STRING_LENGTH];
+    uint16_t    c64_command_line_lenght;
+    uint16_t    c64_command_line_current_pos;
+    bool        c64_command_line_status;
+    bool        c64_command_line_count_s;
 
-    uint32_t    CycleCounter;
-    int         LimitCylesCounter;      // Dieser Counter wird wenn er > 0 ist bei jeden Zyklus um 1 runtergezählt
-                                    // Wechselt er von 1 auf 0 wird die Emulation angehalten und ein Ergeignis ausgelöst
-    bool        DebugMode;
-    bool        DebugAnimation;
-    float_t     AnimationSpeedAdd;
-    float_t     AnimationSpeedCounter;
-    bool        OneZyk;
-    bool        OneOpc;
-    int         OneOpcSource;
+    uint32_t    cycle_counter;
+    int         limit_cyles_counter;        // Dieser Counter wird wenn er > 0 ist bei jeden Zyklus um 1 runtergezählt
+                                            // Wechselt er von 1 auf 0 wird die Emulation angehalten und ein Ergeignis ausgelöst
+    bool        debug_mode;
+    bool        debug_animation;
+    float_t     animation_speed_add;
+    float_t     animation_speed_counter;
+    bool        one_cycle;
+    bool        one_opcode;
+    int         one_opcode_source;
 
-    bool        WarpMode;
+    bool        warp_mode;
 
-    bool        MouseIsHidden;
-    int         MouseHiddenCounter;
-    int         MouseHiddenTime;
+    bool        mouse_is_hidden;
+    int         mouse_hide_counter;
+    int         mouse_hide_time;
 
-    bool        IsKeyMapRec;
-    uint8_t     RecMatrixCode;
+    bool        key_map_is_rec;
+    uint8_t     rec_matrix_code;
 };
 
 #endif // C64CLASS_H
