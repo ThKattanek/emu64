@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.02.2018                //
+// Letzte Änderung am 04.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -20,18 +20,18 @@
 #include <vector>
 #include <QObject>
 
-#define MAX_COMMANDS 512
+#define MAX_COMMAND_NUM 512
 #define CMD_ARG 0xFFFF
 
 using namespace std;
 
 struct CMD_STRUCT
 {
-    const int cmdCommand;           // CMD_COMMAND
-    const char *shortCommand;       // Kurzbezeichnung (bsp.: -a)
-    const char *longCommand;        // Langbezeichnung (bsp.: --all)
+    const uint16_t cmd_command;     // CMD_COMMAND
+    const char *short_command;      // Kurzbezeichnung (bsp.: -a)
+    const char *long_command;       // Langbezeichnung (bsp.: --all)
     const char *legend;             // Erklärung als Kurztext
-    const int  arg_count;           // Anzahl der benötigten Argumente
+    const uint16_t arg_count;       // Anzahl der benötigten Argumente
 
 };
 
@@ -55,18 +55,18 @@ public:
 private:
     bool CheckShortCommands(const char *short_commands);
     bool CheckLongCommands(const char *long_command);
-    void AddCommand(int command, char* arg = NULL);
+    void AddCommand(int command, char* arg = nullptr);
     void OutUnknowOptionError(const char *command, bool is_long);
 
     const CMD_STRUCT *all_commands_list;
     int all_commands_list_count;
-    unsigned int max_long_command_len;
+    int max_long_command_lenght;
 
     const char* app_name;
 
     int command_count;
-    int command_list[MAX_COMMANDS];
-    char *command_arg[MAX_COMMANDS];
+    int command_list[MAX_COMMAND_NUM];
+    char *command_arg[MAX_COMMAND_NUM];
 };
 
 #endif // COMMAND_LINE_CLASS_H

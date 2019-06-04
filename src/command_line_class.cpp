@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.02.2018                //
+// Letzte Änderung am 04.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -27,7 +27,7 @@ CommandLineClass::CommandLineClass(int argc, char *argv[], const char *app_name,
     {
         for(int i=1; i<argc; i++)
         {
-            int len_arg = strlen(argv[i]);
+            size_t len_arg = strlen(argv[i]);
             if(len_arg > 1)
             {
                 if(argv[i][0] == '-' && argv[i][1] != '-')
@@ -64,13 +64,13 @@ CommandLineClass::CommandLineClass(int argc, char *argv[], const char *app_name,
 
     // Prüfen auf Richtige Anzahl von Argumenten
 
-    for(int i=0; i<command_count; i++)
+    for(uint16_t i=0; i<command_count; i++)
     {
         // Command suchen (sind immer keine Argumente)
         if(!CheckArg(i))
         {
-            int arg_count = 0;
-            for(int j=i+1; j<command_count; j++)
+            uint16_t arg_count = 0;
+            for(uint16_t j=i+1; j<command_count; j++)
             {
                 if(CheckArg(j))
                 {
@@ -96,11 +96,11 @@ CommandLineClass::CommandLineClass(int argc, char *argv[], const char *app_name,
     }
 
     // Größe des längsten LongCommand ermitteln
-    max_long_command_len = 0;
+    max_long_command_lenght = 0;
     for(int i=0; i<all_commands_list_count; i++)
     {
-        if(strlen(all_commands_list[i].longCommand) > max_long_command_len)
-            max_long_command_len = strlen(all_commands_list[i].longCommand);
+        if(static_cast<int>(strlen(all_commands_list[i].long_command)) > max_long_command_lenght)
+            max_long_command_lenght = static_cast<int>(strlen(all_commands_list[i].long_command));
     }
 }
 
@@ -123,10 +123,9 @@ const char *CommandLineClass::GetCommandLongString(int command)
 {
     for(int i=0; i<all_commands_list_count; i++)
     {
-        if(all_commands_list[i].cmdCommand == command)
+        if(all_commands_list[i].cmd_command == command)
         {
-            return all_commands_list[i].longCommand;
-            break;
+            return all_commands_list[i].long_command;
         }
     }
     return "";
@@ -151,13 +150,13 @@ char *CommandLineClass::GetArg(int number)
         return command_arg[number];
     }
 
-    return NULL;
+    return nullptr;
 }
 
 int CommandLineClass::GetArgInt(int number, bool *err)
 {
     *err = true;
-    int z = 0;
+    long int z = 0;
 
     if(number < command_count)
     {
@@ -197,7 +196,7 @@ int CommandLineClass::GetArgInt(int number, bool *err)
     {
         // number befindet sich auserhalb des Puffer
     }
-    return z;
+    return static_cast<int>(z);
 }
 
 void CommandLineClass::ShowHelp()
@@ -207,21 +206,21 @@ void CommandLineClass::ShowHelp()
     for(int i=0; i<all_commands_list_count; i++)
     {
         int out_mode = 0;
-        if(strcmp(all_commands_list[i].shortCommand,"") == 0)
+        if(strcmp(all_commands_list[i].short_command,"") == 0)
             out_mode |= 1;
-        if(strcmp(all_commands_list[i].longCommand,"") == 0)
+        if(strcmp(all_commands_list[i].long_command,"") == 0)
             out_mode |= 2;
 
         switch(out_mode)
         {
         case 0:     // short und long vorhanden
-            printf("%3s%s, --%-*s %s\n","-",all_commands_list[i].shortCommand,max_long_command_len + 2,all_commands_list[i].longCommand,all_commands_list[i].legend);
+            printf("%3s%s, --%-*s %s\n","-",all_commands_list[i].short_command,max_long_command_lenght + 2,all_commands_list[i].long_command,all_commands_list[i].legend);
             break;
         case 1:     // nur long vorhanen
-            printf("%5s --%-*s %s\n","",max_long_command_len + 2,all_commands_list[i].longCommand,all_commands_list[i].legend);
+            printf("%5s --%-*s %s\n","",max_long_command_lenght + 2,all_commands_list[i].long_command,all_commands_list[i].legend);
             break;
         case 2:     // nur short vorhanden
-            printf("  -%-*s %s\n",max_long_command_len + 7,all_commands_list[i].shortCommand,all_commands_list[i].legend);
+            printf("  -%-*s %s\n",max_long_command_lenght + 7,all_commands_list[i].short_command,all_commands_list[i].legend);
             break;
         case 3:     // nichts vorhanden
             break;
@@ -235,17 +234,17 @@ void CommandLineClass::ShowHelp()
 
 bool CommandLineClass::CheckShortCommands(const char *short_commands)
 {
-    int len = strlen(short_commands);
+    int len = static_cast<int>(strlen(short_commands));
     for(int i=0; i<len; i++)
     {
         bool found = false;
         for(int j=0; j<all_commands_list_count; j++)
         {
-            if(all_commands_list[j].shortCommand[0] == short_commands[i])
+            if(all_commands_list[j].short_command[0] == short_commands[i])
             {
                 char *str = new char[3];
-                sprintf(str,"%s", all_commands_list[j].shortCommand);
-                AddCommand(all_commands_list[j].cmdCommand, str);
+                sprintf(str,"%s", all_commands_list[j].short_command);
+                AddCommand(all_commands_list[j].cmd_command, str);
                 found = true;
             }
         }
@@ -258,7 +257,6 @@ bool CommandLineClass::CheckShortCommands(const char *short_commands)
             str[1] = 0;
             OutUnknowOptionError(str,false);
             return false;
-            break;
         }
     }
     return true;
@@ -269,11 +267,11 @@ bool CommandLineClass::CheckLongCommands(const char *long_command)
     bool found = false;
     for(int i=0; i<all_commands_list_count; i++)
     {
-        if(strcmp(long_command, all_commands_list[i].longCommand) == 0)
+        if(strcmp(long_command, all_commands_list[i].long_command) == 0)
         {
             char *str = new char[255];
             sprintf(str,"--%s", long_command);
-            AddCommand(all_commands_list[i].cmdCommand, str);
+            AddCommand(all_commands_list[i].cmd_command, str);
             found = true;
         }
     }
@@ -292,10 +290,9 @@ int CommandLineClass::GetCommandArgCount(int command)
 {
     for(int i=0; i<all_commands_list_count; i++)
     {
-        if(all_commands_list[i].cmdCommand == command)
+        if(all_commands_list[i].cmd_command == command)
         {
             return all_commands_list[i].arg_count;
-            break;
         }
     }
 
@@ -304,7 +301,7 @@ int CommandLineClass::GetCommandArgCount(int command)
 
 void CommandLineClass::AddCommand(int command, char *arg)
 {
-    if(command_count >= 0 && command_count < MAX_COMMANDS)
+    if(command_count >= 0 && command_count < MAX_COMMAND_NUM)
     {
         command_list[command_count] = command;
         command_arg[command_count] = arg;
