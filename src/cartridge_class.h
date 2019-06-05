@@ -72,7 +72,7 @@ public:
     uint8_t     rom_bank1_tmp[64*0x2000];     // Alle ChipRoms für 0x8000	(max 64 x 0x2000)
     uint8_t     rom_bank2_tmp[64*0x2000];     // Alle ChipRoms für 0xA000 oder 0xE000 (max 64 x 0x2000)
 
-    uint8_t     *RAM_C64;                     // Kompletter C64 RAM
+    uint8_t     *c64_ram;                     // Kompletter C64 RAM
 
     bool        led_00;                 // LED FCIII
     bool        led_00_old;

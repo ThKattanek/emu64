@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <cstring>
 
-const char* TYPE_STRING[34] = { "Normal Cartridge","Action Replay","KCS Power Cartridge",
+static const char* TYPE_STRING[34] = { "Normal Cartridge","Action Replay","KCS Power Cartridge",
                                 "Final Cartridge III","Simons Basic","Ocean type 1 (128K and 256K)*",
                                 "Expert Cartridge","Fun Play","Super Games","Atomic Power",
                                 "Epyx Fastload","Westermann","Rex","Final Cartridge I",
@@ -675,7 +675,7 @@ void CartridgeClass::WriteIO1(uint16_t adresse, uint8_t value)
 
                         ar_freez = false;
                     }
-                    RAM_C64[adresse] = value;
+                    c64_ram[adresse] = value;
                 break;
         case 4:
                 if(adresse == 0xDE00)
@@ -804,7 +804,7 @@ void CartridgeClass::WriteIO2(uint16_t address, uint8_t value)
         {
         case 1:     // Action Replay 4/5/6
                 ar_ram[(address & 0xFF) + 0x1F00] = value;
-                RAM_C64[address] = value;
+                c64_ram[address] = value;
             break;
         case 3:		// Final Cartridge III
                 if((address & 0xFF) == 0xFF)
@@ -933,7 +933,7 @@ void CartridgeClass::WriteRom1(uint16_t address, uint8_t value)	// 0x8000
 {
         if(!cartridge_is_insert)
         {
-                RAM_C64[address] = value;
+                c64_ram[address] = value;
                 return;
         }
 
@@ -945,14 +945,14 @@ void CartridgeClass::WriteRom1(uint16_t address, uint8_t value)	// 0x8000
                 {
                     ar_ram[address & 0x1FFF] = value;
                 }
-                RAM_C64[address] = value;
+                c64_ram[address] = value;
             break;
         case 32:	// EasyFlash
                 am29f040Lo->Write((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13),value);
-                RAM_C64[address] = value;
+                c64_ram[address] = value;
                 break;
         default:
-                RAM_C64[address] = value;
+                c64_ram[address] = value;
                 break;
         }
 }
@@ -961,7 +961,7 @@ void CartridgeClass::WriteRom2(uint16_t address, uint8_t value)	// 0xA000
 {
         if(!cartridge_is_insert)
         {
-                RAM_C64[address] = value;
+                c64_ram[address] = value;
                 return;
         }
 
@@ -969,10 +969,10 @@ void CartridgeClass::WriteRom2(uint16_t address, uint8_t value)	// 0xA000
         {
         case 32:	// EasyFlash
                 am29f040Hi->Write((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13),value);
-                RAM_C64[address] = value;
+                c64_ram[address] = value;
                 break;
         default:
-                RAM_C64[address] = value;
+                c64_ram[address] = value;
                 break;
         }
 }
@@ -981,7 +981,7 @@ void CartridgeClass::WriteRom3(uint16_t address, uint8_t value)	// 0xE000
 {
         if(!cartridge_is_insert)
         {
-                RAM_C64[address] = value;
+                c64_ram[address] = value;
                 return;
         }
 
@@ -989,10 +989,10 @@ void CartridgeClass::WriteRom3(uint16_t address, uint8_t value)	// 0xE000
         {
         case 32:	// EasyFlash
                 am29f040Hi->Write((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13),value);
-                RAM_C64[address] = value;
+                c64_ram[address] = value;
                 break;
         default:
-                RAM_C64[address] = value;
+                c64_ram[address] = value;
                 break;
         }
 }

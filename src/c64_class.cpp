@@ -401,7 +401,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     cia1->FLAG_PIN = &tape->CassRead;
 
     /// CRT mit MMU verbinden ///
-    crt->RAM_C64 = mmu->GetRAMPointer();
+    crt->c64_ram = mmu->GetRAMPointer();
     mmu->EasyFlashDirty1 = crt->GetFlash040Dirty(0);
     mmu->EasyFlashDirty2 = crt->GetFlash040Dirty(1);
     mmu->EasyFlashByte1 = crt->GetFlash040Byte(0);
