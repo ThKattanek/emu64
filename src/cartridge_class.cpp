@@ -31,7 +31,7 @@ const char* TYPE_STRING[34] = { "Normal Cartridge","Action Replay","KCS Power Ca
                                 "EasyFlash Cartridge", //32
                                 "Unbekannt"};
 
-CRTClass::CRTClass()
+CartridgeClass::CartridgeClass()
 {
     CRTInsert = false;
     CRTTyp = 0;
@@ -46,18 +46,18 @@ CRTClass::CRTClass()
     ARFreez = false;
 }
 
-CRTClass::~CRTClass()
+CartridgeClass::~CartridgeClass()
 {
 }
 
-void CRTClass::ResetAllLEDS(void)
+void CartridgeClass::ResetAllLEDS(void)
 {
     LED_00=LED_00_OLD=LED_01=LED_01_OLD=false;
     if(ChangeLED != 0) ChangeLED(0,LED_00);
     if(ChangeLED != 0) ChangeLED(1,LED_01);
 }
 
-void CRTClass::SetMemLogicAR(unsigned short adresse)
+void CartridgeClass::SetMemLogicAR(unsigned short adresse)
 {
     if(!ActionReplayAktiv) return;
     unsigned char io2, pla_adresse, pla_out;
@@ -96,7 +96,7 @@ void CRTClass::SetMemLogicAR(unsigned short adresse)
     ChangeMemMapProc();
 }
 
-inline uint16_t CRTClass::ConvertDWord(uint32_t value)
+inline uint16_t CartridgeClass::ConvertDWord(uint32_t value)
 {
         uint16_t h,l;
         l = value>>16;
@@ -107,7 +107,7 @@ inline uint16_t CRTClass::ConvertDWord(uint32_t value)
         return value;
 }
 
-bool* CRTClass::GetFlash040Dirty(uint16_t nr)
+bool* CartridgeClass::GetFlash040Dirty(uint16_t nr)
 {
         switch (nr)
         {
@@ -122,7 +122,7 @@ bool* CRTClass::GetFlash040Dirty(uint16_t nr)
         }
 }
 
-uint8_t *CRTClass::GetFlash040Byte(uint16_t nr)
+uint8_t *CartridgeClass::GetFlash040Byte(uint16_t nr)
 {
         switch (nr)
         {
@@ -137,7 +137,7 @@ uint8_t *CRTClass::GetFlash040Byte(uint16_t nr)
         }
 }
 
-int CRTClass::LoadCRTImage(const char *filename)
+int CartridgeClass::LoadCRTImage(const char *filename)
 {
         FILE *file;
         char Kennung[17];
@@ -250,7 +250,7 @@ L2:
         return 0;
 }
 
-void CRTClass::RemoveCRTImage()
+void CartridgeClass::RemoveCRTImage()
 {
         CRTInsert = false;
         *GAME = true;
@@ -258,7 +258,7 @@ void CRTClass::RemoveCRTImage()
         ResetAllLEDS();
 }
 
-int CRTClass::CreateNewEasyFlashImage(const char* filename, const char* crt_name)
+int CartridgeClass::CreateNewEasyFlashImage(const char* filename, const char* crt_name)
 {
         const char* Kennung = "C64 CARTRIDGE   ";
         const char* ChipKennung = "CHIP";
@@ -358,7 +358,7 @@ int CRTClass::CreateNewEasyFlashImage(const char* filename, const char* crt_name
         return 0;
 }
 
-int CRTClass::WriteEasyFlashImage(const char *filename)
+int CartridgeClass::WriteEasyFlashImage(const char *filename)
 {
         CRT_INFO_STRUCT crtinfo;
         const char* Kennung = "C64 CARTRIDGE   ";
@@ -465,12 +465,12 @@ int CRTClass::WriteEasyFlashImage(const char *filename)
         return 0;
 }
 
-void CRTClass::SetEasyFlashJumper(bool enable)
+void CartridgeClass::SetEasyFlashJumper(bool enable)
 {
         EasyFlashJumper = enable;
 }
 
-int CRTClass::GetCRTInfo(const char *filename, CRT_INFO_STRUCT* crt_info)
+int CartridgeClass::GetCRTInfo(const char *filename, CRT_INFO_STRUCT* crt_info)
 {
         FILE *File;
         char Kennung[17];
@@ -576,7 +576,7 @@ L2:
         return 0;
 }
 
-void CRTClass::Reset()
+void CartridgeClass::Reset()
 {
         ROM_LO = CRT_ROM_BANK1;
         ROM_HI = CRT_ROM_BANK2;
@@ -614,7 +614,7 @@ void CRTClass::Reset()
         }
 }
 
-void CRTClass::Freeze()
+void CartridgeClass::Freeze()
 {
         if(!CRTInsert) return;
 
@@ -635,7 +635,7 @@ void CRTClass::Freeze()
         }
 }
 
-void CRTClass::WriteIO1(uint16_t adresse, uint8_t value)
+void CartridgeClass::WriteIO1(uint16_t adresse, uint8_t value)
 {
         if(!CRTInsert) return;
 
@@ -772,7 +772,7 @@ void CRTClass::WriteIO1(uint16_t adresse, uint8_t value)
         }
 }
 
-unsigned char CRTClass::ReadIO1(uint16_t address)
+uint8_t CartridgeClass::ReadIO1(uint16_t address)
 {
         if(!CRTInsert) return 0x00;	// Eigl. Zufallszahlen
 
@@ -797,7 +797,7 @@ unsigned char CRTClass::ReadIO1(uint16_t address)
         return 0xAA;
 }
 
-void CRTClass::WriteIO2(uint16_t address, uint8_t value)
+void CartridgeClass::WriteIO2(uint16_t address, uint8_t value)
 {
         if(!CRTInsert) return;
         switch(CRTTyp)
@@ -843,7 +843,7 @@ void CRTClass::WriteIO2(uint16_t address, uint8_t value)
         }
 }
 
-uint8_t CRTClass::ReadIO2(uint16_t address)
+uint8_t CartridgeClass::ReadIO2(uint16_t address)
 {
         if(!CRTInsert) return 0x00;	// Eigl. Zufallszahlen (Vic Phi)
 
@@ -879,7 +879,7 @@ uint8_t CRTClass::ReadIO2(uint16_t address)
         }
 }
 
-uint8_t CRTClass::ReadRom1(uint16_t address)
+uint8_t CartridgeClass::ReadRom1(uint16_t address)
 {
         if(!CRTInsert) return 0x55;	// Darf eigentlich nie vorkommen !!!!
 
@@ -899,7 +899,7 @@ uint8_t CRTClass::ReadRom1(uint16_t address)
         }
 }
 
-uint8_t CRTClass::ReadRom2(uint16_t address)
+uint8_t CartridgeClass::ReadRom2(uint16_t address)
 {
         if(!CRTInsert) return 0x55;	// Darf eigentlich nie vorkommen !!!!
 
@@ -914,7 +914,7 @@ uint8_t CRTClass::ReadRom2(uint16_t address)
         }
 }
 
-uint8_t CRTClass::ReadRom3(uint16_t address)
+uint8_t CartridgeClass::ReadRom3(uint16_t address)
 {
         if(!CRTInsert) return 0x55;	// Darf eigentlich nie vorkommen !!!!
 
@@ -929,7 +929,7 @@ uint8_t CRTClass::ReadRom3(uint16_t address)
         }
 }
 
-void CRTClass::WriteRom1(uint16_t address, uint8_t value)	// 0x8000
+void CartridgeClass::WriteRom1(uint16_t address, uint8_t value)	// 0x8000
 {
         if(!CRTInsert)
         {
@@ -957,7 +957,7 @@ void CRTClass::WriteRom1(uint16_t address, uint8_t value)	// 0x8000
         }
 }
 
-void CRTClass::WriteRom2(uint16_t address, uint8_t value)	// 0xA000
+void CartridgeClass::WriteRom2(uint16_t address, uint8_t value)	// 0xA000
 {
         if(!CRTInsert)
         {
@@ -977,7 +977,7 @@ void CRTClass::WriteRom2(uint16_t address, uint8_t value)	// 0xA000
         }
 }
 
-void CRTClass::WriteRom3(uint16_t address, uint8_t value)	// 0xE000
+void CartridgeClass::WriteRom3(uint16_t address, uint8_t value)	// 0xE000
 {
         if(!CRTInsert)
         {

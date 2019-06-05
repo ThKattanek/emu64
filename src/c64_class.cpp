@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.06.2019                //
+// Letzte Änderung am 05.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -255,7 +255,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     sid2 = new MOS6581_8085(1,audio_spec_have.freq,audio_spec_have.samples,ret_error);
     cia1 = new MOS6526(0);
     cia2 = new MOS6526(1);
-    crt = new CRTClass();
+    crt = new CartridgeClass();
     reu = new REUClass();
     geo = new GEORAMClass();
     tape = new TAPE1530(audio_spec_have.freq,audio_spec_have.samples,C64Takt);
@@ -341,12 +341,12 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     mmu->Cia2IOWriteProc = bind(&MOS6526::WriteIO,cia2,_1,_2);
     mmu->Cia2IOReadProc = bind(&MOS6526::ReadIO,cia2,_1);
 
-    mmu->CRTRom1WriteProc = bind(&CRTClass::WriteRom1,crt,_1,_2);
-    mmu->CRTRom2WriteProc = bind(&CRTClass::WriteRom2,crt,_1,_2);
-    mmu->CRTRom3WriteProc = bind(&CRTClass::WriteRom3,crt,_1,_2);
-    mmu->CRTRom1ReadProc = bind(&CRTClass::ReadRom1,crt,_1);
-    mmu->CRTRom2ReadProc = bind(&CRTClass::ReadRom2,crt,_1);
-    mmu->CRTRom3ReadProc = bind(&CRTClass::ReadRom3,crt,_1);
+    mmu->CRTRom1WriteProc = bind(&CartridgeClass::WriteRom1,crt,_1,_2);
+    mmu->CRTRom2WriteProc = bind(&CartridgeClass::WriteRom2,crt,_1,_2);
+    mmu->CRTRom3WriteProc = bind(&CartridgeClass::WriteRom3,crt,_1,_2);
+    mmu->CRTRom1ReadProc = bind(&CartridgeClass::ReadRom1,crt,_1);
+    mmu->CRTRom2ReadProc = bind(&CartridgeClass::ReadRom2,crt,_1);
+    mmu->CRTRom3ReadProc = bind(&CartridgeClass::ReadRom3,crt,_1);
     mmu->IO1ReadProc = bind(&C64Class::ReadIO1,this,_1);
     mmu->IO1WriteProc = bind(&C64Class::WriteIO1,this,_1,_2);
     mmu->IO2ReadProc = bind(&C64Class::ReadIO2,this,_1);

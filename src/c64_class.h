@@ -301,7 +301,7 @@ public:
     MOS6581_8085    *sid2;
     MOS6526         *cia1;
     MOS6526         *cia2;
-    CRTClass        *crt;
+    CartridgeClass  *crt;
     REUClass        *reu;
     GEORAMClass     *geo;
     Floppy1541      *floppy[MAX_FLOPPY_NUM];

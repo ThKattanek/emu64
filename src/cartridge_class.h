@@ -8,13 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.06.2019                //
+// Letzte Änderung am 05.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#ifndef CRT_CLASS_H
-#define CRT_CLASS_H
+#ifndef CARTRIDGE_CLASS_H
+#define CARTRIDGE_CLASS_H
 
 #include "structs.h"
 #include "am29f040_class.h"
@@ -24,11 +24,11 @@
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
 
-class CRTClass
+class CartridgeClass
 {
 public:
-    CRTClass();
-    ~CRTClass();
+    CartridgeClass();
+    ~CartridgeClass();
 
     // Funktionen
     bool *GetFlash040Dirty(uint16_t nr);
@@ -44,7 +44,7 @@ public:
     uint16_t ConvertDWord(uint32_t value);
 
     void WriteIO1(uint16_t adresse, uint8_t value);
-    unsigned char ReadIO1(uint16_t address);
+    uint8_t ReadIO1(uint16_t address);
     void WriteIO2(uint16_t address, uint8_t value);
     uint8_t ReadIO2(uint16_t address);
     void WriteRom1(uint16_t address, uint8_t value);
@@ -111,4 +111,4 @@ private:
     unsigned char pla_adresse;
 };
 
-#endif // CRT_CLASS_H
+#endif // CARTRIDGE_CLASS_H

@@ -64,7 +64,7 @@ private slots:
 
 private:
     Ui::CrtWindow *ui;
-    CRTClass *crt;
+    CartridgeClass *crt;
     C64Class *c64;
     QSettings *ini;
     bool isOneShowed;
