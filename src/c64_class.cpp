@@ -360,8 +360,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     mmu->RAM_H = &hi_ram_wire;
     mmu->RAM_L = &lo_ram_wire;
     mmu->CPU_PORT = &cpu_port;
-    crt->EXROM = &exrom_wire;
-    crt->GAME = &game_wire;
+    crt->exrom = &exrom_wire;
+    crt->game = &game_wire;
     crt->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
     crt->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
     cpu->RDY = &rdy_ba_wire;

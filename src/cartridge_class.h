@@ -60,55 +60,53 @@ public:
     function<void(int,bool)> ChangeLED;
 
     // Variablen
-    bool            *EXROM;
-    bool            *GAME;
+    bool        *exrom;
+    bool        *game;
 
-    unsigned char   *ROM_LO;		// 0x8000
-    unsigned char   *ROM_HI;		// 0xA000 oder 0xE000
+    uint8_t     *lo_rom;                      // 0x8000
+    uint8_t     *hi_rom;                      // 0xA000 oder 0xE000
 
-    unsigned char   CRT_ROM_BANK1[64*0x2000];		// Alle ChipRoms für 0x8000	(max 64 x 0x2000)
-    unsigned char   CRT_ROM_BANK2[64*0x2000];		// Alle ChipRoms für 0xA000 oder 0xE000 (max 64 x 0x2000)
+    uint8_t     rom_bank1[64*0x2000];         // Alle ChipRoms für 0x8000	(max 64 x 0x2000)
+    uint8_t     rom_bank2[64*0x2000];         // Alle ChipRoms für 0xA000 oder 0xE000 (max 64 x 0x2000)
 
-    unsigned char   CRT_ROM_BANK1_TMP[64*0x2000];	// Alle ChipRoms für 0x8000	(max 64 x 0x2000)
-    unsigned char   CRT_ROM_BANK2_TMP[64*0x2000];	// Alle ChipRoms für 0xA000 oder 0xE000 (max 64 x 0x2000)
+    uint8_t     rom_bank1_tmp[64*0x2000];     // Alle ChipRoms für 0x8000	(max 64 x 0x2000)
+    uint8_t     rom_bank2_tmp[64*0x2000];     // Alle ChipRoms für 0xA000 oder 0xE000 (max 64 x 0x2000)
 
-    unsigned char   *RAM_C64;	// Kompletter C64 RAM
+    uint8_t     *RAM_C64;                     // Kompletter C64 RAM
 
-    bool            LED_00;             // LED FCIII
-    bool            LED_00_OLD;
-    bool            LED_01;             // LED EF
-    bool            LED_01_OLD;
+    bool        led_00;                 // LED FCIII
+    bool        led_00_old;
+    bool        led_01;                 // LED EF
+    bool        led_01_old;
 
     private:
+    // Funktionen
+    void ResetAllLEDS(void);
+    void SetMemLogicAR(uint16_t address);
+
     // Variablen
+    bool        cartridge_exrom;
+    bool        cartridge_game;
 
-    bool            CRT_EXROM;
-    bool            CRT_GAME;
-
-    bool            CRTInsert;
-    unsigned short  CRTTyp;
+    bool        cartridge_is_insert;
+    uint16_t    cartridge_type;
 
     //// EASY FLASH (32)
-    bool            EasyFlashJumper;
-    unsigned char   EasyFlashRam[256];		// Speziller Speicher für das EasyFlash Cartridge
-    unsigned char   EasyFlashBankReg;		// Bank Register
+    bool            easyflash_jumper;
+    uint8_t         easyflash_ram[256];		// Speziller Speicher für das EasyFlash Cartridge
+    uint8_t         easyflash_bank_reg;		// Bank Register
     AM29F040Class   *am29f040Hi;
     AM29F040Class   *am29f040Lo;
 
-    int             RomLBank;
+    uint32_t    rom_lo_bank;
 
     //// Action Replay 4/5/6 ////
-    unsigned char   ARRegister;             // Inhalt des zuletzt geschriebenen $DExx Wert
-    bool            ARFreez;
-    bool            ActionReplayAktiv;
-    bool            EnableActionReplayRam;
-    unsigned char   ActionReplayRam[0x2000];    // 8KB
-
-private:
-    void ResetAllLEDS(void);
-    void SetMemLogicAR(unsigned short adresse);
-
-    unsigned char pla_adresse;
+    uint8_t     ar_reg;                     // Inhalt des zuletzt geschriebenen $DExx Wert
+    bool        ar_freez;
+    bool        ar_active;
+    bool        ar_enable_ram;
+    uint8_t     ar_ram[0x2000];             // 8KB
+    uint8_t     pla_adresse;
 };
 
 #endif // CARTRIDGE_CLASS_H

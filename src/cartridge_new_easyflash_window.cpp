@@ -14,7 +14,7 @@
 //////////////////////////////////////////////////
 
 #include "cartridge_new_easyflash_window.h"
-#include "ui_crt_new_easyflash_window.h"
+#include "ui_cartridge_new_easyflash_window.h"
 
 CRTNewEasyflashWindow::CRTNewEasyflashWindow(QWidget *parent) :
     QDialog(parent),

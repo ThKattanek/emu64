@@ -17,7 +17,7 @@
 #include <QFontDatabase>
 
 #include "cartridge_window.h"
-#include "ui_crt_window.h"
+#include "ui_cartridge_window.h"
 
 CrtWindow::CrtWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
     QDialog(parent),

@@ -33,17 +33,17 @@ const char* TYPE_STRING[34] = { "Normal Cartridge","Action Replay","KCS Power Ca
 
 CartridgeClass::CartridgeClass()
 {
-    CRTInsert = false;
-    CRTTyp = 0;
+    cartridge_is_insert = false;
+    cartridge_type = 0;
 
-    EasyFlashJumper = false;	// false = Boot
-    am29f040Lo = new AM29F040Class(CRT_ROM_BANK1,1);
-    am29f040Hi = new AM29F040Class(CRT_ROM_BANK2,1);
+    easyflash_jumper = false;	// false = Boot
+    am29f040Lo = new AM29F040Class(rom_bank1,1);
+    am29f040Hi = new AM29F040Class(rom_bank2,1);
 
     ChangeLED = 0;
     ResetAllLEDS();
 
-    ARFreez = false;
+    ar_freez = false;
 }
 
 CartridgeClass::~CartridgeClass()
@@ -52,17 +52,17 @@ CartridgeClass::~CartridgeClass()
 
 void CartridgeClass::ResetAllLEDS(void)
 {
-    LED_00=LED_00_OLD=LED_01=LED_01_OLD=false;
-    if(ChangeLED != 0) ChangeLED(0,LED_00);
-    if(ChangeLED != 0) ChangeLED(1,LED_01);
+    led_00 = led_00_old = led_01 = led_01_old = false;
+    if(ChangeLED != 0) ChangeLED(0,led_00);
+    if(ChangeLED != 0) ChangeLED(1,led_01);
 }
 
-void CartridgeClass::SetMemLogicAR(unsigned short adresse)
+void CartridgeClass::SetMemLogicAR(uint16_t address)
 {
-    if(!ActionReplayAktiv) return;
-    unsigned char io2, pla_adresse, pla_out;
+    if(!ar_active) return;
+    uint8_t io2, pla_address, pla_out;
 
-    if((adresse >= 0xdf00) && (adresse <= 0xdfff))
+    if((address >= 0xdf00) && (address <= 0xdfff))
         io2 = 0;
     else io2 = 8;
 
@@ -76,10 +76,10 @@ void CartridgeClass::SetMemLogicAR(unsigned short adresse)
     // Bit 6 - AdreesBit 14
     // Bit 7 - FreezBit
 
-    if(ARFreez)
-        pla_adresse = ((ARRegister >> 5) & 1) | (ARRegister & 2) | ((ARRegister << 2) & 4) | io2 | ((adresse >> 9) & 16) | ((adresse >> 10) & 32) | ((adresse >> 8) & 64) | 0;
+    if(ar_freez)
+        pla_address = ((ar_reg >> 5) & 1) | (ar_reg & 2) | ((ar_reg << 2) & 4) | io2 | ((address >> 9) & 16) | ((address >> 10) & 32) | ((address >> 8) & 64) | 0;
     else
-        pla_adresse = ((ARRegister >> 5) & 1) | (ARRegister & 2) | ((ARRegister << 2) & 4) | io2 | ((adresse >> 9) & 16) | ((adresse >> 10) & 32) | ((adresse >> 8) & 64) | 128;
+        pla_address = ((ar_reg >> 5) & 1) | (ar_reg & 2) | ((ar_reg << 2) & 4) | io2 | ((address >> 9) & 16) | ((address >> 10) & 32) | ((address >> 8) & 64) | 128;
 
     // PLA Ausgang
     // Bit 0 - ROM Enable (CE)
@@ -88,10 +88,10 @@ void CartridgeClass::SetMemLogicAR(unsigned short adresse)
     // Bit 3 - EXROM
     pla_out = mk7pla[pla_adresse];
 
-    EnableActionReplayRam = (~pla_out>>1 & 1);
+    ar_enable_ram = (~pla_out>>1 & 1);
 
-    *GAME = (pla_out & 4);
-    *EXROM = (pla_out & 8);
+    *game = (pla_out & 4);
+    *exrom = (pla_out & 8);
 
     ChangeMemMapProc();
 }
@@ -144,7 +144,7 @@ int CartridgeClass::LoadCRTImage(const char *filename)
         unsigned short Version;
         unsigned int HeaderLength;
         unsigned long akt_pos;
-        unsigned char exrom,game;
+        unsigned char exrom, game;
         int ChipCount;
         unsigned short chip_adr;
         unsigned short chip_size;
@@ -171,19 +171,19 @@ int CartridgeClass::LoadCRTImage(const char *filename)
 
         reading_elements = fread(&Version,1,sizeof(Version),file);
 
-        reading_elements = fread(&CRTTyp,1,sizeof(CRTTyp),file);
-        CRTTyp = CRTTyp<<8 | CRTTyp>>8;
+        reading_elements = fread(&cartridge_type,1,sizeof(cartridge_type),file);
+        cartridge_type = cartridge_type<<8 | cartridge_type>>8;
 
         reading_elements = fread(&exrom,1,sizeof(exrom),file);
         reading_elements = fread(&game,1,sizeof(game),file);
 
-        if(exrom == 0) CRT_EXROM = false;
-        else CRT_EXROM = true;
-        *EXROM = CRT_EXROM;
+        if(exrom == 0) cartridge_exrom = false;
+        else cartridge_exrom = true;
+        *this->exrom = cartridge_exrom;
 
-        if(game == 0) CRT_GAME = false;
-        else CRT_GAME = true;
-        *GAME = CRT_GAME;
+        if(game == 0) cartridge_game = false;
+        else cartridge_game = true;
+        *this->game = cartridge_game;
 
         fseek(file,0x0040,SEEK_SET);
 
@@ -210,7 +210,7 @@ L1:
                 unsigned short BankPos;
                 reading_elements = fread(&BankPos,1,2,file);
                 BankPos = BankPos<<8 | BankPos>>8;
-                BankPos &= 0xFF;    // Maximal 256 Bänke je CRT_ROM_BANK1 + CRT_ROM_BANK2
+                BankPos &= 0xFF;    // Maximal 256 Bänke je rom_bank1 + rom_bank2
 
                 reading_elements = fread(&chip_adr,1,2,file);
                 chip_adr = chip_adr<<8 | chip_adr>>8;
@@ -220,17 +220,17 @@ L1:
                 switch(chip_adr)
                 {
                 case 0x8000:
-                        reading_elements = fread(CRT_ROM_BANK1 + (BankPos * 0x2000),1,0x2000,file);
+                        reading_elements = fread(rom_bank1 + (BankPos * 0x2000),1,0x2000,file);
                         if(chip_size == 0x4000)
                         {
-                            reading_elements = fread(CRT_ROM_BANK2 + (BankPos * 0x2000),1,0x2000,file);
+                            reading_elements = fread(rom_bank2 + (BankPos * 0x2000),1,0x2000,file);
                         }
                         break;
                 case 0xA000:
-                        reading_elements = fread(CRT_ROM_BANK2 + (BankPos * 0x2000),1,0x2000,file);
+                        reading_elements = fread(rom_bank2 + (BankPos * 0x2000),1,0x2000,file);
                         break;
                 case 0xE000:
-                        reading_elements = fread(CRT_ROM_BANK2 + (BankPos * 0x2000),1,0x2000,file);
+                        reading_elements = fread(rom_bank2 + (BankPos * 0x2000),1,0x2000,file);
                         break;
                 }
                 ChipCount ++;
@@ -239,10 +239,10 @@ L1:
 L2:
         fclose(file);
 
-        ROM_LO = CRT_ROM_BANK1;
-        ROM_HI = CRT_ROM_BANK2;
+        lo_rom = rom_bank1;
+        hi_rom = rom_bank2;
 
-        CRTInsert = true;
+        cartridge_is_insert = true;
         ResetAllLEDS();
 
         Reset();
@@ -252,9 +252,9 @@ L2:
 
 void CartridgeClass::RemoveCRTImage()
 {
-        CRTInsert = false;
-        *GAME = true;
-        *EXROM = true;
+        cartridge_is_insert = false;
+        *game = true;
+        *exrom = true;
         ResetAllLEDS();
 }
 
@@ -286,9 +286,9 @@ int CartridgeClass::CreateNewEasyFlashImage(const char* filename, const char* cr
         /*****/ Version = 0x0001;
         fwrite(&Version,1,sizeof(Version),File);
 
-        /*****/ CRTTyp = 32;
-        CRTTyp = CRTTyp<<8 | CRTTyp>>8;
-        fwrite(&CRTTyp,1,sizeof(CRTTyp),File);
+        /*****/ cartridge_type = 32;
+        cartridge_type = cartridge_type<<8 | cartridge_type>>8;
+        fwrite(&cartridge_type,1,sizeof(cartridge_type),File);
 
         /*****/ exrom = 1;
         /*****/ game = 0;
@@ -392,9 +392,9 @@ int CartridgeClass::WriteEasyFlashImage(const char *filename)
         /*****/ Version = 0x0001;
         fwrite(&Version,1,sizeof(Version),File);
 
-        /*****/ CRTTyp = 32;
-        CRTTyp = CRTTyp<<8 | CRTTyp>>8;
-        fwrite(&CRTTyp,1,sizeof(CRTTyp),File);
+        /*****/ cartridge_type = 32;
+        cartridge_type = cartridge_type<<8 | cartridge_type>>8;
+        fwrite(&cartridge_type,1,sizeof(cartridge_type),File);
 
         /*****/ exrom = 1;
         /*****/ game = 0;
@@ -431,7 +431,7 @@ int CartridgeClass::WriteEasyFlashImage(const char *filename)
                 chip_size = chip_size<<8 | chip_size>>8;
                 fwrite(&chip_size,1,sizeof(chip_size),File);
 
-                fwrite(&CRT_ROM_BANK1[i*0x2000],1,0x2000,File);
+                fwrite(&rom_bank1[i*0x2000],1,0x2000,File);
         }
 
         for(int i=0;i<64;i++)
@@ -457,7 +457,7 @@ int CartridgeClass::WriteEasyFlashImage(const char *filename)
                 chip_size = chip_size<<8 | chip_size>>8;
                 fwrite(&chip_size,1,sizeof(chip_size),File);
 
-                fwrite(&CRT_ROM_BANK2[i*0x2000],1,0x2000,File);
+                fwrite(&rom_bank2[i*0x2000],1,0x2000,File);
         }
 
         fclose(File);
@@ -467,7 +467,7 @@ int CartridgeClass::WriteEasyFlashImage(const char *filename)
 
 void CartridgeClass::SetEasyFlashJumper(bool enable)
 {
-        EasyFlashJumper = enable;
+        easyflash_jumper = enable;
 }
 
 int CartridgeClass::GetCRTInfo(const char *filename, CRT_INFO_STRUCT* crt_info)
@@ -545,24 +545,24 @@ L1:
                 switch(crt_info->ChipInfo[crt_info->ChipCount].LoadAdress)
                 {
                 case 0x8000:
-                        reading_elements = fread(CRT_ROM_BANK1_TMP + Bank1Pos,1,0x2000,File);
-                        crt_info->ChipInfo[crt_info->ChipCount].BufferPointer = CRT_ROM_BANK1_TMP + Bank1Pos;
+                        reading_elements = fread(rom_bank1_tmp + Bank1Pos,1,0x2000,File);
+                        crt_info->ChipInfo[crt_info->ChipCount].BufferPointer = rom_bank1_tmp + Bank1Pos;
                         Bank1Pos += 0x2000;
                         if(tmp == 0x4000)
                         {
-                                reading_elements = fread(CRT_ROM_BANK1_TMP + Bank1Pos,1,0x2000,File);
-                                //crtinfo->ChipInfoHi[crtinfo->ChipCount].BufferPointer = CRT_ROM_BANK2_TMP + Bank2Pos;
+                                reading_elements = fread(rom_bank1_tmp + Bank1Pos,1,0x2000,File);
+                                //crtinfo->ChipInfoHi[crtinfo->ChipCount].BufferPointer = rom_bank2_TMP + Bank2Pos;
                                 Bank1Pos += 0x2000;
                         }
                         break;
                 case 0xA000:
-                        reading_elements = fread(CRT_ROM_BANK2_TMP + Bank2Pos,1,0x2000,File);
-                        crt_info->ChipInfo[crt_info->ChipCount].BufferPointer = CRT_ROM_BANK2_TMP + Bank2Pos;
+                        reading_elements = fread(rom_bank2_tmp + Bank2Pos,1,0x2000,File);
+                        crt_info->ChipInfo[crt_info->ChipCount].BufferPointer = rom_bank2_tmp + Bank2Pos;
                         Bank2Pos += 0x2000;
                         break;
                 case 0xE000:
-                        reading_elements = fread(CRT_ROM_BANK2_TMP + Bank2Pos,1,0x2000,File);
-                        crt_info->ChipInfo[crt_info->ChipCount].BufferPointer = CRT_ROM_BANK2_TMP + Bank2Pos;
+                        reading_elements = fread(rom_bank2_tmp + Bank2Pos,1,0x2000,File);
+                        crt_info->ChipInfo[crt_info->ChipCount].BufferPointer = rom_bank2_tmp + Bank2Pos;
                         Bank2Pos += 0x2000;
                         break;
                 }
@@ -578,15 +578,15 @@ L2:
 
 void CartridgeClass::Reset()
 {
-        ROM_LO = CRT_ROM_BANK1;
-        ROM_HI = CRT_ROM_BANK2;
+        lo_rom = rom_bank1;
+        hi_rom = rom_bank2;
 
-        if(CRTInsert)
+        if(cartridge_is_insert)
         {
-                switch(CRTTyp)
+                switch(cartridge_type)
                 {
                 case 1:		// Action Replay 4/5/6
-                        ActionReplayAktiv = true;
+                        ar_active = true;
                         WriteIO1(0xDE00,0);
                         break;
                 case 3:		//Final Cartgide III
@@ -602,27 +602,27 @@ void CartridgeClass::Reset()
                         break;
 
                 default:
-                        *GAME = CRT_GAME;
-                        *EXROM = CRT_EXROM;
+                        *game = cartridge_game;
+                        *exrom = cartridge_exrom;
                         break;
                 }
         }
         else
         {
-                *GAME = true;
-                *EXROM = true;
+                *game = true;
+                *exrom = true;
         }
 }
 
 void CartridgeClass::Freeze()
 {
-        if(!CRTInsert) return;
+        if(!cartridge_is_insert) return;
 
-        switch(CRTTyp)
+        switch(cartridge_type)
         {
                 case 1:
                 /// ActionReplay 4/5/6
-                    ARFreez = true;
+                    ar_freez = true;
                     WriteIO1(0xDE00,0);
                     CpuTriggerInterrupt(CRT_IRQ);
                     CpuTriggerInterrupt(CRT_NMI);
@@ -637,56 +637,56 @@ void CartridgeClass::Freeze()
 
 void CartridgeClass::WriteIO1(uint16_t adresse, uint8_t value)
 {
-        if(!CRTInsert) return;
+        if(!cartridge_is_insert) return;
 
-        switch(CRTTyp)
+        switch(cartridge_type)
         {
         case 1:		// Action Replay 4/5/6
-                    if(ActionReplayAktiv)
+                    if(ar_active)
                     {
                         if(value & 0x04){
-                            ActionReplayAktiv = false;
+                            ar_active = false;
                         }
 
-                        RomLBank = (value>>3) & 0x03;
+                        rom_lo_bank = (value>>3) & 0x03;
 
-                        switch(RomLBank)
+                        switch(rom_lo_bank)
                         {
                         case 0x00:
-                                ROM_LO = CRT_ROM_BANK1 + (0 * 0x2000);
-                                ROM_HI = CRT_ROM_BANK1 + (0 * 0x2000);
+                                lo_rom = rom_bank1 + (0 * 0x2000);
+                                hi_rom = rom_bank1 + (0 * 0x2000);
                                 break;
                         case 0x01:
-                                ROM_LO = CRT_ROM_BANK1 + (1 * 0x2000);
-                                ROM_HI = CRT_ROM_BANK1 + (1 * 0x2000);
+                                lo_rom = rom_bank1 + (1 * 0x2000);
+                                hi_rom = rom_bank1 + (1 * 0x2000);
                                 break;
                         case 0x02:
-                                ROM_LO = CRT_ROM_BANK1 + (2 * 0x2000);
-                                ROM_HI = CRT_ROM_BANK1 + (2 * 0x2000);
+                                lo_rom = rom_bank1 + (2 * 0x2000);
+                                hi_rom = rom_bank1 + (2 * 0x2000);
                                 break;
                         case 0x03:
-                                ROM_LO = CRT_ROM_BANK1 + (3 * 0x2000);
-                                ROM_HI = CRT_ROM_BANK1 + (3 * 0x2000);
+                                lo_rom = rom_bank1 + (3 * 0x2000);
+                                hi_rom = rom_bank1 + (3 * 0x2000);
                                 break;
                         }
 
-                        ARRegister = value;
+                        ar_reg = value;
                         SetMemLogicAR(adresse);
 
-                        ARFreez = false;
+                        ar_freez = false;
                     }
                     RAM_C64[adresse] = value;
                 break;
         case 4:
                 if(adresse == 0xDE00)
                 {
-                        *GAME = false;
+                        *game = false;
                         ChangeMemMapProc();
                 }
                 break;
         case 5:		// Ocean type 1
                 value &= 0x3F;
-                ROM_LO = CRT_ROM_BANK1 + (value * 0x2000);
+                lo_rom = rom_bank1 + (value * 0x2000);
                 break;
         case 7:		// Fun Play
                 if(adresse == 0xDE00)
@@ -694,76 +694,76 @@ void CartridgeClass::WriteIO1(uint16_t adresse, uint8_t value)
                         switch(value)
                         {
                         case 0x00:
-                                ROM_LO = CRT_ROM_BANK1 + (0 * 0x2000);
+                                lo_rom = rom_bank1 + (0 * 0x2000);
                                 break;
                         case 0x08:
-                                ROM_LO = CRT_ROM_BANK1 + (1 * 0x2000);
+                                lo_rom = rom_bank1 + (1 * 0x2000);
                                 break;
                         case 0x10:
-                                ROM_LO = CRT_ROM_BANK1 + (2 * 0x2000);
+                                lo_rom = rom_bank1 + (2 * 0x2000);
                                 break;
                         case 0x18:
-                                ROM_LO = CRT_ROM_BANK1 + (3 * 0x2000);
+                                lo_rom = rom_bank1 + (3 * 0x2000);
                                 break;
                         case 0x20:
-                                ROM_LO = CRT_ROM_BANK1 + (4 * 0x2000);
+                                lo_rom = rom_bank1 + (4 * 0x2000);
                                 break;
                         case 0x28:
-                                ROM_LO = CRT_ROM_BANK1 + (5 * 0x2000);
+                                lo_rom = rom_bank1 + (5 * 0x2000);
                                 break;
                         case 0x30:
-                                ROM_LO = CRT_ROM_BANK1 + (6 * 0x2000);
+                                lo_rom = rom_bank1 + (6 * 0x2000);
                                 break;
                         case 0x38:
-                                ROM_LO = CRT_ROM_BANK1 + (7 * 0x2000);
+                                lo_rom = rom_bank1 + (7 * 0x2000);
                                 break;
                         case 0x01:
-                                ROM_LO = CRT_ROM_BANK1 + (8 * 0x2000);
+                                lo_rom = rom_bank1 + (8 * 0x2000);
                                 break;
                         case 0x09:
-                                ROM_LO = CRT_ROM_BANK1 + (9 * 0x2000);
+                                lo_rom = rom_bank1 + (9 * 0x2000);
                                 break;
                         case 0x11:
-                                ROM_LO = CRT_ROM_BANK1 + (10 * 0x2000);
+                                lo_rom = rom_bank1 + (10 * 0x2000);
                                 break;
                         case 0x19:
-                                ROM_LO = CRT_ROM_BANK1 + (11 * 0x2000);
+                                lo_rom = rom_bank1 + (11 * 0x2000);
                                 break;
                         case 0x21:
-                                ROM_LO = CRT_ROM_BANK1 + (12 * 0x2000);
+                                lo_rom = rom_bank1 + (12 * 0x2000);
                                 break;
                         case 0x29:
-                                ROM_LO = CRT_ROM_BANK1 + (13 * 0x2000);
+                                lo_rom = rom_bank1 + (13 * 0x2000);
                                 break;
                         case 0x31:
-                                ROM_LO = CRT_ROM_BANK1 + (14 * 0x2000);
+                                lo_rom = rom_bank1 + (14 * 0x2000);
                                 break;
                         case 0x39:
-                                ROM_LO = CRT_ROM_BANK1 + (15 * 0x2000);
+                                lo_rom = rom_bank1 + (15 * 0x2000);
                                 break;
                         }
                 }
                 break;
         case 15:	// C64 Gamesystem
                 value &= 0x3F;
-                ROM_LO = CRT_ROM_BANK1 + (value * 0x2000);
+                lo_rom = rom_bank1 + (value * 0x2000);
                 break;
         case 32:	// EasyFlash
                 if((adresse & 0x02) == 0x00)
                 {
-                        EasyFlashBankReg = value & 0x3F;
-                        ROM_LO = CRT_ROM_BANK1 + ((value & 0x3F) * 0x2000);
-                        ROM_HI = CRT_ROM_BANK2 + ((value & 0x3F) * 0x2000);
+                        easyflash_bank_reg = value & 0x3F;
+                        lo_rom = rom_bank1 + ((value & 0x3F) * 0x2000);
+                        hi_rom = rom_bank2 + ((value & 0x3F) * 0x2000);
                 }
                 if((adresse & 0x02) == 0x02)
                 {
-                        LED_01 = !!(value & 0x80);
-                        if(LED_01 != LED_01_OLD) if(ChangeLED != 0) ChangeLED(1,LED_01);
-                        LED_01_OLD = LED_01;
-                        *EXROM = !!(~value & 0x02);
+                        led_01 = !!(value & 0x80);
+                        if(led_01 != led_01_old) if(ChangeLED != 0) ChangeLED(1,led_01);
+                        led_01_old = led_01;
+                        *exrom = !!(~value & 0x02);
 
-                        if(value & 0x04) *GAME = !!(~value & 0x01);
-                        else *GAME = !!(EasyFlashJumper);
+                        if(value & 0x04) *game = !!(~value & 0x01);
+                        else *game = !!(easyflash_jumper);
                         ChangeMemMapProc();
                 }
                 break;
@@ -774,22 +774,22 @@ void CartridgeClass::WriteIO1(uint16_t adresse, uint8_t value)
 
 uint8_t CartridgeClass::ReadIO1(uint16_t address)
 {
-        if(!CRTInsert) return 0x00;	// Eigl. Zufallszahlen
+        if(!cartridge_is_insert) return 0x00;	// Eigl. Zufallszahlen
 
-        switch(CRTTyp)
+        switch(cartridge_type)
         {
         case 3:		// Final Cartridge III
-                return CRT_ROM_BANK1[0x1E00 + (RomLBank << 13) + (address & 0xFF)];
+                return rom_bank1[0x1E00 + (rom_lo_bank << 13) + (address & 0xFF)];
                 break;
         case 4:
                 if(address == 0xDE00)
                 {
-                        *GAME = true;
+                        *game = true;
                         ChangeMemMapProc();
                 }
                 break;
         case 17:
-                        ROM_LO = CRT_ROM_BANK1 + ((address&0x3F) * 0x2000);
+                        lo_rom = rom_bank1 + ((address&0x3F) * 0x2000);
                 break;
         default:
                 return 0x00;
@@ -799,44 +799,44 @@ uint8_t CartridgeClass::ReadIO1(uint16_t address)
 
 void CartridgeClass::WriteIO2(uint16_t address, uint8_t value)
 {
-        if(!CRTInsert) return;
-        switch(CRTTyp)
+        if(!cartridge_is_insert) return;
+        switch(cartridge_type)
         {
         case 1:     // Action Replay 4/5/6
-                ActionReplayRam[(address & 0xFF) + 0x1F00] = value;
+                ar_ram[(address & 0xFF) + 0x1F00] = value;
                 RAM_C64[address] = value;
             break;
         case 3:		// Final Cartridge III
                 if((address & 0xFF) == 0xFF)
                 {
-                        RomLBank = value & 0x03;
-                        ROM_LO = CRT_ROM_BANK1 + ((value&0x3) * 0x2000);
-                        ROM_HI = CRT_ROM_BANK2 + ((value&0x3) * 0x2000);
-                        *EXROM = ((~value >> 4) & 1) ^ 1;
-                        *GAME = ((~value >> 5) & 1) ^ 1;
+                        rom_lo_bank = value & 0x03;
+                        lo_rom = rom_bank1 + ((value&0x3) * 0x2000);
+                        hi_rom = rom_bank2 + ((value&0x3) * 0x2000);
+                        *exrom = ((~value >> 4) & 1) ^ 1;
+                        *game = ((~value >> 5) & 1) ^ 1;
                         ChangeMemMapProc();
 
                         if((value & 0x30) == 0x10) CpuTriggerInterrupt(CRT_NMI);
                         if(value & 0x40) CpuClearInterrupt(CRT_NMI);
-                        LED_00 = (~value>>7) & 1;
-                        if(LED_00 != LED_00_OLD) if(ChangeLED != 0)  ChangeLED(0,LED_00);
-                        LED_00_OLD = LED_00;
+                        led_00 = (~value>>7) & 1;
+                        if(led_00 != led_00_old) if(ChangeLED != 0)  ChangeLED(0,led_00);
+                        led_00_old = led_00;
                 }
                 break;
         case 8:		// Super Games
-                        ROM_LO = CRT_ROM_BANK1 + ((value&0x3) * 0x2000);
-                        ROM_HI = CRT_ROM_BANK2 + ((value&0x3) * 0x2000);
+                        lo_rom = rom_bank1 + ((value&0x3) * 0x2000);
+                        hi_rom = rom_bank2 + ((value&0x3) * 0x2000);
                         if(value & 0x04)
                         {
-                                *EXROM = 0;
-                                *GAME = 1;
+                                *exrom = 0;
+                                *game = 1;
                         }
-                        else *EXROM = *GAME = 0;
-                        if(value == 0x0C) *EXROM = *GAME = 1;
+                        else *exrom = *game = 0;
+                        if(value == 0x0C) *exrom = *game = 1;
                         ChangeMemMapProc();
                 break;
         case 32:	// EasyFlash
-                EasyFlashRam[address & 0xFF] = value;
+                easyflash_ram[address & 0xFF] = value;
                 break;
         default:
                 break;
@@ -845,33 +845,33 @@ void CartridgeClass::WriteIO2(uint16_t address, uint8_t value)
 
 uint8_t CartridgeClass::ReadIO2(uint16_t address)
 {
-        if(!CRTInsert) return 0x00;	// Eigl. Zufallszahlen (Vic Phi)
+        if(!cartridge_is_insert) return 0x00;	// Eigl. Zufallszahlen (Vic Phi)
 
-        switch(CRTTyp)
+        switch(cartridge_type)
         {
         case 1:		// Action Replay 4/5/6
             SetMemLogicAR(address);
-            if(!ActionReplayAktiv) return 0x00;	// Eigl. Zufallszahlen (Vic Phi)
-            if(EnableActionReplayRam) return ActionReplayRam[(address & 0xFF) + 0x1F00];
-            else return ROM_LO[(address & 0xFF) + 0x1F00];
+            if(!ar_active) return 0x00;	// Eigl. Zufallszahlen (Vic Phi)
+            if(ar_enable_ram) return ar_ram[(address & 0xFF) + 0x1F00];
+            else return lo_rom[(address & 0xFF) + 0x1F00];
 
                 break;
         case 3:		// Final Cartridge III
-                switch (RomLBank)
+                switch (rom_lo_bank)
                 {
                         case 0:
-                                return CRT_ROM_BANK1[address & 0x1fff];
+                                return rom_bank1[address & 0x1fff];
                         case 1:
-                                return CRT_ROM_BANK1[(address & 0x1fff) + 0x2000];
+                                return rom_bank1[(address & 0x1fff) + 0x2000];
                         case 2:
-                                return CRT_ROM_BANK1[(address & 0x1fff) + 0x4000];
+                                return rom_bank1[(address & 0x1fff) + 0x4000];
                         case 3:
-                                return CRT_ROM_BANK1[(address & 0x1fff) + 0x6000];
+                                return rom_bank1[(address & 0x1fff) + 0x6000];
                 }
                 return 0;
                 break;
         case 32:	// EasyFlash
-                return EasyFlashRam[address & 0xFF];
+                return easyflash_ram[address & 0xFF];
                 break;
         default:
                 return 0x00;
@@ -881,74 +881,74 @@ uint8_t CartridgeClass::ReadIO2(uint16_t address)
 
 uint8_t CartridgeClass::ReadRom1(uint16_t address)
 {
-        if(!CRTInsert) return 0x55;	// Darf eigentlich nie vorkommen !!!!
+        if(!cartridge_is_insert) return 0x55;	// Darf eigentlich nie vorkommen !!!!
 
-        switch(CRTTyp)
+        switch(cartridge_type)
         {
         case 1:		// Action Replay 4/5/6
                 SetMemLogicAR(address);
-                if(!EnableActionReplayRam) return ROM_LO[address & 0x1FFF];
-                else return ActionReplayRam[address & 0x1FFF];
+                if(!ar_enable_ram) return lo_rom[address & 0x1FFF];
+                else return ar_ram[address & 0x1FFF];
                 break;
         case 32:	// EasyFlash
-                return am29f040Lo->Read((address & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13));
+                return am29f040Lo->Read((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13));
                 break;
         default:
-                return ROM_LO[address-0x8000];
+                return lo_rom[address-0x8000];
                 break;
         }
 }
 
 uint8_t CartridgeClass::ReadRom2(uint16_t address)
 {
-        if(!CRTInsert) return 0x55;	// Darf eigentlich nie vorkommen !!!!
+        if(!cartridge_is_insert) return 0x55;	// Darf eigentlich nie vorkommen !!!!
 
-        switch(CRTTyp)
+        switch(cartridge_type)
         {
         case 32:	// EasyFlash
-                return am29f040Hi->Read((address & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13));
+                return am29f040Hi->Read((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13));
                 break;
         default:
-                return ROM_HI[address-0xA000];
+                return hi_rom[address-0xA000];
                 break;
         }
 }
 
 uint8_t CartridgeClass::ReadRom3(uint16_t address)
 {
-        if(!CRTInsert) return 0x55;	// Darf eigentlich nie vorkommen !!!!
+        if(!cartridge_is_insert) return 0x55;	// Darf eigentlich nie vorkommen !!!!
 
-        switch(CRTTyp)
+        switch(cartridge_type)
         {
         case 32:	// EasyFlash
-                return am29f040Hi->Read((address & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13));
+                return am29f040Hi->Read((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13));
                 break;
         default:
-                return ROM_HI[address-0xE000];
+                return hi_rom[address-0xE000];
                 break;
         }
 }
 
 void CartridgeClass::WriteRom1(uint16_t address, uint8_t value)	// 0x8000
 {
-        if(!CRTInsert)
+        if(!cartridge_is_insert)
         {
                 RAM_C64[address] = value;
                 return;
         }
 
-        switch(CRTTyp)
+        switch(cartridge_type)
         {
         case 1:     // Action Replay 4/5/6
                 SetMemLogicAR(address);
-                if(EnableActionReplayRam)
+                if(ar_enable_ram)
                 {
-                    ActionReplayRam[address & 0x1FFF] = value;
+                    ar_ram[address & 0x1FFF] = value;
                 }
                 RAM_C64[address] = value;
             break;
         case 32:	// EasyFlash
-                am29f040Lo->Write((address & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13),value);
+                am29f040Lo->Write((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13),value);
                 RAM_C64[address] = value;
                 break;
         default:
@@ -959,16 +959,16 @@ void CartridgeClass::WriteRom1(uint16_t address, uint8_t value)	// 0x8000
 
 void CartridgeClass::WriteRom2(uint16_t address, uint8_t value)	// 0xA000
 {
-        if(!CRTInsert)
+        if(!cartridge_is_insert)
         {
                 RAM_C64[address] = value;
                 return;
         }
 
-        switch(CRTTyp)
+        switch(cartridge_type)
         {
         case 32:	// EasyFlash
-                am29f040Hi->Write((address & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13),value);
+                am29f040Hi->Write((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13),value);
                 RAM_C64[address] = value;
                 break;
         default:
@@ -979,16 +979,16 @@ void CartridgeClass::WriteRom2(uint16_t address, uint8_t value)	// 0xA000
 
 void CartridgeClass::WriteRom3(uint16_t address, uint8_t value)	// 0xE000
 {
-        if(!CRTInsert)
+        if(!cartridge_is_insert)
         {
                 RAM_C64[address] = value;
                 return;
         }
 
-        switch(CRTTyp)
+        switch(cartridge_type)
         {
         case 32:	// EasyFlash
-                am29f040Hi->Write((address & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13),value);
+                am29f040Hi->Write((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13),value);
                 RAM_C64[address] = value;
                 break;
         default:
