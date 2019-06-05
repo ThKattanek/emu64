@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.06.2019                //
+// Letzte Änderung am 05.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -22,7 +22,7 @@
 #include "./mos6569_class.h"
 #include "./mos6581_8085_class.h"
 #include "./mos6526_class.h"
-#include "./crt_class.h"
+#include "./cartridge_class.h"
 #include "./reu_class.h"
 #include "./georam_class.h"
 #include "./floppy1541_class.h"

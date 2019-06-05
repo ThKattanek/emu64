@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.02.2017                //
+// Letzte Änderung am 05.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -21,11 +21,11 @@
 #include <QModelIndex>
 #include <QTimer>
 
-#include "crt_class.h"
+#include "cartridge_class.h"
 #include "c64_class.h"
 #include "structs.h"
 
-#include "./crt_new_easyflash_window.h"
+#include "./cartridge_new_easyflash_window.h"
 
 #define LED_COUNT 2
 

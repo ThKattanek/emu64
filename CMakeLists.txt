@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 02.06.2019                //
+# // Letzte Änderung am 05.06.2019                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -142,9 +142,9 @@ set(SOURCES
     src/c64_keyboard_window.cpp
     src/c64_speed_window.cpp
     src/command_line_class.cpp
-    src/crt_class.cpp
-    src/crt_new_easyflash_window.cpp
-    src/crt_window.cpp
+    src/cartridge_class.cpp
+    src/cartridge_new_easyflash_window.cpp
+    src/cartridge_window.cpp
     src/custom_splashscreen.cpp
     src/d64_class.cpp
     src/debugger_iec_window.cpp
@@ -199,8 +199,8 @@ set(MOC_HEADERS
     src/c64_keyboard_window.h
     src/c64_speed_window.h
     src/command_line_class.h
-    src/crt_new_easyflash_window.h
-    src/crt_window.h
+    src/cartridge_new_easyflash_window.h
+    src/cartridge_window.h
     src/debugger_iec_window.h
     src/debugger_vic_window.h
     src/debugger_window.h
@@ -233,8 +233,8 @@ set(MOC_HEADERS
 set(UIS
     src/c64_keyboard_window.ui
     src/c64_speed_window.ui
-    src/crt_new_easyflash_window.ui
-    src/crt_window.ui
+    src/cartridge_new_easyflash_window.ui
+    src/cartridge_window.ui
     src/debugger_iec_window.ui
     src/debugger_vic_window.ui
     src/debugger_window.ui

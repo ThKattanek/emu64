@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 05.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -36,7 +36,7 @@
 #include "./video_crt_setup_window.h"
 #include "./floppy_window.h"
 #include "./c64_keyboard_window.h"
-#include "./crt_window.h"
+#include "./cartridge_window.h"
 #include "./debugger_window.h"
 #include "./setup_window.h"
 #include "./c64_speed_window.h"

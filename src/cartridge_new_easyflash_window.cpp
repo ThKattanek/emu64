@@ -8,12 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.12.2016                //
+// Letzte Änderung am 05.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "crt_new_easyflash_window.h"
+#include "cartridge_new_easyflash_window.h"
 #include "ui_crt_new_easyflash_window.h"
 
 CRTNewEasyflashWindow::CRTNewEasyflashWindow(QWidget *parent) :

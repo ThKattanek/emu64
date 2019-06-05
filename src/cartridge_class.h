@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.06.2019                //
+// Letzte Änderung am 04.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -31,28 +31,28 @@ public:
     ~CRTClass();
 
     // Funktionen
-    bool *GetFlash040Dirty(int nr);
-    unsigned char* GetFlash040Byte(int nr);
-    int LoadCRTImage(char* filename);
-    void RemoveCRTImage(void);
-    int CreateNewEasyFlashImage(char* filename,char* crt_name);
-    int WriteEasyFlashImage(char* filename);
-    int GetCRTInfo(char* filename,CRT_INFO_STRUCT* crtinfo);
-    void SetEasyFlashJumper(bool enabled);
-    void Reset(void);
-    void Freeze(void);
-    unsigned long conv_dword(unsigned long wert);
+    bool *GetFlash040Dirty(uint16_t nr);
+    uint8_t* GetFlash040Byte(uint16_t nr);
+    int LoadCRTImage(const char* filename);
+    void RemoveCRTImage();
+    int CreateNewEasyFlashImage(const char* filename, const char* crt_name);
+    int WriteEasyFlashImage(const char* filename);
+    int GetCRTInfo(const char* filename, CRT_INFO_STRUCT* crt_info);
+    void SetEasyFlashJumper(bool enable);
+    void Reset();
+    void Freeze();
+    uint16_t ConvertDWord(uint32_t value);
 
-    void WriteIO1(unsigned short adresse,unsigned char wert);
-    unsigned char ReadIO1(unsigned short adresse);
-    void WriteIO2(unsigned short adresse,unsigned char wert);
-    unsigned char ReadIO2(unsigned short adresse);
-    void WriteRom1(unsigned short adresse,unsigned char wert);
-    void WriteRom2(unsigned short adresse,unsigned char wert);
-    void WriteRom3(unsigned short adresse,unsigned char wert);
-    unsigned char ReadRom1(unsigned short adresse);
-    unsigned char ReadRom2(unsigned short adresse);
-    unsigned char ReadRom3(unsigned short adresse);
+    void WriteIO1(uint16_t adresse, uint8_t value);
+    unsigned char ReadIO1(uint16_t address);
+    void WriteIO2(uint16_t address, uint8_t value);
+    uint8_t ReadIO2(uint16_t address);
+    void WriteRom1(uint16_t address, uint8_t value);
+    void WriteRom2(uint16_t address, uint8_t value);
+    void WriteRom3(uint16_t address, uint8_t value);
+    uint8_t ReadRom1(uint16_t address);
+    uint8_t ReadRom2(uint16_t address);
+    uint8_t ReadRom3(uint16_t address);
 
     function<void(void)> ChangeMemMapProc;
     function<void(int)> CpuTriggerInterrupt;

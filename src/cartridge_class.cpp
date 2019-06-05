@@ -8,12 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.06.2019                //
+// Letzte Änderung am 05.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "crt_class.h"
+#include "cartridge_class.h"
 #include <stdio.h>
 #include <cstring>
 
@@ -96,18 +96,18 @@ void CRTClass::SetMemLogicAR(unsigned short adresse)
     ChangeMemMapProc();
 }
 
-inline unsigned long CRTClass::conv_dword(unsigned long wert)
+inline uint16_t CRTClass::ConvertDWord(uint32_t value)
 {
-        unsigned short h,l;
-        l = wert>>16;
-        h = wert & 0xffff;
+        uint16_t h,l;
+        l = value>>16;
+        h = value & 0xffff;
         l = l<<8 | l>>8;
         h = h<<8 | h>>8;
-        wert = h<<16 | l;
-        return wert;
+        value = h<<16 | l;
+        return value;
 }
 
-bool* CRTClass::GetFlash040Dirty(int nr)
+bool* CRTClass::GetFlash040Dirty(uint16_t nr)
 {
         switch (nr)
         {
@@ -122,7 +122,7 @@ bool* CRTClass::GetFlash040Dirty(int nr)
         }
 }
 
-unsigned char* CRTClass::GetFlash040Byte(int nr)
+uint8_t *CRTClass::GetFlash040Byte(uint16_t nr)
 {
         switch (nr)
         {
@@ -137,7 +137,7 @@ unsigned char* CRTClass::GetFlash040Byte(int nr)
         }
 }
 
-int CRTClass::LoadCRTImage(char* filename)
+int CRTClass::LoadCRTImage(const char *filename)
 {
         FILE *file;
         char Kennung[17];
@@ -167,7 +167,7 @@ int CRTClass::LoadCRTImage(char* filename)
         }
 
         reading_elements = fread(&HeaderLength,1,sizeof(HeaderLength),file);
-        HeaderLength = conv_dword(HeaderLength);
+        HeaderLength = ConvertDWord(HeaderLength);
 
         reading_elements = fread(&Version,1,sizeof(Version),file);
 
@@ -202,7 +202,7 @@ L1:
                         goto L2;
                 }
                 reading_elements = fread(&HeaderLength,1,sizeof(HeaderLength),file);
-                HeaderLength = conv_dword(HeaderLength);
+                HeaderLength = ConvertDWord(HeaderLength);
                 akt_pos += HeaderLength;
 
                 fseek(file,2,SEEK_CUR);
@@ -258,7 +258,7 @@ void CRTClass::RemoveCRTImage()
         ResetAllLEDS();
 }
 
-int CRTClass::CreateNewEasyFlashImage(char* filename,char* crt_name)
+int CRTClass::CreateNewEasyFlashImage(const char* filename, const char* crt_name)
 {
         const char* Kennung = "C64 CARTRIDGE   ";
         const char* ChipKennung = "CHIP";
@@ -280,7 +280,7 @@ int CRTClass::CreateNewEasyFlashImage(char* filename,char* crt_name)
         fwrite(Kennung,1,16,File);
 
         /*****/ HeaderLength = 0x40;
-        HeaderLength = conv_dword(HeaderLength);
+        HeaderLength = ConvertDWord(HeaderLength);
         fwrite(&HeaderLength,1,sizeof(HeaderLength),File);
 
         /*****/ Version = 0x0001;
@@ -305,7 +305,7 @@ int CRTClass::CreateNewEasyFlashImage(char* filename,char* crt_name)
         {
                 fwrite(ChipKennung,1,4,File);
                 /*****/ HeaderLength = 0x00002010;
-                HeaderLength = conv_dword(HeaderLength);
+                HeaderLength = ConvertDWord(HeaderLength);
                 fwrite(&HeaderLength,1,sizeof(HeaderLength),File);
 
                 chip_typ = 2;
@@ -331,7 +331,7 @@ int CRTClass::CreateNewEasyFlashImage(char* filename,char* crt_name)
         {
                 fwrite(ChipKennung,1,4,File);
                 /*****/ HeaderLength = 0x00002010;
-                HeaderLength = conv_dword(HeaderLength);
+                HeaderLength = ConvertDWord(HeaderLength);
                 fwrite(&HeaderLength,1,sizeof(HeaderLength),File);
 
                 chip_typ = 2;
@@ -358,7 +358,7 @@ int CRTClass::CreateNewEasyFlashImage(char* filename,char* crt_name)
         return 0;
 }
 
-int CRTClass::WriteEasyFlashImage(char* filename)
+int CRTClass::WriteEasyFlashImage(const char *filename)
 {
         CRT_INFO_STRUCT crtinfo;
         const char* Kennung = "C64 CARTRIDGE   ";
@@ -386,7 +386,7 @@ int CRTClass::WriteEasyFlashImage(char* filename)
         fwrite(Kennung,1,16,File);
 
         /*****/ HeaderLength = 0x40;
-        HeaderLength = conv_dword(HeaderLength);
+        HeaderLength = ConvertDWord(HeaderLength);
         fwrite(&HeaderLength,1,sizeof(HeaderLength),File);
 
         /*****/ Version = 0x0001;
@@ -412,7 +412,7 @@ int CRTClass::WriteEasyFlashImage(char* filename)
         {
                 fwrite(ChipKennung,1,4,File);
                 /*****/ HeaderLength = 0x00002010;
-                HeaderLength = conv_dword(HeaderLength);
+                HeaderLength = ConvertDWord(HeaderLength);
                 fwrite(&HeaderLength,1,sizeof(HeaderLength),File);
 
                 chip_typ = 2;
@@ -438,7 +438,7 @@ int CRTClass::WriteEasyFlashImage(char* filename)
         {
                 fwrite(ChipKennung,1,4,File);
                 /*****/ HeaderLength = 0x00002010;
-                HeaderLength = conv_dword(HeaderLength);
+                HeaderLength = ConvertDWord(HeaderLength);
                 fwrite(&HeaderLength,1,sizeof(HeaderLength),File);
 
                 chip_typ = 2;
@@ -465,12 +465,12 @@ int CRTClass::WriteEasyFlashImage(char* filename)
         return 0;
 }
 
-void CRTClass::SetEasyFlashJumper(bool enabled)
+void CRTClass::SetEasyFlashJumper(bool enable)
 {
-        EasyFlashJumper = enabled;
+        EasyFlashJumper = enable;
 }
 
-int CRTClass::GetCRTInfo(char* filename,CRT_INFO_STRUCT* crtinfo)
+int CRTClass::GetCRTInfo(const char *filename, CRT_INFO_STRUCT* crt_info)
 {
         FILE *File;
         char Kennung[17];
@@ -500,25 +500,25 @@ int CRTClass::GetCRTInfo(char* filename,CRT_INFO_STRUCT* crtinfo)
         }
 
         reading_elements = fread(&HeaderLength,1,sizeof(HeaderLength),File);
-        HeaderLength = conv_dword(HeaderLength);
+        HeaderLength = ConvertDWord(HeaderLength);
 
         reading_elements = fread(&Version,1,sizeof(Version),File);
 
-        sprintf(crtinfo->Version,"%X.%2.2X",(unsigned char)Version,Version>>8);
+        sprintf(crt_info->Version,"%X.%2.2X",(unsigned char)Version,Version>>8);
 
-        reading_elements = fread(&crtinfo->HardwareType,1,sizeof(crtinfo->HardwareType),File);
-        crtinfo->HardwareType = crtinfo->HardwareType<<8 | crtinfo->HardwareType>>8;
-        if(crtinfo->HardwareType > 32) crtinfo->HardwareTypeString = (char*)TYPE_STRING[33];
-        else crtinfo->HardwareTypeString = (char*)TYPE_STRING[crtinfo->HardwareType];
+        reading_elements = fread(&crt_info->HardwareType,1,sizeof(crt_info->HardwareType),File);
+        crt_info->HardwareType = crt_info->HardwareType<<8 | crt_info->HardwareType>>8;
+        if(crt_info->HardwareType > 32) crt_info->HardwareTypeString = (char*)TYPE_STRING[33];
+        else crt_info->HardwareTypeString = (char*)TYPE_STRING[crt_info->HardwareType];
 
-        reading_elements = fread(&crtinfo->EXROM,1,sizeof(crtinfo->EXROM),File);
-        reading_elements = fread(&crtinfo->GAME,1,sizeof(crtinfo->GAME),File);
+        reading_elements = fread(&crt_info->EXROM,1,sizeof(crt_info->EXROM),File);
+        reading_elements = fread(&crt_info->GAME,1,sizeof(crt_info->GAME),File);
 
         fseek(File,0x0020,SEEK_SET);
-        reading_elements = fread(crtinfo->Name,1,32,File);
+        reading_elements = fread(crt_info->Name,1,32,File);
 
         akt_pos = 0x40;
-        crtinfo->ChipCount = 0;
+        crt_info->ChipCount = 0;
         Bank1Pos = Bank2Pos = Bank3Pos = 0;
 L1:
         fseek(File,akt_pos,SEEK_SET);
@@ -527,26 +527,26 @@ L1:
         if(0==strcmp("CHIP",Kennung))
         {
                 reading_elements = fread(&HeaderLength,1,sizeof(HeaderLength),File);
-                HeaderLength = conv_dword(HeaderLength);
+                HeaderLength = ConvertDWord(HeaderLength);
 
                 reading_elements = fread(&tmp,1,2,File);
                 tmp = tmp<<8 | tmp>>8;
-                crtinfo->ChipInfo[crtinfo->ChipCount].Type = tmp;
+                crt_info->ChipInfo[crt_info->ChipCount].Type = tmp;
                 reading_elements = fread(&tmp,1,2,File);
                 tmp = tmp<<8 | tmp>>8;
-                crtinfo->ChipInfo[crtinfo->ChipCount].BankLocation = tmp;
+                crt_info->ChipInfo[crt_info->ChipCount].BankLocation = tmp;
                 reading_elements = fread(&tmp,1,2,File);
                 tmp = tmp<<8 | tmp>>8;
-                crtinfo->ChipInfo[crtinfo->ChipCount].LoadAdress = tmp;
+                crt_info->ChipInfo[crt_info->ChipCount].LoadAdress = tmp;
                 reading_elements = fread(&tmp,1,2,File);
                 tmp = tmp<<8 | tmp>>8;
-                crtinfo->ChipInfo[crtinfo->ChipCount].ChipSize = tmp;
+                crt_info->ChipInfo[crt_info->ChipCount].ChipSize = tmp;
 
-                switch(crtinfo->ChipInfo[crtinfo->ChipCount].LoadAdress)
+                switch(crt_info->ChipInfo[crt_info->ChipCount].LoadAdress)
                 {
                 case 0x8000:
                         reading_elements = fread(CRT_ROM_BANK1_TMP + Bank1Pos,1,0x2000,File);
-                        crtinfo->ChipInfo[crtinfo->ChipCount].BufferPointer = CRT_ROM_BANK1_TMP + Bank1Pos;
+                        crt_info->ChipInfo[crt_info->ChipCount].BufferPointer = CRT_ROM_BANK1_TMP + Bank1Pos;
                         Bank1Pos += 0x2000;
                         if(tmp == 0x4000)
                         {
@@ -557,17 +557,17 @@ L1:
                         break;
                 case 0xA000:
                         reading_elements = fread(CRT_ROM_BANK2_TMP + Bank2Pos,1,0x2000,File);
-                        crtinfo->ChipInfo[crtinfo->ChipCount].BufferPointer = CRT_ROM_BANK2_TMP + Bank2Pos;
+                        crt_info->ChipInfo[crt_info->ChipCount].BufferPointer = CRT_ROM_BANK2_TMP + Bank2Pos;
                         Bank2Pos += 0x2000;
                         break;
                 case 0xE000:
                         reading_elements = fread(CRT_ROM_BANK2_TMP + Bank2Pos,1,0x2000,File);
-                        crtinfo->ChipInfo[crtinfo->ChipCount].BufferPointer = CRT_ROM_BANK2_TMP + Bank2Pos;
+                        crt_info->ChipInfo[crt_info->ChipCount].BufferPointer = CRT_ROM_BANK2_TMP + Bank2Pos;
                         Bank2Pos += 0x2000;
                         break;
                 }
 
-                crtinfo->ChipCount ++;
+                crt_info->ChipCount ++;
                 akt_pos += HeaderLength;
                 goto L1;
         }
@@ -576,7 +576,7 @@ L2:
         return 0;
 }
 
-void CRTClass::Reset(void)
+void CRTClass::Reset()
 {
         ROM_LO = CRT_ROM_BANK1;
         ROM_HI = CRT_ROM_BANK2;
@@ -614,7 +614,7 @@ void CRTClass::Reset(void)
         }
 }
 
-void CRTClass::Freeze(void)
+void CRTClass::Freeze()
 {
         if(!CRTInsert) return;
 
@@ -635,7 +635,7 @@ void CRTClass::Freeze(void)
         }
 }
 
-void CRTClass::WriteIO1(unsigned short adresse,unsigned char wert)
+void CRTClass::WriteIO1(uint16_t adresse, uint8_t value)
 {
         if(!CRTInsert) return;
 
@@ -644,11 +644,11 @@ void CRTClass::WriteIO1(unsigned short adresse,unsigned char wert)
         case 1:		// Action Replay 4/5/6
                     if(ActionReplayAktiv)
                     {
-                        if(wert & 0x04){
+                        if(value & 0x04){
                             ActionReplayAktiv = false;
                         }
 
-                        RomLBank = (wert>>3) & 0x03;
+                        RomLBank = (value>>3) & 0x03;
 
                         switch(RomLBank)
                         {
@@ -670,12 +670,12 @@ void CRTClass::WriteIO1(unsigned short adresse,unsigned char wert)
                                 break;
                         }
 
-                        ARRegister = wert;
+                        ARRegister = value;
                         SetMemLogicAR(adresse);
 
                         ARFreez = false;
                     }
-                    RAM_C64[adresse] = wert;
+                    RAM_C64[adresse] = value;
                 break;
         case 4:
                 if(adresse == 0xDE00)
@@ -685,13 +685,13 @@ void CRTClass::WriteIO1(unsigned short adresse,unsigned char wert)
                 }
                 break;
         case 5:		// Ocean type 1
-                wert &= 0x3F;
-                ROM_LO = CRT_ROM_BANK1 + (wert * 0x2000);
+                value &= 0x3F;
+                ROM_LO = CRT_ROM_BANK1 + (value * 0x2000);
                 break;
         case 7:		// Fun Play
                 if(adresse == 0xDE00)
                 {
-                        switch(wert)
+                        switch(value)
                         {
                         case 0x00:
                                 ROM_LO = CRT_ROM_BANK1 + (0 * 0x2000);
@@ -745,24 +745,24 @@ void CRTClass::WriteIO1(unsigned short adresse,unsigned char wert)
                 }
                 break;
         case 15:	// C64 Gamesystem
-                wert &= 0x3F;
-                ROM_LO = CRT_ROM_BANK1 + (wert * 0x2000);
+                value &= 0x3F;
+                ROM_LO = CRT_ROM_BANK1 + (value * 0x2000);
                 break;
         case 32:	// EasyFlash
                 if((adresse & 0x02) == 0x00)
                 {
-                        EasyFlashBankReg = wert & 0x3F;
-                        ROM_LO = CRT_ROM_BANK1 + ((wert & 0x3F) * 0x2000);
-                        ROM_HI = CRT_ROM_BANK2 + ((wert & 0x3F) * 0x2000);
+                        EasyFlashBankReg = value & 0x3F;
+                        ROM_LO = CRT_ROM_BANK1 + ((value & 0x3F) * 0x2000);
+                        ROM_HI = CRT_ROM_BANK2 + ((value & 0x3F) * 0x2000);
                 }
                 if((adresse & 0x02) == 0x02)
                 {
-                        LED_01 = !!(wert & 0x80);
+                        LED_01 = !!(value & 0x80);
                         if(LED_01 != LED_01_OLD) if(ChangeLED != 0) ChangeLED(1,LED_01);
                         LED_01_OLD = LED_01;
-                        *EXROM = !!(~wert & 0x02);
+                        *EXROM = !!(~value & 0x02);
 
-                        if(wert & 0x04) *GAME = !!(~wert & 0x01);
+                        if(value & 0x04) *GAME = !!(~value & 0x01);
                         else *GAME = !!(EasyFlashJumper);
                         ChangeMemMapProc();
                 }
@@ -772,24 +772,24 @@ void CRTClass::WriteIO1(unsigned short adresse,unsigned char wert)
         }
 }
 
-unsigned char CRTClass::ReadIO1(unsigned short adresse)
+unsigned char CRTClass::ReadIO1(uint16_t address)
 {
         if(!CRTInsert) return 0x00;	// Eigl. Zufallszahlen
 
         switch(CRTTyp)
         {
         case 3:		// Final Cartridge III
-                return CRT_ROM_BANK1[0x1E00 + (RomLBank << 13) + (adresse & 0xFF)];
+                return CRT_ROM_BANK1[0x1E00 + (RomLBank << 13) + (address & 0xFF)];
                 break;
         case 4:
-                if(adresse == 0xDE00)
+                if(address == 0xDE00)
                 {
                         *GAME = true;
                         ChangeMemMapProc();
                 }
                 break;
         case 17:
-                        ROM_LO = CRT_ROM_BANK1 + ((adresse&0x3F) * 0x2000);
+                        ROM_LO = CRT_ROM_BANK1 + ((address&0x3F) * 0x2000);
                 break;
         default:
                 return 0x00;
@@ -797,81 +797,81 @@ unsigned char CRTClass::ReadIO1(unsigned short adresse)
         return 0xAA;
 }
 
-void CRTClass::WriteIO2(unsigned short adresse,unsigned char wert)
+void CRTClass::WriteIO2(uint16_t address, uint8_t value)
 {
         if(!CRTInsert) return;
         switch(CRTTyp)
         {
         case 1:     // Action Replay 4/5/6
-                ActionReplayRam[(adresse & 0xFF) + 0x1F00] = wert;
-                RAM_C64[adresse] = wert;
+                ActionReplayRam[(address & 0xFF) + 0x1F00] = value;
+                RAM_C64[address] = value;
             break;
         case 3:		// Final Cartridge III
-                if((adresse & 0xFF) == 0xFF)
+                if((address & 0xFF) == 0xFF)
                 {
-                        RomLBank = wert & 0x03;
-                        ROM_LO = CRT_ROM_BANK1 + ((wert&0x3) * 0x2000);
-                        ROM_HI = CRT_ROM_BANK2 + ((wert&0x3) * 0x2000);
-                        *EXROM = ((~wert >> 4) & 1) ^ 1;
-                        *GAME = ((~wert >> 5) & 1) ^ 1;
+                        RomLBank = value & 0x03;
+                        ROM_LO = CRT_ROM_BANK1 + ((value&0x3) * 0x2000);
+                        ROM_HI = CRT_ROM_BANK2 + ((value&0x3) * 0x2000);
+                        *EXROM = ((~value >> 4) & 1) ^ 1;
+                        *GAME = ((~value >> 5) & 1) ^ 1;
                         ChangeMemMapProc();
 
-                        if((wert & 0x30) == 0x10) CpuTriggerInterrupt(CRT_NMI);
-                        if(wert & 0x40) CpuClearInterrupt(CRT_NMI);
-                        LED_00 = (~wert>>7) & 1;
+                        if((value & 0x30) == 0x10) CpuTriggerInterrupt(CRT_NMI);
+                        if(value & 0x40) CpuClearInterrupt(CRT_NMI);
+                        LED_00 = (~value>>7) & 1;
                         if(LED_00 != LED_00_OLD) if(ChangeLED != 0)  ChangeLED(0,LED_00);
                         LED_00_OLD = LED_00;
                 }
                 break;
         case 8:		// Super Games
-                        ROM_LO = CRT_ROM_BANK1 + ((wert&0x3) * 0x2000);
-                        ROM_HI = CRT_ROM_BANK2 + ((wert&0x3) * 0x2000);
-                        if(wert & 0x04)
+                        ROM_LO = CRT_ROM_BANK1 + ((value&0x3) * 0x2000);
+                        ROM_HI = CRT_ROM_BANK2 + ((value&0x3) * 0x2000);
+                        if(value & 0x04)
                         {
                                 *EXROM = 0;
                                 *GAME = 1;
                         }
                         else *EXROM = *GAME = 0;
-                        if(wert == 0x0C) *EXROM = *GAME = 1;
+                        if(value == 0x0C) *EXROM = *GAME = 1;
                         ChangeMemMapProc();
                 break;
         case 32:	// EasyFlash
-                EasyFlashRam[adresse & 0xFF] = wert;
+                EasyFlashRam[address & 0xFF] = value;
                 break;
         default:
                 break;
         }
 }
 
-unsigned char CRTClass::ReadIO2(unsigned short adresse)
+uint8_t CRTClass::ReadIO2(uint16_t address)
 {
         if(!CRTInsert) return 0x00;	// Eigl. Zufallszahlen (Vic Phi)
 
         switch(CRTTyp)
         {
         case 1:		// Action Replay 4/5/6
-            SetMemLogicAR(adresse);
+            SetMemLogicAR(address);
             if(!ActionReplayAktiv) return 0x00;	// Eigl. Zufallszahlen (Vic Phi)
-            if(EnableActionReplayRam) return ActionReplayRam[(adresse & 0xFF) + 0x1F00];
-            else return ROM_LO[(adresse & 0xFF) + 0x1F00];
+            if(EnableActionReplayRam) return ActionReplayRam[(address & 0xFF) + 0x1F00];
+            else return ROM_LO[(address & 0xFF) + 0x1F00];
 
                 break;
         case 3:		// Final Cartridge III
                 switch (RomLBank)
                 {
                         case 0:
-                                return CRT_ROM_BANK1[adresse & 0x1fff];
+                                return CRT_ROM_BANK1[address & 0x1fff];
                         case 1:
-                                return CRT_ROM_BANK1[(adresse & 0x1fff) + 0x2000];
+                                return CRT_ROM_BANK1[(address & 0x1fff) + 0x2000];
                         case 2:
-                                return CRT_ROM_BANK1[(adresse & 0x1fff) + 0x4000];
+                                return CRT_ROM_BANK1[(address & 0x1fff) + 0x4000];
                         case 3:
-                                return CRT_ROM_BANK1[(adresse & 0x1fff) + 0x6000];
+                                return CRT_ROM_BANK1[(address & 0x1fff) + 0x6000];
                 }
                 return 0;
                 break;
         case 32:	// EasyFlash
-                return EasyFlashRam[adresse & 0xFF];
+                return EasyFlashRam[address & 0xFF];
                 break;
         default:
                 return 0x00;
@@ -879,120 +879,120 @@ unsigned char CRTClass::ReadIO2(unsigned short adresse)
         }
 }
 
-unsigned char CRTClass::ReadRom1(unsigned short adresse)
+uint8_t CRTClass::ReadRom1(uint16_t address)
 {
         if(!CRTInsert) return 0x55;	// Darf eigentlich nie vorkommen !!!!
 
         switch(CRTTyp)
         {
         case 1:		// Action Replay 4/5/6
-                SetMemLogicAR(adresse);
-                if(!EnableActionReplayRam) return ROM_LO[adresse & 0x1FFF];
-                else return ActionReplayRam[adresse & 0x1FFF];
+                SetMemLogicAR(address);
+                if(!EnableActionReplayRam) return ROM_LO[address & 0x1FFF];
+                else return ActionReplayRam[address & 0x1FFF];
                 break;
         case 32:	// EasyFlash
-                return am29f040Lo->Read((adresse & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13));
+                return am29f040Lo->Read((address & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13));
                 break;
         default:
-                return ROM_LO[adresse-0x8000];
+                return ROM_LO[address-0x8000];
                 break;
         }
 }
 
-unsigned char CRTClass::ReadRom2(unsigned short adresse)
+uint8_t CRTClass::ReadRom2(uint16_t address)
 {
         if(!CRTInsert) return 0x55;	// Darf eigentlich nie vorkommen !!!!
 
         switch(CRTTyp)
         {
         case 32:	// EasyFlash
-                return am29f040Hi->Read((adresse & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13));
+                return am29f040Hi->Read((address & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13));
                 break;
         default:
-                return ROM_HI[adresse-0xA000];
+                return ROM_HI[address-0xA000];
                 break;
         }
 }
 
-unsigned char CRTClass::ReadRom3(unsigned short adresse)
+uint8_t CRTClass::ReadRom3(uint16_t address)
 {
         if(!CRTInsert) return 0x55;	// Darf eigentlich nie vorkommen !!!!
 
         switch(CRTTyp)
         {
         case 32:	// EasyFlash
-                return am29f040Hi->Read((adresse & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13));
+                return am29f040Hi->Read((address & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13));
                 break;
         default:
-                return ROM_HI[adresse-0xE000];
+                return ROM_HI[address-0xE000];
                 break;
         }
 }
 
-void CRTClass::WriteRom1(unsigned short adresse,unsigned char wert)	// 0x8000
+void CRTClass::WriteRom1(uint16_t address, uint8_t value)	// 0x8000
 {
         if(!CRTInsert)
         {
-                RAM_C64[adresse] = wert;
+                RAM_C64[address] = value;
                 return;
         }
 
         switch(CRTTyp)
         {
         case 1:     // Action Replay 4/5/6
-                SetMemLogicAR(adresse);
+                SetMemLogicAR(address);
                 if(EnableActionReplayRam)
                 {
-                    ActionReplayRam[adresse & 0x1FFF] = wert;
+                    ActionReplayRam[address & 0x1FFF] = value;
                 }
-                RAM_C64[adresse] = wert;
+                RAM_C64[address] = value;
             break;
         case 32:	// EasyFlash
-                am29f040Lo->Write((adresse & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13),wert);
-                RAM_C64[adresse] = wert;
+                am29f040Lo->Write((address & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13),value);
+                RAM_C64[address] = value;
                 break;
         default:
-                RAM_C64[adresse] = wert;
+                RAM_C64[address] = value;
                 break;
         }
 }
 
-void CRTClass::WriteRom2(unsigned short adresse,unsigned char wert)	// 0xA000
+void CRTClass::WriteRom2(uint16_t address, uint8_t value)	// 0xA000
 {
         if(!CRTInsert)
         {
-                RAM_C64[adresse] = wert;
+                RAM_C64[address] = value;
                 return;
         }
 
         switch(CRTTyp)
         {
         case 32:	// EasyFlash
-                am29f040Hi->Write((adresse & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13),wert);
-                RAM_C64[adresse] = wert;
+                am29f040Hi->Write((address & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13),value);
+                RAM_C64[address] = value;
                 break;
         default:
-                RAM_C64[adresse] = wert;
+                RAM_C64[address] = value;
                 break;
         }
 }
 
-void CRTClass::WriteRom3(unsigned short adresse,unsigned char wert)	// 0xE000
+void CRTClass::WriteRom3(uint16_t address, uint8_t value)	// 0xE000
 {
         if(!CRTInsert)
         {
-                RAM_C64[adresse] = wert;
+                RAM_C64[address] = value;
                 return;
         }
 
         switch(CRTTyp)
         {
         case 32:	// EasyFlash
-                am29f040Hi->Write((adresse & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13),wert);
-                RAM_C64[adresse] = wert;
+                am29f040Hi->Write((address & 0x1FFF) | ((EasyFlashBankReg & 0x3F)<<13),value);
+                RAM_C64[address] = value;
                 break;
         default:
-                RAM_C64[adresse] = wert;
+                RAM_C64[address] = value;
                 break;
         }
 }

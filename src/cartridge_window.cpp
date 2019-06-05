@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.02.2017                //
+// Letzte Änderung am 05.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,7 +16,7 @@
 #include <QMessageBox>
 #include <QFontDatabase>
 
-#include "crt_window.h"
+#include "cartridge_window.h"
 #include "ui_crt_window.h"
 
 CrtWindow::CrtWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
