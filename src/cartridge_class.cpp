@@ -40,7 +40,6 @@ CartridgeClass::CartridgeClass()
     am29f040Lo = new AM29F040Class(rom_bank1,1);
     am29f040Hi = new AM29F040Class(rom_bank2,1);
 
-    ChangeLED = 0;
     ResetAllLEDS();
 
     ar_freez = false;
@@ -53,8 +52,8 @@ CartridgeClass::~CartridgeClass()
 void CartridgeClass::ResetAllLEDS(void)
 {
     led_00 = led_00_old = led_01 = led_01_old = false;
-    if(ChangeLED != 0) ChangeLED(0,led_00);
-    if(ChangeLED != 0) ChangeLED(1,led_01);
+    if(ChangeLED != nullptr) ChangeLED(0,led_00);
+    if(ChangeLED != nullptr) ChangeLED(1,led_01);
 }
 
 void CartridgeClass::SetMemLogicAR(uint16_t address)
@@ -113,12 +112,12 @@ bool* CartridgeClass::GetFlash040Dirty(uint16_t nr)
         {
         case 0:
                 return &am29f040Lo->dirty;
-                break;
+
         case 1:
                 return &am29f040Hi->dirty;
-                break;
+
         default:
-                return 0;
+                return nullptr;
         }
 }
 
@@ -133,7 +132,7 @@ uint8_t *CartridgeClass::GetFlash040Byte(uint16_t nr)
                 return &am29f040Hi->programm_byte;
                 break;
         default:
-                return 0;
+                return nullptr;
         }
 }
 
@@ -151,7 +150,7 @@ int CartridgeClass::LoadCRTImage(const char *filename)
         size_t reading_elements;
 
         file = fopen (filename, "rb");
-        if (file == NULL)
+        if (file == nullptr)
         {
                 return 0x01;
         }
@@ -272,7 +271,7 @@ int CartridgeClass::CreateNewEasyFlashImage(const char* filename, const char* cr
 
         FILE *File;
         File = fopen (filename, "wb");
-        if (File == NULL)
+        if (File == nullptr)
         {
                 return 0x01;
         }
@@ -378,7 +377,7 @@ int CartridgeClass::WriteEasyFlashImage(const char *filename)
 
         FILE *File;
         File = fopen (filename, "wb");
-        if (File == NULL)
+        if (File == nullptr)
         {
                 return 0x01;
         }
@@ -482,7 +481,7 @@ int CartridgeClass::GetCRTInfo(const char *filename, CRT_INFO_STRUCT* crt_info)
         size_t reading_elements;
 
         File = fopen (filename, "rb");
-        if (File == NULL)
+        if (File == nullptr)
         {
                 return 0x01;
         }
@@ -758,7 +757,7 @@ void CartridgeClass::WriteIO1(uint16_t adresse, uint8_t value)
                 if((adresse & 0x02) == 0x02)
                 {
                         led_01 = !!(value & 0x80);
-                        if(led_01 != led_01_old) if(ChangeLED != 0) ChangeLED(1,led_01);
+                        if(led_01 != led_01_old) if(ChangeLED != nullptr) ChangeLED(1,led_01);
                         led_01_old = led_01;
                         *exrom = !!(~value & 0x02);
 
@@ -780,7 +779,6 @@ uint8_t CartridgeClass::ReadIO1(uint16_t address)
         {
         case 3:		// Final Cartridge III
                 return rom_bank1[0x1E00 + (rom_lo_bank << 13) + (address & 0xFF)];
-                break;
         case 4:
                 if(address == 0xDE00)
                 {
@@ -819,7 +817,7 @@ void CartridgeClass::WriteIO2(uint16_t address, uint8_t value)
                         if((value & 0x30) == 0x10) CpuTriggerInterrupt(CRT_NMI);
                         if(value & 0x40) CpuClearInterrupt(CRT_NMI);
                         led_00 = (~value>>7) & 1;
-                        if(led_00 != led_00_old) if(ChangeLED != 0)  ChangeLED(0,led_00);
+                        if(led_00 != led_00_old) if(ChangeLED != nullptr)  ChangeLED(0,led_00);
                         led_00_old = led_00;
                 }
                 break;
@@ -855,7 +853,6 @@ uint8_t CartridgeClass::ReadIO2(uint16_t address)
             if(ar_enable_ram) return ar_ram[(address & 0xFF) + 0x1F00];
             else return lo_rom[(address & 0xFF) + 0x1F00];
 
-                break;
         case 3:		// Final Cartridge III
                 switch (rom_lo_bank)
                 {
@@ -869,13 +866,12 @@ uint8_t CartridgeClass::ReadIO2(uint16_t address)
                                 return rom_bank1[(address & 0x1fff) + 0x6000];
                 }
                 return 0;
-                break;
+
         case 32:	// EasyFlash
                 return easyflash_ram[address & 0xFF];
-                break;
+
         default:
                 return 0x00;
-                break;
         }
 }
 
@@ -889,13 +885,12 @@ uint8_t CartridgeClass::ReadRom1(uint16_t address)
                 SetMemLogicAR(address);
                 if(!ar_enable_ram) return lo_rom[address & 0x1FFF];
                 else return ar_ram[address & 0x1FFF];
-                break;
+
         case 32:	// EasyFlash
                 return am29f040Lo->Read((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13));
-                break;
+
         default:
                 return lo_rom[address-0x8000];
-                break;
         }
 }
 
@@ -907,10 +902,9 @@ uint8_t CartridgeClass::ReadRom2(uint16_t address)
         {
         case 32:	// EasyFlash
                 return am29f040Hi->Read((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13));
-                break;
+
         default:
                 return hi_rom[address-0xA000];
-                break;
         }
 }
 
@@ -922,10 +916,10 @@ uint8_t CartridgeClass::ReadRom3(uint16_t address)
         {
         case 32:	// EasyFlash
                 return am29f040Hi->Read((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13));
-                break;
+
         default:
                 return hi_rom[address-0xE000];
-                break;
+
         }
 }
 
