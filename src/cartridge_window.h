@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.06.2019                //
+// Letzte Änderung am 06.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -71,7 +71,7 @@ private:
     bool ChipDataExpand;
     bool win_exp;
     unsigned short insterted_hwtyp;
-    CRT_INFO_STRUCT crt_info;
+    CARTRIDGE_INFO_STRUCT crt_info;
     bool CRTIsSelected;
     QString SelCRTFileName;
     QTimer *timer1;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.05.2019                //
+// Letzte Änderung am 06.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -265,7 +265,7 @@ struct CHIP_INFO_STRUCT
     unsigned char* BufferPointer;
 };
 
-struct CRT_INFO_STRUCT
+struct CARTRIDGE_INFO_STRUCT
 {
     char                Name[32];
     char                Version[10];

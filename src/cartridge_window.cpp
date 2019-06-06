@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.06.2019                //
+// Letzte Änderung am 06.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -86,7 +86,7 @@ CrtWindow::~CrtWindow()
         this->resize(this->width()-200,this->height());
     }
     ////////// Save to INI ///////////
-    if(ini != 0)
+    if(ini != nullptr)
     {
         ini->beginGroup("CrtWindow");
         if(isOneShowed) ini->setValue("Geometry",saveGeometry());
@@ -105,7 +105,7 @@ CrtWindow::~CrtWindow()
 void CrtWindow::LoadIni(void)
 {
     ////////// Load from INI ///////////
-    if(ini != 0)
+    if(ini != nullptr)
     {
         ini->beginGroup("CrtWindow");
         if(ini->contains("Geometry")) restoreGeometry(ini->value("Geometry").toByteArray());
@@ -196,8 +196,8 @@ void CrtWindow::onSelectFile(QString filename)
 {
     char str00[256];
 
-    if(crt == 0) return;
-    int res = crt->GetCRTInfo(filename.toLatin1().data(),&crt_info);
+    if(crt == nullptr) return;
+    int res = crt->GetCartridgeInfo(filename.toLatin1().data(),&crt_info);
     switch(res)
     {
     case 0:

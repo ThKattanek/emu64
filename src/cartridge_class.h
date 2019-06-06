@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.06.2019                //
+// Letzte Änderung am 06.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -37,11 +37,11 @@ public:
     void RemoveCRTImage();
     int CreateNewEasyFlashImage(const char* filename, const char* crt_name);
     int WriteEasyFlashImage(const char* filename);
-    int GetCRTInfo(const char* filename, CRT_INFO_STRUCT* crt_info);
+    int GetCartridgeInfo(const char* filename, CARTRIDGE_INFO_STRUCT *crt_info);
     void SetEasyFlashJumper(bool enable);
     void Reset();
     void Freeze();
-    uint16_t ConvertDWord(uint32_t value);
+    uint32_t ConvertDWord(uint32_t value);
 
     void WriteIO1(uint16_t adresse, uint8_t value);
     uint8_t ReadIO1(uint16_t address);

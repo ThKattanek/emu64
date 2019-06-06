@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.06.2019                //
+// Letzte Änderung am 06.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -95,14 +95,18 @@ void CartridgeClass::SetMemLogicAR(uint16_t address)
     ChangeMemMapProc();
 }
 
-inline uint16_t CartridgeClass::ConvertDWord(uint32_t value)
+inline uint32_t CartridgeClass::ConvertDWord(uint32_t value)
 {
-        uint16_t h,l;
-        l = value>>16;
+        uint32_t h,l;
+
+        l = (value >> 16) & 0xffff;
         h = value & 0xffff;
-        l = l<<8 | l>>8;
-        h = h<<8 | h>>8;
+
+        l = ((l << 8) | (l >> 8)) & 0xffff;
+        h = ((h << 8) | (h >> 8)) & 0xffff;
+
         value = h<<16 | l;
+
         return value;
 }
 
@@ -112,10 +116,8 @@ bool* CartridgeClass::GetFlash040Dirty(uint16_t nr)
         {
         case 0:
                 return &am29f040Lo->dirty;
-
         case 1:
                 return &am29f040Hi->dirty;
-
         default:
                 return nullptr;
         }
@@ -127,10 +129,8 @@ uint8_t *CartridgeClass::GetFlash040Byte(uint16_t nr)
         {
         case 0:
                 return &am29f040Lo->programm_byte;
-                break;
         case 1:
                 return &am29f040Hi->programm_byte;
-                break;
         default:
                 return nullptr;
         }
@@ -139,15 +139,15 @@ uint8_t *CartridgeClass::GetFlash040Byte(uint16_t nr)
 int CartridgeClass::LoadCRTImage(const char *filename)
 {
         FILE *file;
-        char Kennung[17];
-        unsigned short Version;
-        unsigned int HeaderLength;
-        unsigned long akt_pos;
-        unsigned char exrom, game;
-        int ChipCount;
-        unsigned short chip_adr;
-        unsigned short chip_size;
-        size_t reading_elements;
+        char signature[17];
+        uint16_t version;
+        uint32_t header_lenght;
+        uint32_t akt_pos;
+        uint8_t exrom, game;
+        uint16_t chip_count;
+        uint16_t chip_address;
+        uint16_t chip_size;
+        size_t reading_bytes;
 
         file = fopen (filename, "rb");
         if (file == nullptr)
@@ -155,26 +155,26 @@ int CartridgeClass::LoadCRTImage(const char *filename)
                 return 0x01;
         }
 
-        reading_elements = fread(Kennung,1,16,file);
+        reading_bytes = fread(signature,1,16,file);
 
-        Kennung[16] = 0;
+        signature[16] = 0;
 
-        if(0!=strcmp("C64 CARTRIDGE   ",Kennung))
+        if(0!=strcmp("C64 CARTRIDGE   ",signature))
         {
                 fclose(file);
                 return 0x02;
         }
 
-        reading_elements = fread(&HeaderLength,1,sizeof(HeaderLength),file);
-        HeaderLength = ConvertDWord(HeaderLength);
+        reading_bytes = fread(&header_lenght,1,sizeof(header_lenght),file);
+        header_lenght = ConvertDWord(header_lenght);
 
-        reading_elements = fread(&Version,1,sizeof(Version),file);
+        reading_bytes = fread(&version,1,sizeof(version),file);
 
-        reading_elements = fread(&cartridge_type,1,sizeof(cartridge_type),file);
-        cartridge_type = cartridge_type<<8 | cartridge_type>>8;
+        reading_bytes = fread(&cartridge_type,1,sizeof(cartridge_type),file);
+        cartridge_type = static_cast<uint16_t>(cartridge_type << 8) | (cartridge_type >> 8);
 
-        reading_elements = fread(&exrom,1,sizeof(exrom),file);
-        reading_elements = fread(&game,1,sizeof(game),file);
+        reading_bytes = fread(&exrom,1,sizeof(exrom),file);
+        reading_bytes = fread(&game,1,sizeof(game),file);
 
         if(exrom == 0) cartridge_exrom = false;
         else cartridge_exrom = true;
@@ -187,52 +187,52 @@ int CartridgeClass::LoadCRTImage(const char *filename)
         fseek(file,0x0040,SEEK_SET);
 
         akt_pos = 0x40;
-        ChipCount = 0;
+        chip_count = 0;
 L1:
         fseek(file,akt_pos,SEEK_SET);
-        reading_elements = fread(Kennung,1,4,file);
-        if(4 > reading_elements) goto L2;
-        Kennung[4] = 0;
-        if(0==strcmp("CHIP",Kennung))
+        reading_bytes = fread(signature,1,4,file);
+        if(4 > reading_bytes) goto L2;
+        signature[4] = 0;
+        if(0==strcmp("CHIP",signature))
         {
-                if(ChipCount == 128)
+                if(chip_count == 128)
                 {
                         //MessageBox(0,"Fehler 128 in CRT Modul","Emu64",0);
                         goto L2;
                 }
-                reading_elements = fread(&HeaderLength,1,sizeof(HeaderLength),file);
-                HeaderLength = ConvertDWord(HeaderLength);
-                akt_pos += HeaderLength;
+                reading_bytes = fread(&header_lenght,1,sizeof(header_lenght),file);
+                header_lenght = ConvertDWord(header_lenght);
+                akt_pos += header_lenght;
 
                 fseek(file,2,SEEK_CUR);
 
-                unsigned short BankPos;
-                reading_elements = fread(&BankPos,1,2,file);
-                BankPos = BankPos<<8 | BankPos>>8;
-                BankPos &= 0xFF;    // Maximal 256 Bänke je rom_bank1 + rom_bank2
+                uint16_t bank_pos;
+                reading_bytes = fread(&bank_pos,1,2,file);
+                bank_pos = static_cast<uint16_t>((bank_pos << 8) | (bank_pos >> 8));
+                bank_pos &= 0xFF;    // Maximal 256 Bänke je rom_bank1 + rom_bank2
 
-                reading_elements = fread(&chip_adr,1,2,file);
-                chip_adr = chip_adr<<8 | chip_adr>>8;
-                reading_elements = fread(&chip_size,1,2,file);
-                chip_size = chip_size<<8 | chip_size>>8;
+                reading_bytes = fread(&chip_address,1,2,file);
+                chip_address = static_cast<uint16_t>((chip_address << 8) | (chip_address >> 8));
+                reading_bytes = fread(&chip_size,1,2,file);
+                chip_size = static_cast<uint16_t>((chip_size << 8) | (chip_size >> 8));
 
-                switch(chip_adr)
+                switch(chip_address)
                 {
                 case 0x8000:
-                        reading_elements = fread(rom_bank1 + (BankPos * 0x2000),1,0x2000,file);
+                        reading_bytes = fread(rom_bank1 + (bank_pos * 0x2000),1,0x2000,file);
                         if(chip_size == 0x4000)
                         {
-                            reading_elements = fread(rom_bank2 + (BankPos * 0x2000),1,0x2000,file);
+                            reading_bytes = fread(rom_bank2 + (bank_pos * 0x2000),1,0x2000,file);
                         }
                         break;
                 case 0xA000:
-                        reading_elements = fread(rom_bank2 + (BankPos * 0x2000),1,0x2000,file);
+                        reading_bytes = fread(rom_bank2 + (bank_pos * 0x2000),1,0x2000,file);
                         break;
                 case 0xE000:
-                        reading_elements = fread(rom_bank2 + (BankPos * 0x2000),1,0x2000,file);
+                        reading_bytes = fread(rom_bank2 + (bank_pos * 0x2000),1,0x2000,file);
                         break;
                 }
-                ChipCount ++;
+                chip_count ++;
                 goto L1;
         }
 L2:
@@ -259,15 +259,15 @@ void CartridgeClass::RemoveCRTImage()
 
 int CartridgeClass::CreateNewEasyFlashImage(const char* filename, const char* crt_name)
 {
-        const char* Kennung = "C64 CARTRIDGE   ";
-        const char* ChipKennung = "CHIP";
-        unsigned short Version;
-        unsigned int HeaderLength;
-        unsigned char exrom,game;
-        unsigned short chip_adr;
-        unsigned short chip_size;
-        unsigned short chip_typ;
-        unsigned short chip_bank;
+        const char* signature = "C64 CARTRIDGE   ";
+        const char* chip_signature = "CHIP";
+        uint16_t version;
+        uint32_t header_lenght;
+        uint8_t exrom, game;
+        uint16_t chip_address;
+        uint16_t chip_size;
+        uint16_t chip_typ;
+        uint16_t chip_bank;
 
         FILE *File;
         File = fopen (filename, "wb");
@@ -276,17 +276,17 @@ int CartridgeClass::CreateNewEasyFlashImage(const char* filename, const char* cr
                 return 0x01;
         }
 
-        fwrite(Kennung,1,16,File);
+        fwrite(signature,1,16,File);
 
-        /*****/ HeaderLength = 0x40;
-        HeaderLength = ConvertDWord(HeaderLength);
-        fwrite(&HeaderLength,1,sizeof(HeaderLength),File);
+        /*****/ header_lenght = 0x40;
+        header_lenght = ConvertDWord(header_lenght);
+        fwrite(&header_lenght,1,sizeof(header_lenght),File);
 
-        /*****/ Version = 0x0001;
-        fwrite(&Version,1,sizeof(Version),File);
+        /*****/ version = 0x0001;
+        fwrite(&version,1,sizeof(version),File);
 
         /*****/ cartridge_type = 32;
-        cartridge_type = cartridge_type<<8 | cartridge_type>>8;
+        cartridge_type = static_cast<uint16_t>((cartridge_type << 8) | (cartridge_type >> 8));
         fwrite(&cartridge_type,1,sizeof(cartridge_type),File);
 
         /*****/ exrom = 1;
@@ -302,25 +302,25 @@ int CartridgeClass::CreateNewEasyFlashImage(const char* filename, const char* cr
 
         for(int i=0;i<64;i++)
         {
-                fwrite(ChipKennung,1,4,File);
-                /*****/ HeaderLength = 0x00002010;
-                HeaderLength = ConvertDWord(HeaderLength);
-                fwrite(&HeaderLength,1,sizeof(HeaderLength),File);
+                fwrite(chip_signature,1,4,File);
+                /*****/ header_lenght = 0x00002010;
+                header_lenght = ConvertDWord(header_lenght);
+                fwrite(&header_lenght,1,sizeof(header_lenght),File);
 
                 chip_typ = 2;
-                chip_typ = chip_typ<<8 | chip_typ>>8;
+                chip_typ = static_cast<uint16_t>((chip_typ << 8) | (chip_typ >> 8));
                 fwrite(&chip_typ,1,sizeof(chip_typ),File);
 
-                chip_bank = (unsigned short)i;
-                chip_bank = chip_bank<<8 | chip_bank>>8;
+                chip_bank = static_cast<uint16_t>(i);
+                chip_bank = static_cast<uint16_t>((chip_bank << 8) | (chip_bank >> 8));
                 fwrite(&chip_bank,1,sizeof(chip_bank),File);
 
-                chip_adr = 0x8000;
-                chip_adr = chip_adr<<8 | chip_adr>>8;
-                fwrite(&chip_adr,1,sizeof(chip_adr),File);
+                chip_address = 0x8000;
+                chip_address = static_cast<uint16_t>((chip_address << 8) | (chip_address >> 8));
+                fwrite(&chip_address,1,sizeof(chip_address),File);
 
                 chip_size = 0x2000;
-                chip_size = chip_size<<8 | chip_size>>8;
+                chip_size = static_cast<uint16_t>((chip_size << 8) | (chip_size >> 8));
                 fwrite(&chip_size,1,sizeof(chip_size),File);
 
                 fseek(File,0x2000,SEEK_CUR);
@@ -328,25 +328,25 @@ int CartridgeClass::CreateNewEasyFlashImage(const char* filename, const char* cr
 
         for(int i=0;i<64;i++)
         {
-                fwrite(ChipKennung,1,4,File);
-                /*****/ HeaderLength = 0x00002010;
-                HeaderLength = ConvertDWord(HeaderLength);
-                fwrite(&HeaderLength,1,sizeof(HeaderLength),File);
+                fwrite(chip_signature,1,4,File);
+                /*****/ header_lenght = 0x00002010;
+                header_lenght = ConvertDWord(header_lenght);
+                fwrite(&header_lenght,1,sizeof(header_lenght),File);
 
                 chip_typ = 2;
-                chip_typ = chip_typ<<8 | chip_typ>>8;
+                chip_typ = static_cast<uint16_t>((chip_typ << 8 | chip_typ >> 8));
                 fwrite(&chip_typ,1,sizeof(chip_typ),File);
 
-                chip_bank = (unsigned short)i;
-                chip_bank = chip_bank<<8 | chip_bank>>8;
+                chip_bank = static_cast<uint16_t>(i);
+                chip_bank = static_cast<uint16_t>((chip_bank << 8) | (chip_bank >> 8));
                 fwrite(&chip_bank,1,sizeof(chip_bank),File);
 
-                chip_adr = 0xA000;
-                chip_adr = chip_adr<<8 | chip_adr>>8;
-                fwrite(&chip_adr,1,sizeof(chip_adr),File);
+                chip_address = 0xA000;
+                chip_address = static_cast<uint16_t>((chip_address << 8) | (chip_address >> 8));
+                fwrite(&chip_address,1,sizeof(chip_address),File);
 
                 chip_size = 0x2000;
-                chip_size = chip_size<<8 | chip_size>>8;
+                chip_size = static_cast<uint16_t>((chip_size << 8) | (chip_size >> 8));
                 fwrite(&chip_size,1,sizeof(chip_size),File);
 
                 fseek(File,0x2000,SEEK_CUR);
@@ -359,18 +359,18 @@ int CartridgeClass::CreateNewEasyFlashImage(const char* filename, const char* cr
 
 int CartridgeClass::WriteEasyFlashImage(const char *filename)
 {
-        CRT_INFO_STRUCT crtinfo;
-        const char* Kennung = "C64 CARTRIDGE   ";
-        const char* ChipKennung = "CHIP";
-        unsigned short Version;
-        unsigned int HeaderLength;
-        unsigned char exrom,game;
-        unsigned short chip_adr;
-        unsigned short chip_size;
-        unsigned short chip_typ;
-        unsigned short chip_bank;
+        CARTRIDGE_INFO_STRUCT cartridge_info;
+        const char* signature = "C64 CARTRIDGE   ";
+        const char* chip_signature = "CHIP";
+        uint16_t version;
+        uint32_t header_lenght;
+        uint8_t exrom, game;
+        uint16_t chip_address;
+        uint16_t chip_size;
+        uint16_t chip_typ;
+        uint16_t chip_bank;
 
-        if(0 != GetCRTInfo(filename,&crtinfo))
+        if(0 != GetCartridgeInfo(filename,&cartridge_info))
         {
                 return 0x01;
         }
@@ -382,17 +382,17 @@ int CartridgeClass::WriteEasyFlashImage(const char *filename)
                 return 0x01;
         }
 
-        fwrite(Kennung,1,16,File);
+        fwrite(signature,1,16,File);
 
-        /*****/ HeaderLength = 0x40;
-        HeaderLength = ConvertDWord(HeaderLength);
-        fwrite(&HeaderLength,1,sizeof(HeaderLength),File);
+        /*****/ header_lenght = 0x40;
+        header_lenght = ConvertDWord(header_lenght);
+        fwrite(&header_lenght,1,sizeof(header_lenght),File);
 
-        /*****/ Version = 0x0001;
-        fwrite(&Version,1,sizeof(Version),File);
+        /*****/ version = 0x0001;
+        fwrite(&version,1,sizeof(version),File);
 
         /*****/ cartridge_type = 32;
-        cartridge_type = cartridge_type<<8 | cartridge_type>>8;
+        cartridge_type = static_cast<uint16_t>((cartridge_type << 8) | (cartridge_type >> 8));
         fwrite(&cartridge_type,1,sizeof(cartridge_type),File);
 
         /*****/ exrom = 1;
@@ -404,30 +404,30 @@ int CartridgeClass::WriteEasyFlashImage(const char *filename)
         fseek(File,0x0020,SEEK_SET);
 
         /*****/ // CRT Name
-        fwrite(crtinfo.Name,1,32,File);
+        fwrite(cartridge_info.Name,1,32,File);
 
 
         for(int i=0;i<64;i++)
         {
-                fwrite(ChipKennung,1,4,File);
-                /*****/ HeaderLength = 0x00002010;
-                HeaderLength = ConvertDWord(HeaderLength);
-                fwrite(&HeaderLength,1,sizeof(HeaderLength),File);
+                fwrite(chip_signature,1,4,File);
+                /*****/ header_lenght = 0x00002010;
+                header_lenght = ConvertDWord(header_lenght);
+                fwrite(&header_lenght,1,sizeof(header_lenght),File);
 
                 chip_typ = 2;
-                chip_typ = chip_typ<<8 | chip_typ>>8;
+                chip_typ = static_cast<uint16_t>((chip_typ << 8) | (chip_typ >> 8));
                 fwrite(&chip_typ,1,sizeof(chip_typ),File);
 
-                chip_bank = (unsigned short)i;
-                chip_bank = chip_bank<<8 | chip_bank>>8;
+                chip_bank = static_cast<uint16_t>(i);
+                chip_bank = static_cast<uint16_t>((chip_bank << 8) | (chip_bank >> 8));
                 fwrite(&chip_bank,1,sizeof(chip_bank),File);
 
-                chip_adr = 0x8000;
-                chip_adr = chip_adr<<8 | chip_adr>>8;
-                fwrite(&chip_adr,1,sizeof(chip_adr),File);
+                chip_address = 0x8000;
+                chip_address = static_cast<uint16_t>((chip_address << 8) | (chip_address >> 8));
+                fwrite(&chip_address,1,sizeof(chip_address),File);
 
                 chip_size = 0x2000;
-                chip_size = chip_size<<8 | chip_size>>8;
+                chip_size = static_cast<uint16_t>((chip_size << 8) | (chip_size >> 8));
                 fwrite(&chip_size,1,sizeof(chip_size),File);
 
                 fwrite(&rom_bank1[i*0x2000],1,0x2000,File);
@@ -435,25 +435,25 @@ int CartridgeClass::WriteEasyFlashImage(const char *filename)
 
         for(int i=0;i<64;i++)
         {
-                fwrite(ChipKennung,1,4,File);
-                /*****/ HeaderLength = 0x00002010;
-                HeaderLength = ConvertDWord(HeaderLength);
-                fwrite(&HeaderLength,1,sizeof(HeaderLength),File);
+                fwrite(chip_signature,1,4,File);
+                /*****/ header_lenght = 0x00002010;
+                header_lenght = ConvertDWord(header_lenght);
+                fwrite(&header_lenght,1,sizeof(header_lenght),File);
 
                 chip_typ = 2;
-                chip_typ = chip_typ<<8 | chip_typ>>8;
+                chip_typ = static_cast<uint16_t>((chip_typ << 8) | (chip_typ >> 8));
                 fwrite(&chip_typ,1,sizeof(chip_typ),File);
 
-                chip_bank = (unsigned short)i;
-                chip_bank = chip_bank<<8 | chip_bank>>8;
+                chip_bank = static_cast<uint16_t>(i);
+                chip_bank = static_cast<uint16_t>((chip_bank << 8) | (chip_bank >> 8));
                 fwrite(&chip_bank,1,sizeof(chip_bank),File);
 
-                chip_adr = 0xA000;
-                chip_adr = chip_adr<<8 | chip_adr>>8;
-                fwrite(&chip_adr,1,sizeof(chip_adr),File);
+                chip_address = 0xA000;
+                chip_address = static_cast<uint16_t>((chip_address << 8) | (chip_address >> 8));
+                fwrite(&chip_address,1,sizeof(chip_address),File);
 
                 chip_size = 0x2000;
-                chip_size = chip_size<<8 | chip_size>>8;
+                chip_size = static_cast<uint16_t>((chip_size << 8) | (chip_size >> 8));
                 fwrite(&chip_size,1,sizeof(chip_size),File);
 
                 fwrite(&rom_bank2[i*0x2000],1,0x2000,File);
@@ -469,15 +469,15 @@ void CartridgeClass::SetEasyFlashJumper(bool enable)
         easyflash_jumper = enable;
 }
 
-int CartridgeClass::GetCRTInfo(const char *filename, CRT_INFO_STRUCT* crt_info)
+int CartridgeClass::GetCartridgeInfo(const char *filename, CARTRIDGE_INFO_STRUCT* crt_info)
 {
         FILE *File;
-        char Kennung[17];
-        unsigned short Version;
-        unsigned int HeaderLength;
-        unsigned long akt_pos;
-        unsigned short tmp;
-        int Bank1Pos,Bank2Pos,Bank3Pos;
+        char signature[17];
+        uint16_t version;
+        uint32_t header_lenght;
+        uint32_t akt_pos;
+        uint16_t tmp;
+        uint16_t Bank1Pos, Bank2Pos, Bank3Pos;
         size_t reading_elements;
 
         File = fopen (filename, "rb");
@@ -486,29 +486,29 @@ int CartridgeClass::GetCRTInfo(const char *filename, CRT_INFO_STRUCT* crt_info)
                 return 0x01;
         }
 
-        reading_elements = fread(Kennung,1,16,File);
+        reading_elements = fread(signature,1,16,File);
         if(reading_elements != 16)
             return 0x01;
 
-        Kennung[16] = 0;
+        signature[16] = 0;
 
-        if(0!=strcmp("C64 CARTRIDGE   ",Kennung))
+        if(0!=strcmp("C64 CARTRIDGE   ",signature))
         {
                 fclose(File);
                 return 0x02;
         }
 
-        reading_elements = fread(&HeaderLength,1,sizeof(HeaderLength),File);
-        HeaderLength = ConvertDWord(HeaderLength);
+        reading_elements = fread(&header_lenght,1,sizeof(header_lenght),File);
+        header_lenght = ConvertDWord(header_lenght);
 
-        reading_elements = fread(&Version,1,sizeof(Version),File);
+        reading_elements = fread(&version,1,sizeof(version),File);
 
-        sprintf(crt_info->Version,"%X.%2.2X",(unsigned char)Version,Version>>8);
+        sprintf(crt_info->Version,"%X.%2.2X",static_cast<uint8_t>(version), version>>8);
 
         reading_elements = fread(&crt_info->HardwareType,1,sizeof(crt_info->HardwareType),File);
-        crt_info->HardwareType = crt_info->HardwareType<<8 | crt_info->HardwareType>>8;
-        if(crt_info->HardwareType > 32) crt_info->HardwareTypeString = (char*)TYPE_STRING[33];
-        else crt_info->HardwareTypeString = (char*)TYPE_STRING[crt_info->HardwareType];
+        crt_info->HardwareType = static_cast<uint16_t>((crt_info->HardwareType << 8) | (crt_info->HardwareType >> 8));
+        if(crt_info->HardwareType > 32) crt_info->HardwareTypeString = const_cast<char*>(TYPE_STRING[33]);
+        else crt_info->HardwareTypeString = const_cast<char*>(TYPE_STRING[crt_info->HardwareType]);
 
         reading_elements = fread(&crt_info->EXROM,1,sizeof(crt_info->EXROM),File);
         reading_elements = fread(&crt_info->GAME,1,sizeof(crt_info->GAME),File);
@@ -521,24 +521,24 @@ int CartridgeClass::GetCRTInfo(const char *filename, CRT_INFO_STRUCT* crt_info)
         Bank1Pos = Bank2Pos = Bank3Pos = 0;
 L1:
         fseek(File,akt_pos,SEEK_SET);
-        if(4 > fread(Kennung,1,4,File)) goto L2;
-        Kennung[4] = 0;
-        if(0==strcmp("CHIP",Kennung))
+        if(4 > fread(signature,1,4,File)) goto L2;
+        signature[4] = 0;
+        if(0==strcmp("CHIP",signature))
         {
-                reading_elements = fread(&HeaderLength,1,sizeof(HeaderLength),File);
-                HeaderLength = ConvertDWord(HeaderLength);
+                reading_elements = fread(&header_lenght,1,sizeof(header_lenght),File);
+                header_lenght = ConvertDWord(header_lenght);
 
                 reading_elements = fread(&tmp,1,2,File);
-                tmp = tmp<<8 | tmp>>8;
+                tmp = static_cast<uint16_t>((tmp << 8) | (tmp >> 8));
                 crt_info->ChipInfo[crt_info->ChipCount].Type = tmp;
                 reading_elements = fread(&tmp,1,2,File);
-                tmp = tmp<<8 | tmp>>8;
+                tmp = static_cast<uint16_t>((tmp << 8) | (tmp >> 8));
                 crt_info->ChipInfo[crt_info->ChipCount].BankLocation = tmp;
                 reading_elements = fread(&tmp,1,2,File);
-                tmp = tmp<<8 | tmp>>8;
+                tmp = static_cast<uint16_t>((tmp << 8) | (tmp >> 8));
                 crt_info->ChipInfo[crt_info->ChipCount].LoadAdress = tmp;
                 reading_elements = fread(&tmp,1,2,File);
-                tmp = tmp<<8 | tmp>>8;
+                tmp = static_cast<uint16_t>((tmp << 8) | (tmp >> 8));
                 crt_info->ChipInfo[crt_info->ChipCount].ChipSize = tmp;
 
                 switch(crt_info->ChipInfo[crt_info->ChipCount].LoadAdress)
@@ -567,7 +567,7 @@ L1:
                 }
 
                 crt_info->ChipCount ++;
-                akt_pos += HeaderLength;
+                akt_pos += header_lenght;
                 goto L1;
         }
 L2:
@@ -887,7 +887,7 @@ uint8_t CartridgeClass::ReadRom1(uint16_t address)
                 else return ar_ram[address & 0x1FFF];
 
         case 32:	// EasyFlash
-                return am29f040Lo->Read((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13));
+                return am29f040Lo->Read(static_cast<uint32_t>((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13)));
 
         default:
                 return lo_rom[address-0x8000];
@@ -901,7 +901,7 @@ uint8_t CartridgeClass::ReadRom2(uint16_t address)
         switch(cartridge_type)
         {
         case 32:	// EasyFlash
-                return am29f040Hi->Read((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13));
+                return am29f040Hi->Read(static_cast<uint32_t>((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13)));
 
         default:
                 return hi_rom[address-0xA000];
@@ -915,7 +915,7 @@ uint8_t CartridgeClass::ReadRom3(uint16_t address)
         switch(cartridge_type)
         {
         case 32:	// EasyFlash
-                return am29f040Hi->Read((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13));
+                return am29f040Hi->Read(static_cast<uint32_t>((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13)));
 
         default:
                 return hi_rom[address-0xE000];
@@ -942,7 +942,7 @@ void CartridgeClass::WriteRom1(uint16_t address, uint8_t value)	// 0x8000
                 c64_ram[address] = value;
             break;
         case 32:	// EasyFlash
-                am29f040Lo->Write((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13),value);
+                am29f040Lo->Write(static_cast<uint32_t>((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13)), value);
                 c64_ram[address] = value;
                 break;
         default:
@@ -962,7 +962,7 @@ void CartridgeClass::WriteRom2(uint16_t address, uint8_t value)	// 0xA000
         switch(cartridge_type)
         {
         case 32:	// EasyFlash
-                am29f040Hi->Write((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13),value);
+                am29f040Hi->Write(static_cast<uint32_t>((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13)),value);
                 c64_ram[address] = value;
                 break;
         default:
@@ -982,7 +982,7 @@ void CartridgeClass::WriteRom3(uint16_t address, uint8_t value)	// 0xE000
         switch(cartridge_type)
         {
         case 32:	// EasyFlash
-                am29f040Hi->Write((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13),value);
+                am29f040Hi->Write(static_cast<uint32_t>((address & 0x1FFF) | ((easyflash_bank_reg & 0x3F)<<13)), value);
                 c64_ram[address] = value;
                 break;
         default:
