@@ -3,18 +3,18 @@
 // Emu64                                        //
 // von Thorsten Kattanek                        //
 //                                              //
-// #file: crt_window.h                          //
+// #file: cartridge_window.h                    //
 //                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.06.2019                //
+// Letzte Änderung am 07.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#ifndef CRT_WINDOW_H
-#define CRT_WINDOW_H
+#ifndef CARTRIDGE_WINDOW_H
+#define CARTRIDGE_WINDOW_H
 
 #include <QDialog>
 #include <QSettings>
@@ -27,21 +27,21 @@
 
 #include "./cartridge_new_easyflash_window.h"
 
-#define LED_COUNT 2
+#define LED_NUM 2
 
 namespace Ui {
-    class CrtWindow;
+    class CartridgeWindow;
 }
 
-class CrtWindow : public QDialog
+class CartridgeWindow : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit CrtWindow(QWidget *parent = 0, QSettings *ini = 0, C64Class *c64 = 0);
-    ~CrtWindow();
+    explicit CartridgeWindow(QWidget *parent = 0, QSettings *ini = 0, C64Class *c64 = 0);
+    ~CartridgeWindow();
     void LoadIni(void);
-    bool SetCrtImage(QString filename);
+    bool SetCartridgeImage(QString filename);
     void ConnectCrt();
     void DisconnectCrt();
     void RetranslateUi();
@@ -63,7 +63,7 @@ private slots:
     void onTimer1();
 
 private:
-    Ui::CrtWindow *ui;
+    Ui::CartridgeWindow *ui;
     CartridgeClass *crt;
     C64Class *c64;
     QSettings *ini;
@@ -75,10 +75,10 @@ private:
     bool CRTIsSelected;
     QString SelCRTFileName;
     QTimer *timer1;
-    bool LedStatus[LED_COUNT];
-    bool LedStatusOld[LED_COUNT];
+    bool LedStatus[LED_NUM];
+    bool LedStatusOld[LED_NUM];
     QIcon *LedRedOn;
     QIcon *LedRedOff;
 };
 
-#endif // CRT_WINDOW_H
+#endif // CARTRIDGE_WINDOW_H

@@ -3,7 +3,7 @@
 // Emu64                                        //
 // von Thorsten Kattanek                        //
 //                                              //
-// #file: crt_window.cpp                        //
+// #file: cartridge_window.cpp                  //
 //                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
@@ -19,9 +19,9 @@
 #include "cartridge_window.h"
 #include "ui_cartridge_window.h"
 
-CrtWindow::CrtWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
+CartridgeWindow::CartridgeWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
     QDialog(parent),
-    ui(new Ui::CrtWindow)
+    ui(new Ui::CartridgeWindow)
 {
     ini = _ini;
 
@@ -78,7 +78,7 @@ CrtWindow::CrtWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
     timer1->start();
 }
 
-CrtWindow::~CrtWindow()
+CartridgeWindow::~CartridgeWindow()
 {
     if(win_exp)
     {
@@ -102,7 +102,7 @@ CrtWindow::~CrtWindow()
     delete ui;
 }
 
-void CrtWindow::LoadIni(void)
+void CartridgeWindow::LoadIni(void)
 {
     ////////// Load from INI ///////////
     if(ini != nullptr)
@@ -125,7 +125,7 @@ void CrtWindow::LoadIni(void)
     ////////////////////////////////////
 }
 
-bool CrtWindow::SetCrtImage(QString filename)
+bool CartridgeWindow::SetCartridgeImage(QString filename)
 {
     QFileInfo fi = QFileInfo(filename);
 
@@ -134,34 +134,34 @@ bool CrtWindow::SetCrtImage(QString filename)
     return CRTIsSelected;
 }
 
-void CrtWindow::ConnectCrt()
+void CartridgeWindow::ConnectCrt()
 {
     on_InsertCRT_clicked();
 }
 
-void CrtWindow::DisconnectCrt()
+void CartridgeWindow::DisconnectCrt()
 {
     on_RemoveCRT_clicked();
 }
 
-void CrtWindow::showEvent(QShowEvent*)
+void CartridgeWindow::showEvent(QShowEvent*)
 {
     isOneShowed = true;
     timer1->start();
 }
 
-void CrtWindow::hideEvent(QHideEvent*)
+void CartridgeWindow::hideEvent(QHideEvent*)
 {
     timer1->stop();
 }
 
-void CrtWindow::RetranslateUi()
+void CartridgeWindow::RetranslateUi()
 {
     ui->retranslateUi(this);
     this->update();
 }
 
-void CrtWindow::on_ViewChipData_clicked()
+void CartridgeWindow::on_ViewChipData_clicked()
 {
     if(ChipDataExpand)
     {
@@ -192,7 +192,7 @@ void CrtWindow::on_ViewChipData_clicked()
     }
 }
 
-void CrtWindow::onSelectFile(QString filename)
+void CartridgeWindow::onSelectFile(QString filename)
 {
     char str00[256];
 
@@ -310,7 +310,7 @@ void CrtWindow::onSelectFile(QString filename)
     }
 }
 
-void CrtWindow::onChipList_currentChanged(const QModelIndex &current, const QModelIndex &)
+void CartridgeWindow::onChipList_currentChanged(const QModelIndex &current, const QModelIndex &)
 {
     char str00[256];
     ui->ChipData->clear();
@@ -336,7 +336,7 @@ void CrtWindow::onChipList_currentChanged(const QModelIndex &current, const QMod
     }
 }
 
-void CrtWindow::onTimer1()
+void CartridgeWindow::onTimer1()
 {
     if(LedStatusOld[0] != LedStatus[0])
     {
@@ -350,11 +350,11 @@ void CrtWindow::onTimer1()
         else ui->EF_LED->setIcon(*LedRedOff);
     }
 
-    for(int i=0; i<LED_COUNT; i++)
+    for(int i=0; i<LED_NUM; i++)
         LedStatusOld[i] = LedStatus[i];
 }
 
-void CrtWindow::on_NewEasyFlashCRT_clicked()
+void CartridgeWindow::on_NewEasyFlashCRT_clicked()
 {
     CRTNewEasyflashWindow *crt_new_ef_window = new CRTNewEasyflashWindow(this);
 
@@ -404,7 +404,7 @@ void CrtWindow::on_NewEasyFlashCRT_clicked()
     delete crt_new_ef_window;
 }
 
-void CrtWindow::on_InsertCRT_clicked()
+void CartridgeWindow::on_InsertCRT_clicked()
 {
     if(CRTIsSelected)
     {
@@ -431,7 +431,7 @@ void CrtWindow::on_InsertCRT_clicked()
     }
 }
 
-void CrtWindow::on_RemoveCRT_clicked()
+void CartridgeWindow::on_RemoveCRT_clicked()
 {
     ui->PageFC->setEnabled(false);
     ui->PageEasyFlash->setEnabled(false);
@@ -439,25 +439,25 @@ void CrtWindow::on_RemoveCRT_clicked()
     c64->RemoveCRT();
 }
 
-void CrtWindow::ChangeLED(int LedNr, bool LedStatus)
+void CartridgeWindow::ChangeLED(int LedNr, bool LedStatus)
 {
-    if(LedNr < LED_COUNT)
+    if(LedNr < LED_NUM)
     {
         this->LedStatus[LedNr] = LedStatus;
     }
 }
 
-void CrtWindow::on_FreezButtonFC3_clicked()
+void CartridgeWindow::on_FreezButtonFC3_clicked()
 {
     crt->Freeze();
 }
 
-void CrtWindow::on_EF_JUMPER0_toggled(bool checked)
+void CartridgeWindow::on_EF_JUMPER0_toggled(bool checked)
 {
     crt->SetEasyFlashJumper(!checked);
 }
 
-void CrtWindow::on_FreezButtonAR_clicked()
+void CartridgeWindow::on_FreezButtonAR_clicked()
 {
     crt->Freeze();
 }

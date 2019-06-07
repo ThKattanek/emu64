@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.06.2019                //
+// Letzte Änderung am 07.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -105,7 +105,7 @@ MainWindow::~MainWindow()
     delete floppy_window;
     delete tape_window;
     delete c64_keyboard_window;
-    delete crt_window;
+    delete cartridge_window;
     delete debugger_window;
     delete speed_window;
     delete show_c64keymap_window;
@@ -320,7 +320,7 @@ void MainWindow::OnInit()
     LogText(trUtf8(">> C64KeyboardWindow wurde erzeugt\n").toLatin1().data());
 
     SplashMessage(trUtf8("CRTWindow wird erstellt."),Qt::darkBlue);
-    crt_window = new CrtWindow(this,ini,c64);
+    cartridge_window = new CartridgeWindow(this,ini,c64);
     LogText(trUtf8(">> CrtWindow wurde erzeugt\n").toLatin1().data());
 
     SplashMessage(trUtf8("DebuggerWindow wird erstellt."),Qt::darkBlue);
@@ -373,7 +373,7 @@ void MainWindow::OnInit()
 
     /// CRT LED mit CRT_Window verbinden ///
     SplashMessage(trUtf8("CRT LED mit CRT Window verbunden."),Qt::darkBlue);
-    c64->crt->ChangeLED = bind(&CrtWindow::ChangeLED,crt_window,_1,_2);
+    c64->crt->ChangeLED = bind(&CartridgeWindow::ChangeLED,cartridge_window,_1,_2);
     LogText(trUtf8(">> CRT LED wurde mit CrtWindow verbunden\n").toLatin1().data());
 
     /// C64 Systemroms laden ///
@@ -464,7 +464,7 @@ void MainWindow::OnInit()
         LogText(trUtf8(">> SetupWindow LoadIni wurde ausgeführt\n").toLatin1().data());
 
         /// CRT Ini erst jetzt laden ///
-        crt_window->LoadIni();
+        cartridge_window->LoadIni();
         LogText(trUtf8(">> CrtWindow LoadIni wurde ausgeführt\n").toLatin1().data());
 
         /// TAPE Ini laden ///
@@ -681,7 +681,7 @@ void MainWindow::RetranslateUi()
     c64_keyboard_window->RetranslateUi();
     floppy_window->RetranslateUi();
     tape_window->RetranslateUi();
-    crt_window->RetranslateUi();
+    cartridge_window->RetranslateUi();
     debugger_window->RetranslateUi();
     setup_window->RetranslateUi();
     speed_window->RetranslateUi();
@@ -826,16 +826,16 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
             fi = new QFileInfo(filename);
             if(fi->exists())
             {
-                if(crt_window->SetCrtImage(fi->absoluteFilePath()))
+                if(cartridge_window->SetCartridgeImage(fi->absoluteFilePath()))
                 {
-                    crt_window->ConnectCrt();
+                    cartridge_window->ConnectCrt();
                 }
             }
             else
                 cout << "Die angebene Datei existiert nicht." << endl;
             break;
         case CMD_UMOUNT_CRT:
-            crt_window->DisconnectCrt();
+            cartridge_window->DisconnectCrt();
             break;
         case CMD_WARP_MODE:
             c64->EnableWarpMode(true);
@@ -998,8 +998,8 @@ void MainWindow::on_actionC64_Tastaturbelegung_ndern_triggered()
 
 void MainWindow::on_actionSteckmodule_triggered()
 {
-    if(crt_window->isHidden()) crt_window->show();
-    else crt_window->hide();
+    if(cartridge_window->isHidden()) cartridge_window->show();
+    else cartridge_window->hide();
 }
 
 void MainWindow::on_actionDebugger_Disassembler_triggered()

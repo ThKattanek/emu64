@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.06.2019                //
+// Letzte Änderung am 07.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -174,7 +174,7 @@ private:
     FloppyWindow *floppy_window;                    // Floppy Editor / Auswahl
     TapeWindow *tape_window;                        // Datasette
     C64KeyboardWindow *c64_keyboard_window;         // Virtuelle C64 Tastatur
-    CrtWindow *crt_window;                          // CRT Auswahl Fenster
+    CartridgeWindow *cartridge_window;              // CRT Auswahl Fenster
     DebuggerWindow *debugger_window;                // Debugger / Disassembler Fenster
     SetupWindow *setup_window;                      // Setup Fenster
     C64SpeedWindow *speed_window;                   // C64 Speed Window
