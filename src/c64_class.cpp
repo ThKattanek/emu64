@@ -2706,7 +2706,7 @@ int C64Class::LoadCRT(char *filename)
     reu->Remove();
     geo->Remove();
 
-    int ret = crt->LoadCRTImage(filename);
+    int ret = crt->LoadCartridgeImage(filename);
     if(ret == 0)
     {
         io_source = 1;
@@ -2719,7 +2719,7 @@ int C64Class::LoadCRT(char *filename)
 
 void C64Class::RemoveCRT()
 {
-    crt->RemoveCRTImage();
+    crt->RemoveCartridgeImage();
     io_source = 0;
     KillCommandLine();
     HardReset();
@@ -2734,7 +2734,7 @@ void C64Class::InsertREU()
 {
     io_source = 2;
 
-    crt->RemoveCRTImage();
+    crt->RemoveCartridgeImage();
     geo->Remove();
 
     reu->Insert();
@@ -2774,7 +2774,7 @@ void C64Class::InsertGEORAM()
 {
     io_source = 3;
 
-    crt->RemoveCRTImage();
+    crt->RemoveCartridgeImage();
     reu->Remove();
     reu_is_insert = false;
 

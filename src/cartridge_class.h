@@ -3,12 +3,12 @@
 // Emu64                                        //
 // von Thorsten Kattanek                        //
 //                                              //
-// #file: crt_class.h                           //
+// #file: cartridge_class.h                     //
 //                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.06.2019                //
+// Letzte Änderung am 07.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -33,8 +33,8 @@ public:
     // Funktionen
     bool *GetFlash040Dirty(uint16_t nr);
     uint8_t* GetFlash040Byte(uint16_t nr);
-    int LoadCRTImage(const char* filename);
-    void RemoveCRTImage();
+    int LoadCartridgeImage(const char* filename);
+    void RemoveCartridgeImage();
     int CreateNewEasyFlashImage(const char* filename, const char* crt_name);
     int WriteEasyFlashImage(const char* filename);
     int GetCartridgeInfo(const char* filename, CARTRIDGE_INFO_STRUCT *crt_info);

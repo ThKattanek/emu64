@@ -3,12 +3,12 @@
 // Emu64                                        //
 // von Thorsten Kattanek                        //
 //                                              //
-// #file: crt_class.cpp                         //
+// #file: cartridge_class.cpp                   //
 //                                              //
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.06.2019                //
+// Letzte Änderung am 07.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -136,7 +136,7 @@ uint8_t *CartridgeClass::GetFlash040Byte(uint16_t nr)
         }
 }
 
-int CartridgeClass::LoadCRTImage(const char *filename)
+int CartridgeClass::LoadCartridgeImage(const char *filename)
 {
         FILE *file;
         char signature[17];
@@ -249,7 +249,7 @@ L2:
         return 0;
 }
 
-void CartridgeClass::RemoveCRTImage()
+void CartridgeClass::RemoveCartridgeImage()
 {
         cartridge_is_insert = false;
         *game = true;

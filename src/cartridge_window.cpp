@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.06.2019                //
+// Letzte Änderung am 07.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -361,7 +361,7 @@ void CrtWindow::on_NewEasyFlashCRT_clicked()
     if(crt_new_ef_window->exec())
     {
         QString filename = crt_new_ef_window->GetFilename();
-        QString crt_name = crt_new_ef_window->GetCrtName();
+        QString cartridge_name = crt_new_ef_window->GetCartridgeName();
         QString fullpath;
 
         if(filename.right(4).toUpper() != ".CRT")
@@ -374,7 +374,7 @@ void CrtWindow::on_NewEasyFlashCRT_clicked()
         QFile file(fullpath);
         if(!file.exists())
         {
-            if(c64->CreateNewEasyFlashImage(fullpath.toLatin1().data(), crt_name.toLatin1().data()))
+            if(c64->CreateNewEasyFlashImage(fullpath.toLatin1().data(), cartridge_name.toLatin1().data()))
             {
                 QMessageBox::critical(this,trUtf8("Fehler!"),trUtf8("Es konnte kein neues EasyFlash Image erstellt werden."));
             }
@@ -388,7 +388,7 @@ void CrtWindow::on_NewEasyFlashCRT_clicked()
         {
             if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Achtung!"),trUtf8("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
             {
-                if(c64->CreateNewEasyFlashImage(fullpath.toLatin1().data(), crt_name.toLatin1().data()))
+                if(c64->CreateNewEasyFlashImage(fullpath.toLatin1().data(), cartridge_name.toLatin1().data()))
                 {
                     QMessageBox::critical(this,trUtf8("Fehler!"),trUtf8("Es konnte kein neues EasyFlash Image erstellt werden."));
                 }
