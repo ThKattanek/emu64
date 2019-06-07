@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.12.2016                //
+// Letzte Änderung am 07.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -27,11 +27,11 @@ class CRTNewEasyflashWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit CRTNewEasyflashWindow(QWidget *parent = 0);
+    explicit CRTNewEasyflashWindow(QWidget *parent = nullptr);
     ~CRTNewEasyflashWindow();
 
     QString GetFilename();
-    QString GetCrtName();
+    QString GetCartridgeName();
 
 private:
     Ui::CRTNewEasyflashWindow *ui;

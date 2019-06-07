@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.06.2019                //
+// Letzte Änderung am 07.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -33,7 +33,7 @@ QString CRTNewEasyflashWindow::GetFilename()
     return ui->Filename->text();
 }
 
-QString CRTNewEasyflashWindow::GetCrtName()
+QString CRTNewEasyflashWindow::GetCartridgeName()
 {
     return ui->CRTName->text();
 }
