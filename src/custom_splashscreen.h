@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 09.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,16 +19,16 @@
 #include <QSplashScreen>
 #include <QPainter>
 
-class customSplashScreen
+class CustomSplashScreen
  :public QSplashScreen
 {
 
 public:
- customSplashScreen(const QPixmap& pixmap);
- ~customSplashScreen();
+ CustomSplashScreen(const QPixmap& pixmap);
+ ~CustomSplashScreen();
  virtual void drawContents(QPainter *painter);
- void showStatusMessage(const QString &message, const QColor &color = Qt::black);
- void setMessageRect(QRect rect, int alignment = Qt::AlignLeft);
+ void ShowStatusMessage(const QString &message, const QColor &color = Qt::black);
+ void SetMessageRect(QRect rect, int alignment = Qt::AlignLeft);
 
 private:
  QString message;

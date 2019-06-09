@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.06.2019                //
+// Letzte Änderung am 09.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,7 +16,7 @@
 #include "./main_window.h"
 #include "./ui_main_window.h"
 
-MainWindow::MainWindow(QWidget *parent,customSplashScreen* splash,QTextStream *log) :
+MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *log) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     c64(NULL)
@@ -167,7 +167,7 @@ void MainWindow::OnInit()
 
     if(splash != NULL)
     {
-        splash->setMessageRect(QRect(0,303,400, 20), Qt::AlignCenter);
+        splash->SetMessageRect(QRect(0,303,400, 20), Qt::AlignCenter);
 
         QFont splashFont;
         splashFont.setFamily("Arial");
@@ -897,7 +897,7 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
 
 void MainWindow::SplashMessage(const QString &message, const QColor &color)
 {
-    if(splash != NULL) splash->showStatusMessage(message,color);
+    if(splash != NULL) splash->ShowStatusMessage(message,color);
 }
 
 void MainWindow::on_menu_main_info_triggered()
