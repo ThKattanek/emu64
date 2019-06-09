@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.06.2019                //
+// Letzte Änderung am 09.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -106,7 +106,7 @@ public:
     bool        ar_active;
     bool        ar_enable_ram;
     uint8_t     ar_ram[0x2000];             // 8KB
-    uint8_t     pla_adresse;
+    uint8_t     pla_address;
 };
 
 #endif // CARTRIDGE_CLASS_H

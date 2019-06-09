@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.06.2019                //
+// Letzte Änderung am 09.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -59,7 +59,7 @@ void CartridgeClass::ResetAllLEDS(void)
 void CartridgeClass::SetMemLogicAR(uint16_t address)
 {
     if(!ar_active) return;
-    uint8_t io2, pla_address, pla_out;
+    uint8_t io2, pla_out;
 
     if((address >= 0xdf00) && (address <= 0xdfff))
         io2 = 0;
@@ -85,7 +85,7 @@ void CartridgeClass::SetMemLogicAR(uint16_t address)
     // Bit 1 - RAM Enable (CS)
     // Bit 2 - GAME
     // Bit 3 - EXROM
-    pla_out = mk7pla[pla_adresse];
+    pla_out = mk7pla[pla_address];
 
     ar_enable_ram = (~pla_out>>1 & 1);
 
