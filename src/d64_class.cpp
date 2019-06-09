@@ -100,49 +100,55 @@ int D64Class::LoadD64(const char *filename)
     d64_name[D64_NAME_LENGHT]=0;
 
     file_count=0;
-L20:
-    int si = 0;
-    int bx = 0;
 
-    if(track==0) goto L50;
-
-    ReadBlock(track, sector,block);
-    if((track == block[0]) && (sector == block[1])) goto L50;
-    track = block[0];
-    sector = block[1];
-L30:
-    d64_files[file_count].Typ = block[si+2];
-    if(block[si+3]==0xFF) goto L50;
-
-    d64_files[file_count].Track = block[si+3];
-    d64_files[file_count].Sektor = block[si+4];
-
-    ReadBlock(block[si+3],block[si+4], block_tmp);
-    d64_files[file_count].Adresse = static_cast<uint16_t>(block_tmp[3] << 8);
-    d64_files[file_count].Adresse += block_tmp[2];
-
-    uint16_t tmp;
-    tmp = static_cast<uint16_t>(block[si+31] << 8);
-    tmp += block[si+30];
-    d64_files[file_count].Laenge = tmp;
-
-    d64_files[file_count].Name[16] = 0;
-
-    for (int z=0; z<16; z++)
+    if(track != 0)
     {
-        d64_files[file_count].Name[z] = static_cast<char>(block[si+5+z]);
+        L20:
+        int si = 0;
+        int bx = 0;
+
+        ReadBlock(track, sector,block);
+
+        if(!((track == block[0]) && (sector == block[1])))
+        {
+            track = block[0];
+            sector = block[1];
+            L30:
+            d64_files[file_count].Typ = block[si+2];
+
+            if(block[si+3] != 0xFF)
+            {
+                d64_files[file_count].Track = block[si+3];
+                d64_files[file_count].Sektor = block[si+4];
+
+                ReadBlock(block[si+3],block[si+4], block_tmp);
+                d64_files[file_count].Adresse = static_cast<uint16_t>(block_tmp[3] << 8);
+                d64_files[file_count].Adresse += block_tmp[2];
+
+                uint16_t tmp;
+                tmp = static_cast<uint16_t>(block[si+31] << 8);
+                tmp += block[si+30];
+                d64_files[file_count].Laenge = tmp;
+
+                d64_files[file_count].Name[16] = 0;
+
+                for (int z=0; z<16; z++)
+                {
+                    d64_files[file_count].Name[z] = static_cast<char>(block[si+5+z]);
+                }
+
+                si += 32;
+                bx++;
+                file_count++;
+
+                d64_size += d64_files[file_count].Laenge;
+
+
+                if (bx<8) goto L30;
+                else goto L20;
+            }
+        }
     }
-
-    si += 32;
-    bx++;
-    file_count++;
-
-    d64_size += d64_files[file_count].Laenge;
-
-    if (bx<8) goto L30;
-    else goto L20;
-
-L50:
     return 0;
 }
 
