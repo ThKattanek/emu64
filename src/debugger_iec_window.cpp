@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.05.2016                //
+// Letzte Änderung am 09.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -22,12 +22,12 @@
 DebuggerIECWindow::DebuggerIECWindow(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DebuggerIECWindow),
-    c64(NULL)
+    c64(nullptr)
 {
     ui->setupUi(this);
 
-    iOff = new QIcon(":/grafik/green_led_off.png");
-    iOn = new QIcon(":/grafik/green_led_on.png");
+    icon_off = new QIcon(":/grafik/green_led_off.png");
+    icon_on = new QIcon(":/grafik/green_led_on.png");
 
     ui->StartExport->setEnabled(true);
     ui->StopExport->setEnabled(false);
@@ -44,9 +44,9 @@ void DebuggerIECWindow::RetranslateUi()
     this->update();
 }
 
-bool DebuggerIECWindow::getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt)
+bool DebuggerIECWindow::GetSaveFileName(QWidget *parent, QString caption, QString filter, QString *file_name, QString *file_extension)
 {
-   if (fileName == NULL)      // "parent" is allowed to be NULL!
+   if (file_name == nullptr)      // "parent" is allowed to be NULL!
       return false;
 
    QFileDialog saveDialog(parent);
@@ -54,10 +54,10 @@ bool DebuggerIECWindow::getSaveFileName(QWidget *parent, QString caption, QStrin
    saveDialog.setAcceptMode(QFileDialog::AcceptSave);
    saveDialog.setConfirmOverwrite(false);
    saveDialog.setFilter(filter);
-   saveDialog.selectFile(*fileName);
+   saveDialog.selectFile(*file_name);
    saveDialog.setOptions(QFileDialog::DontUseNativeDialog);
 
-   *fileName = "";
+   *file_name = "";
 
    if (!saveDialog.exec())
       return false;      // User pressed "Cancel"
@@ -113,8 +113,8 @@ bool DebuggerIECWindow::getSaveFileName(QWidget *parent, QString caption, QStrin
    }
    */
 
-   *fileName = tmpFileName;
-   *fileExt = extension;
+   *file_name = tmpFileName;
+   *file_extension = extension;
    return true;
 }
 
@@ -125,26 +125,27 @@ void DebuggerIECWindow::SetC64Pointer(C64Class *c64)
 
 void DebuggerIECWindow::UpdateSignals()
 {
-    if(c64 == NULL) return;
+    if(c64 == nullptr)
+        return;
 
     IEC_STRUCT iec;
 
     c64->GetIECStatus(&iec);
 
-    if(iec.DATA_OUT) ui->DataOut->setIcon(*iOn);
-    else ui->DataOut->setIcon(*iOff);
+    if(iec.DATA_OUT) ui->DataOut->setIcon(*icon_on);
+    else ui->DataOut->setIcon(*icon_off);
 
-    if(iec.DATA_IN) ui->DataIn->setIcon(*iOn);
-    else ui->DataIn->setIcon(*iOff);
+    if(iec.DATA_IN) ui->DataIn->setIcon(*icon_on);
+    else ui->DataIn->setIcon(*icon_off);
 
-    if(iec.CLOCK_OUT) ui->ClkOut->setIcon(*iOn);
-    else ui->ClkOut->setIcon(*iOff);
+    if(iec.CLOCK_OUT) ui->ClkOut->setIcon(*icon_on);
+    else ui->ClkOut->setIcon(*icon_off);
 
-    if(iec.CLOCK_IN) ui->ClkIn->setIcon(*iOn);
-    else ui->ClkIn->setIcon(*iOff);
+    if(iec.CLOCK_IN) ui->ClkIn->setIcon(*icon_on);
+    else ui->ClkIn->setIcon(*icon_off);
 
-    if(iec.ATN_OUT) ui->AtnOut->setIcon(*iOn);
-    else ui->AtnOut->setIcon(*iOff);
+    if(iec.ATN_OUT) ui->AtnOut->setIcon(*icon_on);
+    else ui->AtnOut->setIcon(*icon_off);
 }
 
 void DebuggerIECWindow::on_StopExport_clicked()
@@ -160,12 +161,13 @@ void DebuggerIECWindow::on_StartExport_clicked()
     QString filename;
     QString fileext;
 
-    if(c64 == NULL) return;
+    if(c64 == nullptr)
+        return;
 
     //QString filename = QFileDialog::getSaveFileName(0,trUtf8("Als VCD speichern"),QDir::homePath(),trUtf8("Value Change Dump ") + "(*.vcd);;" + trUtf8("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
 
 
-    if(!getSaveFileName(this,trUtf8("Als VCD speichern"),trUtf8("Value Change Dump ") + "(*.vcd);;" + trUtf8("Alle Dateien ") + "(*.*)",&filename,&fileext))
+    if(!GetSaveFileName(this,trUtf8("Als VCD speichern"),trUtf8("Value Change Dump ") + "(*.vcd);;" + trUtf8("Alle Dateien ") + "(*.*)",&filename,&fileext))
         return;
 
 

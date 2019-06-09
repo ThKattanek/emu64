@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.05.2016                //
+// Letzte Änderung am 09.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -30,16 +30,15 @@ class DebuggerIECWindow : public QDialog
     Q_OBJECT
     
 public:
-    explicit DebuggerIECWindow(QWidget *parent = 0);
+    explicit DebuggerIECWindow(QWidget *parent = nullptr);
     ~DebuggerIECWindow();
     void RetranslateUi();
-    bool getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt);
+    bool GetSaveFileName(QWidget *parent, QString caption, QString filter, QString *file_name, QString *file_extension);
     void SetC64Pointer(C64Class *c64);
     void UpdateSignals();
     
 private slots:
     void on_StopExport_clicked();
-
     void on_StartExport_clicked();
 
 private:
@@ -47,8 +46,8 @@ private:
 
     C64Class *c64;
 
-    QIcon *iOff;
-    QIcon *iOn;
+    QIcon *icon_off;
+    QIcon *icon_on;
 };
 
 #endif // DEBUGGER_IEC_WINDOW_H
