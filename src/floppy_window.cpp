@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.06.2019                //
+// Letzte Änderung am 09.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -310,14 +310,14 @@ void FloppyWindow::OnD64FileStart1(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
     int floppy_nr = ui->FloppySelect->currentIndex();
-    c64->LoadPRGFromD64(floppy_nr,d64[floppy_nr].D64Files[file_index].Name,0);
+    c64->LoadPRGFromD64(floppy_nr,d64[floppy_nr].d64_files[file_index].Name,0);
 }
 
 void FloppyWindow::OnD64FileStart2(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
     int floppy_nr = ui->FloppySelect->currentIndex();
-    c64->LoadPRGFromD64(floppy_nr,d64[floppy_nr].D64Files[file_index].Name,1);
+    c64->LoadPRGFromD64(floppy_nr,d64[floppy_nr].d64_files[file_index].Name,1);
 }
 
 void FloppyWindow::OnD64FileStart3(bool)
@@ -336,7 +336,7 @@ void FloppyWindow::OnD64FileStart4(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
     int floppy_nr = ui->FloppySelect->currentIndex();
-    c64->LoadPRGFromD64(floppy_nr,d64[floppy_nr].D64Files[file_index].Name,2);
+    c64->LoadPRGFromD64(floppy_nr,d64[floppy_nr].d64_files[file_index].Name,2);
 }
 
 void FloppyWindow::OnPRGExport(bool)
@@ -348,7 +348,7 @@ void FloppyWindow::OnPRGExport(bool)
     char c64_filename[17];
     for (int i=0;i<17;i++)
     {
-       c64_filename[i] = d64[floppy_nr].D64Files[file_index].Name[i];
+       c64_filename[i] = d64[floppy_nr].d64_files[file_index].Name[i];
        if(c64_filename[i]=='/') c64_filename[i]=' ';
        if(c64_filename[i]=='\\') c64_filename[i]=' ';
        if(c64_filename[i]==':') c64_filename[i]=' ';
@@ -359,7 +359,7 @@ void FloppyWindow::OnPRGExport(bool)
     c64_filename[16] = 0;
 
     QString filename = QString(c64_filename);
-    QString fileext = FileTypes[d64[floppy_nr].D64Files[file_index].Typ & 7];
+    QString fileext = FileTypes[d64[floppy_nr].d64_files[file_index].Typ & 7];
 
     if(CompatibleMMCFileName)
     {
@@ -400,7 +400,7 @@ QString FloppyWindow::GetAktFilename(int floppynr)
 
 QString FloppyWindow::GetAktD64Name(int floppynr)
 {
-    return d64[floppynr].D64Name;
+    return d64[floppynr].d64_name;
 }
 
 void FloppyWindow::RefreshD64FileList()
@@ -411,10 +411,10 @@ void FloppyWindow::RefreshD64FileList()
     // Aktuell ausgewählte Floppy
     int floppy = ui->FloppySelect->currentIndex();
     // Anzahl der Files
-    int d64_files = d64[floppy].DateiAnzahl;
+    int d64_files = d64[floppy].file_count;
 
     // D64 Name ermitteln und anzeigen
-    ui->DiskName->setText(d64[floppy].D64Name);
+    ui->DiskName->setText(d64[floppy].d64_name);
 
     // Headerlabels setzen
     ui->D64FileTable->setHorizontalHeaderLabels(QStringList() << "" << "DATEI" << "SP" << "SK" << "ADR" << "SIZE" << "TYP");
@@ -425,24 +425,24 @@ void FloppyWindow::RefreshD64FileList()
     {
         // Icon in Abhängigkeit der Startbarkeit setzen
         QTableWidgetItem *icon_item = new QTableWidgetItem;
-        if((d64[floppy].D64Files[i].Adresse==0x0801) && ((d64[floppy].D64Files[i].Typ & 7)==(2))) icon_item->setIcon(*green_led);
+        if((d64[floppy].d64_files[i].Adresse==0x0801) && ((d64[floppy].d64_files[i].Typ & 7)==(2))) icon_item->setIcon(*green_led);
         else
         {
-            if((d64[floppy].D64Files[i].Adresse<0x0801) && ((d64[floppy].D64Files[i].Typ & 7)==(2))) icon_item->setIcon(*yellow_led);
+            if((d64[floppy].d64_files[i].Adresse<0x0801) && ((d64[floppy].d64_files[i].Typ & 7)==(2))) icon_item->setIcon(*yellow_led);
             else icon_item->setIcon(*red_led);
         }
         ui->D64FileTable->setItem(i,0,icon_item);
 
         // Dateiname setzen
         QString name_str;
-        for(int j=0; j < (int)strlen(d64[floppy].D64Files[i].Name); j++)
+        for(int j=0; j < (int)strlen(d64[floppy].d64_files[i].Name); j++)
         {
-            if(((unsigned char)d64[floppy].D64Files[i].Name[j] == 32) || ((unsigned char)d64[floppy].D64Files[i].Name[j] == 160))
+            if(((unsigned char)d64[floppy].d64_files[i].Name[j] == 32) || ((unsigned char)d64[floppy].d64_files[i].Name[j] == 160))
                 name_str += " ";
-            else if(((unsigned char)d64[floppy].D64Files[i].Name[j] > 127) && ((unsigned char)d64[floppy].D64Files[i].Name[j] < 160))
-                name_str += QChar(((unsigned char)d64[floppy].D64Files[i].Name[j]) + 0xee40);
+            else if(((unsigned char)d64[floppy].d64_files[i].Name[j] > 127) && ((unsigned char)d64[floppy].d64_files[i].Name[j] < 160))
+                name_str += QChar(((unsigned char)d64[floppy].d64_files[i].Name[j]) + 0xee40);
             else
-            name_str += QChar(((unsigned char)d64[floppy].D64Files[i].Name[j]) + 0xe000);
+            name_str += QChar(((unsigned char)d64[floppy].d64_files[i].Name[j]) + 0xe000);
         }
 
         ui->D64FileTable->setCellWidget(i,1,new QLabel(name_str));
@@ -453,14 +453,14 @@ void FloppyWindow::RefreshD64FileList()
         label->setStyleSheet("color: rgb(100, 100, 255);");
 
         // Spur setzen
-        ui->D64FileTable->setCellWidget(i,2,new QLabel(QVariant(d64[floppy].D64Files[i].Track).toString() + " "));
+        ui->D64FileTable->setCellWidget(i,2,new QLabel(QVariant(d64[floppy].d64_files[i].Track).toString() + " "));
         ui->D64FileTable->cellWidget(i,2)->setFont(*c64_font);
         label = (QLabel*) ui->D64FileTable->cellWidget(i,2);
         label->setAlignment(Qt::AlignTop | Qt::AlignRight);
         label->setStyleSheet("color: rgb(100, 100, 255);");
 
         // Sektor setzen
-        ui->D64FileTable->setCellWidget(i,3,new QLabel(QVariant(d64[floppy].D64Files[i].Sektor).toString() + " "));
+        ui->D64FileTable->setCellWidget(i,3,new QLabel(QVariant(d64[floppy].d64_files[i].Sektor).toString() + " "));
         ui->D64FileTable->cellWidget(i,3)->setFont(*c64_font);
         label = (QLabel*) ui->D64FileTable->cellWidget(i,3);
         label->setAlignment(Qt::AlignTop | Qt::AlignRight);
@@ -468,7 +468,7 @@ void FloppyWindow::RefreshD64FileList()
 
         // Adresse setzen
         QString str;
-        str.sprintf(" $%04X",d64[floppy].D64Files[i].Adresse);
+        str.sprintf(" $%04X",d64[floppy].d64_files[i].Adresse);
         ui->D64FileTable->setCellWidget(i,4,new QLabel(str));
         ui->D64FileTable->cellWidget(i,4)->setFont(*c64_font);
         label = (QLabel*) ui->D64FileTable->cellWidget(i,4);
@@ -476,7 +476,7 @@ void FloppyWindow::RefreshD64FileList()
         label->setStyleSheet("color: rgb(100, 100, 255);");
 
         // Size setzen
-        ui->D64FileTable->setCellWidget(i,5,new QLabel(QVariant(d64[floppy].D64Files[i].Laenge).toString() + " "));
+        ui->D64FileTable->setCellWidget(i,5,new QLabel(QVariant(d64[floppy].d64_files[i].Laenge).toString() + " "));
         ui->D64FileTable->cellWidget(i,5)->setFont(*c64_font);
         label = (QLabel*) ui->D64FileTable->cellWidget(i,5);
         label->setAlignment(Qt::AlignTop | Qt::AlignRight);
@@ -484,7 +484,7 @@ void FloppyWindow::RefreshD64FileList()
 
         // Typ setzen
         QString strTyp;
-        int FileTyp = d64[floppy].D64Files[i].Typ;
+        int FileTyp = d64[floppy].d64_files[i].Typ;
 
         if(FileTyp & 0x40) strTyp = FileTypes[FileTyp & 0x07] + "<";
         else strTyp = FileTypes[FileTyp & 0x07];

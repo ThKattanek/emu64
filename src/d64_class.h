@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.02.2017        		//
+// Letzte Änderung am 09.06.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,30 +19,34 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+
 using namespace std;
 
 #include "structs.h"
+
+#define D64_NAME_LENGHT 24
 
 class D64Class
 {
     public:
     D64Class();
     ~D64Class();
-    bool CreateDiskImage(char* filename,char* diskname,char* diskid);
-    int LoadD64(char* Filename);
-    char D64Name[25];
-    void UnLoadD64(void);
-    bool ExportPrg(int DateiNummer,char* Dateiname);
-    int	  DateiAnzahl;
-    int   D64Size;
-    D64_FILES D64Files[256];
+    bool CreateDiskImage(const char* filename, const char* diskname, const char* diskid);
+    int LoadD64(const char* filename);
+    void UnLoadD64();
+    bool ExportPrg(int file_number, const char* filename);
+
+    char        d64_name[D64_NAME_LENGHT+1];
+    uint16_t    file_count;
+    uint32_t    d64_size;
+    D64_FILES   d64_files[256];
 
     private:
-    void ReadBlock(unsigned char Track, unsigned char Sektor, unsigned char * PUFFER);
-    void OutputBlock(unsigned char *buffer);
-    unsigned char D64Image[174848];
-    unsigned char Block[256];
-    unsigned char BlockTmp[256];
+    void ReadBlock(uint8_t track, uint8_t sector, uint8_t* buffer);
+    void OutputBlock(uint8_t* buffer);
+    unsigned char d64_image[174848];
+    unsigned char block[256];
+    unsigned char block_tmp[256];
 };
 
 #endif // D64_CLASS_H

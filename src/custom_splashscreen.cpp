@@ -17,7 +17,7 @@
 
 CustomSplashScreen::CustomSplashScreen(const QPixmap& pixmap)
 {
- QSplashScreen::setPixmap(pixmap);
+    QSplashScreen::setPixmap(pixmap);
 };
 
 CustomSplashScreen::~CustomSplashScreen()
@@ -26,20 +26,20 @@ CustomSplashScreen::~CustomSplashScreen()
 
 void CustomSplashScreen::drawContents(QPainter *painter)
 {
- QPixmap textPix = QSplashScreen::pixmap();
- painter->setPen(this->color);
- painter->drawText(this->rect, this->alignement, this->message);
+     QPixmap textPix = QSplashScreen::pixmap();
+     painter->setPen(this->color);
+     painter->drawText(this->rect, this->alignement, this->message);
 };
 
 void CustomSplashScreen::ShowStatusMessage(const QString &message, const QColor &color)
 {
- this->message = message;
- this->color = color;
- this->showMessage(this->message, this->alignement, this->color);
+     this->message = message;
+     this->color = color;
+     this->showMessage(this->message, this->alignement, this->color);
 };
 
 void CustomSplashScreen::SetMessageRect(QRect rect, int alignement)
 {
- this->rect = rect;
- this->alignement = alignement;
+     this->rect = rect;
+     this->alignement = alignement;
 };

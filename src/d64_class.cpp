@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.02.2018                //
+// Letzte Änderung am 09.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,203 +17,207 @@
 
 D64Class::D64Class()
 {
-    DateiAnzahl = 0;
-    D64Size = 0;
+    file_count = 0;
+    d64_size = 0;
 }
 
 D64Class::~D64Class()
 {
 }
 
-bool D64Class::CreateDiskImage(char* filename,char* diskname,char* diskid)
+bool D64Class::CreateDiskImage(const char *filename, const char *diskname, const char *diskid)
 {
     // Clear Foramtierter Dir Block
-    static unsigned char DIR_BLOCK[256] ={0x12,0x01,0x41,0x00,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x11,0xFC,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x12,0xFF,0xFF,0x03,0x12,0xFF,0xFF,0x03,0x12,0xFF,0xFF,0x03,0x12,0xFF,0xFF,0x03,0x12,0xFF,0xFF,0x03,0x12,0xFF,0xFF,0x03,0x11,0xFF,0xFF,0x01,0x11,0xFF,0xFF,0x01,0x11,0xFF,0xFF,0x01,0x11,0xFF,0xFF,0x01,0x11,0xFF,0xFF,0x01,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0x32,0x41,0xA0,0xA0,0xA0,0xA0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    unsigned char BLOCK[256];
+    static uint8_t directory_block[256] ={0x12,0x01,0x41,0x00,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x11,0xFC,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x12,0xFF,0xFF,0x03,0x12,0xFF,0xFF,0x03,0x12,0xFF,0xFF,0x03,0x12,0xFF,0xFF,0x03,0x12,0xFF,0xFF,0x03,0x12,0xFF,0xFF,0x03,0x11,0xFF,0xFF,0x01,0x11,0xFF,0xFF,0x01,0x11,0xFF,0xFF,0x01,0x11,0xFF,0xFF,0x01,0x11,0xFF,0xFF,0x01,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0x32,0x41,0xA0,0xA0,0xA0,0xA0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    uint8_t block[256];
     FILE* file;
 
-    for(int i=0;i<256;i++) BLOCK[i]=0;
+    for(int i=0; i<256; i++) block[i]=0;
 
     file = fopen(filename, "wb");
-    if (file == NULL)
+    if (file == nullptr)
     {
         return false;
     }
 
-    for(int i=0;i<357;i++) fwrite(BLOCK,1,256,file);
+    for(int i=0; i<357; i++) fwrite(block, 1, 256, file);
 
-    for(int i=0;i<16;i++)
+    for(int i=0; i<16; i++)
     {
-        if(diskname[i]==0) break;
-        DIR_BLOCK[0x90+i]=diskname[i];
+        if(diskname[i] == 0) break;
+        directory_block[0x90+i] = static_cast<uint8_t>(diskname[i]);
     }
-    DIR_BLOCK[0xA2]=diskid[0];
-    DIR_BLOCK[0xA3]=diskid[1];
-    fwrite(DIR_BLOCK,1,256,file);
+    directory_block[0xA2] = static_cast<uint8_t>(diskid[0]);
+    directory_block[0xA3] = static_cast<uint8_t>(diskid[1]);
+    fwrite(directory_block, 1, 256, file);
 
-    BLOCK[1]=0xFF;
-    fwrite(BLOCK,1,256,file);
+    block[1] = 0xFF;
+    fwrite(block, 1, 256, file);
 
-    BLOCK[1]=0x00;
-    for(int i=0;i<324;i++) fwrite(BLOCK,1,256,file);
+    block[1] = 0x00;
+    for(int i=0 ;i<324; i++) fwrite(block, 1, 256, file);
 
     fclose(file);
 
     return true;
 }
 
-int D64Class::LoadD64(char* Filename)
+int D64Class::LoadD64(const char *filename)
 {
-    int Track,Sektor;
+    uint8_t track, sector;
     FILE* file;
     size_t reading_elements;
 
-    file = fopen(Filename, "rb");
-    if (file == NULL)
+    file = fopen(filename, "rb");
+    if (file == nullptr)
     {
         return 1;
     }
 
-    reading_elements = fread (D64Image,1,174848,file);
+    reading_elements = fread (d64_image,1,174848,file);
     fclose(file);
 
     if(reading_elements != 174848)
         return 0;
 
-    ReadBlock(18,0,Block);
+    ReadBlock(18, 0, block);
 
     // OutputBlock(Block);
 
-    Track = Block[0];
-    Sektor = Block[1];
+    track = block[0];
+    sector = block[1];
 
     // Wenn Spur oder Sektor außerhalb der D64 Spezifikation ist
     // wird der Standard Ort gesetzt (18/1)
-    if(Track > 35) Track = 18;
-    if(Sektor > 21) Sektor = 1;
+    if(track > 35) track = 18;
+    if(sector > 21) sector = 1;
 
-    int z;
-    for (z=0;z<23;z++)
+    for (int z=0; z<23; z++)
     {
-        D64Name[z]=Block[0x90+z];
+        d64_name[z] = static_cast<char>(block[0x90+z]);
     }
-    D64Name[z]=0;
 
-    DateiAnzahl=0;
+    d64_name[D64_NAME_LENGHT]=0;
+
+    file_count=0;
 L20:
-    int SI=0;
-    int BX=0;
-    if(Track==0) goto L50;
-    ReadBlock(Track,Sektor,Block);
-    if((Track == Block[0]) && (Sektor == Block[1])) goto L50;
-    Track = Block[0];
-    Sektor = Block[1];
+    int si = 0;
+    int bx = 0;
+
+    if(track==0) goto L50;
+
+    ReadBlock(track, sector,block);
+    if((track == block[0]) && (sector == block[1])) goto L50;
+    track = block[0];
+    sector = block[1];
 L30:
-    D64Files[DateiAnzahl].Typ=Block[SI+2];
-    if(Block[SI+3]==0xFF) goto L50;
+    d64_files[file_count].Typ = block[si+2];
+    if(block[si+3]==0xFF) goto L50;
 
-    D64Files[DateiAnzahl].Track=Block[SI+3];
-    D64Files[DateiAnzahl].Sektor=Block[SI+4];
+    d64_files[file_count].Track = block[si+3];
+    d64_files[file_count].Sektor = block[si+4];
 
-    ReadBlock(Block[SI+3],Block[SI+4],BlockTmp);
-    D64Files[DateiAnzahl].Adresse=BlockTmp[3]<<8;
-    D64Files[DateiAnzahl].Adresse+=BlockTmp[2];
+    ReadBlock(block[si+3],block[si+4], block_tmp);
+    d64_files[file_count].Adresse = static_cast<uint16_t>(block_tmp[3] << 8);
+    d64_files[file_count].Adresse += block_tmp[2];
 
-    unsigned short int TEMP;
-    TEMP=Block[SI+31]<<8;
-    TEMP+=Block[SI+30];
-    D64Files[DateiAnzahl].Laenge=TEMP;
+    uint16_t tmp;
+    tmp = static_cast<uint16_t>(block[si+31] << 8);
+    tmp += block[si+30];
+    d64_files[file_count].Laenge = tmp;
 
-    D64Files[DateiAnzahl].Name[16]=0;
+    d64_files[file_count].Name[16] = 0;
 
-    for (z=0;z<16;z++)
+    for (int z=0; z<16; z++)
     {
-        D64Files[DateiAnzahl].Name[z]=Block[SI+5+z];
+        d64_files[file_count].Name[z] = static_cast<char>(block[si+5+z]);
     }
 
-    SI+=32;
-    BX++;
-    DateiAnzahl++;
+    si += 32;
+    bx++;
+    file_count++;
 
-    D64Size+=D64Files[DateiAnzahl].Laenge;
-    if (BX<8) goto L30;
+    d64_size += d64_files[file_count].Laenge;
+
+    if (bx<8) goto L30;
     else goto L20;
+
 L50:
     return 0;
 }
 
-void D64Class::UnLoadD64(void)
+void D64Class::UnLoadD64()
 {
-    for(int i=0;i<174848;i++) D64Image[i] = 0;
-    for(int i=0;i<25;i++) D64Name[i] = 0;
-    for(int i=0;i<256;i++)
+    for(int i=0; i<174848; i++) d64_image[i] = 0;
+    for(int i=0; i<25; i++) d64_name[i] = 0;
+    for(int i=0; i<256; i++)
     {
-        Block[i] = 0;
-        BlockTmp[i] = 0;
+        block[i] = 0;
+        block_tmp[i] = 0;
     }
-    DateiAnzahl=0;
+    file_count = 0;
 }
 
-bool D64Class::ExportPrg(int DateiNummer,char* Filename)
+bool D64Class::ExportPrg(int file_number, const char *filename)
 {
     FILE* file;
 
-    int BLOCK_ANZAHL;
+    uint16_t block_count;
 
-    if(DateiAnzahl==0) return false;
+    if(file_count==0) return false;
 
-    BLOCK_ANZAHL=D64Files[DateiNummer].Laenge;
-    if( BLOCK_ANZAHL==0) return false;
+    block_count = d64_files[file_number].Laenge;
+    if( block_count == 0) return false;
 
-    file = fopen(Filename, "wb");
-    if (file == NULL)
+    file = fopen(filename, "wb");
+    if (file == nullptr)
     {
         return false;
     }
 
-    int aktTck = D64Files[DateiNummer].Track;
-    int aktSkt = D64Files[DateiNummer].Sektor;
+    uint8_t current_track = d64_files[file_number].Track;
+    uint8_t current_sector = d64_files[file_number].Sektor;
 
-    while(aktTck != 0)
+    while(current_track != 0)
     {
-        ReadBlock(aktTck,aktSkt,Block);
-        aktTck = Block[0];
-        aktSkt = Block[1];
-        if(aktTck == 0) fwrite(Block+2,1,aktSkt-1,file);
-        else fwrite(Block+2,1,254,file);
+        ReadBlock(current_track, current_sector, block);
+        current_track = block[0];
+        current_sector = block[1];
+        if(current_track == 0) fwrite(block+2, 1, current_sector - 1, file);
+        else fwrite(block+2, 1, 254, file);
     }
 
     fclose(file);
     return true;
 }
 
-void D64Class::ReadBlock(unsigned char Track, unsigned char Sektor, unsigned char * PUFFER)
+void D64Class::ReadBlock(uint8_t track, uint8_t sector, uint8_t *buffer)
 {
     // Zeiger auf Track Anfang //	     <------------------------- Track 1-17 ----------------------> <------ Track 18-24 ------> <---- Track 25-30 ----> <-- Track 31-35 -->
-    static unsigned short TRACK_INDEX[36]={0,0,21,42,63,84,105,126,147,168,189,210,231,252,273,294,315,336,357,376,395,414,433,452,471,490,508,526,544,562,580,598,615,632,649,666};
+    static uint16_t track_index[36]={0,0,21,42,63,84,105,126,147,168,189,210,231,252,273,294,315,336,357,376,395,414,433,452,471,490,508,526,544,562,580,598,615,632,649,666};
     // Sektoren pro Track //			  <------------------ Track 1-17 ------------------> <--- Track 18-24 --> <- Track 25-30 -> <-  31-35   ->
-    static unsigned short TRACK_MAX_SEKTOR[36]={0,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,19,19,19,19,19,19,19,18,18,18,18,18,18,17,17,17,17,17};
+    static uint16_t track_max_sector[36]={0,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,19,19,19,19,19,19,19,18,18,18,18,18,18,17,17,17,17,17};
 
-    if(Track > 35)
+    if(track > 35)
     {
-        for (int z=0;z<256;z++) PUFFER[z]=0;
+        for (int z=0;z<256;z++) buffer[z]=0;
         return;
     }
 
-    if(Sektor >= TRACK_MAX_SEKTOR[Track])
+    if(sector >= track_max_sector[track])
     {
-        for (int z=0;z<256;z++) PUFFER[z]=0;
+        for (int z=0;z<256;z++) buffer[z]=0;
         return;
     }
 
-    int TEMP;
+    int tmp;
 
-    TEMP=TRACK_INDEX[Track]+Sektor;
-    TEMP*=256;
-    for (int z=0;z<256;z++) PUFFER[z]=D64Image[TEMP+z];
+    tmp = track_index[track] + sector;
+    tmp *= 256;
+    for (int z=0; z<256; z++) buffer[z] = d64_image[tmp + z];
 }
 
-void D64Class::OutputBlock(unsigned char *buffer)
+void D64Class::OutputBlock(uint8_t *buffer)
 {
     for(int i=0; i<16; i++)
     {
