@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.02.2018                //
+// Letzte Änderung am 09.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -643,7 +643,7 @@ int VideoCaptureClass::WriteFrame(AVFormatContext *fmt_ctx, const AVRational *ti
 
 void VideoCaptureClass::LogPacket(const AVFormatContext *fmt_ctx, const AVPacket *pkt)
 {
-    AVRational *time_base = &fmt_ctx->streams[pkt->stream_index]->time_base;
+    // AVRational *time_base = &fmt_ctx->streams[pkt->stream_index]->time_base;
 
     /*
     printf("pts:%s pts_time:%s dts:%s dts_time:%s duration:%s duration_time:%s stream_index:%d\n",
@@ -745,13 +745,13 @@ void VideoCaptureClass::FillyuvImage(AVFrame *pict, int frame_index, int width, 
 AVFrame* VideoCaptureClass::GetAudioFrame(OutputStream *ost)
 {
     AVFrame *frame = ost->tmp_frame;
-    int j, i, v;
+
     int16_t *q = (int16_t*)frame->data[0];
 
-    for (j = 0; j <frame->nb_samples; j++)
+    for (int i = 0; i <frame->nb_samples; i++)
     {
-        *q++ = FrameAudioDataL[j];
-        *q++ = FrameAudioDataR[j];
+        *q++ = FrameAudioDataL[i];
+        *q++ = FrameAudioDataR[i];
         ost->t     += ost->tincr;
         ost->tincr += ost->tincr2;
     }

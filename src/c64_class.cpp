@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.06.2019                //
+// Letzte Änderung am 09.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -40,6 +40,8 @@ int SDLThreadWarp(void *userdat);
 #define RecPollingWaitStart 20
 
 #define C64ScreenXW 384         //384
+
+const char* C64Class::screenshot_format_name[] = {"BMP","PNG"};
 
 C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<void(char*)> log_function, const char *data_path):
     mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)

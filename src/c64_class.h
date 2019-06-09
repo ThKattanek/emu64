@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.06.2019                //
+// Letzte Änderung am 09.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -56,7 +56,6 @@ using namespace std::tr1::placeholders;
 #define SCREEN_RATIO_16_9 1.777f      // Screenratio 16:9 (1,777)
 
 enum SCREENSHOT_FORMATS {SCREENSHOT_FORMAT_BMP, SCREENSHOT_FORMAT_PNG, SCREENSHOT_FORMATS_COUNT};
-static const char *screenshot_format_name[SCREENSHOT_FORMATS_COUNT]{"BMP","PNG"};
 
 class C64Class
 {
@@ -209,6 +208,8 @@ public:
     int GetVicLastDisplayLinePal();
     int GetVicFirstDisplayLineNtsc();
     int GetVicLastDisplayLineNtsc();
+
+    static const char* screenshot_format_name[SCREENSHOT_FORMATS_COUNT];
 
     uint16_t        current_window_width;
     uint16_t        current_window_height;
