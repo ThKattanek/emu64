@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 09.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -31,13 +31,13 @@ public:
     explicit DebuggerVicWindow(QWidget *parent = 0);
     ~DebuggerVicWindow();
     void RetranslateUi();
-    void SetC64Pointer(C64Class *_c64);
-    void UpdateOutputList(void);
+    void SetC64Pointer(C64Class *c64);
+    void UpdateOutputList();
 
 private:
     Ui::DebuggerVicWindow *ui;
     C64Class *c64;
-    QStringList GrafikModi;
+    QStringList graphic_modi;
 };
 
 #endif // DEBUGGER_VIC_WINDOW_H
