@@ -312,13 +312,13 @@ void DebuggerWindow::UpdateRegister()
         ui->sr_out->setText(QString(str00));
         ui->sr_widget->SetValue(floppy_cpu_reg[currnet_floppy_nr].sr);
 
-        sprintf(str00,"$%4.4X",floppy_cpu_reg[currnet_floppy_nr].irq);
+        sprintf(str00,"$%4.4X", floppy_cpu_reg[currnet_floppy_nr].irq);
         ui->irq_out->setText(QString(str00));
-        sprintf(str00,"$%4.4X",floppy_cpu_reg[currnet_floppy_nr].nmi);
+        sprintf(str00,"$%4.4X", floppy_cpu_reg[currnet_floppy_nr].nmi);
         ui->nmi_out->setText(QString(str00));
-        sprintf(str00,"$%4.4X",floppy_cpu_reg[currnet_floppy_nr]._0314);
+        sprintf(str00,"$%4.4X", floppy_cpu_reg[currnet_floppy_nr]._0314);
         ui->_0314_out->setText(QString(str00));
-        sprintf(str00,"$%4.4X",floppy_cpu_reg[currnet_floppy_nr]._0318);
+        sprintf(str00,"$%4.4X", floppy_cpu_reg[currnet_floppy_nr]._0318);
         ui->_0318_out->setText(QString(str00));
 
         sprintf(str00,"$%4.4X", floppy_cpu_ireg[currnet_floppy_nr].current_opcode_pc);
@@ -437,7 +437,7 @@ void DebuggerWindow::onShowContextMenu(const QPoint& pos)
     }
 }
 
-void DebuggerWindow::onSr_widget_ValueChange(uint8_t value)
+void DebuggerWindow::onSr_widget_ValueChange(unsigned char value)
 {
     on_AnimationStop_clicked();
 
@@ -492,13 +492,13 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
     QString in_str = ui->EingabeFeld->text();
     uint16_t value;
 
-    if(in_str.left(1) == "$") in_str.replace(0,1,"0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
+    if(in_str.left(1) == "$") in_str.replace(0, 1, "0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
 
-    value = in_str.toUShort(&ok,0);
+    value = in_str.toUShort(&ok, 0);
 
     if(!ok)
     {
-        QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Es wurde kein gültiges Zahlenformat benutzt !"));
+        QMessageBox::warning(this, trUtf8("Eingabefehler..."), trUtf8("Es wurde kein gültiges Zahlenformat benutzt !"));
         return;
     }
 
@@ -514,54 +514,54 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
         if(value > 0x100) value -= 0x100;
         if(value > 0xFF)
         {
-            QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Der Wert muss zwischen 0 und 511 liegen !"));
+            QMessageBox::warning(this, trUtf8("Eingabefehler..."), trUtf8("Der Wert muss zwischen 0 und 511 liegen !"));
             return;
         }
         cpu_reg.reg_mask = REG_MASK_SP;
-        cpu_reg.sp = value;
+        cpu_reg.sp = static_cast<uint8_t>(value);
         break;
     case 2:
         if(value > 0xFF)
         {
-            QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
+            QMessageBox::warning(this, trUtf8("Eingabefehler..."), trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
         cpu_reg.reg_mask = REG_MASK_AC;
-        cpu_reg.ac = value;
+        cpu_reg.ac = static_cast<uint8_t>(value);
         break;
     case 3:
         if(value > 0xFF)
         {
-            QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
+            QMessageBox::warning(this, trUtf8("Eingabefehler..."), trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
         cpu_reg.reg_mask = REG_MASK_XR;
-        cpu_reg.xr = value;
+        cpu_reg.xr = static_cast<uint8_t>(value);
         break;
     case 4:
         if(value > 0xFF)
         {
-            QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
+            QMessageBox::warning(this, trUtf8("Eingabefehler..."), trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
         cpu_reg.reg_mask = REG_MASK_YR;
-        cpu_reg.yr = value;
+        cpu_reg.yr = static_cast<uint8_t>(value);
         break;
     case 5:
         if(value > 0xFF)
         {
-            QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
+            QMessageBox::warning(this, trUtf8("Eingabefehler..."), trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
         cpu_reg.reg_mask = REG_MASK_SR;
-        cpu_reg.sr = value;
+        cpu_reg.sr = static_cast<uint8_t>(value);
         break;
     }
 
     if(current_source > 0)
     {
         c64->floppy[currnet_floppy_nr]->SetCpuReg(&cpu_reg);
-        c64->floppy[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr],&floppy_cpu_ireg[currnet_floppy_nr]);
+        c64->floppy[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr], &floppy_cpu_ireg[currnet_floppy_nr]);
     }
     else
     {
@@ -602,9 +602,9 @@ void DebuggerWindow::on_CycleCounterReset_clicked()
     ui->CycleCounter_Out->setText("0000000000");
 }
 
-bool DebuggerWindow::GetSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt)
+bool DebuggerWindow::GetSaveFileName(QWidget* parent, QString caption, QString filter, QString* fileName, QString* fileExt)
 {
-   if (fileName == NULL)      // "parent" is allowed to be NULL!
+   if (fileName == nullptr)      // "parent" is allowed to be NULL!
       return false;
 
    QFileDialog saveDialog(parent);
@@ -620,14 +620,14 @@ bool DebuggerWindow::GetSaveFileName(QWidget *parent, QString caption, QString f
    if (!saveDialog.exec())
       return false;      // User pressed "Cancel"
 
-   QStringList fileList = saveDialog.selectedFiles();
-   if (fileList.count() != 1)
+   QStringList file_list = saveDialog.selectedFiles();
+   if (file_list.count() != 1)
       return false;      // Should not happen, just to be sure
 
-   QString tmpFileName = fileList.at(0);
+   QString tmp_file_name = file_list.at(0);
    QString extension;
 
-   QFileInfo fileInfo(tmpFileName);
+   QFileInfo fileInfo(tmp_file_name);
    if (fileInfo.suffix().isEmpty()) {
       // Add the suffix selected by the user
 
@@ -640,12 +640,12 @@ bool DebuggerWindow::GetSaveFileName(QWidget *parent, QString caption, QString f
       if (extension.indexOf(" ") != -1)
          extension = extension.left(extension.indexOf(" "));
 
-      tmpFileName = tmpFileName + QString(".") + extension;
-      fileInfo.setFile(tmpFileName);
+      tmp_file_name = tmp_file_name + QString(".") + extension;
+      fileInfo.setFile(tmp_file_name);
    }
 
    // Does the file already exist?
-   if (QFile::exists(tmpFileName)) {
+   if (QFile::exists(tmp_file_name)) {
 
        extension = saveDialog.selectedFilter();
        extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
@@ -661,26 +661,26 @@ bool DebuggerWindow::GetSaveFileName(QWidget *parent, QString caption, QString f
          return false;
       else if (result == QMessageBox::No) {
          // Next chance for the user to select a filename
-         if (!GetSaveFileName(parent, caption, filter, &tmpFileName, &extension))
+         if (!GetSaveFileName(parent, caption, filter, &tmp_file_name, &extension))
             // User decided to cancel, exit function here
             return false;
       // User clicked "Yes", so process the execution
-      fileInfo.setFile(tmpFileName);
+      fileInfo.setFile(tmp_file_name);
       }
    }
 
-   *fileName = tmpFileName;
+   *fileName = tmp_file_name;
    *fileExt = extension;
    return true;
 }
 
-void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
+void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
 {
-    unsigned short PC = adresse;
+    uint16_t pc = address;
     char str00[50];
-    unsigned short tmp;
-    unsigned short word;
-    char tmp1;
+    uint16_t tmp;
+    uint16_t word;
+    uint8_t tmp1;
     bool find = false;
     int akt_make_idx = 0;
 
@@ -693,7 +693,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
     {
         for(int i=0;i<DISASS_ROW;i++)
         {
-            if(view_code_address[i] == adresse)
+            if(view_code_address[i] == address)
             {
                 find = true;
                 akt_make_idx = i;
@@ -714,7 +714,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
         disass_addressing[akt_make_idx]->setBackgroundColor(table_position_color);
 
         old_make_idx = akt_make_idx;
-        PC = old_adresse;
+        pc = old_adresse;
     }
     else
     {
@@ -729,34 +729,34 @@ void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
         disass_addressing[0]->setBackgroundColor(table_position_color);
 
         old_make_idx = akt_make_idx = 0;
-        PC = old_adresse = adresse;
+        pc = old_adresse = address;
     }
 
-    unsigned char ram0;
-    unsigned char ram1;
-    unsigned char ram2;
+    uint8_t ram0;
+    uint8_t ram1;
+    uint8_t ram2;
 
-    for(int i=0;i<DISASS_ROW;i++)
+    for(int i=0; i<DISASS_ROW; i++)
     {
-        view_code_address[i] = PC;
-        sprintf(str00,"$%4.4X",PC);
+        view_code_address[i] = pc;
+        sprintf(str00, "$%4.4X", pc);
         disass_pc[i]->setText(str00);
 
         if(current_source > 0)
         {
             currnet_floppy_nr = current_source - 1;
-            ram0 = c64->floppy[currnet_floppy_nr]->ReadByte(PC+0);
-            ram1 = c64->floppy[currnet_floppy_nr]->ReadByte(PC+1);
-            ram2 = c64->floppy[currnet_floppy_nr]->ReadByte(PC+2);
+            ram0 = c64->floppy[currnet_floppy_nr]->ReadByte(pc+0);
+            ram1 = c64->floppy[currnet_floppy_nr]->ReadByte(pc+1);
+            ram2 = c64->floppy[currnet_floppy_nr]->ReadByte(pc+2);
         }
         else
         {
-            ram0 = c64->ReadC64Byte(PC+0);
-            ram1 = c64->ReadC64Byte(PC+1);
-            ram2 = c64->ReadC64Byte(PC+2);
+            ram0 = c64->ReadC64Byte(pc+0);
+            ram1 = c64->ReadC64Byte(pc+1);
+            ram2 = c64->ReadC64Byte(pc+2);
         }
 
-        disass_mnemonic[i]->setText(QString(CpuOPC).mid(ram0*3,3));
+        disass_mnemonic[i]->setText(QString(CpuOPC).mid(ram0*3, 3));
 
         tmp = CpuOPCInfo[ram0];
 
@@ -778,7 +778,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
 
             sprintf(str00,"%2.2X -- --",ram0);
             disass_memory[i]->setText(str00);
-            PC++;
+            pc++;
             break;
         case 1:
             sprintf(str00,"#$%2.2X",ram1);
@@ -786,7 +786,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
 
             sprintf(str00,"%2.2X %2.2X --",ram0,ram1);
             disass_memory[i]->setText(str00);
-            PC+=2;
+            pc+=2;
             break;
         case 2:
             word=ram1;
@@ -796,7 +796,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
 
             sprintf(str00,"%2.2X %2.2X %2.2X",ram0,ram1,ram2);
             disass_memory[i]->setText(str00);
-            PC+=3;
+            pc+=3;
             break;
         case 3:
             sprintf(str00,"$%2.2X",ram1);
@@ -804,7 +804,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
 
             sprintf(str00,"%2.2X %2.2X --",ram0,ram1);
             disass_memory[i]->setText(str00);
-            PC+=2;
+            pc+=2;
             break;
         case 4:
             word=ram1;
@@ -814,7 +814,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
 
             sprintf(str00,"%2.2X %2.2X %2.2X",ram0,ram1,ram2);
             disass_memory[i]->setText(str00);
-            PC+=3;
+            pc+=3;
             break;
         case 5:
             word=ram1;
@@ -824,7 +824,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
 
             sprintf(str00,"%2.2X %2.2X %2.2X",ram0,ram1,ram2);
             disass_memory[i]->setText(str00);
-            PC+=3;
+            pc+=3;
             break;
         case 6:
             sprintf(str00,"$%2.2X,X",ram1);
@@ -832,7 +832,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
 
             sprintf(str00,"%2.2X %2.2X --",ram0,ram1);
             disass_memory[i]->setText(str00);
-            PC+=2;
+            pc+=2;
             break;
         case 7:
             sprintf(str00,"($%2.2X,X)",ram1);
@@ -840,7 +840,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
 
             sprintf(str00,"%2.2X %2.2X --",ram0,ram1);
             disass_memory[i]->setText(str00);
-            PC+=2;
+            pc+=2;
             break;
         case 8:
             sprintf(str00,"($%2.2X),Y",ram1);
@@ -848,17 +848,17 @@ void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
 
             sprintf(str00,"%2.2X %2.2X --",ram0,ram1);
             disass_memory[i]->setText(str00);
-            PC+=2;
+            pc+=2;
             break;
         case 9:
             tmp1 = ram1;
-            word = (PC+2)+tmp1;
+            word = (pc+2)+tmp1;
             sprintf(str00,"$%4.4X",word);
             disass_addressing[i]->setText(str00);
 
             sprintf(str00,"%2.2X %2.2X --",ram0,ram1);
             disass_memory[i]->setText(str00);
-            PC+=2;
+            pc+=2;
             break;
         case 10:
             word=ram1;
@@ -868,7 +868,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
 
             sprintf(str00,"%2.2X %2.2X %2.2X",ram0,ram1,ram2);
             disass_memory[i]->setText(str00);
-            PC+=3;
+            pc+=3;
             break;
         case 11:
             sprintf(str00,"$%2.2X,Y",ram1);
@@ -876,7 +876,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
 
             sprintf(str00,"%2.2X %2.2X --",ram0,ram1);
             disass_memory[i]->setText(str00);
-            PC+=2;
+            pc+=2;
             break;
         }
     }
@@ -885,24 +885,24 @@ void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
 void DebuggerWindow::FillHistoryList(uint8_t index)
 {
     char str00[10];
-    unsigned char hp;
+    uint8_t hp;
 
     if(current_source > 0)
     {
         if(!c64->floppy[currnet_floppy_nr]->GetEnableFloppy()) return;
         hp = c64->floppy[currnet_floppy_nr]->HistoryPointer;
-        for(int i=0;i<HISTORY_ROW;i++)
+        for(int i=0; i<HISTORY_ROW; i++)
         {
-            sprintf(str00,"$%4.4X",c64->floppy[currnet_floppy_nr]->History[hp--]);
+            sprintf(str00, "$%4.4X", c64->floppy[currnet_floppy_nr]->History[hp--]);
             ui->HistoryList->item(i)->setText(QString(str00));
         }
     }
     else
     {
         hp = c64->cpu_pc_history_pos - index;
-        for(int i=0;i<HISTORY_ROW;i++)
+        for(int i=0; i<HISTORY_ROW; i++)
         {
-            sprintf(str00,"$%4.4X",c64->cpu_pc_history[hp--]);
+            sprintf(str00, "$%4.4X", c64->cpu_pc_history[hp--]);
             ui->HistoryList->item(i)->setText(QString(str00));
         }
     }
@@ -916,13 +916,13 @@ void DebuggerWindow::on_ChangeSource_currentIndexChanged(int index)
         currnet_floppy_nr = current_source - 1;
         ui->BreakpointTree->clear();
 
-        if(c64 == 0) return;
+        if(c64 == nullptr) return;
         break_point_update_enable = false;
         int anz = c64->floppy[currnet_floppy_nr]->GetBreakGroupAnz();
         for(int i=0;i<anz;i++)
         {
             BREAK_GROUP *bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(i);
-            AddBreakpointTreeRoot(bg->Name,bg);
+            AddBreakpointTreeRoot(bg->Name, bg);
         }
         break_point_update_enable = true;
     }
@@ -932,13 +932,13 @@ void DebuggerWindow::on_ChangeSource_currentIndexChanged(int index)
 
         ui->BreakpointTree->clear();
 
-        if(c64 == 0) return;
+        if(c64 == nullptr) return;
         break_point_update_enable = false;
         int anz = c64->GetBreakGroupAnz();
         for(int i=0;i<anz;i++)
         {
             BREAK_GROUP *bg = c64->GetBreakGroup(i);
-            AddBreakpointTreeRoot(bg->Name,bg);
+            AddBreakpointTreeRoot(bg->Name, bg);
         }
         break_point_update_enable = true;
     }
@@ -953,19 +953,19 @@ void DebuggerWindow::on_ChangeSource_currentIndexChanged(int index)
 void DebuggerWindow::on_AssAdresseIn_returnPressed()
 {
     bool ok;
-    unsigned short value;
+    uint16_t value;
     QString in_str = ui->AssAdresseIn->text();
 
     if(in_str.left(1) == "$") in_str.replace(0,1,"0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
-    value = in_str.toUShort(&ok,0);                //
+    value = in_str.toUShort(&ok,0);
     if(!ok)
     {
-        QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Es wurde kein gültiges Zahlenformat benutzt !"));
+        QMessageBox::warning(this, trUtf8("Eingabefehler..."), trUtf8("Es wurde kein gültiges Zahlenformat benutzt !"));
         return;
     }
 
     char out_str[10];
-    sprintf(out_str,"$%4.4X",value);
+    sprintf(out_str, "$%4.4X", value);
 
     ui->AssAdresseIn->setText(out_str);
     ui->AssMnemonicIn->clear();
@@ -994,25 +994,24 @@ void DebuggerWindow::on_AssMnemonicIn_textChanged(const QString &arg1)
 
 bool DebuggerWindow::FindMnemonic(QString mnemonic, uint8_t *opcode, uint8_t *opcode_count)
 {
-
     bool found = false;
     uint8_t count = 0;
 
-    for(int i=0;i<255;i++)
+    for(int i=0; i<256; i++)
     {
         if(mnemonic.toUpper() == QString(CpuOPC).mid(i*3,3))
         {
             found = true;
-            if(opcode != 0) opcode[count++] = i;
+            if(opcode != nullptr) opcode[count++] = static_cast<uint8_t>(i);
         }
     }
-    if(opcode_count != 0) *opcode_count = count;
+    if(opcode_count != nullptr) *opcode_count = count;
     return found;
 }
 
 bool DebuggerWindow::FindAddressing(QString address_string, uint8_t *address_type, uint16_t *address_value)
 {
-    unsigned int integer;
+    uint32_t integer;
     bool ok;
 
     QString in_str = address_string.toUpper();
@@ -1032,14 +1031,14 @@ bool DebuggerWindow::FindAddressing(QString address_string, uint8_t *address_typ
         if(integer <= 0xFF)
         {
             *address_type = 3;
-            *address_value = (unsigned short)integer;
+            *address_value = static_cast<uint16_t>(integer);
             return true;
         }
 
         if(integer <= 0xFFFF)
         {
             *address_type = 2;
-            *address_value = (unsigned short)integer;
+            *address_value = static_cast<uint16_t>(integer);
             return true;
         }
     }
@@ -1054,7 +1053,7 @@ bool DebuggerWindow::FindAddressing(QString address_string, uint8_t *address_typ
             if(integer <= 0xFF)
             {
                 *address_type = 1;
-                *address_value = (unsigned short)integer;
+                *address_value = static_cast<uint16_t>(integer);
                 return true;
             }
             else return false;
@@ -1073,14 +1072,14 @@ bool DebuggerWindow::FindAddressing(QString address_string, uint8_t *address_typ
             if(integer <= 0xFF)
             {
                 *address_type = 6;
-                *address_value = (unsigned short)integer;
+                *address_value = static_cast<uint16_t>(integer);
                 return true;
             }
 
             if(integer <= 0xFFFF)
             {
                 *address_type = 4;
-                *address_value = (unsigned short)integer;
+                *address_value = static_cast<uint16_t>(integer);
                 return true;
             }
             return false;
@@ -1098,14 +1097,14 @@ bool DebuggerWindow::FindAddressing(QString address_string, uint8_t *address_typ
             if(integer <= 0xFF)
             {
                 *address_type = 11;
-                *address_value = (unsigned short)integer;
+                *address_value = static_cast<uint16_t>(integer);
                 return true;
             }
 
             if(integer <= 0xFFFF)
             {
                 *address_type = 5;
-                *address_value = (unsigned short)integer;
+                *address_value = static_cast<uint16_t>(integer);
                 return true;
             }
             return false;
@@ -1123,7 +1122,7 @@ bool DebuggerWindow::FindAddressing(QString address_string, uint8_t *address_typ
             if(integer <= 0xFF)
             {
                 *address_type = 7;
-                *address_value = (unsigned short)integer;
+                *address_value = static_cast<uint16_t>(integer);
                 return true;
             }
             else return false;
@@ -1142,7 +1141,7 @@ bool DebuggerWindow::FindAddressing(QString address_string, uint8_t *address_typ
             if(integer <= 0xFF)
             {
                 *address_type = 8;
-                *address_value = (unsigned short)integer;
+                *address_value = static_cast<uint16_t>(integer);
                 return true;
             }
             else return false;
@@ -1161,7 +1160,7 @@ bool DebuggerWindow::FindAddressing(QString address_string, uint8_t *address_typ
             if(integer <= 0xFFFF)
             {
                 *address_type = 10;
-                *address_value = (unsigned short)integer;
+                *address_value = static_cast<uint16_t>(integer);
                 return true;
             }
             else return false;
@@ -1173,19 +1172,19 @@ bool DebuggerWindow::FindAddressing(QString address_string, uint8_t *address_typ
 
 void DebuggerWindow::on_AssAdressierungIn_returnPressed()
 {
-    unsigned short ass_adress;
-    unsigned short new_adress;
+    uint16_t ass_adress;
+    uint16_t new_adress;
 
-    if(Assemble(ui->AssAdresseIn->text(),ui->AssMnemonicIn->text(),ui->AssAdressierungIn->text(),&ass_adress,&new_adress))
+    if(Assemble(ui->AssAdresseIn->text(), ui->AssMnemonicIn->text(), ui->AssAdressierungIn->text(), &ass_adress, &new_adress))
     {
         char out_str[10];
-        sprintf(out_str,"$%4.4X",new_adress);
+        sprintf(out_str, "$%4.4X", new_adress);
         ui->AssAdresseIn->setText(QString(out_str));
         ui->AssMnemonicIn->clear();
         ui->AssAdressierungIn->clear();
         ui->AssMnemonicIn->setFocus();
 
-        FillDisassemblyList(ass_adress,false);
+        FillDisassemblyList(ass_adress, false);
         memory_window->update();
     }
     else
@@ -1193,27 +1192,27 @@ void DebuggerWindow::on_AssAdressierungIn_returnPressed()
         switch(new_adress)
         {
         case 0:
-            QMessageBox::warning(this,trUtf8("Fehler...!"),trUtf8("Fehlerhafte Adresse."));
+            QMessageBox::warning(this, trUtf8("Fehler...!"), trUtf8("Fehlerhafte Adresse."));
             ui->AssAdresseIn->selectAll();
             ui->AssAdresseIn->setFocus();
             break;
         case 1:
-            QMessageBox::warning(this,trUtf8("Fehler...!"),trUtf8("Unbekanntes Mnemonic."));
+            QMessageBox::warning(this, trUtf8("Fehler...!"), trUtf8("Unbekanntes Mnemonic."));
             ui->AssMnemonicIn->selectAll();
             ui->AssMnemonicIn->setFocus();
             break;
         case 2:
-            QMessageBox::warning(this,trUtf8("Fehler...!"),trUtf8("Unbekannte Adressierung."));
+            QMessageBox::warning(this, trUtf8("Fehler...!"), trUtf8("Unbekannte Adressierung."));
             ui->AssAdressierungIn->selectAll();
             ui->AssAdressierungIn->setFocus();
             break;
         case 3:
-            QMessageBox::warning(this,trUtf8("Fehler...!"),trUtf8("Spungweite für Branchbefehl ist zu groß."));
+            QMessageBox::warning(this, trUtf8("Fehler...!"), trUtf8("Spungweite für Branchbefehl ist zu groß."));
             ui->AssAdressierungIn->selectAll();
             ui->AssAdressierungIn->setFocus();
             break;
         case 4:
-            QMessageBox::warning(this,trUtf8("Fehler...!"),trUtf8("Dieser Opcode unterstützt nicht diese Adressierung."));
+            QMessageBox::warning(this, trUtf8("Fehler...!"), trUtf8("Dieser Opcode unterstützt nicht diese Adressierung."));
             ui->AssAdressierungIn->selectAll();
             ui->AssAdressierungIn->setFocus();
             break;
@@ -1223,42 +1222,42 @@ void DebuggerWindow::on_AssAdressierungIn_returnPressed()
 
 bool DebuggerWindow::Assemble(QString address, QString mnemonic, QString addressing, uint16_t *ass_address, uint16_t *new_adress)
 {
-    unsigned int start_adr;
-    unsigned char opc[32];
-    uint8_t opc_anz;
-    unsigned char adr_typ;
-    unsigned short adr_wert;
+    uint32_t start_address;
+    uint8_t opcode[32];
+    uint8_t opcode_count;
+    uint8_t address_type;
+    uint16_t address_value;
 
     bool ok;
 
     QString in_str = address;
     if(in_str.left(1) == "$") in_str.replace(0,1,"0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
-    start_adr = in_str.toUShort(&ok,0);
+    start_address = in_str.toUShort(&ok,0);
     if(!ok)
     {
         *new_adress = 0;
         return false;
     }
 
-    if(!FindMnemonic(mnemonic,opc,&opc_anz))
+    if(!FindMnemonic(mnemonic,opcode,&opcode_count))
     {
         *new_adress = 1;
         return false;
     }
 
-    if(!FindAddressing(addressing,&adr_typ,&adr_wert))
+    if(!FindAddressing(addressing,&address_type,&address_value))
     {
         *new_adress = 2;
         return false;
     }
 
-    *ass_address = start_adr;
+    *ass_address = static_cast<uint16_t>(start_address);
 
-    if((opc[0]==0x90)||(opc[0]==0xB0)||(opc[0]==0xF0)||(opc[0]==0x30)||(opc[0]==0xD0)||(opc[0]==0x10)||(opc[0]==0x50)||(opc[0]==0x70))
+    if((opcode[0]==0x90)||(opcode[0]==0xB0)||(opcode[0]==0xF0)||(opcode[0]==0x30)||(opcode[0]==0xD0)||(opcode[0]==0x10)||(opcode[0]==0x50)||(opcode[0]==0x70))
     {
-        if((adr_typ == 2) || (adr_typ == 3))
+        if((address_type == 2) || (address_type == 3))
         {
-            signed short jmp_adress = adr_wert - (unsigned short)start_adr -2;
+            int16_t jmp_adress = static_cast<int16_t>(address_value) - static_cast<int16_t>(start_address) - 2;
             if((jmp_adress < -128) || (jmp_adress > 127))
             {
                 *new_adress = 3;
@@ -1267,64 +1266,64 @@ bool DebuggerWindow::Assemble(QString address, QString mnemonic, QString address
 
             if(current_source > 0)
             {
-                c64->floppy[currnet_floppy_nr]->WriteByte(start_adr,opc[0]);
-                c64->floppy[currnet_floppy_nr]->WriteByte(start_adr+1,(unsigned char)jmp_adress);
+                c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address), opcode[0]);
+                c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address)+1, static_cast<uint8_t>(jmp_adress));
             }
             else
             {
-                c64->WriteC64Byte(start_adr,opc[0]);
-                c64->WriteC64Byte(start_adr+1,(unsigned char)jmp_adress);
+                c64->WriteC64Byte(static_cast<uint16_t>(start_address), opcode[0]);
+                c64->WriteC64Byte(static_cast<uint16_t>(start_address)+1, static_cast<uint8_t>(jmp_adress));
             }
 
-            *new_adress = start_adr + 2;
+            *new_adress = static_cast<uint16_t>(start_address) + 2;
             return true;
         }
     }
 
-    for(int i=0;i<opc_anz;i++)
+    for(int i=0;i<opcode_count;i++)
     {
-        if((CpuOPCInfo[opc[i]]>>4) == adr_typ)
+        if((CpuOPCInfo[opcode[i]]>>4) == address_type)
         {
-            switch (adr_typ)
+            switch (address_type)
             {
             case 0:
                 if(current_source > 0)
                 {
-                    c64->floppy[currnet_floppy_nr]->WriteByte(start_adr,opc[i]);
+                    c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address), opcode[i]);
                 }
                 else
                 {
-                    c64->WriteC64Byte(start_adr,opc[i]);
+                    c64->WriteC64Byte(static_cast<uint16_t>(start_address), opcode[i]);
                 }
-                *new_adress = start_adr+1;
+                *new_adress = static_cast<uint16_t>(start_address)+1;
                 break;
             case 1: case 3: case 6: case 7: case 8: case 11:
                 if(current_source > 0)
                 {
-                    c64->floppy[currnet_floppy_nr]->WriteByte(start_adr,opc[i]);
-                    c64->floppy[currnet_floppy_nr]->WriteByte(start_adr+1,(unsigned char)adr_wert);
+                    c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address), opcode[i]);
+                    c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address)+1, static_cast<uint8_t>(address_value));
                 }
                 else
                 {
-                    c64->WriteC64Byte(start_adr,opc[i]);
-                    c64->WriteC64Byte(start_adr+1,(unsigned char)adr_wert);
+                    c64->WriteC64Byte(static_cast<uint16_t>(start_address), opcode[i]);
+                    c64->WriteC64Byte(static_cast<uint16_t>(start_address)+1, static_cast<uint8_t>(address_value));
                 }
-                *new_adress = start_adr+2;
+                *new_adress = static_cast<uint16_t>(start_address)+2;
                 break;
             case 2: case 4: case 5: case 10:
                 if(current_source > 0)
                 {
-                    c64->floppy[currnet_floppy_nr]->WriteByte(start_adr,opc[i]);
-                    c64->floppy[currnet_floppy_nr]->WriteByte(start_adr+1,(unsigned char)adr_wert);
-                    c64->floppy[currnet_floppy_nr]->WriteByte(start_adr+2,(unsigned char)(adr_wert>>8));
+                    c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address), opcode[i]);
+                    c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address)+1, static_cast<uint8_t>(address_value));
+                    c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address)+2, static_cast<uint8_t>(address_value>>8));
                 }
                 else
                 {
-                    c64->WriteC64Byte(start_adr,opc[i]);
-                    c64->WriteC64Byte(start_adr+1,(unsigned char)adr_wert);
-                    c64->WriteC64Byte(start_adr+2,(unsigned char)(adr_wert>>8));
+                    c64->WriteC64Byte(static_cast<uint16_t>(start_address), opcode[i]);
+                    c64->WriteC64Byte(static_cast<uint16_t>(start_address)+1, static_cast<uint8_t>(address_value));
+                    c64->WriteC64Byte(static_cast<uint16_t>(start_address)+2, static_cast<uint8_t>(address_value>>8));
                 }
-                *new_adress = start_adr+3;
+                *new_adress = static_cast<uint16_t>(start_address)+3;
                 break;
             }
             return true;
@@ -1384,7 +1383,7 @@ void DebuggerWindow::on_DisAssTable_doubleClicked(const QModelIndex &index)
 
 void DebuggerWindow::on_DisAssScroll_valueChanged(int value)
 {
-    FillDisassemblyList(value,false);
+    FillDisassemblyList(static_cast<uint16_t>(value), false);
 }
 
 void DebuggerWindow::on_AddBreakpoint_clicked()
@@ -1421,7 +1420,7 @@ void DebuggerWindow::on_DelBreakpoint_clicked()
     {
         QTreeWidgetItem *item = ui->BreakpointTree->selectedItems()[0];
 
-        if(item->parent() == 0)
+        if(item->parent() == nullptr)
         {
             bg_index = ui->BreakpointTree->indexOfTopLevelItem(item);
             Name = item->text(0);
@@ -1491,7 +1490,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
     int bg_index;
     int child_index;
 
-    if(item->parent() == 0)
+    if(item->parent() == nullptr)
     {
         /// TopLevel Item (Breakpointname) ///
 
@@ -1524,7 +1523,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
         {
             QString tmp_str = item->text(1);
             bool ok;
-            unsigned short integer;
+            uint16_t integer;
             char str_00[10];
 
             switch(child_index)
@@ -1870,7 +1869,7 @@ void DebuggerWindow::BreakpointProc()
 void DebuggerWindow::on_LoadBreakpoints_clicked()
 {
     if(ui->BreakpointTree->topLevelItemCount() > 0)
-        if(QMessageBox::No == QMessageBox::question(this,trUtf8("Haltepunkte laden..."),trUtf8("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
+        if(QMessageBox::No == QMessageBox::question(this, trUtf8("Haltepunkte laden..."), trUtf8("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
             return;
 
     ui->BreakpointTree->clear();
@@ -1878,7 +1877,7 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
     if(current_source > 0) c64->floppy[currnet_floppy_nr]->DeleteAllBreakGroups();
     else c64->DeleteAllBreakGroups();
 
-    QString filename = QFileDialog::getOpenFileName(this,trUtf8("Haltepunkte öffnen"),QDir::homePath(),trUtf8("Emu64 Haltepunkt Datei ") + "(*.bpt)",0,QFileDialog::DontUseNativeDialog);
+    QString filename = QFileDialog::getOpenFileName(this, trUtf8("Haltepunkte öffnen"), QDir::homePath(), trUtf8("Emu64 Haltepunkt Datei ") + "(*.bpt)", nullptr, QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
        int ret;
@@ -1908,8 +1907,8 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
            /// Alle Haltepunke ins TreeWidget einfügen ///
            if(current_source > 0)
            {
-               int anz = c64->floppy[currnet_floppy_nr]->GetBreakGroupAnz();
-               for(int i=0;i<anz;i++)
+               int count = c64->floppy[currnet_floppy_nr]->GetBreakGroupAnz();
+               for(int i=0; i<count; i++)
                {
                    BREAK_GROUP *bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(i);
                    AddBreakpointTreeRoot(bg->Name,bg);
@@ -1917,8 +1916,8 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
            }
            else
            {
-               int anz = c64->GetBreakGroupAnz();
-               for(int i=0;i<anz;i++)
+               int count = c64->GetBreakGroupAnz();
+               for(int i=0; i<count; i++)
                {
                    BREAK_GROUP *bg = c64->GetBreakGroup(i);
                    AddBreakpointTreeRoot(bg->Name,bg);
@@ -1954,7 +1953,7 @@ void DebuggerWindow::on_SaveBreakpoints_clicked()
 void DebuggerWindow::on_DelAllBreakpoints_clicked()
 {
     if(ui->BreakpointTree->topLevelItemCount() > 0)
-        if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Achtung..."),trUtf8("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
+        if(QMessageBox::Yes == QMessageBox::question(this, trUtf8("Achtung..."), trUtf8("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
         {
             if(current_source > 0) c64->floppy[currnet_floppy_nr]->DeleteAllBreakGroups();
             else c64->DeleteAllBreakGroups();
@@ -1964,15 +1963,15 @@ void DebuggerWindow::on_DelAllBreakpoints_clicked()
 
 void DebuggerWindow::on_HistoryScroll_valueChanged(int value)
 {
-    FillHistoryList(value);
+    FillHistoryList(static_cast<uint8_t>(value));
 }
 
 void DebuggerWindow::on_ExportDisAss_clicked()
 {
     bool ok;
     QString in_str;
-    unsigned short value;
-    unsigned short start,end;
+    uint16_t value;
+    uint16_t start, end;
 
     in_str = ui->ExportStartIn->text();
     if(in_str.left(1) == "$") in_str.replace(0,1,"0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
@@ -2033,7 +2032,7 @@ void DebuggerWindow::onChangeFloppyStatus(void)
 
 void DebuggerWindow::RefreshGUI(void)
 {
-    if(c64 == 0) return;
+    if(c64 == nullptr) return;
 
     c64_cpu_reg.reg_mask = REG_MASK_ALL;
     c64->GetC64CpuReg(&c64_cpu_reg,&c64_cpu_ireg);
@@ -2092,7 +2091,6 @@ void DebuggerWindow::RefreshGUI(void)
 
             /// Alle Haltepunke ins TreeWidget einfügen ///
             FillDisassemblyList(floppy_cpu_ireg[currnet_floppy_nr].current_opcode_pc,false);
-
         }
         else
         {
@@ -2200,7 +2198,7 @@ void DebuggerWindow::RefreshGUI(void)
 
     ui->EingabeFeld->hide();
     UpdateRegister();
-    FillHistoryList(ui->HistoryScroll->value());
+    FillHistoryList(static_cast<uint8_t>(ui->HistoryScroll->value()));
     memory_window->UpdateMemoryList();
     vic_window->UpdateOutputList();
 

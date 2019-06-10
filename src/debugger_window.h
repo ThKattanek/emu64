@@ -85,7 +85,7 @@ private slots:
     void on_nmi_led_clicked(bool checked);
 
     void onShowContextMenu(const QPoint& pos);
-    void onSr_widget_ValueChange(uint8_t value);
+    void onSr_widget_ValueChange(unsigned char value);
     void onReg_label_clicked(LabelWidgetMod* label);
     void onChangeFloppyStatus();
     void onTimerAnimationRefresh();
@@ -94,7 +94,7 @@ private:
 
     void UpdateRegister(void);
     bool GetSaveFileName(QWidget* parent, QString caption, QString filter, QString* fileName, QString* fileExt);
-    void FillDisassemblyList(uint16_t adresse, bool new_refresh);
+    void FillDisassemblyList(uint16_t address, bool new_refresh);
     void FillHistoryList(uint8_t index);
     bool FindMnemonic(QString mnemonic, uint8_t* opcode = nullptr, uint8_t *opcode_count = nullptr);
     bool FindAddressing(QString address_string, uint8_t* address_type, uint16_t* address_value);
