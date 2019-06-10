@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.06.2019        		//
+// Letzte Änderung am 10.06.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -806,7 +806,7 @@ void Floppy1541::GetCpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg)
 {
     if(!FloppyEnabled) return;
     cpu->GetInterneRegister(ireg);
-    ireg->CycleCounter = CycleCounter;
+    ireg->cycle_counter = CycleCounter;
     cpu->GetRegister(reg);
 }
 

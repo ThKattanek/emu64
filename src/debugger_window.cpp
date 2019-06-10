@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.09.2019                //
+// Letzte Änderung am 10.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,27 +19,25 @@
 #include <QTimer>
 #include <QFontDatabase>
 
-#include "debugger_window.h"
-#include "ui_debugger_window.h"
-#include "micro_code_tbl_6510.h"
-#include "micro_code_string_tbl_6510.h"
+#include "./debugger_window.h"
+#include "./ui_debugger_window.h"
+#include "./micro_code_tbl_6510.h"
+#include "./micro_code_string_tbl_6510.h"
 
-DebuggerWindow::DebuggerWindow(QWidget *parent, QSettings *_ini) :
+DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     QDialog(parent),
     ui(new Ui::DebuggerWindow),
-    memory_window(NULL),
-    vic_window(NULL),
-    iec_window(NULL)
+    memory_window(nullptr),
+    vic_window(nullptr),
+    iec_window(nullptr)
 {    
-    ini = _ini;
-    c64 = 0;
+    this->ini = ini;
+    c64 = nullptr;
 
-    AktSource = 0;
+    current_source = 0;
 
-    FillMicroCodeStringTable();
-
-    TableBackColor = QColor(255,255,255);
-    TablePosColor = QColor(255,200,200);
+    table_back_color = QColor(255,255,255);
+    table_position_color = QColor(255,200,200);
 
     old_adresse = 0;
     old_make_idx = 0;
@@ -52,13 +50,13 @@ DebuggerWindow::DebuggerWindow(QWidget *parent, QSettings *_ini) :
     vic_window = new DebuggerVicWindow(this);
     iec_window = new DebuggerIECWindow(this);
 
-    NewRefresh = false;
+    new_refresh = false;
     timer1 = new QTimer(this);
-    connect(timer1,SIGNAL(timeout()),this,SLOT(onTimerAnimationRefresh()));
+    connect(timer1, SIGNAL(timeout()), this, SLOT(onTimerAnimationRefresh()));
     timer1->setInterval(10);
 
-    iOff = new QIcon(":/grafik/blue_led_off.png");
-    iOn = new QIcon(":/grafik/blue_led_on.png");
+    icon_off = new QIcon(":/grafik/blue_led_off.png");
+    icon_on = new QIcon(":/grafik/blue_led_on.png");
     ui->EingabeFeld->hide();
 
     QFontDatabase fontDB;
@@ -68,10 +66,10 @@ DebuggerWindow::DebuggerWindow(QWidget *parent, QSettings *_ini) :
     ui->MCodeHelp->setFont(font1);
 
     ui->DisAssTable->setColumnCount(4);
-    ui->DisAssTable->setColumnWidth(0,44);
-    ui->DisAssTable->setColumnWidth(1,70);
-    ui->DisAssTable->setColumnWidth(2,30);
-    ui->DisAssTable->setColumnWidth(3,57);
+    ui->DisAssTable->setColumnWidth(0, 44);
+    ui->DisAssTable->setColumnWidth(1, 70);
+    ui->DisAssTable->setColumnWidth(2, 30);
+    ui->DisAssTable->setColumnWidth(3, 57);
 
     ui->DisAssTable->setFont(font1);
     ui->DisAssTable->setRowCount(DISASS_ROW);
@@ -81,55 +79,54 @@ DebuggerWindow::DebuggerWindow(QWidget *parent, QSettings *_ini) :
     ui->AssAdressierungIn->setFont(font1);
 
     ui->BreakpointTree->setColumnCount(2);
-    ui->BreakpointTree->setColumnWidth(0,175);
-    ui->BreakpointTree->setColumnWidth(1,50);
-    NewBreakpointfound = false;
+    ui->BreakpointTree->setColumnWidth(0, 175);
+    ui->BreakpointTree->setColumnWidth(1, 50);
+    new_breakpoint_found = false;
 
     ui->HistoryList->setFont(font1);
-    for(int i=0;i<HistoryZeilen;i++)
+    for(int i=0; i<HISTORY_ROW; i++)
     {
         QListWidgetItem *item = new QListWidgetItem(ui->HistoryList);
         item->setText(QVariant(i).toString());
         ui->HistoryList->addItem(item);
     }
 
-    for(int i=0;i<DISASS_ROW;i++)
+    for(int i=0; i<DISASS_ROW; i++)
     {
-        ViewCodeAdressen[i] = 0;
-        DisAssPC[i] = new QTableWidgetItem();
-        DisAssPC[i]->setBackgroundColor(TableBackColor);
-        ui->DisAssTable->setItem(i,0,DisAssPC[i]);
-        DisAssMem[i] = new QTableWidgetItem();
-        DisAssMem[i]->setBackgroundColor(TableBackColor);
-        ui->DisAssTable->setItem(i,1,DisAssMem[i]);
-        DisAssMenmo[i] = new QTableWidgetItem();
-        DisAssMenmo[i]->setBackgroundColor(TableBackColor);
-        ui->DisAssTable->setItem(i,2,DisAssMenmo[i]);
-        DisAssAdr[i] = new QTableWidgetItem();
-        DisAssAdr[i]->setBackgroundColor(TableBackColor);
-        ui->DisAssTable->setItem(i,3,DisAssAdr[i]);
+        view_code_address[i] = 0;
+        disass_pc[i] = new QTableWidgetItem();
+        disass_pc[i]->setBackgroundColor(table_back_color);
+        ui->DisAssTable->setItem(i, 0, disass_pc[i]);
+        disass_memory[i] = new QTableWidgetItem();
+        disass_memory[i]->setBackgroundColor(table_back_color);
+        ui->DisAssTable->setItem(i, 1, disass_memory[i]);
+        disass_mnemonic[i] = new QTableWidgetItem();
+        disass_mnemonic[i]->setBackgroundColor(table_back_color);
+        ui->DisAssTable->setItem(i, 2, disass_mnemonic[i]);
+        disass_addressing[i] = new QTableWidgetItem();
+        disass_addressing[i]->setBackgroundColor(table_back_color);
+        ui->DisAssTable->setItem(i, 3, disass_addressing[i]);
     }
 
-    connect(ui->sr_widget,SIGNAL(ChangeValue(unsigned char)),this,SLOT(onSr_widget_ValueChange(unsigned char)));
-    connect(ui->pc_out,SIGNAL(clicked(LabelWidgetMod*)),this,SLOT(onReg_label_clicked(LabelWidgetMod*)));
-    connect(ui->sp_out,SIGNAL(clicked(LabelWidgetMod*)),this,SLOT(onReg_label_clicked(LabelWidgetMod*)));
-    connect(ui->ac_out,SIGNAL(clicked(LabelWidgetMod*)),this,SLOT(onReg_label_clicked(LabelWidgetMod*)));
-    connect(ui->xr_out,SIGNAL(clicked(LabelWidgetMod*)),this,SLOT(onReg_label_clicked(LabelWidgetMod*)));
-    connect(ui->yr_out,SIGNAL(clicked(LabelWidgetMod*)),this,SLOT(onReg_label_clicked(LabelWidgetMod*)));
-    connect(ui->sr_out,SIGNAL(clicked(LabelWidgetMod*)),this,SLOT(onReg_label_clicked(LabelWidgetMod*)));
+    connect(ui->sr_widget, SIGNAL(ChangeValue(unsigned char)), this, SLOT(onSr_widget_ValueChange(unsigned char)));
+    connect(ui->pc_out, SIGNAL(clicked(LabelWidgetMod*)), this, SLOT(onReg_label_clicked(LabelWidgetMod*)));
+    connect(ui->sp_out, SIGNAL(clicked(LabelWidgetMod*)), this, SLOT(onReg_label_clicked(LabelWidgetMod*)));
+    connect(ui->ac_out, SIGNAL(clicked(LabelWidgetMod*)), this, SLOT(onReg_label_clicked(LabelWidgetMod*)));
+    connect(ui->xr_out, SIGNAL(clicked(LabelWidgetMod*)), this, SLOT(onReg_label_clicked(LabelWidgetMod*)));
+    connect(ui->yr_out, SIGNAL(clicked(LabelWidgetMod*)), this, SLOT(onReg_label_clicked(LabelWidgetMod*)));
+    connect(ui->sr_out, SIGNAL(clicked(LabelWidgetMod*)), this, SLOT(onReg_label_clicked(LabelWidgetMod*)));
 
-    AktEditReg = -1;
+    current_edit_reg = -1;
 
-    RWString = QStringList() << "[READ]" << "[WRITE]";
+    rw_string = QStringList() << "[READ]" << "[WRITE]";
 
-    connect(ui->DisAssTable,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(onShowContextMenu(QPoint)));
+    connect(ui->DisAssTable, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onShowContextMenu(QPoint)));
 
     ////////// Load from INI ///////////
-    if(ini != 0)
+    if(ini != nullptr)
     {
         ini->beginGroup("DebuggerWindow");
         if(ini->contains("Geometry")) restoreGeometry(ini->value("Geometry").toByteArray());
-        //if(ini->value("Show",false).toBool()) show();
         ini->endGroup();
     }
     ////////////////////////////////////
@@ -140,64 +137,62 @@ DebuggerWindow::DebuggerWindow(QWidget *parent, QSettings *_ini) :
 DebuggerWindow::~DebuggerWindow()
 {
     ////////// Save to INI ///////////
-    if(ini != 0)
+    if(ini != nullptr)
     {
         ini->beginGroup("DebuggerWindow");
-        if(isOneShowed) ini->setValue("Geometry",saveGeometry());
-        if(isHidden()) ini->setValue("Show",false);
-        else ini->setValue("Show",true);
+        if(is_one_showed) ini->setValue("Geometry", saveGeometry());
+        if(isHidden()) ini->setValue("Show", false);
+        else ini->setValue("Show", true);
         ini->endGroup();
     }
     ////////////////////////////////////
 
-    delete iOff;
-    delete iOn;
+    delete icon_off;
+    delete icon_on;
     delete timer1;
     delete ui;
 
-    if(memory_window != NULL) delete memory_window;
-    if(vic_window != NULL) delete vic_window;
-    if(iec_window != NULL) delete iec_window;
+    if(memory_window != nullptr) delete memory_window;
+    if(vic_window != nullptr) delete vic_window;
+    if(iec_window != nullptr) delete iec_window;
 }
 
 void DebuggerWindow::AnimationRefreshProc()
 {
-    NewRefresh = true;
+    new_refresh = true;
 }
 
-void DebuggerWindow::onTimerAnimationRefresh(void)
+void DebuggerWindow::onTimerAnimationRefresh()
 {
-    if(NewRefresh)
+    if(new_refresh)
     {
-        NewRefresh = false;
-        if(c64 != 0)
+        new_refresh = false;
+        if(c64 != nullptr)
         {
-            if(AktSource > 0)
+            if(current_source > 0)
             {
-                FloppyCpuReg[AktFloppyNr].REG_MASK = REG_MASK_ALL;
-                c64->floppy[AktFloppyNr]->GetCpuReg(&FloppyCpuReg[AktFloppyNr],&FloppyCpuIReg[AktFloppyNr]);
-
-                FillDisassemblerList(FloppyCpuIReg[AktFloppyNr].AktOpcodePC,false);
+                floppy_cpu_reg[currnet_floppy_nr].reg_mask = REG_MASK_ALL;
+                c64->floppy[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr], &floppy_cpu_ireg[currnet_floppy_nr]);
+                FillDisassemblyList(floppy_cpu_ireg[currnet_floppy_nr].current_opcode_pc, false);
             }
             else
             {
-                C64CpuReg.REG_MASK = REG_MASK_ALL;
-                c64->GetC64CpuReg(&C64CpuReg,&C64CpuIReg);
-
-                FillDisassemblerList(C64CpuIReg.AktOpcodePC,false);
+                c64_cpu_reg.reg_mask = REG_MASK_ALL;
+                c64->GetC64CpuReg(&c64_cpu_reg,&c64_cpu_ireg);
+                FillDisassemblyList(c64_cpu_ireg.current_opcode_pc,false);
             }
         }
 
         UpdateRegister();
-        FillHistoryList(ui->HistoryScroll->value());
+        FillHistoryList(static_cast<uint8_t>(ui->HistoryScroll->value()));
         memory_window->UpdateMemoryList();
         vic_window->UpdateOutputList();
         iec_window->UpdateSignals();
     }
 
-    if(NewBreakpointfound)
+    if(new_breakpoint_found)
     {
-        NewBreakpointfound = false;
+        new_breakpoint_found = false;
         on_AnimationStop_clicked();
 
         for(int i=0;i<c64->GetBreakGroupAnz();i++)
@@ -208,18 +203,18 @@ void DebuggerWindow::onTimerAnimationRefresh(void)
                 ui->ChangeSource->setCurrentIndex(0);
                 if(i < ui->BreakpointTree->topLevelItemCount())
                 {
-                    ui->BreakpointTree->topLevelItem(i)->setBackgroundColor(0,QColor(0,255,0));
-                    ui->BreakpointTree->topLevelItem(i)->setBackgroundColor(1,QColor(1,255,0));
-                    ui->BreakpointTree->topLevelItem(i)->setText(1,trUtf8("ERFÜLLT !"));
+                    ui->BreakpointTree->topLevelItem(i)->setBackgroundColor(0, QColor(0, 255, 0));
+                    ui->BreakpointTree->topLevelItem(i)->setBackgroundColor(1, QColor(1, 255, 0));
+                    ui->BreakpointTree->topLevelItem(i)->setText(1, trUtf8("ERFÜLLT !"));
                 }
             }
         }
 
-        for(int i=0;i<MAX_FLOPPY_NUM;i++)
+        for(int i=0; i<MAX_FLOPPY_NUM; i++)
         {
             if(c64->floppy[i]->GetEnableFloppy())
             {
-                for(int ii=0;ii<c64->floppy[i]->GetBreakGroupAnz();ii++)
+                for(int ii=0; ii<c64->floppy[i]->GetBreakGroupAnz(); ii++)
                 {
                     BREAK_GROUP *bg = c64->floppy[i]->GetBreakGroup(ii);
                     if(bg->bTrue)
@@ -227,9 +222,9 @@ void DebuggerWindow::onTimerAnimationRefresh(void)
                         ui->ChangeSource->setCurrentIndex(i+1);
                         if(ii < ui->BreakpointTree->topLevelItemCount())
                         {
-                            ui->BreakpointTree->topLevelItem(ii)->setBackgroundColor(0,QColor(0,255,0));
-                            ui->BreakpointTree->topLevelItem(ii)->setBackgroundColor(1,QColor(1,255,0));
-                            ui->BreakpointTree->topLevelItem(ii)->setText(1,trUtf8("ERFÜLLT !"));
+                            ui->BreakpointTree->topLevelItem(ii)->setBackgroundColor(0, QColor(0, 255, 0));
+                            ui->BreakpointTree->topLevelItem(ii)->setBackgroundColor(1, QColor(1, 255, 0));
+                            ui->BreakpointTree->topLevelItem(ii)->setText(1, trUtf8("ERFÜLLT !"));
                         }
                     }
                 }
@@ -239,299 +234,10 @@ void DebuggerWindow::onTimerAnimationRefresh(void)
     }
 }
 
-void DebuggerWindow::FillMicroCodeStringTable()
-{
-    MicroCodeStringTable6510 = QStringList()
-    /*000*/ << trUtf8("Opcode von PC-Adresse holen // PC+1")
-    /*001*/ << trUtf8("Lesen von PC-Adresse und verwerfen // PC+1")
-    /*002*/ << trUtf8("PC Hi -> Stack // SR|16 // SP-1")
-    /*003*/ << trUtf8("PC Lo -> Stack // SP-1")
-    /*004*/ << trUtf8("SR -> Stack // SR|4 // SP-1")
-    /*005*/ << trUtf8("PC Lo von 0xFFFE holen")
-    /*006*/ << trUtf8("PC Hi von 0xFFFF holen")
-    /*007*/ << trUtf8("Pointer von PC-Adresse holen // PC+1")
-    /*008*/ << trUtf8("Lesen von Pointer und verwerfen // Pointer+XR")
-    /*009*/ << trUtf8("Adresse Lo von Pointer-Adresse holen // Pointer+1")
-    /*010*/ << trUtf8("Adresse Hi von Pointer-Adresse holen")
-    /*011*/ << trUtf8("TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ)")
-    /*012*/ << trUtf8("JAM")
-    /*013*/ << trUtf8("TMPByte von Adresse holen")
-    /*014*/ << trUtf8("TMPByte nach Adresse schreiben // ASL MEMORY // ORA")
-    /*015*/ << trUtf8("TMPByte nach Adresse schreiben")
-    /*016*/ << trUtf8("Adresse Hi = 0 // Adresse Lo von PC-Adresse holen // PC+1")
-    /*017*/ << trUtf8("TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ))")
-    /*018*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte<<1 // Set SR(NZC)")
-    /*019*/ << trUtf8("TMPByte von PC-Adresse holen")
-    /*020*/ << trUtf8("SR nach SP+0x0100 schreiben // SP-1")
-    /*021*/ << trUtf8("TMPByte von PC-Adresse holen // AC or TMPByte // Set SR(NZ) // PC+1")
-    /*022*/ << trUtf8("TMPByte von PC-Adresse holen // AC<<1 // Set SR(NZC)")
-    /*023*/ << trUtf8("TMPByte von PC-Adresse holen // AC and TMPByte // Set SR(NZC) // PC+1")
-    /*024*/ << trUtf8("Adresse Lo von PC-Adresse holen // PC+1")
-    /*025*/ << trUtf8("Adresse Hi von PC-Adresse holen // PC+1")
-    /*026*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prüfen (BPL)")
-    /*027*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prüfen (BMI)")
-    /*028*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prüfen (BVC)")
-    /*029*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prüfen (BVS)")
-    /*030*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prüfen (BCC)")
-    /*031*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prüfen (BCS)")
-    /*032*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prüfen (BNE)")
-    /*033*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prüfen (BEQ)")
-    /*034*/ << trUtf8("Lesen von PC-Adresse und verwerfen // BranchAdresse=PC+TMPByte")
-    /*035*/ << trUtf8("FIX PC Hi Adresse")
-    /*036*/ << trUtf8("Adresse Hi von Pointer-Adresse holen // Adresse+YR")
-    /*037*/ << trUtf8("TMPByte von Adresse holen // Fix Adresse Hi MCT+1 // AC or TMPByte")
-    /*038*/ << trUtf8("Adresse Hi von PC-Adresse holen // PC=Adresse")
-    /*039*/ << trUtf8("Lesen von PC-Adresse und verwerfen // XR=AC // Set SR(NZ)")
-    /*040*/ << trUtf8("Lesen von PC-Adresse und verwerfen // YR=AC // Set SR(NZ)")
-    /*041*/ << trUtf8("Lesen von PC-Adresse und verwerfen // XR=SP // Set SR(NZ)")
-    /*042*/ << trUtf8("Lesen von PC-Adresse und verwerfen // AC=XR // Set SR(NZ)")
-    /*043*/ << trUtf8("Lesen von PC-Adresse und verwerfen // SP=XR")
-    /*044*/ << trUtf8("Lesen von PC-Adresse und verwerfen // AC=YR // Set SR(NZ)")
-    /*045*/ << trUtf8("AC nach SP+0x0100 schreiben // SP-1")
-    /*046*/ << trUtf8("AC von SP+0x0100 lesen // SP+1")
-    /*047*/ << trUtf8("AC von SP+0x0100 lesen // Set SR(NZ)")
-    /*048*/ << trUtf8("SR von SP+0x0100 lesen // SP+1")
-    /*049*/ << trUtf8("SR von SP+0x0100 lesen")
-    /*050*/ << trUtf8("TMPByte von PC-Adresse lesen // AC + TMPByte + Carry // PC+1")
-    /*051*/ << trUtf8("TMPByte von Adresse lesen // AC + TMPByte + Carry")
-    /*052*/ << trUtf8("TMPByte von Adresse lesen // Adresse Lo + XR")
-    /*053*/ << trUtf8("Adresse Hi von PC-Adresse holen // Adresse+XR  // PC+1")
-    /*054*/ << trUtf8("Adresse Hi von PC-Adresse holen // Adresse+YR  // PC+1")
-    /*055*/ << trUtf8("TMPByte von Adresse lesen // AC + TMPByte + Carry // if(idxReg<Adresse Lo) MCT++")
-    /*056*/ << trUtf8("TMPByte von PC-Adresse lesen // AC - TMPByte - Carry // PC+1")
-    /*057*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte - Carry")
-    /*058*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte - Carry // if(idxReg<Adresse Lo) MCT++")
-    /*059*/ << trUtf8("TMPByte von SP+0x0100 holen")
-    /*060*/ << trUtf8("PC-Adresse Hi nach SP+0x0100 schreiben // SP--")
-    /*061*/ << trUtf8("PC-Adresse Lo nach SP+0x0100 schreiben // SP--")
-    /*062*/ << trUtf8("TMPByte von SP+0x0100 holen // SP+1")
-    /*063*/ << trUtf8("PC-Adresse Lo von SP+0x0100 holen // SP+1")
-    /*064*/ << trUtf8("PC-Adresse Hi von SP+0x0100 holen")
-    /*065*/ << trUtf8("TMPByte von PC-Adresse laden // PC+1")
-    /*066*/ << trUtf8("TMPByte von PC-Adresse lesen // AC and TMPByte // Set SR(NZ) // PC+1")
-    /*067*/ << trUtf8("TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ)")
-    /*068*/ << trUtf8("TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*069*/ << trUtf8("TMPByte von Adresse lesen // CarrayFalg=0")
-    /*070*/ << trUtf8("TMPByte von Adresse lesen // DezimalFalg=0")
-    /*071*/ << trUtf8("TMPByte von Adresse lesen // InterruptFalg=0")
-    /*072*/ << trUtf8("TMPByte von Adresse lesen // OverflowFalg=0")
-    /*073*/ << trUtf8("TMPByte von Adresse lesen // CarrayFalg=1	")
-    /*074*/ << trUtf8("TMPByte von Adresse lesen // DezimalFalg=1")
-    /*075*/ << trUtf8("TMPByte von Adresse lesen // InterruptFalg=1")
-    /*076*/ << trUtf8("TMPByte von Adresse lesen // BIT Operation")
-    /*077*/ << trUtf8("AC nach Adresse schreiben")
-    /*078*/ << trUtf8("XR nach Adresse schreiben")
-    /*079*/ << trUtf8("YR nach Adresse schreiben")
-    /*080*/ << trUtf8("AC von PC-Adresse lesen // Set SR(NZ) // PC+1")
-    /*081*/ << trUtf8("AC von PC-Adresse lesen // Set SR(NZ)")
-    /*082*/ << trUtf8("AC von PC-Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*083*/ << trUtf8("XR von PC-Adresse lesen // Set SR(NZ) // PC+1")
-    /*084*/ << trUtf8("XR von Adresse lesen // Set SR(NZ)")
-    /*085*/ << trUtf8("XR von Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*086*/ << trUtf8("YR von PC-Adresse lesen // Set SR(NZ) // PC+1")
-    /*087*/ << trUtf8("YR von Adresse lesen // Set SR(NZ)")
-    /*088*/ << trUtf8("YR von Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*089*/ << trUtf8("TMPByte von Adresse lesen // XR+1 // Set SR(NZ)")
-    /*090*/ << trUtf8("TMPByte von Adresse lesen // YR+1 // Set SR(NZ)")
-    /*091*/ << trUtf8("TMPByte von Adresse lesen // XR-1 // Set SR(NZ)")
-    /*092*/ << trUtf8("TMPByte von Adresse lesen // YR-1 // Set SR(NZ)")
-    /*093*/ << trUtf8("Illegaler Opcode - wird noch nicht unterstützt // Reset")
-    /*094*/ << trUtf8("PC LO von Adresse lesen // Adresse+1 (Nur Low Wert)")
-    /*095*/ << trUtf8("PC HI von Adresse lesen")
-    /*096*/ << trUtf8("PC LO von $FFFC lesen")
-    /*097*/ << trUtf8("PC HI von $FFFD lesen")
-    /*098*/ << trUtf8("TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*099*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC)")
-    /*100*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // if(idxReg<Adresse Lo) MCT++")
-    /*101*/ << trUtf8("TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*102*/ << trUtf8("TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
-    /*103*/ << trUtf8("TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*104*/ << trUtf8("TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
-    /*105*/ << trUtf8("TMPByte von PC-Adresse lesen // AC XOR TMPByte // Set SR(NZC) // PC+1")
-    /*106*/ << trUtf8("TMPByte von Adresse lesen // AC XOR TMPByte // Set SR(NZC)")
-    /*107*/ << trUtf8("TMPByte von Adresse lesen // AC XOR TMPByte // if(idxReg<Adresse Lo) MCT++")
-    /*108*/ << trUtf8("TMPByte von PC-Adresse holen // AC>>1 // Set SR(NZC)")
-    /*109*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte>>1 // Set SR(NZC)")
-    /*110*/ << trUtf8("TMPByte von PC-Adresse holen // C<-AC<<1<-C // Set SR(NZC)")
-    /*111*/ << trUtf8("TMPByte nach Adresse schreiben // C<-TMPByte<<1<-C // Set SR(NZC)")
-    /*112*/ << trUtf8("TMPByte von PC-Adresse holen // C->AC>>1->C // Set SR(NZC)")
-    /*113*/ << trUtf8("TMPByte nach Adresse schreiben // C->TMPByte>>1->C // Set SR(NZC)")
-    /*114*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte+1 // Set SR(NZ)")
-    /*115*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte-1 // Set SR(NZ)")
-    /*116*/ << trUtf8("SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag löschen")
-    /*117*/ << trUtf8("PC Lo von 0xFFFA holen")
-    /*118*/ << trUtf8("PC Hi von 0xFFFB holen")
-    /*119*/ << trUtf8("TMPByte von Adresse holen // Fix Adresse Hi MCT+1")
-    /*120*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [SLO]")
-    /*121*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [RLA]")
-    /*122*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [SRE]")
-    /*123*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [RRA]")
-    /*124*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [DCP]")
-    /*125*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [ISB]")
-    /*126*/ << trUtf8("AC von Adresse lesen // AC -> XR // Set SR(NZ) // Illegal [LAX]")
-    /*127*/ << trUtf8("AC von Adresse lesen // AC -> XR // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++ // Illegal [LAX]")
-    /*128*/ << trUtf8("AC von Adresse lesen // AC -> XR // Set SR(NZ) // Illegal [LAX]")
-    /*129*/ << trUtf8("Illegal [ASR]")
-    /*130*/ << trUtf8("Illegal [ARR]")
-    /*131*/ << trUtf8("Illegal [ANE]")
-    /*132*/ << trUtf8("Illegal [LXA]")
-    /*133*/ << trUtf8("Illegal [SBX]")
-    /*134*/ << trUtf8("Illegal [SHY]")
-    /*135*/ << trUtf8("Illegal [SHX]")
-    /*136*/ << trUtf8("Illegal [SHA]")
-    /*137*/ << trUtf8("Illegal [SHS]")
-    /*138*/ << trUtf8("Illegal [ANC]")
-    /*139*/ << trUtf8("Illegal [LAE]")
-    /*140*/ << trUtf8("Illegal [LAE] // if(idxReg<Adresse Lo) MCT++");
-}
-
 void DebuggerWindow::RetranslateUi()
 {
     ui->retranslateUi(this);
     ui->sr_widget->RetranslateUi();
-
-    MicroCodeStringTable6510 = QStringList()
-    /*000*/ << trUtf8("Opcode von PC-Adresse holen // PC+1")
-    /*001*/ << trUtf8("Lesen von PC-Adresse und verwerfen // PC+1")
-    /*002*/ << trUtf8("PC Hi -> Stack // SR|16 // SP-1")
-    /*003*/ << trUtf8("PC Lo -> Stack // SP-1")
-    /*004*/ << trUtf8("SR -> Stack // SR|4 // SP-1")
-    /*005*/ << trUtf8("PC Lo von 0xFFFE holen")
-    /*006*/ << trUtf8("PC Hi von 0xFFFF holen")
-    /*007*/ << trUtf8("Pointer von PC-Adresse holen // PC+1")
-    /*008*/ << trUtf8("Lesen von Pointer und verwerfen // Pointer+XR")
-    /*009*/ << trUtf8("Adresse Lo von Pointer-Adresse holen // Pointer+1")
-    /*010*/ << trUtf8("Adresse Hi von Pointer-Adresse holen")
-    /*011*/ << trUtf8("TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ)")
-    /*012*/ << trUtf8("JAM")
-    /*013*/ << trUtf8("TMPByte von Adresse holen")
-    /*014*/ << trUtf8("TMPByte nach Adresse schreiben // ASL MEMORY // ORA")
-    /*015*/ << trUtf8("TMPByte nach Adresse schreiben")
-    /*016*/ << trUtf8("Adresse Hi = 0 // Adresse Lo von PC-Adresse holen // PC+1")
-    /*017*/ << trUtf8("TMPByte von Adresse holen // AC or TMPByte // Set SR(NZ))")
-    /*018*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte<<1 // Set SR(NZC)")
-    /*019*/ << trUtf8("TMPByte von PC-Adresse holen")
-    /*020*/ << trUtf8("SR nach SP+0x0100 schreiben // SP-1")
-    /*021*/ << trUtf8("TMPByte von PC-Adresse holen // AC or TMPByte // Set SR(NZ) // PC+1")
-    /*022*/ << trUtf8("TMPByte von PC-Adresse holen // AC<<1 // Set SR(NZC)")
-    /*023*/ << trUtf8("TMPByte von PC-Adresse holen // AC and TMPByte // Set SR(NZC) // PC+1")
-    /*024*/ << trUtf8("Adresse Lo von PC-Adresse holen // PC+1")
-    /*025*/ << trUtf8("Adresse Hi von PC-Adresse holen // PC+1")
-    /*026*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf FALSE prüfen (BPL)")
-    /*027*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prüfen (BMI)")
-    /*028*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prüfen (BVC)")
-    /*029*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prüfen (BVS)")
-    /*030*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prüfen (BCC)")
-    /*031*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prüfen (BCS)")
-    /*032*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prüfen (BNE)")
-    /*033*/ << trUtf8("TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prüfen (BEQ)")
-    /*034*/ << trUtf8("Lesen von PC-Adresse und verwerfen // BranchAdresse=PC+TMPByte")
-    /*035*/ << trUtf8("FIX PC Hi Adresse")
-    /*036*/ << trUtf8("Adresse Hi von Pointer-Adresse holen // Adresse+YR")
-    /*037*/ << trUtf8("TMPByte von Adresse holen // Fix Adresse Hi MCT+1 // AC or TMPByte")
-    /*038*/ << trUtf8("Adresse Hi von PC-Adresse holen // PC=Adresse")
-    /*039*/ << trUtf8("Lesen von PC-Adresse und verwerfen // XR=AC // Set SR(NZ)")
-    /*040*/ << trUtf8("Lesen von PC-Adresse und verwerfen // YR=AC // Set SR(NZ)")
-    /*041*/ << trUtf8("Lesen von PC-Adresse und verwerfen // XR=SP // Set SR(NZ)")
-    /*042*/ << trUtf8("Lesen von PC-Adresse und verwerfen // AC=XR // Set SR(NZ)")
-    /*043*/ << trUtf8("Lesen von PC-Adresse und verwerfen // SP=XR")
-    /*044*/ << trUtf8("Lesen von PC-Adresse und verwerfen // AC=YR // Set SR(NZ)")
-    /*045*/ << trUtf8("AC nach SP+0x0100 schreiben // SP-1")
-    /*046*/ << trUtf8("AC von SP+0x0100 lesen // SP+1")
-    /*047*/ << trUtf8("AC von SP+0x0100 lesen // Set SR(NZ)")
-    /*048*/ << trUtf8("SR von SP+0x0100 lesen // SP+1")
-    /*049*/ << trUtf8("SR von SP+0x0100 lesen")
-    /*050*/ << trUtf8("TMPByte von PC-Adresse lesen // AC + TMPByte + Carry // PC+1")
-    /*051*/ << trUtf8("TMPByte von Adresse lesen // AC + TMPByte + Carry")
-    /*052*/ << trUtf8("TMPByte von Adresse lesen // Adresse Lo + XR")
-    /*053*/ << trUtf8("Adresse Hi von PC-Adresse holen // Adresse+XR  // PC+1")
-    /*054*/ << trUtf8("Adresse Hi von PC-Adresse holen // Adresse+YR  // PC+1")
-    /*055*/ << trUtf8("TMPByte von Adresse lesen // AC + TMPByte + Carry // if(idxReg<Adresse Lo) MCT++")
-    /*056*/ << trUtf8("TMPByte von PC-Adresse lesen // AC - TMPByte - Carry // PC+1")
-    /*057*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte - Carry")
-    /*058*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte - Carry // if(idxReg<Adresse Lo) MCT++")
-    /*059*/ << trUtf8("TMPByte von SP+0x0100 holen")
-    /*060*/ << trUtf8("PC-Adresse Hi nach SP+0x0100 schreiben // SP--")
-    /*061*/ << trUtf8("PC-Adresse Lo nach SP+0x0100 schreiben // SP--")
-    /*062*/ << trUtf8("TMPByte von SP+0x0100 holen // SP+1")
-    /*063*/ << trUtf8("PC-Adresse Lo von SP+0x0100 holen // SP+1")
-    /*064*/ << trUtf8("PC-Adresse Hi von SP+0x0100 holen")
-    /*065*/ << trUtf8("TMPByte von PC-Adresse laden // PC+1")
-    /*066*/ << trUtf8("TMPByte von PC-Adresse lesen // AC and TMPByte // Set SR(NZ) // PC+1")
-    /*067*/ << trUtf8("TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ)")
-    /*068*/ << trUtf8("TMPByte von Adresse lesen // AC and TMPByte // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*069*/ << trUtf8("TMPByte von Adresse lesen // CarrayFalg=0")
-    /*070*/ << trUtf8("TMPByte von Adresse lesen // DezimalFalg=0")
-    /*071*/ << trUtf8("TMPByte von Adresse lesen // InterruptFalg=0")
-    /*072*/ << trUtf8("TMPByte von Adresse lesen // OverflowFalg=0")
-    /*073*/ << trUtf8("TMPByte von Adresse lesen // CarrayFalg=1	")
-    /*074*/ << trUtf8("TMPByte von Adresse lesen // DezimalFalg=1")
-    /*075*/ << trUtf8("TMPByte von Adresse lesen // InterruptFalg=1")
-    /*076*/ << trUtf8("TMPByte von Adresse lesen // BIT Operation")
-    /*077*/ << trUtf8("AC nach Adresse schreiben")
-    /*078*/ << trUtf8("XR nach Adresse schreiben")
-    /*079*/ << trUtf8("YR nach Adresse schreiben")
-    /*080*/ << trUtf8("AC von PC-Adresse lesen // Set SR(NZ) // PC+1")
-    /*081*/ << trUtf8("AC von PC-Adresse lesen // Set SR(NZ)")
-    /*082*/ << trUtf8("AC von PC-Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*083*/ << trUtf8("XR von PC-Adresse lesen // Set SR(NZ) // PC+1")
-    /*084*/ << trUtf8("XR von Adresse lesen // Set SR(NZ)")
-    /*085*/ << trUtf8("XR von Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*086*/ << trUtf8("YR von PC-Adresse lesen // Set SR(NZ) // PC+1")
-    /*087*/ << trUtf8("YR von Adresse lesen // Set SR(NZ)")
-    /*088*/ << trUtf8("YR von Adresse lesen // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++")
-    /*089*/ << trUtf8("TMPByte von Adresse lesen // XR+1 // Set SR(NZ)")
-    /*090*/ << trUtf8("TMPByte von Adresse lesen // YR+1 // Set SR(NZ)")
-    /*091*/ << trUtf8("TMPByte von Adresse lesen // XR-1 // Set SR(NZ)")
-    /*092*/ << trUtf8("TMPByte von Adresse lesen // YR-1 // Set SR(NZ)")
-    /*093*/ << trUtf8("Illegaler Opcode - wird noch nicht unterstützt // Reset")
-    /*094*/ << trUtf8("PC LO von Adresse lesen // Adresse+1 (Nur Low Wert)")
-    /*095*/ << trUtf8("PC HI von Adresse lesen")
-    /*096*/ << trUtf8("PC LO von $FFFC lesen")
-    /*097*/ << trUtf8("PC HI von $FFFD lesen")
-    /*098*/ << trUtf8("TMPByte von PC-Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*099*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // Set SR(NZC)")
-    /*100*/ << trUtf8("TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // if(idxReg<Adresse Lo) MCT++")
-    /*101*/ << trUtf8("TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*102*/ << trUtf8("TMPByte von Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
-    /*103*/ << trUtf8("TMPByte von PC-Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1")
-    /*104*/ << trUtf8("TMPByte von Adresse lesen // YR - TMPByte (XR wird nicht verändert) // Set SR(NZC)")
-    /*105*/ << trUtf8("TMPByte von PC-Adresse lesen // AC XOR TMPByte // Set SR(NZC) // PC+1")
-    /*106*/ << trUtf8("TMPByte von Adresse lesen // AC XOR TMPByte // Set SR(NZC)")
-    /*107*/ << trUtf8("TMPByte von Adresse lesen // AC XOR TMPByte // if(idxReg<Adresse Lo) MCT++")
-    /*108*/ << trUtf8("TMPByte von PC-Adresse holen // AC>>1 // Set SR(NZC)")
-    /*109*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte>>1 // Set SR(NZC)")
-    /*110*/ << trUtf8("TMPByte von PC-Adresse holen // C<-AC<<1<-C // Set SR(NZC)")
-    /*111*/ << trUtf8("TMPByte nach Adresse schreiben // C<-TMPByte<<1<-C // Set SR(NZC)")
-    /*112*/ << trUtf8("TMPByte von PC-Adresse holen // C->AC>>1->C // Set SR(NZC)")
-    /*113*/ << trUtf8("TMPByte nach Adresse schreiben // C->TMPByte>>1->C // Set SR(NZC)")
-    /*114*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte+1 // Set SR(NZ)")
-    /*115*/ << trUtf8("TMPByte nach Adresse schreiben // TMPByte-1 // Set SR(NZ)")
-    /*116*/ << trUtf8("SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag löschen")
-    /*117*/ << trUtf8("PC Lo von 0xFFFA holen")
-    /*118*/ << trUtf8("PC Hi von 0xFFFB holen")
-    /*119*/ << trUtf8("TMPByte von Adresse holen // Fix Adresse Hi MCT+1")
-    /*120*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [SLO]")
-    /*121*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [RLA]")
-    /*122*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [SRE]")
-    /*123*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [RRA]")
-    /*124*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [DCP]")
-    /*125*/ << trUtf8("TMPByte nach Adresse schreiben // Illegal [ISB]")
-    /*126*/ << trUtf8("AC von Adresse lesen // AC -> XR // Set SR(NZ) // Illegal [LAX]")
-    /*127*/ << trUtf8("AC von Adresse lesen // AC -> XR // Set SR(NZ) // if(idxReg<Adresse Lo) MCT++ // Illegal [LAX]")
-    /*128*/ << trUtf8("AC von Adresse lesen // AC -> XR // Set SR(NZ) // Illegal [LAX]")
-    /*129*/ << trUtf8("Illegal [ASR]")
-    /*130*/ << trUtf8("Illegal [ARR]")
-    /*131*/ << trUtf8("Illegal [ANE]")
-    /*132*/ << trUtf8("Illegal [LXA]")
-    /*133*/ << trUtf8("Illegal [SBX]")
-    /*134*/ << trUtf8("Illegal [SHY]")
-    /*135*/ << trUtf8("Illegal [SHX]")
-    /*136*/ << trUtf8("Illegal [SHA]")
-    /*137*/ << trUtf8("Illegal [SHS]")
-    /*138*/ << trUtf8("Illegal [ANC]")
-    /*139*/ << trUtf8("Illegal [LAE]")
-    /*140*/ << trUtf8("Illegal [LAE] // if(idxReg<Adresse Lo) MCT++");
 
     this->update();
     this->UpdateRegister();
@@ -547,13 +253,13 @@ void DebuggerWindow::SetC64Pointer(C64Class *c64)
     memory_window->SetC64Pointer(c64);
     vic_window->SetC64Pointer(c64);
     iec_window->SetC64Pointer(c64);
-    this->c64->AnimationRefreshProc = bind(&DebuggerWindow::AnimationRefreshProc,this);
-    this->c64->BreakpointProc = bind(&DebuggerWindow::BreakpointProc,this);
+    this->c64->AnimationRefreshProc = bind(&DebuggerWindow::AnimationRefreshProc, this);
+    this->c64->BreakpointProc = bind(&DebuggerWindow::BreakpointProc, this);
 }
 
 void DebuggerWindow::showEvent(QShowEvent*)
 {
-    isOneShowed = true;
+    is_one_showed = true;
     c64->SetDebugMode(true);
     RefreshGUI();
 }
@@ -582,130 +288,130 @@ void DebuggerWindow::hideEvent(QHideEvent*)
 
 void DebuggerWindow::UpdateRegister()
 {
-    if(c64 == 0) return;
+    if(c64 == nullptr) return;
 
     char str00[1024];
 
-    if(AktSource > 0)
+    if(current_source > 0)
     {
         /// Floppy's ///
 
-        if(!c64->floppy[AktFloppyNr]->GetEnableFloppy()) return;
+        if(!c64->floppy[currnet_floppy_nr]->GetEnableFloppy()) return;
 
-        sprintf(str00,"$%4.4X",FloppyCpuReg[AktFloppyNr].PC);
+        sprintf(str00,"$%4.4X", floppy_cpu_reg[currnet_floppy_nr].pc);
         ui->pc_out->setText(QString(str00));
-        sprintf(str00,"$%2.2X",FloppyCpuReg[AktFloppyNr].SP + 0x100);
+        sprintf(str00,"$%2.2X", floppy_cpu_reg[currnet_floppy_nr].sp + 0x100);
         ui->sp_out->setText(QString(str00));
-        sprintf(str00,"$%2.2X",FloppyCpuReg[AktFloppyNr].AC);
+        sprintf(str00,"$%2.2X", floppy_cpu_reg[currnet_floppy_nr].ac);
         ui->ac_out->setText(QString(str00));
-        sprintf(str00,"$%2.2X",FloppyCpuReg[AktFloppyNr].XR);
+        sprintf(str00,"$%2.2X", floppy_cpu_reg[currnet_floppy_nr].xr);
         ui->xr_out->setText(QString(str00));
-        sprintf(str00,"$%2.2X",FloppyCpuReg[AktFloppyNr].YR);
+        sprintf(str00,"$%2.2X", floppy_cpu_reg[currnet_floppy_nr].yr);
         ui->yr_out->setText(QString(str00));
-        sprintf(str00,"$%2.2X",FloppyCpuReg[AktFloppyNr].SR);
+        sprintf(str00,"$%2.2X", floppy_cpu_reg[currnet_floppy_nr].sr);
         ui->sr_out->setText(QString(str00));
-        ui->sr_widget->SetValue(FloppyCpuReg[AktFloppyNr].SR);
+        ui->sr_widget->SetValue(floppy_cpu_reg[currnet_floppy_nr].sr);
 
-        sprintf(str00,"$%4.4X",FloppyCpuReg[AktFloppyNr].IRQ);
+        sprintf(str00,"$%4.4X",floppy_cpu_reg[currnet_floppy_nr].irq);
         ui->irq_out->setText(QString(str00));
-        sprintf(str00,"$%4.4X",FloppyCpuReg[AktFloppyNr].NMI);
+        sprintf(str00,"$%4.4X",floppy_cpu_reg[currnet_floppy_nr].nmi);
         ui->nmi_out->setText(QString(str00));
-        sprintf(str00,"$%4.4X",FloppyCpuReg[AktFloppyNr]._0314);
+        sprintf(str00,"$%4.4X",floppy_cpu_reg[currnet_floppy_nr]._0314);
         ui->_0314_out->setText(QString(str00));
-        sprintf(str00,"$%4.4X",FloppyCpuReg[AktFloppyNr]._0318);
+        sprintf(str00,"$%4.4X",floppy_cpu_reg[currnet_floppy_nr]._0318);
         ui->_0318_out->setText(QString(str00));
 
-        sprintf(str00,"$%4.4X",FloppyCpuIReg[AktFloppyNr].AktOpcodePC);
+        sprintf(str00,"$%4.4X", floppy_cpu_ireg[currnet_floppy_nr].current_opcode_pc);
         ui->opcode_pc_out->setText(QString(str00));
-        sprintf(str00,"$%3.3X",FloppyCpuIReg[AktFloppyNr].AktOpcode);
+        sprintf(str00,"$%3.3X", floppy_cpu_ireg[currnet_floppy_nr].current_opcode);
         ui->opcode_out->setText(QString(str00));
-        sprintf(str00,"$%4.4X",FloppyCpuIReg[AktFloppyNr].Adresse);
+        sprintf(str00,"$%4.4X", floppy_cpu_ireg[currnet_floppy_nr].address);
         ui->adresse_out->setText(QString(str00));
-        sprintf(str00,"$%4.4X",FloppyCpuIReg[AktFloppyNr].BranchAdresse);
+        sprintf(str00,"$%4.4X", floppy_cpu_ireg[currnet_floppy_nr].branch_address);
         ui->branch_adresse_out->setText(QString(str00));
-        sprintf(str00,"$%2.2X",FloppyCpuIReg[AktFloppyNr].Pointer);
+        sprintf(str00,"$%2.2X", floppy_cpu_ireg[currnet_floppy_nr].pointer);
         ui->pointer_out->setText(QString(str00));
-        sprintf(str00,"$%2.2X",FloppyCpuIReg[AktFloppyNr].TMPByte);
+        sprintf(str00,"$%2.2X", floppy_cpu_ireg[currnet_floppy_nr].tmp_byte);
         ui->tmp_byte_out->setText(QString(str00));
-        sprintf(str00,"%10.10d",(int)FloppyCpuIReg[AktFloppyNr].CycleCounter);
+        sprintf(str00,"%10.10d", floppy_cpu_ireg[currnet_floppy_nr].cycle_counter);
         ui->CycleCounter_Out->setText(QString(str00));
 
-        sprintf(str00,"%3.3d ",FloppyCpuIReg[AktFloppyNr].AktMicroCode);
-        ui->micro_code_out->setText(str00 + RWString[MicroCodeRWTable6510[FloppyCpuIReg[AktFloppyNr].AktMicroCode]]);
+        sprintf(str00,"%3.3d ", floppy_cpu_ireg[currnet_floppy_nr].current_micro_code);
+        ui->micro_code_out->setText(str00 + rw_string[micro_code_rw_table_6510[floppy_cpu_ireg[currnet_floppy_nr].current_micro_code]]);
 
-        ui->MCodeHelp->setText(MicroCodeStringTable6510[FloppyCpuIReg[AktFloppyNr].AktMicroCode]);
-        ui->mnemonic_out->setText(QString(CpuOPC).mid(FloppyCpuIReg[AktFloppyNr].AktOpcode*3,3));
+        ui->MCodeHelp->setText(micro_code_string_table_6510[floppy_cpu_ireg[currnet_floppy_nr].current_micro_code]);
+        ui->mnemonic_out->setText(QString(CpuOPC).mid(floppy_cpu_ireg[currnet_floppy_nr].current_opcode * 3, 3));
 
-        if(FloppyCpuIReg[AktFloppyNr].IRQ) ui->irq_led->setIcon(*iOn);
-        else ui->irq_led->setIcon(*iOff);
-        if(!FloppyCpuIReg[AktFloppyNr].RESET) ui->reset_led->setIcon(*iOn);
-        else ui->reset_led->setIcon(*iOff);
+        if(floppy_cpu_ireg[currnet_floppy_nr].irq) ui->irq_led->setIcon(*icon_on);
+        else ui->irq_led->setIcon(*icon_off);
+        if(!floppy_cpu_ireg[currnet_floppy_nr].reset) ui->reset_led->setIcon(*icon_on);
+        else ui->reset_led->setIcon(*icon_off);
     }
     else
     {
         /// C64 ///
-        sprintf(str00,"$%4.4X",C64CpuReg.PC);
+        sprintf(str00, "$%4.4X", c64_cpu_reg.pc);
         ui->pc_out->setText(QString(str00));
-        sprintf(str00,"$%2.2X",C64CpuReg.SP + 0x100);
+        sprintf(str00, "$%2.2X", c64_cpu_reg.sp + 0x100);
         ui->sp_out->setText(QString(str00));
-        sprintf(str00,"$%2.2X",C64CpuReg.AC);
+        sprintf(str00, "$%2.2X", c64_cpu_reg.ac);
         ui->ac_out->setText(QString(str00));
-        sprintf(str00,"$%2.2X",C64CpuReg.XR);
+        sprintf(str00, "$%2.2X", c64_cpu_reg.xr);
         ui->xr_out->setText(QString(str00));
-        sprintf(str00,"$%2.2X",C64CpuReg.YR);
+        sprintf(str00, "$%2.2X", c64_cpu_reg.yr);
         ui->yr_out->setText(QString(str00));
-        sprintf(str00,"$%2.2X",C64CpuReg.SR);
+        sprintf(str00, "$%2.2X", c64_cpu_reg.sr);
         ui->sr_out->setText(QString(str00));
-        ui->sr_widget->SetValue(C64CpuReg.SR);
+        ui->sr_widget->SetValue(c64_cpu_reg.sr);
 
-        sprintf(str00,"$%4.4X",C64CpuReg.IRQ);
+        sprintf(str00, "$%4.4X", c64_cpu_reg.irq);
         ui->irq_out->setText(QString(str00));
-        sprintf(str00,"$%4.4X",C64CpuReg.NMI);
+        sprintf(str00, "$%4.4X", c64_cpu_reg.nmi);
         ui->nmi_out->setText(QString(str00));
-        sprintf(str00,"$%4.4X",C64CpuReg._0314);
+        sprintf(str00, "$%4.4X", c64_cpu_reg._0314);
         ui->_0314_out->setText(QString(str00));
-        sprintf(str00,"$%4.4X",C64CpuReg._0318);
+        sprintf(str00, "$%4.4X", c64_cpu_reg._0318);
         ui->_0318_out->setText(QString(str00));
 
-        sprintf(str00,"$%4.4X",C64CpuIReg.AktOpcodePC);
+        sprintf(str00, "$%4.4X", c64_cpu_ireg.current_opcode_pc);
         ui->opcode_pc_out->setText(QString(str00));
-        sprintf(str00,"$%3.3X",C64CpuIReg.AktOpcode);
+        sprintf(str00, "$%3.3X", c64_cpu_ireg.current_opcode);
         ui->opcode_out->setText(QString(str00));
-        sprintf(str00,"$%4.4X",C64CpuIReg.Adresse);
+        sprintf(str00, "$%4.4X", c64_cpu_ireg.address);
         ui->adresse_out->setText(QString(str00));
-        sprintf(str00,"$%4.4X",C64CpuIReg.BranchAdresse);
+        sprintf(str00, "$%4.4X", c64_cpu_ireg.branch_address);
         ui->branch_adresse_out->setText(QString(str00));
-        sprintf(str00,"$%2.2X",C64CpuIReg.Pointer);
+        sprintf(str00, "$%2.2X", c64_cpu_ireg.pointer);
         ui->pointer_out->setText(QString(str00));
-        sprintf(str00,"$%2.2X",C64CpuIReg.TMPByte);
+        sprintf(str00, "$%2.2X", c64_cpu_ireg.tmp_byte);
         ui->tmp_byte_out->setText(QString(str00));
-        sprintf(str00,"%10.10d",(int)C64CpuIReg.CycleCounter);
+        sprintf(str00,"%10.10d", c64_cpu_ireg.cycle_counter);
         ui->CycleCounter_Out->setText(QString(str00));
 
-        sprintf(str00,"%3.3d ",C64CpuIReg.AktMicroCode);
-        ui->micro_code_out->setText(str00 + RWString[MicroCodeRWTable6510[C64CpuIReg.AktMicroCode]]);
+        sprintf(str00, "%3.3d ", c64_cpu_ireg.current_micro_code);
+        ui->micro_code_out->setText(str00 + rw_string[micro_code_rw_table_6510[c64_cpu_ireg.current_micro_code]]);
 
-        ui->MCodeHelp->setText(MicroCodeStringTable6510[C64CpuIReg.AktMicroCode]);
-        ui->mnemonic_out->setText(QString(CpuOPC).mid(C64CpuIReg.AktOpcode*3,3));
+        ui->MCodeHelp->setText(micro_code_string_table_6510[c64_cpu_ireg.current_micro_code]);
+        ui->mnemonic_out->setText(QString(CpuOPC).mid(c64_cpu_ireg.current_opcode * 3, 3));
 
-        if(C64CpuIReg.CpuWait) ui->wait_led->setIcon(*iOn);
-        else ui->wait_led->setIcon(*iOff);
+        if(c64_cpu_ireg.cpu_wait) ui->wait_led->setIcon(*icon_on);
+        else ui->wait_led->setIcon(*icon_off);
 
         if(!ui->man_lines->checkState())
         {
-            if(C64CpuIReg.IRQ) ui->irq_led->setIcon(*iOn);
-            else ui->irq_led->setIcon(*iOff);
-            if(C64CpuIReg.NMI) ui->nmi_led->setIcon(*iOn);
-            else ui->nmi_led->setIcon(*iOff);
-            if(C64CpuIReg.RDY) ui->rdy_led->setIcon(*iOn);
-            else ui->rdy_led->setIcon(*iOff);
+            if(c64_cpu_ireg.irq) ui->irq_led->setIcon(*icon_on);
+            else ui->irq_led->setIcon(*icon_off);
+            if(c64_cpu_ireg.nmi) ui->nmi_led->setIcon(*icon_on);
+            else ui->nmi_led->setIcon(*icon_off);
+            if(c64_cpu_ireg.rdy) ui->rdy_led->setIcon(*icon_on);
+            else ui->rdy_led->setIcon(*icon_off);
         }
-        if(!C64CpuIReg.RESET) ui->reset_led->setIcon(*iOn);
-        else ui->reset_led->setIcon(*iOff);
-        if(C64CpuIReg.EXROM) ui->exrom_led->setIcon(*iOn);
-        else ui->exrom_led->setIcon(*iOff);
-        if(C64CpuIReg.GAME) ui->game_led->setIcon(*iOn);
-        else ui->game_led->setIcon(*iOff);
+        if(!c64_cpu_ireg.reset) ui->reset_led->setIcon(*icon_on);
+        else ui->reset_led->setIcon(*icon_off);
+        if(c64_cpu_ireg.exrom) ui->exrom_led->setIcon(*icon_on);
+        else ui->exrom_led->setIcon(*icon_off);
+        if(c64_cpu_ireg.game) ui->game_led->setIcon(*icon_on);
+        else ui->game_led->setIcon(*icon_off);
     }
 }
 
@@ -729,43 +435,42 @@ void DebuggerWindow::onShowContextMenu(const QPoint& pos)
     {
         // nothing was chosen
     }
-
 }
 
-void DebuggerWindow::onSr_widget_ValueChange(unsigned char value)
+void DebuggerWindow::onSr_widget_ValueChange(uint8_t value)
 {
     on_AnimationStop_clicked();
 
     ui->EingabeFeld->hide();
 
-    REG_STRUCT CpuReg;
-    CpuReg.REG_MASK = REG_MASK_SR;
-    CpuReg.SR = value;
+    REG_STRUCT cpu_reg;
+    cpu_reg.reg_mask = REG_MASK_SR;
+    cpu_reg.sr = value;
 
     char str00[50];
 
     sprintf(str00,"$%2.2X",value);
     ui->sr_out->setText(str00);
 
-    if(AktSource > 0)
+    if(current_source > 0)
     {
-        c64->floppy[AktFloppyNr]->SetCpuReg(&CpuReg);
+        c64->floppy[currnet_floppy_nr]->SetCpuReg(&cpu_reg);
     }
-    else c64->cpu->SetRegister(&CpuReg);
+    else c64->cpu->SetRegister(&cpu_reg);
 }
 
 void DebuggerWindow::onReg_label_clicked(LabelWidgetMod* label)
 {
     on_AnimationStop_clicked();
 
-    AktEditReg = -1;
+    current_edit_reg = -1;
 
-    if(label->objectName() == "pc_out") AktEditReg = 0;
-    if(label->objectName() == "sp_out") AktEditReg = 1;
-    if(label->objectName() == "ac_out") AktEditReg = 2;
-    if(label->objectName() == "xr_out") AktEditReg = 3;
-    if(label->objectName() == "yr_out") AktEditReg = 4;
-    if(label->objectName() == "sr_out") AktEditReg = 5;
+    if(label->objectName() == "pc_out") current_edit_reg = 0;
+    if(label->objectName() == "sp_out") current_edit_reg = 1;
+    if(label->objectName() == "ac_out") current_edit_reg = 2;
+    if(label->objectName() == "xr_out") current_edit_reg = 3;
+    if(label->objectName() == "yr_out") current_edit_reg = 4;
+    if(label->objectName() == "sr_out") current_edit_reg = 5;
 
     ui->EingabeFeld->setGeometry(label->geometry());
 
@@ -777,7 +482,7 @@ void DebuggerWindow::onReg_label_clicked(LabelWidgetMod* label)
 
 void DebuggerWindow::on_EingabeFeld_returnPressed()
 {
-    if(AktEditReg == -1)
+    if(current_edit_reg == -1)
     {
         ui->EingabeFeld->hide();
         return;
@@ -785,24 +490,25 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
 
     bool ok;
     QString in_str = ui->EingabeFeld->text();
-    unsigned short value;
+    uint16_t value;
 
     if(in_str.left(1) == "$") in_str.replace(0,1,"0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
 
-    value = in_str.toUShort(&ok,0);                //
+    value = in_str.toUShort(&ok,0);
+
     if(!ok)
     {
         QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Es wurde kein gültiges Zahlenformat benutzt !"));
         return;
     }
 
-    REG_STRUCT CpuReg;
+    REG_STRUCT cpu_reg;
 
-    switch(AktEditReg)
+    switch(current_edit_reg)
     {
     case 0:
-        CpuReg.REG_MASK = REG_MASK_PC;
-        CpuReg.PC = value;
+        cpu_reg.reg_mask = REG_MASK_PC;
+        cpu_reg.pc = value;
         break;
     case 1:
         if(value > 0x100) value -= 0x100;
@@ -811,8 +517,8 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
             QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Der Wert muss zwischen 0 und 511 liegen !"));
             return;
         }
-        CpuReg.REG_MASK = REG_MASK_SP;
-        CpuReg.SP = value;
+        cpu_reg.reg_mask = REG_MASK_SP;
+        cpu_reg.sp = value;
         break;
     case 2:
         if(value > 0xFF)
@@ -820,8 +526,8 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
             QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
-        CpuReg.REG_MASK = REG_MASK_AC;
-        CpuReg.AC = value;
+        cpu_reg.reg_mask = REG_MASK_AC;
+        cpu_reg.ac = value;
         break;
     case 3:
         if(value > 0xFF)
@@ -829,8 +535,8 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
             QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
-        CpuReg.REG_MASK = REG_MASK_XR;
-        CpuReg.XR = value;
+        cpu_reg.reg_mask = REG_MASK_XR;
+        cpu_reg.xr = value;
         break;
     case 4:
         if(value > 0xFF)
@@ -838,8 +544,8 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
             QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
-        CpuReg.REG_MASK = REG_MASK_YR;
-        CpuReg.YR = value;
+        cpu_reg.reg_mask = REG_MASK_YR;
+        cpu_reg.yr = value;
         break;
     case 5:
         if(value > 0xFF)
@@ -847,23 +553,23 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
             QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
-        CpuReg.REG_MASK = REG_MASK_SR;
-        CpuReg.SR = value;
+        cpu_reg.reg_mask = REG_MASK_SR;
+        cpu_reg.sr = value;
         break;
     }
 
-    if(AktSource > 0)
+    if(current_source > 0)
     {
-        c64->floppy[AktFloppyNr]->SetCpuReg(&CpuReg);
-        c64->floppy[AktFloppyNr]->GetCpuReg(&FloppyCpuReg[AktFloppyNr],&FloppyCpuIReg[AktFloppyNr]);
+        c64->floppy[currnet_floppy_nr]->SetCpuReg(&cpu_reg);
+        c64->floppy[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr],&floppy_cpu_ireg[currnet_floppy_nr]);
     }
     else
     {
-        c64->cpu->SetRegister(&CpuReg);
-        c64->cpu->GetRegister(&C64CpuReg);
+        c64->cpu->SetRegister(&cpu_reg);
+        c64->cpu->GetRegister(&c64_cpu_reg);
     }
 
-    AktEditReg = -1;
+    current_edit_reg = -1;
     ui->EingabeFeld->hide();
     UpdateRegister();
 }
@@ -879,15 +585,15 @@ void DebuggerWindow::on_OneOpcode_clicked()
 {
     ui->EingabeFeld->hide();
     ClearAllBreakpointBackcolors();
-    c64->OneOpcode(AktSource);
+    c64->OneOpcode(current_source);
 }
 
 
 void DebuggerWindow::on_CycleCounterReset_clicked()
 {
-    if(AktSource > 0)
+    if(current_source > 0)
     {
-        c64->floppy[AktFloppyNr]->ResetCycleCounter();
+        c64->floppy[currnet_floppy_nr]->ResetCycleCounter();
     }
     else
     {
@@ -896,7 +602,7 @@ void DebuggerWindow::on_CycleCounterReset_clicked()
     ui->CycleCounter_Out->setText("0000000000");
 }
 
-bool DebuggerWindow::getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt)
+bool DebuggerWindow::GetSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt)
 {
    if (fileName == NULL)      // "parent" is allowed to be NULL!
       return false;
@@ -955,7 +661,7 @@ bool DebuggerWindow::getSaveFileName(QWidget *parent, QString caption, QString f
          return false;
       else if (result == QMessageBox::No) {
          // Next chance for the user to select a filename
-         if (!getSaveFileName(parent, caption, filter, &tmpFileName, &extension))
+         if (!GetSaveFileName(parent, caption, filter, &tmpFileName, &extension))
             // User decided to cancel, exit function here
             return false;
       // User clicked "Yes", so process the execution
@@ -968,7 +674,7 @@ bool DebuggerWindow::getSaveFileName(QWidget *parent, QString caption, QString f
    return true;
 }
 
-void DebuggerWindow::FillDisassemblerList(unsigned short adresse,bool new_refresh)
+void DebuggerWindow::FillDisassemblyList(uint16_t adresse, bool new_refresh)
 {
     unsigned short PC = adresse;
     char str00[50];
@@ -978,16 +684,16 @@ void DebuggerWindow::FillDisassemblerList(unsigned short adresse,bool new_refres
     bool find = false;
     int akt_make_idx = 0;
 
-    if(AktSource > 0)
+    if(current_source > 0)
     {
-        if(!c64->floppy[AktSource-1]->GetEnableFloppy()) return;
+        if(!c64->floppy[current_source-1]->GetEnableFloppy()) return;
     }
 
     if(!new_refresh)
     {
         for(int i=0;i<DISASS_ROW;i++)
         {
-            if(ViewCodeAdressen[i] == adresse)
+            if(view_code_address[i] == adresse)
             {
                 find = true;
                 akt_make_idx = i;
@@ -997,30 +703,30 @@ void DebuggerWindow::FillDisassemblerList(unsigned short adresse,bool new_refres
 
     if(find)
     {
-        DisAssPC[old_make_idx]->setBackgroundColor(TableBackColor);
-        DisAssMem[old_make_idx]->setBackgroundColor(TableBackColor);
-        DisAssMenmo[old_make_idx]->setBackgroundColor(TableBackColor);
-        DisAssAdr[old_make_idx]->setBackgroundColor(TableBackColor);
+        disass_pc[old_make_idx]->setBackgroundColor(table_back_color);
+        disass_memory[old_make_idx]->setBackgroundColor(table_back_color);
+        disass_mnemonic[old_make_idx]->setBackgroundColor(table_back_color);
+        disass_addressing[old_make_idx]->setBackgroundColor(table_back_color);
 
-        DisAssPC[akt_make_idx]->setBackgroundColor(TablePosColor);
-        DisAssMem[akt_make_idx]->setBackgroundColor(TablePosColor);
-        DisAssMenmo[akt_make_idx]->setBackgroundColor(TablePosColor);
-        DisAssAdr[akt_make_idx]->setBackgroundColor(TablePosColor);
+        disass_pc[akt_make_idx]->setBackgroundColor(table_position_color);
+        disass_memory[akt_make_idx]->setBackgroundColor(table_position_color);
+        disass_mnemonic[akt_make_idx]->setBackgroundColor(table_position_color);
+        disass_addressing[akt_make_idx]->setBackgroundColor(table_position_color);
 
         old_make_idx = akt_make_idx;
         PC = old_adresse;
     }
     else
     {
-        DisAssPC[old_make_idx]->setBackgroundColor(TableBackColor);
-        DisAssMem[old_make_idx]->setBackgroundColor(TableBackColor);
-        DisAssMenmo[old_make_idx]->setBackgroundColor(TableBackColor);
-        DisAssAdr[old_make_idx]->setBackgroundColor(TableBackColor);
+        disass_pc[old_make_idx]->setBackgroundColor(table_back_color);
+        disass_memory[old_make_idx]->setBackgroundColor(table_back_color);
+        disass_mnemonic[old_make_idx]->setBackgroundColor(table_back_color);
+        disass_addressing[old_make_idx]->setBackgroundColor(table_back_color);
 
-        DisAssPC[0]->setBackgroundColor(TablePosColor);
-        DisAssMem[0]->setBackgroundColor(TablePosColor);
-        DisAssMenmo[0]->setBackgroundColor(TablePosColor);
-        DisAssAdr[0]->setBackgroundColor(TablePosColor);
+        disass_pc[0]->setBackgroundColor(table_position_color);
+        disass_memory[0]->setBackgroundColor(table_position_color);
+        disass_mnemonic[0]->setBackgroundColor(table_position_color);
+        disass_addressing[0]->setBackgroundColor(table_position_color);
 
         old_make_idx = akt_make_idx = 0;
         PC = old_adresse = adresse;
@@ -1032,16 +738,16 @@ void DebuggerWindow::FillDisassemblerList(unsigned short adresse,bool new_refres
 
     for(int i=0;i<DISASS_ROW;i++)
     {
-        ViewCodeAdressen[i] = PC;
+        view_code_address[i] = PC;
         sprintf(str00,"$%4.4X",PC);
-        DisAssPC[i]->setText(str00);
+        disass_pc[i]->setText(str00);
 
-        if(AktSource > 0)
+        if(current_source > 0)
         {
-            AktFloppyNr = AktSource - 1;
-            ram0 = c64->floppy[AktFloppyNr]->ReadByte(PC+0);
-            ram1 = c64->floppy[AktFloppyNr]->ReadByte(PC+1);
-            ram2 = c64->floppy[AktFloppyNr]->ReadByte(PC+2);
+            currnet_floppy_nr = current_source - 1;
+            ram0 = c64->floppy[currnet_floppy_nr]->ReadByte(PC+0);
+            ram1 = c64->floppy[currnet_floppy_nr]->ReadByte(PC+1);
+            ram2 = c64->floppy[currnet_floppy_nr]->ReadByte(PC+2);
         }
         else
         {
@@ -1050,17 +756,17 @@ void DebuggerWindow::FillDisassemblerList(unsigned short adresse,bool new_refres
             ram2 = c64->ReadC64Byte(PC+2);
         }
 
-        DisAssMenmo[i]->setText(QString(CpuOPC).mid(ram0*3,3));
+        disass_mnemonic[i]->setText(QString(CpuOPC).mid(ram0*3,3));
 
         tmp = CpuOPCInfo[ram0];
 
         if(!(tmp&8))
         {
-            DisAssMenmo[i]->setTextColor(QColor(0,0,0));
+            disass_mnemonic[i]->setTextColor(QColor(0,0,0));
         }
         else
         {
-            DisAssMenmo[i]->setTextColor(QColor(255,0,0));
+            disass_mnemonic[i]->setTextColor(QColor(255,0,0));
         }
 
         tmp >>= 4;
@@ -1068,133 +774,133 @@ void DebuggerWindow::FillDisassemblerList(unsigned short adresse,bool new_refres
         switch(tmp)
         {
         case 0:
-            DisAssAdr[i]->setText("");
+            disass_addressing[i]->setText("");
 
             sprintf(str00,"%2.2X -- --",ram0);
-            DisAssMem[i]->setText(str00);
+            disass_memory[i]->setText(str00);
             PC++;
             break;
         case 1:
             sprintf(str00,"#$%2.2X",ram1);
-            DisAssAdr[i]->setText(str00);
+            disass_addressing[i]->setText(str00);
 
             sprintf(str00,"%2.2X %2.2X --",ram0,ram1);
-            DisAssMem[i]->setText(str00);
+            disass_memory[i]->setText(str00);
             PC+=2;
             break;
         case 2:
             word=ram1;
             word|=ram2<<8;
             sprintf(str00,"$%4.4X",word);
-            DisAssAdr[i]->setText(str00);
+            disass_addressing[i]->setText(str00);
 
             sprintf(str00,"%2.2X %2.2X %2.2X",ram0,ram1,ram2);
-            DisAssMem[i]->setText(str00);
+            disass_memory[i]->setText(str00);
             PC+=3;
             break;
         case 3:
             sprintf(str00,"$%2.2X",ram1);
-            DisAssAdr[i]->setText(str00);
+            disass_addressing[i]->setText(str00);
 
             sprintf(str00,"%2.2X %2.2X --",ram0,ram1);
-            DisAssMem[i]->setText(str00);
+            disass_memory[i]->setText(str00);
             PC+=2;
             break;
         case 4:
             word=ram1;
             word|=ram2<<8;
             sprintf(str00,"$%4.4X,X",word);
-            DisAssAdr[i]->setText(str00);
+            disass_addressing[i]->setText(str00);
 
             sprintf(str00,"%2.2X %2.2X %2.2X",ram0,ram1,ram2);
-            DisAssMem[i]->setText(str00);
+            disass_memory[i]->setText(str00);
             PC+=3;
             break;
         case 5:
             word=ram1;
             word|=ram2<<8;
             sprintf(str00,"$%4.4X,Y",word);
-            DisAssAdr[i]->setText(str00);
+            disass_addressing[i]->setText(str00);
 
             sprintf(str00,"%2.2X %2.2X %2.2X",ram0,ram1,ram2);
-            DisAssMem[i]->setText(str00);
+            disass_memory[i]->setText(str00);
             PC+=3;
             break;
         case 6:
             sprintf(str00,"$%2.2X,X",ram1);
-            DisAssAdr[i]->setText(str00);
+            disass_addressing[i]->setText(str00);
 
             sprintf(str00,"%2.2X %2.2X --",ram0,ram1);
-            DisAssMem[i]->setText(str00);
+            disass_memory[i]->setText(str00);
             PC+=2;
             break;
         case 7:
             sprintf(str00,"($%2.2X,X)",ram1);
-            DisAssAdr[i]->setText(str00);
+            disass_addressing[i]->setText(str00);
 
             sprintf(str00,"%2.2X %2.2X --",ram0,ram1);
-            DisAssMem[i]->setText(str00);
+            disass_memory[i]->setText(str00);
             PC+=2;
             break;
         case 8:
             sprintf(str00,"($%2.2X),Y",ram1);
-            DisAssAdr[i]->setText(str00);
+            disass_addressing[i]->setText(str00);
 
             sprintf(str00,"%2.2X %2.2X --",ram0,ram1);
-            DisAssMem[i]->setText(str00);
+            disass_memory[i]->setText(str00);
             PC+=2;
             break;
         case 9:
             tmp1 = ram1;
             word = (PC+2)+tmp1;
             sprintf(str00,"$%4.4X",word);
-            DisAssAdr[i]->setText(str00);
+            disass_addressing[i]->setText(str00);
 
             sprintf(str00,"%2.2X %2.2X --",ram0,ram1);
-            DisAssMem[i]->setText(str00);
+            disass_memory[i]->setText(str00);
             PC+=2;
             break;
         case 10:
             word=ram1;
             word|=ram2<<8;
             sprintf(str00,"($%4.4X)",word);
-            DisAssAdr[i]->setText(str00);
+            disass_addressing[i]->setText(str00);
 
             sprintf(str00,"%2.2X %2.2X %2.2X",ram0,ram1,ram2);
-            DisAssMem[i]->setText(str00);
+            disass_memory[i]->setText(str00);
             PC+=3;
             break;
         case 11:
             sprintf(str00,"$%2.2X,Y",ram1);
-            DisAssAdr[i]->setText(str00);
+            disass_addressing[i]->setText(str00);
 
             sprintf(str00,"%2.2X %2.2X --",ram0,ram1);
-            DisAssMem[i]->setText(str00);
+            disass_memory[i]->setText(str00);
             PC+=2;
             break;
         }
     }
 }
 
-void DebuggerWindow::FillHistoryList(unsigned char index)
+void DebuggerWindow::FillHistoryList(uint8_t index)
 {
     char str00[10];
     unsigned char hp;
 
-    if(AktSource > 0)
+    if(current_source > 0)
     {
-        if(!c64->floppy[AktFloppyNr]->GetEnableFloppy()) return;
-        hp = c64->floppy[AktFloppyNr]->HistoryPointer;
-        for(int i=0;i<HistoryZeilen;i++)
+        if(!c64->floppy[currnet_floppy_nr]->GetEnableFloppy()) return;
+        hp = c64->floppy[currnet_floppy_nr]->HistoryPointer;
+        for(int i=0;i<HISTORY_ROW;i++)
         {
-            sprintf(str00,"$%4.4X",c64->floppy[AktFloppyNr]->History[hp--]);
+            sprintf(str00,"$%4.4X",c64->floppy[currnet_floppy_nr]->History[hp--]);
             ui->HistoryList->item(i)->setText(QString(str00));
         }
     }
     else
     {
         hp = c64->cpu_pc_history_pos - index;
-        for(int i=0;i<HistoryZeilen;i++)
+        for(int i=0;i<HISTORY_ROW;i++)
         {
             sprintf(str00,"$%4.4X",c64->cpu_pc_history[hp--]);
             ui->HistoryList->item(i)->setText(QString(str00));
@@ -1204,21 +910,21 @@ void DebuggerWindow::FillHistoryList(unsigned char index)
 
 void DebuggerWindow::on_ChangeSource_currentIndexChanged(int index)
 {
-    AktSource = index;
-    if(AktSource > 0)
+    current_source = index;
+    if(current_source > 0)
     {
-        AktFloppyNr = AktSource - 1;
+        currnet_floppy_nr = current_source - 1;
         ui->BreakpointTree->clear();
 
         if(c64 == 0) return;
-        BreakPointUpdateEnable = false;
-        int anz = c64->floppy[AktFloppyNr]->GetBreakGroupAnz();
+        break_point_update_enable = false;
+        int anz = c64->floppy[currnet_floppy_nr]->GetBreakGroupAnz();
         for(int i=0;i<anz;i++)
         {
-            BREAK_GROUP *bg = c64->floppy[AktFloppyNr]->GetBreakGroup(i);
+            BREAK_GROUP *bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(i);
             AddBreakpointTreeRoot(bg->Name,bg);
         }
-        BreakPointUpdateEnable = true;
+        break_point_update_enable = true;
     }
     else
     {
@@ -1227,20 +933,20 @@ void DebuggerWindow::on_ChangeSource_currentIndexChanged(int index)
         ui->BreakpointTree->clear();
 
         if(c64 == 0) return;
-        BreakPointUpdateEnable = false;
+        break_point_update_enable = false;
         int anz = c64->GetBreakGroupAnz();
         for(int i=0;i<anz;i++)
         {
             BREAK_GROUP *bg = c64->GetBreakGroup(i);
             AddBreakpointTreeRoot(bg->Name,bg);
         }
-        BreakPointUpdateEnable = true;
+        break_point_update_enable = true;
     }
 
     ui->AssAdresseIn->setText("");
     ui->AssMnemonicIn->setText("");
     ui->AssAdressierungIn->setText("");
-    memory_window->ChangeSource(AktSource);
+    memory_window->ChangeSource(current_source);
     RefreshGUI();
 }
 
@@ -1286,11 +992,11 @@ void DebuggerWindow::on_AssMnemonicIn_textChanged(const QString &arg1)
     }
 }
 
-bool DebuggerWindow::FindMnemonic(QString mnemonic, unsigned char *opcode, int *opcode_anzahl)
+bool DebuggerWindow::FindMnemonic(QString mnemonic, uint8_t *opcode, uint8_t *opcode_count)
 {
 
     bool found = false;
-    int count = 0;
+    uint8_t count = 0;
 
     for(int i=0;i<255;i++)
     {
@@ -1300,21 +1006,21 @@ bool DebuggerWindow::FindMnemonic(QString mnemonic, unsigned char *opcode, int *
             if(opcode != 0) opcode[count++] = i;
         }
     }
-    if(opcode_anzahl != 0) *opcode_anzahl = count;
+    if(opcode_count != 0) *opcode_count = count;
     return found;
 }
 
-bool DebuggerWindow::FindAdressierung(QString adr_string, unsigned char *adr_typ, unsigned short *adr_wert)
+bool DebuggerWindow::FindAddressing(QString address_string, uint8_t *address_type, uint16_t *address_value)
 {
     unsigned int integer;
     bool ok;
 
-    QString in_str = adr_string.toUpper();
+    QString in_str = address_string.toUpper();
 
     if(in_str == "")
     {
-        *adr_typ = 0;
-        *adr_wert = 0;
+        *address_type = 0;
+        *address_value = 0;
         return true;
     }
 
@@ -1325,15 +1031,15 @@ bool DebuggerWindow::FindAdressierung(QString adr_string, unsigned char *adr_typ
     {
         if(integer <= 0xFF)
         {
-            *adr_typ = 3;
-            *adr_wert = (unsigned short)integer;
+            *address_type = 3;
+            *address_value = (unsigned short)integer;
             return true;
         }
 
         if(integer <= 0xFFFF)
         {
-            *adr_typ = 2;
-            *adr_wert = (unsigned short)integer;
+            *address_type = 2;
+            *address_value = (unsigned short)integer;
             return true;
         }
     }
@@ -1347,8 +1053,8 @@ bool DebuggerWindow::FindAdressierung(QString adr_string, unsigned char *adr_typ
         {
             if(integer <= 0xFF)
             {
-                *adr_typ = 1;
-                *adr_wert = (unsigned short)integer;
+                *address_type = 1;
+                *address_value = (unsigned short)integer;
                 return true;
             }
             else return false;
@@ -1366,15 +1072,15 @@ bool DebuggerWindow::FindAdressierung(QString adr_string, unsigned char *adr_typ
         {
             if(integer <= 0xFF)
             {
-                *adr_typ = 6;
-                *adr_wert = (unsigned short)integer;
+                *address_type = 6;
+                *address_value = (unsigned short)integer;
                 return true;
             }
 
             if(integer <= 0xFFFF)
             {
-                *adr_typ = 4;
-                *adr_wert = (unsigned short)integer;
+                *address_type = 4;
+                *address_value = (unsigned short)integer;
                 return true;
             }
             return false;
@@ -1391,15 +1097,15 @@ bool DebuggerWindow::FindAdressierung(QString adr_string, unsigned char *adr_typ
         {
             if(integer <= 0xFF)
             {
-                *adr_typ = 11;
-                *adr_wert = (unsigned short)integer;
+                *address_type = 11;
+                *address_value = (unsigned short)integer;
                 return true;
             }
 
             if(integer <= 0xFFFF)
             {
-                *adr_typ = 5;
-                *adr_wert = (unsigned short)integer;
+                *address_type = 5;
+                *address_value = (unsigned short)integer;
                 return true;
             }
             return false;
@@ -1416,8 +1122,8 @@ bool DebuggerWindow::FindAdressierung(QString adr_string, unsigned char *adr_typ
         {
             if(integer <= 0xFF)
             {
-                *adr_typ = 7;
-                *adr_wert = (unsigned short)integer;
+                *address_type = 7;
+                *address_value = (unsigned short)integer;
                 return true;
             }
             else return false;
@@ -1435,8 +1141,8 @@ bool DebuggerWindow::FindAdressierung(QString adr_string, unsigned char *adr_typ
         {
             if(integer <= 0xFF)
             {
-                *adr_typ = 8;
-                *adr_wert = (unsigned short)integer;
+                *address_type = 8;
+                *address_value = (unsigned short)integer;
                 return true;
             }
             else return false;
@@ -1454,8 +1160,8 @@ bool DebuggerWindow::FindAdressierung(QString adr_string, unsigned char *adr_typ
         {
             if(integer <= 0xFFFF)
             {
-                *adr_typ = 10;
-                *adr_wert = (unsigned short)integer;
+                *address_type = 10;
+                *address_value = (unsigned short)integer;
                 return true;
             }
             else return false;
@@ -1479,7 +1185,7 @@ void DebuggerWindow::on_AssAdressierungIn_returnPressed()
         ui->AssAdressierungIn->clear();
         ui->AssMnemonicIn->setFocus();
 
-        FillDisassemblerList(ass_adress,false);
+        FillDisassemblyList(ass_adress,false);
         memory_window->update();
     }
     else
@@ -1515,17 +1221,17 @@ void DebuggerWindow::on_AssAdressierungIn_returnPressed()
     }
 }
 
-bool DebuggerWindow::Assemble(QString adresse, QString mnemonic, QString adressierung, unsigned short *ass_adress, unsigned short *new_adress)
+bool DebuggerWindow::Assemble(QString address, QString mnemonic, QString addressing, uint16_t *ass_address, uint16_t *new_adress)
 {
     unsigned int start_adr;
     unsigned char opc[32];
-    int opc_anz;
+    uint8_t opc_anz;
     unsigned char adr_typ;
     unsigned short adr_wert;
 
     bool ok;
 
-    QString in_str = adresse;
+    QString in_str = address;
     if(in_str.left(1) == "$") in_str.replace(0,1,"0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
     start_adr = in_str.toUShort(&ok,0);
     if(!ok)
@@ -1540,13 +1246,13 @@ bool DebuggerWindow::Assemble(QString adresse, QString mnemonic, QString adressi
         return false;
     }
 
-    if(!FindAdressierung(adressierung,&adr_typ,&adr_wert))
+    if(!FindAddressing(addressing,&adr_typ,&adr_wert))
     {
         *new_adress = 2;
         return false;
     }
 
-    *ass_adress = start_adr;
+    *ass_address = start_adr;
 
     if((opc[0]==0x90)||(opc[0]==0xB0)||(opc[0]==0xF0)||(opc[0]==0x30)||(opc[0]==0xD0)||(opc[0]==0x10)||(opc[0]==0x50)||(opc[0]==0x70))
     {
@@ -1559,10 +1265,10 @@ bool DebuggerWindow::Assemble(QString adresse, QString mnemonic, QString adressi
                 return false;
             }
 
-            if(AktSource > 0)
+            if(current_source > 0)
             {
-                c64->floppy[AktFloppyNr]->WriteByte(start_adr,opc[0]);
-                c64->floppy[AktFloppyNr]->WriteByte(start_adr+1,(unsigned char)jmp_adress);
+                c64->floppy[currnet_floppy_nr]->WriteByte(start_adr,opc[0]);
+                c64->floppy[currnet_floppy_nr]->WriteByte(start_adr+1,(unsigned char)jmp_adress);
             }
             else
             {
@@ -1582,9 +1288,9 @@ bool DebuggerWindow::Assemble(QString adresse, QString mnemonic, QString adressi
             switch (adr_typ)
             {
             case 0:
-                if(AktSource > 0)
+                if(current_source > 0)
                 {
-                    c64->floppy[AktFloppyNr]->WriteByte(start_adr,opc[i]);
+                    c64->floppy[currnet_floppy_nr]->WriteByte(start_adr,opc[i]);
                 }
                 else
                 {
@@ -1593,10 +1299,10 @@ bool DebuggerWindow::Assemble(QString adresse, QString mnemonic, QString adressi
                 *new_adress = start_adr+1;
                 break;
             case 1: case 3: case 6: case 7: case 8: case 11:
-                if(AktSource > 0)
+                if(current_source > 0)
                 {
-                    c64->floppy[AktFloppyNr]->WriteByte(start_adr,opc[i]);
-                    c64->floppy[AktFloppyNr]->WriteByte(start_adr+1,(unsigned char)adr_wert);
+                    c64->floppy[currnet_floppy_nr]->WriteByte(start_adr,opc[i]);
+                    c64->floppy[currnet_floppy_nr]->WriteByte(start_adr+1,(unsigned char)adr_wert);
                 }
                 else
                 {
@@ -1606,11 +1312,11 @@ bool DebuggerWindow::Assemble(QString adresse, QString mnemonic, QString adressi
                 *new_adress = start_adr+2;
                 break;
             case 2: case 4: case 5: case 10:
-                if(AktSource > 0)
+                if(current_source > 0)
                 {
-                    c64->floppy[AktFloppyNr]->WriteByte(start_adr,opc[i]);
-                    c64->floppy[AktFloppyNr]->WriteByte(start_adr+1,(unsigned char)adr_wert);
-                    c64->floppy[AktFloppyNr]->WriteByte(start_adr+2,(unsigned char)(adr_wert>>8));
+                    c64->floppy[currnet_floppy_nr]->WriteByte(start_adr,opc[i]);
+                    c64->floppy[currnet_floppy_nr]->WriteByte(start_adr+1,(unsigned char)adr_wert);
+                    c64->floppy[currnet_floppy_nr]->WriteByte(start_adr+2,(unsigned char)(adr_wert>>8));
                 }
                 else
                 {
@@ -1678,7 +1384,7 @@ void DebuggerWindow::on_DisAssTable_doubleClicked(const QModelIndex &index)
 
 void DebuggerWindow::on_DisAssScroll_valueChanged(int value)
 {
-    FillDisassemblerList(value,false);
+    FillDisassemblyList(value,false);
 }
 
 void DebuggerWindow::on_AddBreakpoint_clicked()
@@ -1687,18 +1393,18 @@ void DebuggerWindow::on_AddBreakpoint_clicked()
     BREAK_GROUP *bg;
     int index;
 
-    if(AktSource > 0)
+    if(current_source > 0)
     {
-        index = c64->floppy[AktFloppyNr]->AddBreakGroup();
+        index = c64->floppy[currnet_floppy_nr]->AddBreakGroup();
     }
     else index = c64->AddBreakGroup();
 
     if(index > -1)
     {
-        if(AktSource > 0) bg = c64->floppy[AktFloppyNr]->GetBreakGroup(index);
+        if(current_source > 0) bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(index);
         else bg = c64->GetBreakGroup(index);
 
-        QString Name = trUtf8("Haltepunkt (") + QVariant(auto_num[AktSource]++).toString() + ")";
+        QString Name = trUtf8("Haltepunkt (") + QVariant(auto_num[current_source]++).toString() + ")";
         strcpy(bg->Name,Name.toLocal8Bit().constData());
         bg->Enable = true;
 
@@ -1729,7 +1435,7 @@ void DebuggerWindow::on_DelBreakpoint_clicked()
         if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Haltepunkt löschen..."),trUtf8("Möchten Sie den folgenden Haltepunkt löschen?\n") + ">> " + Name + " <<",QMessageBox::Yes | QMessageBox::No))
         {
             ui->BreakpointTree->takeTopLevelItem(bg_index);
-            if(AktSource > 0) c64->floppy[AktFloppyNr]->DelBreakGroup(bg_index);
+            if(current_source > 0) c64->floppy[currnet_floppy_nr]->DelBreakGroup(bg_index);
             else c64->DelBreakGroup(bg_index);
         }
     }
@@ -1746,7 +1452,7 @@ void DebuggerWindow::AddBreakpointTreeRoot(QString name,BREAK_GROUP *bg)
     item->setToolTip(0,trUtf8("Der Name des Haltepunkts kann frei gewählt werden."));
     ui->BreakpointTree->addTopLevelItem(item);
 
-    BreakPointUpdateEnable = false;
+    break_point_update_enable = false;
     AddBreakpointTreeChild(item,bg->iPC,bg->bPC,trUtf8("Wenn der Wert gleich dem Programm Counter (PC) ist."));
     AddBreakpointTreeChild(item,bg->iAC,bg->bAC,trUtf8("Wenn der Wert gleich dem Accu Register (AC) ist."));
     AddBreakpointTreeChild(item,bg->iXR,bg->bXR,trUtf8("Wenn der Wert gleich dem X Register (XR) ist."));
@@ -1755,16 +1461,16 @@ void DebuggerWindow::AddBreakpointTreeRoot(QString name,BREAK_GROUP *bg)
     AddBreakpointTreeChild(item,bg->iWAdresse,bg->bWAdresse,trUtf8("Wenn ein Schreibzugriff an dieser Adresse statt findet."));
     AddBreakpointTreeChild(item,bg->iRWert,bg->bRWert,trUtf8("Wenn aus einer Adresse dieser Wert ausgelesen wird."));
     AddBreakpointTreeChild(item,bg->iWWert,bg->bWWert,trUtf8("Wenn in einer Adresse dieser Wert geschrieben wird."));
-    if(AktSource == 0)
+    if(current_source == 0)
     {
         AddBreakpointTreeChild(item,bg->iRZ,bg->bRZ,trUtf8("Wenn der Wert gleich der Aktuellen Rasterzeile ist."));
         AddBreakpointTreeChild(item,bg->iRZZyklus,bg->bRZZyklus,trUtf8("Wenn der Wert gleich dem Aktuellen Zyklus in einer Rasterzeile ist."));
     }
-    BreakPointUpdateEnable = true;
+    break_point_update_enable = true;
     c64->UpdateBreakGroup();
 }
 
-void DebuggerWindow::AddBreakpointTreeChild(QTreeWidgetItem *parent, unsigned short value, unsigned char checked, QString tooltip)
+void DebuggerWindow::AddBreakpointTreeChild(QTreeWidgetItem *parent, uint16_t value, uint8_t checked, QString tooltip)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(parent);
     item->setText(1,QVariant(value).toString());
@@ -1791,9 +1497,9 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
 
         bg_index = ui->BreakpointTree->indexOfTopLevelItem(item);
         BREAK_GROUP *bg;
-        if(AktSource > 0)
+        if(current_source > 0)
         {
-            bg = c64->floppy[AktFloppyNr]->GetBreakGroup(bg_index);
+            bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(bg_index);
         }
         else bg = c64->GetBreakGroup(bg_index);
 
@@ -1808,9 +1514,9 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
         child_index = item->parent()->indexOfChild(item);
 
         BREAK_GROUP *bg;
-        if(AktSource > 0)
+        if(current_source > 0)
         {
-            bg = c64->floppy[AktFloppyNr]->GetBreakGroup(bg_index);
+            bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(bg_index);
         }
         else bg = c64->GetBreakGroup(bg_index);
 
@@ -2142,11 +1848,11 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 break;
             }
         }
-        if(BreakPointUpdateEnable)c64->UpdateBreakGroup();
+        if(break_point_update_enable)c64->UpdateBreakGroup();
     }
 }
 
-void DebuggerWindow::ClearAllBreakpointBackcolors(void)
+void DebuggerWindow::ClearAllBreakpointBackcolors()
 {
     for(int i=0;i<ui->BreakpointTree->topLevelItemCount();i++)
     {
@@ -2158,7 +1864,7 @@ void DebuggerWindow::ClearAllBreakpointBackcolors(void)
 
 void DebuggerWindow::BreakpointProc()
 {
-    NewBreakpointfound = true;
+    new_breakpoint_found = true;
 }
 
 void DebuggerWindow::on_LoadBreakpoints_clicked()
@@ -2169,14 +1875,14 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
 
     ui->BreakpointTree->clear();
 
-    if(AktSource > 0) c64->floppy[AktFloppyNr]->DeleteAllBreakGroups();
+    if(current_source > 0) c64->floppy[currnet_floppy_nr]->DeleteAllBreakGroups();
     else c64->DeleteAllBreakGroups();
 
     QString filename = QFileDialog::getOpenFileName(this,trUtf8("Haltepunkte öffnen"),QDir::homePath(),trUtf8("Emu64 Haltepunkt Datei ") + "(*.bpt)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
        int ret;
-       if(AktSource > 0) ret = c64->floppy[AktFloppyNr]->LoadBreakGroups(filename.toLatin1().data());
+       if(current_source > 0) ret = c64->floppy[currnet_floppy_nr]->LoadBreakGroups(filename.toLatin1().data());
        else ret = c64->LoadBreakGroups(filename.toLatin1().data());
 
        if(ret != 0)
@@ -2200,12 +1906,12 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
        else
        {
            /// Alle Haltepunke ins TreeWidget einfügen ///
-           if(AktSource > 0)
+           if(current_source > 0)
            {
-               int anz = c64->floppy[AktFloppyNr]->GetBreakGroupAnz();
+               int anz = c64->floppy[currnet_floppy_nr]->GetBreakGroupAnz();
                for(int i=0;i<anz;i++)
                {
-                   BREAK_GROUP *bg = c64->floppy[AktFloppyNr]->GetBreakGroup(i);
+                   BREAK_GROUP *bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(i);
                    AddBreakpointTreeRoot(bg->Name,bg);
                }
            }
@@ -2228,14 +1934,14 @@ void DebuggerWindow::on_SaveBreakpoints_clicked()
 
     QString filename;
     QString fileext;
-    if(!getSaveFileName(this,trUtf8("Haltepunkte speichern"),trUtf8("Emu64 Haltepunkt Datei ") + "(*.bpt)",&filename,&fileext))
+    if(!GetSaveFileName(this,trUtf8("Haltepunkte speichern"),trUtf8("Emu64 Haltepunkt Datei ") + "(*.bpt)",&filename,&fileext))
     {
         return;
     }
 
-    if(AktSource > 0)
+    if(current_source > 0)
     {
-        if(!c64->floppy[AktFloppyNr]->SaveBreakGroups(filename.toLatin1().data()))
+        if(!c64->floppy[currnet_floppy_nr]->SaveBreakGroups(filename.toLatin1().data()))
             QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Die Haltepunkte konnten nicht gespeichert werden."));
     }
     else
@@ -2250,7 +1956,7 @@ void DebuggerWindow::on_DelAllBreakpoints_clicked()
     if(ui->BreakpointTree->topLevelItemCount() > 0)
         if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Achtung..."),trUtf8("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
         {
-            if(AktSource > 0) c64->floppy[AktFloppyNr]->DeleteAllBreakGroups();
+            if(current_source > 0) c64->floppy[currnet_floppy_nr]->DeleteAllBreakGroups();
             else c64->DeleteAllBreakGroups();
             ui->BreakpointTree->clear();
         }
@@ -2296,7 +2002,7 @@ void DebuggerWindow::on_ExportDisAss_clicked()
 
     QString filename;
     QString fileext;
-    if(!getSaveFileName(this,trUtf8("Export..."),trUtf8("Disassembler Listing") + "(*.txt);;" + trUtf8("C64 Programm Datei") + "(*.prg)",&filename,&fileext))
+    if(!GetSaveFileName(this,trUtf8("Export..."),trUtf8("Disassembler Listing") + "(*.txt);;" + trUtf8("C64 Programm Datei") + "(*.prg)",&filename,&fileext))
     {
         return;
     }
@@ -2304,18 +2010,18 @@ void DebuggerWindow::on_ExportDisAss_clicked()
     fileext = fileext.toUpper();
     if(fileext == "TXT")
     {
-        if(!c64->ExportASM(filename.toLatin1().data(),start,end,AktSource))
+        if(!c64->ExportASM(filename.toLatin1().data(),start,end,current_source))
             QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Fehler beim speichern der Disassembler Datei."));
     }
 
     if(fileext == "PRG")
     {
-        if((AktSource > 0) && (end > 0x07FF))
+        if((current_source > 0) && (end > 0x07FF))
         {
             QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Floppy RAM geht nur von $0000 - $07FF (2KB)."));
             return;
         }
-        if(!c64->ExportPRG(filename.toLatin1().data(),start,end,AktSource))
+        if(!c64->ExportPRG(filename.toLatin1().data(),start,end,current_source))
             QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Fehler beim speichern der Programm Datei."));
     }
 }
@@ -2329,14 +2035,14 @@ void DebuggerWindow::RefreshGUI(void)
 {
     if(c64 == 0) return;
 
-    C64CpuReg.REG_MASK = REG_MASK_ALL;
-    c64->GetC64CpuReg(&C64CpuReg,&C64CpuIReg);
+    c64_cpu_reg.reg_mask = REG_MASK_ALL;
+    c64->GetC64CpuReg(&c64_cpu_reg,&c64_cpu_ireg);
 
-    if(AktSource > 0)
+    if(current_source > 0)
     {
         /// Floppy's ///
-        FloppyCpuReg[AktFloppyNr].REG_MASK = REG_MASK_ALL;
-        c64->floppy[AktFloppyNr]->GetCpuReg(&FloppyCpuReg[AktFloppyNr],&FloppyCpuIReg[AktFloppyNr]);
+        floppy_cpu_reg[currnet_floppy_nr].reg_mask = REG_MASK_ALL;
+        c64->floppy[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr],&floppy_cpu_ireg[currnet_floppy_nr]);
 
         /// Register Group ///
         ui->RegisterGroup->setTitle(trUtf8("CPU 6502 Register"));
@@ -2370,7 +2076,7 @@ void DebuggerWindow::RefreshGUI(void)
         ui->exrom_led->setVisible(false);
         ui->game_led->setVisible(false);
 
-        if(c64->floppy[AktSource-1]->GetEnableFloppy())
+        if(c64->floppy[current_source-1]->GetEnableFloppy())
         {
             ui->label_floppy_off->setVisible(false);
             ui->RegisterGroup->setEnabled(true);
@@ -2385,7 +2091,7 @@ void DebuggerWindow::RefreshGUI(void)
             ui->BreakGroup->setEnabled(true);
 
             /// Alle Haltepunke ins TreeWidget einfügen ///
-            FillDisassemblerList(FloppyCpuIReg[AktFloppyNr].AktOpcodePC,false);
+            FillDisassemblyList(floppy_cpu_ireg[currnet_floppy_nr].current_opcode_pc,false);
 
         }
         else
@@ -2417,26 +2123,26 @@ void DebuggerWindow::RefreshGUI(void)
             ui->VIA2->setEnabled(false);
 
             ui->LeitungenGroup->setEnabled(false);
-            ui->irq_led->setIcon(*iOff);
-            ui->reset_led->setIcon(*iOff);
+            ui->irq_led->setIcon(*icon_off);
+            ui->reset_led->setIcon(*icon_off);
 
             ui->CycleGroup->setEnabled(false);
             ui->CycleCounter_Out->setText("");
 
             ui->VerlaufGroup->setEnabled(false);
-            for(int i=0;i<HistoryZeilen;i++) ui->HistoryList->item(i)->setText("");
+            for(int i=0;i<HISTORY_ROW;i++) ui->HistoryList->item(i)->setText("");
 
             ui->DisassGroup->setEnabled(false);
             for(int i=0;i<DISASS_ROW;i++)
             {
-                DisAssPC[i]->setText("");
-                DisAssPC[i]->setBackgroundColor(TableBackColor);
-                DisAssMem[i]->setText("");
-                DisAssMem[i]->setBackgroundColor(TableBackColor);
-                DisAssMenmo[i]->setText("");
-                DisAssMenmo[i]->setBackgroundColor(TableBackColor);
-                DisAssAdr[i]->setText("");
-                DisAssAdr[i]->setBackgroundColor(TableBackColor);
+                disass_pc[i]->setText("");
+                disass_pc[i]->setBackgroundColor(table_back_color);
+                disass_memory[i]->setText("");
+                disass_memory[i]->setBackgroundColor(table_back_color);
+                disass_mnemonic[i]->setText("");
+                disass_mnemonic[i]->setBackgroundColor(table_back_color);
+                disass_addressing[i]->setText("");
+                disass_addressing[i]->setBackgroundColor(table_back_color);
             }
             ui->ExportGroup->setEnabled(false);
 
@@ -2489,7 +2195,7 @@ void DebuggerWindow::RefreshGUI(void)
         ui->DisassGroup->setEnabled(true);
         ui->ExportDisAss->setEnabled(true);
         ui->BreakGroup->setEnabled(true);
-        FillDisassemblerList(C64CpuIReg.AktOpcodePC,false);
+        FillDisassemblyList(c64_cpu_ireg.current_opcode_pc,false);
     }
 
     ui->EingabeFeld->hide();
@@ -2537,24 +2243,24 @@ void DebuggerWindow::on_man_lines_clicked(bool checked)
 
     if(!checked)
     {
-        if(C64CpuIReg.IRQ) ui->irq_led->setIcon(*iOn);
-        else ui->irq_led->setIcon(*iOff);
-        if(C64CpuIReg.NMI) ui->nmi_led->setIcon(*iOn);
-        else ui->nmi_led->setIcon(*iOff);
-        if(C64CpuIReg.RDY) ui->rdy_led->setIcon(*iOn);
-        else ui->rdy_led->setIcon(*iOff);
+        if(c64_cpu_ireg.irq) ui->irq_led->setIcon(*icon_on);
+        else ui->irq_led->setIcon(*icon_off);
+        if(c64_cpu_ireg.nmi) ui->nmi_led->setIcon(*icon_on);
+        else ui->nmi_led->setIcon(*icon_off);
+        if(c64_cpu_ireg.rdy) ui->rdy_led->setIcon(*icon_on);
+        else ui->rdy_led->setIcon(*icon_off);
     }
     else
     {
         ui->rdy_led->setChecked(true);
-        ui->rdy_led->setIcon(*iOn);
+        ui->rdy_led->setIcon(*icon_on);
         c64->SetExtRDY(true);
 
         ui->irq_led->setChecked(false);
-        ui->irq_led->setIcon(*iOff);
+        ui->irq_led->setIcon(*icon_off);
 
         ui->nmi_led->setChecked(false);
-        ui->nmi_led->setIcon(*iOff);
+        ui->nmi_led->setIcon(*icon_off);
     }
 }
 
@@ -2563,8 +2269,8 @@ void DebuggerWindow::on_rdy_led_clicked(bool checked)
     if(ui->man_lines->checkState())
     {
         c64->SetExtRDY(checked);
-        if(checked) ui->rdy_led->setIcon(*iOn);
-        else ui->rdy_led->setIcon(*iOff);
+        if(checked) ui->rdy_led->setIcon(*icon_on);
+        else ui->rdy_led->setIcon(*icon_off);
     }
 }
 
@@ -2574,8 +2280,8 @@ void DebuggerWindow::on_irq_led_clicked(bool checked)
     {
         if(checked) c64->cpu->TriggerInterrupt(EXT_IRQ);
         else c64->cpu->ClearInterrupt(EXT_IRQ);
-        if(checked) ui->irq_led->setIcon(*iOn);
-        else ui->irq_led->setIcon(*iOff);
+        if(checked) ui->irq_led->setIcon(*icon_on);
+        else ui->irq_led->setIcon(*icon_off);
     }
 }
 
@@ -2585,7 +2291,7 @@ void DebuggerWindow::on_nmi_led_clicked(bool checked)
     {
         if(checked) c64->cpu->TriggerInterrupt(EXT_NMI);
         else c64->cpu->ClearInterrupt(EXT_NMI);
-        if(checked) ui->nmi_led->setIcon(*iOn);
-        else ui->nmi_led->setIcon(*iOff);
+        if(checked) ui->nmi_led->setIcon(*icon_on);
+        else ui->nmi_led->setIcon(*icon_off);
     }
 }

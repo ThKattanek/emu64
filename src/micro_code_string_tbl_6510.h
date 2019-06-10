@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 10.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,7 +16,9 @@
 #ifndef MICRO_CODE_STRING_TBL_6510_H
 #define MICRO_CODE_STRING_TBL_6510_H
 
-const char* MicroCodeStringTable6510[]=
+#include <stdint.h>
+
+const char* micro_code_string_table_6510[]=
 {
     /*000*/ "Opcode von PC-Adresse holen // PC+1",
     /*001*/ "Lesen von PC-Adresse und verwerfen // PC+1",
@@ -163,7 +165,7 @@ const char* MicroCodeStringTable6510[]=
 
 #define _r 0
 #define _w 1
-static unsigned char MicroCodeRWTable6510[141]=
+static uint8_t micro_code_rw_table_6510[141]=
 {
     //00
     _r,_r,_w,_w,_w,_r,_r,_r,_r,_r,_r,_r,_r,_r,_w,_w,_r,_r,_w,_r,

@@ -2882,9 +2882,9 @@ void C64Class::SetDebugAnimationSpeed(int cycle_sek)
 void C64Class::GetC64CpuReg(REG_STRUCT *reg, IREG_STRUCT *ireg)
 {
     cpu->GetInterneRegister(ireg);
-    ireg->CycleCounter = cycle_counter;
-    ireg->GAME = game_wire;
-    ireg->EXROM = exrom_wire;
+    ireg->cycle_counter = cycle_counter;
+    ireg->game = game_wire;
+    ireg->exrom = exrom_wire;
     cpu->GetRegister(reg);
 }
 

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.06.2019                //
+// Letzte Änderung am 10.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -107,17 +107,37 @@ typedef enum KeyStatus
 
 struct REG_STRUCT
 {
-    unsigned char  REG_MASK;
-    unsigned short PC;
-    unsigned short AC;
-    unsigned short XR;
-    unsigned short YR;
-    unsigned short SP;
-    unsigned short SR;
-    unsigned short IRQ;
-    unsigned short NMI;
-    unsigned short _0314;
-    unsigned short _0318;
+    uint8_t     reg_mask;
+    uint16_t    pc;
+    uint8_t     ac;
+    uint8_t     xr;
+    uint8_t     yr;
+    uint8_t     sp;
+    uint8_t     sr;
+    uint16_t    irq;
+    uint16_t    nmi;
+    uint16_t    _0314;
+    uint16_t    _0318;
+};
+
+struct IREG_STRUCT
+{
+    uint8_t   pointer;
+    uint16_t  address;
+    uint16_t  branch_address;
+    uint16_t  current_opcode_pc;
+    uint16_t  current_opcode;
+    uint8_t   current_micro_code;
+    uint8_t   tmp_byte;
+    bool      irq;
+    bool      nmi;
+    bool      rdy;
+    bool      reset;
+    bool      cpu_wait;
+    bool      jam_flag;
+    uint32_t  cycle_counter;
+    bool      exrom;
+    bool      game;
 };
 
 struct VIC_STRUCT
@@ -156,26 +176,6 @@ struct CIA_STRUCT
     unsigned char   IntData;
     unsigned char   IntMask;
     bool            IRQ;
-};
-
-struct IREG_STRUCT
-{
-    unsigned char   Pointer;
-    unsigned short  Adresse;
-    unsigned short  BranchAdresse;
-    unsigned short  AktOpcodePC;
-    unsigned short  AktOpcode;
-    unsigned char   AktMicroCode;
-    unsigned char   TMPByte;
-    bool            IRQ;
-    bool            NMI;
-    bool            RDY;
-    bool            RESET;
-    bool            CpuWait;
-    bool            JAMFlag;
-    uint32_t        CycleCounter;
-    bool            EXROM;
-    bool            GAME;
 };
 
 struct BREAK_GROUP

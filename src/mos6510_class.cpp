@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.11.2018                //
+// Letzte Änderung am 10.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -169,22 +169,22 @@ void MOS6510::SetRegister(REG_STRUCT *reg)
 {
     if(reg == 0) return;
 
-    unsigned char mask = reg->REG_MASK;
+    unsigned char mask = reg->reg_mask;
     if((mask&1) == 1)
     {
-        PC = reg->PC;
+        PC = reg->pc;
         MCT = ((unsigned char*)MicroCodeTable6510 + 6);
     }
     mask>>=1;
-    if((mask&1) == 1) AC = (unsigned char)reg->AC;
+    if((mask&1) == 1) AC = (unsigned char)reg->ac;
     mask>>=1;
-    if((mask&1) == 1) XR = (unsigned char)reg->XR;
+    if((mask&1) == 1) XR = (unsigned char)reg->xr;
     mask>>=1;
-    if((mask&1) == 1) YR = (unsigned char)reg->YR;
+    if((mask&1) == 1) YR = (unsigned char)reg->yr;
     mask>>=1;
-    if((mask&1) == 1) SP = (unsigned char)reg->SP;
+    if((mask&1) == 1) SP = (unsigned char)reg->sp;
     mask>>=1;
-    if((mask&1) == 1) SR = (unsigned char)reg->SR | 32;
+    if((mask&1) == 1) SR = (unsigned char)reg->sr | 32;
 }
 
 bool MOS6510::GetInterrupts(int typ)
@@ -196,29 +196,29 @@ void MOS6510::GetRegister(REG_STRUCT *reg)
 {
     if(reg == 0) return;
 
-    unsigned char mask = reg->REG_MASK;
-    if((mask&1) == 1) reg->PC = PC;
+    unsigned char mask = reg->reg_mask;
+    if((mask&1) == 1) reg->pc = PC;
     mask>>=1;
-    if((mask&1) == 1) reg->AC = AC;
+    if((mask&1) == 1) reg->ac = AC;
     mask>>=1;
-    if((mask&1) == 1) reg->XR = XR;
+    if((mask&1) == 1) reg->xr = XR;
     mask>>=1;
-    if((mask&1) == 1) reg->YR = YR;
+    if((mask&1) == 1) reg->yr = YR;
     mask>>=1;
-    if((mask&1) == 1) reg->SP = SP;
+    if((mask&1) == 1) reg->sp = SP;
     mask>>=1;
-    if((mask&1) == 1) reg->SR = SR;
+    if((mask&1) == 1) reg->sr = SR;
     mask>>=1;
     if((mask&1) == 1)
     {
-        reg->IRQ = Read(0xFFFE);
-        reg->IRQ |= Read(0xFFFF)<<8;
+        reg->irq = Read(0xFFFE);
+        reg->irq |= Read(0xFFFF)<<8;
     }
     mask>>=1;
     if((mask&1) == 1)
     {
-        reg->NMI = Read(0xFFFA);
-        reg->NMI |= Read(0xFFFB)<<8;
+        reg->nmi = Read(0xFFFA);
+        reg->nmi |= Read(0xFFFB)<<8;
     }
     reg->_0314 = Read(0x314);
     reg->_0314 |= Read(0x315)<<8;
@@ -229,20 +229,19 @@ void MOS6510::GetRegister(REG_STRUCT *reg)
 void MOS6510::GetInterneRegister(IREG_STRUCT* ireg)
 {
     if(ireg == 0) return;
-    ireg->AktOpcodePC = AktOpcodePC;
-    ireg->AktOpcode = AktOpcode;
-    ireg->AktMicroCode = *MCT;
-    ireg->CpuWait = CpuWait;
-    ireg->JAMFlag = JAMFlag;
-    ireg->Pointer = Pointer;
-    ireg->Adresse = Adresse;
-    ireg->BranchAdresse = BranchAdresse;
-    ireg->TMPByte = TMPByte;
-    ireg->IRQ = Interrupts[CIA_IRQ] | Interrupts[VIC_IRQ];
-    ireg->IRQ = IRQLine;
-    ireg->NMI = Interrupts[CIA_NMI] | Interrupts[CRT_NMI] | Interrupts[RESTORE_NMI];
-    ireg->RDY = *RDY;
-    ireg->RESET = *RESET;
+    ireg->current_opcode_pc = AktOpcodePC;
+    ireg->current_opcode = AktOpcode;
+    ireg->current_micro_code = *MCT;
+    ireg->cpu_wait = CpuWait;
+    ireg->jam_flag = JAMFlag;
+    ireg->pointer = Pointer;
+    ireg->address = Adresse;
+    ireg->branch_address = BranchAdresse;
+    ireg->tmp_byte = TMPByte;
+    ireg->irq = IRQLine;
+    ireg->nmi = Interrupts[CIA_NMI] | Interrupts[CRT_NMI] | Interrupts[RESTORE_NMI];
+    ireg->rdy = *RDY;
+    ireg->reset = *RESET;
 }
 
 void MOS6510::SetEnableDebugCart(bool enabled)
