@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.06.2019                //
+// Letzte Änderung am 10.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -20,14 +20,14 @@
 #include <QTableWidgetItem>
 #include <QSettings>
 
-#include "c64_class.h"
-#include "label_widget_mod.h"
-#include "cpu_info.h"
-#include "memory_window.h"
-#include "debugger_vic_window.h"
-#include "debugger_iec_window.h"
+#include "./c64_class.h"
+#include "./label_widget_mod.h"
+#include "./cpu_info.h"
+#include "./memory_window.h"
+#include "./debugger_vic_window.h"
+#include "./debugger_iec_window.h"
 
-#define DisAssZeilen 20
+#define DISASS_ROW 20
 #define HistoryZeilen 7
 
 namespace Ui {
@@ -39,12 +39,12 @@ class DebuggerWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit DebuggerWindow(QWidget *parent = 0, QSettings *ini = 0);
+    explicit DebuggerWindow(QWidget* parent = 0, QSettings* ini = 0);
     ~DebuggerWindow();
-    void showEvent(QShowEvent *event);
-    void hideEvent(QHideEvent *event);
+    void showEvent(QShowEvent* event);
+    void hideEvent(QHideEvent* event);
     void RetranslateUi();
-    void SetC64Pointer(C64Class *c64);
+    void SetC64Pointer(C64Class* c64);
     void AnimationRefreshProc(void);
     void BreakpointProc(void);
 
@@ -73,7 +73,7 @@ private slots:
     void on_DisAssTable_doubleClicked(const QModelIndex &index);
     void on_DisAssScroll_valueChanged(int value);
     void on_AddBreakpoint_clicked();
-    void on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int column);
+    void on_BreakpointTree_itemChanged(QTreeWidgetItem* item, int column);
     void on_DelBreakpoint_clicked();
     void on_LoadBreakpoints_clicked();
     void on_SaveBreakpoints_clicked();
@@ -95,7 +95,7 @@ private:
     bool getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt);
     void FillDisassemblerList(unsigned short adresse,bool new_refresh);
     void FillHistoryList(unsigned char index);
-    bool FindMnemonic(QString mnemonic, unsigned char *opcode = 0, int *opcode_anzahl = 0);
+    bool FindMnemonic(QString mnemonic, unsigned char* opcode = nullptr, int *opcode_anzahl = nullptr);
     bool FindAdressierung(QString adr_string, unsigned char *adr_typ, unsigned short *adr_wert);
     bool Assemble(QString adresse, QString mnemonic, QString adressierung, unsigned short *ass_adress, unsigned short *new_adress);
     void AddBreakpointTreeRoot(QString name,BREAK_GROUP *bg);
@@ -117,13 +117,13 @@ private:
     QIcon *iOff;
     QIcon *iOn;
     QMenu *ContextDisAssList;
-    QTableWidgetItem *DisAssPC[DisAssZeilen];
-    QTableWidgetItem *DisAssMem[DisAssZeilen];
-    QTableWidgetItem *DisAssMenmo[DisAssZeilen];
-    QTableWidgetItem *DisAssAdr[DisAssZeilen];
+    QTableWidgetItem *DisAssPC[DISASS_ROW];
+    QTableWidgetItem *DisAssMem[DISASS_ROW];
+    QTableWidgetItem *DisAssMenmo[DISASS_ROW];
+    QTableWidgetItem *DisAssAdr[DISASS_ROW];
     QColor TableBackColor;
     QColor TablePosColor;
-    unsigned short ViewCodeAdressen[DisAssZeilen];
+    unsigned short ViewCodeAdressen[DISASS_ROW];
     unsigned short old_adresse;
     int old_make_idx;
     QTimer *timer1;

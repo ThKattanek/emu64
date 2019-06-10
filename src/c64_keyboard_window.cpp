@@ -8,13 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek       	//
 //                                              //
-// Letzte Änderung am 03.06.2019                //
+// Letzte Änderung am 10.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "c64_keyboard_window.h"
-#include "ui_c64_keyboard_window.h"
+#include "./c64_keyboard_window.h"
+#include "./ui_c64_keyboard_window.h"
 
 static const int y_min[7] = {12,60,107,153,153,177,199};
 static const int y_max[7] = {59,106,152,198,174,198,247};

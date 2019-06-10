@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.06.2019        		//
+// Letzte Änderung am 10.06.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -22,7 +22,7 @@
 
 using namespace std;
 
-#include "structs.h"
+#include "./structs.h"
 
 #define D64_NAME_LENGHT 24
 

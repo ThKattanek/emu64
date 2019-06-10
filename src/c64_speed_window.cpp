@@ -8,13 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 10.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "c64_speed_window.h"
-#include "ui_c64_speed_window.h"
+#include "./c64_speed_window.h"
+#include "./ui_c64_speed_window.h"
 
 C64SpeedWindow::C64SpeedWindow(QWidget *parent, QSettings *ini) :
     QDialog(parent),

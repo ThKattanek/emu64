@@ -8,13 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.06.2019                //
+// Letzte Änderung am 10.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "cartridge_new_easyflash_window.h"
-#include "ui_cartridge_new_easyflash_window.h"
+#include "./cartridge_new_easyflash_window.h"
+#include "./ui_cartridge_new_easyflash_window.h"
 
 CRTNewEasyflashWindow::CRTNewEasyflashWindow(QWidget *parent) :
     QDialog(parent),

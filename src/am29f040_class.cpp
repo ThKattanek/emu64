@@ -8,12 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.06.2019                //
+// Letzte Änderung am 10.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "am29f040_class.h"
+#include "./am29f040_class.h"
 #include <cstring>
 
 AM29F040Class::AM29F040Class(uint8_t *flashbank, int flashtype)

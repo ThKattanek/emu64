@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.06.2019                //
+// Letzte Änderung am 10.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -74,7 +74,7 @@ DebuggerWindow::DebuggerWindow(QWidget *parent, QSettings *_ini) :
     ui->DisAssTable->setColumnWidth(3,57);
 
     ui->DisAssTable->setFont(font1);
-    ui->DisAssTable->setRowCount(DisAssZeilen);
+    ui->DisAssTable->setRowCount(DISASS_ROW);
 
     ui->AssAdresseIn->setFont(font1);
     ui->AssMnemonicIn->setFont(font1);
@@ -93,7 +93,7 @@ DebuggerWindow::DebuggerWindow(QWidget *parent, QSettings *_ini) :
         ui->HistoryList->addItem(item);
     }
 
-    for(int i=0;i<DisAssZeilen;i++)
+    for(int i=0;i<DISASS_ROW;i++)
     {
         ViewCodeAdressen[i] = 0;
         DisAssPC[i] = new QTableWidgetItem();
@@ -985,7 +985,7 @@ void DebuggerWindow::FillDisassemblerList(unsigned short adresse,bool new_refres
 
     if(!new_refresh)
     {
-        for(int i=0;i<DisAssZeilen;i++)
+        for(int i=0;i<DISASS_ROW;i++)
         {
             if(ViewCodeAdressen[i] == adresse)
             {
@@ -1030,7 +1030,7 @@ void DebuggerWindow::FillDisassemblerList(unsigned short adresse,bool new_refres
     unsigned char ram1;
     unsigned char ram2;
 
-    for(int i=0;i<DisAssZeilen;i++)
+    for(int i=0;i<DISASS_ROW;i++)
     {
         ViewCodeAdressen[i] = PC;
         sprintf(str00,"$%4.4X",PC);
@@ -2427,7 +2427,7 @@ void DebuggerWindow::RefreshGUI(void)
             for(int i=0;i<HistoryZeilen;i++) ui->HistoryList->item(i)->setText("");
 
             ui->DisassGroup->setEnabled(false);
-            for(int i=0;i<DisAssZeilen;i++)
+            for(int i=0;i<DISASS_ROW;i++)
             {
                 DisAssPC[i]->setText("");
                 DisAssPC[i]->setBackgroundColor(TableBackColor);

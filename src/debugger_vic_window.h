@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.06.2019                //
+// Letzte Änderung am 10.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,7 +17,7 @@
 #define DEBUGGER_VIC_WINDOW_H
 
 #include <QDialog>
-#include "c64_class.h"
+#include "./c64_class.h"
 
 namespace Ui {
     class DebuggerVicWindow;

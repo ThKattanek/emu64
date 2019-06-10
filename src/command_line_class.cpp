@@ -8,12 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.06.2019                //
+// Letzte Änderung am 10.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "command_line_class.h"
+#include "./command_line_class.h"
 
 CommandLineClass::CommandLineClass(int argc, char *argv[], const char *app_name, const CMD_STRUCT *command_list, int command_list_count)
 {

@@ -8,13 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.06.2019                //
+// Letzte Änderung am 10.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "debugger_iec_window.h"
-#include "ui_debugger_iec_window.h"
+#include "./debugger_iec_window.h"
+#include "./ui_debugger_iec_window.h"
 
 #include <QFileDialog>
 #include <QMessageBox>

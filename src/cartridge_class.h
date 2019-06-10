@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.06.2019                //
+// Letzte Änderung am 10.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,9 +16,9 @@
 #ifndef CARTRIDGE_CLASS_H
 #define CARTRIDGE_CLASS_H
 
-#include "structs.h"
-#include "am29f040_class.h"
-#include "mk7pla.h"
+#include "./structs.h"
+#include "./am29f040_class.h"
+#include "./mk7pla.h"
 
 #include "tr1/functional"
 using namespace std::tr1;
