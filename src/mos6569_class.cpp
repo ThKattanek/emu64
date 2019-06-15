@@ -60,7 +60,6 @@ VICII::VICII()
         reg_mx[i] = 0;
         reg_my[i] = 0;
         reg_mcolor[i] = 0;
-        SpriteSeqOn[i] = false;
 	}
 
     reg_mx8 = 0;
@@ -111,71 +110,71 @@ VICII::VICII()
 	SetVicType(0);
 
     draw_line_counter = 0;
-    LPTriggered = draw_this_line = vertical_blanking = false;
+    lp_triggered = draw_this_line = vertical_blanking = false;
 
-	isWriteColorReg20 = false;
-	isWriteColorReg21 = false;
+    is_write_reg_ec = false;
+    is_write_reg_b0c = false;
 
-	BadLineEnable = false;
-	BadLineStatus = false;
-	DisplayStatus = false;
-	MatrixBase = 0;
-	CharBase = 0;
-	BitmapBase = 0;
+    badline_enable = false;
+    badline_status = false;
+    display_status = false;
+    matrix_base = 0;
+    char_base = 0;
+    bitmap_base = 0;
 
-	RC = 0;
-	VC = 0;
-	VCBASE = 0;
-	VMLI = 0;
+    rc = 0;
+    vc = 0;
+    vc_base = 0;
+    vmli = 0;
 
-	cAdresse = 0;
-	gAdresse = 0;
+    c_address = 0;
+    g_address = 0;
 
 	for(int i=0;i<40;i++)
 	{
-            cDatenPuffer8Bit[i] = 0;
-            cDatenPuffer4Bit[i] = 0;
+            c_data_buffer_8bit[i] = 0;
+            c_data_buffer_4bit[i] = 0;
 	}
 
 	for(int i=0;i<8;i++)
 	{
-		MC[i] = 0;
-		MCBase[i] = 0;
+        mc[i] = 0;
+        mc_base[i] = 0;
 	}
-	SpriteExpYFlipFlop = 0xFF;
-	SpriteDMA = 0;
-	SpriteView = 0;
+    sprite_y_exp_flip_flop = 0xFF;
+    sprite_dma = 0;
+    sprite_view = 0;
 
 	unsigned short spr_x_start = 0x194;
 	for(int x=0;x<0x200;x++)
 	{
-		SpriteXDisplayTbl[spr_x_start]=x;
-		if(x<107) SpriteXDisplayTbl[spr_x_start] += 8;
+        sprite_x_display_table[spr_x_start]=x;
+        if(x<107) sprite_x_display_table[spr_x_start] += 8;
 		spr_x_start++;
 		spr_x_start &= 0x1FF;
 	}
 
     for(int i=0;i<VIC_CONFIG_NUM;i++) vic_config[i] = true;
-    Write_xd011 = false;
+    write_reg_0x11 = false;
 
-    FirstDisplayLinePAL = 16;                       //VICE - 16, Emu64 - 26
-    LastDisplayLinePAL = 288;                       //VICE - 288, Emu64 - 292
+    first_display_line_pal = 16;                       //VICE - 16, Emu64 - 26
+    last_display_line_pal = 288;                       //VICE - 288, Emu64 - 292
 
-    FirstDisplayLineNTSC = 30;
-    LastDisplayLineNTSC = 288;
+    first_display_line_ntsc = 30;
+    last_display_line_ntsc = 288;
 
-    FirstDisplayLine = FirstDisplayLinePAL;
-    LastDisplayLine = LastDisplayLinePAL;
+    first_display_line = first_display_line_pal;
+    last_display_line = last_display_line_pal;
 
-    HoBorderCMP_L[0]=RAHMEN38_LINKS;
-    HoBorderCMP_R[0]=RAHMEN38_RECHTS;
-    VeBorderCMP_O[0]=RAHMEN24_YSTART;
-    VeBorderCMP_U[0]=RAHMEN24_YSTOP;
+    h_border_compare_left[0]=RAHMEN38_LINKS;
+    h_border_compare_right[0]=RAHMEN38_RECHTS;
+    v_border_compare_top[0]=RAHMEN24_YSTART;
+    v_border_compare_bottom[0]=RAHMEN24_YSTOP;
 
-    HoBorderCMP_L[1]=RAHMEN40_LINKS;
-    HoBorderCMP_R[1]=RAHMEN40_RECHTS;
-    VeBorderCMP_O[1]=RAHMEN25_YSTART;
-    VeBorderCMP_U[1]=RAHMEN25_YSTOP;
+    h_border_compare_left[1]=RAHMEN40_LINKS;
+    h_border_compare_right[1]=RAHMEN40_RECHTS;
+    v_border_compare_top[1]=RAHMEN25_YSTART;
+    v_border_compare_bottom[1]=RAHMEN25_YSTOP;
 }
 
 VICII::~VICII()
@@ -194,11 +193,11 @@ void VICII::GetRegister(VIC_STRUCT *vic_reg)
         if(current_cycle == 1) vic_reg->current_rasterline = current_rasterline;
         else vic_reg->current_rasterline = current_rasterline;
     vic_reg->raster_latch = reg_irq_raster;
-    vic_reg->display_status = DisplayStatus;
+    vic_reg->display_status = display_status;
     vic_reg->graphic_mode = graphic_mode;
     vic_reg->vic_bank = *cia2_port_a & 3;
-    vic_reg->matrix_base = MatrixBase;
-    vic_reg->char_base = CharBase;
+    vic_reg->matrix_base = matrix_base;
+    vic_reg->char_base = char_base;
     vic_reg->irq = irq_flag & 0x80;
 
 	for(int i=0;i<8;i++)
@@ -212,81 +211,81 @@ void VICII::SetVicVDisplayPalSize(uint16_t first_line, uint16_t last_line)
 {
     if(first_line < MAX_RASTERLINES && last_line < MAX_RASTERLINES && first_line <= last_line)
     {
-        FirstDisplayLinePAL = first_line;
-        LastDisplayLinePAL = last_line;
-        SetVicType(System);
+        first_display_line_pal = first_line;
+        last_display_line_pal = last_line;
+        SetVicType(system);
     }
 }
 
 uint16_t VICII::GetVicFirstDisplayLinePal()
 {
-    return FirstDisplayLinePAL;
+    return first_display_line_pal;
 }
 
 uint16_t VICII::GetVicLastDisplayLinePal()
 {
-    return LastDisplayLinePAL;
+    return last_display_line_pal;
 }
 
 uint16_t VICII::GetAktVicDisplayFirstLine()
 {
-    return FirstDisplayLine;
+    return first_display_line;
 }
 
 uint16_t VICII::GetAktVicDisplayLastLine()
 {
-    return LastDisplayLine;
+    return last_display_line;
 }
 
 void VICII::SetVicVDisplayNtscSize(uint16_t first_line, uint16_t last_line)
 {
     if(first_line < MAX_RASTERLINES && last_line < MAX_RASTERLINES && first_line <= last_line)
     {
-        FirstDisplayLineNTSC = first_line;
-        LastDisplayLineNTSC = last_line;
-        SetVicType(System);
+        first_display_line_ntsc = first_line;
+        last_display_line_ntsc = last_line;
+        SetVicType(system);
     }
 }
 
 uint16_t VICII::GetVicFirstDisplayLineNtsc()
 {
-    return FirstDisplayLineNTSC;
+    return first_display_line_ntsc;
 }
 
 uint16_t VICII::GetVicLastDisplayLineNtsc()
 {
-    return LastDisplayLineNTSC;
+    return last_display_line_ntsc;
 }
 
 void VICII::SetVicType(int system)
 {
-	System = system;
+    this->system = system;
 
-	switch(System)
+    switch(system)
 	{
 	case 0:
-		TOTAL_RASTERS=312;
-		TOTAL_ZYKLEN_LINE=63;
-		TOTAL_X=504;
-		RASTER_Y = TOTAL_RASTERS - 1;
-        FirstDisplayLine = FirstDisplayLinePAL;
-        LastDisplayLine = LastDisplayLinePAL;
+        total_rasterlines=312;
+        total_cycles_per_rasterline=63;
+        total_x_coordinate=504;
+        raster_y = total_rasterlines - 1;
+        first_display_line = first_display_line_pal;
+        last_display_line = last_display_line_pal;
 		break;
 	case 1:
-		TOTAL_RASTERS=262;
-		TOTAL_ZYKLEN_LINE=64;
-		TOTAL_X=512;
-		RASTER_Y = TOTAL_RASTERS - 1;
-        FirstDisplayLine = FirstDisplayLineNTSC;
-        LastDisplayLine = LastDisplayLineNTSC;
+        total_rasterlines=262;
+        total_cycles_per_rasterline=64;
+        total_x_coordinate=512;
+        raster_y = total_rasterlines - 1;
+        first_display_line = first_display_line_ntsc;
+        last_display_line = last_display_line_ntsc;
 		break;
 	case 2:
-		TOTAL_RASTERS=263;
-		TOTAL_ZYKLEN_LINE=65;
-		TOTAL_X=520;
-		RASTER_Y = TOTAL_RASTERS - 1;
-        FirstDisplayLine = FirstDisplayLineNTSC;
-        LastDisplayLine = LastDisplayLineNTSC;
+        total_rasterlines=263;
+        total_cycles_per_rasterline=65;
+        total_x_coordinate=520;
+        raster_y = total_rasterlines - 1;
+        first_display_line = first_display_line_ntsc;
+        last_display_line = last_display_line_ntsc;
 		break;
 	}
 }
@@ -315,101 +314,101 @@ inline void VICII::cAccess()
     if (*ba == false)
 	{
 		/// Grafikdaten ///
-        if(current_cycle >= 15 && current_cycle <= 54 && DisplayStatus == true && BadLineStatus == true)
+        if(current_cycle >= 15 && current_cycle <= 54 && display_status == true && badline_status == true)
         {
-            cAdresse = (*cia2_port_a<<14)|MatrixBase|(VC&0x3FF);
-            cDatenPuffer8Bit[VMLI] = Read(cAdresse);
-            cDatenPuffer4Bit[VMLI] = color_ram[(VC&0x3FF)]&0x0F;
+            c_address = (*cia2_port_a<<14)|matrix_base|(vc&0x3FF);
+            c_data_buffer_8bit[vmli] = Read(c_address);
+            c_data_buffer_4bit[vmli] = color_ram[(vc&0x3FF)]&0x0F;
         }
 	}
 }
 
 inline void VICII::gAccess()
 {
-    if (DisplayStatus) // DisplayModus
+    if (display_status) // DisplayModus
 	{
-        if (reg_ctrl_1 & 0x20) gAdresse = (*cia2_port_a<<14)|(BitmapBase)|((VC&0x3FF)<<3)|RC;
-        else gAdresse = (*cia2_port_a<<14)|CharBase|(cDatenPuffer8Bit[VMLI]<<3)|RC;
-        if (reg_ctrl_1 & 0x40) gAdresse &= 0xf9ff;
+        if (reg_ctrl_1 & 0x20) g_address = (*cia2_port_a<<14)|(bitmap_base)|((vc&0x3FF)<<3)|rc;
+        else g_address = (*cia2_port_a<<14)|char_base|(c_data_buffer_8bit[vmli]<<3)|rc;
+        if (reg_ctrl_1 & 0x40) g_address &= 0xf9ff;
 
         switch(graphic_mode)
 		{
 		case 4:
-			GfxData = Read(gAdresse & 0xF9FF);
+            gfx_data = Read(g_address & 0xF9FF);
 			break;
 		default:
-			GfxData = Read(gAdresse);
+            gfx_data = Read(g_address);
 			break;
 		}
 
-		CharData = cDatenPuffer8Bit[VMLI];
-		ColorData = cDatenPuffer4Bit[VMLI];
+        char_data = c_data_buffer_8bit[vmli];
+        color_data = c_data_buffer_4bit[vmli];
 
-		VMLI++;
-		VC++;
+        vmli++;
+        vc++;
 	} 
     else    // IdleModus
 	{
-        gAdresse = reg_ctrl_1 & 0x40 ? 0x39FF : 0x3FFF;
-        gAdresse |=(*cia2_port_a<<14);
-		GfxData = Read(gAdresse);
-		CharData = 0;
-		ColorData = 0;
+        g_address = reg_ctrl_1 & 0x40 ? 0x39FF : 0x3FFF;
+        g_address |=(*cia2_port_a<<14);
+        gfx_data = Read(g_address);
+        char_data = 0;
+        color_data = 0;
 	}
 }
 
 inline void VICII::pAccess(uint8_t sp_nr)
 {
-    pAdresse = (*cia2_port_a<<14)|(MatrixBase)|0x3F8|sp_nr;
-	pWert[sp_nr] = Read(pAdresse);
+    p_address = (*cia2_port_a<<14)|(matrix_base)|0x3F8|sp_nr;
+    p_data[sp_nr] = Read(p_address);
 }
 
 inline void VICII::sAccess(uint8_t sp_nr)
 {
 	//// Es werden gleich alle 3 Bytes geladen ////
-    sAdresse = (*cia2_port_a<<14)|(pWert[sp_nr]<<6)|(MC[sp_nr]&0x3F);
-	SpriteSeq[sp_nr] = (Read(sAdresse))<<16;sAdresse++;
-	SpriteSeq[sp_nr] |= (Read(sAdresse))<<8;sAdresse++;
-	SpriteSeq[sp_nr] |= Read(sAdresse);
+    s_address = (*cia2_port_a<<14)|(p_data[sp_nr]<<6)|(mc[sp_nr]&0x3F);
+    sprite_sequenzer[sp_nr] = (Read(s_address))<<16;s_address++;
+    sprite_sequenzer[sp_nr] |= (Read(s_address))<<8;s_address++;
+    sprite_sequenzer[sp_nr] |= Read(s_address);
 }
 
 inline void VICII::CheckBorder()
 {
 	///////////////// Rahmen ///////////////
-	if(BorderFlipFlop0)
+    if(border_flip_flop0)
 	{
-        if(CSEL==1 && current_cycle == RAHMEN40_RECHTS && BorderFlipFlop1 == false)
+        if(csel==1 && current_cycle == RAHMEN40_RECHTS && border_flip_flop1 == false)
         {
-            BorderLine[BorderLinePos++] = 128;
-            BorderLine[BorderLinePos++] = 128;
-            BorderLine[BorderLinePos++] = 128;
-            BorderLine[BorderLinePos++] = 128;
-            BorderLine[BorderLinePos++] = 128;
-            BorderLine[BorderLinePos++] = 128;
-            BorderLine[BorderLinePos++] = 128;
-            BorderLine[BorderLinePos++] = 128;
+            border_line[border_line_pos++] = 128;
+            border_line[border_line_pos++] = 128;
+            border_line[border_line_pos++] = 128;
+            border_line[border_line_pos++] = 128;
+            border_line[border_line_pos++] = 128;
+            border_line[border_line_pos++] = 128;
+            border_line[border_line_pos++] = 128;
+            border_line[border_line_pos++] = 128;
         }
-        else if(CSEL==0 && current_cycle == RAHMEN38_RECHTS && BorderFlipFlop1 == false)
+        else if(csel==0 && current_cycle == RAHMEN38_RECHTS && border_flip_flop1 == false)
         {
-            BorderLine[BorderLinePos++] = 128;
-            BorderLine[BorderLinePos++] = 128;
-            BorderLine[BorderLinePos++] = 128;
-            BorderLine[BorderLinePos++] = 128;
-            BorderLine[BorderLinePos++] = 128;
-            BorderLine[BorderLinePos++] = 128;
-            BorderLine[BorderLinePos++] = 128;
-            BorderLine[BorderLinePos++] = reg_ec;
+            border_line[border_line_pos++] = 128;
+            border_line[border_line_pos++] = 128;
+            border_line[border_line_pos++] = 128;
+            border_line[border_line_pos++] = 128;
+            border_line[border_line_pos++] = 128;
+            border_line[border_line_pos++] = 128;
+            border_line[border_line_pos++] = 128;
+            border_line[border_line_pos++] = reg_ec;
         }
         else
         {
-            if(isWriteColorReg20)
-                BorderLine[BorderLinePos++] = 0x0f;
+            if(is_write_reg_ec)
+                border_line[border_line_pos++] = 0x0f;
             else
-                BorderLine[BorderLinePos++] = reg_ec;
+                border_line[border_line_pos++] = reg_ec;
 
             int i=7;
             do{
-                BorderLine[BorderLinePos++] = reg_ec;
+                border_line[border_line_pos++] = reg_ec;
                 i--;
             } while(i>0);
 
@@ -417,25 +416,25 @@ inline void VICII::CheckBorder()
 	}
 	else
 	{
-        if(CSEL==0 && current_cycle == RAHMEN38_LINKS && BorderFlipFlop1 == true)
+        if(csel==0 && current_cycle == RAHMEN38_LINKS && border_flip_flop1 == true)
         {
-            if(isWriteColorReg20)
-                BorderLine[BorderLinePos++] = 0x0f;
+            if(is_write_reg_ec)
+                border_line[border_line_pos++] = 0x0f;
             else
-                BorderLine[BorderLinePos++] = reg_ec;
-            BorderLine[BorderLinePos++] = reg_ec;
-            BorderLine[BorderLinePos++] = reg_ec;
-            BorderLine[BorderLinePos++] = reg_ec;
-            BorderLine[BorderLinePos++] = reg_ec;
-            BorderLine[BorderLinePos++] = reg_ec;
-            BorderLine[BorderLinePos++] = 128;
-            BorderLine[BorderLinePos++] = 128;
+                border_line[border_line_pos++] = reg_ec;
+            border_line[border_line_pos++] = reg_ec;
+            border_line[border_line_pos++] = reg_ec;
+            border_line[border_line_pos++] = reg_ec;
+            border_line[border_line_pos++] = reg_ec;
+            border_line[border_line_pos++] = reg_ec;
+            border_line[border_line_pos++] = 128;
+            border_line[border_line_pos++] = 128;
         }
         else
         {
             int i=8;
             do{
-                BorderLine[BorderLinePos++] = 128;
+                border_line[border_line_pos++] = 128;
                 i--;
             } while(i>0);
         }
@@ -458,7 +457,7 @@ inline void VICII::DrawGraphics()
 
     video_buffer_line_xscroll += NEXT_X_SCROLL;
 
-    if(DisplayStatus)	// Display Mode
+    if(display_status)	// Display Mode
     {
         if((current_cycle >= 16) && (current_cycle <= 55)) // Grafiksequenzer --> muss um 16 Pixel verzögert werden
         {
@@ -466,34 +465,34 @@ inline void VICII::DrawGraphics()
 			{
 			case 0:
 				/// Standard Text Modus (ECM/BMM/MCM = 0/0/0) ///
-                Colors[0] = reg_b0c | 0x40;
-				Colors[1] = ColorData | 0x80;
+                colors[0] = reg_b0c | 0x40;
+                colors[1] = color_data | 0x80;
 					
-                for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = Colors[(GfxData>>(i))&1];
+                for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = colors[(gfx_data>>(i))&1];
                 video_buffer_line += 8;
 				break;
 			case 1:
 				/// Multicolor Text Modus (ECM/BMM/MCM = 0/0/1) ///
-				if(!(ColorData&8))
+                if(!(color_data&8))
 				{
 					/// MC-Flag = 0 ///
-                    Colors[0] = reg_b0c | 0x40;
-					Colors[1] = (ColorData&7) | 0x80;
+                    colors[0] = reg_b0c | 0x40;
+                    colors[1] = (color_data&7) | 0x80;
 
-                    for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = Colors[(GfxData>>(i))&1];
+                    for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = colors[(gfx_data>>(i))&1];
                     video_buffer_line += 8;
 				}
 				else
 				{
 					/// MC-Flag = 1 ///
-                    Colors[0] = reg_b0c | 0x40;
-                    Colors[1] = reg_b1c;
-                    Colors[2] = reg_b2c | 0x80;
-					Colors[3] = (ColorData&7) | 0x80;
+                    colors[0] = reg_b0c | 0x40;
+                    colors[1] = reg_b1c;
+                    colors[2] = reg_b2c | 0x80;
+                    colors[3] = (color_data&7) | 0x80;
 
 					for(int i=6;i>-1;i-=2)
 					{
-                        *video_buffer_line_xscroll = Colors[(GfxData>>(i))&3];
+                        *video_buffer_line_xscroll = colors[(gfx_data>>(i))&3];
                         video_buffer_line_xscroll++;
                         *video_buffer_line_xscroll = video_buffer_line_xscroll[-1];
                         video_buffer_line_xscroll++;
@@ -503,22 +502,22 @@ inline void VICII::DrawGraphics()
 				break;
 			case 2:
 				/// Standard Bitmap Modus (ECM/BMM/MCM = 0/1/0) ///
-				Colors[0] = CharData&0x0F;
-				Colors[1] = (CharData>>4) | 0x80;
+                colors[0] = char_data&0x0F;
+                colors[1] = (char_data>>4) | 0x80;
 				
-                for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = Colors[(GfxData>>(i))&1];
+                for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = colors[(gfx_data>>(i))&1];
                 video_buffer_line += 8;
 				break;
 			case 3:
 				/// Multicolor Bitmap Modus (ECM/BMM/MCM = 0/1/1) ///
-                Colors[0] = reg_b0c | 0x40;
-				Colors[1] = CharData>>4;
-				Colors[2] = (CharData&0x0F) | 0x80;
-				Colors[3] = ColorData | 0x80;
+                colors[0] = reg_b0c | 0x40;
+                colors[1] = char_data>>4;
+                colors[2] = (char_data&0x0F) | 0x80;
+                colors[3] = color_data | 0x80;
 				
 				for(int i=6;i>-1;i-=2)
 				{
-                    *video_buffer_line_xscroll = Colors[(GfxData>>(i))&3];
+                    *video_buffer_line_xscroll = colors[(gfx_data>>(i))&3];
                     video_buffer_line_xscroll++;
                     *video_buffer_line_xscroll = video_buffer_line_xscroll[-1];
                     video_buffer_line_xscroll++;
@@ -527,24 +526,24 @@ inline void VICII::DrawGraphics()
 				break;
 			case 4:
 				/// ECM Text Modus (ECM/BMM/MCM = 1/0/0) ///
-				switch((CharData >> 6) & 0x03)
+                switch((char_data >> 6) & 0x03)
 				{
 				case 0:
-                    Colors[0] = reg_b0c | 0x40;
+                    colors[0] = reg_b0c | 0x40;
 					break;
 				case 1:
-                    Colors[0] = reg_b1c;
+                    colors[0] = reg_b1c;
 					break;
 				case 2:
-                    Colors[0] = reg_b2c;
+                    colors[0] = reg_b2c;
 					break;
 				case 3:
-                    Colors[0] = reg_b3c;
+                    colors[0] = reg_b3c;
 					break;
 				}
-				Colors[1] = ColorData | 0x80;
+                colors[1] = color_data | 0x80;
 					
-                for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = Colors[(GfxData>>(i))&1];
+                for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = colors[(gfx_data>>(i))&1];
                 video_buffer_line += 8;
 				break;
 			default:
@@ -562,20 +561,20 @@ inline void VICII::DrawGraphics()
 		}
         else
         {
-                *video_buffer_line_xscroll++ = Colors[0];
-                *video_buffer_line_xscroll++ = Colors[0];
-                *video_buffer_line_xscroll++ = Colors[0];
-                *video_buffer_line_xscroll++ = Colors[0];
-                *video_buffer_line_xscroll++ = Colors[0];
-                *video_buffer_line_xscroll++ = Colors[0];
-                *video_buffer_line_xscroll++ = Colors[0];
-                *video_buffer_line_xscroll++ = Colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
                 video_buffer_line += 8;
         }
 	}
 	else	// Idle Mode
     {
-        Colors[0] = 0 | 0x40;
+        colors[0] = 0 | 0x40;
 
         if((current_cycle >= 16) && (current_cycle <= 55)) // Grafiksequenzer --> muss um 16 Pixel verzögert werden
 		{
@@ -584,30 +583,30 @@ inline void VICII::DrawGraphics()
 			{
 			case 0:
                 /// Standard Text Modus (ECM/BMM/MCM = 0/0/0) ///
-                Colors[1] = 0 | 0x80;
-                for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = Colors[(GfxData>>(i))&1];
+                colors[1] = 0 | 0x80;
+                for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = colors[(gfx_data>>(i))&1];
                 video_buffer_line += 8;
 				break;
 			case 1:
 				/// Multicolor Text Modus (ECM/BMM/MCM = 0/0/1) ///
-				if(!(ColorData&8))
+                if(!(color_data&8))
 				{
                     /// MC-Flag = 0 ///
-					Colors[1] = 0 | 0x80;
+                    colors[1] = 0 | 0x80;
 
-                    for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = Colors[(GfxData>>(i))&1];
+                    for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = colors[(gfx_data>>(i))&1];
                     video_buffer_line += 8;
 				}
 				else
 				{
                     /// MC-Flag = 1 ///
-					Colors[1] = 0;
-					Colors[2] = 0 | 0x80;
-					Colors[3] = 0 | 0x80;
+                    colors[1] = 0;
+                    colors[2] = 0 | 0x80;
+                    colors[3] = 0 | 0x80;
 
 					for(int i=6;i>-1;i-=2)
 					{
-                        *video_buffer_line_xscroll = Colors[(GfxData>>(i))&3];
+                        *video_buffer_line_xscroll = colors[(gfx_data>>(i))&3];
                         video_buffer_line_xscroll++;
                         *video_buffer_line_xscroll = video_buffer_line_xscroll[-1];
                         video_buffer_line_xscroll++;
@@ -617,20 +616,20 @@ inline void VICII::DrawGraphics()
 				break;
 			case 2:
 				/// Standard Bitmap Modus (ECM/BMM/MCM = 0/1/0) ///
-				Colors[1] = 0 | 0x80;
+                colors[1] = 0 | 0x80;
 				
-                for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = Colors[(GfxData>>(i))&1];
+                for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = colors[(gfx_data>>(i))&1];
                 video_buffer_line += 8;
 				break;
 			case 3:
                 /// Multicolor Bitmap Modus (ECM/BMM/MCM = 1/0/0) ///
-                Colors[1] = 0;
-				Colors[2] = 0 | 0x80;
-				Colors[3] = 0 | 0x80;
+                colors[1] = 0;
+                colors[2] = 0 | 0x80;
+                colors[3] = 0 | 0x80;
 				
 				for(int i=6;i>-1;i-=2)
 				{
-                    *video_buffer_line_xscroll = Colors[(GfxData>>(i))&3];
+                    *video_buffer_line_xscroll = colors[(gfx_data>>(i))&3];
                     video_buffer_line_xscroll++;
                     *video_buffer_line_xscroll = video_buffer_line_xscroll[-1];
                     video_buffer_line_xscroll++;
@@ -653,14 +652,14 @@ inline void VICII::DrawGraphics()
 		}
         else
         {
-                *video_buffer_line_xscroll++ = Colors[0];
-                *video_buffer_line_xscroll++ = Colors[0];
-                *video_buffer_line_xscroll++ = Colors[0];
-                *video_buffer_line_xscroll++ = Colors[0];
-                *video_buffer_line_xscroll++ = Colors[0];
-                *video_buffer_line_xscroll++ = Colors[0];
-                *video_buffer_line_xscroll++ = Colors[0];
-                *video_buffer_line_xscroll++ = Colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
+                *video_buffer_line_xscroll++ = colors[0];
                 video_buffer_line += 8;
         }
 	}
@@ -672,7 +671,7 @@ inline void VICII::DrawGraphics()
 
     /// Grey Dot zeichnen
     ///
-    if(isWriteColorReg21 && (video_buffer_line_xscroll[0] & 0x40) && DisplayStatus)
+    if(is_write_reg_b0c && (video_buffer_line_xscroll[0] & 0x40) && display_status)
         video_buffer_line_xscroll[0] = 0x0f;
 
 
@@ -691,15 +690,15 @@ inline void VICII::DrawGraphicsPseudo()
     video_buffer_line += 8;
 
     //CheckBorder
-    BorderLinePos += 8;
+    border_line_pos += 8;
     return;
 }
 
 inline void VICII::DrawSprites()
 {
-    unsigned char AktSpriteBit=0x80;    // Sprites werden hier von 7 nach 0 gezeichnet (Sprite 0 hat die höchste Priorität und 7 die niedrigste)
-    unsigned char AktSpriteColl=0;      // Noch keine Kollision Sprite-Sprite
-    unsigned char AktDataColl=0;        // Noch keine Kollision Sprite-Hintergrund
+    uint8_t current_sprite_bit = 0x80;          // Sprites werden hier von 7 nach 0 gezeichnet (Sprite 0 hat die höchste Priorität und 7 die niedrigste)
+    uint8_t current_sprite_collision = 0;       // Noch keine Kollision Sprite-Sprite
+    uint8_t current_gfx_collision = 0;          // Noch keine Kollision Sprite-Hintergrund
 
     /*
     if(!vic_config[VIC_SPRITES_ON]) return;
@@ -725,109 +724,109 @@ inline void VICII::DrawSprites()
     /////////////////////////////////////////
 
     if(!vic_config[VIC_SPRITES_ON]) return;
-    if(current_rasterline < FirstDisplayLine+1) return;
+    if(current_rasterline < first_display_line+1) return;
 
     // Spritekollisionspuffer löschen
-    for (int i=0; i < 520; i++) SpriteCollisionsPuffer[i] = 0;
+    for (int i=0; i < 520; i++) sprite_collision_buffer[i] = 0;
 
     int SpriteNr = 7;
     while(SpriteNr >= 0)
     {
         // Ist Sprite Sichtbar ?
-        if(((SpriteViewAktLine & AktSpriteBit) == AktSpriteBit) && (reg_mx[SpriteNr]<0x1F8))
+        if(((sprite_view_current_line & current_sprite_bit) == current_sprite_bit) && (reg_mx[SpriteNr]<0x1F8))
 		{
-            SpritePufferLine = (video_buffer_line - (62 * 8)) -4 + SpriteXDisplayTbl[reg_mx[SpriteNr]];
+            sprite_buffer_line = (video_buffer_line - (62 * 8)) -4 + sprite_x_display_table[reg_mx[SpriteNr]];
 
             /// Temporärer Zeiger inerhalb des SpriteCollisionsPuffers auf das Aktuellen Sprites
-            unsigned char *q = SpriteCollisionsPuffer + reg_mx[SpriteNr] + 8;
+            unsigned char *q = sprite_collision_buffer + reg_mx[SpriteNr] + 8;
 
-            if((reg_mdp & AktSpriteBit) == 0)	/// Prüfen auf Sprite Hinter Vordergrund
+            if((reg_mdp & current_sprite_bit) == 0)	/// Prüfen auf Sprite Hinter Vordergrund
 			{
 				/// Sprites vor der Vordergrundgrafik
-                if((reg_mxe & AktSpriteBit) == AktSpriteBit)
+                if((reg_mxe & current_sprite_bit) == current_sprite_bit)
 				{
                     /// Expandiertes Sprite
-                    if((reg_mmc & AktSpriteBit) == AktSpriteBit)
+                    if((reg_mmc & current_sprite_bit) == current_sprite_bit)
 					{
                         /// MultiColor Sprite
                         for(int i=0;i<12;i++)
 						{
-                            switch(SpriteSeqAktLine[SpriteNr] & 0xC00000)
+                            switch(sprite_sequencer_current_line[SpriteNr] & 0xC00000)
 							{
 							case 0x000000:
-								SpritePufferLine += 4;
+                                sprite_buffer_line += 4;
 								break;
 							case 0x400000:
                                 /// Sprite-Grafik Kollision
-                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+2) & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+3) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+2) & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+3) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *SpritePufferLine++ = reg_mm0;
-                                *SpritePufferLine++ = reg_mm0;
-                                *SpritePufferLine++ = reg_mm0;
-                                *SpritePufferLine++ = reg_mm0;
+                                *sprite_buffer_line++ = reg_mm0;
+                                *sprite_buffer_line++ = reg_mm0;
+                                *sprite_buffer_line++ = reg_mm0;
+                                *sprite_buffer_line++ = reg_mm0;
 
                                 /// Sprite-Sprite Kollision (MuliColor Expand)
-                                if (q[i<<2]) AktSpriteColl |= q[i<<2] | AktSpriteBit;
-                                else q[i<<2] = AktSpriteBit;
-                                if (q[(i<<2) + 1]) AktSpriteColl |= q[(i<<2) + 1] | AktSpriteBit;
-                                else q[(i<<2) + 1] = AktSpriteBit;
-                                if (q[(i<<2) + 2]) AktSpriteColl |= q[(i<<2) + 2] | AktSpriteBit;
-                                else q[(i<<2) + 2] = AktSpriteBit;
-                                if (q[(i<<2) + 3]) AktSpriteColl |= q[(i<<2) + 3] | AktSpriteBit;
-                                else q[(i<<2) + 3] = AktSpriteBit;
+                                if (q[i<<2]) current_sprite_collision |= q[i<<2] | current_sprite_bit;
+                                else q[i<<2] = current_sprite_bit;
+                                if (q[(i<<2) + 1]) current_sprite_collision |= q[(i<<2) + 1] | current_sprite_bit;
+                                else q[(i<<2) + 1] = current_sprite_bit;
+                                if (q[(i<<2) + 2]) current_sprite_collision |= q[(i<<2) + 2] | current_sprite_bit;
+                                else q[(i<<2) + 2] = current_sprite_bit;
+                                if (q[(i<<2) + 3]) current_sprite_collision |= q[(i<<2) + 3] | current_sprite_bit;
+                                else q[(i<<2) + 3] = current_sprite_bit;
 
 								break;
 							case 0x800000:
                                 /// Sprite-Grafik Kollision
-                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+2) & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+3) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+2) & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+3) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *SpritePufferLine++ = reg_mcolor[SpriteNr];
-                                *SpritePufferLine++ = reg_mcolor[SpriteNr];
-                                *SpritePufferLine++ = reg_mcolor[SpriteNr];
-                                *SpritePufferLine++ = reg_mcolor[SpriteNr];
+                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
 
                                 /// Sprite-Sprite Kollision (MuliColor Expand)
-                                if (q[i<<2]) AktSpriteColl |= q[i<<2] | AktSpriteBit;
-                                else q[i<<2] = AktSpriteBit;
-                                if (q[(i<<2) + 1]) AktSpriteColl |= q[(i<<2) + 1] | AktSpriteBit;
-                                else q[(i<<2) + 1] = AktSpriteBit;
-                                if (q[(i<<2) + 2]) AktSpriteColl |= q[(i<<2) + 2] | AktSpriteBit;
-                                else q[(i<<2) + 2] = AktSpriteBit;
-                                if (q[(i<<2) + 3]) AktSpriteColl |= q[(i<<2) + 3] | AktSpriteBit;
-                                else q[(i<<2) + 3] = AktSpriteBit;
+                                if (q[i<<2]) current_sprite_collision |= q[i<<2] | current_sprite_bit;
+                                else q[i<<2] = current_sprite_bit;
+                                if (q[(i<<2) + 1]) current_sprite_collision |= q[(i<<2) + 1] | current_sprite_bit;
+                                else q[(i<<2) + 1] = current_sprite_bit;
+                                if (q[(i<<2) + 2]) current_sprite_collision |= q[(i<<2) + 2] | current_sprite_bit;
+                                else q[(i<<2) + 2] = current_sprite_bit;
+                                if (q[(i<<2) + 3]) current_sprite_collision |= q[(i<<2) + 3] | current_sprite_bit;
+                                else q[(i<<2) + 3] = current_sprite_bit;
 
 								break;
 							case 0xC00000:
                                 /// Sprite-Grafik Kollision
-                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+2) & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+3) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+2) & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+3) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *SpritePufferLine++ = reg_mm1;
-                                *SpritePufferLine++ = reg_mm1;
-                                *SpritePufferLine++ = reg_mm1;
-                                *SpritePufferLine++ = reg_mm1;
+                                *sprite_buffer_line++ = reg_mm1;
+                                *sprite_buffer_line++ = reg_mm1;
+                                *sprite_buffer_line++ = reg_mm1;
+                                *sprite_buffer_line++ = reg_mm1;
 
                                 /// Sprite-Sprite Kollision (MuliColor Expand)
-                                if (q[i<<2]) AktSpriteColl |= q[i<<2] | AktSpriteBit;
-                                else q[i<<2] = AktSpriteBit;
-                                if (q[(i<<2) + 1]) AktSpriteColl |= q[(i<<2) + 1] | AktSpriteBit;
-                                else q[(i<<2) + 1] = AktSpriteBit;
-                                if (q[(i<<2) + 2]) AktSpriteColl |= q[(i<<2) + 2] | AktSpriteBit;
-                                else q[(i<<2) + 2] = AktSpriteBit;
-                                if (q[(i<<2) + 3]) AktSpriteColl |= q[(i<<2) + 3] | AktSpriteBit;
-                                else q[(i<<2) + 3] = AktSpriteBit;
+                                if (q[i<<2]) current_sprite_collision |= q[i<<2] | current_sprite_bit;
+                                else q[i<<2] = current_sprite_bit;
+                                if (q[(i<<2) + 1]) current_sprite_collision |= q[(i<<2) + 1] | current_sprite_bit;
+                                else q[(i<<2) + 1] = current_sprite_bit;
+                                if (q[(i<<2) + 2]) current_sprite_collision |= q[(i<<2) + 2] | current_sprite_bit;
+                                else q[(i<<2) + 2] = current_sprite_bit;
+                                if (q[(i<<2) + 3]) current_sprite_collision |= q[(i<<2) + 3] | current_sprite_bit;
+                                else q[(i<<2) + 3] = current_sprite_bit;
 
 								break;
 							}
-                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 2;
+                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 2;
 						}
 					}
 					else
@@ -835,89 +834,89 @@ inline void VICII::DrawSprites()
                         /// SingleColor Sprite
                         for(int i=0;i<24;i++)
 						{
-                            if(SpriteSeqAktLine[SpriteNr] & 0x800000)
+                            if(sprite_sequencer_current_line[SpriteNr] & 0x800000)
 							{
                                 /// Sprite-Grafik Kollision
-                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *SpritePufferLine++ = reg_mcolor[SpriteNr];
-                                *SpritePufferLine++ = reg_mcolor[SpriteNr];
+                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
 
                                 /// Sprite-Sprite Kollision (SingleColor Expand)
-                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
-                                else q[i<<1] = AktSpriteBit;
-                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
-                                else q[(i<<1) + 1] = AktSpriteBit;
+                                if (q[i<<1]) current_sprite_collision |= q[i<<1] | current_sprite_bit;
+                                else q[i<<1] = current_sprite_bit;
+                                if (q[(i<<1) + 1]) current_sprite_collision |= q[(i<<1) + 1] | current_sprite_bit;
+                                else q[(i<<1) + 1] = current_sprite_bit;
 							}
-							else SpritePufferLine += 2;
-                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 1;
+                            else sprite_buffer_line += 2;
+                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 1;
 						}
 					}
 				}
 				else
 				{
                     /// Nicht Expandiertes Sprite
-                    if((reg_mmc & AktSpriteBit) == AktSpriteBit)
+                    if((reg_mmc & current_sprite_bit) == current_sprite_bit)
 					{
                         /// MultiColor Sprite
                         for(int i=0;i<12;i++)
 						{
-                            switch(SpriteSeqAktLine[SpriteNr] & 0xC00000)
+                            switch(sprite_sequencer_current_line[SpriteNr] & 0xC00000)
 							{
 							case 0x000000:
-								SpritePufferLine += 2;
+                                sprite_buffer_line += 2;
 								break;
 							case 0x400000:
                                 /// Sprite-Grafik Kollision
-                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *SpritePufferLine++ = reg_mm0;
-                                *SpritePufferLine++ = reg_mm0;
+                                *sprite_buffer_line++ = reg_mm0;
+                                *sprite_buffer_line++ = reg_mm0;
 
                                 /// Sprite-Sprite Kollision (MuliColor)
-                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
-                                else q[i<<1] = AktSpriteBit;
+                                if (q[i<<1]) current_sprite_collision |= q[i<<1] | current_sprite_bit;
+                                else q[i<<1] = current_sprite_bit;
 
-                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
-                                else q[(i<<1) + 1] = AktSpriteBit;
+                                if (q[(i<<1) + 1]) current_sprite_collision |= q[(i<<1) + 1] | current_sprite_bit;
+                                else q[(i<<1) + 1] = current_sprite_bit;
 
 								break;
 							case 0x800000:
                                 /// Sprite-Grafik Kollision
-                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *SpritePufferLine++ = reg_mcolor[SpriteNr];
-                                *SpritePufferLine++ = reg_mcolor[SpriteNr];
+                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
 
                                 /// Sprite-Sprite Kollision (MuliColor)
-                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
-                                else q[i<<1] = AktSpriteBit;
+                                if (q[i<<1]) current_sprite_collision |= q[i<<1] | current_sprite_bit;
+                                else q[i<<1] = current_sprite_bit;
 
-                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
-                                else q[(i<<1) + 1] = AktSpriteBit;
+                                if (q[(i<<1) + 1]) current_sprite_collision |= q[(i<<1) + 1] | current_sprite_bit;
+                                else q[(i<<1) + 1] = current_sprite_bit;
 
 								break;
 							case 0xC00000:
                                 /// Sprite-Grafik Kollision
-                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *SpritePufferLine++ = reg_mm1;
-                                *SpritePufferLine++ = reg_mm1;
+                                *sprite_buffer_line++ = reg_mm1;
+                                *sprite_buffer_line++ = reg_mm1;
 
                                 /// Sprite-Sprite Kollision (MuliColor)
-                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
-                                else q[i<<1] = AktSpriteBit;
+                                if (q[i<<1]) current_sprite_collision |= q[i<<1] | current_sprite_bit;
+                                else q[i<<1] = current_sprite_bit;
 
-                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
-                                else q[(i<<1) + 1] = AktSpriteBit;
+                                if (q[(i<<1) + 1]) current_sprite_collision |= q[(i<<1) + 1] | current_sprite_bit;
+                                else q[(i<<1) + 1] = current_sprite_bit;
 
 								break;
 							}
-                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 2;
+                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 2;
 						}
 					}
 					else
@@ -925,19 +924,19 @@ inline void VICII::DrawSprites()
                         /// SingleColor Sprite
                         for(int i=0;i<24;i++)
 						{                            
-                            if(SpriteSeqAktLine[SpriteNr] & 0x800000)
+                            if(sprite_sequencer_current_line[SpriteNr] & 0x800000)
                             {
                                 /// Sprite-Grafik Kollision
-                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *SpritePufferLine++ = reg_mcolor[SpriteNr];
+                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
 
                                 /// Sprite-Sprite Kollision
-                                if (q[i]) AktSpriteColl |= q[i] | AktSpriteBit;
-                                else q[i] = AktSpriteBit;
+                                if (q[i]) current_sprite_collision |= q[i] | current_sprite_bit;
+                                else q[i] = current_sprite_bit;
                             }
-							else SpritePufferLine++;
-                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 1;
+                            else sprite_buffer_line++;
+                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 1;
 						}
 					}
 				}
@@ -945,102 +944,102 @@ inline void VICII::DrawSprites()
 			else
 			{
 				/// Sprites hinter der Vordergrundgrafik
-                if((reg_mxe & AktSpriteBit) == AktSpriteBit)
+                if((reg_mxe & current_sprite_bit) == current_sprite_bit)
 				{
                     /// Expandiertes Sprite
-                    if((reg_mmc & AktSpriteBit) == AktSpriteBit)
+                    if((reg_mmc & current_sprite_bit) == current_sprite_bit)
 					{
                         /// MultiColor Sprite
                         for(int i=0;i<12;i++)
 						{
-                            switch(SpriteSeqAktLine[SpriteNr] & 0xC00000)
+                            switch(sprite_sequencer_current_line[SpriteNr] & 0xC00000)
 							{
 							case 0x000000:
-								SpritePufferLine += 4;
+                                sprite_buffer_line += 4;
 								break;
 							case 0x400000:
                                 /// Sprite-Grafik Kollision
-                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+2) & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+3) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+2) & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+3) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mm0;
-								else SpritePufferLine++;
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mm0;
-								else SpritePufferLine++;
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mm0;
-								else SpritePufferLine++;
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mm0;
-								else SpritePufferLine++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm0;
+                                else sprite_buffer_line++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm0;
+                                else sprite_buffer_line++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm0;
+                                else sprite_buffer_line++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm0;
+                                else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (MuliColor Expand)
-                                if (q[i<<2]) AktSpriteColl |= q[i<<2] | AktSpriteBit;
-                                else q[i<<2] = AktSpriteBit;
-                                if (q[(i<<2) + 1]) AktSpriteColl |= q[(i<<2) + 1] | AktSpriteBit;
-                                else q[(i<<2) + 1] = AktSpriteBit;
-                                if (q[(i<<2) + 2]) AktSpriteColl |= q[(i<<2) + 2] | AktSpriteBit;
-                                else q[(i<<2) + 2] = AktSpriteBit;
-                                if (q[(i<<2) + 3]) AktSpriteColl |= q[(i<<2) + 3] | AktSpriteBit;
-                                else q[(i<<2) + 3] = AktSpriteBit;
+                                if (q[i<<2]) current_sprite_collision |= q[i<<2] | current_sprite_bit;
+                                else q[i<<2] = current_sprite_bit;
+                                if (q[(i<<2) + 1]) current_sprite_collision |= q[(i<<2) + 1] | current_sprite_bit;
+                                else q[(i<<2) + 1] = current_sprite_bit;
+                                if (q[(i<<2) + 2]) current_sprite_collision |= q[(i<<2) + 2] | current_sprite_bit;
+                                else q[(i<<2) + 2] = current_sprite_bit;
+                                if (q[(i<<2) + 3]) current_sprite_collision |= q[(i<<2) + 3] | current_sprite_bit;
+                                else q[(i<<2) + 3] = current_sprite_bit;
 
 								break;
 							case 0x800000:
                                 /// Sprite-Grafik Kollision
-                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+2) & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+3) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+2) & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+3) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mcolor[SpriteNr];
-								else SpritePufferLine++;
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mcolor[SpriteNr];
-								else SpritePufferLine++;
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mcolor[SpriteNr];
-								else SpritePufferLine++;
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mcolor[SpriteNr];
-								else SpritePufferLine++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                else sprite_buffer_line++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                else sprite_buffer_line++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                else sprite_buffer_line++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (MuliColor Expand)
-                                if (q[i<<2]) AktSpriteColl |= q[i<<2] | AktSpriteBit;
-                                else q[i<<2] = AktSpriteBit;
-                                if (q[(i<<2) + 1]) AktSpriteColl |= q[(i<<2) + 1] | AktSpriteBit;
-                                else q[(i<<2) + 1] = AktSpriteBit;
-                                if (q[(i<<2) + 2]) AktSpriteColl |= q[(i<<2) + 2] | AktSpriteBit;
-                                else q[(i<<2) + 2] = AktSpriteBit;
-                                if (q[(i<<2) + 3]) AktSpriteColl |= q[(i<<2) + 3] | AktSpriteBit;
-                                else q[(i<<2) + 3] = AktSpriteBit;
+                                if (q[i<<2]) current_sprite_collision |= q[i<<2] | current_sprite_bit;
+                                else q[i<<2] = current_sprite_bit;
+                                if (q[(i<<2) + 1]) current_sprite_collision |= q[(i<<2) + 1] | current_sprite_bit;
+                                else q[(i<<2) + 1] = current_sprite_bit;
+                                if (q[(i<<2) + 2]) current_sprite_collision |= q[(i<<2) + 2] | current_sprite_bit;
+                                else q[(i<<2) + 2] = current_sprite_bit;
+                                if (q[(i<<2) + 3]) current_sprite_collision |= q[(i<<2) + 3] | current_sprite_bit;
+                                else q[(i<<2) + 3] = current_sprite_bit;
 
 								break;
 							case 0xC00000:
                                 /// Sprite-Grafik Kollision
-                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+2) & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+3) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+2) & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+3) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mm1;
-								else SpritePufferLine++;
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mm1;
-								else SpritePufferLine++;
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mm1;
-								else SpritePufferLine++;
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mm1;
-								else SpritePufferLine++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm1;
+                                else sprite_buffer_line++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm1;
+                                else sprite_buffer_line++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm1;
+                                else sprite_buffer_line++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm1;
+                                else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (MuliColor Expand)
-                                if (q[i<<2]) AktSpriteColl |= q[i<<2] | AktSpriteBit;
-                                else q[i<<2] = AktSpriteBit;
-                                if (q[(i<<2) + 1]) AktSpriteColl |= q[(i<<2) + 1] | AktSpriteBit;
-                                else q[(i<<2) + 1] = AktSpriteBit;
-                                if (q[(i<<2) + 2]) AktSpriteColl |= q[(i<<2) + 2] | AktSpriteBit;
-                                else q[(i<<2) + 2] = AktSpriteBit;
-                                if (q[(i<<2) + 3]) AktSpriteColl |= q[(i<<2) + 3] | AktSpriteBit;
-                                else q[(i<<2) + 3] = AktSpriteBit;
+                                if (q[i<<2]) current_sprite_collision |= q[i<<2] | current_sprite_bit;
+                                else q[i<<2] = current_sprite_bit;
+                                if (q[(i<<2) + 1]) current_sprite_collision |= q[(i<<2) + 1] | current_sprite_bit;
+                                else q[(i<<2) + 1] = current_sprite_bit;
+                                if (q[(i<<2) + 2]) current_sprite_collision |= q[(i<<2) + 2] | current_sprite_bit;
+                                else q[(i<<2) + 2] = current_sprite_bit;
+                                if (q[(i<<2) + 3]) current_sprite_collision |= q[(i<<2) + 3] | current_sprite_bit;
+                                else q[(i<<2) + 3] = current_sprite_bit;
 
 								break;
 							}
-                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 2;
+                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 2;
 						}
 					}
 					else
@@ -1048,97 +1047,97 @@ inline void VICII::DrawSprites()
                         /// SingleColor Sprite
                         for(int i=0;i<24;i++)
 						{
-                            if(SpriteSeqAktLine[SpriteNr] & 0x800000)
+                            if(sprite_sequencer_current_line[SpriteNr] & 0x800000)
 							{
                                 /// Sprite-Grafik Kollision
-                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mcolor[SpriteNr];
-								else SpritePufferLine++;
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mcolor[SpriteNr];
-								else SpritePufferLine++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                else sprite_buffer_line++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (SingleColor Expand)
-                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
-                                else q[i<<1] = AktSpriteBit;
-                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
-                                else q[(i<<1) + 1] = AktSpriteBit;
+                                if (q[i<<1]) current_sprite_collision |= q[i<<1] | current_sprite_bit;
+                                else q[i<<1] = current_sprite_bit;
+                                if (q[(i<<1) + 1]) current_sprite_collision |= q[(i<<1) + 1] | current_sprite_bit;
+                                else q[(i<<1) + 1] = current_sprite_bit;
 							}
-							else SpritePufferLine += 2;
-                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 1;
+                            else sprite_buffer_line += 2;
+                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 1;
 						}
 					}
 				}
 				else
 				{
                     /// Nicht Expandiertes Sprite
-                    if((reg_mmc & AktSpriteBit) == AktSpriteBit)
+                    if((reg_mmc & current_sprite_bit) == current_sprite_bit)
 					{
                         /// MultiColor Sprite
                         for(int i=0;i<12;i++)
 						{
-                            switch(SpriteSeqAktLine[SpriteNr] & 0xC00000)
+                            switch(sprite_sequencer_current_line[SpriteNr] & 0xC00000)
 							{
 							case 0x000000:
-								SpritePufferLine += 2;
+                                sprite_buffer_line += 2;
 								break;
 							case 0x400000:
                                 /// Sprite-Grafik Kollision
-                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mm0;
-								else SpritePufferLine++;
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mm0;
-								else SpritePufferLine++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm0;
+                                else sprite_buffer_line++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm0;
+                                else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (MuliColor)
-                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
-                                else q[i<<1] = AktSpriteBit;
+                                if (q[i<<1]) current_sprite_collision |= q[i<<1] | current_sprite_bit;
+                                else q[i<<1] = current_sprite_bit;
 
-                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
-                                else q[(i<<1) + 1] = AktSpriteBit;
+                                if (q[(i<<1) + 1]) current_sprite_collision |= q[(i<<1) + 1] | current_sprite_bit;
+                                else q[(i<<1) + 1] = current_sprite_bit;
 
 								break;
 							case 0x800000:
                                 /// Sprite-Grafik Kollision
-                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mcolor[SpriteNr];
-								else SpritePufferLine++;
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mcolor[SpriteNr];
-								else SpritePufferLine++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                else sprite_buffer_line++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (MuliColor)
-                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
-                                else q[i<<1] = AktSpriteBit;
+                                if (q[i<<1]) current_sprite_collision |= q[i<<1] | current_sprite_bit;
+                                else q[i<<1] = current_sprite_bit;
 
-                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
-                                else q[(i<<1) + 1] = AktSpriteBit;
+                                if (q[(i<<1) + 1]) current_sprite_collision |= q[(i<<1) + 1] | current_sprite_bit;
+                                else q[(i<<1) + 1] = current_sprite_bit;
 
 								break;
 							case 0xC00000:
                                 /// Sprite-Grafik Kollision
-                                if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
-                                if(*(SpritePufferLine+1) & 0x80) AktDataColl |= AktSpriteBit;
+                                if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
+                                if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mm1;
-								else SpritePufferLine++;
-                                if(!(*SpritePufferLine&0x80))*SpritePufferLine++ = reg_mm1;
-								else SpritePufferLine++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm1;
+                                else sprite_buffer_line++;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm1;
+                                else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (MuliColor)
-                                if (q[i<<1]) AktSpriteColl |= q[i<<1] | AktSpriteBit;
-                                else q[i<<1] = AktSpriteBit;
+                                if (q[i<<1]) current_sprite_collision |= q[i<<1] | current_sprite_bit;
+                                else q[i<<1] = current_sprite_bit;
 
-                                if (q[(i<<1) + 1]) AktSpriteColl |= q[(i<<1) + 1] | AktSpriteBit;
-                                else q[(i<<1) + 1] = AktSpriteBit;
+                                if (q[(i<<1) + 1]) current_sprite_collision |= q[(i<<1) + 1] | current_sprite_bit;
+                                else q[(i<<1) + 1] = current_sprite_bit;
 
 								break;
 							}
-                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 2;
+                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 2;
 						}
 					}
 					else
@@ -1146,23 +1145,23 @@ inline void VICII::DrawSprites()
                         /// SingleColor Sprite
                         for(int i=0;i<24;i++)
 						{
-                            if(SpriteSeqAktLine[SpriteNr] & 0x800000)
+                            if(sprite_sequencer_current_line[SpriteNr] & 0x800000)
 							{
-                                if(!(*SpritePufferLine&0x80))
+                                if(!(*sprite_buffer_line&0x80))
                                 {                                    
                                     /// Sprite-Grafik Kollision
-                                    if(*SpritePufferLine & 0x80) AktDataColl |= AktSpriteBit;
+                                    if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                    *SpritePufferLine++ = reg_mcolor[SpriteNr];
+                                    *sprite_buffer_line++ = reg_mcolor[SpriteNr];
 
                                     /// Sprite-Sprite Kollision
-                                    if (q[i]) AktSpriteColl |= q[i] | AktSpriteBit;
-                                    else q[i] = AktSpriteBit;
+                                    if (q[i]) current_sprite_collision |= q[i] | current_sprite_bit;
+                                    else q[i] = current_sprite_bit;
                                 }
-                                else SpritePufferLine++;
+                                else sprite_buffer_line++;
 							}
-							else SpritePufferLine++;
-                            SpriteSeqAktLine[SpriteNr] = SpriteSeqAktLine[SpriteNr] << 1;
+                            else sprite_buffer_line++;
+                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 1;
 						}
 					}
 				}
@@ -1170,7 +1169,7 @@ inline void VICII::DrawSprites()
 		}
 
         SpriteNr--;
-        AktSpriteBit >>= 1;
+        current_sprite_bit >>= 1;
     }
 
     //////////////////////// Sprite Collision ///////////////////////////
@@ -1181,7 +1180,7 @@ inline void VICII::DrawSprites()
         if(reg_mm == 0)
         {
             // IRQ kann ausgelöst werden
-            reg_mm |= AktSpriteColl;
+            reg_mm |= current_sprite_collision;
             if(reg_mm != 0)
             {
                 irq_flag |= 0x04;
@@ -1195,7 +1194,7 @@ inline void VICII::DrawSprites()
         else
         {
             // kein IRQ auslösen
-            reg_mm |= AktSpriteColl;
+            reg_mm |= current_sprite_collision;
         }
     }
 
@@ -1205,7 +1204,7 @@ inline void VICII::DrawSprites()
         if(reg_md == 0)
         {
             // IRQ kann ausgelöst werden
-            reg_md |= AktDataColl;
+            reg_md |= current_gfx_collision;
             if(reg_md != 0)
             {
                 irq_flag |= 0x02;
@@ -1219,7 +1218,7 @@ inline void VICII::DrawSprites()
         else
         {
             // kein IRQ auslösen
-            reg_md |= AktDataColl;
+            reg_md |= current_gfx_collision;
         }
     }
 }
@@ -1227,13 +1226,13 @@ inline void VICII::DrawSprites()
 inline void VICII::DrawBorder()
 {
     if(!vic_config[VIC_BORDER_ON]) return;
-    if(current_rasterline < FirstDisplayLine) return;
-    BorderPufferLine = video_buffer_line - 504;	/// Erstes Sichtbares Pixel
+    if(current_rasterline < first_display_line) return;
+    border_buffer_line = video_buffer_line - 504;	/// Erstes Sichtbares Pixel
 
     for(int x=0;x<504;x++)
 	{
-		if(BorderLine[x] & 128) BorderPufferLine++;
-		else *BorderPufferLine++ = BorderLine[x];
+        if(border_line[x] & 128) border_buffer_line++;
+        else *border_buffer_line++ = border_line[x];
 	}
 }
 
@@ -1244,27 +1243,27 @@ void VICII::OneCycle()
     current_x_coordinate = x_coordinates_table[current_cycle];
 
     // Prüfen ob Badlines zugelassen sind
-    if(current_rasterline == 0x30) BadLineEnable = den;
+    if(current_rasterline == 0x30) badline_enable = den;
 
     // Prüfen auf Badline zustand
-    if((current_rasterline>=0x30) && (current_rasterline<=0xF7) && (reg_y_scroll == (current_rasterline&7)) && (BadLineEnable == true))
+    if((current_rasterline>=0x30) && (current_rasterline<=0xF7) && (reg_y_scroll == (current_rasterline&7)) && (badline_enable == true))
     {
-        BadLineStatus = true;
-        DisplayStatus = true;
+        badline_status = true;
+        display_status = true;
     }
-    else BadLineStatus = false;
+    else badline_status = false;
 
     switch (current_cycle)
 	{
     case 1:
 
-        if (current_rasterline == (TOTAL_RASTERS-1))
+        if (current_rasterline == (total_rasterlines-1))
 		{
             vertical_blanking = true;
             current_rasterline = 0;
             RefreshProc(video_buffer);
             draw_line_counter = 0;
-			VCBASE = 0;
+            vc_base = 0;
 		}
 		else 
 		{
@@ -1273,17 +1272,17 @@ void VICII::OneCycle()
 
 			// Prüfen auf Raster IRQ
             //if (current_rasterline == reg_irq_raster) RasterIRQ();
-            draw_this_line = (current_rasterline >= FirstDisplayLine && current_rasterline <= LastDisplayLine);
+            draw_this_line = (current_rasterline >= first_display_line && current_rasterline <= last_display_line);
 		}
 
         if(draw_this_line)
         {
             video_buffer_line = &video_buffer[draw_line_counter++*MAX_XW];		// Zeiger für Aktuelle Zeile setzen
-            BorderLinePos = 0;
+            border_line_pos = 0;
         }
 
 		// Sprite 2 //
-        if((SpriteDMA & 0x18) == 0) *ba = true;
+        if((sprite_dma & 0x18) == 0) *ba = true;
 
 		// Sprite 3 //
         pAccess(3);
@@ -1295,7 +1294,7 @@ void VICII::OneCycle()
     case 2:
         if (vertical_blanking)
         {
-            LPTriggered = vertical_blanking = false;
+            lp_triggered = vertical_blanking = false;
             //if (reg_irq_raster == 0) RasterIRQ();
         }
 
@@ -1303,14 +1302,14 @@ void VICII::OneCycle()
         if (current_rasterline == reg_irq_raster) RasterIRQ();
 
 		/// Sprite 5 ///
-        if(SpriteDMA & 0x20)  SetBALow();
+        if(sprite_dma & 0x20)  SetBALow();
 
         DrawGraphicsPseudo();
 		break;
 
 	case 3:
 		// Sprite 3 //
-        if((SpriteDMA & 0x30) == 0) *ba = true;
+        if((sprite_dma & 0x30) == 0) *ba = true;
 
 		// Sprite 4 //
         pAccess(4);
@@ -1321,14 +1320,14 @@ void VICII::OneCycle()
 
 	case 4:
 		/// Sprite 6 ///
-		if(SpriteDMA & 0x40)  SetBALow();
+        if(sprite_dma & 0x40)  SetBALow();
 
         DrawGraphicsPseudo();
 		break;
 
 	case 5:
         // Sprite 4 //
-        if((SpriteDMA & 0x60) == 0) *ba = true;
+        if((sprite_dma & 0x60) == 0) *ba = true;
 
 		// Sprite 5 //
         pAccess(5);
@@ -1339,14 +1338,14 @@ void VICII::OneCycle()
 
 	case 6:
 		/// Sprite 7 ///
-		if(SpriteDMA & 0x80)  SetBALow();
+        if(sprite_dma & 0x80)  SetBALow();
 
         DrawGraphicsPseudo();
 		break;
 
 	case 7:
         // Sprite 5 //
-        if((SpriteDMA & 0xC0) == 0) *ba = true;
+        if((sprite_dma & 0xC0) == 0) *ba = true;
 
 		// Sprite 6 //
         pAccess(6);
@@ -1361,19 +1360,19 @@ void VICII::OneCycle()
 
 	case 9:
 		// Sprite 6 //
-        if((SpriteDMA & 0x80) == 0) *ba = true;
+        if((sprite_dma & 0x80) == 0) *ba = true;
 
 		// Sprite 7 //
         pAccess(7);
         if(!*ba) sAccess(7);
 
-        VMLI = 0;
+        vmli = 0;
 
         DrawGraphicsPseudo();
         break;
 
     case 10:
-        VMLI = 0;
+        vmli = 0;
 
         DrawGraphicsPseudo();
 		break;
@@ -1382,62 +1381,62 @@ void VICII::OneCycle()
 		// Sprite 7 //
         *ba = true;
 
-        VC = VCBASE;
+        vc = vc_base;
 
         DrawGraphics();
         break;
 
     case 12:
-        VC = VCBASE;
+        vc = vc_base;
 
-        if(BadLineStatus) SetBALow();
+        if(badline_status) SetBALow();
         DrawGraphics();
         break;
 
     case 13:
-        VC = VCBASE;
+        vc = vc_base;
 
-        if(BadLineStatus) SetBALow();
+        if(badline_status) SetBALow();
         DrawGraphics();
 		break;
 
 	case 14:
-        if(BadLineStatus) SetBALow();
-        if((BadLineStatus == true) && (DisplayStatus == true)) RC = 0;
+        if(badline_status) SetBALow();
+        if((badline_status == true) && (display_status == true)) rc = 0;
 
         /// Sprite MC + 3
         for(int i=0;i<8;i++,SpriteBit<<=1)
         {
-            if(SpriteDMA & SpriteBit) MC[i] += 3;
+            if(sprite_dma & SpriteBit) mc[i] += 3;
         }
 
         DrawGraphics();
 		break;
 
     case 15:
-        if (BadLineStatus) SetBALow();
+        if (badline_status) SetBALow();
         DrawGraphics();
         break;
 
 	case 16:
-		SpriteViewAktLine = SpriteView;
-		SpriteSeqAktLine[0] = SpriteSeq[0];
-		SpriteSeqAktLine[1] = SpriteSeq[1];
-		SpriteSeqAktLine[2] = SpriteSeq[2];
-		SpriteSeqAktLine[3] = SpriteSeq[3];
-		SpriteSeqAktLine[4] = SpriteSeq[4];
-		SpriteSeqAktLine[5] = SpriteSeq[5];
-		SpriteSeqAktLine[6] = SpriteSeq[6];
-		SpriteSeqAktLine[7] = SpriteSeq[7];
+        sprite_view_current_line = sprite_view;
+        sprite_sequencer_current_line[0] = sprite_sequenzer[0];
+        sprite_sequencer_current_line[1] = sprite_sequenzer[1];
+        sprite_sequencer_current_line[2] = sprite_sequenzer[2];
+        sprite_sequencer_current_line[3] = sprite_sequenzer[3];
+        sprite_sequencer_current_line[4] = sprite_sequenzer[4];
+        sprite_sequencer_current_line[5] = sprite_sequenzer[5];
+        sprite_sequencer_current_line[6] = sprite_sequenzer[6];
+        sprite_sequencer_current_line[7] = sprite_sequenzer[7];
 
         /// Sprite ///
         for(int i=0;i<8;i++,SpriteBit<<=1)
         {
-            if((SpriteExpYFlipFlop & SpriteBit) == SpriteBit) MCBase[i] += 2;
+            if((sprite_y_exp_flip_flop & SpriteBit) == SpriteBit) mc_base[i] += 2;
         }
 
         gAccess();
-        if (BadLineStatus) SetBALow();
+        if (badline_status) SetBALow();
 
         DrawGraphics();
 		break;
@@ -1446,16 +1445,16 @@ void VICII::OneCycle()
         /// Sprite ///
         for(int i=0;i<8;i++,SpriteBit<<=1)
         {
-            if((SpriteExpYFlipFlop & SpriteBit) == SpriteBit) MCBase[i] ++;
-            if(MCBase[i] >= 63)
+            if((sprite_y_exp_flip_flop & SpriteBit) == SpriteBit) mc_base[i] ++;
+            if(mc_base[i] >= 63)
             {
-                SpriteDMA  &= ~SpriteBit;
-                SpriteView &= ~SpriteBit;
+                sprite_dma  &= ~SpriteBit;
+                sprite_view &= ~SpriteBit;
             }
         }
 
         gAccess();
-        if (BadLineStatus) SetBALow();
+        if (badline_status) SetBALow();
 
         DrawGraphics();
         break;
@@ -1469,7 +1468,7 @@ void VICII::OneCycle()
     case 49: case 50: case 51: case 52: case 53: case 54:
 
         gAccess();
-        if (BadLineStatus) SetBALow();
+        if (badline_status) SetBALow();
 
         DrawGraphics();
 		break;
@@ -1481,7 +1480,7 @@ void VICII::OneCycle()
 		// In der ersten Phase von Zyklus 55 wird das Expansions-Flipflop
 		// invertiert, wenn das MxYE-Bit gesetzt ist.
 
-        for (int i=0; i<8; i++, SpriteBit<<=1) if (reg_mye & SpriteBit) SpriteExpYFlipFlop ^= SpriteBit;
+        for (int i=0; i<8; i++, SpriteBit<<=1) if (reg_mye & SpriteBit) sprite_y_exp_flip_flop ^= SpriteBit;
 
 		// In der ersten Phasen von Zyklus 55 wird für Sprite 0-3 geprüft, 
 		// ob das entsprechende MxE-Bit in Register $d015 gesetzt und die Y-Koordinate 
@@ -1494,17 +1493,17 @@ void VICII::OneCycle()
 		{
             if ((reg_me & SpriteBit) && ((current_rasterline & 0xff) == reg_my[i]))
 			{
-                if((SpriteDMA & SpriteBit) == 0)
+                if((sprite_dma & SpriteBit) == 0)
 				{
-                    SpriteDMA |= SpriteBit;
-					MCBase[i] = 0;
-                    if (reg_mye & SpriteBit) SpriteExpYFlipFlop &= ~SpriteBit;
+                    sprite_dma |= SpriteBit;
+                    mc_base[i] = 0;
+                    if (reg_mye & SpriteBit) sprite_y_exp_flip_flop &= ~SpriteBit;
 				}
 			}
 		}
 
 		/// Sprite 0 ///
-		if(SpriteDMA & 0x01)  SetBALow();
+        if(sprite_dma & 0x01)  SetBALow();
 
         gAccess();
         DrawGraphics();
@@ -1523,11 +1522,11 @@ void VICII::OneCycle()
 		{
             if ((reg_me & SpriteBit) && (current_rasterline & 0xff) == reg_my[i])
 			{
-                if((SpriteDMA & SpriteBit) == 0)
+                if((sprite_dma & SpriteBit) == 0)
 				{
-                    SpriteDMA |= SpriteBit;
-					MCBase[i] = 0;
-                    if (reg_mye & SpriteBit) SpriteExpYFlipFlop &= ~SpriteBit;
+                    sprite_dma |= SpriteBit;
+                    mc_base[i] = 0;
+                    if (reg_mye & SpriteBit) sprite_y_exp_flip_flop &= ~SpriteBit;
 				}
 			}
 		}	
@@ -1537,29 +1536,29 @@ void VICII::OneCycle()
 	
 	case 57:
 		/// Sprite 1 ///
-		if(SpriteDMA & 0x02)  SetBALow();
+        if(sprite_dma & 0x02)  SetBALow();
 
         DrawGraphics();
 		break;
 
 	case 58:
-        if(DisplayStatus == false)
+        if(display_status == false)
         {
-            VCBASE = VC;
+            vc_base = vc;
         }
-        else if(BadLineStatus)
+        else if(badline_status)
         {
-            if(RC == 7) VCBASE = VC;
-            RC = (RC + 1) & 7;
+            if(rc == 7) vc_base = vc;
+            rc = (rc + 1) & 7;
         }
         else
         {
-            if(RC == 7)
+            if(rc == 7)
             {
-                VCBASE = VC;
-                DisplayStatus = false;
+                vc_base = vc;
+                display_status = false;
             }
-            if(RC < 7) RC = (RC + 1) & 7;
+            if(rc < 7) rc = (rc + 1) & 7;
         }
 
         /// Sprite ///
@@ -1569,9 +1568,9 @@ void VICII::OneCycle()
 		// Ist dies der Fall, wird die Darstellung des Sprites angeschaltet.
         for(int i=0;i<8;i++, SpriteBit<<=1)
 		{
-			MC[i] = MCBase[i];
-            //if(((SpriteDMA & bitc) == bitc) && ((current_rasterline&0xFF) == reg_my[i])) SpriteView |= bitc;
-            if(((SpriteDMA & SpriteBit) == SpriteBit)) SpriteView |= SpriteBit;
+            mc[i] = mc_base[i];
+            //if(((sprite_dma & bitc) == bitc) && ((current_rasterline&0xFF) == reg_my[i])) SpriteView |= bitc;
+            if(((sprite_dma & SpriteBit) == SpriteBit)) sprite_view |= SpriteBit;
 		}
 
 		// Sprite 0 //
@@ -1583,14 +1582,14 @@ void VICII::OneCycle()
 
 	case 59:
 		/// Sprite 2 ///
-		if(SpriteDMA & 0x04)  SetBALow();
+        if(sprite_dma & 0x04)  SetBALow();
 
         DrawGraphics();
 		break;
 	
 	case 60:
 		// Sprite 0 //
-        if((SpriteDMA & 0x06) == 0) *ba = true;
+        if((sprite_dma & 0x06) == 0) *ba = true;
 
 		// Sprite 1 //
         pAccess(1);
@@ -1601,14 +1600,14 @@ void VICII::OneCycle()
 
 	case 61:
 		/// Sprite 3 ///
-        if(SpriteDMA & 0x08)  SetBALow();
+        if(sprite_dma & 0x08)  SetBALow();
 
         DrawGraphics();
 		break;
 
 	case 62:
 		// Sprite 1 //
-        if((SpriteDMA & 0x0C) == 0) *ba = true;
+        if((sprite_dma & 0x0C) == 0) *ba = true;
 
 		// Sprite 2 //
         pAccess(2);
@@ -1619,31 +1618,31 @@ void VICII::OneCycle()
 	
 	case 63:
 		/// Rahmen ///
-        if(RSEL == 0)
+        if(rsel == 0)
 		{
-            if(current_rasterline == RAHMEN24_YSTOP) BorderFlipFlop1 = true;
-            if((current_rasterline == RAHMEN24_YSTART) && (den == true)) BorderFlipFlop1 = false;
+            if(current_rasterline == RAHMEN24_YSTOP) border_flip_flop1 = true;
+            if((current_rasterline == RAHMEN24_YSTART) && (den == true)) border_flip_flop1 = false;
 		}
 		else
 		{
-            if(current_rasterline == RAHMEN25_YSTOP) BorderFlipFlop1 = true;
-            if((current_rasterline == RAHMEN25_YSTART) && (den == true)) BorderFlipFlop1 = false;
+            if(current_rasterline == RAHMEN25_YSTOP) border_flip_flop1 = true;
+            if((current_rasterline == RAHMEN25_YSTART) && (den == true)) border_flip_flop1 = false;
 		}
 
 		/// Sprite 4 ///
-        if(SpriteDMA & 0x10)  SetBALow();
+        if(sprite_dma & 0x10)  SetBALow();
 
 
         DrawGraphicsPseudo();
         DrawSprites();
         DrawBorder();
 
-        if(TOTAL_ZYKLEN_LINE == 63) current_cycle = 0;
+        if(total_cycles_per_rasterline == 63) current_cycle = 0;
 
         break;
 
     case 64:
-        if(TOTAL_ZYKLEN_LINE == 64) current_cycle = 0;
+        if(total_cycles_per_rasterline == 64) current_cycle = 0;
 
         DrawGraphicsPseudo();
         break;
@@ -1658,24 +1657,24 @@ void VICII::OneCycle()
     cAccess();     // cZugriffe immer im 2.Teil eines Zyklus wenn BA Low ist
 
     // Rahmen
-    if(current_cycle == HoBorderCMP_R[CSEL])
+    if(current_cycle == h_border_compare_right[csel])
     {
-        BorderFlipFlop0 = true;
+        border_flip_flop0 = true;
     }
 
-    if(current_cycle == HoBorderCMP_L[CSEL])
+    if(current_cycle == h_border_compare_left[csel])
     {
-        if(current_rasterline == VeBorderCMP_U[RSEL]) BorderFlipFlop1 = true;
-        if(current_rasterline == VeBorderCMP_O[RSEL]  && (den == true)) BorderFlipFlop1 = false;
-        if(BorderFlipFlop1 == false) BorderFlipFlop0 = false;
+        if(current_rasterline == v_border_compare_bottom[rsel]) border_flip_flop1 = true;
+        if(current_rasterline == v_border_compare_top[rsel]  && (den == true)) border_flip_flop1 = false;
+        if(border_flip_flop1 == false) border_flip_flop0 = false;
     }
 
     // Ist ein Spritesequenzer aktiv ?
     // NEU
     //DrawSprites();
 
-    isWriteColorReg20 = false;
-    isWriteColorReg21 = false;
+    is_write_reg_ec = false;
+    is_write_reg_b0c = false;
 
     ///   Auf nächsten Zyklus stellen   ///
     /// Aktueller Zyklus ist nun zuende ///
@@ -1757,46 +1756,46 @@ bool VICII::SaveFreez(FILE* File)
 	fw(DEN);
 	fw(VBlanking);
 	fw(FirstBAZyklus);
-	fw(BadLineEnable);
-	fw(BadLineStatus);
-	fw(DisplayStatus);
-	fw(LPTriggered);
+    fw(badline_enable);
+    fw(badline_status);
+    fw(display_status);
+    fw(lp_triggered);
 	fw(RC);
-	fw(VC);
-	fw(VCBASE);
-	fw(MatrixBase);
-	fw(CharBase);
-	fw(BitmapBase);
-	fw(VMLI);
-	fw(cAdresse);
-	fw(gAdresse);
-	fw1(cDatenPuffer8Bit,64);
-	fw1(cDatenPuffer4Bit,64);
-	fw(GfxData);
-	fw(CharData);
-	fw(ColorData);
+    fw(vc);
+    fw(vc_base);
+    fw(matrix_base);
+    fw(char_base);
+    fw(bitmap_base);
+    fw(vmli);
+    fw(c_address);
+    fw(g_address);
+    fw1(c_value_buffer_8bit,64);
+    fw1(c_value_buffer_4bit,64);
+    fw(gfx_data);
+    fw(char_data);
+    fw(color_data);
 	fw(GreyDotEnable);
-	fw(isWriteColorReg20);
-	fw(isWriteColorReg21);
+    fw(is_write_reg_ec);
+    fw(is_write_reg_b0c);
 
 	//////////////////////////////// Sprites //////////////////////////////////
 
-	fw(SpriteExpYFlipFlop);
+    fw(sprite_y_exp_flip_flop);
 	fw1(MC,8);
-	fw1(MCBase,8);
-	fw(SpriteDMA);
+    fw1(mc_base,8);
+    fw(sprite_dma);
 	fw(SpriteView);
 
 	///////////////////////////////////////////////////////////////////////////
 
 	////////////////////////////// Rahmenstufe ////////////////////////////////
 
-	fw(CSEL);
-	fw(RSEL);
+    fw(csel);
+    fw(rsel);
 	fw(BorderCmpYo);
 	fw(BorderCmpYu);
-	fw(BorderFlipFlop0);
-	fw(BorderFlipFlop1);
+    fw(border_flip_flop0);
+    fw(border_flip_flop1);
 	fw(BorderCMP_Re);
 	fw(BorderCMP_Li);
 	fw(BorderCMP_Ob);
@@ -1856,46 +1855,46 @@ bool VICII::LoadFreez(FILE *File,unsigned short Version)
 		fr(DEN);
 		fr(VBlanking);
 		fr(FirstBAZyklus);
-		fr(BadLineEnable);
-		fr(BadLineStatus);
-		fr(DisplayStatus);
-		fr(LPTriggered);
+        fr(badline_enable);
+        fr(badline_status);
+        fr(display_status);
+        fr(lp_triggered);
 		fr(RC);
-		fr(VC);
-		fr(VCBASE);
-		fr(MatrixBase);
-		fr(CharBase);
-		fr(BitmapBase);
-		fr(VMLI);
-		fr(cAdresse);
-		fr(gAdresse);
-		fr1(cDatenPuffer8Bit,64);
-		fr1(cDatenPuffer4Bit,64);
-		fr(GfxData);
-		fr(CharData);
-		fr(ColorData);
+        fr(vc);
+        fr(vc_base);
+        fr(matrix_base);
+        fr(char_base);
+        fr(bitmap_base);
+        fr(vmli);
+        fr(c_address);
+        fr(g_address);
+        fr1(c_value_buffer_8bit,64);
+        fr1(c_value_buffer_4bit,64);
+        fr(gfx_data);
+        fr(char_data);
+        fr(color_data);
 		fr(GreyDotEnable);
-		fr(isWriteColorReg20);
-		fr(isWriteColorReg21);
+        fr(is_write_reg_ec);
+        fr(is_write_reg_b0c);
 
 		//////////////////////////////// Sprites //////////////////////////////////
 
-		fr(SpriteExpYFlipFlop);
+        fr(sprite_y_exp_flip_flop);
 		fr1(MC,8);
-		fr1(MCBase,8);
-		fr(SpriteDMA);
+        fr1(mc_base,8);
+        fr(sprite_dma);
 		fr(SpriteView);
 
 		///////////////////////////////////////////////////////////////////////////
 
 		////////////////////////////// Rahmenstufe ////////////////////////////////
 
-		fr(CSEL);
-		fr(RSEL);
+        fr(csel);
+        fr(rsel);
 		fr(BorderCmpYo);
 		fr(BorderCmpYu);
-		fr(BorderFlipFlop0);
-		fr(BorderFlipFlop1);
+        fr(border_flip_flop0);
+        fr(border_flip_flop1);
 		fr(BorderCMP_Re);
 		fr(BorderCMP_Li);
 		fr(BorderCMP_Ob);
@@ -1947,21 +1946,21 @@ void VICII::WriteIO(uint16_t address, uint16_t value)
                         graphic_mode = ((reg_ctrl_1 & 0x60) | (reg_ctrl_2 & 0x10)) >> 4;
 		
 			// Prüfen ob Badlines zugelassen sind
-                        if ((current_rasterline == 0x30) && (value & 0x10)) BadLineEnable = true;
+                        if ((current_rasterline == 0x30) && (value & 0x10)) badline_enable = true;
 
 			// Prüfen auf Badline zustand
-                        if((current_rasterline>=0x30) && (current_rasterline<=0xF7) && (reg_y_scroll == (current_rasterline&7)) && (BadLineEnable == true))
+                        if((current_rasterline>=0x30) && (current_rasterline<=0xF7) && (reg_y_scroll == (current_rasterline&7)) && (badline_enable == true))
 			{
-                                BadLineStatus = true;
+                                badline_status = true;
 			}
-            else BadLineStatus = false;
+            else badline_status = false;
 
 			// RSEL
-            RSEL = (value & 0x08)>>3;
+            rsel = (value & 0x08)>>3;
 
 			// DEN
             den = (value & 0x10)>>4;
-            Write_xd011 = true;
+            write_reg_0x11 = true;
 			break;
 
 		/// Rasterzähler
@@ -1984,23 +1983,23 @@ void VICII::WriteIO(uint16_t address, uint16_t value)
             reg_x_scroll = value & 7;
             graphic_mode = ((reg_ctrl_1 & 0x60) | (reg_ctrl_2 & 0x10)) >> 4;
 			
-			// CSEL
-            CSEL = (value & 0x08)>>3;
+            // csel
+            csel = (value & 0x08)>>3;
 			
 			break;
 
 		/// Sprite Y-Expansion
 		case 0x17:
                         reg_mye = value;
-                        SpriteExpYFlipFlop |= ~value;
+                        sprite_y_exp_flip_flop |= ~value;
 			break;
 
 		/// Speicher Pointer
 		case 0x18:
                         reg_vbase = value;
-                        MatrixBase = (value & 0xf0) << 6;
-                        CharBase = (value & 0x0e) << 10;
-                        BitmapBase = (value & 0x08) << 10;
+                        matrix_base = (value & 0xf0) << 6;
+                        char_base = (value & 0x0e) << 10;
+                        bitmap_base = (value & 0x08) << 10;
 			break;
 
 		/// IRQ Flags
@@ -2041,12 +2040,12 @@ void VICII::WriteIO(uint16_t address, uint16_t value)
 		/// Rahmenfarbe
 		case 0x20:
                         reg_ec = value&15;
-                        if(vic_config[VIC_GREY_DOTS_ON]) isWriteColorReg20 = true;
+                        if(vic_config[VIC_GREY_DOTS_ON]) is_write_reg_ec = true;
 			break;
 		/// Hintergrundfarbe 0
         case 0x21:
                         reg_b0c = value&15;
-                        if(vic_config[VIC_GREY_DOTS_ON]) isWriteColorReg21 = true;
+                        if(vic_config[VIC_GREY_DOTS_ON]) is_write_reg_b0c = true;
 			break;
 		/// Hintergrundfarbe 1
                 case 0x22: reg_b1c	= value&15;
@@ -2098,7 +2097,7 @@ uint8_t VICII::ReadIO(uint16_t address)
 
 		/// Control Register 1
 		case 0x11:	
-                    if(Write_xd011) return (reg_ctrl_1 & 0x7F) | ((current_rasterline & 0x100) >> 1);
+                    if(write_reg_0x11) return (reg_ctrl_1 & 0x7F) | ((current_rasterline & 0x100) >> 1);
                     else return 0;
 
 		/// Rasterzähler
@@ -2183,9 +2182,9 @@ uint8_t VICII::ReadIO(uint16_t address)
 
 void VICII::TriggerLightpen()
 {
-    if(!LPTriggered)
+    if(!lp_triggered)
 	{
-        LPTriggered = true;
+        lp_triggered = true;
 
         reg_lpx = current_x_coordinate >> 1;
         reg_lpy = current_rasterline;
