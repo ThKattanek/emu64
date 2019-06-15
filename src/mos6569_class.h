@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.06.2019                //
+// Letzte Änderung am 16.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -59,11 +59,11 @@ public:
     void SetVicVDisplayNtscSize(uint16_t first_line, uint16_t last_line);
     uint16_t GetVicDisplayNtscFirstLine();
     uint16_t GetVicDisplayNtscLastLine();
-    void SetVicType(int system);
+    void SetVicType(uint8_t system);
     void OneCycle();
     //bool SaveFreez(FILE* File);
     //bool LoadFreez(FILE *file,unsigned short version);
-    void WriteIO(uint16_t address, uint16_t value);
+    void WriteIO(uint16_t address, uint8_t value);
     uint8_t ReadIO(uint16_t address);
     void TriggerLightpen();
 
@@ -137,6 +137,7 @@ private:
 
     uint8_t     current_cycle;
     uint16_t    current_rasterline;
+    uint16_t    new_irq_raster;
     uint16_t    x_coordinates_table[64];
     uint16_t    current_x_coordinate;
     uint8_t     graphic_mode;

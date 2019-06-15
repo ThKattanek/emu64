@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.06.2019                //
+// Letzte Änderung am 16.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -24,21 +24,21 @@
 
 // Rahmen Y Start und Stop
 //RSEL=0
-#define RAHMEN24_YSTART		55
-#define RAHMEN24_YSTOP		247
+#define BORDER_RSEL0_YSTART 55
+#define BORDER_RSEL0_YSTOP  247
 
 // RSEL=1
-#define RAHMEN25_YSTART		51
-#define RAHMEN25_YSTOP		251
+#define BORDER_RSEL1_YSTART 51
+#define BORDER_RSEL1_YSTOP  251
 
 // Rahmen X Start und Stop
 //CSEL=0
-#define RAHMEN38_LINKS		18  // Eigtl XKoordinate 0x01f  (18)
-#define RAHMEN38_RECHTS		56  // Eigtl XKoordinate 0x14f  (56)
+#define BORDER_CSEL0_LEFT   18  // Eigtl XKoordinate 0x01f  (18)
+#define BORDER_CSEL0_RIGHT  56  // Eigtl XKoordinate 0x14f  (56)
 
 // CSEL=1
-#define RAHMEN40_LINKS		17  // Eigtl XKoordinate 0x018  (17)
-#define RAHMEN40_RECHTS		57  // Eigtl XKoordinate 0x158  (57)
+#define BORDER_CSEL1_LEFT   17  // Eigtl XKoordinate 0x018  (17)
+#define BORDER_CSEL1_RIGHT  57  // Eigtl XKoordinate 0x158  (57)
 
 // erste and letzte mögliche Rasterzeile für Bad Lines
 #define FIRST_DMA_LINE		0x30
@@ -55,7 +55,7 @@ VICII::VICII()
     current_video_buffer = 0;
     video_buffer = video_buffer_back[0];
 
-	for(int i=0;i<8;i++)
+    for(int i=0; i<8; i++)
 	{
         reg_mx[i] = 0;
         reg_my[i] = 0;
@@ -93,18 +93,18 @@ VICII::VICII()
     irq_mask = 0;
 
     // XKoordinaten in Tabelle schreiben
-    unsigned short xwert = 0x0194;
-    for(int i=1;i<14;i++)
+    uint16_t x_pos = 0x0194;
+    for(int i=1; i<14; i++)
     {
-        x_coordinates_table[i] = xwert;
-        xwert += 8;
+        x_coordinates_table[i] = x_pos;
+        x_pos += 8;
     }
 
-    xwert = 0x0004;
-    for(int i=14;i<64;i++)
+    x_pos = 0x0004;
+    for(int i=14; i<64; i++)
     {
-        x_coordinates_table[i] = xwert;
-        xwert += 8;
+        x_coordinates_table[i] = x_pos;
+        x_pos += 8;
     }
 
 	SetVicType(0);
@@ -130,23 +130,24 @@ VICII::VICII()
     c_address = 0;
     g_address = 0;
 
-	for(int i=0;i<40;i++)
+    for(int i=0; i<40; i++)
 	{
             c_data_buffer_8bit[i] = 0;
             c_data_buffer_4bit[i] = 0;
 	}
 
-	for(int i=0;i<8;i++)
+    for(int i=0; i<8; i++)
 	{
         mc[i] = 0;
         mc_base[i] = 0;
 	}
+
     sprite_y_exp_flip_flop = 0xFF;
     sprite_dma = 0;
     sprite_view = 0;
 
-	unsigned short spr_x_start = 0x194;
-	for(int x=0;x<0x200;x++)
+    uint16_t spr_x_start = 0x194;
+    for(uint16_t x=0; x<0x200; x++)
 	{
         sprite_x_display_table[spr_x_start]=x;
         if(x<107) sprite_x_display_table[spr_x_start] += 8;
@@ -154,7 +155,9 @@ VICII::VICII()
 		spr_x_start &= 0x1FF;
 	}
 
-    for(int i=0;i<VIC_CONFIG_NUM;i++) vic_config[i] = true;
+    for(int i=0; i<VIC_CONFIG_NUM; i++)
+        vic_config[i] = true;
+
     write_reg_0x11 = false;
 
     first_display_line_pal = 16;                       //VICE - 16, Emu64 - 26
@@ -166,15 +169,15 @@ VICII::VICII()
     first_display_line = first_display_line_pal;
     last_display_line = last_display_line_pal;
 
-    h_border_compare_left[0]=RAHMEN38_LINKS;
-    h_border_compare_right[0]=RAHMEN38_RECHTS;
-    v_border_compare_top[0]=RAHMEN24_YSTART;
-    v_border_compare_bottom[0]=RAHMEN24_YSTOP;
+    h_border_compare_left[0]=BORDER_CSEL0_LEFT;
+    h_border_compare_right[0]=BORDER_CSEL0_RIGHT;
+    v_border_compare_top[0]=BORDER_RSEL0_YSTART;
+    v_border_compare_bottom[0]=BORDER_RSEL0_YSTOP;
 
-    h_border_compare_left[1]=RAHMEN40_LINKS;
-    h_border_compare_right[1]=RAHMEN40_RECHTS;
-    v_border_compare_top[1]=RAHMEN25_YSTART;
-    v_border_compare_bottom[1]=RAHMEN25_YSTOP;
+    h_border_compare_left[1]=BORDER_CSEL1_LEFT;
+    h_border_compare_right[1]=BORDER_CSEL1_RIGHT;
+    v_border_compare_top[1]=BORDER_RSEL1_YSTART;
+    v_border_compare_bottom[1]=BORDER_RSEL1_YSTOP;
 }
 
 VICII::~VICII()
@@ -190,8 +193,12 @@ void VICII::SwitchVideoBuffer()
 void VICII::GetRegister(VIC_STRUCT *vic_reg)
 {
     vic_reg->current_cycle = current_cycle;
-        if(current_cycle == 1) vic_reg->current_rasterline = current_rasterline;
-        else vic_reg->current_rasterline = current_rasterline;
+
+    if(current_cycle == 1)
+        vic_reg->current_rasterline = current_rasterline;
+    else
+        vic_reg->current_rasterline = current_rasterline;
+
     vic_reg->raster_latch = reg_irq_raster;
     vic_reg->display_status = display_status;
     vic_reg->graphic_mode = graphic_mode;
@@ -257,7 +264,7 @@ uint16_t VICII::GetVicLastDisplayLineNtsc()
     return last_display_line_ntsc;
 }
 
-void VICII::SetVicType(int system)
+void VICII::SetVicType(uint8_t system)
 {
     this->system = system;
 
@@ -316,9 +323,9 @@ inline void VICII::cAccess()
 		/// Grafikdaten ///
         if(current_cycle >= 15 && current_cycle <= 54 && display_status == true && badline_status == true)
         {
-            c_address = (*cia2_port_a<<14)|matrix_base|(vc&0x3FF);
+            c_address = static_cast<uint16_t>((*cia2_port_a<<14)|matrix_base|(vc & 0x3FF));
             c_data_buffer_8bit[vmli] = Read(c_address);
-            c_data_buffer_4bit[vmli] = color_ram[(vc&0x3FF)]&0x0F;
+            c_data_buffer_4bit[vmli] = color_ram[(vc & 0x3FF)] & 0x0F;
         }
 	}
 }
@@ -327,8 +334,8 @@ inline void VICII::gAccess()
 {
     if (display_status) // DisplayModus
 	{
-        if (reg_ctrl_1 & 0x20) g_address = (*cia2_port_a<<14)|(bitmap_base)|((vc&0x3FF)<<3)|rc;
-        else g_address = (*cia2_port_a<<14)|char_base|(c_data_buffer_8bit[vmli]<<3)|rc;
+        if (reg_ctrl_1 & 0x20) g_address = static_cast<uint16_t>((*cia2_port_a<<14)|(bitmap_base)|((vc & 0x3FF)<<3)|rc);
+        else g_address = static_cast<uint16_t>((*cia2_port_a<<14)|char_base|(c_data_buffer_8bit[vmli]<<3)|rc);
         if (reg_ctrl_1 & 0x40) g_address &= 0xf9ff;
 
         switch(graphic_mode)
@@ -359,16 +366,16 @@ inline void VICII::gAccess()
 
 inline void VICII::pAccess(uint8_t sp_nr)
 {
-    p_address = (*cia2_port_a<<14)|(matrix_base)|0x3F8|sp_nr;
+    p_address = static_cast<uint16_t>((*cia2_port_a<<14)|(matrix_base)|0x3F8|sp_nr);
     p_data[sp_nr] = Read(p_address);
 }
 
 inline void VICII::sAccess(uint8_t sp_nr)
 {
 	//// Es werden gleich alle 3 Bytes geladen ////
-    s_address = (*cia2_port_a<<14)|(p_data[sp_nr]<<6)|(mc[sp_nr]&0x3F);
-    sprite_sequenzer[sp_nr] = (Read(s_address))<<16;s_address++;
-    sprite_sequenzer[sp_nr] |= (Read(s_address))<<8;s_address++;
+    s_address = static_cast<uint16_t>((*cia2_port_a<<14)|(p_data[sp_nr]<<6)|(mc[sp_nr] & 0x3F));
+    sprite_sequenzer[sp_nr] = static_cast<uint32_t>((Read(s_address)) << 16); s_address++;
+    sprite_sequenzer[sp_nr] |= static_cast<uint32_t>(((Read(s_address)) << 8)); s_address++;
     sprite_sequenzer[sp_nr] |= Read(s_address);
 }
 
@@ -377,7 +384,7 @@ inline void VICII::CheckBorder()
 	///////////////// Rahmen ///////////////
     if(border_flip_flop0)
 	{
-        if(csel==1 && current_cycle == RAHMEN40_RECHTS && border_flip_flop1 == false)
+        if(csel==1 && current_cycle == BORDER_CSEL1_RIGHT && border_flip_flop1 == false)
         {
             border_line[border_line_pos++] = 128;
             border_line[border_line_pos++] = 128;
@@ -388,7 +395,7 @@ inline void VICII::CheckBorder()
             border_line[border_line_pos++] = 128;
             border_line[border_line_pos++] = 128;
         }
-        else if(csel==0 && current_cycle == RAHMEN38_RECHTS && border_flip_flop1 == false)
+        else if(csel==0 && current_cycle == BORDER_CSEL0_RIGHT && border_flip_flop1 == false)
         {
             border_line[border_line_pos++] = 128;
             border_line[border_line_pos++] = 128;
@@ -416,12 +423,13 @@ inline void VICII::CheckBorder()
 	}
 	else
 	{
-        if(csel==0 && current_cycle == RAHMEN38_LINKS && border_flip_flop1 == true)
+        if(csel==0 && current_cycle == BORDER_CSEL0_LEFT && border_flip_flop1 == true)
         {
             if(is_write_reg_ec)
                 border_line[border_line_pos++] = 0x0f;
             else
                 border_line[border_line_pos++] = reg_ec;
+
             border_line[border_line_pos++] = reg_ec;
             border_line[border_line_pos++] = reg_ec;
             border_line[border_line_pos++] = reg_ec;
@@ -443,7 +451,7 @@ inline void VICII::CheckBorder()
 
 inline void VICII::DrawGraphics()
 {
-	static unsigned short NEXT_X_SCROLL;
+    static uint16_t next_x_scroll;
 
     if (!draw_this_line) return;
 
@@ -452,10 +460,10 @@ inline void VICII::DrawGraphics()
     if(current_cycle == 14)
 	{
         for(int i=0;i<8;i++) video_buffer_line_xscroll[i] = reg_b0c | 0x40;
-        NEXT_X_SCROLL = reg_x_scroll;
+        next_x_scroll = reg_x_scroll;
 	}
 
-    video_buffer_line_xscroll += NEXT_X_SCROLL;
+    video_buffer_line_xscroll += next_x_scroll;
 
     if(display_status)	// Display Mode
     {
@@ -703,7 +711,7 @@ inline void VICII::DrawSprites()
     /*
     if(!vic_config[VIC_SPRITES_ON]) return;
 
-    unsigned char mask=1;
+    uint8_t mask=1;
 
     for(int SpriteNr=0; SpriteNr<8; SpriteNr++)
     {
@@ -729,16 +737,16 @@ inline void VICII::DrawSprites()
     // Spritekollisionspuffer löschen
     for (int i=0; i < 520; i++) sprite_collision_buffer[i] = 0;
 
-    int SpriteNr = 7;
-    while(SpriteNr >= 0)
+    int sprite_nr = 7;
+    while(sprite_nr >= 0)
     {
         // Ist Sprite Sichtbar ?
-        if(((sprite_view_current_line & current_sprite_bit) == current_sprite_bit) && (reg_mx[SpriteNr]<0x1F8))
+        if(((sprite_view_current_line & current_sprite_bit) == current_sprite_bit) && (reg_mx[sprite_nr]<0x1F8))
 		{
-            sprite_buffer_line = (video_buffer_line - (62 * 8)) -4 + sprite_x_display_table[reg_mx[SpriteNr]];
+            sprite_buffer_line = (video_buffer_line - (62 * 8)) -4 + sprite_x_display_table[reg_mx[sprite_nr]];
 
             /// Temporärer Zeiger inerhalb des SpriteCollisionsPuffers auf das Aktuellen Sprites
-            unsigned char *q = sprite_collision_buffer + reg_mx[SpriteNr] + 8;
+            unsigned char *q = sprite_collision_buffer + reg_mx[sprite_nr] + 8;
 
             if((reg_mdp & current_sprite_bit) == 0)	/// Prüfen auf Sprite Hinter Vordergrund
 			{
@@ -751,7 +759,7 @@ inline void VICII::DrawSprites()
                         /// MultiColor Sprite
                         for(int i=0;i<12;i++)
 						{
-                            switch(sprite_sequencer_current_line[SpriteNr] & 0xC00000)
+                            switch(sprite_sequencer_current_line[sprite_nr] & 0xC00000)
 							{
 							case 0x000000:
                                 sprite_buffer_line += 4;
@@ -786,10 +794,10 @@ inline void VICII::DrawSprites()
                                 if(*(sprite_buffer_line+2) & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+3) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
-                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
-                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
-                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
 
                                 /// Sprite-Sprite Kollision (MuliColor Expand)
                                 if (q[i<<2]) current_sprite_collision |= q[i<<2] | current_sprite_bit;
@@ -826,7 +834,7 @@ inline void VICII::DrawSprites()
 
 								break;
 							}
-                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 2;
+                            sprite_sequencer_current_line[sprite_nr] = sprite_sequencer_current_line[sprite_nr] << 2;
 						}
 					}
 					else
@@ -834,14 +842,14 @@ inline void VICII::DrawSprites()
                         /// SingleColor Sprite
                         for(int i=0;i<24;i++)
 						{
-                            if(sprite_sequencer_current_line[SpriteNr] & 0x800000)
+                            if(sprite_sequencer_current_line[sprite_nr] & 0x800000)
 							{
                                 /// Sprite-Grafik Kollision
                                 if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
-                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
 
                                 /// Sprite-Sprite Kollision (SingleColor Expand)
                                 if (q[i<<1]) current_sprite_collision |= q[i<<1] | current_sprite_bit;
@@ -850,7 +858,7 @@ inline void VICII::DrawSprites()
                                 else q[(i<<1) + 1] = current_sprite_bit;
 							}
                             else sprite_buffer_line += 2;
-                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 1;
+                            sprite_sequencer_current_line[sprite_nr] = sprite_sequencer_current_line[sprite_nr] << 1;
 						}
 					}
 				}
@@ -862,7 +870,7 @@ inline void VICII::DrawSprites()
                         /// MultiColor Sprite
                         for(int i=0;i<12;i++)
 						{
-                            switch(sprite_sequencer_current_line[SpriteNr] & 0xC00000)
+                            switch(sprite_sequencer_current_line[sprite_nr] & 0xC00000)
 							{
 							case 0x000000:
                                 sprite_buffer_line += 2;
@@ -888,8 +896,8 @@ inline void VICII::DrawSprites()
                                 if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
-                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
 
                                 /// Sprite-Sprite Kollision (MuliColor)
                                 if (q[i<<1]) current_sprite_collision |= q[i<<1] | current_sprite_bit;
@@ -916,7 +924,7 @@ inline void VICII::DrawSprites()
 
 								break;
 							}
-                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 2;
+                            sprite_sequencer_current_line[sprite_nr] = sprite_sequencer_current_line[sprite_nr] << 2;
 						}
 					}
 					else
@@ -924,19 +932,19 @@ inline void VICII::DrawSprites()
                         /// SingleColor Sprite
                         for(int i=0;i<24;i++)
 						{                            
-                            if(sprite_sequencer_current_line[SpriteNr] & 0x800000)
+                            if(sprite_sequencer_current_line[sprite_nr] & 0x800000)
                             {
                                 /// Sprite-Grafik Kollision
                                 if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
 
                                 /// Sprite-Sprite Kollision
                                 if (q[i]) current_sprite_collision |= q[i] | current_sprite_bit;
                                 else q[i] = current_sprite_bit;
                             }
                             else sprite_buffer_line++;
-                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 1;
+                            sprite_sequencer_current_line[sprite_nr] = sprite_sequencer_current_line[sprite_nr] << 1;
 						}
 					}
 				}
@@ -952,7 +960,7 @@ inline void VICII::DrawSprites()
                         /// MultiColor Sprite
                         for(int i=0;i<12;i++)
 						{
-                            switch(sprite_sequencer_current_line[SpriteNr] & 0xC00000)
+                            switch(sprite_sequencer_current_line[sprite_nr] & 0xC00000)
 							{
 							case 0x000000:
                                 sprite_buffer_line += 4;
@@ -991,13 +999,13 @@ inline void VICII::DrawSprites()
                                 if(*(sprite_buffer_line+2) & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+3) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
                                 else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (MuliColor Expand)
@@ -1039,7 +1047,7 @@ inline void VICII::DrawSprites()
 
 								break;
 							}
-                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 2;
+                            sprite_sequencer_current_line[sprite_nr] = sprite_sequencer_current_line[sprite_nr] << 2;
 						}
 					}
 					else
@@ -1047,15 +1055,15 @@ inline void VICII::DrawSprites()
                         /// SingleColor Sprite
                         for(int i=0;i<24;i++)
 						{
-                            if(sprite_sequencer_current_line[SpriteNr] & 0x800000)
+                            if(sprite_sequencer_current_line[sprite_nr] & 0x800000)
 							{
                                 /// Sprite-Grafik Kollision
                                 if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
                                 else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (SingleColor Expand)
@@ -1065,7 +1073,7 @@ inline void VICII::DrawSprites()
                                 else q[(i<<1) + 1] = current_sprite_bit;
 							}
                             else sprite_buffer_line += 2;
-                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 1;
+                            sprite_sequencer_current_line[sprite_nr] = sprite_sequencer_current_line[sprite_nr] << 1;
 						}
 					}
 				}
@@ -1077,7 +1085,7 @@ inline void VICII::DrawSprites()
                         /// MultiColor Sprite
                         for(int i=0;i<12;i++)
 						{
-                            switch(sprite_sequencer_current_line[SpriteNr] & 0xC00000)
+                            switch(sprite_sequencer_current_line[sprite_nr] & 0xC00000)
 							{
 							case 0x000000:
                                 sprite_buffer_line += 2;
@@ -1105,9 +1113,9 @@ inline void VICII::DrawSprites()
                                 if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
                                 else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (MuliColor)
@@ -1137,7 +1145,7 @@ inline void VICII::DrawSprites()
 
 								break;
 							}
-                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 2;
+                            sprite_sequencer_current_line[sprite_nr] = sprite_sequencer_current_line[sprite_nr] << 2;
 						}
 					}
 					else
@@ -1145,14 +1153,14 @@ inline void VICII::DrawSprites()
                         /// SingleColor Sprite
                         for(int i=0;i<24;i++)
 						{
-                            if(sprite_sequencer_current_line[SpriteNr] & 0x800000)
+                            if(sprite_sequencer_current_line[sprite_nr] & 0x800000)
 							{
                                 if(!(*sprite_buffer_line&0x80))
                                 {                                    
                                     /// Sprite-Grafik Kollision
                                     if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                    *sprite_buffer_line++ = reg_mcolor[SpriteNr];
+                                    *sprite_buffer_line++ = reg_mcolor[sprite_nr];
 
                                     /// Sprite-Sprite Kollision
                                     if (q[i]) current_sprite_collision |= q[i] | current_sprite_bit;
@@ -1161,14 +1169,14 @@ inline void VICII::DrawSprites()
                                 else sprite_buffer_line++;
 							}
                             else sprite_buffer_line++;
-                            sprite_sequencer_current_line[SpriteNr] = sprite_sequencer_current_line[SpriteNr] << 1;
+                            sprite_sequencer_current_line[sprite_nr] = sprite_sequencer_current_line[sprite_nr] << 1;
 						}
 					}
 				}
 			}
 		}
 
-        SpriteNr--;
+        sprite_nr--;
         current_sprite_bit >>= 1;
     }
 
@@ -1238,7 +1246,7 @@ inline void VICII::DrawBorder()
 
 void VICII::OneCycle()
 {
-    unsigned char SpriteBit = 0x01;
+    uint8_t sprite_bit = 0x01;
 
     current_x_coordinate = x_coordinates_table[current_cycle];
 
@@ -1405,9 +1413,9 @@ void VICII::OneCycle()
         if((badline_status == true) && (display_status == true)) rc = 0;
 
         /// Sprite MC + 3
-        for(int i=0;i<8;i++,SpriteBit<<=1)
+        for(int i=0;i<8;i++,sprite_bit<<=1)
         {
-            if(sprite_dma & SpriteBit) mc[i] += 3;
+            if(sprite_dma & sprite_bit) mc[i] += 3;
         }
 
         DrawGraphics();
@@ -1430,9 +1438,9 @@ void VICII::OneCycle()
         sprite_sequencer_current_line[7] = sprite_sequenzer[7];
 
         /// Sprite ///
-        for(int i=0;i<8;i++,SpriteBit<<=1)
+        for(int i=0;i<8;i++,sprite_bit<<=1)
         {
-            if((sprite_y_exp_flip_flop & SpriteBit) == SpriteBit) mc_base[i] += 2;
+            if((sprite_y_exp_flip_flop & sprite_bit) == sprite_bit) mc_base[i] += 2;
         }
 
         gAccess();
@@ -1443,13 +1451,13 @@ void VICII::OneCycle()
 
     case 17:
         /// Sprite ///
-        for(int i=0;i<8;i++,SpriteBit<<=1)
+        for(int i=0;i<8;i++,sprite_bit<<=1)
         {
-            if((sprite_y_exp_flip_flop & SpriteBit) == SpriteBit) mc_base[i] ++;
+            if((sprite_y_exp_flip_flop & sprite_bit) == sprite_bit) mc_base[i] ++;
             if(mc_base[i] >= 63)
             {
-                sprite_dma  &= ~SpriteBit;
-                sprite_view &= ~SpriteBit;
+                sprite_dma  &= ~sprite_bit;
+                sprite_view &= ~sprite_bit;
             }
         }
 
@@ -1480,7 +1488,7 @@ void VICII::OneCycle()
 		// In der ersten Phase von Zyklus 55 wird das Expansions-Flipflop
 		// invertiert, wenn das MxYE-Bit gesetzt ist.
 
-        for (int i=0; i<8; i++, SpriteBit<<=1) if (reg_mye & SpriteBit) sprite_y_exp_flip_flop ^= SpriteBit;
+        for (int i=0; i<8; i++, sprite_bit<<=1) if (reg_mye & sprite_bit) sprite_y_exp_flip_flop ^= sprite_bit;
 
 		// In der ersten Phasen von Zyklus 55 wird für Sprite 0-3 geprüft, 
 		// ob das entsprechende MxE-Bit in Register $d015 gesetzt und die Y-Koordinate 
@@ -1488,16 +1496,16 @@ void VICII::OneCycle()
 		// von RASTER ist. Ist dies der Fall und der DMA für das Sprite noch 
 		// ausgeschaltet, wird der DMA angeschaltet, MCBASE gelöscht und, 
 		// wenn das MxYE-Bit gesetzt ist, das Expansions-Flipflop gelöscht.
-        SpriteBit = 0x01;
-        for (int i=0; i<4; i++, SpriteBit<<=1)
+        sprite_bit = 0x01;
+        for (int i=0; i<4; i++, sprite_bit<<=1)
 		{
-            if ((reg_me & SpriteBit) && ((current_rasterline & 0xff) == reg_my[i]))
+            if ((reg_me & sprite_bit) && ((current_rasterline & 0xff) == reg_my[i]))
 			{
-                if((sprite_dma & SpriteBit) == 0)
+                if((sprite_dma & sprite_bit) == 0)
 				{
-                    sprite_dma |= SpriteBit;
+                    sprite_dma |= sprite_bit;
                     mc_base[i] = 0;
-                    if (reg_mye & SpriteBit) sprite_y_exp_flip_flop &= ~SpriteBit;
+                    if (reg_mye & sprite_bit) sprite_y_exp_flip_flop &= ~sprite_bit;
 				}
 			}
 		}
@@ -1517,16 +1525,16 @@ void VICII::OneCycle()
 		// von RASTER ist. Ist dies der Fall und der DMA für das Sprite noch 
 		// ausgeschaltet, wird der DMA angeschaltet, MCBASE gelöscht und, 
 		// wenn das MxYE-Bit gesetzt ist, das Expansions-Flipflop gelöscht.
-        SpriteBit = 0x10;
-        for (int i=4; i<8; i++, SpriteBit<<=1)
+        sprite_bit = 0x10;
+        for (int i=4; i<8; i++, sprite_bit<<=1)
 		{
-            if ((reg_me & SpriteBit) && (current_rasterline & 0xff) == reg_my[i])
+            if ((reg_me & sprite_bit) && (current_rasterline & 0xff) == reg_my[i])
 			{
-                if((sprite_dma & SpriteBit) == 0)
+                if((sprite_dma & sprite_bit) == 0)
 				{
-                    sprite_dma |= SpriteBit;
+                    sprite_dma |= sprite_bit;
                     mc_base[i] = 0;
-                    if (reg_mye & SpriteBit) sprite_y_exp_flip_flop &= ~SpriteBit;
+                    if (reg_mye & sprite_bit) sprite_y_exp_flip_flop &= ~sprite_bit;
 				}
 			}
 		}	
@@ -1566,11 +1574,11 @@ void VICII::OneCycle()
 		// geladen (MCBASE->MC) und geprüft, ob der DMA für das Sprite angeschaltet
 		// und die Y-Koordinate des Sprites gleich den unteren 8 Bits von RASTER ist.
 		// Ist dies der Fall, wird die Darstellung des Sprites angeschaltet.
-        for(int i=0;i<8;i++, SpriteBit<<=1)
+        for(int i=0;i<8;i++, sprite_bit<<=1)
 		{
             mc[i] = mc_base[i];
             //if(((sprite_dma & bitc) == bitc) && ((current_rasterline&0xFF) == reg_my[i])) SpriteView |= bitc;
-            if(((sprite_dma & SpriteBit) == SpriteBit)) sprite_view |= SpriteBit;
+            if(((sprite_dma & sprite_bit) == sprite_bit)) sprite_view |= sprite_bit;
 		}
 
 		// Sprite 0 //
@@ -1620,18 +1628,17 @@ void VICII::OneCycle()
 		/// Rahmen ///
         if(rsel == 0)
 		{
-            if(current_rasterline == RAHMEN24_YSTOP) border_flip_flop1 = true;
-            if((current_rasterline == RAHMEN24_YSTART) && (den == true)) border_flip_flop1 = false;
+            if(current_rasterline == BORDER_RSEL0_YSTOP) border_flip_flop1 = true;
+            if((current_rasterline == BORDER_RSEL0_YSTART) && (den == true)) border_flip_flop1 = false;
 		}
 		else
 		{
-            if(current_rasterline == RAHMEN25_YSTOP) border_flip_flop1 = true;
-            if((current_rasterline == RAHMEN25_YSTART) && (den == true)) border_flip_flop1 = false;
+            if(current_rasterline == BORDER_RSEL1_YSTOP) border_flip_flop1 = true;
+            if((current_rasterline == BORDER_RSEL1_YSTART) && (den == true)) border_flip_flop1 = false;
 		}
 
 		/// Sprite 4 ///
         if(sprite_dma & 0x10)  SetBALow();
-
 
         DrawGraphicsPseudo();
         DrawSprites();
@@ -1905,8 +1912,7 @@ bool VICII::LoadFreez(FILE *File,unsigned short Version)
 }
 */
 
-unsigned short NEW_IRQ_RASTER = 0;
-void VICII::WriteIO(uint16_t address, uint16_t value)
+void VICII::WriteIO(uint16_t address, uint8_t value)
 {
     address &= 63;
     switch (address)
@@ -1914,13 +1920,13 @@ void VICII::WriteIO(uint16_t address, uint16_t value)
 		/// Sprite X Position
 		case 0x00: case 0x02: case 0x04: case 0x06:
 		case 0x08: case 0x0A: case 0x0C: case 0x0E:
-                        reg_mx[address >> 1] = (reg_mx[address >> 1] & 0xFF00) | value;
+            reg_mx[address >> 1] = (reg_mx[address >> 1] & 0xFF00) | value;
 		break;
 
 		/// Sprite Y Position
 		case 0x01: case 0x03: case 0x05: case 0x07:
 		case 0x09: case 0x0B: case 0x0D: case 0x0F:
-                        reg_my[address >> 1] = value;
+            reg_my[address >> 1] = value;
 		break;
 
 		/// Sprite X Position MSB
@@ -1939,9 +1945,9 @@ void VICII::WriteIO(uint16_t address, uint16_t value)
                         reg_ctrl_1 = value;
                         reg_y_scroll = value & 7;
 
-                        NEW_IRQ_RASTER = (reg_irq_raster & 0xFF) | ((value & 0x80) << 1);
-                        if (reg_irq_raster != NEW_IRQ_RASTER && current_rasterline == NEW_IRQ_RASTER) RasterIRQ();
-                        reg_irq_raster = NEW_IRQ_RASTER;
+                        new_irq_raster = static_cast<uint16_t>((reg_irq_raster & 0xFF) | ((value & 0x80) << 1));
+                        if (reg_irq_raster != new_irq_raster && current_rasterline == new_irq_raster) RasterIRQ();
+                        reg_irq_raster = new_irq_raster;
 			
                         graphic_mode = ((reg_ctrl_1 & 0x60) | (reg_ctrl_2 & 0x10)) >> 4;
 		
@@ -1967,9 +1973,9 @@ void VICII::WriteIO(uint16_t address, uint16_t value)
 		case 0x12:
                         //reg_irq_raster = (reg_irq_raster & 0xFF00) | wert;
 
-                        NEW_IRQ_RASTER = (reg_irq_raster & 0xFF00) | value;
-                        if (reg_irq_raster != NEW_IRQ_RASTER && current_rasterline == NEW_IRQ_RASTER) RasterIRQ();
-                        reg_irq_raster = NEW_IRQ_RASTER;
+                        new_irq_raster = (reg_irq_raster & 0xFF00) | value;
+                        if (reg_irq_raster != new_irq_raster && current_rasterline == new_irq_raster) RasterIRQ();
+                        reg_irq_raster = new_irq_raster;
 			break;
 
 		/// Sprite Enable
@@ -1997,9 +2003,9 @@ void VICII::WriteIO(uint16_t address, uint16_t value)
 		/// Speicher Pointer
 		case 0x18:
                         reg_vbase = value;
-                        matrix_base = (value & 0xf0) << 6;
-                        char_base = (value & 0x0e) << 10;
-                        bitmap_base = (value & 0x08) << 10;
+                        matrix_base = static_cast<uint16_t>((value & 0xf0) << 6);
+                        char_base = static_cast<uint16_t>((value & 0x0e) << 10);
+                        bitmap_base = static_cast<uint16_t>((value & 0x08) << 10);
 			break;
 
 		/// IRQ Flags
@@ -2078,90 +2084,88 @@ void VICII::WriteIO(uint16_t address, uint16_t value)
 
 uint8_t VICII::ReadIO(uint16_t address)
 {
+    uint8_t ret;
     address &= 63;
+
     switch (address)
 	{
 		/// Sprite X Position
 		case 0x00: case 0x02: case 0x04: case 0x06:
 		case 0x08: case 0x0A: case 0x0C: case 0x0E:
-                        return (unsigned char)reg_mx[address >> 1];
+            return static_cast<uint8_t>(reg_mx[address >> 1]);
 
 		/// Sprite Y Position
 		case 0x01: case 0x03: case 0x05: case 0x07:
 		case 0x09: case 0x0B: case 0x0D: case 0x0F:
-                        return reg_my[address >> 1];
+            return reg_my[address >> 1];
 
 		/// Sprite X Position MSB
-		case 0x10:	
-                        return reg_mx8;
+        case 0x10:
+            return reg_mx8;
 
 		/// Control Register 1
 		case 0x11:	
-                    if(write_reg_0x11) return (reg_ctrl_1 & 0x7F) | ((current_rasterline & 0x100) >> 1);
-                    else return 0;
+            if(write_reg_0x11) return (reg_ctrl_1 & 0x7F) | ((current_rasterline & 0x100) >> 1);
+            else return 0;
 
 		/// Rasterzähler
 		case 0x12:
-                        return (unsigned char)current_rasterline;
+            return static_cast<uint8_t>(current_rasterline);
 
 		/// Ligthpen X
-		case 0x13:
-                        return reg_lpx;
+        case 0x13:
+            return reg_lpx;
 
 		/// Ligthpen Y
 		case 0x14:
-                        return reg_lpy;
+            return reg_lpy;
 
 		case 0x15:	// Sprite enable
-                        return reg_me;
+            return reg_me;
 
 		// Control Register 2
 		case 0x16:
-                        return reg_ctrl_2 | 0xC0;
+            return reg_ctrl_2 | 0xC0;
 
 		/// Sprite Y-Expansion
 		case 0x17:
-                        return reg_mye;
+            return reg_mye;
 
 		/// Speicher Pointer
 		case 0x18:
-                        return reg_vbase | 0x01;
+            return reg_vbase | 0x01;
 
 		/// IRQ Flags
 		case 0x19:
-                        return irq_flag | 0x70;
+            return irq_flag | 0x70;
 
 		/// IRQ Mask
 		case 0x1A:
-                        return irq_mask | 0xF0;
+            return irq_mask | 0xF0;
 
 		/// Sprite Daten Priorität
 		case 0x1B:
-                        return reg_mdp;
+            return reg_mdp;
 
 		/// Sprite Multicolor
 		case 0x1C:
-                        return reg_mmc;
+            return reg_mmc;
 
 		/// Sprite X-Expansion
 		case 0x1D:
-                        return reg_mxe;
+            return reg_mxe;
 
 		/// Sprite - Sprite Kollision
 		case 0x1E:
-        {
-            unsigned char ret = reg_mm;
+            ret = reg_mm;
             reg_mm = 0;
             return ret;
-        }
 
 		/// Sprite - Daten Kollision
 		case 0x1F:
-        {
-            unsigned char ret = reg_md;
+            ret = reg_md;
             reg_md = 0;
             return ret;
-        }
 
         case 0x20: return reg_ec | 0xf0;
         case 0x21: return reg_b0c | 0xf0;
@@ -2186,8 +2190,8 @@ void VICII::TriggerLightpen()
 	{
         lp_triggered = true;
 
-        reg_lpx = current_x_coordinate >> 1;
-        reg_lpy = current_rasterline;
+        reg_lpx = static_cast<uint8_t>(current_x_coordinate >> 1);
+        reg_lpy = static_cast<uint8_t>(current_rasterline);
 
         irq_flag |= 0x08;
         if (irq_mask & 0x08)
