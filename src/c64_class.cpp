@@ -2891,7 +2891,7 @@ void C64Class::GetC64CpuReg(REG_STRUCT *reg, IREG_STRUCT *ireg)
 void C64Class::GetVicReg(VIC_STRUCT *vic_reg)
 {
     vic->GetRegister(vic_reg);
-    vic_reg->IRQ = cpu->GetInterrupts(VIC_IRQ);
+    vic_reg->irq = cpu->GetInterrupts(VIC_IRQ);
 }
 
 void C64Class::GetIECStatus(IEC_STRUCT *iec)

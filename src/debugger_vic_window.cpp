@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 15.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -57,20 +57,20 @@ void DebuggerVicWindow::UpdateOutputList()
     c64->GetVicReg(&vs);
 
     char str00[1024];
-    sprintf(str00,"$%3.3X (%d)",vs.AktRasterzeile,vs.AktRasterzeile);
+    sprintf(str00,"$%3.3X (%d)",vs.current_rasterline,vs.current_rasterline);
     ui->OutputList->topLevelItem(0)->setText(1,str00);
-    sprintf(str00,"$%3.3X (%d)",vs.RasterLatch,vs.RasterLatch);
+    sprintf(str00,"$%3.3X (%d)",vs.raster_latch,vs.raster_latch);
     ui->OutputList->topLevelItem(1)->setText(1,str00);
-    sprintf(str00,"%d",vs.AktZyklus);
+    sprintf(str00,"%d",vs.current_cycle);
     ui->OutputList->topLevelItem(2)->setText(1,str00);
-    if(vs.DisplayStatus) ui->OutputList->topLevelItem(3)->setText(1,"Display Mode");
+    if(vs.display_status) ui->OutputList->topLevelItem(3)->setText(1,"Display Mode");
     else ui->OutputList->topLevelItem(3)->setText(1,"Idle Mode");
-    ui->OutputList->topLevelItem(4)->setText(1,graphic_modi[vs.GrafikMode & 7]);
-    sprintf(str00,"Nr.%d [$%4.4X-$%4.4X]",vs.VicBank,vs.VicBank*0x4000,(vs.VicBank*0x4000)+0x3FFF);
+    ui->OutputList->topLevelItem(4)->setText(1,graphic_modi[vs.graphic_mode & 7]);
+    sprintf(str00,"Nr.%d [$%4.4X-$%4.4X]",vs.vic_bank,vs.vic_bank*0x4000,(vs.vic_bank*0x4000)+0x3FFF);
     ui->OutputList->topLevelItem(5)->setText(1,str00);
-    sprintf(str00,"$%4.4X [$%4.4X]",vs.MatrixBase,(static_cast<uint16_t>(vs.VicBank<<14)|vs.MatrixBase));
+    sprintf(str00,"$%4.4X [$%4.4X]",vs.matrix_base,(static_cast<uint16_t>(vs.vic_bank<<14)|vs.matrix_base));
     ui->OutputList->topLevelItem(6)->setText(1,str00);
-    sprintf(str00,"$%4.4X [$%4.4X]",vs.CharBase,(static_cast<uint16_t>(vs.VicBank<<14)|vs.CharBase));
+    sprintf(str00,"$%4.4X [$%4.4X]",vs.char_base,(static_cast<uint16_t>(vs.vic_bank<<14)|vs.char_base));
     ui->OutputList->topLevelItem(7)->setText(1,str00);
-    ui->OutputList->topLevelItem(8)->setText(1,QVariant(vs.IRQ).toString());
+    ui->OutputList->topLevelItem(8)->setText(1,QVariant(vs.irq).toString());
 }

@@ -22,10 +22,10 @@
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
 
-#define MAX_RASTER_ROWS 312
+#define MAX_RASTERLINES 312
 
 #define MAX_XW 504
-#define MAX_YW MAX_RASTER_ROWS
+#define MAX_YW MAX_RASTERLINES
 #define VIDEO_BUFFER_SIZE MAX_XW*MAX_YW*4
 
 enum
@@ -115,37 +115,37 @@ private:
     uint8_t   reg_ctrl_2;
     uint16_t  reg_y_scroll;
     uint16_t  reg_x_scroll;
-    uint8_t   VBASE;
-    uint16_t  IRQ_RASTER;
-    uint8_t   LPX;
-    uint8_t   LPY;
-    uint8_t   ME;
-    uint8_t   MYE;
-    uint8_t   MDP;
-    uint8_t   MMC;
-    uint8_t   MXE;
-    uint8_t   MM;
-    uint8_t   MD;
-    uint8_t   EC;
-    uint8_t   B0C;
-    uint8_t   B1C;
-    uint8_t   B2C;
-    uint8_t   B3C;
-    uint8_t   MM0;
-    uint8_t   MM1;
-    uint8_t   MCOLOR[8];
+    uint8_t   reg_vbase;
+    uint16_t  reg_irq_raster;
+    uint8_t   reg_lpx;
+    uint8_t   reg_lpy;
+    uint8_t   reg_me;
+    uint8_t   reg_mye;
+    uint8_t   reg_mdp;
+    uint8_t   reg_mmc;
+    uint8_t   reg_mxe;
+    uint8_t   reg_mm;
+    uint8_t   reg_md;
+    uint8_t   reg_ec;
+    uint8_t   reg_b0c;
+    uint8_t   reg_b1c;
+    uint8_t   reg_b2c;
+    uint8_t   reg_b3c;
+    uint8_t   reg_mm0;
+    uint8_t   reg_mm1;
+    uint8_t   reg_mcolor[8];
 
-    uint8_t   AktZyklus;
-    uint16_t  AktRZ;
-    uint16_t  XKoordTbl[64];
-    uint16_t  AktXKoordinate;
-    uint8_t   GrafikMode;
-    uint8_t   IRQFlag;
-    uint8_t   IRQMask;
+    uint8_t   current_cycle;
+    uint16_t  current_rasterline;
+    uint16_t  x_coordinates_table[64];
+    uint16_t  current_x_coordinate;
+    uint8_t   graphic_mode;
+    uint8_t   irq_flag;
+    uint8_t   irq_mask;
 
-    bool            DEN;
-    bool            VBlanking;
-    uint8_t   FirstBAZyklus;
+    bool      den;
+    bool      vertical_blanking;
+    uint8_t   first_ba_cycle;
     bool            BadLineEnable;
     bool            BadLineStatus;
     bool            DisplayStatus;	// false = Idle / true = Display

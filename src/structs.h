@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 15.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -142,17 +142,17 @@ struct IREG_STRUCT
 
 struct VIC_STRUCT
 {
-    unsigned short  AktRasterzeile;
-    unsigned short  RasterLatch;
-    unsigned short  AktZyklus;
-    bool            IRQ;
-    unsigned short  SpriteX[8];
-    unsigned char   SpriteY[8];
-    bool            DisplayStatus;
-    unsigned char   GrafikMode;
-    unsigned char   VicBank;
-    unsigned short  MatrixBase;
-    unsigned short  CharBase;
+    uint16_t  current_rasterline;
+    uint16_t  raster_latch;
+    uint16_t  current_cycle;
+    bool      irq;
+    uint16_t  sprite_x[8];
+    uint8_t   sprite_y[8];
+    bool      display_status;
+    uint8_t   graphic_mode;
+    uint8_t   vic_bank;
+    uint16_t  matrix_base;
+    uint16_t  char_base;
 };
 
 struct CIA_STRUCT
