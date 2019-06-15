@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 15.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,49 +17,49 @@
 
 PORT::PORT()
 {
-	InputBits = 0;
-	OutputBits = 0;
+    input_bits = 0;
+    output_bits = 0;
 }
 
 PORT::~PORT()
 {
 }
 
-unsigned char* PORT::GetOutputBitsPointer(void)
+uint8_t *PORT::GetOutputBitsPointer()
 {
-	return &OutputBits;
+    return &output_bits;
 }
 
-unsigned char* PORT::GetInputBitsPointer(void)
+uint8_t *PORT::GetInputBitsPointer()
 {
-	return &InputBits;
+    return &input_bits;
 }
 
-unsigned char PORT::GetInput(void)
+unsigned char PORT::GetInput()
 {
-	return ~InputBits;
+    return ~input_bits;
 }
 
-void PORT::SetInput(unsigned char wert)
+void PORT::SetInput(uint8_t value)
 {
-	InputBits = ~wert;
+    input_bits = ~value;
 }
 
-unsigned char PORT::GetOutput(void)
+uint8_t PORT::GetOutput()
 {
-	return ~OutputBits;
+    return ~output_bits;
 }
 
-void PORT::SetOutput(unsigned char wert)
+void PORT::SetOutput(uint8_t value)
 {
-	OutputBits = ~wert;
+    output_bits = ~value;
 }
 
 /*
 bool PORT::SaveFreez(FILE* File)
 {
-	fwrite(&InputBits,1,sizeof(InputBits),File);
-	fwrite(&OutputBits,1,sizeof(OutputBits),File);
+    fwrite(&input_bits,1,sizeof(input_bits),File);
+    fwrite(&output_bits,1,sizeof(output_bits),File);
 	return true;
 }
 
@@ -69,8 +69,8 @@ bool PORT::LoadFreez(FILE* File,unsigned short Version)
 	{
 	case 0x0100:
 	case 0x0101:
-		fread(&InputBits,1,sizeof(InputBits),File);
-		fread(&OutputBits,1,sizeof(OutputBits),File);
+        fread(&input_bits,1,sizeof(input_bits),File);
+        fread(&output_bits,1,sizeof(output_bits),File);
 		break;
 	}
 	return true;

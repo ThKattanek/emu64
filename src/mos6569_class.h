@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.05.2019                //
+// Letzte Änderung am 15.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -22,13 +22,11 @@
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
 
-#define MAX_RASTER_ZEILEN 312
+#define MAX_RASTER_ROWS 312
 
 #define MAX_XW 504
-#define MAX_YW MAX_RASTER_ZEILEN
-#define VIDEO_PUFFER_SIZE MAX_XW*MAX_YW*4
-
-#define VicConfigSizeof 5
+#define MAX_YW MAX_RASTER_ROWS
+#define VIDEO_BUFFER_SIZE MAX_XW*MAX_YW*4
 
 enum
 {
@@ -36,7 +34,8 @@ enum
         VIC_SPRITES_ON,
         VIC_SPR_SPR_COLL_ON,
         VIC_SPR_BCK_COLL_ON,
-        VIC_GREY_DOTS_ON
+        VIC_GREY_DOTS_ON,
+        VIC_CONFIG_NUM
 };
 
 class VICII
@@ -45,9 +44,9 @@ public:
 /// Funktionen ///
     VICII();
     ~VICII();
-    void SwitchVideoPuffer();
+    void SwitchVideoBuffer();
     void GetRegister(VIC_STRUCT *vic_reg);
-    void SetVicVDisplayPalSize(int first_line, int last_line);
+    void SetVicVDisplayPalSize(uint16_t first_line, uint16_t last_line);
 
     uint16_t GetVicFirstDisplayLinePal();
     uint16_t GetVicLastDisplayLinePal();
@@ -57,120 +56,119 @@ public:
     uint16_t GetAktVicDisplayFirstLine();
     uint16_t GetAktVicDisplayLastLine();
 
-    void SetVicVDisplayNtscSize(int first_line, int last_line);
+    void SetVicVDisplayNtscSize(uint16_t first_line, uint16_t last_line);
     uint16_t GetVicDisplayNtscFirstLine();
     uint16_t GetVicDisplayNtscLastLine();
     void SetVicType(int system);
-    void OneZyklus(void);
+    void OneCycle();
     //bool SaveFreez(FILE* File);
     //bool LoadFreez(FILE *file,unsigned short version);
-    void WriteIO(unsigned short adresse,unsigned char wert);
-    unsigned char ReadIO(unsigned short adresse);
-    void TriggerLightpen(void);
+    void WriteIO(uint16_t address, uint16_t value);
+    uint8_t ReadIO(uint16_t address);
+    void TriggerLightpen();
 
-    function<unsigned char(unsigned short)> *ReadProcTbl;
-    function<void(unsigned char*)> RefreshProc;
+    function<uint8_t(uint16_t)> *ReadProcTbl;
+    function<void(uint8_t*)> RefreshProc;
     function<void(int)> CpuTriggerInterrupt;
     function<void(int)> CpuClearInterrupt;
 
-/// Variablen ///
-    bool            *BA;
-    unsigned char   *CIA2_PA;
-    unsigned char   *CIA1_PB;
-    unsigned char   *FarbRam;
+    /// Variablen ///
+    bool        *ba;
+    uint8_t     *cia2_port_a;
+    uint8_t     *cia1_port_b;
+    uint8_t     *color_ram;
 
-    unsigned short  *Breakpoints;
-    unsigned short  *BreakStatus;
-    unsigned short  *BreakWerte;
+    uint16_t    *breakpoints;
+    uint16_t    *break_status;
+    uint16_t    *break_values;
 
-    bool            VicConfig[VicConfigSizeof];
+    bool        vic_config[VIC_CONFIG_NUM];
 
-    unsigned char   *VideoPuffer;
-    int             AktVideoPuffer;
-    unsigned char   VideoPufferBack[2][VIDEO_PUFFER_SIZE];
-
+    uint8_t     *video_buffer;
+    uint8_t     video_buffer_back[2][VIDEO_BUFFER_SIZE];
+    int         current_video_buffer;
 
 private:
-    void RasterIRQ(void);
-    void SetBALow(void);
-    void cZugriff(void);
-    void gZugriff(void);
-    void pZugriff(unsigned char sp_nr);
-    void sZugriff(unsigned char sp_nr);
-    void CheckBorder(void);
-    void DrawGraphics(void);
-    void DrawGraphicsPseudo(void);
+    void RasterIRQ();
+    void SetBALow();
+    void cAccess();
+    void gAccess();
+    void pAccess(uint8_t sp_nr);
+    void sAccess(uint8_t sp_nr);
+    void CheckBorder();
+    void DrawGraphics();
+    void DrawGraphicsPseudo();
     void DrawSprites();
-    void DrawBorder(void);
+    void DrawBorder();
 
     /// Variablen ///
 
-    unsigned char   *VideoPufferLine;
-    int             DrawLineCounter;
-    bool            DrawThisLine;
+    uint8_t *video_buffer_line;
+    int     draw_line_counter;
+    bool    draw_this_line;
 
     //// Interne Register ////
-    unsigned short  MX[8];
-    unsigned char   MY[8];
-    unsigned char   MX8;
-    unsigned char   CTRL1;
-    unsigned char   CTRL2;
-    unsigned short  Y_SCROLL;
-    unsigned short  X_SCROLL;
-    unsigned char   VBASE;
-    unsigned short  IRQ_RASTER;
-    unsigned char   LPX;
-    unsigned char   LPY;
-    unsigned char   ME;
-    unsigned char   MYE;
-    unsigned char   MDP;
-    unsigned char   MMC;
-    unsigned char   MXE;
-    unsigned char   MM;
-    unsigned char   MD;
-    unsigned char   EC;
-    unsigned char   B0C;
-    unsigned char   B1C;
-    unsigned char   B2C;
-    unsigned char   B3C;
-    unsigned char   MM0;
-    unsigned char   MM1;
-    unsigned char   MCOLOR[8];
+    uint16_t  reg_mx[8];
+    uint8_t   reg_my[8];
+    uint8_t   reg_mx8;
+    uint8_t   reg_ctrl_1;
+    uint8_t   reg_ctrl_2;
+    uint16_t  reg_y_scroll;
+    uint16_t  reg_x_scroll;
+    uint8_t   VBASE;
+    uint16_t  IRQ_RASTER;
+    uint8_t   LPX;
+    uint8_t   LPY;
+    uint8_t   ME;
+    uint8_t   MYE;
+    uint8_t   MDP;
+    uint8_t   MMC;
+    uint8_t   MXE;
+    uint8_t   MM;
+    uint8_t   MD;
+    uint8_t   EC;
+    uint8_t   B0C;
+    uint8_t   B1C;
+    uint8_t   B2C;
+    uint8_t   B3C;
+    uint8_t   MM0;
+    uint8_t   MM1;
+    uint8_t   MCOLOR[8];
 
-    unsigned char   AktZyklus;
-    unsigned short  AktRZ;
-    unsigned short  XKoordTbl[64];
-    unsigned short  AktXKoordinate;
-    unsigned char   GrafikMode;
-    unsigned char   IRQFlag;
-    unsigned char   IRQMask;
+    uint8_t   AktZyklus;
+    uint16_t  AktRZ;
+    uint16_t  XKoordTbl[64];
+    uint16_t  AktXKoordinate;
+    uint8_t   GrafikMode;
+    uint8_t   IRQFlag;
+    uint8_t   IRQMask;
 
     bool            DEN;
     bool            VBlanking;
-    unsigned char   FirstBAZyklus;
+    uint8_t   FirstBAZyklus;
     bool            BadLineEnable;
     bool            BadLineStatus;
     bool            DisplayStatus;	// false = Idle / true = Display
     bool            LPTriggered;
-    unsigned char   RC;
-    unsigned short  VC;
-    unsigned short  VCBASE;
-    unsigned short  MatrixBase;
-    unsigned short  CharBase;
-    unsigned short  BitmapBase;
-    unsigned char   VMLI;
+    uint8_t   RC;
+    uint16_t  VC;
+    uint16_t  VCBASE;
+    uint16_t  MatrixBase;
+    uint16_t  CharBase;
+    uint16_t  BitmapBase;
+    uint8_t   VMLI;
 
-    unsigned short  cAdresse;
-    unsigned short  gAdresse;
-    unsigned short  pAdresse;
-    unsigned short  sAdresse;
-    unsigned char   pWert[8];
-    unsigned char   cDatenPuffer8Bit[64];
-    unsigned char   cDatenPuffer4Bit[64];
+    uint16_t  cAdresse;
+    uint16_t  gAdresse;
+    uint16_t  pAdresse;
+    uint16_t  sAdresse;
+    uint8_t   pWert[8];
+    uint8_t   cDatenPuffer8Bit[64];
+    uint8_t   cDatenPuffer4Bit[64];
 
-    unsigned char   GfxData;
-    unsigned char   CharData;
-    unsigned char   ColorData;
+    uint8_t   GfxData;
+    uint8_t   CharData;
+    uint8_t   ColorData;
 
     bool            isWriteColorReg20;
     bool            isWriteColorReg21;
@@ -190,17 +188,17 @@ private:
 
     //////////////////////////////// Sprites //////////////////////////////////
 
-    unsigned short  SpriteXDisplayTbl[0x200];
-    unsigned char   SpriteExpYFlipFlop;
-    unsigned char   MC[8];
-    unsigned char   MCBase[8];
-    unsigned char   SpriteDMA;
-    unsigned char   SpriteView;
-    unsigned char   SpriteViewAktLine;
-    unsigned long   SpriteSeq[8];
-    unsigned long   SpriteSeqAktLine[8];
+    uint16_t  SpriteXDisplayTbl[0x200];
+    uint8_t   SpriteExpYFlipFlop;
+    uint8_t   MC[8];
+    uint8_t   MCBase[8];
+    uint8_t   SpriteDMA;
+    uint8_t   SpriteView;
+    uint8_t   SpriteViewAktLine;
+    uint32_t   SpriteSeq[8];
+    uint32_t   SpriteSeqAktLine[8];
     bool            SpriteSeqOn[8];
-    unsigned char	SpriteCollisionsPuffer[MAX_XW + 4*24];
+    uint8_t	SpriteCollisionsPuffer[MAX_XW + 4*24];
 
     ///////////////////////////////////////////////////////////////////////////
 
@@ -222,7 +220,7 @@ private:
     ///////////////////////////////////////////////////////////////////////////
 
     unsigned char   Colors[4];
-    unsigned char   *VideoPufferLine_XScroll;
+    unsigned char   *video_buffer_line_xscroll;
     unsigned char   *SpritePufferLine;	/// Erstes Sichtbares Pixel
     unsigned char   *BorderPufferLine;	/// Erstes Sichtbares Pixel
 };

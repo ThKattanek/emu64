@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 15.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -201,8 +201,8 @@ public:
     void SetVicConfig(int var, bool enable);    // var = VIC_BORDER_ON, VIC_SPRITES_ON, VIC_SPR_SPR_COLL_ON, VIC_SPR_BCK_COLL_ON
     bool GetVicConfig(int var);
 
-    void SetVicDisplaySizePal(int first_line, int last_line);
-    void SetVicDisplaySizeNtsc(int first_line, int last_line);
+    void SetVicDisplaySizePal(uint16_t first_line, uint16_t last_line);
+    void SetVicDisplaySizeNtsc(uint16_t first_line, uint16_t last_line);
 
     int GetVicFirstDisplayLinePal();
     int GetVicLastDisplayLinePal();
@@ -292,7 +292,7 @@ public:
     SDL_Thread      *warp_thread;
     bool            warp_thread_end;
 
-    uint8_t         *vic_puffer;
+    uint8_t         *vic_buffer;
     VideoCrtClass   *video_crt_output;
 
     MMU             *mmu;

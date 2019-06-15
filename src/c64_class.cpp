@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 15.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -34,7 +34,7 @@ int SDLThreadWarp(void *userdat);
 #ifdef _WIN32
     #define AudioPufferSize (882)    // 882 bei 44.100 Khz
 #else
-    #define AudioPufferSize (880*2)    // 882 bei 44.100 Khz
+    #define AudioPufferSize (882*3)    // 882 bei 44.100 Khz
 #endif
 
 #define RecPollingWaitStart 20
@@ -262,7 +262,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     geo = new GEORAMClass();
     tape = new TAPE1530(audio_spec_have.freq,audio_spec_have.samples,C64Takt);
 
-    vic_puffer = vic->VideoPuffer;
+    vic_buffer = vic->video_buffer;
 
     cia2->FloppyIEC = &floppy_iec_wire;
     cia2->C64IEC = &c64_iec_wire;
@@ -383,11 +383,11 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     cia2->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
     cia2->PA = &cia2_port_a;
     cia2->PB = &cia2_port_b;
-    vic->BA = &rdy_ba_wire;
+    vic->ba = &rdy_ba_wire;
     vic->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
     vic->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
-    vic->FarbRam = mmu->GetFarbramPointer();
-    vic->CIA2_PA = cia2_port_a.GetOutputBitsPointer();
+    vic->color_ram = mmu->GetFarbramPointer();
+    vic->cia2_port_a = cia2_port_a.GetOutputBitsPointer();
     sid1->RESET = &reset_wire;
     sid2->RESET = &reset_wire;
     reu->BA = &rdy_ba_wire;
@@ -447,17 +447,17 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     enable_stereo_sid_6channel_mode = false;
     stereo_sid_address = 0xD420;
 
-    vic->BA = &rdy_ba_wire;
-    vic->CIA2_PA = cia2->PA->GetOutputBitsPointer();
+    vic->ba = &rdy_ba_wire;
+    vic->cia2_port_a = cia2->PA->GetOutputBitsPointer();
 
     /// Breakpoints ///
     cpu->BreakStatus = &break_status;
     cpu->BreakWerte = break_values;
     cpu->Breakpoints = breakpoints;
 
-    vic->BreakStatus = &break_status;
-    vic->BreakWerte = break_values;
-    vic->Breakpoints = breakpoints;
+    vic->break_status = &break_status;
+    vic->break_values = break_values;
+    vic->breakpoints = breakpoints;
 
     cpu->History = cpu_pc_history;
     cpu->HistoryPointer = &cpu_pc_history_pos;
@@ -691,8 +691,8 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
     SDL_LockSurface(c64_screen);
     video_crt_output->ConvertVideo(static_cast<void*>(c64_screen->pixels),c64_screen->pitch,vic_puffer,104,current_c64_screen_width,current_c64_screen_height,504,312,false);
 
-    this->vic_puffer = vic_puffer;
-    vic->SwitchVideoPuffer();
+    this->vic_buffer = vic_puffer;
+    vic->SwitchVideoBuffer();
     SDL_UnlockSurface(c64_screen);
 
     ///////////////////////////////////
@@ -772,7 +772,7 @@ void C64Class::WarpModeLoop()
     }
     floppy_iec_wire = ~floppy_iec_wire;
 
-    vic->OneZyklus();
+    vic->OneCycle();
     cia1->OneZyklus();
     cia2->OneZyklus();
 
@@ -893,7 +893,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             }
             floppy_iec_wire = ~floppy_iec_wire;
 
-            vic->OneZyklus();
+            vic->OneCycle();
             cia1->OneZyklus();
             cia2->OneZyklus();
             sid1->OneZyklus();
@@ -1049,7 +1049,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     }
                     floppy_iec_wire = ~floppy_iec_wire;
 
-                    vic->OneZyklus();
+                    vic->OneCycle();
 
                     cia1->OneZyklus();
                     cia2->OneZyklus();
@@ -1107,7 +1107,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 }
                 floppy_iec_wire = ~floppy_iec_wire;
 
-                vic->OneZyklus();
+                vic->OneCycle();
                 cia1->OneZyklus();
                 cia2->OneZyklus();
                 sid1->OneZyklus();
@@ -1145,7 +1145,7 @@ loop_wait_next_opc:
                 /// Für Externe Erweiterungen ///
                 //if(ExtZyklus) ZyklusProcExt();
 
-                vic->OneZyklus();
+                vic->OneCycle();
                 cia1->OneZyklus();
                 cia2->OneZyklus();
                 sid1->OneZyklus();
@@ -3344,22 +3344,22 @@ int C64Class::GetSidDumpFrames()
 
 void C64Class::SetVicConfig(int var, bool enable)
 {
-    if(var >= VicConfigSizeof) return;
-    vic->VicConfig[var] = enable;
+    if(var >= VIC_CONFIG_NUM) return;
+    vic->vic_config[var] = enable;
 }
 
 bool C64Class::GetVicConfig(int var)
 {
-    if(var >= VicConfigSizeof) return false;
-    return vic->VicConfig[var];
+    if(var >= VIC_CONFIG_NUM) return false;
+    return vic->vic_config[var];
 }
 
-void C64Class::SetVicDisplaySizePal(int first_line, int last_line)
+void C64Class::SetVicDisplaySizePal(uint16_t first_line, uint16_t last_line)
 {
     vic->SetVicVDisplayPalSize(first_line, last_line);
 }
 
-void C64Class::SetVicDisplaySizeNtsc(int first_line, int last_line)
+void C64Class::SetVicDisplaySizeNtsc(uint16_t first_line, uint16_t last_line)
 {
     vic->SetVicVDisplayNtscSize(first_line, last_line);
 }
