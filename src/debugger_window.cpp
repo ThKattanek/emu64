@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 18.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -195,7 +195,7 @@ void DebuggerWindow::onTimerAnimationRefresh()
         new_breakpoint_found = false;
         on_AnimationStop_clicked();
 
-        for(int i=0;i<c64->GetBreakGroupAnz();i++)
+        for(int i=0;i<c64->GetBreakGroupCount();i++)
         {
             BREAK_GROUP *bg = c64->GetBreakGroup(i);
             if(bg->bTrue)
@@ -214,7 +214,7 @@ void DebuggerWindow::onTimerAnimationRefresh()
         {
             if(c64->floppy[i]->GetEnableFloppy())
             {
-                for(int ii=0; ii<c64->floppy[i]->GetBreakGroupAnz(); ii++)
+                for(int ii=0; ii<c64->floppy[i]->GetBreakGroupCount(); ii++)
                 {
                     BREAK_GROUP *bg = c64->floppy[i]->GetBreakGroup(ii);
                     if(bg->bTrue)
@@ -918,7 +918,7 @@ void DebuggerWindow::on_ChangeSource_currentIndexChanged(int index)
 
         if(c64 == nullptr) return;
         break_point_update_enable = false;
-        int anz = c64->floppy[currnet_floppy_nr]->GetBreakGroupAnz();
+        int anz = c64->floppy[currnet_floppy_nr]->GetBreakGroupCount();
         for(int i=0;i<anz;i++)
         {
             BREAK_GROUP *bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(i);
@@ -934,7 +934,7 @@ void DebuggerWindow::on_ChangeSource_currentIndexChanged(int index)
 
         if(c64 == nullptr) return;
         break_point_update_enable = false;
-        int anz = c64->GetBreakGroupAnz();
+        int anz = c64->GetBreakGroupCount();
         for(int i=0;i<anz;i++)
         {
             BREAK_GROUP *bg = c64->GetBreakGroup(i);
@@ -1907,7 +1907,7 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
            /// Alle Haltepunke ins TreeWidget einfügen ///
            if(current_source > 0)
            {
-               int count = c64->floppy[currnet_floppy_nr]->GetBreakGroupAnz();
+               int count = c64->floppy[currnet_floppy_nr]->GetBreakGroupCount();
                for(int i=0; i<count; i++)
                {
                    BREAK_GROUP *bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(i);
@@ -1916,7 +1916,7 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
            }
            else
            {
-               int count = c64->GetBreakGroupAnz();
+               int count = c64->GetBreakGroupCount();
                for(int i=0; i<count; i++)
                {
                    BREAK_GROUP *bg = c64->GetBreakGroup(i);

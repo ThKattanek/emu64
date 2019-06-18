@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.06.2019        		//
+// Letzte Änderung am 18.06.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,31 +16,17 @@
 #ifndef FLOPPY1541_CLASS_H
 #define FLOPPY1541_CLASS_H
 
-#include "cstring"
+#include <math.h>
+#include <cstring>
 #include <fstream>
 
-#include "mos6502_class.h"
-#include "mos6522_class.h"
-#include "structs.h"
+#include "./mos6502_class.h"
+#include "./mos6522_class.h"
+#include "./structs.h"
 
-#include "tr1/functional"
+#include <tr1/functional>
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
-
-static const int NUM_SECTORS[42] = {21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,19,19,19,19,19,19,19,18,18,18,18,18,18,17,17,17,17,17,17,17,17,17,17,17,17};
-
-//const unsigned char NUM_SECTORS[41] = {0,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,
-//                       19,19,19,19,19,19,19,
-//                       18,18,18,18,18,18,
-//                       17,17,17,17,17,17,17,17,17,17};
-
-const unsigned char D64_TRACK_ZONE[41] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-                   1,1,1,1,1,1,1,
-                   2,2,2,2,2,2,
-                   3,3,3,3,3,3,3,3,3,3};
-
-// const unsigned char D64_SECTOR_GAP[4] = {1,10,5,2}; //Meine Werte
-const unsigned char D64_SECTOR_GAP[4] = {12, 21, 16, 13}; // von GPZ Code übermommen imggen
 
 #define D64 0
 #define G64 1
@@ -55,54 +41,54 @@ public:
 
     /// Funktionen ///
 
-    Floppy1541(bool *reset, int samplerate = 0,int puffersize = 0, bool *floppy_found_breakpoint = 0);
+    Floppy1541(bool *reset, int samplerate = 0, int buffersize = 0, bool *floppy_found_breakpoint = nullptr);
     ~Floppy1541();
 
     void SetEnableFloppy(bool status);
     bool GetEnableFloppy(void);
     void SetEnableFloppySound(bool status);
-    bool GetEnableFloppySound(void);
-    void* GetSoundBuffer(void);
-    void ZeroSoundBufferPos(void);
-    void SetFloppySoundVolume(double volume);
-    bool LoadDiskImage(char* filename);
-    void UnLoadDiskImage(void);
-    void SetC64IEC(unsigned char* port);
-    void SetDeviceNummer(unsigned char nummer);
+    bool GetEnableFloppySound();
+    void* GetSoundBuffer();
+    void ZeroSoundBufferPos();
+    void SetFloppySoundVolume(float_t volume);
+    bool LoadDiskImage(const char* filename);
+    void UnLoadDiskImage();
+    void SetC64IEC(uint8_t* port);
+    void SetDeviceNumber(uint8_t number);
     void SetWriteProtect(bool status);
-    bool LoadDosRom(char* filename);
-    bool OneZyklus(void);
-    void GetCpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg);
+    bool LoadDosRom(const char* filename);
+    bool OneCycle();
+    void GetCpuReg(REG_STRUCT *reg, IREG_STRUCT *ireg);
     void SetCpuReg(REG_STRUCT *reg);
-    void SetResetReady(bool* ResetReady,unsigned short ResetReadyAdr);
+    void SetResetReady(bool* ResetReady, uint16_t ResetReadyAdr);
     void GetFloppyInfo(FLOPPY_INFO *fi);
-    unsigned char ReadByte(unsigned short adresse);
-    void WriteByte(unsigned short adresse,unsigned char wert);
-    int LoadFloppySounds(char* motor_sound,char* motor_on_sound,char* motor_off_sound,char* anschlag_sound,char* stepper_dec_sound,char* Stepper_inc_sound);
-    void ResetCycleCounter(void);
-    unsigned char* GetRamPointer(void);
-    int AddBreakGroup(void);
+    uint8_t ReadByte(uint16_t address);
+    void WriteByte(uint16_t address, uint8_t value);
+    int LoadFloppySounds(const char* motor_sound_filename, const char* motor_on_sound_filename, const char* motor_off_sound_filename, const char* anschlag_sound_filename, const char* stepper_dec_sound_filename, const char* Stepper_inc_sound_filename);
+    void ResetCycleCounter();
+    uint8_t* GetRamPointer();
+    int16_t AddBreakGroup();
     void DelBreakGroup(int index);
     BREAK_GROUP* GetBreakGroup(int index);
-    void UpdateBreakGroup(void);
-    void DeleteAllBreakGroups(void);
-    int GetBreakGroupAnz(void);
-    int LoadBreakGroups(char *filename);
-    bool SaveBreakGroups(char *filename);
-    bool CheckBreakpoints(void);
+    void UpdateBreakGroup();
+    void DeleteAllBreakGroups();
+    int GetBreakGroupCount();
+    int LoadBreakGroups(const char *filename);
+    bool SaveBreakGroups(const char *filename);
+    bool CheckBreakpoints();
 
     /// Wird mit den einzelnen Chips verbunden via "bind" ///
 
-    void WriteNoMem(unsigned short adresse,unsigned char wert);
-    unsigned char ReadNoMem(unsigned short adresse);
-    void WriteRam(unsigned short adresse,unsigned char wert);
-    unsigned char ReadRam(unsigned short adresse);
-    unsigned char ReadRom(unsigned short adresse);
-    bool SyncFound(void);
-    unsigned char ReadGCRByte(void);
-    void WriteGCRByte(unsigned char);
-    void SpurInc(void);
-    void SpurDec(void);
+    void WriteNoMem(uint16_t address, uint8_t value);
+    uint8_t ReadNoMem(uint16_t address);
+    void WriteRam(uint16_t address, uint8_t value);
+    uint8_t ReadRam(uint16_t address);
+    uint8_t ReadRom(uint16_t address);
+    bool SyncFound();
+    uint8_t ReadGCRByte();
+    void WriteGCRByte(uint8_t value);
+    void SpurInc();
+    void SpurDec();
 
     /// Variablen ///
 
@@ -123,17 +109,21 @@ private:
 
     /// Funktionen ///
 
-    void CheckImageWrite(void);
-    void D64ImageToGCRImage(void);
+    void CheckImageWrite();
+    void D64ImageToGCRImage();
     void SectorToGCR(unsigned int spur, unsigned int sektor);
     void ConvertToGCR(unsigned char *source_buffer, unsigned char *destination_buffer);
-    void GCRImageToD64Image(void);
+    void GCRImageToD64Image();
     void GCRToSector(unsigned int spur, unsigned int sektor);
     void ConvertToD64(unsigned char *source_buffer, unsigned char *destination_buffer);
-    void RenderFloppySound(void);
-    void StartDiskChange(void);
+    void RenderFloppySound();
+    void StartDiskChange();
 
     /// Variablen ///
+
+    static const uint8_t num_sectors[42];
+    static const uint8_t d64_track_zone[41];
+    static const uint8_t d64_sector_gap[4];
 
     bool    FloppyEnabled;
     bool    WriteProtect;
@@ -231,7 +221,7 @@ private:
     unsigned short  BreakStatus;
     bool            *FoundBreakpoint;
 
-    unsigned char   BreakGroupAnz;
+    int             breakgroup_count;
     BREAK_GROUP     *BreakGroup[MAX_BREAK_GROUP_NUM];
 
     ////////////////////////////////////////////////////////////

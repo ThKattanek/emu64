@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.06.2019                //
+// Letzte Änderung am 18.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -150,7 +150,7 @@ public:
     BREAK_GROUP* GetBreakGroup(int index);
     void UpdateBreakGroup();
     void DeleteAllBreakGroups();
-    int GetBreakGroupAnz();
+    int GetBreakGroupCount();
     int LoadBreakGroups(char *filename);
     bool SaveBreakGroups(char *filename);
     bool ExportPRG(char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
@@ -450,7 +450,7 @@ private:
     uint16_t        break_status;
     bool            floppy_found_breakpoint;
 
-    uint8_t         breakgroup_count;
+    int             breakgroup_count;
     BREAK_GROUP     *breakgroup[MAX_BREAK_GROUP_NUM];
 
     ////////////////////////////////////////////////////////////

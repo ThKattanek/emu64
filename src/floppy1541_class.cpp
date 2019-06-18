@@ -8,22 +8,32 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019        		//
+// Letzte Änderung am 18.06.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "floppy1541_class.h"
+#include "./floppy1541_class.h"
 
 #include <QDebug>
 
-Floppy1541::Floppy1541(bool *reset, int samplerate,int puffersize, bool *floppy_found_breakpoint):
+const uint8_t Floppy1541::num_sectors[] = {21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,19,19,19,19,19,19,19,18,18,18,18,18,18,17,17,17,17,17,17,17,17,17,17,17,17};
+const uint8_t Floppy1541::d64_track_zone[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                   1,1,1,1,1,1,1,
+                   2,2,2,2,2,2,
+                   3,3,3,3,3,3,3,3,3,3};
+const uint8_t Floppy1541::d64_sector_gap[] = {12, 21, 16, 13};  // von GPZ Code übermommen imggen
+                                                                // 1,10,5,2; // Meine alten Werte
+
+
+
+Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy_found_breakpoint):
     FloppyEnabled(false)
 
 {
     RESET = reset;
     GCR_PTR = 0;
-    BreakGroupAnz = 0;
+    breakgroup_count = 0;
 
     CycleCounter = 0;
 
@@ -108,7 +118,7 @@ Floppy1541::Floppy1541(bool *reset, int samplerate,int puffersize, bool *floppy_
     FreqConvAddWert = ((double)1.0)/((double)985248.0/Samplerate);
     FreqConvCounter = 0.0;
     SoundBufferPos = 0;
-    SoundBufferSize = puffersize;
+    SoundBufferSize = buffersize;
     SoundBuffer = new short[SoundBufferSize*2];
     for(int i=0;i<SoundBufferSize*2;i++) SoundBuffer[i] = 0;
 }
@@ -173,27 +183,27 @@ void Floppy1541::SetEnableFloppySound(bool status)
     }
 }
 
-bool Floppy1541::GetEnableFloppySound(void)
+bool Floppy1541::GetEnableFloppySound()
 {
     return FloppySoundEnabled;
 }
 
-void* Floppy1541::GetSoundBuffer(void)
+void* Floppy1541::GetSoundBuffer()
 {
     return SoundBuffer;
 }
 
-void Floppy1541::ZeroSoundBufferPos(void)
+void Floppy1541::ZeroSoundBufferPos()
 {
     SoundBufferPos = 0;
 }
 
-void Floppy1541::SetFloppySoundVolume(double volume)
+void Floppy1541::SetFloppySoundVolume(float_t volume)
 {
     Volume = volume;
 }
 
-bool Floppy1541::LoadDiskImage(char* filename)
+bool Floppy1541::LoadDiskImage(const char* filename)
 {
     FILE *file;
     char EXT[4];
@@ -317,7 +327,7 @@ bool Floppy1541::LoadDiskImage(char* filename)
     return false;
 }
 
-void Floppy1541::UnLoadDiskImage(void)
+void Floppy1541::UnLoadDiskImage()
 {
     CheckImageWrite();
     for(int i=0;i<174848;i++) D64Image[i] = 0;
@@ -325,7 +335,7 @@ void Floppy1541::UnLoadDiskImage(void)
     WriteProtect = false;
 }
 
-inline void Floppy1541::CheckImageWrite(void)
+inline void Floppy1541::CheckImageWrite()
 {
     FILE *File;
 
@@ -354,13 +364,13 @@ inline void Floppy1541::CheckImageWrite(void)
     }
 }
 
-inline void Floppy1541::D64ImageToGCRImage(void)
+inline void Floppy1541::D64ImageToGCRImage()
 {
     for (int SPUR=1; SPUR<=35; SPUR++)
     {
-        TrackSize[(SPUR-1)*2] = GCR_SECTOR_SIZE*NUM_SECTORS[SPUR-1];
-        TrackSize[((SPUR-1)*2)+1] = GCR_SECTOR_SIZE*NUM_SECTORS[SPUR-1];
-        for(int SECTOR=0; SECTOR<NUM_SECTORS[SPUR-1];SECTOR++)
+        TrackSize[(SPUR-1)*2] = GCR_SECTOR_SIZE*num_sectors[SPUR-1];
+        TrackSize[((SPUR-1)*2)+1] = GCR_SECTOR_SIZE*num_sectors[SPUR-1];
+        for(int SECTOR=0; SECTOR<num_sectors[SPUR-1];SECTOR++)
         {
             SectorToGCR(SPUR,SECTOR);
         }
@@ -434,7 +444,7 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
     ConvertToGCR(buffer, P);
     P += 5;
 
-    unsigned char gap_size = D64_SECTOR_GAP[D64_TRACK_ZONE[spur]];
+    unsigned char gap_size = d64_sector_gap[d64_track_zone[spur]];
     memset(P, 0x55, gap_size);							// Gap
 }
 
@@ -463,10 +473,10 @@ inline void Floppy1541::ConvertToGCR(unsigned char *source_buffer, unsigned char
     *destination_buffer = (unsigned char)tmp;
 }
 
-inline void Floppy1541::GCRImageToD64Image(void)
+inline void Floppy1541::GCRImageToD64Image()
 {
     for (int spur=1; spur<=35; spur++)
-        for(int sector=0; sector<NUM_SECTORS[spur-1];sector++)
+        for(int sector=0; sector<num_sectors[spur-1];sector++)
             GCRToSector(spur,sector);
 }
 
@@ -531,17 +541,17 @@ inline void Floppy1541::ConvertToD64(unsigned char *source_buffer, unsigned char
     destination_buffer[3]=TMP1;
 }
 
-void Floppy1541::SetC64IEC(unsigned char* iec)
+void Floppy1541::SetC64IEC(uint8_t *iec)
 {
     via1->C64IEC = iec;
 }
 
-void Floppy1541::SetDeviceNummer(unsigned char nummer)
+void Floppy1541::SetDeviceNumber(uint8_t number)
 {
-    if((nummer < 8) || (nummer > 11)) return;
-    if(Jumper == (nummer-8)) return;
+    if((number < 8) || (number > 11)) return;
+    if(Jumper == (number-8)) return;
 
-    Jumper = nummer - 8;
+    Jumper = number - 8;
     cpu->Reset();
 }
 
@@ -562,7 +572,7 @@ void Floppy1541::GetFloppyInfo(FLOPPY_INFO *fi)
     fi->Data = !!(tmp&8);
 }
 
-bool Floppy1541::LoadDosRom(char* filename)
+bool Floppy1541::LoadDosRom(const char *filename)
 {
     FILE *file;
     file = fopen(filename, "rb");
@@ -580,14 +590,14 @@ bool Floppy1541::LoadDosRom(char* filename)
     return true;
 }
 
-int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* motor_off_sound, char* anschlag_sound, char* stepper_dec_sound, char* Stepper_inc_sound)
+int Floppy1541::LoadFloppySounds(const char *motor_sound_filename, const char *motor_on_sound_filename, const char *motor_off_sound_filename, const char *anschlag_sound_filename, const char *stepper_dec_sound_filename, const char *Stepper_inc_sound_filename)
 {
     FILE* File;
     size_t reading_elements;
 
     FloppySoundsLoaded = false;
 
-    File = fopen(motor_on_sound, "rb");
+    File = fopen(motor_on_sound_filename, "rb");
     if (File == NULL)
     {
             return 0x01;
@@ -604,7 +614,7 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     if(reading_elements != (unsigned int)FloppySound00Size)
         return 0x01;
 
-    File = fopen(motor_sound, "rb");
+    File = fopen(motor_sound_filename, "rb");
     if (File == NULL)
     {
             delete[] FloppySound00;
@@ -619,7 +629,7 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     reading_elements = fread(FloppySound01,2,FloppySound01Size,File);
     fclose(File);
 
-    File = fopen(motor_off_sound, "rb");
+    File = fopen(motor_off_sound_filename, "rb");
     if (File == NULL)
     {
             delete[] FloppySound00;
@@ -635,7 +645,7 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     reading_elements = fread(FloppySound02,2,FloppySound02Size,File);
     fclose(File);
 
-    File = fopen(Stepper_inc_sound, "rb");
+    File = fopen(Stepper_inc_sound_filename, "rb");
     if (File == NULL)
     {
             delete[] FloppySound00;
@@ -652,7 +662,7 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     reading_elements = fread(FloppySound03,2,FloppySound03Size,File);
     fclose(File);
 
-    File = fopen(stepper_dec_sound, "rb");
+    File = fopen(stepper_dec_sound_filename, "rb");
     if (File == NULL)
     {
             delete[] FloppySound00;
@@ -670,7 +680,7 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     reading_elements = fread(FloppySound04,2,FloppySound04Size,File);
     fclose(File);
 
-    File = fopen(anschlag_sound, "rb");
+    File = fopen(anschlag_sound_filename, "rb");
     if (File == NULL)
     {
             delete[] FloppySound00;
@@ -693,17 +703,17 @@ int Floppy1541::LoadFloppySounds(char* motor_sound, char* motor_on_sound, char* 
     return 0;
 }
 
-void Floppy1541::ResetCycleCounter(void)
+void Floppy1541::ResetCycleCounter()
 {
     CycleCounter = 0;
 }
 
-unsigned char* Floppy1541::GetRamPointer(void)
+uint8_t *Floppy1541::GetRamPointer()
 {
     return RAM;
 }
 
-bool Floppy1541::OneZyklus(void)
+bool Floppy1541::OneCycle()
 {
     if(FloppySoundEnabled)
     {
@@ -792,14 +802,14 @@ bool Floppy1541::OneZyklus(void)
     return ret;
 }
 
-unsigned char Floppy1541::ReadByte(unsigned short adresse)
+uint8_t Floppy1541::ReadByte(uint16_t address)
 {
-    return ReadProcTbl[(adresse)>>8](adresse);
+    return ReadProcTbl[(address)>>8](address);
 }
 
-void Floppy1541::WriteByte(unsigned short adresse,unsigned char wert)
+void Floppy1541::WriteByte(uint16_t address, uint8_t value)
 {
-    WriteProcTbl[(adresse)>>8](adresse,wert);
+    WriteProcTbl[(address)>>8](address,value);
 }
 
 void Floppy1541::GetCpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg)
@@ -815,37 +825,37 @@ void Floppy1541::SetCpuReg(REG_STRUCT *reg)
     cpu->SetRegister(reg);
 }
 
-void Floppy1541::SetResetReady(bool* ResetReady,unsigned short ResetReadyAdr)
+void Floppy1541::SetResetReady(bool* ResetReady, uint16_t ResetReadyAdr)
 {
     cpu->ResetReady = ResetReady;
     cpu->ResetReadyAdr = ResetReadyAdr;
 }
 
-void Floppy1541::WriteNoMem(unsigned short,unsigned char)
+void Floppy1541::WriteNoMem(uint16_t address, uint8_t value)
 {
 }
 
-unsigned char Floppy1541::ReadNoMem(unsigned short)
+uint8_t Floppy1541::ReadNoMem(uint16_t address)
 {
     return 0x0;
 }
 
-void Floppy1541::WriteRam(unsigned short adresse,unsigned char wert)
+void Floppy1541::WriteRam(uint16_t address, uint8_t value)
 {
-    RAM[adresse] = wert;
+    RAM[address] = value;
 }
 
-unsigned char Floppy1541::ReadRam(unsigned short adresse)
+uint8_t Floppy1541::ReadRam(uint16_t address)
 {
-    return RAM[adresse];
+    return RAM[address];
 }
 
-unsigned char Floppy1541::ReadRom(unsigned short adresse)
+uint8_t Floppy1541::ReadRom(uint16_t address)
 {
-    return ROM[adresse-0xC000];
+    return ROM[address-0xC000];
 }
 
-bool Floppy1541::SyncFound(void)
+bool Floppy1541::SyncFound()
 {
     // bool found = false;
 
@@ -890,24 +900,24 @@ L1:
     }
 }
 
-unsigned char Floppy1541::ReadGCRByte(void)
+uint8_t Floppy1541::ReadGCRByte()
 {
     AktGCRWert = *GCR_PTR++;	// Rotate disk
     if (GCR_PTR >= GCRSpurEnde) GCR_PTR = GCRSpurStart;
     return	AktGCRWert;
 }
 
-void Floppy1541::WriteGCRByte(unsigned char wert)
+void Floppy1541::WriteGCRByte(uint8_t value)
 {
     ImageWriteStatus = true;
 
     GCR_PTR++;	// Rotate disk
-    *GCR_PTR = wert;
+    *GCR_PTR = value;
 
     if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
 }
 
-void Floppy1541::SpurInc(void)
+void Floppy1541::SpurInc()
 {
     if (AktHalbSpur == ((NUM_TRACKS-1) * 2)) return;
 
@@ -920,7 +930,7 @@ void Floppy1541::SpurInc(void)
     else StepperInc = true;
 }
 
-void Floppy1541::SpurDec(void)
+void Floppy1541::SpurDec()
 {
     if (AktHalbSpur  == 0)
     {
@@ -936,7 +946,7 @@ void Floppy1541::SpurDec(void)
     StepperDec = true;
 }
 
-void Floppy1541::RenderFloppySound(void)
+void Floppy1541::RenderFloppySound()
 {
     switch(MotorLoopStatus)
     {
@@ -1014,36 +1024,36 @@ void Floppy1541::StartDiskChange()
     WriteProtect = !WriteProtect;
 }
 
-int Floppy1541::AddBreakGroup(void)
+int16_t Floppy1541::AddBreakGroup()
 {
-    if(BreakGroupAnz == MAX_BREAK_GROUP_NUM) return -1;
+    if(breakgroup_count == MAX_BREAK_GROUP_NUM) return -1;
 
-    BreakGroup[BreakGroupAnz] = new BREAK_GROUP;
-    memset(BreakGroup[BreakGroupAnz],0,sizeof(BREAK_GROUP));
-    BreakGroup[BreakGroupAnz]->iRZZyklus = 1;
-    BreakGroupAnz ++;
-    return BreakGroupAnz - 1;
+    BreakGroup[breakgroup_count] = new BREAK_GROUP;
+    memset(BreakGroup[breakgroup_count],0,sizeof(BREAK_GROUP));
+    BreakGroup[breakgroup_count]->iRZZyklus = 1;
+    breakgroup_count ++;
+    return breakgroup_count - 1;
 }
 
 void Floppy1541::DelBreakGroup(int index)
 {
-    if(index >= BreakGroupAnz) return;
+    if(index >= breakgroup_count) return;
     delete BreakGroup[index];
-    BreakGroupAnz--;
-    for(int i = index; i < BreakGroupAnz; i++) BreakGroup[i] = BreakGroup[i+1];
+    breakgroup_count--;
+    for(int i = index; i < breakgroup_count; i++) BreakGroup[i] = BreakGroup[i+1];
     UpdateBreakGroup();
 }
 
 BREAK_GROUP* Floppy1541::GetBreakGroup(int index)
 {
-    if(index >= BreakGroupAnz) return 0;
+    if(index >= breakgroup_count) return 0;
     return BreakGroup[index];
 }
 
-void Floppy1541::UpdateBreakGroup(void)
+void Floppy1541::UpdateBreakGroup()
 {
     for(int i=0; i<0x10000;i++) Breakpoints[i] = 0;
-    for(int i=0;i<BreakGroupAnz;i++)
+    for(int i=0;i<breakgroup_count;i++)
     {
         BREAK_GROUP* bg = BreakGroup[i];
         if(bg->Enable)
@@ -1062,22 +1072,22 @@ void Floppy1541::UpdateBreakGroup(void)
     }
 }
 
-void Floppy1541::DeleteAllBreakGroups(void)
+void Floppy1541::DeleteAllBreakGroups()
 {
-    for(int i=0;i<BreakGroupAnz;i++)
+    for(int i=0;i<breakgroup_count;i++)
     {
         delete BreakGroup[i];
     }
-    BreakGroupAnz = 0;
+    breakgroup_count = 0;
     UpdateBreakGroup();
 }
 
-int Floppy1541::GetBreakGroupAnz(void)
+int Floppy1541::GetBreakGroupCount()
 {
-    return BreakGroupAnz;
+    return breakgroup_count;
 }
 
-int Floppy1541::LoadBreakGroups(char *filename)
+int Floppy1541::LoadBreakGroups(const char *filename)
 {
     FILE *file;
     char Kennung[10];
@@ -1144,7 +1154,7 @@ int Floppy1541::LoadBreakGroups(char *filename)
     return 0;
 }
 
-bool Floppy1541::SaveBreakGroups(char *filename)
+bool Floppy1541::SaveBreakGroups(const char *filename)
 {
     FILE *file;
     char Kennung[]  = "EMU64_BPT";
@@ -1163,10 +1173,10 @@ bool Floppy1541::SaveBreakGroups(char *filename)
     fwrite(&Version,sizeof(Version),1,file);
 
     /// Groupanzahl ///
-    fwrite(&BreakGroupAnz,sizeof(BreakGroupAnz),1,file);
+    fwrite(&breakgroup_count,sizeof(breakgroup_count),1,file);
 
     /// Groups ///
-    for(int i=0;i<BreakGroupAnz;i++)
+    for(int i=0;i<breakgroup_count;i++)
     {
         fwrite(BreakGroup[i]->Name,sizeof(BreakGroup[i]->Name),1,file);
         fwrite(&BreakGroup[i]->Enable,sizeof(BreakGroup[i]->Enable),1,file);
@@ -1196,11 +1206,11 @@ bool Floppy1541::SaveBreakGroups(char *filename)
     return true;
 }
 
-bool Floppy1541::CheckBreakpoints(void)
+bool Floppy1541::CheckBreakpoints()
 {
     int BreaksIO = 0;
 
-    for (int i=0;i<BreakGroupAnz;i++)
+    for (int i=0;i<breakgroup_count;i++)
     {
         BREAK_GROUP* bg = BreakGroup[i];
         int count1 = 0;

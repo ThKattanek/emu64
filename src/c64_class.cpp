@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.06.2019                //
+// Letzte Änderung am 18.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -34,7 +34,7 @@ int SDLThreadWarp(void *userdat);
 #ifdef _WIN32
     #define AudioPufferSize (882)    // 882 bei 44.100 Khz
 #else
-    #define AudioPufferSize (882*3)    // 882 bei 44.100 Khz
+    #define AudioPufferSize (882*2)    // 882 bei 44.100 Khz
 #endif
 
 #define RecPollingWaitStart 20
@@ -296,7 +296,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
         floppy[i] = new Floppy1541(&reset_wire,audio_spec_have.freq,audio_spec_have.samples,&floppy_found_breakpoint);
         floppy[i]->SetResetReady(&floppy_reset_ready[i],0xEBFF);
         floppy[i]->SetC64IEC(&c64_iec_wire);
-        floppy[i]->SetDeviceNummer(static_cast<uint8_t>(8+i));
+        floppy[i]->SetDeviceNumber(static_cast<uint8_t>(8+i));
         floppy[i]->LoadDosRom(filename);
         //floppy[i]->LoadFloppySounds((char*)"floppy_sounds/motor.raw",(char*)"floppy_sounds/motor_on.raw",(char*)"floppy_sounds/motor_off.raw",(char*)"floppy_sounds/anschlag.raw",(char*)"floppy_sounds/stepper_inc.raw",(char*)"floppy_sounds/stepper_dec.raw");
         floppy[i]->LoadFloppySounds(motor_filename,motor_on_filename,motor_off_filename,bumper_filename,stepper_inc_filename,stepper_dec_filename);
@@ -757,14 +757,14 @@ void C64Class::WarpModeLoop()
     floppy_iec_wire = 0;
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
-        floppy[i]->OneZyklus();
+        floppy[i]->OneCycle();
 
         #ifdef floppy_asyncron
         counter_plus++;
         if(counter_plus == more_one_floppy_cylce_count)
         {
             counter_plus = 0;
-            floppy[i]->OneZyklus();
+            floppy[i]->OneCycle();
         }
         #endif
 
@@ -878,14 +878,14 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             floppy_iec_wire = 0;
             for(int i=0; i<MAX_FLOPPY_NUM; i++)
             {
-                floppy[i]->OneZyklus();
+                floppy[i]->OneCycle();
 
                 #ifdef floppy_asyncron
                 counter_plus++;
                 if(counter_plus == more_one_floppy_cylce_count)
                 {
                     counter_plus = 0;
-                    floppy[i]->OneZyklus();
+                    floppy[i]->OneCycle();
                 }
                 #endif
 
@@ -1034,14 +1034,14 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     floppy_iec_wire = 0;
                     for(int i=0; i<MAX_FLOPPY_NUM; i++)
                     {
-                        floppy[i]->OneZyklus();
+                        floppy[i]->OneCycle();
 
                         #ifdef floppy_asyncron
                         counter_plus++;
                         if(counter_plus == more_one_floppy_cylce_count)
                         {
                             counter_plus = 0;
-                            floppy[i]->OneZyklus();
+                            floppy[i]->OneCycle();
                         }
                         #endif
 
@@ -1092,14 +1092,14 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 floppy_iec_wire = 0;
                 for(int i=0; i<MAX_FLOPPY_NUM; i++)
                 {
-                    floppy[i]->OneZyklus();
+                    floppy[i]->OneCycle();
 
                     #ifdef floppy_asyncron
                     counter_plus++;
                     if(counter_plus == more_one_floppy_cylce_count)
                     {
                         counter_plus = 0;
-                        floppy[i]->OneZyklus();
+                        floppy[i]->OneCycle();
                     }
                     #endif
 
@@ -1163,21 +1163,21 @@ loop_wait_next_opc:
                     {
                         if(i != FloppyNr)
                         {
-                            floppy[i]->OneZyklus();
+                            floppy[i]->OneCycle();
 
                             #ifdef floppy_asyncron
                             counter_plus++;
                             if(counter_plus == more_one_floppy_cylce_count)
                             {
                                 counter_plus = 0;
-                                floppy[i]->OneZyklus();
+                                floppy[i]->OneCycle();
                             }
                             #endif
 
                             floppy_iec_wire |= ~floppy[i]->FloppyIECLocal;
                         }
                     }
-                    bool ret = floppy[FloppyNr]->OneZyklus();
+                    bool ret = floppy[FloppyNr]->OneCycle();
                     floppy_iec_wire |= ~floppy[FloppyNr]->FloppyIECLocal;
                     floppy_iec_wire = ~floppy_iec_wire;
                     if(!ret)  goto loop_wait_next_opc;
@@ -2969,7 +2969,7 @@ void C64Class::DeleteAllBreakGroups()
     UpdateBreakGroup();
 }
 
-int C64Class::GetBreakGroupAnz()
+int C64Class::GetBreakGroupCount()
 {
     return breakgroup_count;
 }
