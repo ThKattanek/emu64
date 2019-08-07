@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 07.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -53,7 +53,7 @@ bool DebuggerIECWindow::GetSaveFileName(QWidget *parent, QString caption, QStrin
    saveDialog.setWindowTitle(caption);
    saveDialog.setAcceptMode(QFileDialog::AcceptSave);
    saveDialog.setConfirmOverwrite(false);
-   saveDialog.setFilter(filter);
+   //saveDialog.setFilter(filter);
    saveDialog.selectFile(*file_name);
    saveDialog.setOptions(QFileDialog::DontUseNativeDialog);
 
@@ -73,7 +73,7 @@ bool DebuggerIECWindow::GetSaveFileName(QWidget *parent, QString caption, QStrin
    if (fileInfo.suffix().isEmpty()) {
       // Add the suffix selected by the user
 
-      extension = saveDialog.selectedFilter();
+      //extension = saveDialog.selectedFilter();
       extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
       extension = extension.left(extension.indexOf(")"));
       extension = extension.simplified();

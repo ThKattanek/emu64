@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.06.2019        		//
+// Letzte Änderung am 07.08.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,14 +19,11 @@
 #include <math.h>
 #include <cstring>
 #include <fstream>
+#include <functional>
 
 #include "./mos6502_class.h"
 #include "./mos6522_class.h"
 #include "./structs.h"
-
-#include <tr1/functional>
-using namespace std::tr1;
-using namespace std::tr1::placeholders;
 
 #define D64 0
 #define G64 1
@@ -134,8 +131,8 @@ private:
 
     REG_STRUCT rs;
 
-    function<unsigned char(unsigned short)>  ReadProcTbl[256];
-    function<void(unsigned short, unsigned char)> WriteProcTbl[256];
+    std::function<unsigned char(unsigned short)>  ReadProcTbl[256];
+    std::function<void(unsigned short, unsigned char)> WriteProcTbl[256];
 
     unsigned char RAM[0x800];   // 2KB
     unsigned char ROM[0x4000];  // 16KB

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.04.2018                //
+// Letzte Änderung am 07.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -311,7 +311,7 @@ void WidgetFileBrowse::on_view_refresh_clicked()
 
 void WidgetFileBrowse::on_delete_file_clicked()
 {
-    QString file_path = dirmodel->fileInfo(ui->listView_filebrowser->currentIndex()).absoluteFilePath().toAscii().data();
+    QString file_path = dirmodel->fileInfo(ui->listView_filebrowser->currentIndex()).absoluteFilePath().toUtf8().data();
 
     if(!QFile(file_path).exists()) return;
 

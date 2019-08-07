@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.11.2018                //
+// Letzte Änderung am 07.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,11 +16,9 @@
 #ifndef MOS6502_CLASS_H
 #define MOS6502_CLASS_H
 
-#include "structs.h"
+#include <functional>
 
-#include "tr1/functional"
-using namespace std::tr1;
-using namespace std::tr1::placeholders;
+#include "./structs.h"
 
 class MOS6502
 {
@@ -42,8 +40,8 @@ public:
     void TriggerInterrupt(int typ);
     void ClearInterrupt(int typ);
 
-    function<unsigned char(unsigned short)> *ReadProcTbl;
-    function<void(unsigned short,unsigned char)> *WriteProcTbl;
+    std::function<unsigned char(unsigned short)> *ReadProcTbl;
+    std::function<void(unsigned short,unsigned char)> *WriteProcTbl;
 
     /// Variablen ///
 

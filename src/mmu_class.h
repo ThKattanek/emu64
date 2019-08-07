@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.06.2019                //
+// Letzte Änderung am 07.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,12 +16,10 @@
 #ifndef MMU_CLASS_H
 #define MMU_CLASS_H
 
-#include "structs.h"
-#include "mos6510_class.h"
+#include <functional>
 
-#include <tr1/functional>
-using namespace std::tr1;
-using namespace std::tr1::placeholders;
+#include "./structs.h"
+#include "./mos6510_class.h"
 
 class MMU
 {
@@ -49,31 +47,31 @@ public:
     // Diese werden Teilweise Intern und Extern gesetzt ///
     // Ein Aufruf erfolg immer ohne Überprüfung auf gültigen Zeiger !!! //
 
-    function<unsigned char(unsigned short)> CPUReadProcTbl[0x100];
-    function<void(unsigned short,unsigned char)> CPUWriteProcTbl[0x100];
-    function<unsigned char(unsigned short)> VICReadProcTbl[0x100];
+    std::function<unsigned char(unsigned short)> CPUReadProcTbl[0x100];
+    std::function<void(unsigned short,unsigned char)> CPUWriteProcTbl[0x100];
+    std::function<unsigned char(unsigned short)> VICReadProcTbl[0x100];
 
-    function<unsigned char(unsigned short)>* GetCPUReadProcTable;
-    function<unsigned char(unsigned short)>* GetVICReadProcTable;
-    function<void(unsigned short, unsigned char)>* GetCPUWriteProcTable();
-    function<void(unsigned short,unsigned char)> VicIOWriteProc;
-    function<void(unsigned short,unsigned char)> SidIOWriteProc;
-    function<void(unsigned short,unsigned char)> Cia1IOWriteProc;
-    function<void(unsigned short,unsigned char)> Cia2IOWriteProc;
-    function<void(unsigned short,unsigned char)> IO1WriteProc;
-    function<void(unsigned short,unsigned char)> IO2WriteProc;
-    function<void(unsigned short,unsigned char)> CRTRom1WriteProc;
-    function<void(unsigned short,unsigned char)> CRTRom2WriteProc;
-    function<void(unsigned short,unsigned char)> CRTRom3WriteProc;
-    function<unsigned char(unsigned short)> CRTRom1ReadProc;
-    function<unsigned char(unsigned short)> CRTRom2ReadProc;
-    function<unsigned char(unsigned short)> CRTRom3ReadProc;
-    function<unsigned char(unsigned short)> VicIOReadProc;
-    function<unsigned char(unsigned short)> SidIOReadProc;
-    function<unsigned char(unsigned short)> Cia1IOReadProc;
-    function<unsigned char(unsigned short)> Cia2IOReadProc;
-    function<unsigned char(unsigned short)> IO1ReadProc;
-    function<unsigned char(unsigned short)> IO2ReadProc;
+    std::function<unsigned char(unsigned short)>* GetCPUReadProcTable;
+    std::function<unsigned char(unsigned short)>* GetVICReadProcTable;
+    std::function<void(unsigned short, unsigned char)>* GetCPUWriteProcTable();
+    std::function<void(unsigned short,unsigned char)> VicIOWriteProc;
+    std::function<void(unsigned short,unsigned char)> SidIOWriteProc;
+    std::function<void(unsigned short,unsigned char)> Cia1IOWriteProc;
+    std::function<void(unsigned short,unsigned char)> Cia2IOWriteProc;
+    std::function<void(unsigned short,unsigned char)> IO1WriteProc;
+    std::function<void(unsigned short,unsigned char)> IO2WriteProc;
+    std::function<void(unsigned short,unsigned char)> CRTRom1WriteProc;
+    std::function<void(unsigned short,unsigned char)> CRTRom2WriteProc;
+    std::function<void(unsigned short,unsigned char)> CRTRom3WriteProc;
+    std::function<unsigned char(unsigned short)> CRTRom1ReadProc;
+    std::function<unsigned char(unsigned short)> CRTRom2ReadProc;
+    std::function<unsigned char(unsigned short)> CRTRom3ReadProc;
+    std::function<unsigned char(unsigned short)> VicIOReadProc;
+    std::function<unsigned char(unsigned short)> SidIOReadProc;
+    std::function<unsigned char(unsigned short)> Cia1IOReadProc;
+    std::function<unsigned char(unsigned short)> Cia2IOReadProc;
+    std::function<unsigned char(unsigned short)> IO1ReadProc;
+    std::function<unsigned char(unsigned short)> IO2ReadProc;
 
     bool *GAME;
     bool *EXROM;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.06.2019                //
+// Letzte Änderung am 07.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -43,7 +43,7 @@ int SDLThreadWarp(void *userdat);
 
 const char* C64Class::screenshot_format_name[] = {"BMP","PNG"};
 
-C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<void(char*)> log_function, const char *data_path):
+C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::function<void(char*)> log_function, const char *data_path):
     mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
 {
     changed_graphic_modi = false;
@@ -330,31 +330,31 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     cpu->ReadProcTbl = mmu->CPUReadProcTbl;
     cpu->WriteProcTbl = mmu->CPUWriteProcTbl;
     vic->ReadProcTbl = mmu->VICReadProcTbl;
-    vic->RefreshProc = bind(&C64Class::VicRefresh,this,_1);
+    vic->RefreshProc = std::bind(&C64Class::VicRefresh,this,std::placeholders::_1);
     reu->ReadProcTbl = mmu->CPUReadProcTbl;
     reu->WriteProcTbl = mmu->CPUWriteProcTbl;
 
-    mmu->VicIOWriteProc = bind(&VICII::WriteIO,vic,_1,_2);
-    mmu->VicIOReadProc = bind(&VICII::ReadIO,vic,_1);
-    mmu->SidIOWriteProc = bind(&C64Class::WriteSidIO,this,_1,_2);
-    mmu->SidIOReadProc = bind(&C64Class::ReadSidIO,this,_1);
-    mmu->Cia1IOWriteProc = bind(&MOS6526::WriteIO,cia1,_1,_2);
-    mmu->Cia1IOReadProc = bind(&MOS6526::ReadIO,cia1,_1);
-    mmu->Cia2IOWriteProc = bind(&MOS6526::WriteIO,cia2,_1,_2);
-    mmu->Cia2IOReadProc = bind(&MOS6526::ReadIO,cia2,_1);
+    mmu->VicIOWriteProc = std::bind(&VICII::WriteIO,vic,std::placeholders::_1,std::placeholders::_2);
+    mmu->VicIOReadProc = std::bind(&VICII::ReadIO,vic,std::placeholders::_1);
+    mmu->SidIOWriteProc = std::bind(&C64Class::WriteSidIO,this,std::placeholders::_1,std::placeholders::_2);
+    mmu->SidIOReadProc = std::bind(&C64Class::ReadSidIO,this,std::placeholders::_1);
+    mmu->Cia1IOWriteProc = std::bind(&MOS6526::WriteIO,cia1,std::placeholders::_1,std::placeholders::_2);
+    mmu->Cia1IOReadProc = std::bind(&MOS6526::ReadIO,cia1,std::placeholders::_1);
+    mmu->Cia2IOWriteProc = std::bind(&MOS6526::WriteIO,cia2,std::placeholders::_1,std::placeholders::_2);
+    mmu->Cia2IOReadProc = std::bind(&MOS6526::ReadIO,cia2,std::placeholders::_1);
 
-    mmu->CRTRom1WriteProc = bind(&CartridgeClass::WriteRom1,crt,_1,_2);
-    mmu->CRTRom2WriteProc = bind(&CartridgeClass::WriteRom2,crt,_1,_2);
-    mmu->CRTRom3WriteProc = bind(&CartridgeClass::WriteRom3,crt,_1,_2);
-    mmu->CRTRom1ReadProc = bind(&CartridgeClass::ReadRom1,crt,_1);
-    mmu->CRTRom2ReadProc = bind(&CartridgeClass::ReadRom2,crt,_1);
-    mmu->CRTRom3ReadProc = bind(&CartridgeClass::ReadRom3,crt,_1);
-    mmu->IO1ReadProc = bind(&C64Class::ReadIO1,this,_1);
-    mmu->IO1WriteProc = bind(&C64Class::WriteIO1,this,_1,_2);
-    mmu->IO2ReadProc = bind(&C64Class::ReadIO2,this,_1);
-    mmu->IO2WriteProc = bind(&C64Class::WriteIO2,this,_1,_2);
+    mmu->CRTRom1WriteProc = std::bind(&CartridgeClass::WriteRom1,crt,std::placeholders::_1,std::placeholders::_2);
+    mmu->CRTRom2WriteProc = std::bind(&CartridgeClass::WriteRom2,crt,std::placeholders::_1,std::placeholders::_2);
+    mmu->CRTRom3WriteProc = std::bind(&CartridgeClass::WriteRom3,crt,std::placeholders::_1,std::placeholders::_2);
+    mmu->CRTRom1ReadProc = std::bind(&CartridgeClass::ReadRom1,crt,std::placeholders::_1);
+    mmu->CRTRom2ReadProc = std::bind(&CartridgeClass::ReadRom2,crt,std::placeholders::_1);
+    mmu->CRTRom3ReadProc = std::bind(&CartridgeClass::ReadRom3,crt,std::placeholders::_1);
+    mmu->IO1ReadProc = std::bind(&C64Class::ReadIO1,this,std::placeholders::_1);
+    mmu->IO1WriteProc = std::bind(&C64Class::WriteIO1,this,std::placeholders::_1,std::placeholders::_2);
+    mmu->IO2ReadProc = std::bind(&C64Class::ReadIO2,this,std::placeholders::_1);
+    mmu->IO2WriteProc = std::bind(&C64Class::WriteIO2,this,std::placeholders::_1,std::placeholders::_2);
 
-    crt->ChangeMemMapProc = bind(&MMU::ChangeMemMap,mmu);
+    crt->ChangeMemMapProc = std::bind(&MMU::ChangeMemMap,mmu);
 
     /// Module mit Virtuellen Leitungen verbinden
     mmu->GAME = &game_wire;
@@ -364,35 +364,35 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<voi
     mmu->CPU_PORT = &cpu_port;
     crt->exrom = &exrom_wire;
     crt->game = &game_wire;
-    crt->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
-    crt->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
+    crt->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
+    crt->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
     cpu->RDY = &rdy_ba_wire;
     cpu->RESET = &reset_wire;
     cpu->ResetReady = &c64_reset_ready;
     cpu->ResetReadyAdr = 0xE5CD;
     cpu->EnableExtInterrupts = enable_ext_wires;
     cia1->RESET = &reset_wire;
-    cia1->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
-    cia1->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
-    cia1->VicTriggerLP = bind(&VICII::TriggerLightpen,vic);
-    cia1->ChangePOTSwitch = bind(&C64Class::ChangePOTSwitch,this);
+    cia1->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
+    cia1->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
+    cia1->VicTriggerLP = std::bind(&VICII::TriggerLightpen,vic);
+    cia1->ChangePOTSwitch = std::bind(&C64Class::ChangePOTSwitch,this);
     cia1->PA = &cia1_port_a;
     cia1->PB = &cia1_port_b;
     cia2->RESET = &reset_wire;
-    cia2->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
-    cia2->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
+    cia2->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
+    cia2->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
     cia2->PA = &cia2_port_a;
     cia2->PB = &cia2_port_b;
     vic->ba = &rdy_ba_wire;
-    vic->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
-    vic->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
+    vic->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
+    vic->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
     vic->color_ram = mmu->GetFarbramPointer();
     vic->cia2_port_a = cia2_port_a.GetOutputBitsPointer();
     sid1->RESET = &reset_wire;
     sid2->RESET = &reset_wire;
     reu->BA = &rdy_ba_wire;
-    reu->CpuTriggerInterrupt = bind(&MOS6510::TriggerInterrupt,cpu,_1);
-    reu->CpuClearInterrupt = bind(&MOS6510::ClearInterrupt,cpu,_1);
+    reu->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
+    reu->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
     reu->RESET = &reset_wire;
     reu->WRITE_FF00 = &cpu->WRITE_FF00;
 

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.02.2018                //
+// Letzte Änderung am 07.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -150,7 +150,7 @@ bool VideoCaptureWindow::getSaveFileName(QWidget *parent, QString caption, QStri
    saveDialog.setWindowTitle(caption);
    saveDialog.setAcceptMode(QFileDialog::AcceptSave);
    saveDialog.setConfirmOverwrite(false);
-   saveDialog.setFilter(filter);
+   //saveDialog.setFilter(filter);
    saveDialog.selectFile(*fileName);
    saveDialog.setOptions(QFileDialog::DontUseNativeDialog);
 
@@ -170,7 +170,7 @@ bool VideoCaptureWindow::getSaveFileName(QWidget *parent, QString caption, QStri
    if (fileInfo.suffix().isEmpty()) {
       // Add the suffix selected by the user
 
-      extension = saveDialog.selectedFilter();
+      //extension = saveDialog.selectedFilter();
       extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
       extension = extension.left(extension.indexOf(")"));
       extension = extension.simplified();

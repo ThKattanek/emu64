@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.06.2019                //
+// Letzte Änderung am 07.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -287,7 +287,7 @@ void MainWindow::OnInit()
     /// C64 Klasse Installieren ... Das HERZ ///
     SplashMessage(trUtf8("C64 Klasse wird initialisiert."),Qt::darkBlue);
     int ret_error;
-    c64 = new C64Class(&ret_error,video_crt_output,bind(&MainWindow::LogText,this,_1),QString(dataPath).toLatin1().data());
+    c64 = new C64Class(&ret_error,video_crt_output,bind(&MainWindow::LogText,this,std::placeholders::_1),QString(dataPath).toLatin1().data());
     if(ret_error != 0)
     {
         ErrorMsg(trUtf8("Emu64 Fehler ..."),trUtf8("Fehler beim Installieren der C64 Klasse"))
@@ -373,7 +373,7 @@ void MainWindow::OnInit()
 
     /// CRT LED mit CRT_Window verbinden ///
     SplashMessage(trUtf8("CRT LED mit CRT Window verbunden."),Qt::darkBlue);
-    c64->crt->ChangeLED = bind(&CartridgeWindow::ChangeLED,cartridge_window,_1,_2);
+    c64->crt->ChangeLED = bind(&CartridgeWindow::ChangeLED,cartridge_window,std::placeholders::_1,std::placeholders::_2);
     LogText(trUtf8(">> CRT LED wurde mit CrtWindow verbunden\n").toLatin1().data());
 
     /// C64 Systemroms laden ///
@@ -425,7 +425,7 @@ void MainWindow::OnInit()
 
     /// DebugCartEvent von C64 Klasse hierher leiten
     IsDebugCartEvent = false;
-    c64->DebugCartEvent = bind(&MainWindow::DebugCartEvent,this,_1);
+    c64->DebugCartEvent = bind(&MainWindow::DebugCartEvent,this,std::placeholders::_1);
     LogText(trUtf8(">> C64Class DebugCartEvent mit MainWindow verknüpft\n").toLatin1().data());
 
     connect(floppy_window,SIGNAL(ChangeFloppyImage(int)),this,SLOT(OnChangeFloppyImage(int)));
@@ -547,7 +547,7 @@ void MainWindow::OnMessage(QStringList msg)
         for(int i=0; i<msg.length(); i++)
         {
             char *p = new char[msg.at(i).size()+1];
-            strcpy(p,msg.at(i).toAscii().data());
+            strcpy(p,msg.at(i).toUtf8().data());
             list.push_back(p);
         }
         ExecuteCommandLine(list);
@@ -704,7 +704,7 @@ bool MainWindow::getSaveFileName(QWidget *parent, QString caption, QString filte
    saveDialog.setWindowTitle(caption);
    saveDialog.setAcceptMode(QFileDialog::AcceptSave);
    saveDialog.setConfirmOverwrite(false);
-   saveDialog.setFilter(filter);
+   //saveDialog.setFilter(filter);
    saveDialog.selectFile(*fileName);
    saveDialog.setOptions(QFileDialog::DontUseNativeDialog);
 
@@ -724,7 +724,7 @@ bool MainWindow::getSaveFileName(QWidget *parent, QString caption, QString filte
    if (fileInfo.suffix().isEmpty()) {
       // Add the suffix selected by the user
 
-      extension = saveDialog.selectedFilter();
+      //extension = saveDialog.selectedFilter();
       extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
       extension = extension.left(extension.indexOf(")"));
       extension = extension.simplified();
@@ -740,7 +740,7 @@ bool MainWindow::getSaveFileName(QWidget *parent, QString caption, QString filte
    // Does the file already exist?
    if (QFile::exists(tmpFileName)) {
 
-       extension = saveDialog.selectedFilter();
+       //extension = saveDialog.selectedFilter();
        extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
        extension = extension.left(extension.indexOf(")"));
        extension = extension.simplified();
@@ -806,7 +806,7 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
                     if(fi->exists())
                     {
                         cout << "Laufwerksnummer: " << lwnr << endl;
-                        cout << "Disk Image: " << fi->fileName().toAscii().data() << endl;
+                        cout << "Disk Image: " << fi->fileName().toUtf8().data() << endl;
 
                         if(floppy_window->SetDiskImage(lwnr-8, fi->absoluteFilePath()))
                         {

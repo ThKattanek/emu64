@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 07.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,10 +17,9 @@
 #define REU_CLASS_H
 
 #include <fstream>
-#include "structs.h"
-#include "tr1/functional"
-using namespace std::tr1;
-using namespace std::tr1::placeholders;
+#include <functional>
+
+#include "./structs.h"
 
 class REUClass
 {
@@ -45,10 +44,10 @@ class REUClass
     bool SaveFreez(FILE *File);
     bool LoadFreez(FILE *File,unsigned short Version);
 
-    function<unsigned char(unsigned short)> *ReadProcTbl;
-    function<void(unsigned short,unsigned char)> *WriteProcTbl;
-    function<void(int)> CpuTriggerInterrupt;
-    function<void(int)> CpuClearInterrupt;
+    std::function<unsigned char(unsigned short)> *ReadProcTbl;
+    std::function<void(unsigned short,unsigned char)> *WriteProcTbl;
+    std::function<void(int)> CpuTriggerInterrupt;
+    std::function<void(int)> CpuClearInterrupt;
 
     // Variablen
     bool *BA;			// Extern

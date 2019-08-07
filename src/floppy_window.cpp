@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.06.2019                //
+// Letzte Änderung am 07.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -300,9 +300,9 @@ void FloppyWindow::OnD64FileStart0(bool)
     int floppy_nr = ui->FloppySelect->currentIndex();
     QString FileName = TmpPath + "/tmp.prg";
 
-    if(d64[floppy_nr].ExportPrg(file_index,FileName.toAscii().data()))
+    if(d64[floppy_nr].ExportPrg(file_index,FileName.toUtf8().data()))
     {
-        c64->LoadAutoRun(floppy_nr,FileName.toAscii().data());
+        c64->LoadAutoRun(floppy_nr,FileName.toUtf8().data());
     }
 }
 
@@ -326,9 +326,9 @@ void FloppyWindow::OnD64FileStart3(bool)
     int floppy_nr = ui->FloppySelect->currentIndex();
     QString FileName = TmpPath + "/tmp.prg";
 
-    if(d64[floppy_nr].ExportPrg(file_index,FileName.toAscii().data()))
+    if(d64[floppy_nr].ExportPrg(file_index,FileName.toUtf8().data()))
     {
-        c64->LoadPRG(FileName.toAscii().data(),NULL);
+        c64->LoadPRG(FileName.toUtf8().data(),NULL);
     }
 }
 
@@ -374,7 +374,7 @@ void FloppyWindow::OnPRGExport(bool)
 
     if(filename != "")
     {
-        if(!d64[floppy_nr].ExportPrg(file_index,filename.toAscii().data()))
+        if(!d64[floppy_nr].ExportPrg(file_index,filename.toUtf8().data()))
         {
             QMessageBox::critical(this,"C64 Datei Export","Fehler beim exportieren der C64 Datei.\nDie Datei konnte nicht exortiert.");
         }
@@ -535,7 +535,7 @@ bool FloppyWindow::GetSaveFileName(QWidget *parent, QString caption, QString fil
    saveDialog.setWindowTitle(caption);
    saveDialog.setAcceptMode(QFileDialog::AcceptSave);
    saveDialog.setConfirmOverwrite(false);
-   saveDialog.setFilter(filter);
+   //saveDialog.setFilter(filter);
    saveDialog.selectFile(*fileName);
    saveDialog.setDefaultSuffix(*fileExt);
    saveDialog.setOptions(QFileDialog::DontUseNativeDialog);
@@ -556,7 +556,7 @@ bool FloppyWindow::GetSaveFileName(QWidget *parent, QString caption, QString fil
    if (fileInfo.suffix().isEmpty()) {
       // Add the suffix selected by the user
 
-      extension = saveDialog.selectedFilter();
+      //extension = saveDialog.selectedFilter();
       extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
       extension = extension.left(extension.indexOf(")"));
       extension = extension.simplified();
@@ -642,7 +642,7 @@ void FloppyWindow::on_CreateNewD64_clicked()
         if(!file.exists())
         {
             D64Class d64;
-            if(!d64.CreateDiskImage(fullpath.toAscii().data(),diskname.toAscii().data(),diskid.toAscii().data()))
+            if(!d64.CreateDiskImage(fullpath.toUtf8().data(),diskname.toUtf8().data(),diskid.toUtf8().data()))
             {
                 QMessageBox::critical(this,trUtf8("Fehler!"),trUtf8("Es konnte kein neues Diskimage erstellt werden."));
             }
@@ -658,7 +658,7 @@ void FloppyWindow::on_CreateNewD64_clicked()
             if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Achtung!"),trUtf8("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
             {
                 D64Class d64;
-                if(!d64.CreateDiskImage(fullpath.toAscii().data(),diskname.toAscii().data(),diskid.toAscii().data()))
+                if(!d64.CreateDiskImage(fullpath.toUtf8().data(),diskname.toUtf8().data(),diskid.toUtf8().data()))
                 {
                     QMessageBox::critical(this,trUtf8("Fehler!"),trUtf8("Es konnte kein neues Diskimage erstellt werden."));
                 }

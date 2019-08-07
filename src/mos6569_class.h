@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.06.2019                //
+// Letzte Änderung am 07.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,10 +17,9 @@
 #define MOS_6569_CLASS_H
 
 #include <cstdint>
-#include "structs.h"
-#include "tr1/functional"
-using namespace std::tr1;
-using namespace std::tr1::placeholders;
+#include <functional>
+
+#include "./structs.h"
 
 #define MAX_RASTERLINES 312
 
@@ -67,10 +66,10 @@ public:
     uint8_t ReadIO(uint16_t address);
     void TriggerLightpen();
 
-    function<uint8_t(uint16_t)> *ReadProcTbl;
-    function<void(uint8_t*)> RefreshProc;
-    function<void(int)> CpuTriggerInterrupt;
-    function<void(int)> CpuClearInterrupt;
+    std::function<uint8_t(uint16_t)> *ReadProcTbl;
+    std::function<void(uint8_t*)> RefreshProc;
+    std::function<void(int)> CpuTriggerInterrupt;
+    std::function<void(int)> CpuClearInterrupt;
 
     /// Variablen ///
     bool        *ba;
