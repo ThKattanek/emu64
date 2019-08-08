@@ -70,16 +70,11 @@ DEFINES += DATA_PATH=\\\"$$PREFIX\\\"
 
 # Translations
 
-CONFIG += lrelease
+# TRANSLATIONS += emu64_de.ts \
+#                emu64_en.ts
 
-TRANSLATIONS += emu64_de.ts \
-                emu64_en.ts
-
-#updateqm.input = TRANSLATIONS
-#updateqm.output = qm/${QMAKE_FILE_BASE}.qm
-#updateqm.commands = $$QMAKE_LRELEASE -silent ${QMAKE_FILE_IN} -qm qm/${QMAKE_FILE_BASE}.qm
-#updateqm.CONFIG += no_link target_predeps
-#QMAKE_EXTRA_COMPILERS += updateqm
+QMAKE_PRE_LINK += lrelease \"$$PWD/emu64_de.ts\" \
+                & lrelease \"$$PWD/emu64_en.ts\"
 
 # Abhängigkeiten
 

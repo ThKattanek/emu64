@@ -10,8 +10,10 @@ Emu64 auf Facebook: [https://www.facebook.com/Emu64-103321833093172](https://www
 ## Screenshot
 ![Screenshot](screenshot.png)
 
-
 ## Emu64 erstellen unter Linux
+
+### Wichtige Vorraussetzung
+- qttools5-dev-tools
 
 ### Benötigte Libs 
 - qt5
