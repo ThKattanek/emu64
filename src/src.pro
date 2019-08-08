@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 07.08.2019                //
+# // Letzte Änderung am 08.08.2019                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -211,4 +211,5 @@ FORMS += \
     widget_sr_edit.ui \
     widget_tape_counter.ui
 
-RC_FILE = emu64.rc
+RESOURCES += emu64.qrc
+RC_FILE += emu64.rc
