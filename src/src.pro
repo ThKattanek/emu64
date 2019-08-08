@@ -56,7 +56,7 @@ win32{
        message("Compiling for Windows 64bit system")
    }
 }
-# Install Destination Path
+# Installpath
 
 linux-g++{
 }
@@ -68,8 +68,25 @@ message(Installpath: $$PREFIX)
 
 DEFINES += DATA_PATH=\\\"$$PREFIX\\\"
 
+# Translations
+
+CONFIG += lrelease
+
+TRANSLATIONS += emu64_de.ts \
+                emu64_en.ts
+
+#updateqm.input = TRANSLATIONS
+#updateqm.output = qm/${QMAKE_FILE_BASE}.qm
+#updateqm.commands = $$QMAKE_LRELEASE -silent ${QMAKE_FILE_IN} -qm qm/${QMAKE_FILE_BASE}.qm
+#updateqm.CONFIG += no_link target_predeps
+#QMAKE_EXTRA_COMPILERS += updateqm
+
+# Abhängigkeiten
+
 CONFIG += link_pkgconfig
 PKGCONFIG += sdl2 SDL2_image libpng glu libavutil libavformat libavcodec libswresample libswscale
+
+# Quelltexte
 
 SOURCES += \
     am29f040_class.cpp \
