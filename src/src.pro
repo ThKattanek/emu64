@@ -14,11 +14,6 @@
 # //////////////////////////////////////////////////
 
 # PREFIX=/usr/local
-#
-#
-
-# Es muss noch auf quazip geprüft werden und wenn vorhanden DZIP_SUPPORT gesetzt werden.
-# Der Sourccode fragt dieses Flag ab
 
 QT       += core gui
 
@@ -56,22 +51,8 @@ win32{
        message("Compiling for Windows 64bit system")
    }
 }
-# Installpath
-
-linux-g++{
-}
-
-win32{
-}
-
-message(Installpath: $$PREFIX)
-
-DEFINES += DATA_PATH=\\\"$$PREFIX\\\"
 
 # Translations
-
-# TRANSLATIONS += emu64_de.ts \
-#                emu64_en.ts
 
 QMAKE_PRE_LINK += lrelease \"$$PWD/emu64_de.ts\" \
                 & lrelease \"$$PWD/emu64_en.ts\"
@@ -80,6 +61,18 @@ QMAKE_PRE_LINK += lrelease \"$$PWD/emu64_de.ts\" \
 
 CONFIG += link_pkgconfig
 PKGCONFIG += sdl2 SDL2_image libpng glu libavutil libavformat libavcodec libswresample libswscale
+
+message("Zip: $$ZIP")
+
+linux-g++{
+    DEFINES += ZIP_SUPPORT=true
+    LIBS += -lquazip5
+}
+
+win32{
+    DEFINES += ZIP_SUPPORT=true
+    PKGCONFIG += quazip
+}
 
 # Quelltexte
 
@@ -225,3 +218,26 @@ FORMS += \
 
 RESOURCES += emu64.qrc
 RC_FILE += emu64.rc
+
+# Install
+
+linux-g++{
+}
+
+win32{
+}
+
+message(Installpath: $$PREFIX)
+DEFINES += DATA_PATH=\\\"$$PREFIX\\\"
+
+win32{
+    # Binary
+    target.path = $$PREFIX
+    INSTALLS += target
+
+    # C64 Roms
+    roms.path = $$PREFIX/roms
+    roms.files += ../roms/*
+    INSTALLS += roms
+}
+
