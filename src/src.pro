@@ -17,6 +17,9 @@
 #
 #
 
+# Es muss noch auf quazip geprüft werden und wenn vorhanden DZIP_SUPPORT gesetzt werden.
+# Der Sourccode fragt dieses Flag ab
+
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
