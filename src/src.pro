@@ -219,7 +219,7 @@ FORMS += \
 RESOURCES += emu64.qrc
 RC_FILE += emu64.rc
 
-# Install
+# Installation
 
 linux-g++{
 }
@@ -239,5 +239,33 @@ win32{
     roms.path = $$PREFIX/roms
     roms.files += ../roms/*
     INSTALLS += roms
+
+    # Floppy Sounds
+    floppy_sounds.path = $$PREFIX/floppy_sounds
+    floppy_sounds.files = ../floppy_sounds/*
+    INSTALLS += floppy_sounds
+
+    # GFX
+    gfx.path = $$PREFIX/gfx
+    gfx.files += ../grafik/kreis0.png
+    gfx.files += ../grafik/kreis1.png
+    gfx.files += ../grafik/pfeil0.png
+    gfx.files += ../grafik/pfeil1.png
+    gfx.files += ../grafik/sdl_icon.png
+    INSTALLS += gfx
+
+    # TXT
+    txt.path = $$PREFIX
+    txt.files += ../kommandozeilenparameter.txt
+    txt.files += ../LICENSE
+    INSTALLS += txt
+
+    # Languages
+    languages.path = $$PREFIX/languages
+    languages.files += ../grafik/flaggen/emu64_de.png
+    languages.files += ../grafik/flaggen/emu64_en.png
+    languages.files += emu64_de.qm
+    languages.files += emu64_en.qm
+    INSTALLS += languages
 }
 
