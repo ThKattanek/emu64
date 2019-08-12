@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 08.08.2019                //
+# // Letzte Änderung am 12.08.2019                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -231,41 +231,44 @@ message(Installpath: $$PREFIX)
 DEFINES += DATA_PATH=\\\"$$PREFIX\\\"
 
 win32{
-    # Binary
     target.path = $$PREFIX
-    INSTALLS += target
-
-    # C64 Roms
     roms.path = $$PREFIX/roms
-    roms.files += ../roms/*
-    INSTALLS += roms
-
-    # Floppy Sounds
     floppy_sounds.path = $$PREFIX/floppy_sounds
-    floppy_sounds.files = ../floppy_sounds/*
-    INSTALLS += floppy_sounds
-
-    # GFX
     gfx.path = $$PREFIX/gfx
-    gfx.files += ../grafik/kreis0.png
-    gfx.files += ../grafik/kreis1.png
-    gfx.files += ../grafik/pfeil0.png
-    gfx.files += ../grafik/pfeil1.png
-    gfx.files += ../grafik/sdl_icon.png
-    INSTALLS += gfx
-
-    # TXT
     txt.path = $$PREFIX
-    txt.files += ../kommandozeilenparameter.txt
-    txt.files += ../LICENSE
-    INSTALLS += txt
-
-    # Languages
     languages.path = $$PREFIX/languages
-    languages.files += ../grafik/flaggen/emu64_de.png
-    languages.files += ../grafik/flaggen/emu64_en.png
-    languages.files += emu64_de.qm
-    languages.files += emu64_en.qm
-    INSTALLS += languages
 }
 
+linux-g++{
+    target.path = $$PREFIX/bin
+    roms.path = $$PREFIX/share/$$TARGET/roms
+    floppy_sounds.path = $$PREFIX/share/$$TARGET/floppy_sounds
+    gfx.path = $$PREFIX/share/$$TARGET/gfx
+    txt.path = $$PREFIX/share/$$TARGET
+    languages.path = $$PREFIX/share/$$TARGET/languages
+}
+
+# C64 Roms
+roms.files += ../roms/*
+
+# Floppy Sounds
+floppy_sounds.files = ../floppy_sounds/*
+
+# GFX
+gfx.files += ../grafik/kreis0.png
+gfx.files += ../grafik/kreis1.png
+gfx.files += ../grafik/pfeil0.png
+gfx.files += ../grafik/pfeil1.png
+gfx.files += ../grafik/sdl_icon.png
+
+# TXT
+txt.files += ../kommandozeilenparameter.txt
+txt.files += ../LICENSE
+
+# Languages
+languages.files += ../grafik/flaggen/emu64_de.png
+languages.files += ../grafik/flaggen/emu64_en.png
+languages.files += emu64_de.qm
+languages.files += emu64_en.qm
+
+INSTALLS += target roms floppy_sounds gfx txt languages
