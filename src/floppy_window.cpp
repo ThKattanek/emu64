@@ -8,19 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.08.2019                //
+// Letzte Änderung am 16.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include <QFontDatabase>
-#include <QDebug>
-#include <QMenu>
-#include <QFileDialog>
-#include <QMessageBox>
-
-#include "floppy_window.h"
-#include "ui_floppy_window.h"
+#include "./floppy_window.h"
+#include "./ui_floppy_window.h"
 
 #define MAX_D64_FILES 128
 
@@ -80,7 +74,7 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QStr
 FloppyWindow::~FloppyWindow()
 {
     ////////// Save to INI ///////////
-    if(ini != 0)
+    if(ini != nullptr)
     {
         ini->beginGroup("FloppyWindow");
         if(isOneShowed)
@@ -128,7 +122,7 @@ void FloppyWindow::showEvent(QShowEvent*)
 void FloppyWindow::LoadIni()
 {
     ////////// Load from INI ///////////
-    if(ini != 0)
+    if(ini != nullptr)
     {
         ini->beginGroup("FloppyWindow");
         if(ini->contains("Geometry")) restoreGeometry(ini->value("Geometry").toByteArray());
@@ -168,7 +162,7 @@ void FloppyWindow::LoadIni()
     ////////////////////////////////////
 }
 
-bool FloppyWindow::SetDiskImage(int floppynr, QString filename)
+bool FloppyWindow::SetDiskImage(uint8_t floppynr, QString filename)
 {
     if(floppynr >= MAX_FLOPPY_NUM) return false;
 
@@ -264,16 +258,16 @@ void FloppyWindow::on_FloppySelect_currentIndexChanged(int index)
 void FloppyWindow::OnCustomMenuRequested(QPoint pos)
 {
     QMenu *menu=new QMenu(this);
-    menu->addAction(new QAction(trUtf8("Laden und Starten mit Reset ohne Kernal"), this));
-    menu->addAction(new QAction(trUtf8("Laden und Starten mit Reset"), this));
-    menu->addAction(new QAction(trUtf8("Laden und Starten"), this));
-    menu->addAction(new QAction(trUtf8("Laden ohne Kernal"), this));
-    menu->addAction(new QAction(trUtf8("Laden"), this));
+    menu->addAction(new QAction(tr("Laden und Starten mit Reset ohne Kernal"), this));
+    menu->addAction(new QAction(tr("Laden und Starten mit Reset"), this));
+    menu->addAction(new QAction(tr("Laden und Starten"), this));
+    menu->addAction(new QAction(tr("Laden ohne Kernal"), this));
+    menu->addAction(new QAction(tr("Laden"), this));
 
     QMenu *menu_export = new QMenu(this);
     menu_export->setTitle("Export");
-    menu_export->addAction(new QAction(trUtf8("Datei exportieren"), this));
-    menu_export->addAction(new QAction(trUtf8("Dateiname MMC/SD2IEC kompatibel"), this));
+    menu_export->addAction(new QAction(tr("Datei exportieren"), this));
+    menu_export->addAction(new QAction(tr("Dateiname MMC/SD2IEC kompatibel"), this));
     menu_export->actions().at(1)->setCheckable(true);
     menu_export->actions().at(1)->setChecked(CompatibleMMCFileName);
 
@@ -297,7 +291,7 @@ void FloppyWindow::OnCustomMenuRequested(QPoint pos)
 void FloppyWindow::OnD64FileStart0(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
-    int floppy_nr = ui->FloppySelect->currentIndex();
+    uint8_t floppy_nr = static_cast<uint8_t>(ui->FloppySelect->currentIndex());
     QString FileName = TmpPath + "/tmp.prg";
 
     if(d64[floppy_nr].ExportPrg(file_index,FileName.toUtf8().data()))
@@ -309,33 +303,33 @@ void FloppyWindow::OnD64FileStart0(bool)
 void FloppyWindow::OnD64FileStart1(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
-    int floppy_nr = ui->FloppySelect->currentIndex();
+    uint8_t floppy_nr = static_cast<uint8_t>(ui->FloppySelect->currentIndex());
     c64->LoadPRGFromD64(floppy_nr,d64[floppy_nr].d64_files[file_index].Name,0);
 }
 
 void FloppyWindow::OnD64FileStart2(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
-    int floppy_nr = ui->FloppySelect->currentIndex();
+    uint8_t floppy_nr = static_cast<uint8_t>(ui->FloppySelect->currentIndex());
     c64->LoadPRGFromD64(floppy_nr,d64[floppy_nr].d64_files[file_index].Name,1);
 }
 
 void FloppyWindow::OnD64FileStart3(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
-    int floppy_nr = ui->FloppySelect->currentIndex();
+    uint8_t floppy_nr = static_cast<uint8_t>(ui->FloppySelect->currentIndex());
     QString FileName = TmpPath + "/tmp.prg";
 
     if(d64[floppy_nr].ExportPrg(file_index,FileName.toUtf8().data()))
     {
-        c64->LoadPRG(FileName.toUtf8().data(),NULL);
+        c64->LoadPRG(FileName.toUtf8().data(),nullptr);
     }
 }
 
 void FloppyWindow::OnD64FileStart4(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
-    int floppy_nr = ui->FloppySelect->currentIndex();
+    uint8_t floppy_nr = static_cast<uint8_t>(ui->FloppySelect->currentIndex());
     c64->LoadPRGFromD64(floppy_nr,d64[floppy_nr].d64_files[file_index].Name,2);
 }
 
@@ -367,9 +361,13 @@ void FloppyWindow::OnPRGExport(bool)
         fileext = fileext.toLower();
     }
 
-    if(c64 == NULL) return;
+    if(c64 == nullptr) return;
 
-    if(!GetSaveFileName(this,trUtf8("C64 Datei Exportieren"),trUtf8("C64 Programmdatei ") + "(*.prg *.seq *.usr *.rel *.cbm *.e00 *.del);;" + trUtf8("Alle Dateien ") + "(*.*)",&filename,&fileext))
+    QStringList filters;
+    filters << tr("C64 Programmdatei (*.prg *.seq *.usr *.rel *.cbm *.e00 *.del")
+            << tr("Alle Dateien (*.*)");
+
+    if(!CustomSaveFileDialog::GetSaveFileName(this, tr("C64 Datei Exportieren"), filters, &filename, &fileext))
         return;
 
     if(filename != "")
@@ -390,7 +388,7 @@ void FloppyWindow::OnPRGNameMMCKompatibel(bool)
 
 void FloppyWindow::OnWriteProtectedChanged(bool wp_satus)
 {
-    c64->SetFloppyWriteProtect(ui->FloppySelect->currentIndex(),wp_satus);
+    c64->SetFloppyWriteProtect(static_cast<uint8_t>(ui->FloppySelect->currentIndex()), wp_satus);
 }
 
 QString FloppyWindow::GetAktFilename(int floppynr)
@@ -435,34 +433,34 @@ void FloppyWindow::RefreshD64FileList()
 
         // Dateiname setzen
         QString name_str;
-        for(int j=0; j < (int)strlen(d64[floppy].d64_files[i].Name); j++)
+        for(int j=0; j < static_cast<int>(strlen(d64[floppy].d64_files[i].Name)); j++)
         {
-            if(((unsigned char)d64[floppy].d64_files[i].Name[j] == 32) || ((unsigned char)d64[floppy].d64_files[i].Name[j] == 160))
+            if((static_cast<uint8_t>(d64[floppy].d64_files[i].Name[j] == 32)) || (static_cast<uint8_t>(d64[floppy].d64_files[i].Name[j]) == 160))
                 name_str += " ";
-            else if(((unsigned char)d64[floppy].d64_files[i].Name[j] > 127) && ((unsigned char)d64[floppy].d64_files[i].Name[j] < 160))
-                name_str += QChar(((unsigned char)d64[floppy].d64_files[i].Name[j]) + 0xee40);
+            else if((static_cast<uint8_t>(d64[floppy].d64_files[i].Name[j]) > 127) && (static_cast<uint8_t>(d64[floppy].d64_files[i].Name[j]) < 160))
+                name_str += QChar((static_cast<uint8_t>(d64[floppy].d64_files[i].Name[j])) + 0xee40);
             else
-            name_str += QChar(((unsigned char)d64[floppy].d64_files[i].Name[j]) + 0xe000);
+            name_str += QChar((static_cast<uint8_t>(d64[floppy].d64_files[i].Name[j])) + 0xe000);
         }
 
         ui->D64FileTable->setCellWidget(i,1,new QLabel(name_str));
 
         ui->D64FileTable->cellWidget(i,1)->setFont(*c64_font);
-        QLabel* label = (QLabel*) ui->D64FileTable->cellWidget(i,1);
+        QLabel* label = static_cast<QLabel*>(ui->D64FileTable->cellWidget(i,1));
         label->setAlignment(Qt::AlignTop);
         label->setStyleSheet("color: rgb(100, 100, 255);");
 
         // Spur setzen
         ui->D64FileTable->setCellWidget(i,2,new QLabel(QVariant(d64[floppy].d64_files[i].Track).toString() + " "));
         ui->D64FileTable->cellWidget(i,2)->setFont(*c64_font);
-        label = (QLabel*) ui->D64FileTable->cellWidget(i,2);
+        label = static_cast<QLabel*>(ui->D64FileTable->cellWidget(i,2));
         label->setAlignment(Qt::AlignTop | Qt::AlignRight);
         label->setStyleSheet("color: rgb(100, 100, 255);");
 
         // Sektor setzen
         ui->D64FileTable->setCellWidget(i,3,new QLabel(QVariant(d64[floppy].d64_files[i].Sektor).toString() + " "));
         ui->D64FileTable->cellWidget(i,3)->setFont(*c64_font);
-        label = (QLabel*) ui->D64FileTable->cellWidget(i,3);
+        label = static_cast<QLabel*>(ui->D64FileTable->cellWidget(i,3));
         label->setAlignment(Qt::AlignTop | Qt::AlignRight);
         label->setStyleSheet("color: rgb(100, 100, 255);");
 
@@ -471,14 +469,14 @@ void FloppyWindow::RefreshD64FileList()
         str.sprintf(" $%04X",d64[floppy].d64_files[i].Adresse);
         ui->D64FileTable->setCellWidget(i,4,new QLabel(str));
         ui->D64FileTable->cellWidget(i,4)->setFont(*c64_font);
-        label = (QLabel*) ui->D64FileTable->cellWidget(i,4);
+        label = static_cast<QLabel*>(ui->D64FileTable->cellWidget(i,4));
         label->setAlignment(Qt::AlignTop);
         label->setStyleSheet("color: rgb(100, 100, 255);");
 
         // Size setzen
         ui->D64FileTable->setCellWidget(i,5,new QLabel(QVariant(d64[floppy].d64_files[i].Laenge).toString() + " "));
         ui->D64FileTable->cellWidget(i,5)->setFont(*c64_font);
-        label = (QLabel*) ui->D64FileTable->cellWidget(i,5);
+        label = static_cast<QLabel*>(ui->D64FileTable->cellWidget(i,5));
         label->setAlignment(Qt::AlignTop | Qt::AlignRight);
         label->setStyleSheet("color: rgb(100, 100, 255);");
 
@@ -493,7 +491,7 @@ void FloppyWindow::RefreshD64FileList()
 
         ui->D64FileTable->setCellWidget(i,6,new QLabel(strTyp));
         ui->D64FileTable->cellWidget(i,6)->setFont(*c64_font);
-        label = (QLabel*) ui->D64FileTable->cellWidget(i,6);
+        label = static_cast<QLabel*>(ui->D64FileTable->cellWidget(i,6));
         label->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
         label->setStyleSheet("color: rgb(100, 100, 255);");
 
@@ -502,11 +500,15 @@ void FloppyWindow::RefreshD64FileList()
         {
             ui->D64FileTable->setRowHeight(i,16);
             ui->D64FileTable->cellWidget(i,1)->setFixedHeight(16);
+            ui->D64FileTable->cellWidget(i,1)->setMaximumHeight(16);
+            ui->D64FileTable->cellWidget(i,1)->setMinimumHeight(16);
         }
         else
         {
             ui->D64FileTable->setRowHeight(i,8);
             ui->D64FileTable->cellWidget(i,1)->setFixedHeight(8);
+            ui->D64FileTable->cellWidget(i,1)->setMaximumHeight(8);
+            ui->D64FileTable->cellWidget(i,1)->setMinimumHeight(8);
         }
 
         if(!(FileTyp & 0x80) && !ui->ViewSplatFiles->isChecked())
@@ -524,54 +526,6 @@ void FloppyWindow::on_ViewSplatFiles_clicked()
 void FloppyWindow::on_D64FileTable_cellDoubleClicked(int , int )
 {
     OnD64FileStart0(0);
-}
-
-bool FloppyWindow::GetSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt)
-{
-   if (fileName == NULL)      // "parent" is allowed to be NULL!
-      return false;
-
-   QFileDialog saveDialog(parent);
-   saveDialog.setWindowTitle(caption);
-   saveDialog.setAcceptMode(QFileDialog::AcceptSave);
-   saveDialog.setConfirmOverwrite(false);
-   //saveDialog.setFilter(filter);
-   saveDialog.selectFile(*fileName);
-   saveDialog.setDefaultSuffix(*fileExt);
-   saveDialog.setOptions(QFileDialog::DontUseNativeDialog);
-
-   *fileName = "";
-
-   if (!saveDialog.exec())
-      return false;      // User pressed "Cancel"
-
-   QStringList fileList = saveDialog.selectedFiles();
-   if (fileList.count() != 1)
-      return false;      // Should not happen, just to be sure
-
-   QString tmpFileName = fileList.at(0);
-   QString extension;
-
-   QFileInfo fileInfo(tmpFileName);
-   if (fileInfo.suffix().isEmpty()) {
-      // Add the suffix selected by the user
-
-      //extension = saveDialog.selectedFilter();
-      extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
-      extension = extension.left(extension.indexOf(")"));
-      extension = extension.simplified();
-
-      // If the filter specifies more than one extension, choose the first one
-      if (extension.indexOf(" ") != -1)
-         extension = extension.left(extension.indexOf(" "));
-
-      tmpFileName = tmpFileName + QString(".") + extension;
-      fileInfo.setFile(tmpFileName);
-   }
-
-   *fileName = tmpFileName;
-   *fileExt = extension;
-   return true;
 }
 
 void FloppyWindow::SetD64BigSize(bool enable)
@@ -644,7 +598,7 @@ void FloppyWindow::on_CreateNewD64_clicked()
             D64Class d64;
             if(!d64.CreateDiskImage(fullpath.toUtf8().data(),diskname.toUtf8().data(),diskid.toUtf8().data()))
             {
-                QMessageBox::critical(this,trUtf8("Fehler!"),trUtf8("Es konnte kein neues Diskimage erstellt werden."));
+                QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues Diskimage erstellt werden."));
             }
             else
             {
@@ -655,12 +609,12 @@ void FloppyWindow::on_CreateNewD64_clicked()
         }
         else
         {
-            if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Achtung!"),trUtf8("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
+            if(QMessageBox::Yes == QMessageBox::question(this,tr("Achtung!"),tr("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
             {
                 D64Class d64;
                 if(!d64.CreateDiskImage(fullpath.toUtf8().data(),diskname.toUtf8().data(),diskid.toUtf8().data()))
                 {
-                    QMessageBox::critical(this,trUtf8("Fehler!"),trUtf8("Es konnte kein neues Diskimage erstellt werden."));
+                    QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues Diskimage erstellt werden."));
                 }
                 else
                 {

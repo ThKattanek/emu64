@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.12.2016                //
+// Letzte Änderung am 16.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -41,8 +41,8 @@ void ShowC64KeyMappingWindow::UpdateText()
 {
     ui->text_out->clear();
 
-    ui->text_out->appendPlainText(trUtf8("C64 Taste     |       SDL Taste"));
-    ui->text_out->appendPlainText(trUtf8("--------------+----------------"));
+    ui->text_out->appendPlainText(tr("C64 Taste     |       SDL Taste"));
+    ui->text_out->appendPlainText(tr("--------------+----------------"));
 
     int c64_key_table_size = c64->GetC64KeyTableSize();
     C64_KEYS *c64_key_table = c64->GetC64KeyTable();
@@ -50,7 +50,7 @@ void ShowC64KeyMappingWindow::UpdateText()
 
     for(int i=0; i<c64_key_table_size; i++)
     {
-        QString line = QString(trUtf8(c64_key_names[i])) + " ";
+        QString line = QString(tr(c64_key_names[i])) + " ";
         int len = line.length();
         for(int j=0; j<(14-len); j++)
         {
@@ -60,7 +60,7 @@ void ShowC64KeyMappingWindow::UpdateText()
         line += "|";
 
         //const char* sdl_key_name = SDL_GetKeyName(c64_key_table[i].SDLKeyCode);
-        QString sdl_key_name = QString(trUtf8(SDL_GetKeyName(c64_key_table[i].SDLKeyCode)));
+        QString sdl_key_name = QString(tr(SDL_GetKeyName(c64_key_table[i].SDLKeyCode)));
 
         len = sdl_key_name.length();
         for(int j=0; j<(15-len); j++)

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 16.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -33,7 +33,6 @@ public:
     explicit DebuggerIECWindow(QWidget *parent = nullptr);
     ~DebuggerIECWindow();
     void RetranslateUi();
-    bool GetSaveFileName(QWidget *parent, QString caption, QString filter, QString *file_name, QString *file_extension);
     void SetC64Pointer(C64Class *c64);
     void UpdateSignals();
     

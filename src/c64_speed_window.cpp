@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 16.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -131,13 +131,13 @@ void C64SpeedWindow::on_Pause_clicked()
     if(pause_status)
     {
         pause_status = true;
-        ui->Pause->setText(trUtf8("Weiter"));
+        ui->Pause->setText(tr("Weiter"));
         c64->SetDebugMode(true);
     }
     else
     {
         pause_status = false;
-        ui->Pause->setText(trUtf8("Pause"));
+        ui->Pause->setText(tr("Pause"));
         c64->SetDebugMode(false);
     }
     SetPauseTooltip();
@@ -152,10 +152,10 @@ void C64SpeedWindow::SetPauseTooltip()
 {
     if(pause_status)
     {
-        ui->Pause->setToolTip(trUtf8("Lässt den C64, mit der eingestellten Geschwindigkeit, weiterlaufen."));
+        ui->Pause->setToolTip(tr("Lässt den C64, mit der eingestellten Geschwindigkeit, weiterlaufen."));
     }
     else
     {
-        ui->Pause->setToolTip(trUtf8("Hält den C64 komplett an."));
+        ui->Pause->setToolTip(tr("Hält den C64 komplett an."));
     }
 }

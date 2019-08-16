@@ -3,7 +3,7 @@
 # // Emu64                                        //
 # // von Thorsten Kattanek                        //
 # //                                              //
-# // #file: sid_dump_window.h                     //
+# // #file: custom_save_file_dialog.h             //
 # //                                              //
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
@@ -13,39 +13,20 @@
 # //                                              //
 # //////////////////////////////////////////////////
 
-#ifndef SID_DUMP_WINDOW_H
-#define SID_DUMP_WINDOW_H
+#ifndef CUSTOM_SAVE_FILE_DIALOG_H
+#define CUSTOM_SAVE_FILE_DIALOG_H
 
-#include <QDialog>
-#include <QSettings>
-#include <QTimer>
+#include <QObject>
+#include <QFileDialog>
+#include <QMessageBox>
 
-#include "./custom_save_file_dialog.h"
-#include "./c64_class.h"
-
-
-namespace Ui {
-class SidDumpWindow;
-}
-
-class SidDumpWindow : public QDialog
+class CustomSaveFileDialog : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit SidDumpWindow(QWidget *parent = nullptr, C64Class *c64 = nullptr);
-    ~SidDumpWindow();
-    void RetranslateUi();
 
-private slots:
-    void on_SidDumpStart_clicked();
-    void on_SidDumpStop_clicked();
-    void OnTimer1();
+static bool GetSaveFileName(QWidget *parent, QString caption, QStringList filters, QString *fileName, QString *fileExt);
 
-private:
-    Ui::SidDumpWindow *ui;
-    C64Class *c64;
-    QTimer *timer1;
 };
 
-#endif // SID_DUMP_WINDOW_H
+#endif // CUSTOM_SAVE_FILE_DIALOG_H

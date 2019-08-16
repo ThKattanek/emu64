@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.06.2019                //
+// Letzte Änderung am 16.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -33,7 +33,7 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoCrtClass *vid
     ui->setupUi(this);
 
     // VIC Farbmodi zur ComboBox hinzufügen
-    ui->C64Farbmodus->addItems(QStringList()<<"Emu64"<<"Emu64 (bis 4.00)"<<"CCS64"<<"PC64"<<"C64S"<<"Vice"<<"Frodo"<<trUtf8("Pepto")<<trUtf8("Schwarz / Weiß"));
+    ui->C64Farbmodus->addItems(QStringList()<<"Emu64"<<"Emu64 (bis 4.00)"<<"CCS64"<<"PC64"<<"C64S"<<"Vice"<<"Frodo"<<tr("Pepto")<<tr("Schwarz / Weiß"));
 
     // VIC Emulation Default Einstellungen setzen
     ui->VicSpriteViewEnable->setEnabled(true);
@@ -97,7 +97,7 @@ void SetupWindow::LoadINI(C64Class *c64)
         ui->VJoySlots->setColumnWidth(4,59);
 
         QStringList header_label;
-        //header_label << trUtf8("Bezeichnung") << "Port 1" << "Port 2" << "" << "";
+        //header_label << tr("Bezeichnung") << "Port 1" << "Port 2" << "" << "";
         //ui->VJoySlots->setHorizontalHeaderLabels(header_label);
 
         for(int i=0; i<MAX_VJOY_NUM; i++)
@@ -106,18 +106,18 @@ void SetupWindow::LoadINI(C64Class *c64)
             ini->beginGroup(group_name);
 
             QTableWidgetItem *item = new QTableWidgetItem(ini->value("Name","Slot " + QVariant(i+1).toString()).toString());
-            item->setToolTip(trUtf8("Mit einem doppelklick kann man den Namen ändern."));
+            item->setToolTip(tr("Mit einem doppelklick kann man den Namen ändern."));
             ui->VJoySlots->setItem(i,0,item);
             ui->VJoySlots->setRowHeight(i,18);
 
             item = new QTableWidgetItem("");
             item->setFlags(Qt::ItemIsEditable);
-            item->setToolTip(trUtf8("Verbindet diesen Slot mit dem C64 Gameport 1"));
+            item->setToolTip(tr("Verbindet diesen Slot mit dem C64 Gameport 1"));
             ui->VJoySlots->setItem(i,1,item);
 
             item = new QTableWidgetItem("");
             item->setFlags(Qt::ItemIsEditable);
-            item->setToolTip(trUtf8("Verbindet diesen Slot mit dem C64 Gameport 2"));
+            item->setToolTip(tr("Verbindet diesen Slot mit dem C64 Gameport 2"));
             ui->VJoySlots->setItem(i,2,item);
 
             ButtonMod *button;
@@ -545,23 +545,23 @@ void SetupWindow::UpdateToolTips()
     ButtonMod *button;
 
     QStringList header_label;
-    header_label << trUtf8("Bezeichnung") << "Port 1" << "Port 2" << "" << "";
+    header_label << tr("Bezeichnung") << "Port 1" << "Port 2" << "" << "";
     ui->VJoySlots->setHorizontalHeaderLabels(header_label);
 
     for(int i=0; i<MAX_VJOY_NUM; i++)
     {
         item = ui->VJoySlots->item(i,0);
-        if(item != NULL) item->setToolTip(trUtf8("Mit einem doppelklick kann man den Namen ändern."));
+        if(item != NULL) item->setToolTip(tr("Mit einem doppelklick kann man den Namen ändern."));
         item = ui->VJoySlots->item(i,1);
-        if(item != NULL) item->setToolTip(trUtf8("Verbindet diesen Slot mit dem C64 Gameport 1"));
+        if(item != NULL) item->setToolTip(tr("Verbindet diesen Slot mit dem C64 Gameport 1"));
         item = ui->VJoySlots->item(i,2);
-        if(item != NULL) item->setToolTip(trUtf8("Verbindet diesen Slot mit dem C64 Gameport 2"));
+        if(item != NULL) item->setToolTip(tr("Verbindet diesen Slot mit dem C64 Gameport 2"));
 
 
         button = (ButtonMod*)ui->VJoySlots->cellWidget(i,3);
-        if(button != NULL) button->setText(trUtf8("Lernen"));
+        if(button != NULL) button->setText(tr("Lernen"));
         button = (ButtonMod*)ui->VJoySlots->cellWidget(i,4);
-        if(button != NULL) button->setText(trUtf8("Löschen"));
+        if(button != NULL) button->setText(tr("Löschen"));
     }
 }
 
@@ -795,10 +795,10 @@ void SetupWindow::on_SelectRomSet_currentIndexChanged(const QString &arg1)
 
 void SetupWindow::on_DeleteRomSet_clicked()
 {
-    if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Löschen?"),trUtf8("Möchten Sie dieses RomSet wirklich entfernen?\n\n") + "[" + ui->SelectRomSet->currentText() + "]",QMessageBox::Yes | QMessageBox::No))
+    if(QMessageBox::Yes == QMessageBox::question(this,tr("Löschen?"),tr("Möchten Sie dieses RomSet wirklich entfernen?\n\n") + "[" + ui->SelectRomSet->currentText() + "]",QMessageBox::Yes | QMessageBox::No))
     {
         if(!RemoveDir(*romsetPath + ui->SelectRomSet->currentText()))
-            QMessageBox::critical(this,trUtf8("Löschen?"),trUtf8("RomSet konnte nicht gelöscht werden"));
+            QMessageBox::critical(this,tr("Löschen?"),tr("RomSet konnte nicht gelöscht werden"));
 
         FillRomSetCombo();
     }

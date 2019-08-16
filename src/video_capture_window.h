@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.09.2017                //
+// Letzte Änderung am 16.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,10 +17,10 @@
 #define VIDEO_CAPTURE_WINDOW_H
 
 #include <QDialog>
-#include <QMessageBox>
-#include <QFileDialog>
 #include <QTimer>
+
 #include "./c64_class.h"
+#include "./custom_save_file_dialog.h"
 
 namespace Ui {
 class VideoCaptureWindow;
@@ -31,7 +31,7 @@ class VideoCaptureWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit VideoCaptureWindow(QWidget *parent = 0, C64Class *c64 = 0);
+    explicit VideoCaptureWindow(QWidget *parent = nullptr, C64Class *c64 = nullptr);
     ~VideoCaptureWindow();
     void RetranslateUi();
 
@@ -42,7 +42,6 @@ private slots:
     void OnTimer1();
 
 private:
-    bool getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt);
     Ui::VideoCaptureWindow *ui;
     C64Class *c64;
     QTimer *timer1;

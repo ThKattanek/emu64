@@ -17,7 +17,9 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4){
+
+QT += widgets
 
 TARGET = emu64
 TEMPLATE = app
@@ -272,3 +274,12 @@ languages.files += emu64_de.qm
 languages.files += emu64_en.qm
 
 INSTALLS += target roms floppy_sounds gfx txt languages
+}
+
+greaterThan(QT_MAJOR_VERSION, 4)
+
+HEADERS += \
+    custom_save_file_dialog.h
+
+SOURCES += \
+    custom_save_file_dialog.cpp

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.08.2019                //
+// Letzte Änderung am 16.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -285,7 +285,7 @@ void WidgetFileBrowse::on_WriteProtected_clicked(bool checked)
 
         if(permissions.testFlag(QFile::WriteOwner))
         {
-            QMessageBox::warning(this,trUtf8("Fehler !"),trUtf8("Leider konnte der Schreibschutz der Disk Image Datei nicht gesetzt werden.\nBitte überprüfen Sie ob Sie über genügend Rechte verfügen.\nDer Emu64 wird diese Datei dennoch nicht verändern !"));
+            QMessageBox::warning(this,tr("Fehler !"),tr("Leider konnte der Schreibschutz der Disk Image Datei nicht gesetzt werden.\nBitte überprüfen Sie ob Sie über genügend Rechte verfügen.\nDer Emu64 wird diese Datei dennoch nicht verändern !"));
         }
         emit WriteProtectedChanged(checked);
     }
@@ -298,7 +298,7 @@ void WidgetFileBrowse::on_WriteProtected_clicked(bool checked)
         if(!permissions.testFlag(QFile::WriteOwner))
         {
             ui->WriteProtected->setChecked(true);
-            QMessageBox::warning(this,trUtf8("Fehler !"),trUtf8("Leider konnte der Schreibschutz der Disk Image Datei nicht entfernt werden.\nBitte überprüfen Sie ob Sie über genügend Rechte verfügen.\n Auf das Disk Image kann momentan nicht geschrieben werden !"));
+            QMessageBox::warning(this,tr("Fehler !"),tr("Leider konnte der Schreibschutz der Disk Image Datei nicht entfernt werden.\nBitte überprüfen Sie ob Sie über genügend Rechte verfügen.\n Auf das Disk Image kann momentan nicht geschrieben werden !"));
         }
         emit WriteProtectedChanged(ui->WriteProtected->isChecked());
     }
@@ -315,12 +315,12 @@ void WidgetFileBrowse::on_delete_file_clicked()
 
     if(!QFile(file_path).exists()) return;
 
-    if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Löschen?"),trUtf8("Möchten Sie diese Datei wirklich entfernen?\n\n") + "[" + file_path + "]",QMessageBox::Yes | QMessageBox::No))
+    if(QMessageBox::Yes == QMessageBox::question(this,tr("Löschen?"),tr("Möchten Sie diese Datei wirklich entfernen?\n\n") + "[" + file_path + "]",QMessageBox::Yes | QMessageBox::No))
     {
         QFile file(file_path);
         if(!file.remove())
         {
-            QMessageBox::critical(this,trUtf8("Fehler !"),trUtf8("Die Datei konnte nicht gelöscht werden.\n\n") + file.errorString());
+            QMessageBox::critical(this,tr("Fehler !"),tr("Die Datei konnte nicht gelöscht werden.\n\n") + file.errorString());
         }
     }
 }

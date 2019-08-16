@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.12.2016                //
+// Letzte Änderung am 16.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -58,57 +58,57 @@ QString NewRomSetWindow::GetDos1541RomFilename()
 
 void NewRomSetWindow::on_sel_kernal_rom_clicked()
 {
-    QString filename = QFileDialog::getOpenFileName(this,trUtf8("Kernal ROM öffnen "),"",trUtf8("ROM Dateien ") + "(*.rom);;" + trUtf8("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
+    QString filename = QFileDialog::getOpenFileName(this,tr("Kernal ROM öffnen "),"",tr("ROM Dateien ") + "(*.rom);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
         ui->kernal_rom->setText(filename);
 
         QFile file(filename);
         if(file.size() != 8192)
-            ui->KernalSizeError->setText(trUtf8("Falsche Dateigröße !"));
-        else ui->KernalSizeError->setText(trUtf8(""));
+            ui->KernalSizeError->setText(tr("Falsche Dateigröße !"));
+        else ui->KernalSizeError->setText(tr(""));
     }
 }
 
 void NewRomSetWindow::on_sel_basic_rom_clicked()
 {
-    QString filename = QFileDialog::getOpenFileName(this,trUtf8("Basic ROM öffnen "),"",trUtf8("ROM Dateien ") + "(*.rom);;" + trUtf8("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
+    QString filename = QFileDialog::getOpenFileName(this,tr("Basic ROM öffnen "),"",tr("ROM Dateien ") + "(*.rom);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
         ui->basic_rom->setText(filename);
 
         QFile file(filename);
         if(file.size() != 8192)
-            ui->BasicSizeError->setText(trUtf8("Falsche Dateigröße !"));
-        else ui->BasicSizeError->setText(trUtf8(""));
+            ui->BasicSizeError->setText(tr("Falsche Dateigröße !"));
+        else ui->BasicSizeError->setText(tr(""));
     }
 }
 
 void NewRomSetWindow::on_sel_char_rom_clicked()
 {
-    QString filename = QFileDialog::getOpenFileName(this,trUtf8("Char ROM öffnen "),"",trUtf8("ROM Dateien ") + "(*.rom);;" + trUtf8("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
+    QString filename = QFileDialog::getOpenFileName(this,tr("Char ROM öffnen "),"",tr("ROM Dateien ") + "(*.rom);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
         ui->char_rom->setText(filename);
 
         QFile file(filename);
         if(file.size() != 4096)
-            ui->CharSizeError->setText(trUtf8("Falsche Dateigröße !"));
-        else ui->CharSizeError->setText(trUtf8(""));
+            ui->CharSizeError->setText(tr("Falsche Dateigröße !"));
+        else ui->CharSizeError->setText(tr(""));
     }
 }
 
 void NewRomSetWindow::on_sel_dos1541_rom_clicked()
 {
-    QString filename = QFileDialog::getOpenFileName(this,trUtf8("Dos 1541 ROM öffnen "),"",trUtf8("ROM Dateien ") + "(*.rom);;" + trUtf8("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
+    QString filename = QFileDialog::getOpenFileName(this,tr("Dos 1541 ROM öffnen "),"",tr("ROM Dateien ") + "(*.rom);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
         ui->dos1514_rom->setText(filename);
 
         QFile file(filename);
         if(file.size() != 16384)
-            ui->DosSizeError->setText(trUtf8("Falsche Dateigröße !"));
-        else ui->DosSizeError->setText(trUtf8(""));
+            ui->DosSizeError->setText(tr("Falsche Dateigröße !"));
+        else ui->DosSizeError->setText(tr(""));
     }
 }
 
@@ -128,11 +128,11 @@ void NewRomSetWindow::on_RomSetName_textChanged(const QString &arg1)
     if(dir.exists())
     {
         ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-        ui->ExistInfo->setText(trUtf8("ROM-Set existiert schon!"));
+        ui->ExistInfo->setText(tr("ROM-Set existiert schon!"));
     }
     else
     {
         ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
-        ui->ExistInfo->setText(trUtf8(""));
+        ui->ExistInfo->setText(tr(""));
     }
 }
