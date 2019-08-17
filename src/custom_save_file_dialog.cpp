@@ -44,32 +44,31 @@ bool CustomSaveFileDialog::GetSaveFileName(QWidget *parent, QString caption, QSt
 
     QFileInfo fileInfo(tmpFileName);
 
+    // Get Selected Fileextension
+    extension = saveDialog.selectedNameFilter();
+    extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
+    extension = extension.left(extension.indexOf(")"));
+    extension = extension.simplified();
+
+    // If the filter specifies more than one extension, choose the first one
+    if (extension.indexOf(" ") != -1)
+       extension = extension.left(extension.indexOf(" "));
+
+
     if (fileInfo.suffix().isEmpty())
     {
        // Add the suffix selected by the user
-
-       extension = saveDialog.selectedNameFilter();
-       extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
-       extension = extension.left(extension.indexOf(")"));
-       extension = extension.simplified();
-
-       // If the filter specifies more than one extension, choose the first one
-       if (extension.indexOf(" ") != -1)
-          extension = extension.left(extension.indexOf(" "));
-
        tmpFileName = tmpFileName + QString(".") + extension;
        fileInfo.setFile(tmpFileName);
     }
     else
     {
-        extension = tmpFileName;
-        extension = extension.right(extension.size() - extension.indexOf(".") - 1);
-        //extension = extension.left(extension.indexOf(")"));
-        extension = extension.simplified();
+        QString ext = tmpFileName;
+        ext = ext.right(ext.size() - ext.indexOf(".") - 1);
+        ext = ext.simplified();
 
-        // If the filter specifies more than one extension, choose the first one
-        if (extension.indexOf(" ") != -1)
-           extension = extension.left(extension.indexOf(" "));
+        if(extension != ext)
+            tmpFileName = tmpFileName + QString(".") + extension;
 
         fileInfo.setFile(tmpFileName);
     }
