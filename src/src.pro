@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 12.08.2019                //
+# // Letzte Änderung am 16.08.2019                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -144,6 +144,7 @@ HEADERS += \
     cartridge_class.h \
     cartridge_new_easyflash_window.h \
     cartridge_window.h \
+    custom_save_file_dialog.h \
     custom_splashscreen.h \
     d64_class.h \
     debugger_iec_window.h \
@@ -275,11 +276,3 @@ languages.files += emu64_en.qm
 
 INSTALLS += target roms floppy_sounds gfx txt languages
 }
-
-greaterThan(QT_MAJOR_VERSION, 4)
-
-HEADERS += \
-    custom_save_file_dialog.h
-
-SOURCES += \
-    custom_save_file_dialog.cpp
