@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 16.08.2019                //
+# // Letzte Änderung am 17.08.2019                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -59,6 +59,19 @@ bool CustomSaveFileDialog::GetSaveFileName(QWidget *parent, QString caption, QSt
 
        tmpFileName = tmpFileName + QString(".") + extension;
        fileInfo.setFile(tmpFileName);
+    }
+    else
+    {
+        extension = tmpFileName;
+        extension = extension.right(extension.size() - extension.indexOf(".") - 1);
+        //extension = extension.left(extension.indexOf(")"));
+        extension = extension.simplified();
+
+        // If the filter specifies more than one extension, choose the first one
+        if (extension.indexOf(" ") != -1)
+           extension = extension.left(extension.indexOf(" "));
+
+        fileInfo.setFile(tmpFileName);
     }
 
     // Does the file already exist?
