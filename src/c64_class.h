@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.06.2019                //
+// Letzte Änderung am 07.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -37,10 +37,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_image.h>
-
-#include "tr1/functional"
-using namespace std::tr1;
-using namespace std::tr1::placeholders;
+#include <functional>
 
 #define MAX_STRING_LENGTH 1024
 
@@ -61,7 +58,7 @@ class C64Class
 {
 
 public:
-    C64Class(int *ret_error, VideoCrtClass *video_crt_output, function<void(char*)> log_function, const char *data_path);
+    C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::function<void(char*)> log_function, const char *data_path);
     ~C64Class();
     void StartEmulation();
     void EndEmulation();
@@ -325,12 +322,12 @@ public:
     bool            loop_thread_end;
     bool            loop_thread_is_end;
 
-    function<void(void)> AnimationRefreshProc;
-    function<void(void)> BreakpointProc;
-    function<void(char*)> LogText;
-    function<void(void)> CloseEventC64Screen;
-    function<void(void)> LimitCyclesEvent;
-    function<void(unsigned char)> DebugCartEvent;
+    std::function<void(void)> AnimationRefreshProc;
+    std::function<void(void)> BreakpointProc;
+    std::function<void(char*)> LogText;
+    std::function<void(void)> CloseEventC64Screen;
+    std::function<void(void)> LimitCyclesEvent;
+    std::function<void(unsigned char)> DebugCartEvent;
 
     uint16_t        cpu_pc_history[256];
     uint8_t         cpu_pc_history_pos;
@@ -369,8 +366,8 @@ private:
     void CloseVideoCaptureSystem();
     void SwapRBSurface(SDL_Surface *surface); // swaps the color red with blue in sdl surface
 
-    function<uint8_t(uint16_t)> *ReadProcTbl;
-    function<void(uint16_t, uint8_t)> *WriteProcTbl;
+    std::function<uint8_t(uint16_t)> *ReadProcTbl;
+    std::function<void(uint16_t, uint8_t)> *WriteProcTbl;
 
     char  gfx_path[MAX_STRING_LENGTH];
     char  floppy_sound_path[MAX_STRING_LENGTH];

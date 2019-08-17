@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.06.2019        		//
+// Letzte Änderung am 07.08.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -56,38 +56,38 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
 
     for(int i=0;i<256;i++)
     {
-        ReadProcTbl[i] = bind(&Floppy1541::ReadNoMem,this,_1);
-        WriteProcTbl[i] = bind(&Floppy1541::WriteNoMem,this,_1,_2);
+        ReadProcTbl[i] = std::bind(&Floppy1541::ReadNoMem,this,std::placeholders::_1);
+        WriteProcTbl[i] = std::bind(&Floppy1541::WriteNoMem,this,std::placeholders::_1,std::placeholders::_2);
     }
 
     for(int i=0;i<8;i++)
     {
-        ReadProcTbl[i] = bind(&Floppy1541::ReadRam,this,_1);
-        WriteProcTbl[i] = bind(&Floppy1541::WriteRam,this,_1,_2);
+        ReadProcTbl[i] = std::bind(&Floppy1541::ReadRam,this,std::placeholders::_1);
+        WriteProcTbl[i] = std::bind(&Floppy1541::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
     }
 
     for(int i=0;i<64;i++)
     {
-         ReadProcTbl[i+0xC0] = bind(&Floppy1541::ReadRom,this,_1);
+         ReadProcTbl[i+0xC0] = std::bind(&Floppy1541::ReadRom,this,std::placeholders::_1);
     }
 
-    ReadProcTbl[0x18] = bind(&MOS6522::ReadIO,via1,_1);
-    WriteProcTbl[0x18] = bind(&MOS6522::WriteIO,via1,_1,_2);
+    ReadProcTbl[0x18] = std::bind(&MOS6522::ReadIO,via1,std::placeholders::_1);
+    WriteProcTbl[0x18] = std::bind(&MOS6522::WriteIO,via1,std::placeholders::_1,std::placeholders::_2);
 
-    ReadProcTbl[0x1C] = bind(&MOS6522::ReadIO,via2,_1);
-    WriteProcTbl[0x1C] = bind(&MOS6522::WriteIO,via2,_1,_2);
+    ReadProcTbl[0x1C] = std::bind(&MOS6522::ReadIO,via2,std::placeholders::_1);
+    WriteProcTbl[0x1C] = std::bind(&MOS6522::WriteIO,via2,std::placeholders::_1,std::placeholders::_2);
 
-    via2->SyncFound = bind(&Floppy1541::SyncFound,this);
-    via2->ReadGCRByte = bind(&Floppy1541::ReadGCRByte,this);
-    via2->WriteGCRByte = bind(&Floppy1541::WriteGCRByte,this,_1);
-    via2->SpurDec = bind(&Floppy1541::SpurDec,this);
-    via2->SpurInc = bind(&Floppy1541::SpurInc,this);
+    via2->SyncFound = std::bind(&Floppy1541::SyncFound,this);
+    via2->ReadGCRByte = std::bind(&Floppy1541::ReadGCRByte,this);
+    via2->WriteGCRByte = std::bind(&Floppy1541::WriteGCRByte,this,std::placeholders::_1);
+    via2->SpurDec = std::bind(&Floppy1541::SpurDec,this);
+    via2->SpurInc = std::bind(&Floppy1541::SpurInc,this);
 
-    via1->TriggerInterrupt = bind(&MOS6502::TriggerInterrupt,cpu,_1);
-    via1->ClearInterrupt = bind(&MOS6502::ClearInterrupt,cpu,_1);
+    via1->TriggerInterrupt = std::bind(&MOS6502::TriggerInterrupt,cpu,std::placeholders::_1);
+    via1->ClearInterrupt = std::bind(&MOS6502::ClearInterrupt,cpu,std::placeholders::_1);
 
-    via2->TriggerInterrupt = bind(&MOS6502::TriggerInterrupt,cpu,_1);
-    via2->ClearInterrupt = bind(&MOS6502::ClearInterrupt,cpu,_1);
+    via2->TriggerInterrupt = std::bind(&MOS6502::TriggerInterrupt,cpu,std::placeholders::_1);
+    via2->ClearInterrupt = std::bind(&MOS6502::ClearInterrupt,cpu,std::placeholders::_1);
 
     Jumper = 0;
     via1->Jumper = &Jumper;

@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 11.12.2018                //
+# // Letzte Änderung am 16.08.2019                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -46,11 +46,16 @@ void SidDumpWindow::RetranslateUi()
 
 void SidDumpWindow::on_SidDumpStart_clicked()
 {
-    if(c64 == NULL) return;
+    if(c64 == nullptr) return;
 
     QString filename;
     QString fileext;
-    if(!getSaveFileName(this,trUtf8("SID Dump Aufzeichen ..."),trUtf8("Emu64 SID Dump") + "(*.sdp)",&filename,&fileext))
+
+    QStringList filters;
+    filters << tr("Emu64 SID Dump (*.sdp)")
+            << tr("Alle Dateien (*.*)");
+
+    if(!CustomSaveFileDialog::GetSaveFileName(this,tr("SID Dump Aufzeichen ..."), filters, &filename, &fileext))
     {
         return;
     }
@@ -73,92 +78,18 @@ void SidDumpWindow::on_SidDumpStop_clicked()
 
 void SidDumpWindow::OnTimer1()
 {
-    if(c64 == 0) return;
+    if(c64 == nullptr) return;
 
-    int time = c64->GetSidDumpFrames();
-    unsigned  hour = time / (50*60*60);
-    time %= (50*60*60);
-    unsigned  minutes = time / (50*60);
-    time %= (50*60);
-    unsigned  seconds = time / 50;
-    unsigned  frames = time % 50;
+    int32_t time = c64->GetSidDumpFrames();
+    int32_t  hour = time / (50 * 60 * 60);
+    time %= (50 * 60 * 60);
+    int32_t  minutes = time / (50 * 60);
+    time %= (50 * 60);
+    int32_t  seconds = time / 50;
+    int32_t  frames = time % 50;
 
     char out_str[16];
 
     sprintf(out_str,"%02d:%02d:%02d-%02d",hour,minutes,seconds,frames);
     ui->TimeOutput->setText(out_str);
-}
-
-bool SidDumpWindow::getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt)
-{
-   if (fileName == NULL)      // "parent" is allowed to be NULL!
-      return false;
-
-   QFileDialog saveDialog(parent);
-   saveDialog.setWindowTitle(caption);
-   saveDialog.setAcceptMode(QFileDialog::AcceptSave);
-   saveDialog.setConfirmOverwrite(false);
-   saveDialog.setFilter(filter);
-   saveDialog.selectFile(*fileName);
-   saveDialog.setOptions(QFileDialog::DontUseNativeDialog);
-
-   *fileName = "";
-
-   if (!saveDialog.exec())
-      return false;      // User pressed "Cancel"
-
-   QStringList fileList = saveDialog.selectedFiles();
-   if (fileList.count() != 1)
-      return false;      // Should not happen, just to be sure
-
-   QString tmpFileName = fileList.at(0);
-   QString extension;
-
-   QFileInfo fileInfo(tmpFileName);
-   if (fileInfo.suffix().isEmpty()) {
-      // Add the suffix selected by the user
-
-      extension = saveDialog.selectedFilter();
-      extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
-      extension = extension.left(extension.indexOf(")"));
-      extension = extension.simplified();
-
-      // If the filter specifies more than one extension, choose the first one
-      if (extension.indexOf(" ") != -1)
-         extension = extension.left(extension.indexOf(" "));
-
-      tmpFileName = tmpFileName + QString(".") + extension;
-      fileInfo.setFile(tmpFileName);
-   }
-
-   /*
-   // Does the file already exist?
-   if (QFile::exists(tmpFileName)) {
-
-       extension = saveDialog.selectedFilter();
-       extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
-       extension = extension.left(extension.indexOf(")"));
-       extension = extension.simplified();
-
-      int result = QMessageBox::question(parent, QObject::trUtf8("Überschreiben?"),
-         QObject::trUtf8("Soll die Datei \"%1\" überschrieben werden?").arg(fileInfo.fileName()),
-         QMessageBox::Yes,
-         QMessageBox::No | QMessageBox::Default,
-         QMessageBox::Cancel | QMessageBox::Escape);
-      if (result == QMessageBox::Cancel)
-         return false;
-      else if (result == QMessageBox::No) {
-         // Next chance for the user to select a filename
-         if (!getSaveFileName(parent, caption, filter, &tmpFileName, &extension))
-            // User decided to cancel, exit function here
-            return false;
-      // User clicked "Yes", so process the execution
-      fileInfo.setFile(tmpFileName);
-      }
-   }
-    */
-
-   *fileName = tmpFileName;
-   *fileExt = extension;
-   return true;
 }

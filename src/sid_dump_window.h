@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 11.12.2018                //
+# // Letzte Änderung am 17.08.2019                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -18,9 +18,10 @@
 
 #include <QDialog>
 #include <QSettings>
-#include <QFileDialog>
 #include <QTimer>
+
 #include "./c64_class.h"
+#include "./custom_save_file_dialog.h"
 
 namespace Ui {
 class SidDumpWindow;
@@ -31,12 +32,11 @@ class SidDumpWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit SidDumpWindow(QWidget *parent = 0, C64Class *c64 = 0);
+    explicit SidDumpWindow(QWidget *parent = nullptr, C64Class *c64 = nullptr);
     ~SidDumpWindow();
     void RetranslateUi();
 
 private slots:
-    bool getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt);
     void on_SidDumpStart_clicked();
     void on_SidDumpStop_clicked();
     void OnTimer1();

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 07.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,11 +16,8 @@
 #ifndef MOS_6510_CLASS_H
 #define MOS_6510_CLASS_H
 
-#include "structs.h"
-
-#include <tr1/functional>
-using namespace std::tr1;
-using namespace std::tr1::placeholders;
+#include "./structs.h"
+#include <functional>
 
 #define DEBUG_CART_ADRESS 0xD7FF
 
@@ -45,8 +42,8 @@ public:
     void TriggerInterrupt(int typ);
     void ClearInterrupt(int typ);
 
-    function<unsigned char(unsigned short)> *ReadProcTbl;
-    function<void(unsigned short,unsigned char)> *WriteProcTbl;
+    std::function<unsigned char(unsigned short)> *ReadProcTbl;
+    std::function<void(unsigned short,unsigned char)> *WriteProcTbl;
 
     /// Variablen ///
 

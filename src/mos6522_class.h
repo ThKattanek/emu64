@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.08.2016                //
+// Letzte Änderung am 07.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,11 +16,9 @@
 #ifndef MOS6522_CLASS_H
 #define MOS6522_CLASS_H
 
-#include "structs.h"
+#include <functional>
 
-#include "tr1/functional"
-using namespace std::tr1;
-using namespace std::tr1::placeholders;
+#include "./structs.h"
 
 class MOS6522
 {
@@ -37,13 +35,13 @@ public:
     void WriteIO(unsigned short adresse, unsigned char);
     unsigned char ReadIO(unsigned short adresse);
 
-    function<bool(void)> SyncFound;
-    function<unsigned char(void)> ReadGCRByte;
-    function<void(unsigned char)> WriteGCRByte;
-    function<void(void)> SpurInc;
-    function<void(void)> SpurDec;
-    function<void(int)> TriggerInterrupt;
-    function<void(int)> ClearInterrupt;
+    std::function<bool(void)> SyncFound;
+    std::function<unsigned char(void)> ReadGCRByte;
+    std::function<void(unsigned char)> WriteGCRByte;
+    std::function<void(void)> SpurInc;
+    std::function<void(void)> SpurDec;
+    std::function<void(int)> TriggerInterrupt;
+    std::function<void(int)> ClearInterrupt;
 
     /// Variablen ///
 

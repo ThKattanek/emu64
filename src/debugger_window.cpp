@@ -8,16 +8,10 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.06.2019                //
+// Letzte Änderung am 16.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
-
-#include <QMenu>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QTimer>
-#include <QFontDatabase>
 
 #include "./debugger_window.h"
 #include "./ui_debugger_window.h"
@@ -205,7 +199,7 @@ void DebuggerWindow::onTimerAnimationRefresh()
                 {
                     ui->BreakpointTree->topLevelItem(i)->setBackgroundColor(0, QColor(0, 255, 0));
                     ui->BreakpointTree->topLevelItem(i)->setBackgroundColor(1, QColor(1, 255, 0));
-                    ui->BreakpointTree->topLevelItem(i)->setText(1, trUtf8("ERFÜLLT !"));
+                    ui->BreakpointTree->topLevelItem(i)->setText(1, tr("ERFÜLLT !"));
                 }
             }
         }
@@ -224,7 +218,7 @@ void DebuggerWindow::onTimerAnimationRefresh()
                         {
                             ui->BreakpointTree->topLevelItem(ii)->setBackgroundColor(0, QColor(0, 255, 0));
                             ui->BreakpointTree->topLevelItem(ii)->setBackgroundColor(1, QColor(1, 255, 0));
-                            ui->BreakpointTree->topLevelItem(ii)->setText(1, trUtf8("ERFÜLLT !"));
+                            ui->BreakpointTree->topLevelItem(ii)->setText(1, tr("ERFÜLLT !"));
                         }
                     }
                 }
@@ -423,7 +417,7 @@ void DebuggerWindow::onShowContextMenu(const QPoint& pos)
     // QPoint globalPos = myWidget->viewport()->mapToGlobal(pos);
 
     QMenu myMenu;
-    myMenu.addAction(trUtf8("Test1"));
+    myMenu.addAction(tr("Test1"));
     // ...
 
     QAction* selectedItem = myMenu.exec(globalPos);
@@ -498,7 +492,7 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
 
     if(!ok)
     {
-        QMessageBox::warning(this, trUtf8("Eingabefehler..."), trUtf8("Es wurde kein gültiges Zahlenformat benutzt !"));
+        QMessageBox::warning(this, tr("Eingabefehler..."), tr("Es wurde kein gültiges Zahlenformat benutzt !"));
         return;
     }
 
@@ -514,7 +508,7 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
         if(value > 0x100) value -= 0x100;
         if(value > 0xFF)
         {
-            QMessageBox::warning(this, trUtf8("Eingabefehler..."), trUtf8("Der Wert muss zwischen 0 und 511 liegen !"));
+            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Der Wert muss zwischen 0 und 511 liegen !"));
             return;
         }
         cpu_reg.reg_mask = REG_MASK_SP;
@@ -523,7 +517,7 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
     case 2:
         if(value > 0xFF)
         {
-            QMessageBox::warning(this, trUtf8("Eingabefehler..."), trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
+            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
         cpu_reg.reg_mask = REG_MASK_AC;
@@ -532,7 +526,7 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
     case 3:
         if(value > 0xFF)
         {
-            QMessageBox::warning(this, trUtf8("Eingabefehler..."), trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
+            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
         cpu_reg.reg_mask = REG_MASK_XR;
@@ -541,7 +535,7 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
     case 4:
         if(value > 0xFF)
         {
-            QMessageBox::warning(this, trUtf8("Eingabefehler..."), trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
+            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
         cpu_reg.reg_mask = REG_MASK_YR;
@@ -550,7 +544,7 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
     case 5:
         if(value > 0xFF)
         {
-            QMessageBox::warning(this, trUtf8("Eingabefehler..."), trUtf8("Der Wert muss zwischen 0 und 255 liegen !"));
+            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Der Wert muss zwischen 0 und 255 liegen !"));
             return;
         }
         cpu_reg.reg_mask = REG_MASK_SR;
@@ -588,7 +582,6 @@ void DebuggerWindow::on_OneOpcode_clicked()
     c64->OneOpcode(current_source);
 }
 
-
 void DebuggerWindow::on_CycleCounterReset_clicked()
 {
     if(current_source > 0)
@@ -600,78 +593,6 @@ void DebuggerWindow::on_CycleCounterReset_clicked()
         c64->ResetC64CycleCounter();
     }
     ui->CycleCounter_Out->setText("0000000000");
-}
-
-bool DebuggerWindow::GetSaveFileName(QWidget* parent, QString caption, QString filter, QString* fileName, QString* fileExt)
-{
-   if (fileName == nullptr)      // "parent" is allowed to be NULL!
-      return false;
-
-   QFileDialog saveDialog(parent);
-   saveDialog.setWindowTitle(caption);
-   saveDialog.setAcceptMode(QFileDialog::AcceptSave);
-   saveDialog.setConfirmOverwrite(false);
-   saveDialog.setFilter(filter);
-   saveDialog.selectFile(*fileName);
-   saveDialog.setOptions(QFileDialog::DontUseNativeDialog);
-
-   *fileName = "";
-
-   if (!saveDialog.exec())
-      return false;      // User pressed "Cancel"
-
-   QStringList file_list = saveDialog.selectedFiles();
-   if (file_list.count() != 1)
-      return false;      // Should not happen, just to be sure
-
-   QString tmp_file_name = file_list.at(0);
-   QString extension;
-
-   QFileInfo fileInfo(tmp_file_name);
-   if (fileInfo.suffix().isEmpty()) {
-      // Add the suffix selected by the user
-
-      extension = saveDialog.selectedFilter();
-      extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
-      extension = extension.left(extension.indexOf(")"));
-      extension = extension.simplified();
-
-      // If the filter specifies more than one extension, choose the first one
-      if (extension.indexOf(" ") != -1)
-         extension = extension.left(extension.indexOf(" "));
-
-      tmp_file_name = tmp_file_name + QString(".") + extension;
-      fileInfo.setFile(tmp_file_name);
-   }
-
-   // Does the file already exist?
-   if (QFile::exists(tmp_file_name)) {
-
-       extension = saveDialog.selectedFilter();
-       extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
-       extension = extension.left(extension.indexOf(")"));
-       extension = extension.simplified();
-
-      int result = QMessageBox::question(parent, QObject::trUtf8("Überschreiben?"),
-         QObject::trUtf8("Soll die Datei \"%1\" überschrieben werden?").arg(fileInfo.fileName()),
-         QMessageBox::Yes,
-         QMessageBox::No | QMessageBox::Default,
-         QMessageBox::Cancel | QMessageBox::Escape);
-      if (result == QMessageBox::Cancel)
-         return false;
-      else if (result == QMessageBox::No) {
-         // Next chance for the user to select a filename
-         if (!GetSaveFileName(parent, caption, filter, &tmp_file_name, &extension))
-            // User decided to cancel, exit function here
-            return false;
-      // User clicked "Yes", so process the execution
-      fileInfo.setFile(tmp_file_name);
-      }
-   }
-
-   *fileName = tmp_file_name;
-   *fileExt = extension;
-   return true;
 }
 
 void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
@@ -960,7 +881,7 @@ void DebuggerWindow::on_AssAdresseIn_returnPressed()
     value = in_str.toUShort(&ok,0);
     if(!ok)
     {
-        QMessageBox::warning(this, trUtf8("Eingabefehler..."), trUtf8("Es wurde kein gültiges Zahlenformat benutzt !"));
+        QMessageBox::warning(this, tr("Eingabefehler..."), tr("Es wurde kein gültiges Zahlenformat benutzt !"));
         return;
     }
 
@@ -1192,27 +1113,27 @@ void DebuggerWindow::on_AssAdressierungIn_returnPressed()
         switch(new_adress)
         {
         case 0:
-            QMessageBox::warning(this, trUtf8("Fehler...!"), trUtf8("Fehlerhafte Adresse."));
+            QMessageBox::warning(this, tr("Fehler...!"), tr("Fehlerhafte Adresse."));
             ui->AssAdresseIn->selectAll();
             ui->AssAdresseIn->setFocus();
             break;
         case 1:
-            QMessageBox::warning(this, trUtf8("Fehler...!"), trUtf8("Unbekanntes Mnemonic."));
+            QMessageBox::warning(this, tr("Fehler...!"), tr("Unbekanntes Mnemonic."));
             ui->AssMnemonicIn->selectAll();
             ui->AssMnemonicIn->setFocus();
             break;
         case 2:
-            QMessageBox::warning(this, trUtf8("Fehler...!"), trUtf8("Unbekannte Adressierung."));
+            QMessageBox::warning(this, tr("Fehler...!"), tr("Unbekannte Adressierung."));
             ui->AssAdressierungIn->selectAll();
             ui->AssAdressierungIn->setFocus();
             break;
         case 3:
-            QMessageBox::warning(this, trUtf8("Fehler...!"), trUtf8("Spungweite für Branchbefehl ist zu groß."));
+            QMessageBox::warning(this, tr("Fehler...!"), tr("Spungweite für Branchbefehl ist zu groß."));
             ui->AssAdressierungIn->selectAll();
             ui->AssAdressierungIn->setFocus();
             break;
         case 4:
-            QMessageBox::warning(this, trUtf8("Fehler...!"), trUtf8("Dieser Opcode unterstützt nicht diese Adressierung."));
+            QMessageBox::warning(this, tr("Fehler...!"), tr("Dieser Opcode unterstützt nicht diese Adressierung."));
             ui->AssAdressierungIn->selectAll();
             ui->AssAdressierungIn->setFocus();
             break;
@@ -1369,8 +1290,8 @@ void DebuggerWindow::on_AnimationStop_clicked()
 
 void DebuggerWindow::on_AnimationSpeed_valueChanged(int value)
 {
-    if(value == 1) ui->anispeed_out->setText(QVariant(value).toString() + trUtf8(" Zyklus/Sek"));
-    else ui->anispeed_out->setText(QVariant(value).toString() + trUtf8(" Zyklen/Sek"));
+    if(value == 1) ui->anispeed_out->setText(QVariant(value).toString() + tr(" Zyklus/Sek"));
+    else ui->anispeed_out->setText(QVariant(value).toString() + tr(" Zyklen/Sek"));
     c64->SetDebugAnimationSpeed(value);
 }
 
@@ -1403,7 +1324,7 @@ void DebuggerWindow::on_AddBreakpoint_clicked()
         if(current_source > 0) bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(index);
         else bg = c64->GetBreakGroup(index);
 
-        QString Name = trUtf8("Haltepunkt (") + QVariant(auto_num[current_source]++).toString() + ")";
+        QString Name = tr("Haltepunkt (") + QVariant(auto_num[current_source]++).toString() + ")";
         strcpy(bg->Name,Name.toLocal8Bit().constData());
         bg->Enable = true;
 
@@ -1431,7 +1352,7 @@ void DebuggerWindow::on_DelBreakpoint_clicked()
             Name = item->parent()->text(0);
         }
 
-        if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Haltepunkt löschen..."),trUtf8("Möchten Sie den folgenden Haltepunkt löschen?\n") + ">> " + Name + " <<",QMessageBox::Yes | QMessageBox::No))
+        if(QMessageBox::Yes == QMessageBox::question(this,tr("Haltepunkt löschen..."),tr("Möchten Sie den folgenden Haltepunkt löschen?\n") + ">> " + Name + " <<",QMessageBox::Yes | QMessageBox::No))
         {
             ui->BreakpointTree->takeTopLevelItem(bg_index);
             if(current_source > 0) c64->floppy[currnet_floppy_nr]->DelBreakGroup(bg_index);
@@ -1448,22 +1369,22 @@ void DebuggerWindow::AddBreakpointTreeRoot(QString name,BREAK_GROUP *bg)
     item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEditable);
     item->setCheckState(0,Qt::Checked);
     item->setDisabled(false);
-    item->setToolTip(0,trUtf8("Der Name des Haltepunkts kann frei gewählt werden."));
+    item->setToolTip(0,tr("Der Name des Haltepunkts kann frei gewählt werden."));
     ui->BreakpointTree->addTopLevelItem(item);
 
     break_point_update_enable = false;
-    AddBreakpointTreeChild(item,bg->iPC,bg->bPC,trUtf8("Wenn der Wert gleich dem Programm Counter (PC) ist."));
-    AddBreakpointTreeChild(item,bg->iAC,bg->bAC,trUtf8("Wenn der Wert gleich dem Accu Register (AC) ist."));
-    AddBreakpointTreeChild(item,bg->iXR,bg->bXR,trUtf8("Wenn der Wert gleich dem X Register (XR) ist."));
-    AddBreakpointTreeChild(item,bg->iYR,bg->bYR,trUtf8("Wenn der Wert gleich dem Y Register (YR) ist."));
-    AddBreakpointTreeChild(item,bg->iRAdresse,bg->bRAdresse,trUtf8("Wenn ein Lesezugriff an dieser Adresse statt findet."));
-    AddBreakpointTreeChild(item,bg->iWAdresse,bg->bWAdresse,trUtf8("Wenn ein Schreibzugriff an dieser Adresse statt findet."));
-    AddBreakpointTreeChild(item,bg->iRWert,bg->bRWert,trUtf8("Wenn aus einer Adresse dieser Wert ausgelesen wird."));
-    AddBreakpointTreeChild(item,bg->iWWert,bg->bWWert,trUtf8("Wenn in einer Adresse dieser Wert geschrieben wird."));
+    AddBreakpointTreeChild(item,bg->iPC,bg->bPC,tr("Wenn der Wert gleich dem Programm Counter (PC) ist."));
+    AddBreakpointTreeChild(item,bg->iAC,bg->bAC,tr("Wenn der Wert gleich dem Accu Register (AC) ist."));
+    AddBreakpointTreeChild(item,bg->iXR,bg->bXR,tr("Wenn der Wert gleich dem X Register (XR) ist."));
+    AddBreakpointTreeChild(item,bg->iYR,bg->bYR,tr("Wenn der Wert gleich dem Y Register (YR) ist."));
+    AddBreakpointTreeChild(item,bg->iRAdresse,bg->bRAdresse,tr("Wenn ein Lesezugriff an dieser Adresse statt findet."));
+    AddBreakpointTreeChild(item,bg->iWAdresse,bg->bWAdresse,tr("Wenn ein Schreibzugriff an dieser Adresse statt findet."));
+    AddBreakpointTreeChild(item,bg->iRWert,bg->bRWert,tr("Wenn aus einer Adresse dieser Wert ausgelesen wird."));
+    AddBreakpointTreeChild(item,bg->iWWert,bg->bWWert,tr("Wenn in einer Adresse dieser Wert geschrieben wird."));
     if(current_source == 0)
     {
-        AddBreakpointTreeChild(item,bg->iRZ,bg->bRZ,trUtf8("Wenn der Wert gleich der Aktuellen Rasterzeile ist."));
-        AddBreakpointTreeChild(item,bg->iRZZyklus,bg->bRZZyklus,trUtf8("Wenn der Wert gleich dem Aktuellen Zyklus in einer Rasterzeile ist."));
+        AddBreakpointTreeChild(item,bg->iRZ,bg->bRZ,tr("Wenn der Wert gleich der Aktuellen Rasterzeile ist."));
+        AddBreakpointTreeChild(item,bg->iRZZyklus,bg->bRZZyklus,tr("Wenn der Wert gleich dem Aktuellen Zyklus in einer Rasterzeile ist."));
     }
     break_point_update_enable = true;
     c64->UpdateBreakGroup();
@@ -1479,7 +1400,7 @@ void DebuggerWindow::AddBreakpointTreeChild(QTreeWidgetItem *parent, uint16_t va
     else item->setCheckState(0,Qt::Unchecked);
     item->setDisabled(false);
     item->setToolTip(0,tooltip);
-    item->setToolTip(1,trUtf8("Doppelklick um Werte zu verändern."));
+    item->setToolTip(1,tr("Doppelklick um Werte zu verändern."));
     item->setBackgroundColor(1,QColor(200,200,255));
     item->setForeground(1,QColor(200,0,0));
     parent->addChild(item);
@@ -1657,7 +1578,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 bg->bYR = item->checkState(0);
                 break;
             case 4:
-                item->setText(0,trUtf8("Lesen von Adresse:"));
+                item->setText(0,tr("Lesen von Adresse:"));
 
                 if(tmp_str != "")
                 {
@@ -1682,7 +1603,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 bg->bRAdresse = item->checkState(0);
                 break;
             case 5:
-                item->setText(0,trUtf8("Schreiben in Adresse:"));
+                item->setText(0,tr("Schreiben in Adresse:"));
 
                 if(tmp_str != "")
                 {
@@ -1707,7 +1628,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 bg->bWAdresse = item->checkState(0);
                 break;
             case 6:
-                item->setText(0,trUtf8("Lesen von Wert:"));
+                item->setText(0,tr("Lesen von Wert:"));
 
                 if(tmp_str != "")
                 {
@@ -1741,7 +1662,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 bg->bRWert = item->checkState(0);
                 break;
             case 7:
-                item->setText(0,trUtf8("Schreiben von Wert:"));
+                item->setText(0,tr("Schreiben von Wert:"));
 
                 if(tmp_str != "")
                 {
@@ -1775,7 +1696,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 bg->bWWert = item->checkState(0);
                 break;
             case 8:
-                item->setText(0,trUtf8("Rasterzeile:"));
+                item->setText(0,tr("Rasterzeile:"));
 
                 if(tmp_str != "")
                 {
@@ -1809,7 +1730,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 bg->bRZ = item->checkState(0);
                 break;
             case 9:
-                item->setText(0,trUtf8("Zyklus:"));
+                item->setText(0,tr("Zyklus:"));
 
                 if(tmp_str != "")
                 {
@@ -1869,7 +1790,7 @@ void DebuggerWindow::BreakpointProc()
 void DebuggerWindow::on_LoadBreakpoints_clicked()
 {
     if(ui->BreakpointTree->topLevelItemCount() > 0)
-        if(QMessageBox::No == QMessageBox::question(this, trUtf8("Haltepunkte laden..."), trUtf8("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
+        if(QMessageBox::No == QMessageBox::question(this, tr("Haltepunkte laden..."), tr("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
             return;
 
     ui->BreakpointTree->clear();
@@ -1877,7 +1798,7 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
     if(current_source > 0) c64->floppy[currnet_floppy_nr]->DeleteAllBreakGroups();
     else c64->DeleteAllBreakGroups();
 
-    QString filename = QFileDialog::getOpenFileName(this, trUtf8("Haltepunkte öffnen"), QDir::homePath(), trUtf8("Emu64 Haltepunkt Datei ") + "(*.bpt)", nullptr, QFileDialog::DontUseNativeDialog);
+    QString filename = QFileDialog::getOpenFileName(this, tr("Haltepunkte öffnen"), QDir::homePath(), tr("Emu64 Haltepunkt Datei ") + "(*.bpt)", nullptr, QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
        int ret;
@@ -1889,16 +1810,16 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
             switch(ret)
             {
             case -1:
-                QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Die Datei konnte nicht geöffnet werden."));
+                QMessageBox::warning(this,tr("Fehler..."),tr("Die Datei konnte nicht geöffnet werden."));
                 break;
             case -2:
-                QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Es handelt sich nicht um eine Emu64 Datei."));
+                QMessageBox::warning(this,tr("Fehler..."),tr("Es handelt sich nicht um eine Emu64 Datei."));
                 break;
             case -3:
-                QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Diese Datei wurde mit einer neueren Emu64 Version erstellt."));
+                QMessageBox::warning(this,tr("Fehler..."),tr("Diese Datei wurde mit einer neueren Emu64 Version erstellt."));
                 break;
             case -4:
-                QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Diese Datei enthält keine Haltepunkte."));
+                QMessageBox::warning(this,tr("Fehler..."),tr("Diese Datei enthält keine Haltepunkte."));
                 break;
             }
        }
@@ -1933,7 +1854,12 @@ void DebuggerWindow::on_SaveBreakpoints_clicked()
 
     QString filename;
     QString fileext;
-    if(!GetSaveFileName(this,trUtf8("Haltepunkte speichern"),trUtf8("Emu64 Haltepunkt Datei ") + "(*.bpt)",&filename,&fileext))
+
+    QStringList filters;
+    filters << tr("Emu64 Haltepunkt Datei (*.bpt)")
+            << tr("Alle Dateien (*.*)");
+
+    if(!CustomSaveFileDialog::GetSaveFileName(this, tr("Haltepunkte speichern"), filters, &filename, &fileext))
     {
         return;
     }
@@ -1941,19 +1867,19 @@ void DebuggerWindow::on_SaveBreakpoints_clicked()
     if(current_source > 0)
     {
         if(!c64->floppy[currnet_floppy_nr]->SaveBreakGroups(filename.toLatin1().data()))
-            QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Die Haltepunkte konnten nicht gespeichert werden."));
+            QMessageBox::warning(this,tr("Fehler..."),tr("Die Haltepunkte konnten nicht gespeichert werden."));
     }
     else
     {
         if(!c64->SaveBreakGroups(filename.toLatin1().data()))
-          QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Die Haltepunkte konnten nicht gespeichert werden."));
+          QMessageBox::warning(this,tr("Fehler..."),tr("Die Haltepunkte konnten nicht gespeichert werden."));
     }
 }
 
 void DebuggerWindow::on_DelAllBreakpoints_clicked()
 {
     if(ui->BreakpointTree->topLevelItemCount() > 0)
-        if(QMessageBox::Yes == QMessageBox::question(this, trUtf8("Achtung..."), trUtf8("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
+        if(QMessageBox::Yes == QMessageBox::question(this, tr("Achtung..."), tr("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
         {
             if(current_source > 0) c64->floppy[currnet_floppy_nr]->DeleteAllBreakGroups();
             else c64->DeleteAllBreakGroups();
@@ -1978,7 +1904,7 @@ void DebuggerWindow::on_ExportDisAss_clicked()
     value = in_str.toUShort(&ok,0);
     if(!ok)
     {
-        QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Es wurde kein gültiges Zahlenformat benutzt ! [Export Von:]"));
+        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gültiges Zahlenformat benutzt ! [Export Von:]"));
         return;
     }
     start = value;
@@ -1988,20 +1914,26 @@ void DebuggerWindow::on_ExportDisAss_clicked()
     value = in_str.toUShort(&ok,0);
     if(!ok)
     {
-        QMessageBox::warning(this,trUtf8("Eingabefehler..."),trUtf8("Es wurde kein gültiges Zahlenformat benutzt ! [Export Bis:]"));
+        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gültiges Zahlenformat benutzt ! [Export Bis:]"));
         return;
     }
     end = value;
 
     if(start >= end)
     {
-        QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Startadresse muss kleiner sein als Endadresse."));
+        QMessageBox::warning(this,tr("Fehler..."),tr("Startadresse muss kleiner sein als Endadresse."));
         return;
     }
 
     QString filename;
     QString fileext;
-    if(!GetSaveFileName(this,trUtf8("Export..."),trUtf8("Disassembler Listing") + "(*.txt);;" + trUtf8("C64 Programm Datei") + "(*.prg)",&filename,&fileext))
+
+    QStringList filters;
+    filters << tr("Disassembler Listing (*.txt)")
+            << tr("C64 Programm Datei (*.prg)")
+            << tr("Alle Dateien (*.*)");
+
+    if(!CustomSaveFileDialog::GetSaveFileName(this,tr("Export..."), filters, &filename, &fileext))
     {
         return;
     }
@@ -2010,18 +1942,18 @@ void DebuggerWindow::on_ExportDisAss_clicked()
     if(fileext == "TXT")
     {
         if(!c64->ExportASM(filename.toLatin1().data(),start,end,current_source))
-            QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Fehler beim speichern der Disassembler Datei."));
+            QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der Disassembler Datei."));
     }
 
     if(fileext == "PRG")
     {
         if((current_source > 0) && (end > 0x07FF))
         {
-            QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Floppy RAM geht nur von $0000 - $07FF (2KB)."));
+            QMessageBox::warning(this,tr("Fehler..."),tr("Floppy RAM geht nur von $0000 - $07FF (2KB)."));
             return;
         }
         if(!c64->ExportPRG(filename.toLatin1().data(),start,end,current_source))
-            QMessageBox::warning(this,trUtf8("Fehler..."),trUtf8("Fehler beim speichern der Programm Datei."));
+            QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der Programm Datei."));
     }
 }
 
@@ -2044,7 +1976,7 @@ void DebuggerWindow::RefreshGUI(void)
         c64->floppy[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr],&floppy_cpu_ireg[currnet_floppy_nr]);
 
         /// Register Group ///
-        ui->RegisterGroup->setTitle(trUtf8("CPU 6502 Register"));
+        ui->RegisterGroup->setTitle(tr("CPU 6502 Register"));
         ui->label_nmi->setVisible(false);
         ui->label_0314->setVisible(false);
         ui->label_0318->setVisible(false);
@@ -2053,7 +1985,7 @@ void DebuggerWindow::RefreshGUI(void)
         ui->_0318_out->setVisible(false);
 
         /// IRegister Group ///
-        ui->IRegisterGroup->setTitle(trUtf8("CPU 6502 Interne Register (Emu64 Modell)"));
+        ui->IRegisterGroup->setTitle(tr("CPU 6502 Interne Register (Emu64 Modell)"));
         ui->label_cpu_wait->setVisible(false);
         ui->wait_led->setVisible(false);
 
@@ -2152,7 +2084,7 @@ void DebuggerWindow::RefreshGUI(void)
         /// C64 ///
 
         /// Register Group ///
-        ui->RegisterGroup->setTitle(trUtf8("CPU 6510 Register"));
+        ui->RegisterGroup->setTitle(tr("CPU 6510 Register"));
         ui->label_nmi->setVisible(true);
         ui->label_0314->setVisible(true);
         ui->label_0318->setVisible(true);
@@ -2161,7 +2093,7 @@ void DebuggerWindow::RefreshGUI(void)
         ui->_0318_out->setVisible(true);
 
         /// IRegister Group ///
-        ui->IRegisterGroup->setTitle(trUtf8("CPU 6510 Interne Register (Emu64 Modell)"));
+        ui->IRegisterGroup->setTitle(tr("CPU 6510 Interne Register (Emu64 Modell)"));
         ui->label_cpu_wait->setVisible(true);
         ui->wait_led->setVisible(true);
 

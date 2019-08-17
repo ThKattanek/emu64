@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.06.2019                //
+// Letzte Änderung am 16.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,10 +19,12 @@
 #include <QDialog>
 #include <QMenu>
 #include <QSettings>
+#include <QFontDatabase>
 
-#include "d64_class.h"
-#include "c64_class.h"
-#include "floppy_new_d64_window.h"
+#include "./d64_class.h"
+#include "./c64_class.h"
+#include "./floppy_new_d64_window.h"
+#include "./custom_save_file_dialog.h"
 
 namespace Ui {
     class FloppyWindow;
@@ -37,7 +39,7 @@ public:
     ~FloppyWindow();
     void RetranslateUi();
     void LoadIni();
-    bool SetDiskImage(int floppynr, QString filename);
+    bool SetDiskImage(uint8_t floppynr, QString filename);
     void showEvent(QShowEvent *event);
     QString GetAktFilename(int floppynr);
     QString GetAktD64Name(int floppynr);
@@ -68,7 +70,6 @@ private slots:
 
 private:
     void RefreshD64FileList(void);
-    bool GetSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt);
     void SetD64BigSize(bool enable);
 
     Ui::FloppyWindow *ui;

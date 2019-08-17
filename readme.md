@@ -10,17 +10,16 @@ Emu64 auf Facebook: [https://www.facebook.com/Emu64-103321833093172](https://www
 ## Screenshot
 ![Screenshot](screenshot.png)
 
-
 ## Emu64 erstellen unter Linux
 
-### Benötigte Dev Pakete 
-- qt4
-- git
-- cmake
+### Wichtige Vorraussetzung
+- qttools5-dev-tools
+
+### Benötigte Libs 
+- qt5
 - sdl2
 - sdl2-image
 - quazip
-- png
 - ffmpeg
   - avcodec
   - avutil
@@ -34,11 +33,10 @@ git clone https://github.com/ThKattanek/emu64.git
 cd emu64
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
+qmake PREFIX="/usr/local" ..
 make
 make install
 ```
-Optional kann noch -DCMAKE_INSTALL_PREFIX=[InstallPfad] verwendet werden.
 
 ### Deinstallieren
 ```bash

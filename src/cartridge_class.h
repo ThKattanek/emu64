@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 07.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,13 +16,11 @@
 #ifndef CARTRIDGE_CLASS_H
 #define CARTRIDGE_CLASS_H
 
+#include <functional>
+
 #include "./structs.h"
 #include "./am29f040_class.h"
 #include "./mk7pla.h"
-
-#include "tr1/functional"
-using namespace std::tr1;
-using namespace std::tr1::placeholders;
 
 class CartridgeClass
 {
@@ -54,10 +52,10 @@ public:
     uint8_t ReadRom2(uint16_t address);
     uint8_t ReadRom3(uint16_t address);
 
-    function<void(void)> ChangeMemMapProc;
-    function<void(int)> CpuTriggerInterrupt;
-    function<void(int)> CpuClearInterrupt;
-    function<void(int,bool)> ChangeLED;
+    std::function<void(void)> ChangeMemMapProc;
+    std::function<void(int)> CpuTriggerInterrupt;
+    std::function<void(int)> CpuClearInterrupt;
+    std::function<void(int,bool)> ChangeLED;
 
     // Variablen
     bool        *exrom;

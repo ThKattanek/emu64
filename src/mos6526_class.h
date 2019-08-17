@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 14.05.2016                //
+// Letzte Änderung am 07.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,12 +17,10 @@
 #define MOS_6526_CLASS_H
 
 #include <cstring>
-#include "mos6526_port.h"
-#include "structs.h"
+#include <functional>
 
-#include "tr1/functional"
-using namespace std::tr1;
-using namespace std::tr1::placeholders;
+#include "./mos6526_port.h"
+#include "./structs.h"
 
 #define UhrCounterPAL 98438
 #define UhrCounterNTSC 118126
@@ -61,11 +59,11 @@ public:
 
     bool *RESET;
     bool RESET_OLD;
-    function<void(int)> CpuTriggerInterrupt;
-    function<void(int)> CpuClearInterrupt;
-    function<void(void)> VicTriggerLP;
+    std::function<void(int)> CpuTriggerInterrupt;
+    std::function<void(int)> CpuClearInterrupt;
+    std::function<void(void)> VicTriggerLP;
 
-    function<void(void)> ChangePOTSwitch;
+    std::function<void(void)> ChangePOTSwitch;
 
     PORT *PA;
     PORT *PB;

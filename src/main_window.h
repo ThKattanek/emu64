@@ -21,8 +21,6 @@
 #include <QSettings>
 #include <QActionGroup>
 #include <QMainWindow>
-#include <QMessageBox>
-#include <QFileDialog>
 #include <QBitmap>
 #include <QRect>
 #include <QThread>
@@ -44,7 +42,7 @@
 #include "./show_c64_key_mapping_window.h"
 #include "./video_capture_window.h"
 #include "./sid_dump_window.h"
-
+#include "./custom_save_file_dialog.h"
 #include "./command_line_class.h"
 #include "./emu64_commands.h"
 #include "c64_class.h"
@@ -142,7 +140,6 @@ private:
     void CreateLanguageMenu(QString defaultLocale);
     void RetranslateUi();
     void SetC64ScreenTitle(void);
-    bool getSaveFileName(QWidget *parent, QString caption, QString filter, QString *fileName, QString *fileExt);
     void ExecuteCommandLine(vector<char*> &arg);
     void SplashMessage(const QString &message, const QColor &color);
 

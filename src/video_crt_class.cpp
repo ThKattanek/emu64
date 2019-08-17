@@ -65,6 +65,9 @@ VideoCrtClass::VideoCrtClass()
     AktFarbMode = 0;
     Double2x = false;
     Kontrast = 0.8;
+
+    HoBlurWY = 0;
+    HoBlurWUV = 0;
 }
 
 VideoCrtClass::~VideoCrtClass(void)

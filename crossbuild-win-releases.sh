@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 06.02.2018                //
+# // Letzte Änderung am 12.08.2019                //
 # // www.emu64-projekt.de                         //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -36,6 +36,8 @@ else
     exit
 fi    
 
+export PATH=$mxe_path/usr/bin:$PATH
+
 # check and create a public_release dir
 if [ ! -d ./public_release ]; then
 mkdir ./public_release; 
@@ -45,18 +47,18 @@ fi
 
 cd public_release
 
-# check of cmake for static i686 and x86_64
-declare i686_cmake=$mxe_path/usr/bin/i686-w64-mingw32.static-cmake
-declare x86_64_cmake=$mxe_path/usr/bin/x86_64-w64-mingw32.static-cmake
+# check of qmake for static i686 and x86_64
+declare i686_qmake=$mxe_path/usr/i686-w64-mingw32.static/qt5/bin/qmake
+declare x86_64_qmake=$mxe_path/usr/x86_64-w64-mingw32.static/qt5/bin/qmake
 
 if [ ! -e $i686_cmake ]; then
-    echo "Cmake for static i686 is not exist!"
+    echo "qmake for static i686 is not exist!"
 else
     declare i686_ok=true
 fi
 
 if [ ! -e $x86_64_cmake ]; then
-    echo "Cmake for static x86_64 is not exist!"
+    echo "qmake for static x86_64 is not exist!"
 else
     declare x86_64_ok=true
 fi
@@ -74,14 +76,14 @@ if [ $i686_ok ]; then
     fi
 
     # check and delete if exist a install dir
-    declare install_i686_dir="./"$project_name"_"$version"_win_x32"
+    declare install_i686_dir=$PWD"/"$project_name"_"$version"_win_x32"
     if [ -d $install_i686_dir ]; then
         rm -rf $install_i686_dir/*
     fi
 
     # execute cmake
     cd $build_i686_dir
-    $i686_cmake ../.. -DCMAKE_INSTALL_PREFIX=../$install_i686_dir -DWIN32_STATIC_BUILD=TRUE
+    $i686_qmake PREFIX=$install_i686_dir ../..
     make -j8 install
     cd ..
     
@@ -116,14 +118,14 @@ if [ $x86_64_ok ]; then
     fi
 
     # check and delete if exist a install dir
-    declare install_x86_64_dir="./"$project_name"_"$version"_win_x64"
+    declare install_x86_64_dir=$PWD"/"$project_name"_"$version"_win_x64"
     if [ -d $install_x86_64_dir ]; then
         rm -rf $install_x86_64_dir/*
     fi
 
     # execute cmake
     cd $build_x86_64_dir
-    $x86_64_cmake ../.. -DCMAKE_INSTALL_PREFIX=../$install_x86_64_dir -DWIN32_STATIC_BUILD=TRUE
+    $x86_64_qmake PREFIX=$install_x86_64_dir ../..
     make -j8 install
     cd ..
 

@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     XInitThreads();
 #endif
 
-    QTextStream *log = 0;
+    QTextStream *log = nullptr;
     QDir config_dir = QDir(QDir::homePath() + "/.config/emu64");
 
     CommandLineClass *cmd_line = new CommandLineClass(argc, argv, "emu64",command_list, command_list_count);

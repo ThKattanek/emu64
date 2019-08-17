@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 16.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -376,7 +376,7 @@ void CartridgeWindow::on_NewEasyFlashCRT_clicked()
         {
             if(c64->CreateNewEasyFlashImage(fullpath.toLatin1().data(), cartridge_name.toLatin1().data()))
             {
-                QMessageBox::critical(this,trUtf8("Fehler!"),trUtf8("Es konnte kein neues EasyFlash Image erstellt werden."));
+                QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues EasyFlash Image erstellt werden."));
             }
             else
             {
@@ -386,11 +386,11 @@ void CartridgeWindow::on_NewEasyFlashCRT_clicked()
         }
         else
         {
-            if(QMessageBox::Yes == QMessageBox::question(this,trUtf8("Achtung!"),trUtf8("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
+            if(QMessageBox::Yes == QMessageBox::question(this,tr("Achtung!"),tr("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
             {
                 if(c64->CreateNewEasyFlashImage(fullpath.toLatin1().data(), cartridge_name.toLatin1().data()))
                 {
-                    QMessageBox::critical(this,trUtf8("Fehler!"),trUtf8("Es konnte kein neues EasyFlash Image erstellt werden."));
+                    QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues EasyFlash Image erstellt werden."));
                 }
                 else
                 {
@@ -427,7 +427,7 @@ void CartridgeWindow::on_InsertCRT_clicked()
                 break;
             }
         }
-        else QMessageBox::warning(this,trUtf8("CRT Fehler"),trUtf8("Fehler beim Laden des ausgewählten CRT Files"));
+        else QMessageBox::warning(this,tr("CRT Fehler"),tr("Fehler beim Laden des ausgewählten CRT Files"));
     }
 }
 

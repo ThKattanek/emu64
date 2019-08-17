@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.08.2016                //
+// Letzte Änderung am 16.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -32,8 +32,8 @@ FloppyNewD64Window::FloppyNewD64Window(QWidget *parent) :
     ui->Diskname->setFont(*c64_font1);
     ui->DIskID->setFont(*c64_font1);
 
-    ui->Filename->setText(trUtf8("Neue_Disk"));
-    ui->Diskname->setText(trUtf8("EMU64 DISK"));
+    ui->Filename->setText(tr("Neue_Disk"));
+    ui->Diskname->setText(tr("EMU64 DISK"));
     ui->DIskID->setText("01");
 }
 

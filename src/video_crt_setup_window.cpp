@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 16.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -135,7 +135,7 @@ void VideoCrtSetupWindow::on_horblurUV_scroll_valueChanged(int value)
 void VideoCrtSetupWindow::on_phase_scroll_valueChanged(int value)
 {
     float winkel = (value - 1000) * 0.045f;
-    ui->phase_out->setText(QVariant(winkel).toString() + trUtf8("°"));
+    ui->phase_out->setText(QVariant(winkel).toString() + tr("°"));
     video_crt_output->SetPhaseAltLineOffset(value);
     video_crt_output->UpdateParameter();
 }

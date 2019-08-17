@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 16.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,8 +19,12 @@
 #include <QTreeWidgetItem>
 #include <QTableWidgetItem>
 #include <QSettings>
+#include <QMenu>
+#include <QTimer>
+#include <QFontDatabase>
 
 #include "./c64_class.h"
+#include "./custom_save_file_dialog.h"
 #include "./label_widget_mod.h"
 #include "./cpu_info.h"
 #include "./memory_window.h"
@@ -93,7 +97,6 @@ private slots:
 private:
 
     void UpdateRegister(void);
-    bool GetSaveFileName(QWidget* parent, QString caption, QString filter, QString* fileName, QString* fileExt);
     void FillDisassemblyList(uint16_t address, bool new_refresh);
     void FillHistoryList(uint8_t index);
     bool FindMnemonic(QString mnemonic, uint8_t* opcode = nullptr, uint8_t *opcode_count = nullptr);
@@ -112,7 +115,7 @@ private:
     QSettings *ini;
     QStringList rw_string;
     bool is_one_showed;
-    int current_edit_reg;
+    int32_t current_edit_reg;
     QIcon *icon_off;
     QIcon *icon_on;
     QMenu *context_diss_assList;
@@ -124,13 +127,13 @@ private:
     QColor table_position_color;
     uint16_t view_code_address[DISASS_ROW];
     uint16_t old_adresse;
-    int old_make_idx;
+    int32_t old_make_idx;
     QTimer *timer1;
     bool new_refresh;
     bool break_point_update_enable;
     bool new_breakpoint_found;
-    int current_source;
-    int currnet_floppy_nr;
+    int32_t current_source;
+    int32_t currnet_floppy_nr;
 };
 
 #endif // DEBUGGER_WINDOW_H

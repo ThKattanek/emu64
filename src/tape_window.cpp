@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.01.2017                //
+// Letzte Änderung am 16.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -113,8 +113,8 @@ void TapeWindow::hideEvent(QHideEvent*)
 void TapeWindow::OnSelectFile(QString filename)
 {
     UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_STOP));
-    if(!c64->LoadTapeImage(filename.toAscii().data()))
-        QMessageBox::warning(this,trUtf8("Fehler!"),trUtf8("Fehler beim laden des TapeImages"));
+    if(!c64->LoadTapeImage(filename.toUtf8().data()))
+        QMessageBox::warning(this,tr("Fehler!"),tr("Fehler beim laden des TapeImages"));
 
     unsigned int tape_time = roundf(c64->GetTapeLenTime());
 
@@ -125,7 +125,7 @@ void TapeWindow::OnSelectFile(QString filename)
     tape_time %= 60;
     TimeString += QVariant(tape_time).toString() + "s";
 
-    ui->TapeInfoOut->setText(trUtf8("Tape Länge: ") + TimeString + " [MaxCounter: " + QVariant(c64->GetTapeLenCount()).toString() + "]");
+    ui->TapeInfoOut->setText(tr("Tape Länge: ") + TimeString + " [MaxCounter: " + QVariant(c64->GetTapeLenCount()).toString() + "]");
 }
 
 void TapeWindow::OnRefreshGUI()
@@ -144,7 +144,7 @@ void TapeWindow::OnRefreshGUI()
 void TapeWindow::on_Rec_clicked()
 {
     TapeNewWindow tnw(this);
-    tnw.setWindowTitle(trUtf8("Name des neues TAP Files."));
+    tnw.setWindowTitle(tr("Name des neues TAP Files."));
 
     if(tnw.exec())
     {
@@ -157,7 +157,7 @@ void TapeWindow::on_Rec_clicked()
 
             if(QFile::exists(fullpath))
             {
-                if(QMessageBox::No == QMessageBox::question(this,trUtf8("Achtung!"),trUtf8("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
+                if(QMessageBox::No == QMessageBox::question(this,tr("Achtung!"),tr("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
                 {
                     UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_STOP));
                     return;
@@ -165,9 +165,9 @@ void TapeWindow::on_Rec_clicked()
             }
 
             // Theoretisch bereit zur Aufnahme
-            if(!c64->RecordTapeImage(fullpath.toAscii().data()))
+            if(!c64->RecordTapeImage(fullpath.toUtf8().data()))
             {
-                QMessageBox::information(this,trUtf8("Achtung"),trUtf8("Es konnte keine Aufnahme gestartet werden.\nBitte überprüfen Sie ob sie ausreichend Rechte besitzen."));
+                QMessageBox::information(this,tr("Achtung"),tr("Es konnte keine Aufnahme gestartet werden.\nBitte überprüfen Sie ob sie ausreichend Rechte besitzen."));
             }
             else
             {
@@ -178,7 +178,7 @@ void TapeWindow::on_Rec_clicked()
         }
         else
         {
-            QMessageBox::information(this,trUtf8("Achtung"),trUtf8("Es muss ein Tape Name angegeben werden.\nEs wird keine Aufnahme gestartet!"));
+            QMessageBox::information(this,tr("Achtung"),tr("Es muss ein Tape Name angegeben werden.\nEs wird keine Aufnahme gestartet!"));
             UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_STOP));
         }
     }
@@ -244,22 +244,22 @@ void TapeWindow::SetTapeVolume(int mode)
     case 0:
         ui->Volume->setIcon(*VolMute);
         c64->SetTapeSoundVolume(0.0);
-        ui->Volume->setToolTip(trUtf8("Datasette Lautsprecher ist ausgeschaltet."));
+        ui->Volume->setToolTip(tr("Datasette Lautsprecher ist ausgeschaltet."));
         break;
     case 1:
         ui->Volume->setIcon(*VolLow);
         c64->SetTapeSoundVolume(0.05);
-        ui->Volume->setToolTip(trUtf8("Datasette Lautsprecher ist auf leise gestellt."));
+        ui->Volume->setToolTip(tr("Datasette Lautsprecher ist auf leise gestellt."));
         break;
     case 2:
         ui->Volume->setIcon(*VolMedium);
         c64->SetTapeSoundVolume(0.1);
-        ui->Volume->setToolTip(trUtf8("Datasette Lautsprecher ist auf mittel gestellt."));
+        ui->Volume->setToolTip(tr("Datasette Lautsprecher ist auf mittel gestellt."));
         break;
     case 3:
         ui->Volume->setIcon(*VolHigh);
         c64->SetTapeSoundVolume(0.3);
-        ui->Volume->setToolTip(trUtf8("Datasette Lautsprecher ist auf laut gestellt."));
+        ui->Volume->setToolTip(tr("Datasette Lautsprecher ist auf laut gestellt."));
         break;
     default:
         break;
