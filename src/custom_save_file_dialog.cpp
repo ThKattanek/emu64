@@ -15,6 +15,8 @@
 
 #include "custom_save_file_dialog.h"
 
+#include <QDebug>
+
 bool CustomSaveFileDialog::GetSaveFileName(QWidget *parent, QString caption, QStringList filters, QString *fileName, QString *fileExt)
 {
     if (fileName == nullptr)
@@ -23,11 +25,10 @@ bool CustomSaveFileDialog::GetSaveFileName(QWidget *parent, QString caption, QSt
     QFileDialog saveDialog(parent);
     saveDialog.setWindowTitle(caption);
     saveDialog.setAcceptMode(QFileDialog::AcceptSave);
-    saveDialog.setOption(QFileDialog::DontConfirmOverwrite, true);
+    saveDialog.setOption(QFileDialog::DontConfirmOverwrite);
 
     saveDialog.setNameFilters(filters);
     saveDialog.selectFile(*fileName);
-    saveDialog.setOptions(QFileDialog::DontUseNativeDialog);
 
     *fileName = "";
 
@@ -42,10 +43,12 @@ bool CustomSaveFileDialog::GetSaveFileName(QWidget *parent, QString caption, QSt
     QString extension;
 
     QFileInfo fileInfo(tmpFileName);
-    if (fileInfo.suffix().isEmpty()) {
+
+    if (fileInfo.suffix().isEmpty())
+    {
        // Add the suffix selected by the user
 
-       //extension = saveDialog.selectedFilter();
+       extension = saveDialog.selectedNameFilter();
        extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
        extension = extension.left(extension.indexOf(")"));
        extension = extension.simplified();
@@ -58,11 +61,11 @@ bool CustomSaveFileDialog::GetSaveFileName(QWidget *parent, QString caption, QSt
        fileInfo.setFile(tmpFileName);
     }
 
-    /*
     // Does the file already exist?
-    if (QFile::exists(tmpFileName)) {
 
-        extension = saveDialog.selectedFilter();
+    if (QFile::exists(tmpFileName))
+    {
+        extension = saveDialog.selectedNameFilter();
         extension = extension.right(extension.size() - extension.indexOf("*.") - 2);
         extension = extension.left(extension.indexOf(")"));
         extension = extension.simplified();
@@ -76,14 +79,13 @@ bool CustomSaveFileDialog::GetSaveFileName(QWidget *parent, QString caption, QSt
           return false;
        else if (result == QMessageBox::No) {
           // Next chance for the user to select a filename
-          if (!getSaveFileName(parent, caption, filter, &tmpFileName, &extension))
+          if (!GetSaveFileName(parent, caption, filters, &tmpFileName, &extension))
              // User decided to cancel, exit function here
              return false;
        // User clicked "Yes", so process the execution
        fileInfo.setFile(tmpFileName);
        }
     }
-     */
 
     *fileName = tmpFileName;
     *fileExt = extension;
