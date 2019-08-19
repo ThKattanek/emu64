@@ -8,12 +8,10 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.06.2019                //
+// Letzte Änderung am 19.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
-
-#define _WIN32_WINNT 0x0500
 
 #include "./single_application.h"
 #include "./main_window.h"
@@ -28,8 +26,6 @@
 #if (!defined(SINGLE_THREADED_PLAYBACK) and defined(Q_WS_X11))
 #include <X11/Xlib.h>
 #endif
-
-//#undef main
 
 int main(int argc, char *argv[])
 {
@@ -136,7 +132,7 @@ int main(int argc, char *argv[])
     if(log) *log << "*** Emu64 Linux Binary File ***\n\n";
 #endif
 
-    if(log!=0) *log << "Emu64 Version: " << VERSION_STRING << "\n\n";
+    if(log != nullptr) *log << "Emu64 Version: " << VERSION_STRING << "\n\n";
 
     MainWindow *w;
 
@@ -146,13 +142,13 @@ int main(int argc, char *argv[])
         CustomSplashScreen *splash = new CustomSplashScreen(image);
         splash->setPixmap(image);
         splash->setMask(image.mask());
-        splash->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::SplashScreen);
+        splash->setWindowFlags(Qt::WindowStaysOnTopHint);
         splash->show();
-        w = new MainWindow(0,splash,log);
+        w = new MainWindow(nullptr, splash, log);
     }
     else
     {
-        w = new MainWindow(0,NULL,log);
+        w = new MainWindow(nullptr, nullptr, log);
     }
 
     QObject::connect(app,SIGNAL(messageAvailable(QStringList)),w,SLOT(OnMessage(QStringList)));
