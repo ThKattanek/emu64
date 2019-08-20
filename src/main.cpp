@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.08.2019                //
+// Letzte Änderung am 20.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -26,6 +26,8 @@
 #if (!defined(SINGLE_THREADED_PLAYBACK) and defined(Q_WS_X11))
 #include <X11/Xlib.h>
 #endif
+
+#undef main
 
 int main(int argc, char *argv[])
 {
