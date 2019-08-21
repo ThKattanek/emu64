@@ -335,7 +335,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
     cycle_counter = 0;
     limit_cyles_counter = 0;
     debug_animation = false;
-    animation_speed_add = AudioPufferSize/AudioSampleRate;
+    animation_speed_add = audio_spec_have.samples/AudioSampleRate;
     animation_speed_counter = 0;
 
     for(int i=0;i<8;i++)
@@ -2917,7 +2917,7 @@ void C64Class::SetDebugAnimation(bool status)
 void C64Class::SetDebugAnimationSpeed(int cycle_sek)
 {
     animation_speed_counter = 0;
-    animation_speed_add = static_cast<float_t>(AudioPufferSize) / static_cast<float_t>(AudioSampleRate) * static_cast<float_t>(cycle_sek);
+    animation_speed_add = static_cast<float_t>(audio_spec_have.samples) / static_cast<float_t>(AudioSampleRate) * static_cast<float_t>(cycle_sek);
 }
 
 void C64Class::GetC64CpuReg(REG_STRUCT *reg, IREG_STRUCT *ireg)
