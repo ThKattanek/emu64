@@ -525,7 +525,7 @@ void MainWindow::OnInit()
 
 
     /////////////////////////////////////
-    SplashMessage(tr("C64 EMULATION WIRD NUN GESTARET."),Qt::darkBlue);
+    SplashMessage(tr("C64 EMULATION WIRD NUN GESTARTET."),Qt::darkBlue);
     if(ret_error == 0) c64->StartEmulation();
     else
     {

@@ -2580,8 +2580,9 @@ Do you want it to overwrite?</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="528"/>
-        <source>C64 EMULATION WIRD NUN GESTARET.</source>
-        <translation>C64 Emulation starts now.</translation>
+        <source>C64 EMULATION WIRD NUN GESTARTET.</source>
+        <oldsource>C64 EMULATION WIRD NUN GESTARET.</oldsource>
+        <translation type="unfinished">C64 Emulation starts now.</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="644"/>

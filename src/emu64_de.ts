@@ -1897,8 +1897,9 @@ Soll diese überschrieben werden?</source>
     </message>
     <message>
         <location filename="main_window.cpp" line="528"/>
-        <source>C64 EMULATION WIRD NUN GESTARET.</source>
-        <translation></translation>
+        <source>C64 EMULATION WIRD NUN GESTARTET.</source>
+        <oldsource>C64 EMULATION WIRD NUN GESTARET.</oldsource>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="644"/>
