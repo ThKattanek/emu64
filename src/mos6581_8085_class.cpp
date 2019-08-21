@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.05.2019                //
+// Letzte Änderung am 21.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -181,6 +181,11 @@ void MOS6581_8085::SetPotXY(unsigned char pot_x, unsigned char pot_y)
 {
     PotX = pot_x;
     PotY = pot_y;
+}
+
+void MOS6581_8085::ZeroSoundBufferPos()
+{
+    SoundBufferPos = 0;
 }
 
 bool MOS6581_8085::OneZyklus(void)

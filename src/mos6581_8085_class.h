@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.05.2019                //
+// Letzte Änderung am 21.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -69,6 +69,7 @@ class MOS6581_8085
     void SetC64Zyklen(float ZyklenSek);
     void SetVoiceEnable(int nr, bool enable);
     void SetPotXY(unsigned char pot_x, unsigned char pot_y);
+    void ZeroSoundBufferPos();
     bool OneZyklus(void);
 
     bool SaveFreez(FILE* File);
