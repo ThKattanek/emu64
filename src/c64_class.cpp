@@ -32,9 +32,9 @@ int SDLThreadWarp(void *userdat);
 #define C64Takt 985248  // 50,124542Hz (Original C64 PAL)
 
 #ifdef _WIN32
-    #define AudioPufferSize (882*2)    // 882 bei 44.100 Khz
+    #define AudioPufferSize (882)    // 882 bei 44.100 Khz
 #else
-    #define AudioPufferSize (882*2)    // 882 bei 44.100 Khz
+    #define AudioPufferSize (882)    // 882 bei 44.100 Khz
 #endif
 
 #define RecPollingWaitStart 20
@@ -1044,7 +1044,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
         SDL_MixAudioFormat(reinterpret_cast<uint8_t*>(audio_16bit_buffer),reinterpret_cast<uint8_t*>(tape->GetSoundBuffer()), AUDIO_S16,static_cast<uint32_t>(sample_buffer_size*2),SDL_MIX_MAXVOLUME);
 
         /// Audio auf Output Stream ausgeben
-        if(!is_audio_sample_float && is_audio_sample_signed && audio_sample_bit_size == 16)
+        if(!is_audio_sample_float && audio_sample_bit_size == 16)
             memcpy(stream,audio_16bit_buffer,static_cast<size_t>(laenge));
 
         else if(is_audio_sample_float && audio_sample_bit_size == 32)
@@ -1452,7 +1452,7 @@ void C64Class::InitGrafik()
 
     while(!vic_refresh_is_holded)
     {
-          SDL_Delay(1);
+        SDL_Delay(1);
     }
 
     /// Allegmeine Einstellungen ///
@@ -1508,7 +1508,7 @@ void C64Class::InitGrafik()
     gl_context = SDL_GL_CreateContext(sdl_window);
 
     // OpenGL Initialisieren //
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,1);
+    //SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,1);
 
     glShadeModel(GL_SMOOTH);
     glEnable(GL_TEXTURE_2D);
