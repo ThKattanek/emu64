@@ -253,8 +253,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
     mmu = new MMU();
     cpu = new MOS6510();
     vic = new VICII();
-    sid1 = new MOS6581_8085(0,audio_spec_have.freq,audio_spec_have.samples,ret_error);
-    sid2 = new MOS6581_8085(1,audio_spec_have.freq,audio_spec_have.samples,ret_error);
+    sid1 = new MOS6581_8085(0,audio_spec_have.freq,audio_spec_have.size,ret_error);
+    sid2 = new MOS6581_8085(1,audio_spec_have.freq,audio_spec_have.size,ret_error);
     cia1 = new MOS6526(0);
     cia2 = new MOS6526(1);
     crt = new CartridgeClass();
@@ -969,8 +969,6 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             }
 
         }
-
-
 
         if(enable_stereo_sid)
         {
