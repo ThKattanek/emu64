@@ -222,6 +222,9 @@ FORMS += \
 RESOURCES += emu64.qrc
 RC_FILE += emu64.rc
 
+TRANSLATIONS += emu64_de.ts \
+            emu64_en.ts
+
 # Installation
 
 linux-g++{
