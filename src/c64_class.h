@@ -244,6 +244,14 @@ public:
     SDL_AudioSpec   audio_spec_want;
     SDL_AudioSpec   audio_spec_have;
 
+    uint16_t        audio_sample_bit_size;
+    uint16_t        audio_channels;
+    bool            is_audio_sample_little_endian;
+    bool            is_audio_sample_float;
+    bool            is_audio_sample_signed;
+
+    int16_t         *audio_16bit_buffer;
+
     SDL_Surface     *c64_screen;
     GLuint          c64_screen_texture;
     uint8_t         *c64_screen_buffer;

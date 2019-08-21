@@ -32,7 +32,7 @@ int SDLThreadWarp(void *userdat);
 #define C64Takt 985248  // 50,124542Hz (Original C64 PAL)
 
 #ifdef _WIN32
-    #define AudioPufferSize (882)    // 882 bei 44.100 Khz
+    #define AudioPufferSize (882*2)    // 882 bei 44.100 Khz
 #else
     #define AudioPufferSize (882*2)    // 882 bei 44.100 Khz
 #endif
@@ -46,6 +46,8 @@ const char* C64Class::screenshot_format_name[] = {"BMP","PNG"};
 C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::function<void(char*)> log_function, const char *data_path):
     mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
 {
+    *ret_error = 0;
+
     changed_graphic_modi = false;
     changed_window_pos = false;
     changed_window_size = false;
@@ -120,7 +122,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
          LogText(const_cast<char*>("<< ERROR: Fehler beim installieren von SDL2\n"));
-        *ret_error = -1;
+         *ret_error = -1;
+         return;
     }
     else
         LogText(const_cast<char*>(">> SDL2 wurde installiert\n"));
@@ -133,8 +136,6 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
         LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
         LogText(filename);
         LogText(const_cast<char*>("\n"));
-
-        //*ret_error = -2;
     }
     else
     {
@@ -153,8 +154,6 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
         LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
         LogText(filename);
         LogText(const_cast<char*>("\n"));
-
-        //*ret_error = -3;
     }
     else
     {
@@ -173,8 +172,6 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
         LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
         LogText(filename);
         LogText(const_cast<char*>("\n"));
-
-        //*ret_error = -4;
     }
     else
     {
@@ -193,8 +190,6 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
         LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
         LogText(filename);
         LogText(const_cast<char*>("\n"));
-
-       // *ret_error = -5;
     }
     else
     {
@@ -212,6 +207,21 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
 
     /// SLD Audio Installieren (C64 Emulation) ///
 
+    //  SDL Audio Format
+    //  +----------------------sample is signed if set
+    //  |
+    //  |        +----------sample is bigendian if set
+    //  |        |
+    //  |        |           +--sample is float if set
+    //  |        |           |
+    //  |        |           |  +--sample bit size---+
+    //  |        |           |  |                    |
+    // 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
+
+    // Wunschformat
+    // Muss aber nicht sein, das dieses auch verwendet wird
+    // Wichtig ... Es muss alles aus audio_spec_have verwendetet werden
+
     SDL_memset(&audio_spec_want, 0, sizeof(audio_spec_want));
     audio_spec_want.freq = AudioSampleRate;
     audio_spec_want.format = AUDIO_S16;
@@ -223,15 +233,23 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
     if( SDL_OpenAudio(&audio_spec_want, &audio_spec_have) > 0 )
     {
         LogText(const_cast<char*>("<< ERROR: Fehler beim installieren von SDL_Audio\n"));
-        *ret_error = -6;
+        *ret_error = -2;
+        return;
     }
     LogText(const_cast<char*>(">> SDL_Audio wurde installiert\n"));
 
-    if (audio_spec_want.format != audio_spec_have.format)
-    {
-        printf("Audio Format \"AUDIO_S16 wird nicht unterstuetzt.\n");
-        *ret_error = -6;
-    }
+    audio_channels = audio_spec_have.channels;
+    audio_sample_bit_size = audio_spec_have.format & 0x00ff;
+    is_audio_sample_little_endian = audio_spec_have.format & 0x8000;
+    is_audio_sample_float = audio_spec_have.format & 0x0100;
+    is_audio_sample_signed = audio_spec_have.format & 0x1000;
+    audio_16bit_buffer = new int16_t[audio_spec_have.samples];
+
+    cout << "Audio Channels: " << audio_channels << endl;
+    cout << "Audio Sample Bit Size: " << audio_sample_bit_size << endl;
+    cout << "Audio Sample Is Float: " << is_audio_sample_float << endl;
+    cout << "Audio Sample Is Signed: " << is_audio_sample_signed << endl;
+    cout << "Audio Sample Is Little Endian: " << is_audio_sample_little_endian << endl;
 
     OpenSDLJoystick();
 
@@ -253,8 +271,9 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
     mmu = new MMU();
     cpu = new MOS6510();
     vic = new VICII();
-    sid1 = new MOS6581_8085(0,audio_spec_have.freq,audio_spec_have.size,ret_error);
-    sid2 = new MOS6581_8085(1,audio_spec_have.freq,audio_spec_have.size,ret_error);
+    int sid_ret_error;
+    sid1 = new MOS6581_8085(0,audio_spec_have.freq,audio_spec_have.samples,&sid_ret_error);
+    sid2 = new MOS6581_8085(1,audio_spec_have.freq,audio_spec_have.samples,&sid_ret_error);
     cia1 = new MOS6526(0);
     cia2 = new MOS6526(1);
     crt = new CartridgeClass();
@@ -490,6 +509,9 @@ C64Class::~C64Class()
     if(geo != nullptr) delete geo;
 
     if(video_capture != nullptr) delete video_capture;
+
+    if(audio_16bit_buffer != nullptr)
+        delete [] audio_16bit_buffer;
 }
 
 void C64Class::StartEmulation()
@@ -839,18 +861,22 @@ void C64Class::WarpModeLoop()
 
 void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 {
-    int16_t* puffer = reinterpret_cast<int16_t*>(stream);
+    //int16_t* puffer = reinterpret_cast<int16_t*>(stream);
+
     static uint32_t counter_plus=0;
 
-    sid1->SoundBufferPos = 0;
-    sid2->SoundBufferPos = 0;
+    sid1->ZeroSoundBufferPos();
+    sid2->ZeroSoundBufferPos();
+
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
         floppy[i]->ZeroSoundBufferPos();
     tape->ZeroSoundBufferPos();
 
+    int sample_buffer_size_mono = laenge / ((audio_sample_bit_size/8) * audio_channels);
+
     if(!debug_mode)
     {
-        while((sid1->SoundBufferPos < (laenge/4) && (debug_mode == false)))
+        while((sid1->SoundBufferPos < sample_buffer_size_mono) && (debug_mode == false))
         {
             CheckKeys();
             cycle_counter++;
@@ -970,24 +996,26 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
         }
 
+        int sample_buffer_size = laenge / (audio_sample_bit_size/8);
+
         if(enable_stereo_sid)
         {
             if(!enable_stereo_sid_6channel_mode)
             {
                 int j=0;
-                for(int i=0; i<(laenge/2); i+=2)
+                for(int i=0; i<(sample_buffer_size); i+=2)
                 {
-                    puffer[i] = static_cast<int16_t>(sid1->SoundBuffer[j] * sid_volume);
-                    puffer[i+1] = static_cast<int16_t>(sid2->SoundBuffer[j] * sid_volume);
+                    audio_16bit_buffer[i] = static_cast<int16_t>(sid1->SoundBuffer[j] * sid_volume);
+                    audio_16bit_buffer[i+1] = static_cast<int16_t>(sid2->SoundBuffer[j] * sid_volume);
                     j++;
                 }
             }
             else
             {
                 int j=0;
-                for(int i=0; i<(laenge/2); i+=2)
+                for(int i=0; i<(sample_buffer_size); i+=2)
                 {
-                    puffer[i] = puffer[i+1] = static_cast<int16_t>(static_cast<float_t>(sid1->SoundBuffer[j] + sid2->SoundBuffer[j]) * sid_volume * 0.75f);
+                    audio_16bit_buffer[i] = audio_16bit_buffer[i+1] = static_cast<int16_t>(static_cast<float_t>(sid1->SoundBuffer[j] + sid2->SoundBuffer[j]) * sid_volume * 0.75f);
                     j++;
                 }
             }
@@ -995,24 +1023,36 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
         else
         {
             int j=0;
-            for(int i=0; i<(laenge/2); i+=2)
+            for(int i=0; i<(sample_buffer_size); i+=2)
             {
-                puffer[i] = puffer[i+1] = static_cast<int16_t>(sid1->SoundBuffer[j] * sid_volume);
+                audio_16bit_buffer[i] = audio_16bit_buffer[i+1] = static_cast<int16_t>(sid1->SoundBuffer[j] * sid_volume);
                 j++;
             }
         }
 
         /// Capture Audio
-        video_capture->FillSourceAudioBuffer(puffer, laenge/2);
+        video_capture->FillSourceAudioBuffer(audio_16bit_buffer, sample_buffer_size);
 
         /// Floppysound dazu mixen ///
+
         for(int i=0; i<MAX_FLOPPY_NUM; i++)
         {
-            if(floppy[i]->GetEnableFloppySound()) SDL_MixAudio(reinterpret_cast<uint8_t*>(puffer),reinterpret_cast<uint8_t*>(floppy[i]->GetSoundBuffer()),static_cast<uint32_t>(laenge),255);
+            if(floppy[i]->GetEnableFloppySound()) SDL_MixAudioFormat(reinterpret_cast<uint8_t*>(audio_16bit_buffer),reinterpret_cast<uint8_t*>(floppy[i]->GetSoundBuffer()), AUDIO_S16,static_cast<uint32_t>(sample_buffer_size*2),SDL_MIX_MAXVOLUME);
         }
 
         /// Tapesound dazu mixen ///
-        SDL_MixAudio(reinterpret_cast<uint8_t*>(puffer),reinterpret_cast<uint8_t*>(tape->GetSoundBuffer()),static_cast<uint32_t>(laenge),255);
+        SDL_MixAudioFormat(reinterpret_cast<uint8_t*>(audio_16bit_buffer),reinterpret_cast<uint8_t*>(tape->GetSoundBuffer()), AUDIO_S16,static_cast<uint32_t>(sample_buffer_size*2),SDL_MIX_MAXVOLUME);
+
+        /// Audio auf Output Stream ausgeben
+        if(!is_audio_sample_float && is_audio_sample_signed && audio_sample_bit_size == 16)
+            memcpy(stream,audio_16bit_buffer,static_cast<size_t>(laenge));
+
+        else if(is_audio_sample_float && audio_sample_bit_size == 32)
+        {
+            float *float_stream = reinterpret_cast<float*>(stream);
+            for(int i=0; i<sample_buffer_size; i++)
+                float_stream[i] = static_cast<float>(audio_16bit_buffer[i]) / static_cast<float>(0x7fff);
+        }
     }
     else
     {
@@ -1203,7 +1243,7 @@ loop_wait_next_opc:
         }
 
         // Audiopuffer mit 0 füllen ();
-        memset(puffer,0,static_cast<size_t>(laenge));
+        memset(stream,0,static_cast<size_t>(laenge));
     }
 }
 

@@ -292,6 +292,7 @@ void MainWindow::OnInit()
     {
         ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim Installieren der C64 Klasse"))
         this->close();
+        return;
     }
 
     SetC64ScreenTitle();
