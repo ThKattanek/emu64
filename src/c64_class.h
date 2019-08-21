@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.08.2019                //
+// Letzte Änderung am 21.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -251,6 +251,7 @@ public:
     bool            is_audio_sample_signed;
 
     int16_t         *audio_16bit_buffer;
+    int             audio_16bit_buffer_size;
 
     SDL_Surface     *c64_screen;
     GLuint          c64_screen_texture;

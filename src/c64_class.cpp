@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.08.2019                //
+// Letzte Änderung am 21.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -243,7 +243,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
     is_audio_sample_little_endian = audio_spec_have.format & 0x8000;
     is_audio_sample_float = audio_spec_have.format & 0x0100;
     is_audio_sample_signed = audio_spec_have.format & 0x1000;
-    audio_16bit_buffer = new int16_t[audio_spec_have.samples];
+    audio_16bit_buffer_size = audio_spec_have.samples * audio_channels;
+    audio_16bit_buffer = new int16_t[audio_16bit_buffer_size];
 
     cout << "Audio Channels: " << audio_channels << endl;
     cout << "Audio Sample Bit Size: " << audio_sample_bit_size << endl;
@@ -861,8 +862,6 @@ void C64Class::WarpModeLoop()
 
 void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 {
-    //int16_t* puffer = reinterpret_cast<int16_t*>(stream);
-
     static uint32_t counter_plus=0;
 
     sid1->ZeroSoundBufferPos();
@@ -870,6 +869,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
         floppy[i]->ZeroSoundBufferPos();
+
     tape->ZeroSoundBufferPos();
 
     int sample_buffer_size_mono = laenge / ((audio_sample_bit_size/8) * audio_channels);
@@ -901,6 +901,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             /// Für Externe Erweiterungen ///
             //if(ExtZyklus) ZyklusProcExt();
 
+
             floppy_iec_wire = 0;
             for(int i=0; i<MAX_FLOPPY_NUM; i++)
             {
@@ -929,6 +930,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
             if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
             cpu->OneZyklus();
+
 
             if((break_status != 0) || (floppy_found_breakpoint == true )) if(CheckBreakpoints()) break;
 
@@ -995,6 +997,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             }
 
         }
+
 
         int sample_buffer_size = laenge / (audio_sample_bit_size/8);
 
