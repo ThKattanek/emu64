@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.05.2019                //
+// Letzte Änderung am 22.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -367,9 +367,8 @@ void TAPE1530::ZeroSoundBufferPos()
 
 void TAPE1530::OneCycle()
 {
-    //if(file == NULL) return;
-    if(!IsTapeInsert) return;
-    if(CPU_PORT == NULL) return;
+    if(CPU_PORT == nullptr) return;
+    if(!IsTapeInsert && !IsRecTapeInsert) return;
 
     static signed short WaveOut;
     static bool MotorStatusTmp = false;
