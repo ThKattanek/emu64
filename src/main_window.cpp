@@ -1099,7 +1099,7 @@ void MainWindow::on_actionGEO_loeschen_triggered()
 
 void MainWindow::on_actionVollbild_triggered()
 {
-    c64->SetFullscreen();
+    c64->SetFullscreen(true);
 }
 
 void MainWindow::on_actionBandlaufwerk_1530_triggered()

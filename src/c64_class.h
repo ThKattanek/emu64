@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.08.2019                //
+// Letzte Änderung am 22.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -79,7 +79,8 @@ public:
     uint8_t* GetRAMPointer(uint16_t address);
     void SetGrafikModi(bool enable_32bit_colors, bool enable_screen_doublesize, bool enable_screen_crt_output, bool filter_enable, uint16_t fullscreen_width = 0, uint16_t fullscreen_height = 0);
     void SetSDLWindowName(char *name);
-    void SetFullscreen();
+    void SetFullscreen(bool is_fullscreen);
+    void ToggleScreenMode();
     void InitGrafik();
     void ReleaseGrafik();
     void DrawC64Screen();

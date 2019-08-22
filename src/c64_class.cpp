@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.08.2019                //
+// Letzte Änderung am 22.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1439,12 +1439,29 @@ void C64Class::SetSDLWindowName(char *name)
     SDL_SetWindowTitle(sdl_window, name);
 }
 
-void C64Class::SetFullscreen()
+void C64Class::SetFullscreen(bool is_fullscreen)
 {
-    enable_fullscreen = true;
-    SDL_ShowCursor(false);
-    SDL_SetWindowFullscreen(sdl_window,SDL_WINDOW_FULLSCREEN_DESKTOP);
+    enable_fullscreen = is_fullscreen;
+
+    if(is_fullscreen)
+    {
+        SDL_ShowCursor(false);
+        SDL_SetWindowFullscreen(sdl_window,SDL_WINDOW_FULLSCREEN_DESKTOP);
+    }
+    else
+    {
+        SDL_ShowCursor(true);
+        SDL_SetWindowFullscreen(sdl_window,0);
+        changed_window_size = true;
+    }
+
     SetFocusToC64Window();
+}
+
+void C64Class::ToggleScreenMode()
+{
+     enable_fullscreen = ! enable_fullscreen;
+     SetFullscreen(enable_fullscreen);
 }
 
 void C64Class::InitGrafik()
@@ -2066,18 +2083,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
                 if((KMOD_MODE == (keymod & KMOD_MODE) || KMOD_LALT == (keymod & KMOD_LALT) || KMOD_RALT == (keymod & KMOD_RALT)) && (return_key_is_down == false))
                 {
-                    enable_fullscreen = ! enable_fullscreen;
-                    if(enable_fullscreen)
-                    {
-                        SDL_ShowCursor(false);
-                        SDL_SetWindowFullscreen(sdl_window,SDL_WINDOW_FULLSCREEN_DESKTOP);
-                    }
-                    else
-                    {
-                        SDL_ShowCursor(true);
-                        SDL_SetWindowFullscreen(sdl_window,0);
-                    }
-
+                    ToggleScreenMode();     // switching between fullscreen an window mode
                 }
 
                 return_key_is_down = true;
