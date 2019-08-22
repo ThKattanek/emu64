@@ -612,22 +612,18 @@ int SDLThread(void *userdat)
         if(c64->changed_window_pos)
         {
             c64->changed_window_pos = false;
+
             SDL_SetWindowPosition(c64->sdl_window, c64->sdl_window_pos_x, c64->sdl_window_pos_y);
         }
 
         if(c64->changed_window_size)
         {
             c64->changed_window_size = false;
-            SDL_SetWindowSize(c64->sdl_window, c64->sdl_window_size_width, c64->sdl_window_size_height);
-
-#ifdef _WIN32
-            c64->current_window_width = c64->sdl_window_size_width;
-            c64->current_window_height = c64->sdl_window_size_height;
-            glViewport(0,0,c64->current_window_width, c64->current_window_height);
+            glViewport(0,0,c64->sdl_window_size_width, c64->sdl_window_size_height);
             glMatrixMode(GL_PROJECTION);
             glOrtho(0,c64->current_window_width, c64->current_window_height,0,-1,1);
             glLoadIdentity();
-#endif
+            SDL_SetWindowSize(c64->sdl_window, c64->sdl_window_size_width, c64->sdl_window_size_height);
         }
 
         /// Wird ausgeführt wenn Keine Thread Pause anliegt ///
@@ -1441,10 +1437,15 @@ void C64Class::SetSDLWindowName(char *name)
 
 void C64Class::SetFullscreen(bool is_fullscreen)
 {
+    static int size_w, size_h, pos_x, pos_y;
+
     enable_fullscreen = is_fullscreen;
 
     if(is_fullscreen)
     {
+        SDL_GetWindowSize(sdl_window, &size_w, &size_h);
+        SDL_GetWindowPosition(sdl_window, &pos_x, &pos_y);
+
         SDL_ShowCursor(false);
         SDL_SetWindowFullscreen(sdl_window,SDL_WINDOW_FULLSCREEN_DESKTOP);
     }
@@ -1452,7 +1453,9 @@ void C64Class::SetFullscreen(bool is_fullscreen)
     {
         SDL_ShowCursor(true);
         SDL_SetWindowFullscreen(sdl_window,0);
-        changed_window_size = true;
+
+        SDL_SetWindowSize(sdl_window, size_w, size_h);
+        SDL_SetWindowPosition(sdl_window, pos_x, pos_y);
     }
 
     SetFocusToC64Window();
@@ -1825,10 +1828,11 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
         switch (event->window.event)
         {
+            case SDL_WINDOWEVENT_SIZE_CHANGED:
             case SDL_WINDOWEVENT_RESIZED:
-
                 current_window_width = static_cast<uint16_t>(event->window.data1);
                 current_window_height = static_cast<uint16_t>(event->window.data2);
+
                 glViewport(0,0,current_window_width,current_window_height);
                 glMatrixMode(GL_PROJECTION);
                 glOrtho(0,current_window_width,current_window_height,0,-1,1);
