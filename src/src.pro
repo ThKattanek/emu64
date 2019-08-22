@@ -67,6 +67,8 @@ PKGCONFIG += sdl2 SDL2_image libpng glu libavutil libavformat libavcodec libswre
 # Für Win32 / Librarys ohne PKCONFIG
 #LIBS += -lsdl2 -lsdl2main -lsdl2_image -lpng -lglu32 -lopengl32 -lavutil -lavformat -lavcodec -lswresample -lswscale
 
+#
+
 message("Zip: $$ZIP")
 
 linux-g++{
