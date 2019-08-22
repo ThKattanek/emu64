@@ -163,145 +163,145 @@
     <message>
         <location filename="cartridge_window.ui" line="25"/>
         <source>Steckmodule</source>
-        <translation type="unfinished">Cartridges</translation>
+        <translation>Cartridges</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="111"/>
         <source>Modul aktivieren</source>
-        <translation type="unfinished">Activate Cartridge</translation>
+        <translation>Activate Cartridge</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="135"/>
         <source>Modul deaktivieren</source>
-        <translation type="unfinished">Deactivate Cartridge</translation>
+        <translation>Deactivate Cartridge</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="216"/>
         <source>Variable</source>
-        <translation type="unfinished">Variable</translation>
+        <translation>Variable</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="229"/>
         <source>Inhalt</source>
-        <translation type="unfinished">Content</translation>
+        <translation>Content</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="242"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="250"/>
         <source>Version</source>
-        <translation type="unfinished">Version</translation>
+        <translation>Version</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="258"/>
         <source>Hardware Typ</source>
-        <translation type="unfinished">Hardware Type</translation>
+        <translation>Hardware Type</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="266"/>
         <source>EXPROM Leitung</source>
-        <translation type="unfinished">EXPROM Circuit</translation>
+        <translation>EXPROM Circuit</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="274"/>
         <source>GAME Leitung</source>
-        <translation type="unfinished">GAME Circuit</translation>
+        <translation>GAME Circuit</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="279"/>
         <source>Chip Anzahl</source>
-        <translation type="unfinished">Number of chips</translation>
+        <translation>Chip Count</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="312"/>
         <source>Nr.</source>
-        <translation type="unfinished">No.</translation>
+        <translation>No.</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="325"/>
         <source>Chip Typ</source>
-        <translation type="unfinished">Chip Type</translation>
+        <translation>Chip Type</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="338"/>
         <source>Bank</source>
-        <translation type="unfinished">Bank</translation>
+        <translation>Bank</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="351"/>
         <source>Adresse</source>
-        <translation type="unfinished">Address</translation>
+        <translation>Address</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="364"/>
         <source>Größe</source>
-        <translation type="unfinished">Size</translation>
+        <translation>Size</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="451"/>
         <source>Boot Schalter</source>
-        <translation type="unfinished">Boot switch</translation>
+        <translation>Boot switch</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="466"/>
         <source>Modul starten</source>
-        <translation type="unfinished">Start Cartridge</translation>
+        <translation>Start Cartridge</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="485"/>
         <source>C64 Normal starten</source>
-        <translation type="unfinished">Start C64 normally </translation>
+        <translation>Start C64 normally</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="502"/>
         <source>Flashspeicher Anzeigen</source>
-        <translation type="unfinished">Flash memory display</translation>
+        <translation>Flash memory display</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="518"/>
         <source>EasyFlash CRT speichern</source>
-        <translation type="unfinished">Save EasyFlash CRT</translation>
+        <translation>Save EasyFlash CRT</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="531"/>
         <location filename="cartridge_window.ui" line="628"/>
         <source>Weitere Infos</source>
-        <translation type="unfinished">More info</translation>
+        <translation>More info</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="548"/>
         <source>&lt;html&gt; &lt;a style = &apos;text-decoration:none&apos;href =&apos;http://www.c64-wiki.de/index.php/EasyFlash&apos;&gt;Artikel im C64 Wiki&lt;/a&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt; &lt;a style = &apos;text-decoration:none&apos;href =&apos;http://www.c64-wiki.com/index.php/EasyFlash&apos;&gt;C64 Wiki&lt;/a&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt; &lt;a style = &apos;text-decoration:none&apos;href =&apos;http://www.c64-wiki.com/index.php/EasyFlash&apos;&gt;C64 Wiki&lt;/a&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="565"/>
         <source>Status LED</source>
-        <translation type="unfinished">Status LED</translation>
+        <translation>Status LED</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="602"/>
         <location filename="cartridge_window.ui" line="680"/>
         <source>FREEZE</source>
-        <translation type="unfinished">FREEZE</translation>
+        <translation>FREEZE</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="645"/>
         <source>&lt;html&gt; &lt;a style = &apos;text-decoration:none&apos;href =&apos;http://www.c64-wiki.de/index.php/Final_Cartridge_III&apos;&gt;Artikel im C64 Wiki&lt;/a&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt; &lt;a style = &apos;text-decoration:none&apos;href =&apos;http://www.c64-wiki.com/index.php/Final_Cartridge_3&apos;&gt;C64 Wiki&lt;/a&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt; &lt;a style = &apos;text-decoration:none&apos;href =&apos;http://www.c64-wiki.com/index.php/Final_Cartridge_3&apos;&gt;C64 Wiki&lt;/a&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="cartridge_window.ui" line="767"/>
         <source>Leeres EasyFlash erstellen</source>
-        <translation type="unfinished">Create empty Easy Flash</translation>
+        <translation>Create empty Easy Flash</translation>
     </message>
     <message>
         <location filename="cartridge_window.cpp" line="379"/>
         <location filename="cartridge_window.cpp" line="393"/>
         <source>Fehler!</source>
-        <translation type="unfinished">Error!</translation>
+        <translation>Error!</translation>
     </message>
     <message>
         <location filename="cartridge_window.cpp" line="379"/>
