@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.08.2019                //
+// Letzte Änderung am 23.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -612,7 +612,6 @@ int SDLThread(void *userdat)
         if(c64->changed_window_pos)
         {
             c64->changed_window_pos = false;
-
             SDL_SetWindowPosition(c64->sdl_window, c64->sdl_window_pos_x, c64->sdl_window_pos_y);
         }
 
@@ -621,7 +620,7 @@ int SDLThread(void *userdat)
             c64->changed_window_size = false;
             glViewport(0,0,c64->sdl_window_size_width, c64->sdl_window_size_height);
             glMatrixMode(GL_PROJECTION);
-            glOrtho(0,c64->current_window_width, c64->current_window_height,0,-1,1);
+            glOrtho(0,c64->sdl_window_size_width, c64->sdl_window_size_height,0,-1,1);
             glLoadIdentity();
             SDL_SetWindowSize(c64->sdl_window, c64->sdl_window_size_width, c64->sdl_window_size_height);
         }
@@ -1454,8 +1453,12 @@ void C64Class::SetFullscreen(bool is_fullscreen)
         SDL_ShowCursor(true);
         SDL_SetWindowFullscreen(sdl_window,0);
 
-        SDL_SetWindowSize(sdl_window, size_w, size_h);
-        SDL_SetWindowPosition(sdl_window, pos_x, pos_y);
+        sdl_window_pos_x = pos_x;
+        sdl_window_pos_y = pos_y;
+        sdl_window_size_width = size_w;
+        sdl_window_size_height = size_h;
+        changed_window_pos = true;
+        changed_window_size = true;
     }
 
     SetFocusToC64Window();
