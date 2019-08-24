@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.08.2019                //
+// Letzte Änderung am 24.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -77,7 +77,7 @@ public:
     uint8_t ReadC64Byte(uint16_t address);
     void WriteC64Byte(uint16_t address, uint8_t value);
     uint8_t* GetRAMPointer(uint16_t address);
-    void SetGrafikModi(bool enable_32bit_colors, bool enable_screen_doublesize, bool enable_screen_crt_output, bool filter_enable, uint16_t fullscreen_width = 0, uint16_t fullscreen_height = 0);
+    void SetGrafikModi(bool enable_screen_doublesize, bool enable_screen_crt_output, bool filter_enable, uint16_t fullscreen_width = 0, uint16_t fullscreen_height = 0);
     void SetSDLWindowName(char *name);
     void SetFullscreen(bool is_fullscreen);
     void ToggleScreenMode();
@@ -214,7 +214,6 @@ public:
     int             current_window_color_bits;
     uint16_t        current_c64_screen_width;
     uint16_t        current_c64_screen_height;
-    bool            enable_screen_32bit_colors;
     bool            enable_screen_doublesize;
     bool            enable_screen_crt_output;
     bool            enable_screen_filter;

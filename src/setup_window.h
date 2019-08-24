@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 24.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -49,15 +49,13 @@ public:
     int GetScreenshotFormat();
 
 signals:
-    void ChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode, bool filter);
+    void ChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool filter);
     void ResetSreenshotCounter(void);
 
 private slots:
     void on_C64Farbmodus_currentIndexChanged(int index);
     void on_WPal_toggled(bool checked);
     void on_WDouble_toggled(bool checked);
-    void on_W16Bit_toggled(bool checked);
-    void on_W32Bit_toggled(bool checked);
     void on_WFilter_toggled(bool checked);
     void on_ResetSShotCounter_clicked();
     void on_VJoySlots_cellChanged(int row, int column);

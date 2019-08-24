@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.08.2019                //
+// Letzte Änderung am 24.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -32,7 +32,7 @@ int SDLThreadWarp(void *userdat);
 #define C64Takt 985248  // 50,124542Hz (Original C64 PAL)
 
 #ifdef _WIN32
-    #define AudioPufferSize (882)    // 882 bei 44.100 Khz
+    #define AudioPufferSize (882*2)    // 882 bei 44.100 Khz
 #else
     #define AudioPufferSize (882)    // 882 bei 44.100 Khz
 #endif
@@ -254,7 +254,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
 
     OpenSDLJoystick();
 
-    SetGrafikModi(video_crt_output->StartC64isColorBit32, video_crt_output->StartC64isDoublesize, video_crt_output->StartC64isPalmode, false);
+    SetGrafikModi(video_crt_output->StartC64isDoublesize, video_crt_output->StartC64isPalmode, false);
 
     sprintf(filename,"%ssdl_icon.png",gfx_path);
     sdl_window_icon = IMG_Load(filename);
@@ -1410,9 +1410,8 @@ uint8_t* C64Class::GetRAMPointer(uint16_t address)
     return mmu->GetRAMPointer() + address;
 }
 
-void C64Class::SetGrafikModi(bool enable_32bit_colors, bool enable_screen_doublesize, bool enable_screen_crt_output, bool enable_screen_filter, uint16_t fullscreen_width, uint16_t fullscreen_height)
+void C64Class::SetGrafikModi(bool enable_screen_doublesize, bool enable_screen_crt_output, bool enable_screen_filter, uint16_t fullscreen_width, uint16_t fullscreen_height)
 {
-    this->enable_screen_32bit_colors = enable_32bit_colors;
     this->enable_screen_doublesize = enable_screen_doublesize;
     this->enable_screen_crt_output =  enable_screen_crt_output;
     this->enable_screen_filter = enable_screen_filter;
@@ -1422,7 +1421,7 @@ void C64Class::SetGrafikModi(bool enable_32bit_colors, bool enable_screen_double
     changed_graphic_modi = true;
 
     char str00[255];
-    sprintf(str00,">>   32Bit = %d\n>>   Doublesize = %d\n>>   PAL = %d\n>>   Filter = %d\n>>   FullResXW = %d\n>>   FullResrYW = %d\n", enable_32bit_colors, enable_screen_doublesize, enable_screen_crt_output, enable_screen_filter, fullscreen_width, fullscreen_height);
+    sprintf(str00,">>   Doublesize = %d\n>>   PAL = %d\n>>   Filter = %d\n>>   FullResXW = %d\n>>   FullResrYW = %d\n", enable_screen_doublesize, enable_screen_crt_output, enable_screen_filter, fullscreen_width, fullscreen_height);
 
     LogText(const_cast<char*>(">> Grafikmodus wurde gesetzt:\n"));
     LogText(str00);
@@ -1500,26 +1499,13 @@ void C64Class::InitGrafik()
         current_c64_screen_height *=2;
     }
 
-    if(enable_screen_32bit_colors)
+    current_window_color_bits = 32;
+    if(c64_screen_buffer != nullptr)
     {
-        current_window_color_bits = 32;
-        if(c64_screen_buffer != nullptr)
-        {
-            delete[] c64_screen_buffer;
-        }
-        c64_screen_buffer = new uint8_t[current_c64_screen_width*current_c64_screen_height*4];
+        delete[] c64_screen_buffer;
     }
-    else
-    {
-        current_window_color_bits = 16;
-        if(c64_screen_buffer != nullptr)
-        {
-            delete[] c64_screen_buffer;
-        }
-        c64_screen_buffer = new uint8_t[current_c64_screen_width * current_c64_screen_height * 2];
-    }
+    c64_screen_buffer = new uint8_t[current_c64_screen_width*current_c64_screen_height*4];
 
-    video_crt_output->SetDisplayMode(current_window_color_bits);
     video_crt_output->EnableCrtOutput(enable_screen_crt_output);
     video_crt_output->EnableVideoDoubleSize(enable_screen_doublesize);
 

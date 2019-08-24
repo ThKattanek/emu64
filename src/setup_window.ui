@@ -34,7 +34,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <property name="documentMode">
     <bool>false</bool>
@@ -439,7 +439,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>30</y>
+       <y>40</y>
        <width>381</width>
        <height>131</height>
       </rect>
@@ -498,69 +498,6 @@
       </property>
       <property name="text">
        <string>Vertikal Sync</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="WFilter">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>310</x>
-        <y>60</y>
-        <width>61</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Schaltet einen Bilineare Filterung mit zu. (Das Bild wird etwas verwaschener)</string>
-      </property>
-      <property name="text">
-       <string>Filter</string>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="W16Bit">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>310</x>
-        <y>15</y>
-        <width>61</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Schaltet den internen Farbmodus auf 16Bit pro Pixel um.</string>
-      </property>
-      <property name="text">
-       <string>16 Bit</string>
-      </property>
-      <property name="checked">
-       <bool>false</bool>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="W32Bit">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>310</x>
-        <y>35</y>
-        <width>61</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Schaltet den internen Farbmodus auf 32Bit pro Pixel um.</string>
-      </property>
-      <property name="text">
-       <string>32 Bit</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QCheckBox" name="WAspectRatio">
@@ -638,9 +575,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>165</y>
+       <y>180</y>
        <width>381</width>
-       <height>101</height>
+       <height>51</height>
       </rect>
      </property>
      <property name="font">
@@ -748,6 +685,25 @@
        <string>Counter Zurücksetzen</string>
       </property>
      </widget>
+    </widget>
+    <widget class="QCheckBox" name="WFilter">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>240</y>
+       <width>121</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Schaltet einen Bilineare Filterung mit zu. (Das Bild wird etwas verwaschener)</string>
+     </property>
+     <property name="text">
+      <string>Filter aktivieren</string>
+     </property>
     </widget>
    </widget>
    <widget class="QWidget" name="SteuerungTab">

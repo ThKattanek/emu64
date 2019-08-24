@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 24.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -74,12 +74,6 @@ VideoCrtClass::~VideoCrtClass(void)
 {
 }
 
-void VideoCrtClass::SetDisplayMode(int DisplayMode)
-{
-    DestDisplayMode = DisplayMode;
-    UpdateParameter();
-}
-
 void VideoCrtClass::UpdateParameter(void)
 {
     CreateVicIIColors();
@@ -130,8 +124,6 @@ void VideoCrtClass::SetC64Palette(int palnr)
 {
     AktFarbMode = palnr;
 
-    //if(pixel_format == 0) return;
-
     int ij = 0;
     for(int j=0;j<16;j++)
     {
@@ -141,14 +133,6 @@ void VideoCrtClass::SetC64Palette(int palnr)
         {
             /// Für 32Bit Video Display ///
             Palette32Bit[ij] = 0xFF000000 | color_rgba[2]<<16 | color_rgba[1]<<8 | color_rgba[0];
-
-            /// Für 16Bit Video Display ///
-            /// RGB-565
-            unsigned char r = (color_rgba[0] * 31) / 255;
-            unsigned char g = (color_rgba[1] * 63) / 255;
-            unsigned char b = (color_rgba[2] * 31) / 255;
-            Palette16Bit[ij] = r<<11 | g<<5 | b;
-
             color_rgba+=4;
             ij++;
         }
@@ -269,23 +253,11 @@ inline void VideoCrtClass::CreateVicIIColors(void)
                                                 ColorIn = ColorOut;
                                                 ChangeContrast(&ColorIn, &ColorOut,Kontrast);
 
-                                                if(DestDisplayMode == 32)
-                                                {
-                                                    RGB =  (unsigned long)ColorOut.r;       // Rot
-                                                    RGB |= (unsigned long)ColorOut.g<<8;    // Grün
-                                                    RGB |= (unsigned long)ColorOut.b<<16;   // Blau
+                                                RGB =  (unsigned long)ColorOut.r;       // Rot
+                                                RGB |= (unsigned long)ColorOut.g<<8;    // Grün
+                                                RGB |= (unsigned long)ColorOut.b<<16;   // Blau
 
-                                                    BlurTable0[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
-                                                }
-
-                                                if(DestDisplayMode == 16)
-                                                {
-                                                    unsigned char r = ((unsigned char)ColorOut.r * 31) / 255;
-                                                    unsigned char g = ((unsigned char)ColorOut.g * 63) / 255;
-                                                    unsigned char b = ((unsigned char)ColorOut.b * 31) / 255;
-
-                                                    BlurTable0[x[0]][x[1]][x[2]][x[3]] = (unsigned long)(r<<11 | g<<5 | b);
-                                                }
+                                                BlurTable0[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
 
                                                 /// Tabelle 1 für Gerade Zeile
                                                 _y *= Scanline;
@@ -306,23 +278,12 @@ inline void VideoCrtClass::CreateVicIIColors(void)
                                                 ColorIn = ColorOut;
                                                 ChangeContrast(&ColorIn, &ColorOut,Kontrast);
 
-                                                if(DestDisplayMode == 32)
-                                                {
-                                                    RGB =  (unsigned long)ColorOut.r;       // Rot
-                                                    RGB |= (unsigned long)ColorOut.g<<8;    // Grün
-                                                    RGB |= (unsigned long)ColorOut.b<<16;   // Blau
 
-                                                    BlurTable0S[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
-                                                }
+                                                RGB =  (unsigned long)ColorOut.r;       // Rot
+                                                RGB |= (unsigned long)ColorOut.g<<8;    // Grün
+                                                RGB |= (unsigned long)ColorOut.b<<16;   // Blau
 
-                                                if(DestDisplayMode == 16)
-                                                {
-                                                    unsigned char r = ((unsigned char)ColorOut.r * 31) / 255;
-                                                    unsigned char g = ((unsigned char)ColorOut.g * 63) / 255;
-                                                    unsigned char b = ((unsigned char)ColorOut.b * 31) / 255;
-
-                                                    BlurTable0S[x[0]][x[1]][x[2]][x[3]] = (unsigned long)(r<<11 | g<<5 | b);
-                                                }
+                                                BlurTable0S[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
 
                                                 /// Tabelle 1 für Ungerade Zeilen
                                                 _y = C64YUVPalette2[x[0]*3];
@@ -366,24 +327,11 @@ inline void VideoCrtClass::CreateVicIIColors(void)
                                                 ColorIn = ColorOut;
                                                 ChangeContrast(&ColorIn, &ColorOut,Kontrast);
 
-                                                if(DestDisplayMode == 32)
-                                                {
-                                                    RGB =  (unsigned long)ColorOut.r;       // Rot
-                                                    RGB |= (unsigned long)ColorOut.g<<8;    // Grün
-                                                    RGB |= (unsigned long)ColorOut.b<<16;   // Blau
+                                                RGB =  (unsigned long)ColorOut.r;       // Rot
+                                                RGB |= (unsigned long)ColorOut.g<<8;    // Grün
+                                                RGB |= (unsigned long)ColorOut.b<<16;   // Blau
 
-                                                    BlurTable1[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
-
-                                                }
-
-                                                if(DestDisplayMode == 16)
-                                                {
-                                                    unsigned char r = ((unsigned char)ColorOut.r * 31) / 255;
-                                                    unsigned char g = ((unsigned char)ColorOut.g * 63) / 255;
-                                                    unsigned char b = ((unsigned char)ColorOut.b * 31) / 255;
-
-                                                    BlurTable1[x[0]][x[1]][x[2]][x[3]] = (unsigned long)(r<<11 | g<<5 | b);
-                                                }
+                                                BlurTable1[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
 
                                                 _y *= Scanline;
 
@@ -404,60 +352,12 @@ inline void VideoCrtClass::CreateVicIIColors(void)
                                                 ColorIn = ColorOut;
                                                 ChangeContrast(&ColorIn, &ColorOut,Kontrast);
 
-                                                if(DestDisplayMode == 32)
-                                                {
-                                                    RGB =  (unsigned long)ColorOut.r;       // Rot
-                                                    RGB |= (unsigned long)ColorOut.g<<8;    // Grün
-                                                    RGB |= (unsigned long)ColorOut.b<<16;   // Blau
+                                                RGB =  (unsigned long)ColorOut.r;       // Rot
+                                                RGB |= (unsigned long)ColorOut.g<<8;    // Grün
+                                                RGB |= (unsigned long)ColorOut.b<<16;   // Blau
 
-                                                    BlurTable1S[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
-                                                }
+                                                BlurTable1S[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
 
-                                                if(DestDisplayMode == 16)
-                                                {
-                                                    unsigned char r = ((unsigned char)ColorOut.r * 31) / 255;
-                                                    unsigned char g = ((unsigned char)ColorOut.g * 63) / 255;
-                                                    unsigned char b = ((unsigned char)ColorOut.b * 31) / 255;
-
-                                                    BlurTable1S[x[0]][x[1]][x[2]][x[3]] = (unsigned long)(r<<11 | g<<5 | b);
-                                                }
-
-                                                /*
-                                                if(DestDisplayMode == 16)
-                                                {
-                                                    unsigned short r;
-                                                    unsigned short g;
-                                                    unsigned short b;
-
-                                                    unsigned long RGBTmp = BlurTable0[x[0]][x[1]][x[2]][x[3]];
-                                                    r = ((((RGBTmp&0x00FF0000)>>16)&0xFF) * 31) / 255;
-                                                    g = ((((RGBTmp&0x0000FF00)>>8)&0xFF) * 63) / 255;
-                                                    b = ((((RGBTmp&0x000000FF))&0xFF) * 31) / 255;
-                                                    //BlurTable0[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
-                                                    BlurTable0[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
-
-                                                    RGBTmp = BlurTable1[x[0]][x[1]][x[2]][x[3]];
-                                                    r = ((((RGBTmp&0x00FF0000)>>16)&0xFF) * 31) / 255;
-                                                    g = ((((RGBTmp&0x0000FF00)>>8)&0xFF) * 63) / 255;
-                                                    b = ((((RGBTmp&0x000000FF))&0xFF) * 31) / 255;
-                                                    //BlurTable1[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
-                                                    BlurTable1[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
-
-                                                    RGBTmp = BlurTable0S[x[0]][x[1]][x[2]][x[3]];
-                                                    r = ((((RGBTmp&0x00FF0000)>>16)&0xFF) * 31) / 255;
-                                                    g = ((((RGBTmp&0x0000FF00)>>8)&0xFF) * 63) / 255;
-                                                    b = ((((RGBTmp&0x000000FF))&0xFF) * 31) / 255;
-                                                    //BlurTable0S[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
-                                                    BlurTable0S[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
-
-                                                    RGBTmp = BlurTable1S[x[0]][x[1]][x[2]][x[3]];
-                                                    r = ((((RGBTmp&0x00FF0000)>>16)&0xFF) * 31) / 255;
-                                                    g = ((((RGBTmp&0x0000FF00)>>8)&0xFF) * 63) / 255;
-                                                    b = ((((RGBTmp&0x000000FF))&0xFF) * 31) / 255;
-                                                    //BlurTable1S[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
-                                                    BlurTable1S[x[0]][x[1]][x[2]][x[3]] = r<<11 | g<<5 | b;
-                                                }
-                                                */
                                         }
 }
 
@@ -471,162 +371,79 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
     {
         if(Double2x)
         {
-            switch(DestDisplayMode)
+            for(int y=0;y<(OutYW/2);y++)
             {
-            case 16:
-                for(int y=0;y<OutYW/2;y++)
+                Outpuffer32 = ((uint32_t*)Outpuffer + ((y*2)*Pitch/4));
+                Outpuffer32Scanline = ((uint32_t*)Outpuffer + (((y*2)+1)*(Pitch/4)));
+
+                w0 = w1 = w2 = w3 = *VideoSource8 & 0x0F;
+
+                switch(y&1)
                 {
-                    Outpuffer16 = ((uint16_t*)Outpuffer + (((y*2)+1)*Pitch/2));
-                    Outpuffer16Scanline = ((uint16_t*)Outpuffer + ((y*2)*(Pitch/2)));
-
-                    w0 = w1 = w2 = w3 = *VideoSource8 & 0x0F;
-                    switch(y&1)
+                case 0:
+                    for(int x=0;x<(OutXW/2);x++)
                     {
-                    case 0:
-                        for(int x=0;x<(OutXW/2);x++)
-                        {
-                            *(Outpuffer16++) = (unsigned short)BlurTable0[w0][w1][w2][w3];
-                            *(Outpuffer16++) = (unsigned short)BlurTable0[w0][w1][w2][w3];
-                            *(Outpuffer16Scanline++) = (unsigned short)BlurTable0S[w0][w1][w2][w3];
-                            *(Outpuffer16Scanline++) = (unsigned short)BlurTable0S[w0][w1][w2][w3];
-                            w3 = w2;
-                            w2 = w1;
-                            w1 = w0;
-                            w0 = *(VideoSource8+x+2) & 0x0F;
-                        }
-                        break;
-                    case 1:
-                        for(int x=0;x<(OutXW/2);x++)
-                        {
-                            *(Outpuffer16++) = (unsigned short)BlurTable1[w0][w1][w2][w3];
-                            *(Outpuffer16++) = (unsigned short)BlurTable1[w0][w1][w2][w3];
-                            *(Outpuffer16Scanline++) = (unsigned short)BlurTable1S[w0][w1][w2][w3];
-                            *(Outpuffer16Scanline++) = (unsigned short)BlurTable1S[w0][w1][w2][w3];
-                            w3 = w2;
-                            w2 = w1;
-                            w1 = w0;
-                            w0 = *(VideoSource8+x+2) & 0x0F;
-                        }
-                        break;
+                        *(Outpuffer32++) = BlurTable0[w0][w1][w2][w3];
+                        *(Outpuffer32++) = BlurTable0[w0][w1][w2][w3];
+                        *(Outpuffer32Scanline++) = BlurTable0S[w0][w1][w2][w3];
+                        *(Outpuffer32Scanline++) = BlurTable0S[w0][w1][w2][w3];
+                        w3 = w2;
+                        w2 = w1;
+                        w1 = w0;
+                        w0 = *(VideoSource8+x+1) & 0x0F;
                     }
-                    VideoSource8 = VideoSource8+InXW;
-                }
-                break;
-            case 32:
-                for(int y=0;y<(OutYW/2);y++)
-                {
-                    Outpuffer32 = ((uint32_t*)Outpuffer + ((y*2)*Pitch/4));
-                    Outpuffer32Scanline = ((uint32_t*)Outpuffer + (((y*2)+1)*(Pitch/4)));
-
-                    w0 = w1 = w2 = w3 = *VideoSource8 & 0x0F;
-
-                    switch(y&1)
+                    break;
+                case 1:
+                    for(int x=0;x<(OutXW/2);x++)
                     {
-                    case 0:
-                        for(int x=0;x<(OutXW/2);x++)
-                        {
-                            *(Outpuffer32++) = BlurTable0[w0][w1][w2][w3];
-                            *(Outpuffer32++) = BlurTable0[w0][w1][w2][w3];
-                            *(Outpuffer32Scanline++) = BlurTable0S[w0][w1][w2][w3];
-                            *(Outpuffer32Scanline++) = BlurTable0S[w0][w1][w2][w3];
-                            w3 = w2;
-                            w2 = w1;
-                            w1 = w0;
-                            w0 = *(VideoSource8+x+1) & 0x0F;
-                        }
-                        break;
-                    case 1:
-                        for(int x=0;x<(OutXW/2);x++)
-                        {
-                            *(Outpuffer32++) = BlurTable1[w0][w1][w2][w3];
-                            *(Outpuffer32++) = BlurTable1[w0][w1][w2][w3];
-                            *(Outpuffer32Scanline++) = BlurTable1S[w0][w1][w2][w3];
-                            *(Outpuffer32Scanline++) = BlurTable1S[w0][w1][w2][w3];
-                            w3 = w2;
-                            w2 = w1;
-                            w1 = w0;
-                            w0 = *(VideoSource8+x+1) & 0x0F;
-                        }
-                        break;
+                        *(Outpuffer32++) = BlurTable1[w0][w1][w2][w3];
+                        *(Outpuffer32++) = BlurTable1[w0][w1][w2][w3];
+                        *(Outpuffer32Scanline++) = BlurTable1S[w0][w1][w2][w3];
+                        *(Outpuffer32Scanline++) = BlurTable1S[w0][w1][w2][w3];
+                        w3 = w2;
+                        w2 = w1;
+                        w1 = w0;
+                        w0 = *(VideoSource8+x+1) & 0x0F;
                     }
-                    VideoSource8 = VideoSource8+InXW;
+                    break;
                 }
-                break;
+                VideoSource8 = VideoSource8+InXW;
             }
         }
         else
         { 
-            switch(DestDisplayMode)
+            for(int y=0;y<OutYW;y++)
             {
-            case 16:
-                for(int y=0;y<OutYW;y++)
+                Outpuffer32 = ((uint32_t*)Outpuffer + ((y)*Pitch/4));
+                Outpuffer32Scanline = ((uint32_t*)Outpuffer + (((y*2)+1)*(Pitch/4)));
+
+                w0 = w1 = w2 = w3 = *VideoSource8 & 0x0F;
+
+                switch(y&1)
                 {
-                    Outpuffer16 = ((unsigned short*)Outpuffer + ((y)*Pitch/2));
-
-                    w0 = w1 = w2 = w3 = *VideoSource8 & 0x0F;
-
-                    switch(y&1)
+                case 0:
+                    for(int x=0;x<(OutXW);x++)
                     {
-                    case 0:
-                        for(int x=0;x<(OutXW);x++)
-                        {
-                            *(Outpuffer16++) = (unsigned short)BlurTable0[w0][w1][w2][w3];
+                            *(Outpuffer32++) = BlurTable0[w0][w1][w2][w3];
                             w3 = w2;
                             w2 = w1;
                             w1 = w0;
                             w0 = *(VideoSource8+x+1) & 0x0F;
-                        }
-                        break;
-                    case 1:
-                        for(int x=0;x<(OutXW);x++)
-                        {
-                            *(Outpuffer16++) = (unsigned short)BlurTable1[w0][w1][w2][w3];
+                    }
+                    break;
+                case 1:
+                    for(int x=0;x<(OutXW);x++)
+                    {
+                            *(Outpuffer32++) = BlurTable1[w0][w1][w2][w3];
                             w3 = w2;
                             w2 = w1;
                             w1 = w0;
                             w0 = *(VideoSource8+x+1) & 0x0F;
-                        }
-                        break;
                     }
-                    VideoSource8 = VideoSource8+InXW;
+                    break;
                 }
-                break;
-            case 32:
+                VideoSource8 = VideoSource8+InXW;
 
-                for(int y=0;y<OutYW;y++)
-                {
-                    Outpuffer32 = ((uint32_t*)Outpuffer + ((y)*Pitch/4));
-                    Outpuffer32Scanline = ((uint32_t*)Outpuffer + (((y*2)+1)*(Pitch/4)));
-
-                    w0 = w1 = w2 = w3 = *VideoSource8 & 0x0F;
-
-                    switch(y&1)
-                    {
-                    case 0:
-                        for(int x=0;x<(OutXW);x++)
-                        {
-                                *(Outpuffer32++) = BlurTable0[w0][w1][w2][w3];
-                                w3 = w2;
-                                w2 = w1;
-                                w1 = w0;
-                                w0 = *(VideoSource8+x+1) & 0x0F;
-                        }
-                        break;
-                    case 1:
-                        for(int x=0;x<(OutXW);x++)
-                        {
-                                *(Outpuffer32++) = BlurTable1[w0][w1][w2][w3];
-                                w3 = w2;
-                                w2 = w1;
-                                w1 = w0;
-                                w0 = *(VideoSource8+x+1) & 0x0F;
-                        }
-                        break;
-                    }
-                    VideoSource8 = VideoSource8+InXW;
-                }
-
-                break;
             }
         }
     }
@@ -635,70 +452,30 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
     else
     if(Double2x)
     {
-        switch(DestDisplayMode)
+        for(int y=0;y<(OutYW/2);y++)
         {
-        case 16: /// OK
-            for(int y=0;y<(OutYW/2);y++)
+            Outpuffer32 = ((uint32_t*)Outpuffer + ((y*2)*Pitch/4));
+            Outpuffer32Scanline = ((uint32_t*)Outpuffer + (((y*2)+1)*(Pitch/4)));
+            for(int x=0;x<(OutXW/2);x++)
             {
-                Outpuffer16 = ((uint16_t*)Outpuffer + (((y*2)+1)*Pitch/2));
-                Outpuffer16Scanline = ((uint16_t*)Outpuffer + ((y*2)*(Pitch/2)));
-
-                for(int x=0;x<(OutXW/2);x++)
-                {
-                    *(Outpuffer16++) = Palette16Bit[VideoSource8[x] & 0x0F];
-                    *(Outpuffer16++) = Palette16Bit[VideoSource8[x] & 0x0F];
-                    *(Outpuffer16Scanline++) = Palette16Bit[VideoSource8[x] & 0x0F];
-                    *(Outpuffer16Scanline++) = Palette16Bit[VideoSource8[x] & 0x0F];
-                }
-                VideoSource8 = VideoSource8+InXW;
+                *(Outpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
+                *(Outpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
+                *(Outpuffer32Scanline++) = Palette32Bit[VideoSource8[x] & 0x0F];
+                *(Outpuffer32Scanline++) = Palette32Bit[VideoSource8[x] & 0x0F];
             }
-            break;
-        case 32: /// OK
-            for(int y=0;y<(OutYW/2);y++)
-            {
-                Outpuffer32 = ((uint32_t*)Outpuffer + ((y*2)*Pitch/4));
-                Outpuffer32Scanline = ((uint32_t*)Outpuffer + (((y*2)+1)*(Pitch/4)));
-                for(int x=0;x<(OutXW/2);x++)
-                {
-                    *(Outpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
-                    *(Outpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
-                    *(Outpuffer32Scanline++) = Palette32Bit[VideoSource8[x] & 0x0F];
-                    *(Outpuffer32Scanline++) = Palette32Bit[VideoSource8[x] & 0x0F];
-                }
-                VideoSource8 = VideoSource8+InXW;
-            }
-            break;
+            VideoSource8 = VideoSource8+InXW;
         }
     }
     else
     {
-        switch(DestDisplayMode)
+        for(int y=0;y<(OutYW);y++)
         {
-        case 16: /// OK
-
-            for(int y=0;y<(OutYW);y++)
+            Outpuffer32 = ((uint32_t*)Outpuffer + ((y)*Pitch/4));
+            for(int x=0;x<(OutXW);x++)
             {
-                Outpuffer16 = ((uint16_t*)Outpuffer + (((y)+1)*Pitch/2));
-
-                for(int x=0;x<(OutXW);x++)
-                {
-                    *(Outpuffer16++) = Palette16Bit[VideoSource8[x] & 0x0F];
-                }
-                VideoSource8 = VideoSource8+InXW;
+                *(Outpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
             }
-
-            break;
-        case 32: /// OK
-            for(int y=0;y<(OutYW);y++)
-            {
-                Outpuffer32 = ((uint32_t*)Outpuffer + ((y)*Pitch/4));
-                for(int x=0;x<(OutXW);x++)
-                {
-                    *(Outpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
-                }
-                VideoSource8 = VideoSource8+InXW;
-            }
-            break;
+            VideoSource8 = VideoSource8+InXW;
         }
     }
 }

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019                //
+// Letzte Änderung am 24.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -26,7 +26,7 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoCrtClass *vid
 {
     this->video_crt_output = video_crt_output;
     this->ini = ini;
-    connect(this,SIGNAL(ChangeGrafikModi(bool,bool,bool,bool,bool)),parent,member);
+    connect(this,SIGNAL(ChangeGrafikModi(bool,bool,bool,bool)),parent,member);
     this->romsetPath = romsetPath;
     this->dataPath = dataPath;
 
@@ -177,13 +177,6 @@ void SetupWindow::LoadINI(C64Class *c64)
         video_crt_output->StartC64isPalmode = bvalue;
 
         bvalue = ini->value("WindowColor32BitMode",1).toBool();
-
-        if(!bvalue)
-            ui->W16Bit->setChecked(true);
-        else
-            ui->W32Bit->setChecked(true);
-
-        video_crt_output->StartC64isColorBit32 = bvalue;
 
         bvalue = ini->value("WindowDoubleSizeMode",0).toBool();
         ui->WDouble->setChecked(bvalue);
@@ -344,12 +337,11 @@ void SetupWindow::LoadINI(C64Class *c64)
 
 void SetupWindow::SaveINI()
 {
-    if(ini != 0)
+    if(ini != nullptr)
     {
         ini->beginGroup("SetupWindow");
         ini->setValue("NoPALColorMode",ui->C64Farbmodus->currentIndex());
         ini->setValue("WindowPalMode",ui->WPal->isChecked());
-        ini->setValue("WindowColor32BitMode",ui->W32Bit->isChecked());
         ini->setValue("WindowDoubleSizeMode",ui->WDouble->isChecked());
         ini->setValue("WindowFilter",ui->WFilter->isChecked());
         ini->setValue("WindowAspectRatio",ui->WAspectRatio->isChecked());
@@ -446,32 +438,22 @@ void SetupWindow::on_C64Farbmodus_currentIndexChanged(int index)
 
 void SetupWindow::on_WPal_toggled(bool)
 {
-    emit ChangeGrafikModi(false,ui->WPal->isChecked(),ui->WDouble->isChecked(),ui->W32Bit->isChecked(),ui->WFilter->isChecked());
+    emit ChangeGrafikModi(false,ui->WPal->isChecked(),ui->WDouble->isChecked(),ui->WFilter->isChecked());
 }
 
 void SetupWindow::on_WDouble_toggled(bool)
 {
-    emit ChangeGrafikModi(false,ui->WPal->isChecked(),ui->WDouble->isChecked(),ui->W32Bit->isChecked(),ui->WFilter->isChecked());
-}
-
-void SetupWindow::on_W16Bit_toggled(bool)
-{
-    emit ChangeGrafikModi(false,ui->WPal->isChecked(),ui->WDouble->isChecked(),ui->W32Bit->isChecked(),ui->WFilter->isChecked());
-}
-
-void SetupWindow::on_W32Bit_toggled(bool)
-{
-    emit ChangeGrafikModi(false,ui->WPal->isChecked(),ui->WDouble->isChecked(),ui->W32Bit->isChecked(),ui->WFilter->isChecked());
+    emit ChangeGrafikModi(false,ui->WPal->isChecked(),ui->WDouble->isChecked(),ui->WFilter->isChecked());
 }
 
 void SetupWindow::on_WFilter_toggled(bool)
 {
-    emit ChangeGrafikModi(false,ui->WPal->isChecked(),ui->WDouble->isChecked(),ui->W32Bit->isChecked(),ui->WFilter->isChecked());
+    emit ChangeGrafikModi(false,ui->WPal->isChecked(),ui->WDouble->isChecked(),ui->WFilter->isChecked());
 }
 
 void SetupWindow::ReSetup()
 {
-    emit ChangeGrafikModi(false,ui->WPal->isChecked(),ui->WDouble->isChecked(),ui->W32Bit->isChecked(),ui->WFilter->isChecked());
+    emit ChangeGrafikModi(false,ui->WPal->isChecked(),ui->WDouble->isChecked(),ui->WFilter->isChecked());
 }
 
 int SetupWindow::GetScreenshotFormat()

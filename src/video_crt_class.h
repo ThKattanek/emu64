@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 24.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -45,7 +45,6 @@ public:
         ~VideoCrtClass();
         //void SetPixelFormat(SDL_PixelFormat *format);
         void ConvertVideo(void* Outpuffer, long Pitch, unsigned char* VICOutPuffer, int VICOutPufferOffset, int OutXW, int OutYW, int InXW, int InYW, bool FlipTex);
-        void SetDisplayMode(int DisplayMode);
         void UpdateParameter(void);
         void SetPhaseAltLineOffset(int offset);
         void SetHorizontalBlurY(int wblur);
@@ -60,7 +59,6 @@ public:
         float *GetC64YUVPalette();
         unsigned long YHistogramm[256];
 
-        bool StartC64isColorBit32;
         bool StartC64isDoublesize;
         bool StartC64isPalmode;
 
@@ -71,15 +69,15 @@ private:
 
         bool                Double2x;
         bool                enable_crt_output;
-        uint32_t            DestDisplayMode;
-        uint16_t            *Outpuffer16;
-        uint16_t            *Outpuffer16Scanline;
+        //uint32_t            DestDisplayMode;
+        //uint16_t            *Outpuffer16;
+        //uint16_t            *Outpuffer16Scanline;
         uint32_t            *Outpuffer32;
         uint32_t            *Outpuffer32Scanline;
         uint8_t             *VideoSource8;
 
         //////// Normaler Palettenmodus //////////
-        uint16_t	Palette16Bit[256];
+        //uint16_t	Palette16Bit[256];
         uint32_t	Palette32Bit[256];
         int		AktFarbMode;
         //////////////////////////////////////////

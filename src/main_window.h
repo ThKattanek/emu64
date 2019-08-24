@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.06.2019                //
+// Letzte Änderung am 23.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -123,7 +123,7 @@ private slots:
     void on_actionVollbild_triggered();
     void on_actionBandlaufwerk_1530_triggered();
 
-    void OnChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool bit32mode, bool filter);
+    void OnChangeGrafikModi(bool fullscreen, bool palmode, bool doublemode, bool filter);
     void OnChangeFloppyImage(int floppynr);
     void OnResetScreenshotCounter(void);
     void OnSetupFished(int result);

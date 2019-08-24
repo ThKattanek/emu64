@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019                //
+// Letzte Änderung am 24.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -329,7 +329,7 @@ void MainWindow::OnInit()
     LogText(tr(">> DebuggerWindow wurde erzeugt\n").toLatin1().data());
 
     SplashMessage(tr("SetupWindow wird erstellt."),Qt::darkBlue);
-    setup_window = new SetupWindow(this,SLOT(OnChangeGrafikModi(bool,bool,bool,bool,bool)),video_crt_output,ini,&romsetPath,&dataPath);
+    setup_window = new SetupWindow(this,SLOT(OnChangeGrafikModi(bool,bool,bool,bool)),video_crt_output,ini,&romsetPath,&dataPath);
     connect(setup_window,SIGNAL(finished(int)),this,SLOT(OnSetupFished(int)));
     LogText(tr(">> SetupWindow wurde erzeugt\n").toLatin1().data());
 
@@ -947,11 +947,11 @@ void MainWindow::on_actionEmu64_Einstellungen_triggered()
     else setup_window->hide();
 }
 
-void MainWindow::OnChangeGrafikModi(bool fullscreen, bool palmode, bool doublemode, bool bit32mode, bool filter)
+void MainWindow::OnChangeGrafikModi(bool fullscreen, bool palmode, bool doublemode, bool filter)
 {
     if(!fullscreen)
     {
-        if(c64 != nullptr) c64->SetGrafikModi(bit32mode,doublemode,palmode,filter,0,0);
+        if(c64 != nullptr) c64->SetGrafikModi(doublemode,palmode,filter,0,0);
     }
 }
 
