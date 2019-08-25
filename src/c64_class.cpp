@@ -224,11 +224,17 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
 
     SDL_memset(&audio_spec_want, 0, sizeof(audio_spec_want));
     audio_spec_want.freq = AudioSampleRate;
-    audio_spec_want.format = AUDIO_S16;
+    audio_spec_want.format = AUDIO_S16SYS;
     audio_spec_want.channels = 2;
     audio_spec_want.samples = AudioPufferSize;
     audio_spec_want.callback = AudioMix;
     audio_spec_want.userdata = this;
+
+    #ifdef _WIN32
+        if(getenv("SDL_AUDIODRIVER") == NULL)
+            putenv("SDL_AUDIODRIVER=directsound");
+
+    #endif
 
     if( SDL_OpenAudio(&audio_spec_want, &audio_spec_have) > 0 )
     {
@@ -248,6 +254,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
 
     char out_text[1024];
 
+    sprintf(out_text, "\t -Audio Driver: %s\n" , getenv("SDL_AUDIODRIVER"));
+    LogText(out_text);
     sprintf(out_text, "\t -Audio Channels: %d\n" ,audio_channels);
     LogText(out_text);
     sprintf(out_text, "\t -Audio Buffersize: %d\n" ,audio_spec_have.samples);
