@@ -961,6 +961,7 @@ void MainWindow::OnChangeGrafikModi(bool fullscreen, bool palmode, bool doublemo
     if(!fullscreen)
     {
         if(c64 != nullptr) c64->SetGrafikModi(doublemode,palmode,filter,0,0);
+        LogText(tr(">> TEST1\n").toUtf8());
     }
 }
 

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.08.2019                //
+// Letzte Änderung am 25.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -246,11 +246,20 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
     audio_16bit_buffer_size = audio_spec_have.samples * audio_channels;
     audio_16bit_buffer = new int16_t[audio_16bit_buffer_size];
 
-    cout << "Audio Channels: " << audio_channels << endl;
-    cout << "Audio Sample Bit Size: " << audio_sample_bit_size << endl;
-    cout << "Audio Sample Is Float: " << is_audio_sample_float << endl;
-    cout << "Audio Sample Is Signed: " << is_audio_sample_signed << endl;
-    cout << "Audio Sample Is Little Endian: " << is_audio_sample_little_endian << endl;
+    char out_text[1024];
+
+    sprintf(out_text, "\t -Audio Channels: %d\n" ,audio_channels);
+    LogText(out_text);
+    sprintf(out_text, "\t -Audio Buffersize: %d\n" ,audio_spec_have.samples);
+    LogText(out_text);
+    sprintf(out_text, "\t -Audio Sample Bit Size: %d\n",audio_sample_bit_size);
+    LogText(out_text);
+    sprintf(out_text, "\t -Audio Sample Is Float: %d\n",is_audio_sample_float);
+    LogText(out_text);
+    sprintf(out_text, "\t -Audio Sample Is Signed: %d\n",is_audio_sample_signed);
+    LogText(out_text);
+    sprintf(out_text, "\t -Audio Sample Is Little Endian: %d\n",is_audio_sample_little_endian);
+    LogText(out_text);
 
     OpenSDLJoystick();
 
@@ -1422,11 +1431,13 @@ void C64Class::SetGrafikModi(bool enable_screen_doublesize, bool enable_screen_c
 
     changed_graphic_modi = true;
 
+    /*
     char str00[255];
     sprintf(str00,">>   Doublesize = %d\n>>   PAL = %d\n>>   Filter = %d\n>>   FullResXW = %d\n>>   FullResrYW = %d\n", enable_screen_doublesize, enable_screen_crt_output, enable_screen_filter, fullscreen_width, fullscreen_height);
 
     LogText(const_cast<char*>(">> Grafikmodus wurde gesetzt:\n"));
     LogText(str00);
+    */
 }
 
 void C64Class::SetSDLWindowName(char *name)
