@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.08.2019                //
+// Letzte Änderung am 25.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -176,15 +176,12 @@ void SetupWindow::LoadINI(C64Class *c64)
         ui->WPal->setChecked(bvalue);
         video_crt_output->StartC64isPalmode = bvalue;
 
-        bvalue = ini->value("WindowColor32BitMode",1).toBool();
-
         bvalue = ini->value("WindowDoubleSizeMode",0).toBool();
         ui->WDouble->setChecked(bvalue);
         video_crt_output->StartC64isDoublesize = bvalue;
 
         bvalue = ini->value("WindowFilter",0).toBool();
         ui->WFilter->setChecked(bvalue);
-        on_WFilter_toggled(bvalue);
 
         bvalue = ini->value("WindowAspectRatio",0).toBool();
         ui->WAspectRatio->setChecked(bvalue);

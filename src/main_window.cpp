@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.08.2019                //
+// Letzte Änderung am 25.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -265,7 +265,7 @@ void MainWindow::OnInit()
         }
         else
         {
-            LogText(tr("<< Ein neues Screenshot Verzeichnis konnte nicht erstellt werden\n<< Keine Screenshots möglich !!").toUtf8());
+            LogText(tr("<< Ein neues Screenshot Verzeichnis konnte nicht erstellt werden\n<< Keine Screenshots moeglich !!").toUtf8());
             ScreenshotsEnable = false;
         }
     }
@@ -355,9 +355,9 @@ void MainWindow::OnInit()
     ini->endGroup();
     LogText(tr(">> Aktuelle Screenshotnummer wurde geladen\n").toUtf8());
 
-    SplashMessage(tr("SetupWindow wird mit INI abgeglichen."),Qt::darkBlue);
-    setup_window->ReSetup();
-    LogText(tr(">> SetupWindow ReSetup wurde durchgeführt\n").toUtf8());
+    //SplashMessage(tr("SetupWindow wird mit INI abgeglichen."),Qt::darkBlue);
+    //setup_window->ReSetup();
+    //LogText(tr(">> SetupWindow ReSetup wurde durchgeführt\n").toUtf8());
 
     //SplashMessage(tr("SDL Window Titelleiste wird benannt."),Qt::darkBlue);
     //SDL_WM_SetCaption((const char*)tr("C64 Bildschirm").toUtf8(),0);
@@ -403,7 +403,7 @@ void MainWindow::OnInit()
 
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
-        SplashMessage(tr("Floppy: ") + QVariant(i).toString() + "wird in Tabelle eingefügt",Qt::darkBlue);
+        SplashMessage(tr("Floppy: ") + QVariant(i).toString() + "wird in Tabelle eingefuegt",Qt::darkBlue);
         ui->FloppyTabel->setRowHeight(i,24);
         WidgetFloppyStatus *w = new WidgetFloppyStatus(this,i,c64->floppy[i]);
         w->SetGeraeteID(i+8);
@@ -417,27 +417,27 @@ void MainWindow::OnInit()
 
     /// Close Evend von C64 Klasse hierher leiten
     c64->CloseEventC64Screen = bind(&MainWindow::CloseC64Screeen,this);
-    LogText(tr(">> SDL Window Close Event mit MainWindow verknüpft\n").toUtf8());
+    LogText(tr(">> SDL Window Close Event mit MainWindow verknuepft\n").toUtf8());
 
     /// LimitCyclesEvent von C64 Klasse hierher leiten
     IsLimitCyclesEvent = false;
     c64->LimitCyclesEvent = bind(&MainWindow::LimitCyclesEvent,this);
-    LogText(tr(">> C64Class LimitCycelsEvent mit MainWindow verknüpft\n").toUtf8());
+    LogText(tr(">> C64Class LimitCycelsEvent mit MainWindow verknuepft\n").toUtf8());
 
     /// DebugCartEvent von C64 Klasse hierher leiten
     IsDebugCartEvent = false;
     c64->DebugCartEvent = bind(&MainWindow::DebugCartEvent,this,std::placeholders::_1);
-    LogText(tr(">> C64Class DebugCartEvent mit MainWindow verknüpft\n").toUtf8());
+    LogText(tr(">> C64Class DebugCartEvent mit MainWindow verknuepft\n").toUtf8());
 
     connect(floppy_window,SIGNAL(ChangeFloppyImage(int)),this,SLOT(OnChangeFloppyImage(int)));
-    LogText(tr(">> ChangeFloppyImage Event mit MainWindow verknüpft\n").toUtf8());
+    LogText(tr(">> ChangeFloppyImage Event mit MainWindow verknuepft\n").toUtf8());
 
     ////////// Load from INI ///////////
     SplashMessage(tr("Einstellungen werden von INI geladen und gesetzt."),Qt::darkBlue);
     if(ini != nullptr)
     {
         floppy_window->LoadIni();
-        LogText(tr(">> FloppyWindow LoadIni wurde ausgeführt\n").toUtf8());
+        LogText(tr(">> FloppyWindow LoadIni wurde ausgefuehrt\n").toUtf8());
 
         ini->beginGroup("MainWindow");
         if(ini->contains("Geometry")) restoreGeometry(ini->value("Geometry").toByteArray());
@@ -462,15 +462,15 @@ void MainWindow::OnInit()
 
         /// SETUP Ini laden ///
         setup_window->LoadINI(c64);
-        LogText(tr(">> SetupWindow LoadIni wurde ausgeführt\n").toUtf8());
+        LogText(tr(">> SetupWindow LoadIni wurde ausgefuehrt\n").toUtf8());
 
         /// CRT Ini erst jetzt laden ///
         cartridge_window->LoadIni();
-        LogText(tr(">> CrtWindow LoadIni wurde ausgeführt\n").toUtf8());
+        LogText(tr(">> CrtWindow LoadIni wurde ausgefuehrt\n").toUtf8());
 
         /// TAPE Ini laden ///
         tape_window->LoadIni();
-        LogText(tr(">> TapeWindow LoadIni wurde ausgeführt\n").toUtf8());
+        LogText(tr(">> TapeWindow LoadIni wurde ausgefuehrt\n").toUtf8());
 
         /// C64 Key Mapping aus INI laden ///
 
@@ -521,7 +521,7 @@ void MainWindow::OnInit()
 
     ini->endGroup();
 
-    LogText(">> Emu64 wurde initialisiert\n");
+    LogText(">> Emu64 wurde initialisiert\n\n\n");
 
 
     /////////////////////////////////////
@@ -805,7 +805,7 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
 
             if(!(val > 0))
             {
-                cmd_line->OutErrorMsg("Die Anzahl der Zyklen müssen größer als 0 sein.","--help");
+                cmd_line->OutErrorMsg("Die Anzahl der Zyklen müssen groeßer als 0 sein.","--help");
                 break;
             }
             c64->SetLimitCycles(val);
@@ -961,7 +961,9 @@ void MainWindow::OnChangeGrafikModi(bool fullscreen, bool palmode, bool doublemo
     if(!fullscreen)
     {
         if(c64 != nullptr) c64->SetGrafikModi(doublemode,palmode,filter,0,0);
-        LogText(tr(">> TEST1\n").toUtf8());
+        char out_text[1024];
+        sprintf(out_text,">> Change Grafik Mode: %d-%d-%d\n",doublemode,palmode,filter);
+        LogText(out_text);
     }
 }
 
