@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.08.2019        		//
+// Letzte Änderung am 25.08.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -757,11 +757,16 @@ bool Floppy1541::OneCycle()
         if(FreqConvCounter>=(double)1.0)
         {
             FreqConvCounter-=(double)1.0;
-            if(FloppySoundsLoaded)RenderFloppySound();
+
+            if(FloppySoundsLoaded && FloppyEnabled)
+                RenderFloppySound();
+            else {
+                SoundBuffer[SoundBufferPos] = SoundBuffer[SoundBufferPos+1] = 0;
+                SoundBufferPos += 2;
+                if(SoundBufferPos >= SoundBufferSize*2) SoundBufferPos = 0;
+            }
         }
     }
-
-    if(!FloppyEnabled) return true;
 
     // Disk Wechsel Simulieren
     if(DiskChangeSimState != 0)
