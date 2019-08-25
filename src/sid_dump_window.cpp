@@ -60,7 +60,7 @@ void SidDumpWindow::on_SidDumpStart_clicked()
         return;
     }
 
-    if(c64->StartSidDump(filename.toLatin1().data()))
+    if(c64->StartSidDump(filename.toUtf8()))
     {
         ui->SidDumpStart->setEnabled(false);
         ui->SidDumpStop->setEnabled(true);

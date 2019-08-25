@@ -1802,8 +1802,8 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
     if(filename != "")
     {
        int ret;
-       if(current_source > 0) ret = c64->floppy[currnet_floppy_nr]->LoadBreakGroups(filename.toLatin1().data());
-       else ret = c64->LoadBreakGroups(filename.toLatin1().data());
+       if(current_source > 0) ret = c64->floppy[currnet_floppy_nr]->LoadBreakGroups(filename.toUtf8());
+       else ret = c64->LoadBreakGroups(filename.toUtf8().data());
 
        if(ret != 0)
        {
@@ -1866,12 +1866,12 @@ void DebuggerWindow::on_SaveBreakpoints_clicked()
 
     if(current_source > 0)
     {
-        if(!c64->floppy[currnet_floppy_nr]->SaveBreakGroups(filename.toLatin1().data()))
+        if(!c64->floppy[currnet_floppy_nr]->SaveBreakGroups(filename.toUtf8()))
             QMessageBox::warning(this,tr("Fehler..."),tr("Die Haltepunkte konnten nicht gespeichert werden."));
     }
     else
     {
-        if(!c64->SaveBreakGroups(filename.toLatin1().data()))
+        if(!c64->SaveBreakGroups(filename.toUtf8().data()))
           QMessageBox::warning(this,tr("Fehler..."),tr("Die Haltepunkte konnten nicht gespeichert werden."));
     }
 }
@@ -1941,7 +1941,7 @@ void DebuggerWindow::on_ExportDisAss_clicked()
     fileext = fileext.toUpper();
     if(fileext == "TXT")
     {
-        if(!c64->ExportASM(filename.toLatin1().data(),start,end,current_source))
+        if(!c64->ExportASM(filename.toUtf8().data(),start,end,current_source))
             QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der Disassembler Datei."));
     }
 
@@ -1952,7 +1952,7 @@ void DebuggerWindow::on_ExportDisAss_clicked()
             QMessageBox::warning(this,tr("Fehler..."),tr("Floppy RAM geht nur von $0000 - $07FF (2KB)."));
             return;
         }
-        if(!c64->ExportPRG(filename.toLatin1().data(),start,end,current_source))
+        if(!c64->ExportPRG(filename.toUtf8().data(),start,end,current_source))
             QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der Programm Datei."));
     }
 }

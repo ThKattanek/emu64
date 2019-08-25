@@ -487,7 +487,7 @@ void SetupWindow::on_VJoySlots_cellChanged(int row, int column)
 {
     if(column == 0)
     {
-        strcpy(c64->virtual_joys[row].Name,ui->VJoySlots->item(row,column)->text().toLatin1().data());
+        strcpy(c64->virtual_joys[row].Name,ui->VJoySlots->item(row,column)->text().toUtf8());
     }
 }
 
@@ -764,11 +764,11 @@ void SetupWindow::on_SelectRomSet_currentIndexChanged(const QString &arg1)
 
     if(c64 != NULL)
     {
-        c64->LoadC64Roms(kernal_rom.toLatin1().data(),basic_rom.toLatin1().data(),char_rom.toLatin1().data());
+        c64->LoadC64Roms(kernal_rom.toUtf8().data(),basic_rom.toUtf8().data(),char_rom.toUtf8().data());
 
         for(int i=0; i<MAX_FLOPPY_NUM; i++)
         {
-            c64->LoadFloppyRom(i,dos1541_rom.toLatin1().data());
+            c64->LoadFloppyRom(i,dos1541_rom.toUtf8().data());
         }
 
         c64->HardReset();

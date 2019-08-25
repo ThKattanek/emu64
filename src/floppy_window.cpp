@@ -143,7 +143,7 @@ void FloppyWindow::LoadIni()
             AktDir[i] = ini->value("AktDir","").toString();
             AktFile[i] = ini->value("AktFile","").toString();
             AktFileName[i] = AktDir[i] + "/" + AktFile[i];
-            d64[i].LoadD64(AktFileName[i].toLatin1().data());
+            d64[i].LoadD64(AktFileName[i].toUtf8());
 
             // Write Protect für alle Floppys setzen
             c64->floppy[i]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktFileName[i]));
@@ -171,7 +171,7 @@ bool FloppyWindow::SetDiskImage(uint8_t floppynr, QString filename)
     AktDir[floppynr] = fi.absolutePath();
     AktFile[floppynr] = fi.fileName();
     AktFileName[floppynr] = AktDir[floppynr] + "/" + AktFile[floppynr];
-    d64[floppynr].LoadD64(AktFileName[floppynr].toLatin1().data());
+    d64[floppynr].LoadD64(AktFileName[floppynr].toUtf8());
 
     c64->floppy[floppynr]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktFileName[floppynr]));
 
@@ -202,14 +202,14 @@ void FloppyWindow::OnSelectFile(QString filename)
         AktFile[FloppyNr] = ui->FileBrowser->GetAktFile();
         if("D64" == AktFileName[FloppyNr].right(3).toUpper())
         {
-            d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toLatin1().data());
+            d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toUtf8());
             RefreshD64FileList();
             emit ChangeFloppyImage(FloppyNr);
         }
 
         if("G64" == AktFileName[FloppyNr].right(3).toUpper())
         {
-            //d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toLatin1().data());
+            //d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toUtf8());
             //RefreshD64FileList();
 
 

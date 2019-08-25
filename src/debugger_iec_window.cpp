@@ -97,7 +97,7 @@ void DebuggerIECWindow::on_StartExport_clicked()
 
     if(filename != "")
     {
-        if(c64->StartIECDump(filename.toLatin1().data()))
+        if(c64->StartIECDump(filename.toUtf8()))
         {
             ui->StopExport->setEnabled(true);
             ui->StartExport->setEnabled(false);

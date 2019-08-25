@@ -71,7 +71,7 @@ void VideoCaptureWindow::on_CaptureStart_clicked()
         return;
     }
 
-    if(c64->StartVideoRecord(filename.toLatin1().data(),ui->AudioBitrate->value() * 1000, ui->VideoBitrate->value()*1000))
+    if(c64->StartVideoRecord(filename.toUtf8(),ui->AudioBitrate->value() * 1000, ui->VideoBitrate->value()*1000))
     {
         ui->CaptureStart->setEnabled(false);
         ui->CaptureStop->setEnabled(true);
