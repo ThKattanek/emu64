@@ -612,11 +612,12 @@ void C64Class::SDLThreadPauseEnd()
 int SDLThread(void *userdat)
 {
     C64Class *c64 = static_cast<C64Class*>(userdat);
+    c64->LogText(">> SDLThread Start.\n");
+
     SDL_Event event;
     c64->loop_thread_end = false;
     c64->loop_thread_is_end = false;
     c64->sdl_thread_pause = false;
-
     c64->c64_screen_buffer = nullptr;
 
     while (!c64->loop_thread_end)
@@ -625,7 +626,9 @@ int SDLThread(void *userdat)
         if(c64->changed_graphic_modi)
         {
             c64->changed_graphic_modi = false;
+            c64->LogText(">> SDLThread: InitGrafik Start.\n");
             c64->InitGrafik();
+            c64->LogText(">> SDLThread: InitGrafik Ende.\n");
         }
 
         if(c64->changed_window_pos)
@@ -676,6 +679,8 @@ int SDLThread(void *userdat)
 
     c64->ReleaseGrafik();
     c64->loop_thread_is_end = true;
+
+    c64->LogText(">> SDLThread Ende\n");
 
     return 0;
 }
@@ -1492,14 +1497,20 @@ void C64Class::ToggleScreenMode()
 
 void C64Class::InitGrafik()
 {
+    char out_string[1024];
     /// VicRefresh stoppen und solange warten bis wirklich Stop ist ///
     enable_hold_vic_refresh = true;
     vic_refresh_is_holded = false;
+
+
+    LogText("\tInitGrafik: Warten bis Vic-Refresh angehalten wurde.\n");
 
     while(!vic_refresh_is_holded)
     {
         SDL_Delay(1);
     }
+
+    LogText("\tInitGrafik: Vic-Refresh wurde angehalten.\n");
 
     /// Allegmeine Einstellungen ///
 
@@ -1507,6 +1518,8 @@ void C64Class::InitGrafik()
         enable_fullscreen  = true;
     else enable_fullscreen = false;
 
+    sprintf(out_string,"\tInitGrafik: EnableFullscreen: %d\n",enable_fullscreen);
+    LogText(out_string);
 
     current_window_width = current_c64_screen_width = C64ScreenXW;
     current_window_height = current_c64_screen_height = vic->GetAktVicDisplayLastLine() - vic->GetAktVicDisplayFirstLine();
@@ -1520,6 +1533,11 @@ void C64Class::InitGrafik()
         current_c64_screen_height *=2;
     }
 
+    sprintf(out_string,"\tInitGrafik: WindowWidth: %d, WindowHeight: %d\n",current_window_width, current_window_height);
+    LogText(out_string);
+    sprintf(out_string,"\tInitGrafik: C64ScreenWidth: %d, C64ScreenHeight: %d\n",current_c64_screen_width, current_c64_screen_height);
+    LogText(out_string);
+
     current_window_color_bits = 32;
     if(c64_screen_buffer != nullptr)
     {
@@ -1527,18 +1545,46 @@ void C64Class::InitGrafik()
     }
     c64_screen_buffer = new uint8_t[current_c64_screen_width*current_c64_screen_height*4];
 
+    sprintf(out_string,"\tInitGrafik: WindowColorBits: %d\n", current_window_color_bits);
+    LogText(out_string);
+
     video_crt_output->EnableCrtOutput(enable_screen_crt_output);
     video_crt_output->EnableVideoDoubleSize(enable_screen_doublesize);
 
+    sprintf(out_string,"\tInitGrafik: EnableVideoCrtOutput: %d\n", enable_screen_crt_output);
+    LogText(out_string);
+    sprintf(out_string,"\tInitGrafik: EnableVideoDoubleSize: %d\n", enable_screen_doublesize);
+    LogText(out_string);
+
     if(sdl_window == nullptr)
     {
+        LogText("\tInitGrafik: SDL_Window noch nicht vorhanden.\n");
         sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
-
+        if(sdl_window == nullptr)
+            LogText("\tInitGrafik: Fehler beim erstellen des SDL_Window.\n");
+        else
+        {
+            sprintf(out_string,"\tInitGrafik: SDL_Window wurde erstellt (%d,%d).\n",current_window_width, current_window_height);
+            LogText(out_string);
+        }
         SDL_SetWindowIcon(sdl_window,sdl_window_icon);
+        LogText("\tInitGrafik: SDL_Window Icon wurde gesetzt.\n");
     }
-    else SDL_SetWindowSize(sdl_window,current_window_width,current_window_height);
+    else
+    {
+        LogText("\tInitGrafik: SDL_Window ist schon vorhanden.\n");
+
+        SDL_SetWindowSize(sdl_window,current_window_width,current_window_height);
+
+        sprintf(out_string,"\tInitGrafik: SDL_Window Groesse wurde gesetzt (%d,%d).\n",current_window_width, current_window_height);
+        LogText(out_string);
+    }
 
     gl_context = SDL_GL_CreateContext(sdl_window);
+    if(gl_context == nullptr)
+        LogText("\tInitGrafik: Fehler beim erstellen des GLContext.\n");
+    else
+        LogText("\tInitGrafik: GLContext wurde erstellt.\n");
 
     // OpenGL Initialisieren //
     //SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,1);
@@ -1549,33 +1595,53 @@ void C64Class::InitGrafik()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glViewport(0,0,current_window_width,current_window_height);
+    LogText("\tInitGrafik: GLVieport wurde gesetzt.\n");
     glMatrixMode(GL_PROJECTION);
     glOrtho(0,current_window_width,current_window_height,0,-1,1);
+    LogText("\tInitGrafik: GLOrtho wurde gesetzt.\n");
     glLoadIdentity();
 
     glGenTextures(1,&c64_screen_texture);
+    LogText("\tInitGrafik: C64 Screen Textur wurde generiert.\n");
+
     glBindTexture( GL_TEXTURE_2D, c64_screen_texture);
+    LogText("\tInitGrafik: C64 Screen Textur wurde gebunden.\n");
 
     // Textur Stretching Parameter setzen
     if(enable_screen_filter)
     {
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        LogText("\tInitGrafik: Screenfilter ist aktiviert.\n");
     }
     else
     {
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+        LogText("\tInitGrafik: Screenfilter ist deaktiviert.\n");
     }
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
     if(c64_screen != nullptr)
+    {
        SDL_FreeSurface(c64_screen);
+        LogText("\tInitGrafik: SDL Surface C64Screen wurde wieder freigegeben.\n");
+    }
+
     c64_screen = SDL_CreateRGBSurface(0, current_c64_screen_width, current_c64_screen_height, current_window_color_bits, 0, 0, 0, 0);
+    if(c64_screen != nullptr)
+        LogText("\tInitGrafik: C64Screen - SDL RGB Surface wurde erstellt.\n");
+    else
+        LogText("\tInitGrafik: C64Screen - SDL RGB Surface konnte nicht erstellt werden.\n");
 
     glTexImage2D( GL_TEXTURE_2D, 0, 4, current_c64_screen_width, current_c64_screen_height, 0,GL_RGBA, GL_UNSIGNED_BYTE, c64_screen_buffer);
+
+    if(glGetError() == GL_NO_ERROR)
+        LogText("\tInitGrafik: 2DTexturImage wurde aus C64ScreenBuffer erstellt.\n");
+    else
+        LogText("\tInitGrafik: 2DTexturImage konnte nicht aus C64ScreenBuffer erstellt werden.\n");
 
     GLenum  TextureFormat = 0;
     GLint   NofColors = 0;
@@ -1598,6 +1664,7 @@ void C64Class::InitGrafik()
 
     if(img_joy_arrow0 != nullptr)
     {
+        LogText("\tInitGrafik: Textur ImgJoyArrow0 wird erstellt.\n");
         glGenTextures(1,&texture_joy_arrow0);
         glBindTexture( GL_TEXTURE_2D, texture_joy_arrow0 );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -1606,10 +1673,16 @@ void C64Class::InitGrafik()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
         //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, Pfeil0->w, Pfeil0->h, 0,TextureFormat, GL_UNSIGNED_BYTE, Pfeil0->pixels );
         gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, img_joy_arrow0->w, img_joy_arrow0->h,TextureFormat, GL_UNSIGNED_BYTE, img_joy_arrow0->pixels );
+
+        if(glGetError() == GL_NO_ERROR)
+            LogText("\tInitGrafik: Textur konnte erstellt werden.\n");
+        else
+            LogText("\tInitGrafik: Textur konnte nicht erstellt werden.\n");
     }
 
     if(img_joy_arrow1 != nullptr)
     {
+        LogText("\tInitGrafik: Textur ImgJoyArrow1 wird erstellt.\n");
         glGenTextures(1,&texture_joy_arrow1);
         glBindTexture( GL_TEXTURE_2D, texture_joy_arrow1 );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -1618,10 +1691,16 @@ void C64Class::InitGrafik()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
         //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, Pfeil1->w, Pfeil1->h, 0,TextureFormat, GL_UNSIGNED_BYTE, Pfeil1->pixels );
         gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, img_joy_arrow1->w, img_joy_arrow1->h,TextureFormat, GL_UNSIGNED_BYTE, img_joy_arrow1->pixels );
+
+        if(glGetError() == GL_NO_ERROR)
+            LogText("\tInitGrafik: Textur konnte erstellt werden.\n");
+        else
+            LogText("\tInitGrafik: Textur konnte nicht erstellt werden.\n");
     }
 
     if(img_joy_button0 != nullptr)
     {
+        LogText("\tInitGrafik: Textur ImgJoyButton0 wird erstellt.\n");
         glGenTextures(1,&texture_joy_button0);
         glBindTexture( GL_TEXTURE_2D, texture_joy_button0 );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -1630,10 +1709,16 @@ void C64Class::InitGrafik()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
         //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, Kreis0->w, Kreis0->h, 0,TextureFormat, GL_UNSIGNED_BYTE, Kreis0->pixels );
         gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, img_joy_button0->w, img_joy_button0->h,TextureFormat, GL_UNSIGNED_BYTE, img_joy_button0->pixels );
+
+        if(glGetError() == GL_NO_ERROR)
+            LogText("\tInitGrafik: Textur konnte erstellt werden.\n");
+        else
+            LogText("\tInitGrafik: Textur konnte nicht erstellt werden.\n");
     }
 
     if(img_joy_button1 != nullptr)
     {
+        LogText("\tInitGrafik: Textur ImgJoyButton1 wird erstellt.\n");
         glGenTextures(1,&texture_joy_button1);
         glBindTexture( GL_TEXTURE_2D, texture_joy_button1 );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -1642,10 +1727,17 @@ void C64Class::InitGrafik()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
         //glTexImage2D( GL_TEXTURE_2D, 0, NofColors, Kreis1->w, Kreis1->h, 0,TextureFormat, GL_UNSIGNED_BYTE, Kreis1->pixels );
         gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, img_joy_button1->w, img_joy_button1->h,TextureFormat, GL_UNSIGNED_BYTE, img_joy_button1->pixels );
+
+        if(glGetError() == GL_NO_ERROR)
+            LogText("\tInitGrafik: Textur konnte erstellt werden.\n");
+        else
+            LogText("\tInitGrafik: Textur konnte nicht erstellt werden.\n");
     }
 
     /// VicRefresh wieder zulassen ///
     enable_hold_vic_refresh = false;
+
+    LogText("\tInitGrafik: Vic-Refresh wurde wieder freigegeben.\n");
 }
 
 void C64Class::ReleaseGrafik()

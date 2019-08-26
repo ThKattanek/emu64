@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.08.2019                //
+// Letzte Änderung am 26.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -523,6 +523,10 @@ void MainWindow::OnInit()
 
     LogText(">> Emu64 wurde initialisiert\n\n\n");
 
+    if(splash != nullptr) splash->close();
+    LogText(tr(">> Splashsreen wurde geschlossen.\n").toUtf8());
+
+    this->show();
 
     /////////////////////////////////////
     SplashMessage(tr("C64 EMULATION WIRD NUN GESTARTET."),Qt::darkBlue);
@@ -541,11 +545,6 @@ void MainWindow::OnInit()
 
     c64->HardReset();
     LogText(tr(">> Hardreset wurde ausgefuehrt.\n").toUtf8());
-
-    if(splash != nullptr) splash->close();
-    LogText(tr(">> Splashsreen wurde geschlossen.\n").toUtf8());
-
-    this->show();
 }
 
 void MainWindow::OnMessage(QStringList msg)
