@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.08.2019                //
+// Letzte Änderung am 26.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -32,7 +32,7 @@ int SDLThreadWarp(void *userdat);
 #define C64Takt 985248  // 50,124542Hz (Original C64 PAL)
 
 #ifdef _WIN32
-    #define AudioPufferSize (882*2)    // 882 bei 44.100 Khz
+    #define AudioPufferSize (882)    // 882 bei 44.100 Khz
 #else
     #define AudioPufferSize (882)    // 882 bei 44.100 Khz
 #endif
