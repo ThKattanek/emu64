@@ -8,13 +8,15 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.08.2019                //
+// Letzte Änderung am 27.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "./main_window.h"
 #include "./ui_main_window.h"
+
+static QMutex mutex_log_text;
 
 MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *log) :
     QMainWindow(parent),
@@ -544,6 +546,7 @@ void MainWindow::OnInit()
     LogText(tr(">> C64 Emulation wurde gestartet.\n").toUtf8());
 
     c64->HardReset();
+
     LogText(tr(">> Hardreset wurde ausgefuehrt.\n").toUtf8());
 }
 
@@ -565,11 +568,13 @@ void MainWindow::OnMessage(QStringList msg)
 
 void MainWindow::LogText(const char *log_text)
 {
+    mutex_log_text.lock();
     if(log != nullptr)
     {
         *log << log_text;
         log->flush();
     }
+    mutex_log_text.unlock();
 }
 
 void MainWindow::CloseC64Screeen()

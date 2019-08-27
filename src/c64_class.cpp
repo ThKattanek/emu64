@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.08.2019                //
+// Letzte Änderung am 27.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -537,6 +537,7 @@ void C64Class::StartEmulation()
     /// SLD Thread starten (ab hier startet auch die C64 Emulation ///
     sdl_thread = SDL_CreateThread(SDLThread, "C64Thread", this);
     LogText(">> C64Thread wurde gestartet.\n");
+
     SDL_PauseAudio(0);
     LogText(">> SDL Audiostream wurde getartet.\n");
 }
