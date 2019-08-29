@@ -3387,8 +3387,13 @@ void C64Class::SetScreenshotDir(const char *screenshot_dir)
         this->screenshot_dir = nullptr;
     }
 
-    this->screenshot_dir = new char[strlen(screenshot_dir)];
+    this->screenshot_dir = new char[strlen(screenshot_dir)+1];
+
+#ifdef __STDC_LIB_EXT1__
     strcpy_s(this->screenshot_dir, static_cast<size_t>(strlen(screenshot_dir))+1, screenshot_dir);
+#else
+    strcpy(this->screenshot_dir, screenshot_dir);
+#endif
 }
 
 void C64Class::EnableScreenshots(bool is_enable)
