@@ -2179,7 +2179,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                 }
                 else
                 {
-                    if(event->key.keysym.mod == KMOD_LSHIFT)
+                    if((KMOD_LSHIFT == (event->key.keysym.mod & KMOD_LSHIFT)) || (KMOD_RSHIFT == (event->key.keysym.mod & KMOD_RSHIFT)))
                     {
                         HardReset();
                         reset_wire = false;
@@ -2283,7 +2283,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                 break;
 
             case SDLK_F12:
-               reset_wire = true;
+                reset_wire = true;
                 break;
 
             default:
