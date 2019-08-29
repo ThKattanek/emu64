@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.08.2019                //
+// Letzte Änderung am 29.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -170,7 +170,12 @@ public:
     uint8_t GetMapReadSource(uint8_t page);
     uint8_t GetMapWriteDestination(uint8_t page);
 
-    void SaveScreenshot(const char *filename, uint8_t format = SCREENSHOT_FORMAT_PNG);
+    void SetScreenshotNumber(uint32_t number);
+    uint32_t GetScreenshotNumber();
+    void SetScreenshotFormat(uint8_t format);
+    void SetScreenshotDir(const char* screenshot_dir);
+    void EnableScreenshots(bool is_enable);
+    void SaveScreenshot();
     const char* GetScreenshotFormatName(uint8_t format);
     void SetExitScreenshot(const char *filename);
 
@@ -341,10 +346,13 @@ public:
     uint16_t        cpu_pc_history[256];
     uint8_t         cpu_pc_history_pos;
 
-    uint8_t         screenshot_format;
-
     bool            start_screenshot;
     char            screenshot_filename[MAX_STRING_LENGTH];
+
+    bool            is_screenshot_enable;
+    uint32_t        screenshot_number;
+    char*           screenshot_dir;
+    uint8_t         screenshot_format;
 
     bool            enable_exit_screenshot;
     char            exit_screenshot_filename[MAX_STRING_LENGTH];

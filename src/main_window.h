@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.08.2019                //
+// Letzte Änderung am 29.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -163,7 +163,6 @@ private:
     QSettings *ini;
 
     bool ScreenshotsEnable;       // Konnte kein Screenshot Verzeichnis gefunden werden und auch nicht erstellt werden so ist es false
-    int ScreenshotNumber;         // Nummer des nächsten Screenshots
 
     bool RomSetEnable;            // False wenn kein RomSet-Verzeichnis existiert und keins erstellt werden konnte
 

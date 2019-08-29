@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.08.2019                //
+// Letzte Änderung am 29.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -114,6 +114,11 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
 
     enable_distortion = true;
     SetDistortion(-0.05f);
+
+    is_screenshot_enable = false;
+    screenshot_number = 0;
+    screenshot_dir = nullptr;
+    screenshot_format = 0;
 
     video_capture = nullptr;
 
@@ -2163,6 +2168,10 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
         {
             switch(event->key.keysym.sym)
             {
+            case SDLK_F11:
+                SaveScreenshot();
+                break;
+
             case SDLK_F12:
                 if(rec_joy_mapping)
                 {
@@ -3355,11 +3364,58 @@ uint8_t C64Class::GetMapWriteDestination(uint8_t page)
     return mmu->GetWriteDestination(page);
 }
 
-void C64Class::SaveScreenshot(const char *filename, uint8_t format)
+void C64Class::SetScreenshotNumber(uint32_t number)
 {
+    screenshot_number = number;
+}
 
-    strcpy(screenshot_filename, filename);
+uint32_t C64Class::GetScreenshotNumber()
+{
+    return screenshot_number;
+}
+
+void C64Class::SetScreenshotFormat(uint8_t format)
+{
     screenshot_format = format;
+}
+
+void C64Class::SetScreenshotDir(const char *screenshot_dir)
+{
+    if(this->screenshot_dir != nullptr)
+    {
+        delete [] this->screenshot_dir;
+        this->screenshot_dir = nullptr;
+    }
+
+    this->screenshot_dir = new char[strlen(screenshot_dir)];
+    strcpy_s(this->screenshot_dir, static_cast<size_t>(strlen(screenshot_dir))+1, screenshot_dir);
+}
+
+void C64Class::EnableScreenshots(bool is_enable)
+{
+    is_screenshot_enable = is_enable;
+}
+
+void C64Class::SaveScreenshot()
+{
+    if(!is_screenshot_enable) return;
+
+    cout << "Screenshot Nummer: " << screenshot_number << endl;
+
+    switch (screenshot_format)
+    {
+    case SCREENSHOT_FORMAT_BMP: // .bmp
+        sprintf(screenshot_filename,"%s/emu64_%d.bmp",screenshot_dir,screenshot_number);
+        break;
+    case SCREENSHOT_FORMAT_PNG: // .png
+        sprintf(screenshot_filename,"%s/emu64_%d.png",screenshot_dir,screenshot_number);
+        break;
+    default:
+        sprintf(screenshot_filename,"%s/emu64_%d.png",screenshot_dir,screenshot_number);
+        break;
+    }
+
+    screenshot_number++;
     start_screenshot = true;
 }
 

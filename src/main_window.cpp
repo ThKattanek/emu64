@@ -53,7 +53,7 @@ MainWindow::~MainWindow()
         ini->beginGroup("MainWindow");
         ini->setValue("Geometry",saveGeometry());
         ini->setValue("State",saveState());
-        ini->setValue("ScreenshotCounter",ScreenshotNumber);
+        ini->setValue("ScreenshotCounter",c64->GetScreenshotNumber());
         ini->setValue("LastAutoloadDir",lastAutoloadPath);
         ini->endGroup();
 
@@ -168,6 +168,9 @@ void MainWindow::OnInit()
     tmpPath = QDir::tempPath();
     LogText((QString(">> TEMP Path = ") + tmpPath + QString("\n")).toUtf8());
 
+    screenshotPath = configPath + "/screenshots";
+    LogText((QString(">> Screenshot Path = ") + screenshotPath + QString("\n")).toUtf8());
+
     if(splash != nullptr)
     {
         splash->SetMessageRect(QRect(0,303,400, 20), Qt::AlignCenter);
@@ -246,21 +249,17 @@ void MainWindow::OnInit()
         LogText("\n");
     }
 
-    /// ScreenshotPath erstellen ///
-    screenshotPath = configPath + "/screenshots/";
-
     dir = new QDir(screenshotPath);
-
     SplashMessage(tr("Screenshotverzeichnis wird gesucht."),Qt::darkBlue);
     if(dir->exists())
     {
-        LogText(tr(">> Ein Screenshot Verzeichnis ist vorhanden\n").toUtf8());
+        LogText(tr(">> Das Screenshot Verzeichnis ist vorhanden\n").toUtf8());
         ScreenshotsEnable = true;
     }
     else
     {
-        SplashMessage(tr("Screenshotverzeichnis wird erstellt."),Qt::darkBlue);
-        LogText(tr("<< Ein Screenshot Verzeichnis ist nicht vorhanden\n").toUtf8());
+        SplashMessage(tr("Das Screenshotverzeichnis wird erstellt."),Qt::darkBlue);
+        LogText(tr("<< Das Screenshot Verzeichnis ist nicht vorhanden\n").toUtf8());
         if(dir->mkdir(screenshotPath))
         {
             LogText(tr(">> Ein neues Screenshot Verzeichnis wurde erstellt\n").toUtf8());
@@ -272,15 +271,7 @@ void MainWindow::OnInit()
             ScreenshotsEnable = false;
         }
     }
-
     delete dir;
-
-    if(ScreenshotsEnable)
-    {
-        LogText(">> screenshotPath = ");
-        LogText(screenshotPath.toUtf8());
-        LogText("\n");
-    }
 
     /// Klassen installieren ///
     SplashMessage(tr("VideoPal Klasse wird initialisiert."),Qt::darkBlue);
@@ -299,6 +290,8 @@ void MainWindow::OnInit()
     }
 
     SetC64ScreenTitle();
+    c64->EnableScreenshots(ScreenshotsEnable);
+    c64->SetScreenshotDir(screenshotPath.toUtf8());
 
     /// Window Klassen erstellen ///
     /// Unter MAC sollte ohne übergabe des this Zeigers die Klasseb erstellt werden
@@ -354,9 +347,12 @@ void MainWindow::OnInit()
 
     ini->beginGroup("MainWindow");
     SplashMessage(tr("Screenshotnummer wird geladen."),Qt::darkBlue);
-    ScreenshotNumber = (int)ini->value("ScreenshotCounter",0).toInt();
+    uint32_t screenshot_number;
+    screenshot_number = (int)ini->value("ScreenshotCounter",0).toInt();
+    c64->SetScreenshotNumber(screenshot_number);
     ini->endGroup();
     LogText(tr(">> Aktuelle Screenshotnummer wurde geladen\n").toUtf8());
+
 
     //SplashMessage(tr("SetupWindow wird mit INI abgeglichen."),Qt::darkBlue);
     //setup_window->ReSetup();
@@ -466,6 +462,8 @@ void MainWindow::OnInit()
         /// SETUP Ini laden ///
         setup_window->LoadINI(c64);
         LogText(tr(">> SetupWindow LoadIni wurde ausgefuehrt\n").toUtf8());
+
+        c64->SetScreenshotFormat(setup_window->GetScreenshotFormat());
 
         /// CRT Ini erst jetzt laden ///
         cartridge_window->LoadIni();
@@ -981,19 +979,25 @@ void MainWindow::OnChangeFloppyImage(int floppynr)
 
 void MainWindow::OnResetScreenshotCounter()
 {
-    ScreenshotNumber = 0;
+    c64->SetScreenshotNumber(0);
 }
 
 void MainWindow::OnSetupFished(int result)
 {
     if(result == 0)
+    {
         c64->StopRecJoystickMapping();
+        c64->SetScreenshotFormat(setup_window->GetScreenshotFormat());
+    }
 }
 
 void MainWindow::on_actionScreenshot_triggered()
-{    
+{
     if(ScreenshotsEnable)
     {
+        c64->SaveScreenshot();
+
+        /*
         int format = setup_window->GetScreenshotFormat();
         switch (format)
         {
@@ -1008,6 +1012,7 @@ void MainWindow::on_actionScreenshot_triggered()
         }
 
         ScreenshotNumber++;
+        */
     }
     else QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.\nÜberprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !"));
 }

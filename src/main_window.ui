@@ -167,7 +167,7 @@ background-position: center
      <x>0</x>
      <y>0</y>
      <width>482</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="font">
@@ -629,7 +629,7 @@ background-position: center
     </font>
    </property>
    <property name="shortcut">
-    <string>F9</string>
+    <string>F11</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
