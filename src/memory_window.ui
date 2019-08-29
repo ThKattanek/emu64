@@ -52,6 +52,9 @@
    <attribute name="verticalHeaderVisible">
     <bool>false</bool>
    </attribute>
+   <attribute name="verticalHeaderMinimumSectionSize">
+    <number>8</number>
+   </attribute>
   </widget>
   <widget class="QScrollBar" name="MemoryScroll">
    <property name="geometry">

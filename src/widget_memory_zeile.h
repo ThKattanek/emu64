@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 29.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,6 +17,7 @@
 #define WIDGET_MEMORY_ZEILE_H
 
 #include <QLineEdit>
+#include <QFontDatabase>
 
 namespace Ui {
     class WidgetMemoryZeile;
@@ -27,7 +28,7 @@ class WidgetMemoryZeile : public QWidget
     Q_OBJECT
 
 public:
-    explicit WidgetMemoryZeile(QWidget *parent = 0);
+    explicit WidgetMemoryZeile(QFont *font1, QWidget *parent = nullptr);
     ~WidgetMemoryZeile();
     void Fill(unsigned short adr, unsigned char* byte_puffer,QString ReadSource,QString WriteDestination);
     void EndableBitLeiste(bool status);

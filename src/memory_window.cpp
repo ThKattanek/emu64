@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019                //
+// Letzte Änderung am 29.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -54,9 +54,13 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
         MapWriteDestination[i+0xC0] = FMV_OPEN;
     }
 
+    QFontDatabase fontDB;
+    fontDB.addApplicationFont(":/fonts/lucon.ttf");
+    QFont font1("Lucida Console",9);
+
     for(int i=0;i<MemZeilenAnz;i++)
     {
-        WidgetMemoryZeile *w = new WidgetMemoryZeile(this);
+        WidgetMemoryZeile *w = new WidgetMemoryZeile(&font1, this);
         ui->MemoryTable->setCellWidget(i,0,w);
         ui->MemoryTable->setRowHeight(i,w->height());
         ui->MemoryTable->setColumnWidth(0,w->width());

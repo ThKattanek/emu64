@@ -8,46 +8,41 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 29.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include <QFontDatabase>
 #include <cstdio>
 
-#include "widget_memory_zeile.h"
-#include "ui_widget_memory_zeile.h"
+#include "./widget_memory_zeile.h"
+#include "./ui_widget_memory_zeile.h"
 
-WidgetMemoryZeile::WidgetMemoryZeile(QWidget *parent) :
+WidgetMemoryZeile::WidgetMemoryZeile(QFont *font1, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WidgetMemoryZeile)
 {
     ui->setupUi(this);
 
-    QFontDatabase fontDB;
-    fontDB.addApplicationFont(":/fonts/lucon.ttf");
-    QFont font1("Lucida Console",9);
-
-    ui->AdresseOut->setFont(font1);
-    ui->EditValue_0->setFont(font1);
-    ui->EditValue_1->setFont(font1);
-    ui->EditValue_2->setFont(font1);
-    ui->EditValue_3->setFont(font1);
-    ui->EditValue_4->setFont(font1);
-    ui->EditValue_5->setFont(font1);
-    ui->EditValue_6->setFont(font1);
-    ui->EditValue_7->setFont(font1);
-    ui->EditValue_8->setFont(font1);
-    ui->EditValue_9->setFont(font1);
-    ui->EditValue_10->setFont(font1);
-    ui->EditValue_11->setFont(font1);
-    ui->EditValue_12->setFont(font1);
-    ui->EditValue_13->setFont(font1);
-    ui->EditValue_14->setFont(font1);
-    ui->EditValue_15->setFont(font1);
-    ui->ReadOut->setFont(font1);
-    ui->WriteOut->setFont(font1);
+    ui->AdresseOut->setFont(*font1);
+    ui->EditValue_0->setFont(*font1);
+    ui->EditValue_1->setFont(*font1);
+    ui->EditValue_2->setFont(*font1);
+    ui->EditValue_3->setFont(*font1);
+    ui->EditValue_4->setFont(*font1);
+    ui->EditValue_5->setFont(*font1);
+    ui->EditValue_6->setFont(*font1);
+    ui->EditValue_7->setFont(*font1);
+    ui->EditValue_8->setFont(*font1);
+    ui->EditValue_9->setFont(*font1);
+    ui->EditValue_10->setFont(*font1);
+    ui->EditValue_11->setFont(*font1);
+    ui->EditValue_12->setFont(*font1);
+    ui->EditValue_13->setFont(*font1);
+    ui->EditValue_14->setFont(*font1);
+    ui->EditValue_15->setFont(*font1);
+    ui->ReadOut->setFont(*font1);
+    ui->WriteOut->setFont(*font1);
 }
 
 WidgetMemoryZeile::~WidgetMemoryZeile()
