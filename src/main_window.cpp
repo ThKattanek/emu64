@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.08.2019                //
+// Letzte Änderung am 29.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -29,8 +29,9 @@ MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *l
     isFirstPaintEvent = false;
 
     this->setGeometry(0,0,0,0);
-    this->show();
-    this->hide();
+
+    //this->show();
+    //this->hide();
 
     /// Haputfenster UI setzen ///
     ui->setupUi(this);
