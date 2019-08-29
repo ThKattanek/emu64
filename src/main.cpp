@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.08.2019                //
+// Letzte Änderung am 29.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -142,10 +142,9 @@ int main(int argc, char *argv[])
     {
         QPixmap image(":/splash");
         CustomSplashScreen *splash = new CustomSplashScreen(image);
-        splash->setPixmap(image);
-        splash->setMask(image.mask());
-        splash->setWindowFlags(Qt::WindowStaysOnTopHint);
+        splash->setWindowFlag(Qt :: WindowStaysOnTopHint);
         splash->show();
+
         w = new MainWindow(nullptr, splash, log);
     }
     else
