@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019                //
+// Letzte Änderung am 29.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -27,40 +27,52 @@ VideoCrtSetupWindow::VideoCrtSetupWindow(QWidget *parent, C64Class *c64, VideoCr
     this->c64 = c64;
     this->video_crt_output = video_crt_output;
 
+    no_video_crt_parameter_updates = true;
+
     ////////// Load from INI ///////////
     if(ini != 0)
-    {
+    {   
         int value;
         ini->beginGroup("TVSetupWindow");
         if(ini->contains("Geometry")) setGeometry(ini->value("Geometry").toRect());
+
         value = ini->value("Saettigung",75).toInt();
-        ui->saettigung_scroll->setValue(value);
         if(ui->saettigung_scroll->value() == value) on_saettigung_scroll_valueChanged(value);
+        ui->saettigung_scroll->setValue(value);
+
         value = ini->value("Helligkeit",40).toInt();
-        ui->helligkeit_scroll->setValue(value);
         if(ui->helligkeit_scroll->value() == value) on_helligkeit_scroll_valueChanged(value);
+        ui->helligkeit_scroll->setValue(value);
+
         value = ini->value("Kontrast",50).toInt();
-        ui->kontrast_scroll->setValue(value);
         if(ui->kontrast_scroll->value() == value) on_kontrast_scroll_valueChanged(value);
+        ui->kontrast_scroll->setValue(value);
+
         value = ini->value("HorBlurY",2).toInt();
-        ui->horblurY_scroll->setValue(value);
         if(ui->horblurY_scroll->value() == value) on_horblurY_scroll_valueChanged(value);
+        ui->horblurY_scroll->setValue(value);
+
         value = ini->value("HorBlurUV",4).toInt();
-        ui->horblurUV_scroll->setValue(value);
         if(ui->horblurUV_scroll->value() == value) on_horblurUV_scroll_valueChanged(value);
+        ui->horblurUV_scroll->setValue(value);
+
         value = ini->value("PhaseLineOffset",840).toInt();
-        ui->phase_scroll->setValue(value);
         if(ui->phase_scroll->value() == value) on_phase_scroll_valueChanged(value);
+        ui->phase_scroll->setValue(value);
+
         value = ini->value("Scanline",75).toInt();
-        ui->scanline_scroll->setValue(value);
         if(ui->scanline_scroll->value() == value) on_scanline_scroll_valueChanged(value);
+        ui->scanline_scroll->setValue(value);
 
         value = ini->value("Distortion",100).toInt();
-        ui->distortion_scroll->setValue(value);
         if(ui->distortion_scroll->value() == value) on_distortion_scroll_valueChanged(value);
+        ui->distortion_scroll->setValue(value);
 
         ini->endGroup();
     }
+
+    no_video_crt_parameter_updates = false;
+
     ////////////////////////////////////
     video_crt_output->UpdateParameter();
 }
@@ -101,35 +113,35 @@ void VideoCrtSetupWindow::on_saettigung_scroll_valueChanged(int value)
 {
     ui->saettigung_out->setText(QVariant(value).toString());
     video_crt_output->SetSaturation((float)value/100.0f);
-    video_crt_output->UpdateParameter();
+    if(!no_video_crt_parameter_updates) video_crt_output->UpdateParameter();
 }
 
 void VideoCrtSetupWindow::on_helligkeit_scroll_valueChanged(int value)
 {
     ui->helligkeit_out->setText(QVariant(value).toString());
     video_crt_output->SetHelligkeit((value+50)/100.0f);
-    video_crt_output->UpdateParameter();
+    if(!no_video_crt_parameter_updates) video_crt_output->UpdateParameter();
 }
 
 void VideoCrtSetupWindow::on_kontrast_scroll_valueChanged(int value)
 {
     ui->kontrast_out->setText(QVariant(value).toString());
     video_crt_output->SetKontrast((float)value/100.0f);
-    video_crt_output->UpdateParameter();
+   if(!no_video_crt_parameter_updates) video_crt_output->UpdateParameter();
 }
 
 void VideoCrtSetupWindow::on_horblurY_scroll_valueChanged(int value)
 {
     ui->horblurY_out->setText(QVariant(value-1).toString() + " Pixel");
     video_crt_output->SetHorizontalBlurY(value);
-    video_crt_output->UpdateParameter();
+    if(!no_video_crt_parameter_updates) video_crt_output->UpdateParameter();
 }
 
 void VideoCrtSetupWindow::on_horblurUV_scroll_valueChanged(int value)
 {
     ui->horblurUV_out->setText(QVariant(value-1).toString() + " Pixel");
     video_crt_output->SetHorizontalBlurUV(value);
-    video_crt_output->UpdateParameter();
+    if(!no_video_crt_parameter_updates) video_crt_output->UpdateParameter();
 }
 
 void VideoCrtSetupWindow::on_phase_scroll_valueChanged(int value)
@@ -137,14 +149,14 @@ void VideoCrtSetupWindow::on_phase_scroll_valueChanged(int value)
     float winkel = (value - 1000) * 0.045f;
     ui->phase_out->setText(QVariant(winkel).toString() + tr("°"));
     video_crt_output->SetPhaseAltLineOffset(value);
-    video_crt_output->UpdateParameter();
+    if(!no_video_crt_parameter_updates) video_crt_output->UpdateParameter();
 }
 
 void VideoCrtSetupWindow::on_scanline_scroll_valueChanged(int value)
 {
     ui->scanline_out->setText((QVariant(value).toString() + " %"));
     video_crt_output->SetScanline(value);
-    video_crt_output->UpdateParameter();
+    if(!no_video_crt_parameter_updates) video_crt_output->UpdateParameter();
 }
 
 void VideoCrtSetupWindow::on_distortion_scroll_valueChanged(int value)

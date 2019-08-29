@@ -307,9 +307,9 @@ void MainWindow::OnInit()
     info_window = new InfoWindow(this);
     LogText(tr(">> InfoWindow wurde erzeugt\n").toUtf8());
 
-    SplashMessage(tr("CrtSetupWindow wird erstellt."),Qt::darkBlue);
+    SplashMessage(tr("VideoCrtSetupWindow wird erstellt."),Qt::darkBlue);
     video_crt_setup_window = new VideoCrtSetupWindow(this,c64,video_crt_output,ini);
-    LogText(tr(">> CrtSetupWindow wurde erzeugt\n").toUtf8());
+    LogText(tr(">> VideoCrtSetupWindow wurde erzeugt\n").toUtf8());
 
     SplashMessage(tr("FloppyWindow wird erstellt."),Qt::darkBlue);
     floppy_window = new FloppyWindow(this,ini,c64,tmpPath);

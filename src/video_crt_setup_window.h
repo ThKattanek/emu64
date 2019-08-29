@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019        		//
+// Letzte Änderung am 29.08.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -56,6 +56,8 @@ private:
     C64Class *c64;
     VideoCrtClass *video_crt_output;
     bool isOneShowed;
+
+    bool no_video_crt_parameter_updates;
 };
 
 #endif // CRT_SETUP_WINDOW_H
