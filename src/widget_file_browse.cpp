@@ -247,6 +247,8 @@ void WidgetFileBrowse::on_listView_filebrowser_clicked(const QModelIndex &index)
                 ui->listWidget_zip->addItems(FileList);
                 zip.close();
             }
+
+            ui->listWidget_zip->setCurrentRow(0);
         }
         else
 #endif
