@@ -88,10 +88,7 @@ QString WidgetFileBrowse::GetAktFile(void)
 
 void WidgetFileBrowse::SetTempDir(QString tmp_path)
 {
-
     this->tmp_path = tmp_path;
-
-    qDebug() << tmp_path;
 }
 
 void WidgetFileBrowse::SetAktDir(QString akt_dir)
@@ -163,12 +160,9 @@ bool WidgetFileBrowse::isFileWriteProtect(QString filename)
 #ifdef ZIP_SUPPORT
 void WidgetFileBrowse::on_listWidget_zip_itemSelectionChanged()
 {
-    qDebug() << "Fehler in ZIP-Datei: " ;
-
     QString AktZIPName = dirmodel->fileInfo(ui->listView_filebrowser->currentIndex()).absoluteFilePath();
-
     QString ZIPInFile = ui->listWidget_zip->currentItem()->text();
-    QString OutFileName = QCoreApplication::applicationDirPath() + "/tmp/" + ZIPInFile;
+    QString OutFileName = tmp_path + "/" + ZIPInFile;
 
     QuaZip zip(AktZIPName);
     if(zip.open(QuaZip::mdUnzip))
