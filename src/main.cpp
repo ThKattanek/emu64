@@ -142,6 +142,7 @@ int main(int argc, char *argv[])
     {
         QPixmap image(":/splash");
         CustomSplashScreen *splash = new CustomSplashScreen(image);
+        splash->setMask(image.mask());
         splash->setWindowFlag(Qt :: WindowStaysOnTopHint);
         splash->show();
 
