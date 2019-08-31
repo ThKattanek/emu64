@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.04.2018                //
+// Letzte Änderung am 31.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -35,11 +35,12 @@ class WidgetFileBrowse : public QWidget
     Q_OBJECT
 
 public:
-    explicit WidgetFileBrowse(QWidget *parent = 0);
+    explicit WidgetFileBrowse(QWidget *parent = nullptr);
     void RetranslateUi();
     void SetFileFilter(const QStringList & filters);
     QString GetAktDir(void);
     QString GetAktFile(void);
+    void SetTempDir(QString tmp_path);
     void SetAktDir(QString akt_dir);
     void SetAktFile(QString akt_dir, QString akt_file);
     void RefreshAktDir(void);
@@ -67,6 +68,8 @@ private slots:
 
 private:
     QString rootPathName(const QString &aPath);
+
+    QString tmp_path;
 
     Ui::WidgetFileBrowse *ui;
     QFileSystemModel *dirmodel;

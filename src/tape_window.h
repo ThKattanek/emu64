@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 03.10.2016                //
+// Letzte Änderung am 31.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -33,7 +33,7 @@ class TapeWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit TapeWindow(QWidget *parent = 0, QSettings *_ini = 0, C64Class *c64 = 0);
+    explicit TapeWindow(QWidget *parent = nullptr, QSettings *_ini = nullptr, C64Class *c64 = nullptr, QString tmp_path = nullptr);
     ~TapeWindow();
     void RetranslateUi();
     void LoadIni();
@@ -61,6 +61,8 @@ private:
 
     QSettings *ini;
     C64Class *c64;
+
+    QString tmp_path;
 
     QIcon *GreenLEDOff;
     QIcon *GreenLEDOn;

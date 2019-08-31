@@ -344,7 +344,7 @@ void MainWindow::OnInit()
     LogText(tr(">> FloppyWindow wurde erzeugt\n").toUtf8());
 
     SplashMessage(tr("TapeWindow wird erstellt."),Qt::darkBlue);
-    tape_window = new TapeWindow(this,ini,c64);
+    tape_window = new TapeWindow(this,ini,c64,emu64_tmp.path());
     LogText(tr(">> TapeWindow wurde erzeugt\n").toUtf8());
 
     SplashMessage(tr("C64KeyboardWindow wird erstellt."),Qt::darkBlue);
@@ -352,7 +352,7 @@ void MainWindow::OnInit()
     LogText(tr(">> C64KeyboardWindow wurde erzeugt\n").toUtf8());
 
     SplashMessage(tr("CRTWindow wird erstellt."),Qt::darkBlue);
-    cartridge_window = new CartridgeWindow(this,ini,c64);
+    cartridge_window = new CartridgeWindow(this,ini,c64,emu64_tmp.path());
     LogText(tr(">> CrtWindow wurde erzeugt\n").toUtf8());
 
     SplashMessage(tr("DebuggerWindow wird erstellt."),Qt::darkBlue);

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019                //
+// Letzte Änderung am 31.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -23,6 +23,8 @@ WidgetFileBrowse::WidgetFileBrowse(QWidget *parent) :
     ui(new Ui::WidgetFileBrowse)
 {
     ui->setupUi(this);
+
+    tmp_path = nullptr;
 
     ui->delete_file->setDisabled(true);
 
@@ -82,6 +84,14 @@ QString WidgetFileBrowse::GetAktDir(void)
 QString WidgetFileBrowse::GetAktFile(void)
 {
     return dirmodel->fileName(ui->listView_filebrowser->currentIndex());
+}
+
+void WidgetFileBrowse::SetTempDir(QString tmp_path)
+{
+
+    this->tmp_path = tmp_path;
+
+    qDebug() << tmp_path;
 }
 
 void WidgetFileBrowse::SetAktDir(QString akt_dir)
@@ -153,6 +163,8 @@ bool WidgetFileBrowse::isFileWriteProtect(QString filename)
 #ifdef ZIP_SUPPORT
 void WidgetFileBrowse::on_listWidget_zip_itemSelectionChanged()
 {
+    qDebug() << "Fehler in ZIP-Datei: " ;
+
     QString AktZIPName = dirmodel->fileInfo(ui->listView_filebrowser->currentIndex()).absoluteFilePath();
 
     QString ZIPInFile = ui->listWidget_zip->currentItem()->text();

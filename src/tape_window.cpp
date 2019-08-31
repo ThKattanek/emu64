@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019                //
+// Letzte Änderung am 31.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,12 +16,15 @@
 #include "tape_window.h"
 #include "ui_tape_window.h"
 
-TapeWindow::TapeWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
+TapeWindow::TapeWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QString tmp_path) :
     QDialog(parent),
     ui(new Ui::TapeWindow)
 {
     ini = _ini;
     ui->setupUi(this);
+
+    this->tmp_path = tmp_path;
+    ui->FileBrowser->SetTempDir(tmp_path);
 
     // ICON's für LED's laden
     GreenLEDOff = new QIcon(":/grafik/green_led_off.png");

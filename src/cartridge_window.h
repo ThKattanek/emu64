@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 31.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -38,7 +38,7 @@ class CartridgeWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit CartridgeWindow(QWidget *parent = 0, QSettings *ini = 0, C64Class *c64 = 0);
+    explicit CartridgeWindow(QWidget *parent = nullptr, QSettings *ini = nullptr, C64Class *c64 = nullptr, QString tmp_path = nullptr);
     ~CartridgeWindow();
     void LoadIni(void);
     bool SetCartridgeImage(QString filename);
@@ -66,6 +66,7 @@ private:
     Ui::CartridgeWindow *ui;
     CartridgeClass *crt;
     C64Class *c64;
+    QString tmp_path;
     QSettings *ini;
     bool isOneShowed;
     bool ChipDataExpand;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019                //
+// Letzte Änderung am 31.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,7 +19,7 @@
 #include "./cartridge_window.h"
 #include "./ui_cartridge_window.h"
 
-CartridgeWindow::CartridgeWindow(QWidget *parent, QSettings *_ini, C64Class *c64) :
+CartridgeWindow::CartridgeWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QString tmp_path) :
     QDialog(parent),
     ui(new Ui::CartridgeWindow)
 {
@@ -27,8 +27,11 @@ CartridgeWindow::CartridgeWindow(QWidget *parent, QSettings *_ini, C64Class *c64
 
     this->c64 = c64;
     crt = c64->crt;
+    this->tmp_path = tmp_path;
 
     ui->setupUi(this);
+
+    ui->FileBrowser->SetTempDir(tmp_path);
 
     LedRedOff = new QIcon(":/grafik/red_led_off.png");
     LedRedOn = new QIcon(":/grafik/red_led_on.png");
