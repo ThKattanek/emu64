@@ -57,7 +57,7 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QStr
 
     c64_font = c64_font1;
 
-    ui->DiskName->setFont(*c64_font1);
+    ui->DiskName->setFont(*c64_font2);
 
     // Spalten für D64 Datei-Anzeige hinzufügen
     ui->D64FileTable->setColumnCount(7);
