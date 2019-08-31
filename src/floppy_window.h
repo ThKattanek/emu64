@@ -97,7 +97,7 @@ private:
     QIcon *yellow_led_big;
     QIcon *red_led_big;
 
-    QString TmpPath;
+    QString tmp_path;
 
     bool CompatibleMMCFileName;
 };

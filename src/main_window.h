@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.08.2019                //
+// Letzte Änderung am 31.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -152,11 +152,13 @@ private:
     QString dataPath;            // Pfad für alle Emu64 Daten
     QString custom_dataPath;     // Pfad für alle Emu64 Daten -> Wenn er per Komandozeile angegeben wurde (--data-path)
 
-    //QString appPath;             // Pfad der emu64 Datei
+    //QString appPath;           // Pfad der emu64 Datei
     QString langPath;            // Pfad für alle Sprachfiles
-    QString tmpPath;             // Pfad für alle Temporären Dateien die Emu64 erzeugt (Wird beim Start und Ende geleert)
+    //QString system_tmp_path;     // Pfad für alle Temporären Dateien die Emu64 erzeugt (Wird beim Start und Ende geleert)
     QString screenshotPath;      // Pfad für alle Emu64 Screenshots (nicht änderbar)
     QString romsetPath;          // Pfad für Benutzerdefinierte ROM-Sets
+
+    QDir    emu64_tmp;           // QDir Object für Emu64 Temp-Verzeichnis
 
     QString lastAutoloadPath;    // Pfad der letzten Autoloadfunktion
 

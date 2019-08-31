@@ -28,7 +28,7 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QStr
     isOneShowed = false;
 
     this->c64 = c64;
-    this->TmpPath = tmp_path;
+    this->tmp_path = tmp_path;
 
     FileTypes = QStringList() << "DEL" << "SEQ" << "PRG" << "USR" << "REL" << "CBM" << "E00" << "E?C";
 
@@ -292,7 +292,7 @@ void FloppyWindow::OnD64FileStart0(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
     uint8_t floppy_nr = static_cast<uint8_t>(ui->FloppySelect->currentIndex());
-    QString FileName = TmpPath + "/tmp.prg";
+    QString FileName = tmp_path + "/tmp.prg";
 
     if(d64[floppy_nr].ExportPrg(file_index,FileName.toUtf8().data()))
     {
@@ -318,7 +318,7 @@ void FloppyWindow::OnD64FileStart3(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
     uint8_t floppy_nr = static_cast<uint8_t>(ui->FloppySelect->currentIndex());
-    QString FileName = TmpPath + "/tmp.prg";
+    QString FileName = tmp_path + "/tmp.prg";
 
     if(d64[floppy_nr].ExportPrg(file_index,FileName.toUtf8().data()))
     {

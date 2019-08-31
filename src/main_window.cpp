@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.08.2019                //
+// Letzte Änderung am 31.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -122,12 +122,14 @@ MainWindow::~MainWindow()
     LogText(tr("\n>> Emu64 wurde sauber beendet...").toUtf8());
     delete log;
 
-    // Temporäre Dateien löschen
-    QFile tmpfile(tmpPath + "/tmp.prg");
-
-    if(tmpfile.exists())
+    // Alle temporären Dateien löschen ausser Verzeichnisse (legt Emu64 auch nicht an)
+    if(emu64_tmp.exists())
     {
-        tmpfile.remove();
+        QStringList files = emu64_tmp.entryList(QDir::NoDot | QDir::NoDotDot | QDir::Files);
+        for(int i=0; i<files.count(); i++)
+        {
+            QFile::remove(emu64_tmp.path() + "/" + files[i]);
+        }
     }
 }
 
@@ -165,8 +167,41 @@ void MainWindow::OnInit()
 #endif
     LogText((QString(">> Data Path = ") + dataPath + QString("\n")).toUtf8());
 
-    tmpPath = QDir::tempPath();
-    LogText((QString(">> TEMP Path = ") + tmpPath + QString("\n")).toUtf8());
+    /// Emu64 Temporäres Verzeichnis ermitteln, anlegen, ...
+    QDir tmp = QDir::temp();
+
+    if(tmp.exists())
+    {
+        LogText((QString(">> System Temp Path: ") + tmp.path() + QString("\n")).toUtf8());
+
+        emu64_tmp = QDir(tmp.path() + "/emu64");
+
+        if(!emu64_tmp.exists())
+        {
+            LogText((QString(">> Emu64 Temp Verzeichnis existiert nicht und wird erstellt.") + emu64_tmp.path() + QString("\n")).toUtf8());
+            if(!tmp.mkdir("emu64"))
+            {
+                LogText((QString(">> Emu64 Temp Verzeichnis konnte nicht ermittelt werden.") + emu64_tmp.path() + QString("\n")).toUtf8());
+            }
+        }
+
+        if(!emu64_tmp.exists())
+        {
+            LogText((QString(">> Emu64 Temp Path konnte nicht ermittelt werden.") + emu64_tmp.path() + QString("\n")).toUtf8());
+            emu64_tmp.path() = nullptr;
+        }
+        else
+        {
+            emu64_tmp.path() = emu64_tmp.path();
+            LogText((QString(">> Emu64 Temp Path: ") + emu64_tmp.path() + QString("\n")).toUtf8());
+        }
+    }
+    else {
+        LogText((QString(">> System Temp Path konnte nicht ermittelt werden.")).toUtf8());
+        tmp.path() = nullptr;
+        LogText((QString(">> Emu64 Temp Path konnte nicht ermittelt werden.")).toUtf8());
+        emu64_tmp.path() = nullptr;
+    }
 
     screenshotPath = configPath + "/screenshots";
     LogText((QString(">> Screenshot Path = ") + screenshotPath + QString("\n")).toUtf8());
@@ -305,7 +340,7 @@ void MainWindow::OnInit()
     LogText(tr(">> VideoCrtSetupWindow wurde erzeugt\n").toUtf8());
 
     SplashMessage(tr("FloppyWindow wird erstellt."),Qt::darkBlue);
-    floppy_window = new FloppyWindow(this,ini,c64,tmpPath);
+    floppy_window = new FloppyWindow(this,ini,c64,emu64_tmp.path());
     LogText(tr(">> FloppyWindow wurde erzeugt\n").toUtf8());
 
     SplashMessage(tr("TapeWindow wird erstellt."),Qt::darkBlue);
