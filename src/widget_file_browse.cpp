@@ -162,7 +162,10 @@ void WidgetFileBrowse::on_listWidget_zip_itemSelectionChanged()
 {
     QString AktZIPName = dirmodel->fileInfo(ui->listView_filebrowser->currentIndex()).absoluteFilePath();
     QString ZIPInFile = ui->listWidget_zip->currentItem()->text();
-    QString OutFileName = tmp_path + "/" + ZIPInFile;
+
+    QString file = ZIPInFile.section("/",-1,-1);    // Evt. enthaltenen Pfad abschneiden
+
+    QString OutFileName = tmp_path + "/" + file;
 
     QuaZip zip(AktZIPName);
     if(zip.open(QuaZip::mdUnzip))
@@ -177,6 +180,8 @@ void WidgetFileBrowse::on_listWidget_zip_itemSelectionChanged()
         {
             qDebug() << "Fehler beim Öffnen des ZIPFiles: " << ZIPInFile;
         }
+
+        // Aus OutFileName alles entfernen mit '/'
 
         QFile outfile(OutFileName);
         if(outfile.open(QIODevice::ReadWrite))
