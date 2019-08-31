@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019                //
+// Letzte Änderung am 31.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -71,6 +71,7 @@ private slots:
 private:
     void RefreshD64FileList(void);
     void SetD64BigSize(bool enable);
+    QString ConvC64Name(const char* name, bool invers = false);
 
     Ui::FloppyWindow *ui;
 

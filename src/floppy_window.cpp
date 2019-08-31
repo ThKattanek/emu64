@@ -400,7 +400,7 @@ QString FloppyWindow::GetAktFilename(int floppynr)
 
 QString FloppyWindow::GetAktD64Name(int floppynr)
 {
-    return d64[floppynr].d64_name;
+    return ConvC64Name(d64[floppynr].d64_name, true);
 }
 
 void FloppyWindow::RefreshD64FileList()
@@ -414,7 +414,7 @@ void FloppyWindow::RefreshD64FileList()
     int d64_files = d64[floppy].file_count;
 
     // D64 Name ermitteln und anzeigen
-    ui->DiskName->setText(d64[floppy].d64_name);
+    ui->DiskName->setText(ConvC64Name(d64[floppy].d64_name, true));
 
     // Headerlabels setzen
     ui->D64FileTable->setHorizontalHeaderLabels(QStringList() << "" << "DATEI" << "SP" << "SK" << "ADR" << "SIZE" << "TYP");
@@ -433,19 +433,7 @@ void FloppyWindow::RefreshD64FileList()
         }
         ui->D64FileTable->setItem(i,0,icon_item);
 
-        // Dateiname setzen
-        QString name_str;
-        for(int j=0; j < static_cast<int>(strlen(d64[floppy].d64_files[i].Name)); j++)
-        {
-            if((static_cast<uint8_t>(d64[floppy].d64_files[i].Name[j] == 32)) || (static_cast<uint8_t>(d64[floppy].d64_files[i].Name[j]) == 160))
-                name_str += " ";
-            else if((static_cast<uint8_t>(d64[floppy].d64_files[i].Name[j]) > 127) && (static_cast<uint8_t>(d64[floppy].d64_files[i].Name[j]) < 160))
-                name_str += QChar((static_cast<uint8_t>(d64[floppy].d64_files[i].Name[j])) + 0xee40);
-            else
-            name_str += QChar((static_cast<uint8_t>(d64[floppy].d64_files[i].Name[j])) + 0xe000);
-        }
-
-        ui->D64FileTable->setCellWidget(i,1,new QLabel(name_str));
+        ui->D64FileTable->setCellWidget(i,1,new QLabel(ConvC64Name(d64[floppy].d64_files[i].Name)));
 
         ui->D64FileTable->cellWidget(i,1)->setFont(*c64_font);
         QLabel* label = static_cast<QLabel*>(ui->D64FileTable->cellWidget(i,1));
@@ -570,6 +558,50 @@ void FloppyWindow::SetD64BigSize(bool enable)
         ui->D64FileTable->setColumnWidth(5,45);
         ui->D64FileTable->setColumnWidth(6,45);
     }
+}
+
+QString FloppyWindow::ConvC64Name(const char *name, bool invers)
+{
+    size_t size = strlen(name);
+    char *new_name = new char[size];
+    strcpy(new_name, name);
+
+    QString name_str = "";
+    for(size_t i=0; i<size; i++)
+    {
+        if(static_cast<uint8_t>(new_name[i]) != 0)
+        {
+            if(static_cast<uint8_t>(new_name[i]) == 32 || (static_cast<uint8_t>(new_name[i]) == 160))
+            {
+                if(!invers)
+                    name_str += ' ';
+                else
+                    name_str += QChar(' ' + 0xe200);
+            }
+            else
+            {
+                if((static_cast<uint8_t>(new_name[i]) > 127) && (static_cast<uint8_t>(new_name[i]) < 160))
+                {
+                    if(!invers)
+                        name_str += QChar((static_cast<uint8_t>(new_name[i])) + 0xee40);
+                    else
+                        name_str += QChar((static_cast<uint8_t>(new_name[i])) + 0xee40);
+                }
+                else
+                {
+                    if(!invers)
+                    {
+                        name_str += QChar((static_cast<uint8_t>(new_name[i])) + 0xe000);
+                    }
+                    else
+                        name_str += QChar((static_cast<uint8_t>(new_name[i])) + 0xe200);
+                }
+            }
+        }
+    }
+    delete [] new_name;
+
+    return name_str;
 }
 
 void FloppyWindow::on_D64FileTableBigSize_clicked(bool checked)

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 31.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,6 +19,8 @@ D64Class::D64Class()
 {
     file_count = 0;
     d64_size = 0;
+
+    for(int i=0; i<D64_NAME_LENGHT+1; i++) d64_name[i] = 0;
 }
 
 D64Class::~D64Class()
