@@ -563,7 +563,7 @@ void FloppyWindow::SetD64BigSize(bool enable)
 QString FloppyWindow::ConvC64Name(const char *name, bool invers)
 {
     size_t size = strlen(name);
-    char *new_name = new char[size];
+    char *new_name = new char[size+1];
     strcpy(new_name, name);
 
     QString name_str = "";
