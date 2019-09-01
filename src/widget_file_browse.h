@@ -23,8 +23,8 @@
 
 #ifdef ZIP_SUPPORT
     #ifdef MXE_CROSS_COMPILER
-        #include "quazip5/quazip.h"
-        #include "quazip5/quazipfile.h"
+        #include "quazip/quazip.h"
+        #include "quazip/quazipfile.h"
     #else
         #include "quazip5/quazip.h"
         #include "quazip5/quazipfile.h"
