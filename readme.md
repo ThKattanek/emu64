@@ -33,6 +33,7 @@ git clone https://github.com/ThKattanek/emu64.git
 cd emu64
 mkdir build
 cd build
+lrelease ../src/src.pro
 qmake PREFIX="/usr/local" ..
 make -j8
 sudo make install
