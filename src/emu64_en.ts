@@ -2864,7 +2864,7 @@ Do you want it to overwrite?</translation>
         <location filename="main_window.cpp" line="389"/>
         <source>&gt;&gt; Aktuelle Screenshotnummer wurde geladen
 </source>
-        <translation>&gt;&gt; Current screenshotnumber has been loadet
+        <translation>&gt;&gt; Current screenshotnumber loaded
 </translation>
     </message>
     <message>
