@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 16.08.2019                //
+# // Letzte Änderung am 01.09.2019                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -54,17 +54,12 @@ win32{
    }
 }
 
-# Translations
-
-QMAKE_PRE_LINK += lrelease \"$$PWD/emu64_de.ts\" \
-                & lrelease \"$$PWD/emu64_en.ts\"
-
 # Abhängigkeiten
 
 CONFIG += link_pkgconfig
 PKGCONFIG += sdl2 SDL2_image libpng glu libavutil libavformat libavcodec libswresample libswscale
 
-# Für Win32 / Librarys ohne PKCONFIG
+# Für Win32 / Libs ohne PKCONFIG angeben
 #LIBS += -lsdl2 -lsdl2main -lsdl2_image -lpng -lglu32 -lopengl32 -lavutil -lavformat -lavcodec -lswresample -lswscale
 
 message("Zip: $$ZIP")
@@ -222,19 +217,13 @@ FORMS += \
     widget_sr_edit.ui \
     widget_tape_counter.ui
 
+TRANSLATIONS += emu64_en.ts \
+                emu64_de.ts
+
 RESOURCES += emu64.qrc
 RC_FILE += emu64.rc
 
-TRANSLATIONS += emu64_de.ts \
-            emu64_en.ts
-
 # Installation
-
-linux-g++{
-}
-
-win32{
-}
 
 message(Installpath: $$PREFIX)
 DEFINES += DATA_PATH=\\\"$$PREFIX\\\"

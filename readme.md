@@ -27,15 +27,15 @@ Emu64 auf Facebook: [https://www.facebook.com/Emu64-103321833093172](https://www
   - avformat
   - swscale
 
-### Build
+### Build und Installation
 ```bash
 git clone https://github.com/ThKattanek/emu64.git
 cd emu64
 mkdir build
 cd build
 qmake PREFIX="/usr/local" ..
-make
-make install
+make -j8
+sudo make install
 ```
 
 ### Deinstallieren
