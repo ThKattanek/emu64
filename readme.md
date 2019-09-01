@@ -47,8 +47,6 @@ Achtung! Verzeichnisse die durch die Installation erstellt wurden werden hiermit
 
 ### Detailierte Beschreibungen für verschiedene Linux Distributionen
 
-[Kompilieren unter Fedora 27](https://github.com/ThKattanek/emu64/wiki/Emu64-auf-Fedora-27-kompilieren)
-
 [Kompilieren unter Debian 9.3.0](https://github.com/ThKattanek/emu64/wiki/Emu64-auf-Debian-9.3.0-kompilieren)
 
 [Windows Versionen unter Linux mit MXE](https://github.com/ThKattanek/emu64/wiki/Windows-Build-unter-Linux-mit-MXE-erstellen)
