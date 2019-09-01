@@ -1561,12 +1561,12 @@ manually. Just for testing purposes.</translation>
     <message>
         <location filename="debugger_window.cpp" line="1293"/>
         <source> Zyklus/Sek</source>
-        <translation>Cycle/Sec</translation>
+        <translation> Cycle/Sec</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1294"/>
         <source> Zyklen/Sek</source>
-        <translation>Cycles/Sec</translation>
+        <translation> Cycles/Sec</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1327"/>
@@ -1577,7 +1577,8 @@ manually. Just for testing purposes.</translation>
         <location filename="debugger_window.cpp" line="1355"/>
         <source>Möchten Sie den folgenden Haltepunkt löschen?
 </source>
-        <translation>Do you want to delete this breakpoint?</translation>
+        <translation>Do you want to delete this breakpoint?
+</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1376"/>
@@ -1714,13 +1715,13 @@ Do you want to continue?</translation>
     <message>
         <location filename="debugger_window.cpp" line="1859"/>
         <source>Emu64 Haltepunkt Datei (*.bpt)</source>
-        <translation type="unfinished"></translation>
+        <translation>Emu64 Breakpoint File (*.bpt)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1860"/>
         <location filename="debugger_window.cpp" line="1934"/>
         <source>Alle Dateien (*.*)</source>
-        <translation type="unfinished"></translation>
+        <translation>All Files (*.*)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1882"/>
@@ -1745,12 +1746,12 @@ Do you want to continue?</translation>
     <message>
         <location filename="debugger_window.cpp" line="1932"/>
         <source>Disassembler Listing (*.txt)</source>
-        <translation type="unfinished"></translation>
+        <translation>Disasssembler Listing (*.txt)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1933"/>
         <source>C64 Programm Datei (*.prg)</source>
-        <translation type="unfinished"></translation>
+        <translation>C64 Program File (*.prg)</translation>
     </message>
     <message>
         <location filename="debugger_window.cpp" line="1936"/>
@@ -1935,12 +1936,12 @@ Do you want to continue?</translation>
     <message>
         <location filename="floppy_window.cpp" line="369"/>
         <source>C64 Programmdatei (*.prg *.seq *.usr *.rel *.cbm *.e00 *.del</source>
-        <translation type="unfinished"></translation>
+        <translation>C64 Program File (*.prg *.seq *.usr *.rel *.cbm *.e00 *.del</translation>
     </message>
     <message>
         <location filename="floppy_window.cpp" line="370"/>
         <source>Alle Dateien (*.*)</source>
-        <translation type="unfinished"></translation>
+        <translation>All Files (*.*)</translation>
     </message>
     <message>
         <location filename="floppy_window.cpp" line="372"/>
@@ -2541,7 +2542,8 @@ Do you want it to overwrite?</translation>
         <source>&gt;&gt; C64SpeedWindow wurde erzeugt
 </source>
         <oldsource>CRT Window wird mit CRT Klasee verbunden.</oldsource>
-        <translation>&gt;&gt; Creating c64 window</translation>
+        <translation>&gt;&gt; C64Speed Window created
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="415"/>
@@ -2567,25 +2569,29 @@ Do you want it to overwrite?</translation>
         <location filename="main_window.cpp" line="454"/>
         <source>&gt;&gt; SDL Window Close Event mit MainWindow verknuepft
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; SDl Window Close Event linked to MainWindow
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="459"/>
         <source>&gt;&gt; C64Class LimitCycelsEvent mit MainWindow verknuepft
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; C64Class LimitCyclesEvent linked to MainWindow
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="464"/>
         <source>&gt;&gt; C64Class DebugCartEvent mit MainWindow verknuepft
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; C64Class DebugCartEvent linked to MainWindow
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="467"/>
         <source>&gt;&gt; ChangeFloppyImage Event mit MainWindow verknuepft
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; ChangeFloppyImage Event linked to MainWindow
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="470"/>
@@ -2596,31 +2602,36 @@ Do you want it to overwrite?</translation>
         <location filename="main_window.cpp" line="474"/>
         <source>&gt;&gt; FloppyWindow LoadIni wurde ausgefuehrt
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; FloppyWindow LoadIni started
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="499"/>
         <source>&gt;&gt; SetupWindow LoadIni wurde ausgefuehrt
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; SetupWindow LoadIni started
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="505"/>
         <source>&gt;&gt; CrtWindow LoadIni wurde ausgefuehrt
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; CrtWindow LoadIni started
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="509"/>
         <source>&gt;&gt; TapeWindow LoadIni wurde ausgefuehrt
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; TapeWindow LoadIni started
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="563"/>
         <source>&gt;&gt; Splashsreen wurde geschlossen.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; Splashscreen closed
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="568"/>
@@ -2632,25 +2643,29 @@ Do you want it to overwrite?</translation>
         <location filename="main_window.cpp" line="570"/>
         <source>&gt;&gt; C64 Emulation wird gestartet.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; C64 Emulation started
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="575"/>
         <source>&lt;&lt; C64 Emulation konnte nicht gestartet werden.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;&lt; C64 Emulation couldnt start
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="580"/>
         <source>&gt;&gt; C64 Emulation wurde gestartet.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; C64 Emulation started
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="584"/>
         <source>&gt;&gt; Hardreset wurde ausgefuehrt.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; Hardreset started
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="691"/>
@@ -2695,7 +2710,8 @@ Do you want it to overwrite?</translation>
         <source>&gt;&gt; Ein RomSet Verzeichnis ist vorhanden
 </source>
         <oldsource>Screenshotverzeichnis wird erstellt.</oldsource>
-        <translation type="unfinished">Creating screenshot directory.</translation>
+        <translation>&gt;&gt; RomSet Directory found
+</translation>
     </message>
     <message>
         <source>&lt;&lt; Ein Screenshot Verzeichnis ist nicht vorhanden
@@ -2830,13 +2846,14 @@ Do you want it to overwrite?</translation>
     <message>
         <location filename="main_window.cpp" line="379"/>
         <source>SidDumpWindow wird erstellt.</source>
-        <translation type="unfinished"></translation>
+        <translation>SidDumpWindow created</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="381"/>
         <source>&gt;&gt; SidDumpWindow wurde erzeugt
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; SidDumpWindow created
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="384"/>
@@ -2854,35 +2871,36 @@ Do you want it to overwrite?</translation>
         <location filename="main_window.cpp" line="291"/>
         <source>&gt;&gt; Das Screenshot Verzeichnis ist vorhanden
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; Screenshot directory found</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="296"/>
         <source>Das Screenshotverzeichnis wird erstellt.</source>
-        <translation type="unfinished"></translation>
+        <translation>Screenshot directory created</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="297"/>
         <source>&lt;&lt; Das Screenshot Verzeichnis ist nicht vorhanden
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;&lt; The Screenshot directory was not found</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="305"/>
         <source>&lt;&lt; Ein neues Screenshot Verzeichnis konnte nicht erstellt werden
 &lt;&lt; Keine Screenshots moeglich !!</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;&lt; Screenshot directory was not created
+&lt;&lt; Unable to screenshot !!</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="338"/>
         <source>VideoCrtSetupWindow wird erstellt.</source>
-        <translation type="unfinished"></translation>
+        <translation>VideoCrtSetupWindow created</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="340"/>
         <source>&gt;&gt; VideoCrtSetupWindow wurde erzeugt
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt; VideoCrtSetupWindow created</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="402"/>
@@ -3414,12 +3432,12 @@ Please check the file access rights of the directory!</translation>
     <message>
         <location filename="setup_window.ui" line="465"/>
         <source>Schaltet die Video CRT Emulation der Grafikausgabe ein. (Sollte vorrangig benutzt werden)</source>
-        <translation type="unfinished"></translation>
+        <translation>Enables the CRT Emulation for the Video output (Should be the default)</translation>
     </message>
     <message>
         <location filename="setup_window.ui" line="468"/>
         <source>Video CRT Ausgabe</source>
-        <translation type="unfinished"></translation>
+        <translation>Video CRT Output</translation>
     </message>
     <message>
         <location filename="setup_window.ui" line="481"/>
@@ -3527,7 +3545,7 @@ Please check the file access rights of the directory!</translation>
     <message>
         <location filename="setup_window.ui" line="705"/>
         <source>Filter aktivieren</source>
-        <translation type="unfinished"></translation>
+        <translation>Enable filter</translation>
     </message>
     <message>
         <location filename="setup_window.ui" line="719"/>
@@ -3665,27 +3683,27 @@ Please check the file access rights of the directory!</translation>
     <message>
         <location filename="sid_dump_window.ui" line="14"/>
         <source>SID Dump</source>
-        <translation type="unfinished">SID Dump</translation>
+        <translation>SID Dump</translation>
     </message>
     <message>
         <location filename="sid_dump_window.ui" line="86"/>
         <source>00:00:00-00</source>
-        <translation type="unfinished">00:00:00-00</translation>
+        <translation>00:00:00-00</translation>
     </message>
     <message>
         <location filename="sid_dump_window.cpp" line="55"/>
         <source>Emu64 SID Dump (*.sdp)</source>
-        <translation type="unfinished"></translation>
+        <translation>Emu64 Sid Dump (*.sdp)</translation>
     </message>
     <message>
         <location filename="sid_dump_window.cpp" line="56"/>
         <source>Alle Dateien (*.*)</source>
-        <translation type="unfinished"></translation>
+        <translation>All Files (*.*)</translation>
     </message>
     <message>
         <location filename="sid_dump_window.cpp" line="58"/>
         <source>SID Dump Aufzeichen ...</source>
-        <translation type="unfinished"></translation>
+        <translation>SID Dump Records ...</translation>
     </message>
 </context>
 <context>
@@ -3884,27 +3902,27 @@ Recording wont start!</translation>
     <message>
         <location filename="video_capture_window.cpp" line="63"/>
         <source>MPEG-4 (*.mp4)</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG-4 (*.mp4)</translation>
     </message>
     <message>
         <location filename="video_capture_window.cpp" line="64"/>
         <source>MKV (Matroschka) (*.mkv)</source>
-        <translation type="unfinished"></translation>
+        <translation>MKV (Matroschka) (*.mvk)</translation>
     </message>
     <message>
         <location filename="video_capture_window.cpp" line="65"/>
         <source>AVI (*.avi)</source>
-        <translation type="unfinished"></translation>
+        <translation>AVI (*.avi)</translation>
     </message>
     <message>
         <location filename="video_capture_window.cpp" line="66"/>
         <source>QuickTime (*.mov)</source>
-        <translation type="unfinished"></translation>
+        <translation>QuickTime (*.mov)</translation>
     </message>
     <message>
         <location filename="video_capture_window.cpp" line="67"/>
         <source>Alle Dateien (*.*)</source>
-        <translation type="unfinished"></translation>
+        <translation>All Files (*.*)</translation>
     </message>
     <message>
         <location filename="video_capture_window.cpp" line="69"/>
@@ -3933,57 +3951,57 @@ Recording wont start!</translation>
     <message>
         <location filename="video_crt_setup_window.ui" line="46"/>
         <source>Video CRT Einstellungen</source>
-        <translation type="unfinished"></translation>
+        <translation>Video CRT Settings</translation>
     </message>
     <message>
         <location filename="video_crt_setup_window.ui" line="89"/>
         <source>Sättigung</source>
-        <translation type="unfinished">Saturation</translation>
+        <translation>Saturation</translation>
     </message>
     <message>
         <location filename="video_crt_setup_window.ui" line="112"/>
         <source>Helligkeit</source>
-        <translation type="unfinished">Brightness</translation>
+        <translation>Brightness</translation>
     </message>
     <message>
         <location filename="video_crt_setup_window.ui" line="138"/>
         <source>Kontrast</source>
-        <translation type="unfinished">Contrast</translation>
+        <translation>Contrast</translation>
     </message>
     <message>
         <location filename="video_crt_setup_window.ui" line="161"/>
         <source>Horizontaler Blur (Y)</source>
-        <translation type="unfinished">Horizontaler Blur (Y)</translation>
+        <translation>Horizontal Blur (Y)</translation>
     </message>
     <message>
         <location filename="video_crt_setup_window.ui" line="184"/>
         <source>Horizontaler Blur (UV)</source>
-        <translation type="unfinished">Horizontaler Blur (UV)</translation>
+        <translation>Horizontale Blur (UV)</translation>
     </message>
     <message>
         <location filename="video_crt_setup_window.ui" line="207"/>
         <source>Phasen Verschiebung</source>
-        <translation type="unfinished">Phase shift</translation>
+        <translation>Phase shift</translation>
     </message>
     <message>
         <location filename="video_crt_setup_window.ui" line="230"/>
         <source>Scanline</source>
-        <translation type="unfinished">Scanline</translation>
+        <translation>Scanline</translation>
     </message>
     <message>
         <location filename="video_crt_setup_window.ui" line="565"/>
         <source>Alles wieder auf Standard Werte zurücksetzen</source>
-        <translation type="unfinished">Reset to default values</translation>
+        <translation>Reset to default values</translation>
     </message>
     <message>
         <location filename="video_crt_setup_window.ui" line="581"/>
         <source>Verzerrung</source>
-        <translation type="unfinished">Distortion</translation>
+        <translation>Distortion</translation>
     </message>
     <message>
         <location filename="video_crt_setup_window.cpp" line="150"/>
         <source>°</source>
-        <translation type="unfinished"></translation>
+        <translation>°</translation>
     </message>
 </context>
 <context>
