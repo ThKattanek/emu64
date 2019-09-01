@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.08.2019                //
+// Letzte Änderung am 01.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -22,8 +22,13 @@
 #include <QRegExp>
 
 #ifdef ZIP_SUPPORT
-#include "quazip/quazip.h"
-#include "quazip/quazipfile.h"
+    #ifdef MXE_CROSS_COMPILER
+        #include "quazip5/quazip.h"
+        #include "quazip5/quazipfile.h"
+    #else
+        #include "quazip5/quazip.h"
+        #include "quazip5/quazipfile.h"
+    #endif
 #endif
 
 namespace Ui {
