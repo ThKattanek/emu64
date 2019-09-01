@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 12.08.2019                //
+# // Letzte Änderung am 01.09.2019                //
 # // www.emu64-projekt.de                         //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -81,7 +81,10 @@ if [ $i686_ok ]; then
         rm -rf $install_i686_dir/*
     fi
 
-    # execute cmake
+    # compile ts files
+    lrelease ../src/src.pro
+    
+    # execute qmake
     cd $build_i686_dir
     $i686_qmake PREFIX=$install_i686_dir ../..
     make -j8 install
@@ -123,7 +126,10 @@ if [ $x86_64_ok ]; then
         rm -rf $install_x86_64_dir/*
     fi
 
-    # execute cmake
+    # compile ts files
+    lrelease ../src/src.pro
+    
+    # execute qmake
     cd $build_x86_64_dir
     $x86_64_qmake PREFIX=$install_x86_64_dir ../..
     make -j8 install
