@@ -312,24 +312,24 @@
     <message>
         <location filename="cartridge_window.cpp" line="392"/>
         <source>Achtung!</source>
-        <translation type="unfinished">Attention!</translation>
+        <translation>Attention!</translation>
     </message>
     <message>
         <location filename="cartridge_window.cpp" line="392"/>
         <source>Eine Datei mit diesen Namen existiert schon!
 Soll diese überschrieben werden?</source>
-        <translation type="unfinished">A file with that name allready exists!
+        <translation>A file with that name allready exists!
 Do you want it to overwrite?</translation>
     </message>
     <message>
         <location filename="cartridge_window.cpp" line="433"/>
         <source>CRT Fehler</source>
-        <translation type="unfinished">CRT error</translation>
+        <translation>CRT error</translation>
     </message>
     <message>
         <location filename="cartridge_window.cpp" line="433"/>
         <source>Fehler beim Laden des ausgewählten CRT Files</source>
-        <translation type="unfinished">Error while loading the selected CRT file</translation>
+        <translation>Error while loading the selected CRT file</translation>
     </message>
 </context>
 <context>
@@ -542,12 +542,12 @@ Do you want it to overwrite?</translation>
     <message>
         <location filename="debugger_iec_window.cpp" line="92"/>
         <source>Value Change Dump (*.vcd)</source>
-        <translation type="unfinished"></translation>
+        <translation>Value Change Dump</translation>
     </message>
     <message>
         <location filename="debugger_iec_window.cpp" line="93"/>
         <source>Alle Dateien (*.*)</source>
-        <translation type="unfinished"></translation>
+        <translation>All Files (*.*)</translation>
     </message>
     <message>
         <location filename="debugger_iec_window.cpp" line="108"/>
@@ -1914,7 +1914,7 @@ Do you want to continue?</translation>
     <message>
         <location filename="floppy_window.cpp" line="266"/>
         <source>Laden ohne Kernal</source>
-        <translation type="unfinished"></translation>
+        <translation>Load without kernal</translation>
     </message>
     <message>
         <location filename="floppy_window.cpp" line="267"/>
@@ -2001,12 +2001,12 @@ Do you want it to overwrite?</translation>
     <message>
         <location filename="info_window.ui" line="115"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forum: &lt;a href=&quot;http://www.emu64-projekt.de&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;www.emu64-projekt.de&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="info_window.ui" line="202"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;GitHub: &lt;a href=&quot;https://github.com/ThKattanek/emu64&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;www.github.com/ThKattanek/emu64&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Thomas Daden (+ Emu64 Handbuch, Emu64-Wiki, Emu64 Webspace)</source>
@@ -2205,7 +2205,7 @@ Do you want it to overwrite?</translation>
         <location filename="main_window.ui" line="841"/>
         <location filename="main_window.ui" line="844"/>
         <source>Video CRT Einstellungen</source>
-        <translation type="unfinished"></translation>
+        <translation>Video CRT Settings</translation>
     </message>
     <message>
         <location filename="main_window.ui" line="1078"/>
@@ -2384,7 +2384,7 @@ Do you want it to overwrite?</translation>
         <location filename="main_window.ui" line="632"/>
         <source>F11</source>
         <oldsource>F9</oldsource>
-        <translation type="unfinished">F9</translation>
+        <translation>F11</translation>
     </message>
     <message>
         <location filename="main_window.ui" line="799"/>
@@ -2626,7 +2626,7 @@ Do you want it to overwrite?</translation>
         <location filename="main_window.cpp" line="568"/>
         <source>C64 EMULATION WIRD NUN GESTARTET.</source>
         <oldsource>C64 EMULATION WIRD NUN GESTARET.</oldsource>
-        <translation type="unfinished">C64 Emulation starts now.</translation>
+        <translation>C64 Emulation starts now.</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="570"/>
@@ -2847,7 +2847,8 @@ Do you want it to overwrite?</translation>
         <location filename="main_window.cpp" line="389"/>
         <source>&gt;&gt; Aktuelle Screenshotnummer wurde geladen
 </source>
-        <translation>&gt;&gt; Screenshotnumber has been loadet</translation>
+        <translation>&gt;&gt; Current screenshotnumber has been loadet
+</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="291"/>
@@ -3014,13 +3015,13 @@ Do you want it to overwrite?</translation>
     <message>
         <location filename="main_window.cpp" line="1091"/>
         <source>REU Image Dateien (*.reu)</source>
-        <translation type="unfinished"></translation>
+        <translation>REU image files (*.reu)</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="1092"/>
         <location filename="main_window.cpp" line="1140"/>
         <source>Alle Dateien (*.*)</source>
-        <translation type="unfinished"></translation>
+        <translation>All files (*.*)</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="1094"/>
@@ -3041,7 +3042,7 @@ Do you want it to overwrite?</translation>
     <message>
         <location filename="main_window.cpp" line="1139"/>
         <source>GEORAM Image Dateien (*.img)</source>
-        <translation type="unfinished"></translation>
+        <translation>GEORAM image files (*.img)</translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="1151"/>
@@ -3339,32 +3340,33 @@ Please check the file access rights of the directory!</translation>
     <message>
         <location filename="setup_window.ui" line="242"/>
         <source>VIC</source>
-        <translation type="unfinished">VIC</translation>
+        <translatorcomment>VIC</translatorcomment>
+        <translation>VIC</translation>
     </message>
     <message>
         <location filename="setup_window.ui" line="254"/>
         <source>Sprites anzeigen</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprites showing</translation>
     </message>
     <message>
         <location filename="setup_window.ui" line="267"/>
         <source>Rahmen anzeigen</source>
-        <translation type="unfinished"></translation>
+        <translation>Border showing</translation>
     </message>
     <message>
         <location filename="setup_window.ui" line="283"/>
         <source>Sprite - Sprite Kollision</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprite - Sprite collision</translation>
     </message>
     <message>
         <location filename="setup_window.ui" line="299"/>
         <source>Sprite - Hintergrund Kollision</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprite - Background collision</translation>
     </message>
     <message>
         <location filename="setup_window.ui" line="312"/>
         <source>Grey Dots anzeigen</source>
-        <translation type="unfinished"></translation>
+        <translation>Grey Dots showing</translation>
     </message>
     <message>
         <location filename="setup_window.ui" line="322"/>
