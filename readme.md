@@ -19,6 +19,7 @@ Emu64 auf Facebook: [https://www.facebook.com/Emu64-103321833093172](https://www
 - qt5
 - sdl2
 - sdl2-image
+- png
 - quazip5
 - ffmpeg
   - avcodec
