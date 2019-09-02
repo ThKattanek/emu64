@@ -36,7 +36,7 @@ git checkout 5.0.17
 mkdir build
 cd build
 lrelease ../src/src.pro
-qmake PREFIX="/usr/local" ..
+qmake .. PREFIX="/usr/local"
 make -j8
 sudo make install
 ```
