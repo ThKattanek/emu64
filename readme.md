@@ -13,13 +13,13 @@ Emu64 auf Facebook: [https://www.facebook.com/Emu64-103321833093172](https://www
 ## Emu64 erstellen unter Linux
 
 ### Wichtige Vorraussetzung
-- qttools5-dev-tools
+- qttools5-dev
 
 ### Benötigte Libs 
 - qt5
 - sdl2
 - sdl2-image
-- quazip
+- quazip5
 - ffmpeg
   - avcodec
   - avutil
@@ -31,6 +31,7 @@ Emu64 auf Facebook: [https://www.facebook.com/Emu64-103321833093172](https://www
 ```bash
 git clone https://github.com/ThKattanek/emu64.git
 cd emu64
+git checkout 5.0.17
 mkdir build
 cd build
 lrelease ../src/src.pro
