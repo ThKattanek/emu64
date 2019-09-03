@@ -1,0 +1,167 @@
+5.0.17
+------
+
+- Portierung von Qt4 nach Qt5
+- [issue #135] Im Debugger kam es zu einem Absturz wenn man in der ASM Zeile ein NOP eingegeben hat.
+- ZIP Support kann man in der qmake Projektdatei auskommentieren (wenn man probleme mit quazip hat)
+- von cmake wieder zurück zum Buildsystem qmake
+- G64 File könne wieder geladen werden (Inhalt wird aber im FloppyWindow und FloppyStatus "noch" nicht angezeigt)
+- Anzahl der GAP Bytes bei der D64->GCR Konvertierung angepasst
+- Kontextmenü im D64 Verzeichnis um einen Punkt erweiter -> "Laden ohne Kernal". Die Datei wird einfach ins RAM geschrieben ohne auszuführen
+- [issue #134] Spiel Benji Space Rescue startet nun (Nach einem CLI wenn die IRQ Leitung noch Low ist, wird der nächste Befehl noch abgearbeitet und kein IQR ausgelöst )
+- 6510 IQR/NMI div. Änderungen
+- VIC Einstellungen hinzugefügt
+    - Sprite View on/off
+    - Border View on/off
+    - Sprite - Sprite Kollision on/off
+    - Sprite - Background Kollision on/off
+    - Grey Dots on/off
+- [issue #143] Div. Demos kein Sound. Bei einem ReadOnly Register wird immer der zuletzt im SID geschriebener Wert zurückgegeben. Das für ca. 2000-4000 Zyklen. Danach wir 0 zurückgegeben.
+- Grey Dots werden jetzt wieder angezeigt. (Abschaltbar)
+- [issue #152] Erste und letzte Display Zeile wurde neu festgelegt. Erste Sichtbare Zeile:  26 Letzte Sichtbare Zeile: 292 Das ganze ist über die emu64.ini einstellbar und zwar für PAL und NTSC getrennt.
+- SID Dump wieder hinzugefügt
+- Konsolenmeldung: libpng warning: iCCP: known incorrect sRGB profile --> gefixt
+- [issue #153] Tape Record funktioniert wieder
+- Tape Soundausgabe funktioniert wieder richtig
+- Virtuelle C64 Tastatur: Funktionstasten F2,F4,F6,F8,CRSR hoch und runter funktionieren nun ohne gedrückte Shift Taste.
+- Absturz in Virtueller C64 Tastatur behoben, wenn außerhalb der Tasten geklickt wurde
+- Soundausgabe überarbeitet
+- 16-bit Videomode komplett entfernt
+- Logmeldungen erweitert
+- Emu64 Start, beschleunigt. Sollte wieder zügig starten
+- [issue #137] Sreenshots von F9 auf F11 verlagert, funktioniert nun aber im Hauptfenster und im C64 Bildschirm
+- Hardreset per Shift-F12 funktioniert nun auch 
+- [issue #96] ZIP Support funtioniert nun wieder im Floppy, Cartridge und Tape Fenster
+- D64 Directory Darstellung im Haupt- und im Floppyfenster gefixt
+- Quellcode teilweise aufgeräumt und einige Warnings entfernt
+
+5.0.16
+------
+
+- [issue #117] Bildschirmgröße wird beim starten des Emu64 wieder richtig hergestellt. Das Problem gab es nur in der Windows Version.
+- [issue #119] Wechsel zwischen Vollbild und Fenstermodus funktioniert wieder mittels Alt+Return unter Ubuntu.
+- [issue #16] Videoaufzeichnung jetzt direkt aus dem Emu64 möglich
+- TV/Video Setup - Verzerrung wird jetzt auch zurückgesetzt wenn auf Standardwerte zurück gesetzt wird.
+- [issue #121] Beim laden eines PRG konnte es vorkommen das über die Grenzen des C64 RAM geschrieben wurde.
+- RESET komplett aus MOS-6569 (VICII) entfernt. Er besitzt gar keinen RESET Eingang!
+- Info Window angepasst
+- Buildsystem Umstellung: von qmake nach cmake
+- [issue #54] Einstellung 4:3 bei Vollbild wird Standardmäßig gesetzt.
+- [issue #87] Im Debugger werden dir Breakpoints wieder richtig geladen.
+- [issue #131] Fehler beim laden von CRT Images behoben. Sams Journey ist somit Spielbar. (Spielstand lässt sich jedoch noch nicht speichern!)
+- [issue #131] EasyFlash Logic für Write Register DE00 + DE02 aus Schaltplan übernommen.
+- Neue Kommandozeilen-Option: --data-path (Angabe eines Benutzerdefinierten Pfads für roms, floppysounds, gxf und languages.)
+- Neue Kommandozeilen-Option: --video-capture (Startet die Aufzeichnung des C64 Screens.)
+
+5.0.15
+------
+
+- Emu64 hat nun WIP Support in der VICE Testsuite. Danke an Groepaz vom VICE-Team
+  https://sourceforge.net/p/vice-emu/code/HEAD/tree/testprogs/testbench/
+- PNG als Screenshotformat hinzugefügt
+- Pepto Palette hinzugefügt
+- WARP Modus hinzugefügt (Option in C64Speed Fenster oder als Kommandozeilen-Option)
+- Verarbeitung von Kommandozeilen-Optionen in Emu64 eingebaut
+- Neue Kommandozeilen-Option: --nosplash (Der SplashScreen wird beim Start nicht angezeigt.)
+- Neue Kommandozeilen-Option: -a, --autostart <Dateiname> (Lädt ein C64 Programm (prg,t00 ...) und startet es gleich.)
+- Neue Kommandozeilen-Option: -m, --mount-disk <laufwerksnummer> <Dateiname> (Mountet ein Diskimage. Die Laufwerksnummer muss zwischen 8 und 11 liegen.)
+- Neue Kommandozeilen-Option: --mount-crt <Dateiname> (Steckt ein Modulimage in den Expansionport ein.)
+- Neue Kommandozeilen-Option: --umount-crt (Entfernt ein Modulimage aus dem Expansionsport.)
+- Neue Kommandozeilen-Option: -r, --soft-reset (Führt einen Soft Reset durch.)
+- Neue Kommandozeilen-Option: -R, --hard-reset (Führt einen Hard Reset durch.)
+- Neue Kommandozeilen-Option: --warp (Aktiviert den WarpMode. (Maximum C64 Speed / kein Sound))
+- Neue Kommandozeilen-Option: --poke64 <Adresse (0-65535)> <Wert (0-255)> (Schreibt ein Byte an eine C64 Adresse.)
+- Neue Kommandozeilen-Option: --limitcycles <nZyklen> (Beendet den Emulator nach nZyklen mit Exitcode 1.)
+- Neue Kommandozeilen-Option: --exitscreenshot <Dateiname> (Speichert vor dem beenden noch ein Screenshot als png.)
+- Neue Kommandozeilen-Option: --debugcart (Beendet den Emu64 bei einem Schreibzugriff auf $d7ff und gibt den Wert als Exitcode zurück.)
+- Neue Kommandozeilen-Option: --multiple-instance (Ermöglicht das starten mehrerer Emu64 Instanzen.)
+- Neue Kommandozeilen-Option: --reset-ini (Setzt die emu64.ini zurück. (Alle bisherigen Einstellungen gehen verloren!))
+- Neue Kommandozeilen-Option: -?, --help (Ein Hilfe Text wird angezeigt und Emu64 wird nicht gestartet.)
+- Neue Kommandozeilen-Option: --version (Zeigt die aktuelle Emu64 Versionsnummer an.)
+- BUGFIX#xx: Die Logdatei wird nun immer geschrieben, auch bei einem Absturz
+- BUGFIX#90: Emu64 Absturz (Zufällig) wenn kein Disk Image eingelegt war
+- BUGFIX#97: Bei D64 Images wo in der BAM (18/0) ungültige Werte stehen wird für das Directory 18/1 angenommen
+
+5.0.14
+------
+
+- Stereo SID ist nun auch in 5.xxx eingebunden und kann konfiguriert werden
+- Stereo SID - 6 Kanal Modus (Neu) (beide SID's auf beiden Kanälen)
+- Liegt der zweite SID auch auf IO $d400 so wird dieser um 1000 Zyklen verzögert (Pseudo Stereo)
+- Position und Größe wird nun auch beim TapeWindow gespeichert
+- Es können nun wieder eigene ROM Sets (Kernal/Basic/Char/1541-Dos) erstellt werden.
+- Restore NMI (RESTORE TASTE) liegt default auf ENTF 
+- Jeder C64 Taste kann nun intuitiv eine Physikalische Taste zugewiesen werden
+- Es lässt sich nun wieder ein leeres EasyFlash Image erstellen
+- BUGFIX#90: Emu64 sollte nun wieder schneller starten (lange warte Zeit bei "C64 Klasse wird initialisiert")
+- BUGFIX#73: Emu64 lässt sich nun auch unter Windows durch schließen des C64 Screens beenden
+- BUGFIX#53: AltGr + Return geht nun auch unter Windows (Vollbild)
+- BUGFIX#81: EasyFlash LED funktioniert wieder
+
+5.0.13
+------
+
+- FileBrowser für Floppy, Datasette und Steckmodul Fenster überarbeitet
+- Löschen im FileBrowser nun möglich
+- Mit freundlicher Genehmigung von style64.org wird nun für die DiskImage Inahltanzeigen C64_Pro-STYLE.ttf
+  benutzt.
+- Automatisches ausblenden des Mauszeigers über dem C64 Bildschirm.Die Zeit ist einstellbar
+- Die Position und Größe des C64 Bildschirms wird sich beim beenden nun auch gemerkt und beim
+  nächsten Start wieder hergestellt
+- Neue Grafik für das Joystick Mappen, von Selmiak eingefügt
+- Datasetten Funktionalität wurden nun komplett portiert
+- Soundpuffer wurde verdoppelt
+- BUGFIX#47: beim beenden des Setup Fensters wird nun auch ein geöffnetes Joystick Mapping Fenster geschlossen
+- BUGFIX#72: Nach dem starten sollte der C64 Bildschirm nun immer im Vordergrund sein
+- BUGFIX#76: Disksymbol im Floppystatus Fenster funktioniert wieder
+- BUGFIX#78: Dateinamen sollten nun sortiert sein (aktualisieren hilft auch)
+
+5.0.12
+------
+
+- SID Ausgabe Lautstärke kann nun über Einstellungen->Sound eingestellt werden
+- FloppyWindow komplett überarbeitet
+- Kontextmenü im D64 Inhaltsverzeichnis Fenster wieder eingefügt, sowie Autostart per doppelklick
+- Ein leeres D64 Image kann nun wieder erstellt werden
+- PRG Export auch wieder eingebaut
+- CRT einstecken durch Doppelklick
+- Diskwechselsimulation überarbeitet
+- Blindenmodus für D64 Inhaltsverzeichnis
+- verändertes Diskimage wird nun wieder richtig abgespeichert
+- C64 Bildschirm Titeltext wird nun auch übersetz
+
+5.0.11
+------
+
+- Export IEC Bus Signale in eine VCD Datei. Diese Datei kann man sich z.B. mit gtkWave als Signal-Zeit Diagramm anzeigen lassen.
+- Fenster Focus auf C64 Screen nach Autostart / REU / GEO RAM
+- auch beim lernen eines neuen Controllers, wechselt dieser automatisch zum C64 Screen
+- Wechsel zwischen Fenster und Vollbildmodus nun wie üblich mit Alt+Return o. Atl-Gr+Return
+- Verzeichnis der letzten Autostart Datei wird beim beenden gespeichert
+- Maus 1531 Support wieder hinzugefügt
+- Hardreset nun auch im C64 Screen (Shift + ESC)
+- Keine Absturtzmeldung mehr nach dem beenden von Emu64 (Speicherzugriffsverletzung)
+- Sprite Kollision wieder eingebaut
+- Action Replay in Emulation und GUI eingebaut --> Kein Fastload
+- Mappen und benutzen eines Analog Sticks von z.B. eines Gamepad funktioniert nun wieder
+
+5.0.10
+------
+
+- kein win x64 Port mehr
+
+5.0.9
+-----
+
+- Android Port hinzugefügt (kein laden, keine Joysticks und noch sehr Buggy)
+  (3 Demos können mit der Menütaste nacheinander geladen werden)
+- lesen der SID Register 27/28 durch die CPU nun wieder möglich. (Boingmaster braucht das z.B.)
+- Einfacher D64 Autostart über Komandozeile nun möglich
+- VIC XKoordinaten angepasst (Zyklus1 = 0x194)
+- VIC BA Timing geändert
+- VIC Rahmenstufe komplett überarbeitet
+- CIA 1/2 Wartezyklen vor InteruptTrigger wieder entfernt
+- CPU6510 und 6502 IRQ überarbeitet (nach Virtual6502)
+- Hintergrundfarbe B0C wird nun Zyklengenau gezeichnet (ohne Grafiksequenzer verzoegerung)
+- REU Emulation komplett von V4.30 portiert
+- GEORAM Emulation komplett von V4.30 portiert
