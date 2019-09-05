@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.08.2019        		//
+// Letzte Änderung am 05.09.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -32,7 +32,7 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
 
 {
     RESET = reset;
-    GCR_PTR = 0;
+    GCR_PTR = nullptr;
     breakgroup_count = 0;
 
     CycleCounter = 0;
@@ -864,7 +864,7 @@ bool Floppy1541::SyncFound()
 {
     // bool found = false;
 
-    if (AktHalbSpur >= ((NUM_TRACKS-1) * 2)) return false;
+    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr)) return false;
 
     // NEU TEST
     /*
