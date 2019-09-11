@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.08.2019        		//
+// Letzte Änderung am 11.09.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -29,8 +29,13 @@
 #define G64 1
 #define MAX_BREAK_GROUP_NUM 255
 
+#define D64_IMAGE_SIZE 174848
+#define G64_IMAGE_SIZE 665952
+
 #define DISK_CHANGE_STATE_COUNTS 4
 #define DISK_CHANGE_STATE_CYCLES 1000
+
+#define DIRECTORY_TRACK 18
 
 class Floppy1541
 {    
@@ -73,6 +78,8 @@ public:
     int LoadBreakGroups(const char *filename);
     bool SaveBreakGroups(const char *filename);
     bool CheckBreakpoints();
+    bool CheckImageDirectoryWrite();
+    uint8_t *GetCurrentD64ImageBuffer();
 
     /// Wird mit den einzelnen Chips verbunden via "bind" ///
 
@@ -155,15 +162,16 @@ private:
     int                 ImageTyp;
     unsigned char       AktGCRWert;
     static const int	NUM_TRACKS = 42;
-    static const int	GCR_SECTOR_SIZE = 364;  // SYNC Header Gap SYNC Data Gap (should be 5 SYNC bytes each) ///  ALF Sector in Byte
-    static const int	GCR_TRACK_SIZE = 7928;  // Each track in gcr_data has 21 sectors
-    unsigned char       AktHalbSpur;		// Aktuelle Halbspur Nummer (2..70)
-    unsigned char *     GCR_PTR;                // Zeiger auf GCR Daten Unter R/W Kopf
-    unsigned char *     GCRSpurStart;		// Zeiger auf Start der GCR Daten auf Aktuellen Track
-    unsigned char *     GCRSpurEnde;		// Zeiger auf Ende der GCR Daten auf Aktuellen Track
-    bool                ImageWriteStatus;	// Sowie in Image geschrieben wird gehts auf true
-    unsigned char       D64Image[174848];	// Aktuelles D64 Image
-    unsigned char       GCRImage[665952];	// Aktuelles GCR Image
+    static const int	GCR_SECTOR_SIZE = 364;      // SYNC Header Gap SYNC Data Gap (should be 5 SYNC bytes each) ///  ALF Sector in Byte
+    static const int	GCR_TRACK_SIZE = 7928;      // Each track in gcr_data has 21 sectors
+    unsigned char       AktHalbSpur;                // Aktuelle Halbspur Nummer (2..70)
+    unsigned char *     GCR_PTR;                    // Zeiger auf GCR Daten Unter R/W Kopf
+    unsigned char *     GCRSpurStart;               // Zeiger auf Start der GCR Daten auf Aktuellen Track
+    unsigned char *     GCRSpurEnde;                // Zeiger auf Ende der GCR Daten auf Aktuellen Track
+    bool                ImageWriteStatus;           // Sowie in Image geschrieben wird gehts auf true
+    bool                ImageDirectoryWriteStatus;  // Sowie in das Image auf Spur 18 geschrieben wird wird es true
+    unsigned char       D64Image[D64_IMAGE_SIZE];   // Aktuelles D64 Image
+    unsigned char       GCRImage[G64_IMAGE_SIZE];   // Aktuelles GCR Image
     unsigned short      TrackSize[256];
 
     /// Für Floppy Sound ///

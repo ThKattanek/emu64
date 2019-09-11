@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.09.2019        		//
+// Letzte Änderung am 11.09.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -101,7 +101,7 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
     via1->RESET = reset;
     via2->RESET = reset;
 
-    for(int i=0;i<(174848);i++) D64Image[i]=0x00;
+    for(int i=0;i<D64_IMAGE_SIZE;i++) D64Image[i]=0x00;
     D64ImageToGCRImage();
     UnLoadDiskImage();
 
@@ -231,10 +231,10 @@ bool Floppy1541::LoadDiskImage(const char* filename)
             return false;
         }
 
-        for(int i=0;i<(665952);i++) GCRImage[i]=0x00;
+        for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i]=0x00;
 
-        reading_elements = fread (D64Image,1,174848,file);
-        if(reading_elements != 174848)
+        reading_elements = fread (D64Image,1,D64_IMAGE_SIZE,file);
+        if(reading_elements != D64_IMAGE_SIZE)
         {
             fclose(file);
             return false;
@@ -247,6 +247,7 @@ bool Floppy1541::LoadDiskImage(const char* filename)
         GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
 
         ImageWriteStatus = false;
+        ImageDirectoryWriteStatus = false;
         ImageTyp = D64;
 
         SyncFoundCount = 0;
@@ -272,7 +273,7 @@ bool Floppy1541::LoadDiskImage(const char* filename)
             return false;
         }
 
-        for(int i=0;i<(665952);i++) GCRImage[i]=0x00;
+        for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i]=0x00;
 
         reading_elements = fread (kennung,1,8,file);
         kennung[8]=0;
@@ -318,6 +319,7 @@ bool Floppy1541::LoadDiskImage(const char* filename)
         fclose(file);
 
         ImageWriteStatus = false;
+        ImageDirectoryWriteStatus = false;
         ImageTyp = G64;
 
         SyncFoundCount = 0;
@@ -330,8 +332,8 @@ bool Floppy1541::LoadDiskImage(const char* filename)
 void Floppy1541::UnLoadDiskImage()
 {
     CheckImageWrite();
-    for(int i=0;i<174848;i++) D64Image[i] = 0;
-    for(int i=0;i<665952;i++) GCRImage[i] = 0;
+    for(int i=0;i<D64_IMAGE_SIZE;i++) D64Image[i] = 0;
+    for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i] = 0;
     WriteProtect = false;
 }
 
@@ -347,13 +349,13 @@ inline void Floppy1541::CheckImageWrite()
             GCRImageToD64Image();
 
             File = fopen (ImageFileName, "wb");
-            if(File == NULL)
+            if(File == nullptr)
             {
                 //MessageBox(0,"Fehler beim schreiben des Aktuellen Images","Emu64 Fehler",0);
                 return;
             }
 
-            fwrite(D64Image,1,174848,File);
+            fwrite(D64Image,1,D64_IMAGE_SIZE,File);
 
             fclose(File);
             break;
@@ -376,6 +378,7 @@ inline void Floppy1541::D64ImageToGCRImage()
         }
     }
     ImageWriteStatus=false;
+    ImageDirectoryWriteStatus=false;
 }
 
 inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
@@ -916,6 +919,11 @@ void Floppy1541::WriteGCRByte(uint8_t value)
 {
     ImageWriteStatus = true;
 
+    if(AktHalbSpur == (DIRECTORY_TRACK-1) * 2)
+    {
+        ImageDirectoryWriteStatus = true;
+    }
+
     GCR_PTR++;	// Rotate disk
     *GCR_PTR = value;
 
@@ -1278,4 +1286,31 @@ bool Floppy1541::CheckBreakpoints()
         return true;
     }
     else return false;
+}
+
+bool Floppy1541::CheckImageDirectoryWrite()
+{
+//#define CHECK_ONLY_MOTOR_OFF
+
+#ifdef CHECK_ONLY_MOTOR_OFF
+    bool ret = ImageDirectoryWriteStatus;
+
+    if(!DiskMotorOn)
+    {
+        ImageDirectoryWriteStatus = false;
+        return  ret;
+    }
+    return false;
+#else
+    bool ret = ImageDirectoryWriteStatus;
+    ImageDirectoryWriteStatus = false;
+
+    return  ret;
+#endif
+}
+
+uint8_t *Floppy1541::GetCurrentD64ImageBuffer()
+{
+    GCRImageToD64Image();
+    return  D64Image;
 }

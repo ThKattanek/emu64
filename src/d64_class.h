@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019        		//
+// Letzte Änderung am 11.09.2019      		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,6 +19,8 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+
+#define D64_IMAGE_SIZE 174848
 
 using namespace std;
 
@@ -33,9 +35,11 @@ class D64Class
     ~D64Class();
     bool CreateDiskImage(const char* filename, const char* diskname, const char* diskid);
     int LoadD64(const char* filename);
+    void ReLoad(uint8_t* d64_image_buffer);
     void UnLoadD64();
     bool ExportPrg(int file_number, const char* filename);
 
+    char        filename[1024];
     char        d64_name[D64_NAME_LENGHT+1];
     uint16_t    file_count;
     uint32_t    d64_size;
@@ -44,7 +48,8 @@ class D64Class
     private:
     void ReadBlock(uint8_t track, uint8_t sector, uint8_t* buffer);
     void OutputBlock(uint8_t* buffer);
-    unsigned char d64_image[174848];
+    void UpdateImageData();
+    unsigned char d64_image[D64_IMAGE_SIZE];
     unsigned char block[256];
     unsigned char block_tmp[256];
 };

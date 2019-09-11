@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.08.2019                //
+// Letzte Änderung am 11.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -29,6 +29,8 @@ D64Class::~D64Class()
 
 bool D64Class::CreateDiskImage(const char *filename, const char *diskname, const char *diskid)
 {
+    strcpy(this->filename, filename);
+
     // Clear Foramtierter Dir Block
     static uint8_t directory_block[256] ={0x12,0x01,0x41,0x00,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x15,0xFF,0xFF,0x1F,0x11,0xFC,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x13,0xFF,0xFF,0x07,0x12,0xFF,0xFF,0x03,0x12,0xFF,0xFF,0x03,0x12,0xFF,0xFF,0x03,0x12,0xFF,0xFF,0x03,0x12,0xFF,0xFF,0x03,0x12,0xFF,0xFF,0x03,0x11,0xFF,0xFF,0x01,0x11,0xFF,0xFF,0x01,0x11,0xFF,0xFF,0x01,0x11,0xFF,0xFF,0x01,0x11,0xFF,0xFF,0x01,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0xA0,0x32,0x41,0xA0,0xA0,0xA0,0xA0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     uint8_t block[256];
@@ -66,7 +68,8 @@ bool D64Class::CreateDiskImage(const char *filename, const char *diskname, const
 
 int D64Class::LoadD64(const char *filename)
 {
-    uint8_t track, sector;
+    strcpy(this->filename, filename);
+
     FILE* file;
     size_t reading_elements;
 
@@ -76,87 +79,26 @@ int D64Class::LoadD64(const char *filename)
         return 1;
     }
 
-    reading_elements = fread (d64_image,1,174848,file);
+    reading_elements = fread (d64_image,1,D64_IMAGE_SIZE,file);
     fclose(file);
 
-    if(reading_elements != 174848)
+    if(reading_elements != D64_IMAGE_SIZE)
         return 0;
 
-    ReadBlock(18, 0, block);
+    UpdateImageData();
 
-    // OutputBlock(Block);
-
-    track = block[0];
-    sector = block[1];
-
-    // Wenn Spur oder Sektor außerhalb der D64 Spezifikation ist
-    // wird der Standard Ort gesetzt (18/1)
-    if(track > 35) track = 18;
-    if(sector > 21) sector = 1;
-
-    for (int z=0; z<23; z++)
-    {
-        d64_name[z] = static_cast<char>(block[0x90+z]);
-    }
-
-    d64_name[D64_NAME_LENGHT]=0;
-
-    file_count=0;
-
-    if(track != 0)
-    {
-        L20:
-        int si = 0;
-        int bx = 0;
-
-        ReadBlock(track, sector,block);
-
-        if(!((track == block[0]) && (sector == block[1])))
-        {
-            track = block[0];
-            sector = block[1];
-            L30:
-            d64_files[file_count].Typ = block[si+2];
-
-            if(block[si+3] != 0xFF)
-            {
-                d64_files[file_count].Track = block[si+3];
-                d64_files[file_count].Sektor = block[si+4];
-
-                ReadBlock(block[si+3],block[si+4], block_tmp);
-                d64_files[file_count].Adresse = static_cast<uint16_t>(block_tmp[3] << 8);
-                d64_files[file_count].Adresse += block_tmp[2];
-
-                uint16_t tmp;
-                tmp = static_cast<uint16_t>(block[si+31] << 8);
-                tmp += block[si+30];
-                d64_files[file_count].Laenge = tmp;
-
-                d64_files[file_count].Name[16] = 0;
-
-                for (int z=0; z<16; z++)
-                {
-                    d64_files[file_count].Name[z] = static_cast<char>(block[si+5+z]);
-                }
-
-                si += 32;
-                bx++;
-                file_count++;
-
-                d64_size += d64_files[file_count].Laenge;
-
-
-                if (bx<8) goto L30;
-                else goto L20;
-            }
-        }
-    }
     return 0;
+}
+
+void D64Class::ReLoad(uint8_t *d64_image_buffer)
+{
+    memcpy(d64_image, d64_image_buffer, D64_IMAGE_SIZE);
+    UpdateImageData();
 }
 
 void D64Class::UnLoadD64()
 {
-    for(int i=0; i<174848; i++) d64_image[i] = 0;
+    for(int i=0; i<D64_IMAGE_SIZE; i++) d64_image[i] = 0;
     for(int i=0; i<25; i++) d64_name[i] = 0;
     for(int i=0; i<256; i++)
     {
@@ -237,4 +179,79 @@ void D64Class::OutputBlock(uint8_t *buffer)
         printf("\n");
     }
     printf("\n");
+}
+
+void D64Class::UpdateImageData()
+{
+    uint8_t track, sector;
+
+    ReadBlock(18, 0, block);
+
+    // OutputBlock(Block);
+
+    track = block[0];
+    sector = block[1];
+
+    // Wenn Spur oder Sektor außerhalb der D64 Spezifikation ist
+    // wird der Standard Ort gesetzt (18/1)
+    if(track > 35) track = 18;
+    if(sector > 21) sector = 1;
+
+    for (int z=0; z<23; z++)
+    {
+        d64_name[z] = static_cast<char>(block[0x90+z]);
+    }
+
+    d64_name[D64_NAME_LENGHT]=0;
+
+    file_count=0;
+
+    if(track != 0)
+    {
+        L20:
+        int si = 0;
+        int bx = 0;
+
+        ReadBlock(track, sector,block);
+
+        if(!((track == block[0]) && (sector == block[1])))
+        {
+            track = block[0];
+            sector = block[1];
+            L30:
+            d64_files[file_count].Typ = block[si+2];
+
+            if(block[si+3] != 0xFF)
+            {
+                d64_files[file_count].Track = block[si+3];
+                d64_files[file_count].Sektor = block[si+4];
+
+                ReadBlock(block[si+3],block[si+4], block_tmp);
+                d64_files[file_count].Adresse = static_cast<uint16_t>(block_tmp[3] << 8);
+                d64_files[file_count].Adresse += block_tmp[2];
+
+                uint16_t tmp;
+                tmp = static_cast<uint16_t>(block[si+31] << 8);
+                tmp += block[si+30];
+                d64_files[file_count].Laenge = tmp;
+
+                d64_files[file_count].Name[16] = 0;
+
+                for (int z=0; z<16; z++)
+                {
+                    d64_files[file_count].Name[z] = static_cast<char>(block[si+5+z]);
+                }
+
+                si += 32;
+                bx++;
+                file_count++;
+
+                d64_size += d64_files[file_count].Laenge;
+
+
+                if (bx<8) goto L30;
+                else goto L20;
+            }
+        }
+    }
 }

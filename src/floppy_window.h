@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.08.2019                //
+// Letzte Änderung am 11.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -20,6 +20,7 @@
 #include <QMenu>
 #include <QSettings>
 #include <QFontDatabase>
+#include <QTimer>
 
 #include "./d64_class.h"
 #include "./c64_class.h"
@@ -41,6 +42,7 @@ public:
     void LoadIni();
     bool SetDiskImage(uint8_t floppynr, QString filename);
     void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent*);
     QString GetAktFilename(int floppynr);
     QString GetAktD64Name(int floppynr);
     QStringList FileTypes;
@@ -61,6 +63,7 @@ private slots:
     void OnPRGExport(bool);
     void OnPRGNameMMCKompatibel(bool);
     void OnWriteProtectedChanged(bool);
+    void OnCheckWriteDiskImageDir();
 
     void on_FloppySelect_currentIndexChanged(int index);
     void on_ViewSplatFiles_clicked();
@@ -74,6 +77,8 @@ private:
     QString ConvC64Name(const char* name, bool invers = false);
 
     Ui::FloppyWindow *ui;
+    QTimer *refresh_timer_1;    // Timer für Prüfung auf Schreibzugriff auf Image Directory
+
 
     QFont *c64_font;
     QFont *c64_font1;   // NormalSize (18)

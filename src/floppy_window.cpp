@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.08.2019                //
+// Letzte Änderung am 11.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -71,6 +71,12 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QStr
     CompatibleMMCFileName = false;
     ui->D64FileTable->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->D64FileTable, SIGNAL(customContextMenuRequested(QPoint)),SLOT(OnCustomMenuRequested(QPoint)));
+
+    // Timer für
+    refresh_timer_1 = new QTimer(this);
+    refresh_timer_1->setInterval(1000);    // 1000ms also 1x in der Sekunde
+    refresh_timer_1->stop();
+    connect(refresh_timer_1,SIGNAL(timeout()),this,SLOT(OnCheckWriteDiskImageDir()));
 }
 
 FloppyWindow::~FloppyWindow()
@@ -119,6 +125,13 @@ FloppyWindow::~FloppyWindow()
 void FloppyWindow::showEvent(QShowEvent*)
 {
     isOneShowed = true;
+    OnCheckWriteDiskImageDir();
+    refresh_timer_1->start();
+}
+
+void FloppyWindow::hideEvent(QHideEvent *)
+{
+    refresh_timer_1->stop();
 }
 
 void FloppyWindow::LoadIni()
@@ -173,6 +186,7 @@ bool FloppyWindow::SetDiskImage(uint8_t floppynr, QString filename)
     AktDir[floppynr] = fi.absolutePath();
     AktFile[floppynr] = fi.fileName();
     AktFileName[floppynr] = AktDir[floppynr] + "/" + AktFile[floppynr];
+
     d64[floppynr].LoadD64(AktFileName[floppynr].toUtf8());
 
     c64->floppy[floppynr]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktFileName[floppynr]));
@@ -182,6 +196,7 @@ bool FloppyWindow::SetDiskImage(uint8_t floppynr, QString filename)
     ui->FileBrowser->SetAktFile(AktDir[floppynr],AktFile[floppynr]);
 
     RefreshD64FileList();
+    emit ChangeFloppyImage(floppynr);
 
     return true;
 }
@@ -391,6 +406,17 @@ void FloppyWindow::OnPRGNameMMCKompatibel(bool)
 void FloppyWindow::OnWriteProtectedChanged(bool wp_satus)
 {
     c64->SetFloppyWriteProtect(static_cast<uint8_t>(ui->FloppySelect->currentIndex()), wp_satus);
+}
+
+void FloppyWindow::OnCheckWriteDiskImageDir()
+{
+    int floppy_nr = ui->FloppySelect->currentIndex();
+
+    if(c64->floppy[floppy_nr]->CheckImageDirectoryWrite())
+    {
+       d64[ui->FloppySelect->currentIndex()].ReLoad(c64->floppy[floppy_nr]->GetCurrentD64ImageBuffer());
+       RefreshD64FileList();
+    }
 }
 
 QString FloppyWindow::GetAktFilename(int floppynr)
