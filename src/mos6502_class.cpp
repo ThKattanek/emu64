@@ -863,8 +863,8 @@ bool MOS6502::OneZyklus(void)
     //R // TMPByte von Adresse lesen // BIT Operation
     case 76:
         TMPByte = Read(Adresse);
-        SET_SR_NZ(AC & TMPByte);
-        SR = (TMPByte&192)|(SR&63);
+        SET_ZERO(AC & TMPByte);
+        SR = (TMPByte & 0xC0) | (SR & 0x3F);
         break;
     //W // AC nach Adresse schreiben
     case 77:
