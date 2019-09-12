@@ -156,7 +156,7 @@ float *VideoCrtClass::GetC64YUVPalette()
 
 inline void VideoCrtClass::ConvertYUVToRGB()
 {
-    float source = 1.8f;    // PAL
+    float source = 2.8f;    // PAL
     float target = 2.2f;    // sRGB
 
     float _r, _g, _b;
