@@ -156,17 +156,40 @@ float *VideoCrtClass::GetC64YUVPalette()
 
 inline void VideoCrtClass::ConvertYUVToRGB()
 {
+    float source = 1.8f;    // PAL
+    float target = 2.2f;    // sRGB
+
+    float _r, _g, _b;
+
     // from yuv to rgb
     r = static_cast<int16_t>(_y + 0.0f *_u + 1.140f *_v);
     g = static_cast<int16_t>(_y - 0.396f * _u - 0.581f * _v);
     b = static_cast<int16_t>(_y + 2.029f * _u);
 
+
+    // gamma correction
+
+    // MIN = 0
     if(r<0) r=0;
-    if(r>255) r=255;
     if(g<0) g=0;
-    if(g>255) g=255;
     if(b<0) b=0;
+
+    // MAX = 255
+    if(r>255) r=255;
+    if(g>255) g=255;
     if(b>255) b=255;
+
+    _r = powf(255.0f, 1.0f - source) * powf(r, source);
+    _g = powf(255.0f, 1.0f - source) * powf(g, source);
+    _b = powf(255.0f, 1.0f - source) * powf(b, source);
+
+    _r = powf(255.0f, 1.0f - 1.0f/target) * powf(_r, 1.0f/target);
+    _g = powf(255.0f, 1.0f - 1.0f/target) * powf(_g, 1.0f/target);
+    _b = powf(255.0f, 1.0f - 1.0f/target) * powf(_b, 1.0f/target);
+
+    r = static_cast<int16_t>(roundf(_r));
+    g = static_cast<int16_t>(roundf(_g));
+    b = static_cast<int16_t>(roundf(_b));
 }
 
 inline void VideoCrtClass::CreateVicIIColors(void)
@@ -180,12 +203,12 @@ inline void VideoCrtClass::CreateVicIIColors(void)
     for(int i=0;i<16;i++)
     {
         c64_yuv_palette0[i*3+0] = VicColors[i].luminace * brightness;
-        c64_yuv_palette0[i*3+1] = VIC_SATURATION * static_cast<float>(cos((VicColors[i].angel + VIC_PHASE) * (static_cast<float>(MATH_PI) / 180.0f))) * brightness;
-        c64_yuv_palette0[i*3+2] = VIC_SATURATION * sin((VicColors[i].angel + VIC_PHASE) * (static_cast<float>(MATH_PI) / 180.0f)) * brightness;
+        c64_yuv_palette0[i*3+1] = VIC_SATURATION * cosf((VicColors[i].angel + VIC_PHASE) * (static_cast<float>(MATH_PI) / 180.0f)) * brightness;
+        c64_yuv_palette0[i*3+2] = VIC_SATURATION * sinf((VicColors[i].angel + VIC_PHASE) * (static_cast<float>(MATH_PI) / 180.0f)) * brightness;
 
         c64_yuv_palette1[i*3+0] = VicColors[i].luminace * brightness;
-        c64_yuv_palette1[i*3+1] = -(VIC_SATURATION * static_cast<float>(cos((VicColors[i].angel + VIC_PHASE + Offs) * (static_cast<float>(MATH_PI) / 180.0f)))) * brightness;
-        c64_yuv_palette1[i*3+2] = -(VIC_SATURATION * static_cast<float>(sin((VicColors[i].angel + VIC_PHASE + Offs) * (static_cast<float>(MATH_PI) / 180.0f)))) * brightness;
+        c64_yuv_palette1[i*3+1] = -(VIC_SATURATION * cosf((VicColors[i].angel + VIC_PHASE + Offs) * (static_cast<float>(MATH_PI) / 180.0f))) * brightness;
+        c64_yuv_palette1[i*3+2] = -(VIC_SATURATION * sinf((VicColors[i].angel + VIC_PHASE + Offs) * (static_cast<float>(MATH_PI) / 180.0f))) * brightness;
 
         if (VicColors[i].direction == 0.0f)
         {
