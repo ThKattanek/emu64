@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.08.2019                //
+// Letzte Änderung am 12.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -276,7 +276,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
 
     OpenSDLJoystick();
 
-    SetGrafikModi(video_crt_output->StartC64isDoublesize, video_crt_output->StartC64isPalmode, false);
+    SetGrafikModi(video_crt_output->start_c64_is_doublesize, video_crt_output->start_c64_is_palmode, false);
 
     sprintf(filename,"%ssdl_icon.png",gfx_path);
     sdl_window_icon = IMG_Load(filename);

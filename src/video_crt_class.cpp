@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.08.2019                //
+// Letzte Änderung am 12.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -38,7 +38,7 @@
 #define LUMN7   199.0f
 #define LUMN8   256.0f
 
-static VIC_COLOR_STRUCT VicFarben[16] =
+static VIC_COLOR_STRUCT VicColors[16] =
 {
     { LUMN0, ANGLE_ORN, -0},
     { LUMN8, ANGLE_BRN,  0},
@@ -62,12 +62,12 @@ static VIC_COLOR_STRUCT VicFarben[16] =
 
 VideoCrtClass::VideoCrtClass()
 {
-    AktFarbMode = 0;
-    Double2x = false;
-    Kontrast = 0.8;
+    current_color_palette_mumber = 0;
+    is_double2x = false;
+    contrast = 0.8f;
 
-    HoBlurWY = 0;
-    HoBlurWUV = 0;
+    hor_blur_wy = 0;
+    hor_blur_wuv = 0;
 }
 
 VideoCrtClass::~VideoCrtClass(void)
@@ -79,60 +79,60 @@ void VideoCrtClass::UpdateParameter(void)
     CreateVicIIColors();
 }
 
-void VideoCrtClass::SetPhaseAltLineOffset(int offset)
+void VideoCrtClass::SetPhaseAlternatingLineOffset(int offset)
 {
     if(offset < 0) offset = 0;
     if(offset > 2000) offset = 2000;
-    PhaseAlternatingLine = offset;
+    phase_alternating_line = offset;
 }
 
 void VideoCrtClass::SetHorizontalBlurY(int wblur)
 {
     if(wblur > 5) wblur = 5;
-    HoBlurWY = wblur;
-    blur_y_mul = 1.0f/(HoBlurWY);
+    hor_blur_wy = wblur;
+    blur_y_mul = 1.0f/(hor_blur_wy);
 }
 
 void VideoCrtClass::SetHorizontalBlurUV(int wblur)
 {
     if(wblur > 5) wblur = 5;
-    HoBlurWUV = wblur;
-    blur_uv_mul = 1.0f/(HoBlurWUV);
+    hor_blur_wuv = wblur;
+    blur_uv_mul = 1.0f/(hor_blur_wuv);
 }
 
-void VideoCrtClass::SetScanline(int wert)
+void VideoCrtClass::SetScanline(int value)
 {
-    Scanline = wert/100.0f;
+    scanline = value/100.0f;
 }
 
-void VideoCrtClass::SetSaturation(float wert)
+void VideoCrtClass::SetSaturation(float value)
 {
-    Saturation = wert*1.2f;
+    saturation = value*1.2f;
 }
 
-void VideoCrtClass::SetHelligkeit(float wert)
+void VideoCrtClass::SetBrightness(float value)
 {
-    Helligkeit = wert;
+    brightness = value;
 }
 
-void VideoCrtClass::SetKontrast(float wert)
+void VideoCrtClass::SetContrast(float value)
 {
-    Kontrast = wert+0.5f;
+    contrast = value+0.5f;
 }
 
-void VideoCrtClass::SetC64Palette(int palnr)
+void VideoCrtClass::SetC64Palette(uint8_t palnr)
 {
-    AktFarbMode = palnr;
+    current_color_palette_mumber = palnr;
 
     int ij = 0;
     for(int j=0;j<16;j++)
     {
-        uint8_t *color_rgba = (uint8_t*)&c64_colors[palnr*16*4];
+        uint8_t *color_rgba = &c64_colors[palnr*16*4];
 
         for(int i=0;i<16;i++)
         {
             /// Für 32Bit Video Display ///
-            Palette32Bit[ij] = 0xFF000000 | color_rgba[2]<<16 | color_rgba[1]<<8 | color_rgba[0];
+            palette[ij] = 0xFF000000 | static_cast<uint32_t>((color_rgba[2]<<16 | color_rgba[1]<<8 | color_rgba[0]));
             color_rgba+=4;
             ij++;
         }
@@ -141,34 +141,33 @@ void VideoCrtClass::SetC64Palette(int palnr)
 
 void VideoCrtClass::EnableVideoDoubleSize(bool enabled)
 {
-        Double2x = enabled;
+        is_double2x = enabled;
 }
 
 void VideoCrtClass::EnableCrtOutput(bool enabled)
 {
-        enable_crt_output = enabled;
+        is_crt_output = enabled;
 }
 
 float *VideoCrtClass::GetC64YUVPalette()
 {
-    return C64YUVPalette1;
+    return c64_yuv_palette0;
 }
 
-inline void VideoCrtClass::RGB_To_YUV(float rgb[3], float yuv[3])
+inline void VideoCrtClass::ConvertYUVToRGB()
 {
-        yuv[0] = float(0.299*rgb[0]+0.587*rgb[1]+0.114*rgb[2]);  // Y
-        yuv[1] = float(-0.147*rgb[0]-0.289*rgb[1]+0.436*rgb[2]); // U
-        yuv[2] = float(0.615*rgb[0]-0.515*rgb[1]-0.100*rgb[2]);  // V
-}
+    // from yuv to rgb
+    r = static_cast<int16_t>(_y + 0.0f *_u + 1.140f *_v);
+    g = static_cast<int16_t>(_y - 0.396f * _u - 0.581f * _v);
+    b = static_cast<int16_t>(_y + 2.029f * _u);
 
-inline void VideoCrtClass::YUV_To_RGB(float yuv[3], float rgb[3])
-{
-        rgb[0] = float(yuv[0]+0.000*yuv[1]+1.140*yuv[2]); // Rot
-        rgb[1] = float(yuv[0]-0.396*yuv[1]-0.581*yuv[2]); // Grün
-        rgb[2] = float(yuv[0]+2.029*yuv[1]+0.000*yuv[2]); // Blau
+    if(r<0) r=0;
+    if(r>255) r=255;
+    if(g<0) g=0;
+    if(g>255) g=255;
+    if(b<0) b=0;
+    if(b>255) b=255;
 }
-
-const float PI = 3.14159265358979323846264338327950288419716939937510;
 
 inline void VideoCrtClass::CreateVicIIColors(void)
 {
@@ -176,31 +175,31 @@ inline void VideoCrtClass::CreateVicIIColors(void)
         COLOR_STRUCT ColorIn;
 
         /// Für Phase Alternating Line
-        float Offs=(((float)(PhaseAlternatingLine)) / (2000.0f / 90.0f))+(180.0f-45.0f);
+        float Offs=((phase_alternating_line) / (2000.0f / 90.0f))+(180.0f-45.0f);
 
         for(int i=0;i<16;i++)
         {
-                C64YUVPalette1[i*3+0] = VicFarben[i].Luminace * Helligkeit;
-                C64YUVPalette1[i*3+1] = (float)(VIC_SATURATION * cos((VicFarben[i].Angel + VIC_PHASE) * (MATH_PI / 180.0))) * Helligkeit;
-                C64YUVPalette1[i*3+2] = (float)(VIC_SATURATION * sin((VicFarben[i].Angel + VIC_PHASE) * (MATH_PI / 180.0))) * Helligkeit;
+                c64_yuv_palette0[i*3+0] = VicColors[i].luminace * brightness;
+                c64_yuv_palette0[i*3+1] = VIC_SATURATION * static_cast<float>(cos((VicColors[i].angel + VIC_PHASE) * (static_cast<float>(MATH_PI) / 180.0f))) * brightness;
+                c64_yuv_palette0[i*3+2] = VIC_SATURATION * sin((VicColors[i].angel + VIC_PHASE) * (static_cast<float>(MATH_PI) / 180.0f)) * brightness;
 
-                C64YUVPalette2[i*3+0] = VicFarben[i].Luminace * Helligkeit;
-                C64YUVPalette2[i*3+1] = -(float)(VIC_SATURATION * cos((VicFarben[i].Angel + VIC_PHASE + Offs) * (MATH_PI / 180.0))) * Helligkeit;
-                C64YUVPalette2[i*3+2] = -(float)(VIC_SATURATION * sin((VicFarben[i].Angel + VIC_PHASE + Offs) * (MATH_PI / 180.0))) * Helligkeit;
+                c64_yuv_palette1[i*3+0] = VicColors[i].luminace * brightness;
+                c64_yuv_palette1[i*3+1] = -(VIC_SATURATION * static_cast<float>(cos((VicColors[i].angel + VIC_PHASE + Offs) * (static_cast<float>(MATH_PI) / 180.0f)))) * brightness;
+                c64_yuv_palette1[i*3+2] = -(VIC_SATURATION * static_cast<float>(sin((VicColors[i].angel + VIC_PHASE + Offs) * (static_cast<float>(MATH_PI) / 180.0f)))) * brightness;
 
-                if (VicFarben[i].Direction == 0)
+                if (VicColors[i].direction == 0.0f)
                 {
-                        C64YUVPalette1[i*3+1] = 0.0f;
-                        C64YUVPalette1[i*3+2] = 0.0f;
-                        C64YUVPalette2[i*3+1] = 0.0f;
-                        C64YUVPalette2[i*3+2] = 0.0f;
+                        c64_yuv_palette0[i*3+1] = 0.0f;
+                        c64_yuv_palette0[i*3+2] = 0.0f;
+                        c64_yuv_palette1[i*3+1] = 0.0f;
+                        c64_yuv_palette1[i*3+2] = 0.0f;
                 }
-                if (VicFarben[i].Direction < 0)
+                if (VicColors[i].direction < 0)
                 {
-                        C64YUVPalette1[i*3+1] = -C64YUVPalette1[i*3+1];
-                        C64YUVPalette1[i*3+2] = -C64YUVPalette1[i*3+2];
-                        C64YUVPalette2[i*3+1] = -C64YUVPalette2[i*3+1];
-                        C64YUVPalette2[i*3+2] = -C64YUVPalette2[i*3+2];
+                        c64_yuv_palette0[i*3+1] = -c64_yuv_palette0[i*3+1];
+                        c64_yuv_palette0[i*3+2] = -c64_yuv_palette0[i*3+2];
+                        c64_yuv_palette1[i*3+1] = -c64_yuv_palette1[i*3+1];
+                        c64_yuv_palette1[i*3+2] = -c64_yuv_palette1[i*3+2];
                 }
         }
 
@@ -211,152 +210,117 @@ inline void VideoCrtClass::CreateVicIIColors(void)
                                 for(x[3]=0;x[3]<16;x[3]++)
                                         {
                                                 /// Tabelle 0 für Gerade Zeile
-                                                _y = C64YUVPalette1[x[0]*3];
-                                                _u = C64YUVPalette1[x[0]*3+1];
-                                                _v = C64YUVPalette1[x[0]*3+2];
+                                                _y = c64_yuv_palette0[x[0]*3];
+                                                _u = c64_yuv_palette0[x[0]*3+1];
+                                                _v = c64_yuv_palette0[x[0]*3+2];
 
                                                 // UV BLUR
-                                                for(int i=1; i<HoBlurWUV ; i++)
+                                                for(int i=1; i<hor_blur_wuv ; i++)
                                                 {
-                                                        _u += C64YUVPalette1[x[i]*3+1];
-                                                        _v += C64YUVPalette1[x[i]*3+2];
+                                                        _u += c64_yuv_palette0[x[i]*3+1];
+                                                        _v += c64_yuv_palette0[x[i]*3+2];
                                                 }
-                                                _u /= HoBlurWUV;
-                                                _v /= HoBlurWUV;
+                                                _u /= hor_blur_wuv;
+                                                _v /= hor_blur_wuv;
 
                                                 // Y BLUR
                                                 float HoBlurWYIntension = 0.75f;
-                                                if(HoBlurWY > 1)
+                                                if(hor_blur_wy > 1)
                                                 {
                                                     _y *= HoBlurWYIntension;
-                                                    float intension_add = (1.0f - HoBlurWYIntension) / (HoBlurWY-1);
-                                                    for(int i=1; i<HoBlurWY ; i++)
+                                                    float intension_add = (1.0f - HoBlurWYIntension) / (hor_blur_wy-1);
+                                                    for(int i=1; i<hor_blur_wy ; i++)
                                                     {
-                                                         _y += C64YUVPalette1[x[i]*3] * i * intension_add;
+                                                         _y += c64_yuv_palette0[x[i]*3] * i * intension_add;
                                                     }
                                                 }
 
-                                                r = (short)(_y+0.000*_u+1.140*_v);
-                                                g = (short)(_y-0.396*_u-0.581*_v);
-                                                b = (short)(_y+2.029*_u+0.000*_v);
+                                                ConvertYUVToRGB();
 
-                                                if(r < 0) r=0;
-                                                if(r > 255) r=255;
-                                                if(g < 0) g=0;
-                                                if(g > 255) g=255;
-                                                if(b < 0) b=0;
-                                                if(b > 255) b=255;
-
-                                                ColorIn = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
-                                                ChangeSaturation(&ColorIn,&ColorOut,Saturation);
+                                                ColorIn = COLOR_STRUCT(r, g, b, 0.0f);
+                                                ChangeSaturation(&ColorIn,&ColorOut,saturation);
 
                                                 ColorIn = ColorOut;
-                                                ChangeContrast(&ColorIn, &ColorOut,Kontrast);
+                                                ChangeContrast(&ColorIn, &ColorOut,contrast);
 
-                                                RGB =  (unsigned long)ColorOut.r;       // Rot
-                                                RGB |= (unsigned long)ColorOut.g<<8;    // Grün
-                                                RGB |= (unsigned long)ColorOut.b<<16;   // Blau
+                                                rgb =  static_cast<uint32_t>(ColorOut.r);       // Rot
+                                                rgb |= static_cast<uint32_t>(ColorOut.g)<<8;    // Grün
+                                                rgb |= static_cast<uint32_t>(ColorOut.b)<<16;   // Blau
 
-                                                BlurTable0[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
+                                                BlurTable0[x[0]][x[1]][x[2]][x[3]] = rgb | 0xFF000000;
 
                                                 /// Tabelle 1 für Gerade Zeile
-                                                _y *= Scanline;
-                                                r = (short)(_y+0.000*_u+1.140*_v);
-                                                g = (short)(_y-0.396*_u-0.581*_v);
-                                                b = (short)(_y+2.029*_u+0.000*_v);
+                                                _y *= scanline;
 
-                                                if(r < 0) r=0;
-                                                if(r > 255) r=255;
-                                                if(g < 0) g=0;
-                                                if(g > 255) g=255;
-                                                if(b < 0) b=0;
-                                                if(b > 255) b=255;
+                                                ConvertYUVToRGB();
 
-                                                ColorIn = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
-                                                ChangeSaturation(&ColorIn,&ColorOut,Saturation);
+                                                ColorIn = COLOR_STRUCT(r, g, b, 0.0f);
+                                                ChangeSaturation(&ColorIn,&ColorOut,saturation);
 
                                                 ColorIn = ColorOut;
-                                                ChangeContrast(&ColorIn, &ColorOut,Kontrast);
+                                                ChangeContrast(&ColorIn, &ColorOut,contrast);
 
 
-                                                RGB =  (unsigned long)ColorOut.r;       // Rot
-                                                RGB |= (unsigned long)ColorOut.g<<8;    // Grün
-                                                RGB |= (unsigned long)ColorOut.b<<16;   // Blau
+                                                rgb =  static_cast<uint32_t>(ColorOut.r);       // Rot
+                                                rgb |= static_cast<uint32_t>(ColorOut.g)<<8;    // Grün
+                                                rgb |= static_cast<uint32_t>(ColorOut.b)<<16;   // Blau
 
-                                                BlurTable0S[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
+                                                BlurTable0S[x[0]][x[1]][x[2]][x[3]] = rgb | 0xFF000000;
 
                                                 /// Tabelle 1 für Ungerade Zeilen
-                                                _y = C64YUVPalette2[x[0]*3];
-                                                _u = C64YUVPalette2[x[0]*3+1];
-                                                _v = C64YUVPalette2[x[0]*3+2];
+                                                _y = c64_yuv_palette1[x[0]*3];
+                                                _u = c64_yuv_palette1[x[0]*3+1];
+                                                _v = c64_yuv_palette1[x[0]*3+2];
 
                                                 // UV BLUR
-                                                for(int i=1; i<HoBlurWUV ; i++)
+                                                for(int i=1; i<hor_blur_wuv ; i++)
                                                 {
-                                                        _u += C64YUVPalette2[x[i]*3+1];
-                                                        _v += C64YUVPalette2[x[i]*3+2];
+                                                        _u += c64_yuv_palette1[x[i]*3+1];
+                                                        _v += c64_yuv_palette1[x[i]*3+2];
                                                 }
-                                                _u /= HoBlurWUV;
-                                                _v /= HoBlurWUV;
+                                                _u /= hor_blur_wuv;
+                                                _v /= hor_blur_wuv;
 
                                                 // Y BLUR
-                                                if(HoBlurWY > 1)
+                                                if(hor_blur_wy > 1)
                                                 {
                                                     _y *= HoBlurWYIntension;
-                                                    float intension_add = (1.0f - HoBlurWYIntension) / (HoBlurWY-1);
-                                                    for(int i=1; i<HoBlurWY ; i++)
+                                                    float intension_add = (1.0f - HoBlurWYIntension) / (hor_blur_wy-1);
+                                                    for(int i=1; i<hor_blur_wy ; i++)
                                                     {
-                                                         _y += C64YUVPalette1[x[i]*3] * i * intension_add;
+                                                         _y += c64_yuv_palette0[x[i]*3] * i * intension_add;
                                                     }
                                                 }
 
-                                                r = (short)(_y+0.000*_u+1.140*_v);
-                                                g = (short)(_y-0.396*_u-0.581*_v);
-                                                b = (short)(_y+2.029*_u+0.000*_v);
+                                                ConvertYUVToRGB();
 
-                                                if(r < 0) r=0;
-                                                if(r > 255) r=255;
-                                                if(g < 0) g=0;
-                                                if(g > 255) g=255;
-                                                if(b < 0) b=0;
-                                                if(b > 255) b=255;
-
-                                                ColorIn = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
-                                                ChangeSaturation(&ColorIn,&ColorOut,Saturation);
+                                                ColorIn = COLOR_STRUCT(r, g, b, 0.0f);
+                                                ChangeSaturation(&ColorIn,&ColorOut,saturation);
 
                                                 ColorIn = ColorOut;
-                                                ChangeContrast(&ColorIn, &ColorOut,Kontrast);
+                                                ChangeContrast(&ColorIn, &ColorOut,contrast);
 
-                                                RGB =  (unsigned long)ColorOut.r;       // Rot
-                                                RGB |= (unsigned long)ColorOut.g<<8;    // Grün
-                                                RGB |= (unsigned long)ColorOut.b<<16;   // Blau
+                                                rgb =  static_cast<uint32_t>(ColorOut.r);       // Rot
+                                                rgb |= static_cast<uint32_t>(ColorOut.g)<<8;    // Grün
+                                                rgb |= static_cast<uint32_t>(ColorOut.b)<<16;   // Blau
 
-                                                BlurTable1[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
+                                                BlurTable1[x[0]][x[1]][x[2]][x[3]] = rgb | 0xFF000000;
 
-                                                _y *= Scanline;
+                                                _y *= scanline;
 
-                                                r = (short)(_y+0.000*_u+1.140*_v);
-                                                g = (short)(_y-0.396*_u-0.581*_v);
-                                                b = (short)(_y+2.029*_u+0.000*_v);
+                                                ConvertYUVToRGB();
 
-                                                if(r < 0) r=0;
-                                                if(r > 255) r=255;
-                                                if(g < 0) g=0;
-                                                if(g > 255) g=255;
-                                                if(b < 0) b=0;
-                                                if(b > 255) b=255;
-
-                                                ColorIn = COLOR_STRUCT((float)r,(float)g,(float)b,.0f);
-                                                ChangeSaturation(&ColorIn,&ColorOut,Saturation);
+                                                ColorIn = COLOR_STRUCT(r, g, b, 0.0f);
+                                                ChangeSaturation(&ColorIn,&ColorOut,saturation);
 
                                                 ColorIn = ColorOut;
-                                                ChangeContrast(&ColorIn, &ColorOut,Kontrast);
+                                                ChangeContrast(&ColorIn, &ColorOut,contrast);
 
-                                                RGB =  (unsigned long)ColorOut.r;       // Rot
-                                                RGB |= (unsigned long)ColorOut.g<<8;    // Grün
-                                                RGB |= (unsigned long)ColorOut.b<<16;   // Blau
+                                                rgb = static_cast<uint32_t>(ColorOut.r);       // Rot
+                                                rgb |= static_cast<uint32_t>(ColorOut.g)<<8;    // Grün
+                                                rgb |= static_cast<uint32_t>(ColorOut.b)<<16;   // Blau
 
-                                                BlurTable1S[x[0]][x[1]][x[2]][x[3]] = RGB | 0xFF000000;
+                                                BlurTable1S[x[0]][x[1]][x[2]][x[3]] = rgb | 0xFF000000;
 
                                         }
 }
@@ -364,85 +328,85 @@ inline void VideoCrtClass::CreateVicIIColors(void)
 void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOutPuffer,int VICOutPufferOffset,int OutXW,int OutYW,int InXW,int,bool)
 {
     static uint8_t w0,w1,w2,w3;
-    VideoSource8 = (uint8_t*)VICOutPuffer;
-    VideoSource8 += VICOutPufferOffset;
+    video_source = VICOutPuffer;
+    video_source += VICOutPufferOffset;
 
-    if(enable_crt_output)
+    if(is_crt_output)
     {
-        if(Double2x)
+        if(is_double2x)
         {
             for(int y=0;y<(OutYW/2);y++)
             {
-                Outpuffer32 = ((uint32_t*)Outpuffer + ((y*2)*Pitch/4));
-                Outpuffer32Scanline = ((uint32_t*)Outpuffer + (((y*2)+1)*(Pitch/4)));
+                out_buffer = (static_cast<uint32_t*>(Outpuffer) + ((y*2)*Pitch/4));
+                out_buffer_scanline = (static_cast<uint32_t*>(Outpuffer) + (((y*2)+1)*(Pitch/4)));
 
-                w0 = w1 = w2 = w3 = *VideoSource8 & 0x0F;
+                w0 = w1 = w2 = w3 = *video_source & 0x0F;
 
                 switch(y&1)
                 {
                 case 0:
                     for(int x=0;x<(OutXW/2);x++)
                     {
-                        *(Outpuffer32++) = BlurTable0[w0][w1][w2][w3];
-                        *(Outpuffer32++) = BlurTable0[w0][w1][w2][w3];
-                        *(Outpuffer32Scanline++) = BlurTable0S[w0][w1][w2][w3];
-                        *(Outpuffer32Scanline++) = BlurTable0S[w0][w1][w2][w3];
+                        *(out_buffer++) = BlurTable0[w0][w1][w2][w3];
+                        *(out_buffer++) = BlurTable0[w0][w1][w2][w3];
+                        *(out_buffer_scanline++) = BlurTable0S[w0][w1][w2][w3];
+                        *(out_buffer_scanline++) = BlurTable0S[w0][w1][w2][w3];
                         w3 = w2;
                         w2 = w1;
                         w1 = w0;
-                        w0 = *(VideoSource8+x+1) & 0x0F;
+                        w0 = *(video_source+x+1) & 0x0F;
                     }
                     break;
                 case 1:
                     for(int x=0;x<(OutXW/2);x++)
                     {
-                        *(Outpuffer32++) = BlurTable1[w0][w1][w2][w3];
-                        *(Outpuffer32++) = BlurTable1[w0][w1][w2][w3];
-                        *(Outpuffer32Scanline++) = BlurTable1S[w0][w1][w2][w3];
-                        *(Outpuffer32Scanline++) = BlurTable1S[w0][w1][w2][w3];
+                        *(out_buffer++) = BlurTable1[w0][w1][w2][w3];
+                        *(out_buffer++) = BlurTable1[w0][w1][w2][w3];
+                        *(out_buffer_scanline++) = BlurTable1S[w0][w1][w2][w3];
+                        *(out_buffer_scanline++) = BlurTable1S[w0][w1][w2][w3];
                         w3 = w2;
                         w2 = w1;
                         w1 = w0;
-                        w0 = *(VideoSource8+x+1) & 0x0F;
+                        w0 = *(video_source+x+1) & 0x0F;
                     }
                     break;
                 }
-                VideoSource8 = VideoSource8+InXW;
+                video_source = video_source+InXW;
             }
         }
         else
         { 
             for(int y=0;y<OutYW;y++)
             {
-                Outpuffer32 = ((uint32_t*)Outpuffer + ((y)*Pitch/4));
-                Outpuffer32Scanline = ((uint32_t*)Outpuffer + (((y*2)+1)*(Pitch/4)));
+                out_buffer = (static_cast<uint32_t*>(Outpuffer) + ((y)*Pitch/4));
+                out_buffer_scanline = (static_cast<uint32_t*>(Outpuffer) + (((y*2)+1)*(Pitch/4)));
 
-                w0 = w1 = w2 = w3 = *VideoSource8 & 0x0F;
+                w0 = w1 = w2 = w3 = *video_source & 0x0F;
 
                 switch(y&1)
                 {
                 case 0:
                     for(int x=0;x<(OutXW);x++)
                     {
-                            *(Outpuffer32++) = BlurTable0[w0][w1][w2][w3];
+                            *(out_buffer++) = BlurTable0[w0][w1][w2][w3];
                             w3 = w2;
                             w2 = w1;
                             w1 = w0;
-                            w0 = *(VideoSource8+x+1) & 0x0F;
+                            w0 = *(video_source+x+1) & 0x0F;
                     }
                     break;
                 case 1:
                     for(int x=0;x<(OutXW);x++)
                     {
-                            *(Outpuffer32++) = BlurTable1[w0][w1][w2][w3];
+                            *(out_buffer++) = BlurTable1[w0][w1][w2][w3];
                             w3 = w2;
                             w2 = w1;
                             w1 = w0;
-                            w0 = *(VideoSource8+x+1) & 0x0F;
+                            w0 = *(video_source+x+1) & 0x0F;
                     }
                     break;
                 }
-                VideoSource8 = VideoSource8+InXW;
+                video_source = video_source+InXW;
 
             }
         }
@@ -450,46 +414,46 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
     //////////////////////////////////////////////////////////////////////////
     ///////////////////// AUSGABE ÜBER NORMALE FARBPALETTE ///////////////////
     else
-    if(Double2x)
+    if(is_double2x)
     {
         for(int y=0;y<(OutYW/2);y++)
         {
-            Outpuffer32 = ((uint32_t*)Outpuffer + ((y*2)*Pitch/4));
-            Outpuffer32Scanline = ((uint32_t*)Outpuffer + (((y*2)+1)*(Pitch/4)));
+            out_buffer = (static_cast<uint32_t*>(Outpuffer) + ((y*2)*Pitch/4));
+            out_buffer_scanline = (static_cast<uint32_t*>(Outpuffer) + (((y*2)+1)*(Pitch/4)));
             for(int x=0;x<(OutXW/2);x++)
             {
-                *(Outpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
-                *(Outpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
-                *(Outpuffer32Scanline++) = Palette32Bit[VideoSource8[x] & 0x0F];
-                *(Outpuffer32Scanline++) = Palette32Bit[VideoSource8[x] & 0x0F];
+                *(out_buffer++) = palette[video_source[x] & 0x0F];
+                *(out_buffer++) = palette[video_source[x] & 0x0F];
+                *(out_buffer_scanline++) = palette[video_source[x] & 0x0F];
+                *(out_buffer_scanline++) = palette[video_source[x] & 0x0F];
             }
-            VideoSource8 = VideoSource8+InXW;
+            video_source = video_source+InXW;
         }
     }
     else
     {
         for(int y=0;y<(OutYW);y++)
         {
-            Outpuffer32 = ((uint32_t*)Outpuffer + ((y)*Pitch/4));
+            out_buffer = (static_cast<uint32_t*>(Outpuffer) + ((y)*Pitch/4));
             for(int x=0;x<(OutXW);x++)
             {
-                *(Outpuffer32++) = Palette32Bit[VideoSource8[x] & 0x0F];
+                *(out_buffer++) = palette[video_source[x] & 0x0F];
             }
-            VideoSource8 = VideoSource8+InXW;
+            video_source = video_source+InXW;
         }
     }
 }
 
-void VideoCrtClass::ChangeSaturation(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float wert)
+void VideoCrtClass::ChangeSaturation(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float value)
 {
     float R = col_in->r;
     float G = col_in->g;
     float B = col_in->b;
 
     float grey = R * 0.2125f + G * 0.7154f + B * 0.0721f;
-    col_out->r = grey + wert * (R - grey);
-    col_out->g = grey + wert * (G - grey);
-    col_out->b = grey + wert * (B - grey);
+    col_out->r = grey + value * (R - grey);
+    col_out->g = grey + value * (G - grey);
+    col_out->b = grey + value * (B - grey);
 
     if(col_out->r > 255.0f) col_out->r = 255.0f;
     else if(col_out->r < 0.0f) col_out->r = 0.0f;
@@ -501,15 +465,15 @@ void VideoCrtClass::ChangeSaturation(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out
     else if(col_out->b < 0.0f) col_out->b = 0.0f;
 }
 
-void VideoCrtClass::ChangeContrast(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float wert)
+void VideoCrtClass::ChangeContrast(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float value)
 {
     float R = col_in->r;
     float G = col_in->g;
     float B = col_in->b;
 
-    col_out->r = 0.5f + wert * (R - 0.5f);
-    col_out->g = 0.5f + wert * (G - 0.5f);
-    col_out->b = 0.5f + wert * (B - 0.5f);
+    col_out->r = 0.5f + value * (R - 0.5f);
+    col_out->g = 0.5f + value * (G - 0.5f);
+    col_out->b = 0.5f + value * (B - 0.5f);
 
     if(col_out->r > 255.0f) col_out->r = 255.0f;
     else if(col_out->r < 0.0f) col_out->r = 0.0f;

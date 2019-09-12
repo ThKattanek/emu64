@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.08.2019                //
+// Letzte Änderung am 12.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -30,7 +30,7 @@ VideoCrtSetupWindow::VideoCrtSetupWindow(QWidget *parent, C64Class *c64, VideoCr
     no_video_crt_parameter_updates = true;
 
     ////////// Load from INI ///////////
-    if(ini != 0)
+    if(ini != nullptr)
     {   
         int value;
         ini->beginGroup("TVSetupWindow");
@@ -80,7 +80,7 @@ VideoCrtSetupWindow::VideoCrtSetupWindow(QWidget *parent, C64Class *c64, VideoCr
 VideoCrtSetupWindow::~VideoCrtSetupWindow()
 {
     ///////// Save to INI /////////
-    if(ini != 0)
+    if(ini != nullptr)
     {
         ini->beginGroup("TVSetupWindow");
         if(isOneShowed) ini->setValue("Geometry",geometry());
@@ -112,21 +112,21 @@ void VideoCrtSetupWindow::RetranslateUi()
 void VideoCrtSetupWindow::on_saettigung_scroll_valueChanged(int value)
 {
     ui->saettigung_out->setText(QVariant(value).toString());
-    video_crt_output->SetSaturation((float)value/100.0f);
+    video_crt_output->SetSaturation(static_cast<float>(value)/100.0f);
     if(!no_video_crt_parameter_updates) video_crt_output->UpdateParameter();
 }
 
 void VideoCrtSetupWindow::on_helligkeit_scroll_valueChanged(int value)
 {
     ui->helligkeit_out->setText(QVariant(value).toString());
-    video_crt_output->SetHelligkeit((value+50)/100.0f);
+    video_crt_output->SetBrightness((value+50)/100.0f);
     if(!no_video_crt_parameter_updates) video_crt_output->UpdateParameter();
 }
 
 void VideoCrtSetupWindow::on_kontrast_scroll_valueChanged(int value)
 {
     ui->kontrast_out->setText(QVariant(value).toString());
-    video_crt_output->SetKontrast((float)value/100.0f);
+    video_crt_output->SetContrast(static_cast<float>(value)/100.0f);
    if(!no_video_crt_parameter_updates) video_crt_output->UpdateParameter();
 }
 
@@ -148,7 +148,7 @@ void VideoCrtSetupWindow::on_phase_scroll_valueChanged(int value)
 {
     float winkel = (value - 1000) * 0.045f;
     ui->phase_out->setText(QVariant(winkel).toString() + tr("°"));
-    video_crt_output->SetPhaseAltLineOffset(value);
+    video_crt_output->SetPhaseAlternatingLineOffset(value);
     if(!no_video_crt_parameter_updates) video_crt_output->UpdateParameter();
 }
 
