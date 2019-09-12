@@ -927,7 +927,8 @@ void Floppy1541::WriteGCRByte(uint8_t value)
     GCR_PTR++;	// Rotate disk
     *GCR_PTR = value;
 
-    if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
+
+    if (GCR_PTR >= GCRSpurEnde) GCR_PTR = GCRSpurStart;
 }
 
 void Floppy1541::SpurInc()
@@ -945,9 +946,21 @@ void Floppy1541::SpurInc()
 
 void Floppy1541::SpurDec()
 {
+    static uint8_t stepper_bump = 0;
+
     if (AktHalbSpur  == 0)
     {
-        StepperAnschlag = true;
+        GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
+        GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
+
+        if(stepper_bump != 2)
+            stepper_bump++;
+        else
+        {
+            stepper_bump = 0;
+            StepperAnschlag = true;
+        }
+
         return;
     }
 
