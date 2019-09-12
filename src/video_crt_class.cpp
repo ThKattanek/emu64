@@ -19,43 +19,36 @@
 
 #include <iostream>
 
-#define VIC_SATURATION	48.0f		//48.0f
-#define VIC_PHASE	-4.5f
+/*
+mc[ 0x6 ] = mc[ 0x9 ] =  8;                   // Blue,    Brown
+mc[ 0xb ] = mc[ 0x2 ] = 10;                   // Dk.Grey, Red
+mc[ 0x4 ] = mc[ 0x8 ] = 12;                   // Purple,  Orange
+mc[ 0xc ] = mc[ 0xe ] = 15;                   // Md.Grey, Lt.Blue
+mc[ 0x5 ] = mc[ 0xa ] = 16;                   // Green,   Lt.Red
+mc[ 0xf ] = mc[ 0x3 ] = 20;                   // Lt.Grey, Cyan
+mc[ 0x7 ] = mc[ 0xd ] = 24;                   // Yellow,  Lt.Green
+mc[ 0x1 ]             = 32;                   // White
+*/
 
-#define ANGLE_RED   112.5f
-#define ANGLE_GRN   -135.0f
-#define ANGLE_BLU   0.0f
-#define ANGLE_ORN   -45.0f
-#define ANGLE_BRN   157.5f
-
-#define LUMN0     0.0f
-#define LUMN1    56.0f
-#define LUMN2    74.0f
-#define LUMN3    92.0f
-#define LUMN4   117.0f
-#define LUMN5   128.0f
-#define LUMN6   163.0f
-#define LUMN7   199.0f
-#define LUMN8   256.0f
-
-static VIC_COLOR_STRUCT VicColors[16] =
+static float COLOR_LEVEL[16] =
 {
-    { LUMN0, ANGLE_ORN, -0},
-    { LUMN8, ANGLE_BRN,  0},
-    { LUMN2, ANGLE_RED,  1},
-    { LUMN6, ANGLE_RED, -1},
-    { LUMN3, ANGLE_GRN, -1},
-    { LUMN5, ANGLE_GRN,  1},
-    { LUMN1, ANGLE_BLU,  1},
-    { LUMN7, ANGLE_BLU, -1},
-    { LUMN3, ANGLE_ORN, -1},
-    { LUMN1, ANGLE_BRN,  1},
-    { LUMN5, ANGLE_RED,  1},
-    { LUMN2, ANGLE_RED, -0},
-    { LUMN4, ANGLE_GRN, -0},
-    { LUMN7, ANGLE_GRN,  1},
-    { LUMN4, ANGLE_BLU,  1},
-    { LUMN6, ANGLE_BLU, -0}
+    0,32,10,20,12,16,8,24,12,8,16,10,15,24,15,20
+};
+
+/*
+angles[ 0x4 ]                 = 2;                // Purple
+angles[ 0x2 ] = angles[ 0xa ] = 4;                // Red
+angles[ 0x8 ]                 = 5;                // Orange
+angles[ 0x9 ]                 = 6;                // Brown
+angles[ 0x7 ]                 = 7;                // Yellow
+angles[ 0x5 ] = angles[ 0xd ] = 2 + 8;            // Green
+angles[ 0x3 ]                 = 4 + 8;            // Cyan
+angles[ 0x6 ] = angles[ 0xe ] = 7 + 8;            // Blue
+*/
+
+static float COLOR_ANGLES[16] =
+{
+    0, 0, 4, 4+8, 2, 2+8, 7+8, 7, 5, 6, 4, 0, 0, 2+8, 7+8, 0
 };
 
 #define MATH_PI	3.141592653589793238462643383279
@@ -68,6 +61,11 @@ VideoCrtClass::VideoCrtClass()
 
     hor_blur_wy = 0;
     hor_blur_wuv = 0;
+
+    sector = 360.0f/16.0f;
+    origin = sector/2.0f;
+    radian = static_cast<float>(MATH_PI)/180.0f;
+    screen = 1.0f/5.0f;
 }
 
 VideoCrtClass::~VideoCrtClass(void)
@@ -107,17 +105,19 @@ void VideoCrtClass::SetScanline(int value)
 
 void VideoCrtClass::SetSaturation(float value)
 {
-    saturation = value*1.2f;
+    saturation = value * 100.0f;
+    saturation *=   1.0f - screen;
 }
 
 void VideoCrtClass::SetBrightness(float value)
 {
-    brightness = value;
+    brightness = (value * 100.f) - 50.f;
+    brightness *= 2.0f;
 }
 
 void VideoCrtClass::SetContrast(float value)
 {
-    contrast = value+0.5f;
+    contrast = value * 2.0f;
 }
 
 void VideoCrtClass::SetC64Palette(uint8_t palnr)
@@ -154,7 +154,7 @@ float *VideoCrtClass::GetC64YUVPalette()
     return c64_yuv_palette0;
 }
 
-inline void VideoCrtClass::ConvertYUVToRGB()
+inline void VideoCrtClass::ConvertYUVToRGB(COLOR_STRUCT *color_out)
 {
     float source = 2.8f;    // PAL
     float target = 2.2f;    // sRGB
@@ -165,7 +165,6 @@ inline void VideoCrtClass::ConvertYUVToRGB()
     r = static_cast<int16_t>(_y + 0.0f *_u + 1.140f *_v);
     g = static_cast<int16_t>(_y - 0.396f * _u - 0.581f * _v);
     b = static_cast<int16_t>(_y + 2.029f * _u);
-
 
     // gamma correction
 
@@ -190,40 +189,47 @@ inline void VideoCrtClass::ConvertYUVToRGB()
     r = static_cast<int16_t>(roundf(_r));
     g = static_cast<int16_t>(roundf(_g));
     b = static_cast<int16_t>(roundf(_b));
+
+    color_out->r = r;
+    color_out->g = g;
+    color_out->b = b;
+    color_out->a = 0.0f;
 }
 
 inline void VideoCrtClass::CreateVicIIColors(void)
 {
-    COLOR_STRUCT ColorOut;
-    COLOR_STRUCT ColorIn;
+    COLOR_STRUCT color_out;
 
-    /// Für Phase Alternating Line
-    float Offs=((phase_alternating_line) / (2000.0f / 90.0f))+(180.0f-45.0f);
+    // Für Phase Alternating Line
+    // --> pahphase_alternating_line 0 - 2000 ==== Offs Umrechnen nach -2.0f - 2.0f
+    float Offs =((static_cast<float>(phase_alternating_line) / 1000.0f ) - 1.0f) * 2.0f;
 
     for(int i=0;i<16;i++)
     {
-        c64_yuv_palette0[i*3+0] = VicColors[i].luminace * brightness;
-        c64_yuv_palette0[i*3+1] = VIC_SATURATION * cosf((VicColors[i].angel + VIC_PHASE) * (static_cast<float>(MATH_PI) / 180.0f)) * brightness;
-        c64_yuv_palette0[i*3+2] = VIC_SATURATION * sinf((VicColors[i].angel + VIC_PHASE) * (static_cast<float>(MATH_PI) / 180.0f)) * brightness;
+        c64_yuv_palette0[i*3+1] = 0;
+        c64_yuv_palette0[i*3+2] = 0;
 
-        c64_yuv_palette1[i*3+0] = VicColors[i].luminace * brightness;
-        c64_yuv_palette1[i*3+1] = -(VIC_SATURATION * cosf((VicColors[i].angel + VIC_PHASE + Offs) * (static_cast<float>(MATH_PI) / 180.0f))) * brightness;
-        c64_yuv_palette1[i*3+2] = -(VIC_SATURATION * sinf((VicColors[i].angel + VIC_PHASE + Offs) * (static_cast<float>(MATH_PI) / 180.0f))) * brightness;
+        float color_angle = COLOR_ANGLES[i];
 
-        if (VicColors[i].direction == 0.0f)
+        if(color_angle != 0.0f)
         {
-            c64_yuv_palette0[i*3+1] = 0.0f;
-            c64_yuv_palette0[i*3+2] = 0.0f;
-            c64_yuv_palette1[i*3+1] = 0.0f;
-            c64_yuv_palette1[i*3+2] = 0.0f;
+            float angle = ( origin + color_angle * sector ) * radian;
+            c64_yuv_palette0[i*3+1] = cosf( angle ) * saturation;
+            c64_yuv_palette0[i*3+2] = sinf( angle ) * saturation;
+
+            c64_yuv_palette1[i*3+1] = cosf( angle + Offs) * saturation;
+            c64_yuv_palette1[i*3+2] = sinf( angle + Offs) * saturation;
         }
-        if (VicColors[i].direction < 0)
-        {
-            c64_yuv_palette0[i*3+1] = -c64_yuv_palette0[i*3+1];
-            c64_yuv_palette0[i*3+2] = -c64_yuv_palette0[i*3+2];
-            c64_yuv_palette1[i*3+1] = -c64_yuv_palette1[i*3+1];
-            c64_yuv_palette1[i*3+2] = -c64_yuv_palette1[i*3+2];
-        }
+
+        c64_yuv_palette0[i*3+0] = c64_yuv_palette1[i*3+0] = 8 * COLOR_LEVEL[i] + brightness;
+
+        c64_yuv_palette0[i*3+0] *= contrast + screen;
+        c64_yuv_palette0[i*3+1] *= contrast + screen;
+        c64_yuv_palette0[i*3+2] *= contrast + screen;
+
+        c64_yuv_palette1[i*3+0] *= contrast + screen;
+        c64_yuv_palette1[i*3+1] *= contrast + screen;
+        c64_yuv_palette1[i*3+2] *= contrast + screen;
     }
 
     int x[4];
@@ -262,35 +268,22 @@ inline void VideoCrtClass::CreateVicIIColors(void)
                         }
                     }
 
-                    ConvertYUVToRGB();
+                    ConvertYUVToRGB(&color_out);
 
-                    ColorIn = COLOR_STRUCT(r, g, b, 0.0f);
-                    ChangeSaturation(&ColorIn,&ColorOut,saturation);
-
-                    ColorIn = ColorOut;
-                    ChangeContrast(&ColorIn, &ColorOut,contrast);
-
-                    rgb =  static_cast<uint32_t>(ColorOut.r);       // Rot
-                    rgb |= static_cast<uint32_t>(ColorOut.g)<<8;    // Grün
-                    rgb |= static_cast<uint32_t>(ColorOut.b)<<16;   // Blau
+                    rgb =  static_cast<uint32_t>(color_out.r);       // Rot
+                    rgb |= static_cast<uint32_t>(color_out.g)<<8;    // Grün
+                    rgb |= static_cast<uint32_t>(color_out.b)<<16;   // Blau
 
                     BlurTable0[x[0]][x[1]][x[2]][x[3]] = rgb | 0xFF000000;
 
                     /// Tabelle 1 für Gerade Zeile
                     _y *= scanline;
 
-                    ConvertYUVToRGB();
+                    ConvertYUVToRGB(&color_out);
 
-                    ColorIn = COLOR_STRUCT(r, g, b, 0.0f);
-                    ChangeSaturation(&ColorIn,&ColorOut,saturation);
-
-                    ColorIn = ColorOut;
-                    ChangeContrast(&ColorIn, &ColorOut,contrast);
-
-
-                    rgb =  static_cast<uint32_t>(ColorOut.r);       // Rot
-                    rgb |= static_cast<uint32_t>(ColorOut.g)<<8;    // Grün
-                    rgb |= static_cast<uint32_t>(ColorOut.b)<<16;   // Blau
+                    rgb =  static_cast<uint32_t>(color_out.r);       // Rot
+                    rgb |= static_cast<uint32_t>(color_out.g)<<8;    // Grün
+                    rgb |= static_cast<uint32_t>(color_out.b)<<16;   // Blau
 
                     BlurTable0S[x[0]][x[1]][x[2]][x[3]] = rgb | 0xFF000000;
 
@@ -319,33 +312,21 @@ inline void VideoCrtClass::CreateVicIIColors(void)
                         }
                     }
 
-                    ConvertYUVToRGB();
+                    ConvertYUVToRGB(&color_out);
 
-                    ColorIn = COLOR_STRUCT(r, g, b, 0.0f);
-                    ChangeSaturation(&ColorIn,&ColorOut,saturation);
-
-                    ColorIn = ColorOut;
-                    ChangeContrast(&ColorIn, &ColorOut,contrast);
-
-                    rgb =  static_cast<uint32_t>(ColorOut.r);       // Rot
-                    rgb |= static_cast<uint32_t>(ColorOut.g)<<8;    // Grün
-                    rgb |= static_cast<uint32_t>(ColorOut.b)<<16;   // Blau
+                    rgb =  static_cast<uint32_t>(color_out.r);       // Rot
+                    rgb |= static_cast<uint32_t>(color_out.g)<<8;    // Grün
+                    rgb |= static_cast<uint32_t>(color_out.b)<<16;   // Blau
 
                     BlurTable1[x[0]][x[1]][x[2]][x[3]] = rgb | 0xFF000000;
 
                     _y *= scanline;
 
-                    ConvertYUVToRGB();
+                    ConvertYUVToRGB(&color_out);
 
-                    ColorIn = COLOR_STRUCT(r, g, b, 0.0f);
-                    ChangeSaturation(&ColorIn,&ColorOut,saturation);
-
-                    ColorIn = ColorOut;
-                    ChangeContrast(&ColorIn, &ColorOut,contrast);
-
-                    rgb = static_cast<uint32_t>(ColorOut.r);       // Rot
-                    rgb |= static_cast<uint32_t>(ColorOut.g)<<8;    // Grün
-                    rgb |= static_cast<uint32_t>(ColorOut.b)<<16;   // Blau
+                    rgb = static_cast<uint32_t>(color_out.r);       // Rot
+                    rgb |= static_cast<uint32_t>(color_out.g)<<8;    // Grün
+                    rgb |= static_cast<uint32_t>(color_out.b)<<16;   // Blau
 
                     BlurTable1S[x[0]][x[1]][x[2]][x[3]] = rgb | 0xFF000000;
                 }
@@ -470,45 +451,4 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
             video_source = video_source+InXW;
         }
     }
-}
-
-void VideoCrtClass::ChangeSaturation(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float value)
-{
-    float R = col_in->r;
-    float G = col_in->g;
-    float B = col_in->b;
-
-    float grey = R * 0.2125f + G * 0.7154f + B * 0.0721f;
-    col_out->r = grey + value * (R - grey);
-    col_out->g = grey + value * (G - grey);
-    col_out->b = grey + value * (B - grey);
-
-    if(col_out->r > 255.0f) col_out->r = 255.0f;
-    else if(col_out->r < 0.0f) col_out->r = 0.0f;
-
-    if(col_out->g > 255.0f) col_out->g = 255.0f;
-    else if(col_out->g < 0.0f) col_out->g = 0.0f;
-
-    if(col_out->b > 255.0f) col_out->b = 255.0f;
-    else if(col_out->b < 0.0f) col_out->b = 0.0f;
-}
-
-void VideoCrtClass::ChangeContrast(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float value)
-{
-    float R = col_in->r;
-    float G = col_in->g;
-    float B = col_in->b;
-
-    col_out->r = 0.5f + value * (R - 0.5f);
-    col_out->g = 0.5f + value * (G - 0.5f);
-    col_out->b = 0.5f + value * (B - 0.5f);
-
-    if(col_out->r > 255.0f) col_out->r = 255.0f;
-    else if(col_out->r < 0.0f) col_out->r = 0.0f;
-
-    if(col_out->g > 255.0f) col_out->g = 255.0f;
-    else if(col_out->g < 0.0f) col_out->g = 0.0f;
-
-    if(col_out->b > 255.0f) col_out->b = 255.0f;
-    else if(col_out->b < 0.0f) col_out->b = 0.0f;
 }

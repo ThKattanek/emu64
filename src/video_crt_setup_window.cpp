@@ -119,7 +119,7 @@ void VideoCrtSetupWindow::on_saettigung_scroll_valueChanged(int value)
 void VideoCrtSetupWindow::on_helligkeit_scroll_valueChanged(int value)
 {
     ui->helligkeit_out->setText(QVariant(value).toString());
-    video_crt_output->SetBrightness((value+50)/100.0f);
+    video_crt_output->SetBrightness(value/100.0f);
     if(!no_video_crt_parameter_updates) video_crt_output->UpdateParameter();
 }
 
@@ -167,8 +167,8 @@ void VideoCrtSetupWindow::on_distortion_scroll_valueChanged(int value)
 
 void VideoCrtSetupWindow::on_Reset_clicked()
 {
-    ui->saettigung_scroll->setValue(75);
-    ui->helligkeit_scroll->setValue(40);
+    ui->saettigung_scroll->setValue(50);
+    ui->helligkeit_scroll->setValue(50);
     ui->kontrast_scroll->setValue(50);
     ui->horblurY_scroll->setValue(2);
     ui->horblurUV_scroll->setValue(4);

@@ -61,9 +61,7 @@ public:
         bool start_c64_is_palmode;
 
 private:
-        inline void ConvertYUVToRGB();
-        void ChangeSaturation(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float value);
-        void ChangeContrast(COLOR_STRUCT *col_in, COLOR_STRUCT *col_out, float value);
+        inline void ConvertYUVToRGB(COLOR_STRUCT *color_out);
 
         bool                is_double2x;
         bool                is_crt_output;
@@ -95,6 +93,11 @@ private:
         float   blur_y_sum;
         float   blur_u_sum;
         float   blur_v_sum;
+
+        float sector;
+        float origin;
+        float radian;
+        float screen;
 
         //// Einstellbare Werte
         float	saturation;				// 0 - 2000
