@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.09.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -45,6 +45,7 @@ public:
         ~VideoCrtClass();
         void ConvertVideo(void* Outpuffer, long Pitch, unsigned char* VICOutPuffer, int VICOutPufferOffset, int OutXW, int OutYW, int InXW, int InYW, bool FlipTex);
         void UpdateParameter(void);
+        void SetFirstVicRevision(bool enabled);
         void SetPhaseAlternatingLineOffset(int offset);
         void SetHorizontalBlurY(int wblur);
         void SetHorizontalBlurUV(int wblur);
@@ -100,9 +101,10 @@ private:
         float screen;
 
         //// Einstellbare Werte
-        float	saturation;				// 0 - 2000
-        float	brightness;				// 0 - 2
-        float	contrast;				// 0 - 1
+        bool    is_first_pal_vic_revision;  // true = first VIC revision, false = all revisions > 1
+        float	saturation;                 // 0 - 1
+        float	brightness;                 // 0 - 1
+        float	contrast;                   // 0 - 1
         int32_t hor_blur_wy;
         int32_t	hor_blur_wuv;
         int32_t phase_alternating_line;		// 0 - 2000

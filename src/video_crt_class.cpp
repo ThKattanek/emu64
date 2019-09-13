@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.09.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,20 +19,10 @@
 
 #include <iostream>
 
-/*
-mc[ 0x6 ] = mc[ 0x9 ] =  8;                   // Blue,    Brown
-mc[ 0xb ] = mc[ 0x2 ] = 10;                   // Dk.Grey, Red
-mc[ 0x4 ] = mc[ 0x8 ] = 12;                   // Purple,  Orange
-mc[ 0xc ] = mc[ 0xe ] = 15;                   // Md.Grey, Lt.Blue
-mc[ 0x5 ] = mc[ 0xa ] = 16;                   // Green,   Lt.Red
-mc[ 0xf ] = mc[ 0x3 ] = 20;                   // Lt.Grey, Cyan
-mc[ 0x7 ] = mc[ 0xd ] = 24;                   // Yellow,  Lt.Green
-mc[ 0x1 ]             = 32;                   // White
-*/
-
-static float COLOR_LEVEL[16] =
+static uint8_t LUMA_TABLE[2][16] =
 {
-    0,32,10,20,12,16,8,24,12,8,16,10,15,24,15,20
+    {0,32,8,24,16,16,8,24,16,8,16,8,16,24,16,24},       // First VIC II PAL Revision -> 5 different luma levels
+    {0,32,10,20,12,16,8,24,12,8,16,10,15,24,15,20}      // All PAL Revisions > 1     -> 9 different luma levels
 };
 
 /*
@@ -46,7 +36,7 @@ angles[ 0x3 ]                 = 4 + 8;            // Cyan
 angles[ 0x6 ] = angles[ 0xe ] = 7 + 8;            // Blue
 */
 
-static float COLOR_ANGLES[16] =
+static uint8_t COLOR_ANGLES[16] =
 {
     0, 0, 4, 4+8, 2, 2+8, 7+8, 7, 5, 6, 4, 0, 0, 2+8, 7+8, 0
 };
@@ -55,6 +45,8 @@ static float COLOR_ANGLES[16] =
 
 VideoCrtClass::VideoCrtClass()
 {
+    is_first_pal_vic_revision = false;
+
     current_color_palette_mumber = 0;
     is_double2x = false;
     contrast = 0.8f;
@@ -75,6 +67,11 @@ VideoCrtClass::~VideoCrtClass(void)
 void VideoCrtClass::UpdateParameter(void)
 {
     CreateVicIIColors();
+}
+
+void VideoCrtClass::SetFirstVicRevision(bool enabled)
+{
+    is_first_pal_vic_revision = enabled;
 }
 
 void VideoCrtClass::SetPhaseAlternatingLineOffset(int offset)
@@ -221,7 +218,10 @@ inline void VideoCrtClass::CreateVicIIColors(void)
             c64_yuv_palette1[i*3+2] = sinf( angle + Offs) * saturation;
         }
 
-        c64_yuv_palette0[i*3+0] = c64_yuv_palette1[i*3+0] = 8 * COLOR_LEVEL[i] + brightness;
+        if(is_first_pal_vic_revision)
+            c64_yuv_palette0[i*3+0] = c64_yuv_palette1[i*3+0] = 8 * LUMA_TABLE[0][i] + brightness;
+        else
+            c64_yuv_palette0[i*3+0] = c64_yuv_palette1[i*3+0] = 8 * LUMA_TABLE[1][i] + brightness;
 
         c64_yuv_palette0[i*3+0] *= contrast + screen;
         c64_yuv_palette0[i*3+1] *= contrast + screen;
