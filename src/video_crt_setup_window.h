@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.08.2019        		//
+// Letzte Änderung am 13.09.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -45,8 +45,9 @@ private slots:
     void on_horblurUV_scroll_valueChanged(int value);
     void on_phase_scroll_valueChanged(int value);
     void on_scanline_scroll_valueChanged(int value);
-    void on_Reset_clicked();
     void on_distortion_scroll_valueChanged(int value);
+    void on_FirstVicRevision_clicked(bool checked);
+    void on_Reset_clicked();
 
 private:
     void showEvent(QShowEvent* event);

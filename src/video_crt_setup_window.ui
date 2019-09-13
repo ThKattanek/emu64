@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>355</width>
-    <height>155</height>
+    <height>180</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,13 +22,13 @@
   <property name="minimumSize">
    <size>
     <width>344</width>
-    <height>155</height>
+    <height>180</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>360</width>
-    <height>155</height>
+    <height>180</height>
    </size>
   </property>
   <property name="font">
@@ -542,8 +542,8 @@
   <widget class="QPushButton" name="Reset">
    <property name="geometry">
     <rect>
-     <x>28</x>
-     <y>128</y>
+     <x>30</x>
+     <y>150</y>
      <width>309</width>
      <height>22</height>
     </rect>
@@ -619,6 +619,25 @@
    </property>
    <property name="text">
     <string notr="true">-</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="FirstVicRevision">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>130</y>
+     <width>141</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Schaltet auf die allererste PAL VIC II Version um. Diese hatte lediglich 5 Luminanz Abstufungen, die nachfolgenden hatten dann 9.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0,0, 128);</string>
+   </property>
+   <property name="text">
+    <string>PAL VIC Revision 1</string>
    </property>
   </widget>
  </widget>

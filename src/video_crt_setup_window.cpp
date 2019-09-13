@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.09.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -33,6 +33,8 @@ VideoCrtSetupWindow::VideoCrtSetupWindow(QWidget *parent, C64Class *c64, VideoCr
     if(ini != nullptr)
     {   
         int value;
+        bool bvalue;
+
         ini->beginGroup("TVSetupWindow");
         if(ini->contains("Geometry")) setGeometry(ini->value("Geometry").toRect());
 
@@ -68,6 +70,10 @@ VideoCrtSetupWindow::VideoCrtSetupWindow(QWidget *parent, C64Class *c64, VideoCr
         if(ui->distortion_scroll->value() == value) on_distortion_scroll_valueChanged(value);
         ui->distortion_scroll->setValue(value);
 
+        bvalue = ini->value("FirstVICRevision",false).toBool();
+        ui->FirstVicRevision->setChecked(bvalue);
+        video_crt_output->SetFirstVicRevision(bvalue);
+
         ini->endGroup();
     }
 
@@ -92,6 +98,7 @@ VideoCrtSetupWindow::~VideoCrtSetupWindow()
         ini->setValue("PhaseLineOffset",ui->phase_scroll->value());
         ini->setValue("Scanline",ui->scanline_scroll->value());
         ini->setValue("Distortion",ui->distortion_scroll->value());
+        ini->setValue("FirstVICRevision",ui->FirstVicRevision->isChecked());
         ini->endGroup();
     }
     ///////////////////////////////
@@ -165,14 +172,23 @@ void VideoCrtSetupWindow::on_distortion_scroll_valueChanged(int value)
     c64->SetDistortion((0.01f*(value-100))*MAX_DISTORTION);
 }
 
+void VideoCrtSetupWindow::on_FirstVicRevision_clicked(bool checked)
+{
+    video_crt_output->SetFirstVicRevision(checked);
+    if(!no_video_crt_parameter_updates) video_crt_output->UpdateParameter();
+}
+
 void VideoCrtSetupWindow::on_Reset_clicked()
 {
     ui->saettigung_scroll->setValue(50);
     ui->helligkeit_scroll->setValue(50);
     ui->kontrast_scroll->setValue(50);
     ui->horblurY_scroll->setValue(2);
-    ui->horblurUV_scroll->setValue(4);
-    ui->phase_scroll->setValue(840);
-    ui->scanline_scroll->setValue(75);
+    ui->horblurUV_scroll->setValue(3);
+    ui->phase_scroll->setValue(1000);
+    ui->scanline_scroll->setValue(60);
     ui->distortion_scroll->setValue(100);
+    ui->FirstVicRevision->setChecked(false);
 }
+
+
