@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -71,7 +71,7 @@ void VideoCaptureWindow::on_CaptureStart_clicked()
         return;
     }
 
-    if(c64->StartVideoRecord(filename.toUtf8(),ui->AudioBitrate->value() * 1000, ui->VideoBitrate->value()*1000))
+    if(c64->StartVideoRecord(filename.toLocal8Bit(),ui->AudioBitrate->value() * 1000, ui->VideoBitrate->value()*1000))
     {
         ui->CaptureStart->setEnabled(false);
         ui->CaptureStop->setEnabled(true);

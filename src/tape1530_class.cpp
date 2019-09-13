@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.08.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -81,7 +81,7 @@ void TAPE1530::SetC64Zyklen(float cycles_per_second)
     PlayFrequenzFaktor = 4294967296.0 / cycles_per_second;     // 2^32 / Samplerate;
 }
 
-bool TAPE1530::LoadTapeImage(char *filename)
+bool TAPE1530::LoadTapeImage(const char *filename)
 {
     char EXT[4];
     size_t reading_elements;
@@ -240,7 +240,7 @@ bool TAPE1530::LoadTapeImage(char *filename)
     return false;
 }
 
-bool TAPE1530::RecordTapeImage(char *filename)
+bool TAPE1530::RecordTapeImage(const char *filename)
 {
     if(recfile != NULL) return false;
 

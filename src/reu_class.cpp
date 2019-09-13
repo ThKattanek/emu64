@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.02.2018                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -41,7 +41,7 @@ void REUClass::Remove(void)
     REUInsert = false;
 }
 
-int REUClass::LoadRAM(char *filename)
+int REUClass::LoadRAM(const char *filename)
 {
     /// REU Inhalt laden ...
     FILE* file;
@@ -67,7 +67,7 @@ int REUClass::LoadRAM(char *filename)
     return 0;
 }
 
-int REUClass::SaveRAM(char *filename)
+int REUClass::SaveRAM(const char *filename)
 {
     /// REU Inhalt speichern ...
     FILE* file;

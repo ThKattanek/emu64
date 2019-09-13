@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.08.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -116,7 +116,7 @@ void TapeWindow::hideEvent(QHideEvent*)
 void TapeWindow::OnSelectFile(QString filename)
 {
     UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_STOP));
-    if(!c64->LoadTapeImage(filename.toUtf8().data()))
+    if(!c64->LoadTapeImage(filename.toLocal8Bit()))
         QMessageBox::warning(this,tr("Fehler!"),tr("Fehler beim laden des TapeImages"));
 
     unsigned int tape_time = roundf(c64->GetTapeLenTime());
@@ -168,7 +168,7 @@ void TapeWindow::on_Rec_clicked()
             }
 
             // Theoretisch bereit zur Aufnahme
-            if(!c64->RecordTapeImage(fullpath.toUtf8().data()))
+            if(!c64->RecordTapeImage(fullpath.toLocal8Bit()))
             {
                 QMessageBox::information(this,tr("Achtung"),tr("Es konnte keine Aufnahme gestartet werden.\nBitte überprüfen Sie ob sie ausreichend Rechte besitzen."));
             }

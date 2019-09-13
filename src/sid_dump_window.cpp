@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 16.08.2019                //
+# // Letzte Änderung am 13.09.2019                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -60,7 +60,7 @@ void SidDumpWindow::on_SidDumpStart_clicked()
         return;
     }
 
-    if(c64->StartSidDump(filename.toUtf8()))
+    if(c64->StartSidDump(filename.toLocal8Bit()))
     {
         ui->SidDumpStart->setEnabled(false);
         ui->SidDumpStop->setEnabled(true);

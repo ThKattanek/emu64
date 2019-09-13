@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.02.2018                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -34,7 +34,7 @@ void GEORAMClass::Remove(void)
     GEORAMInsert = false;
 }
 
-int GEORAMClass::LoadRAM(char *filename)
+int GEORAMClass::LoadRAM(const char *filename)
 {
     /// GEORAM Inhalt laden ...
     FILE* file;
@@ -52,7 +52,7 @@ int GEORAMClass::LoadRAM(char *filename)
     return 0;
 }
 
-int GEORAMClass::SaveRAM(char *filename)
+int GEORAMClass::SaveRAM(const char *filename)
 {
     /// GEORAM Inhalt speichern ...
     FILE* file;

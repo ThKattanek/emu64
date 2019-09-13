@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -97,7 +97,7 @@ void DebuggerIECWindow::on_StartExport_clicked()
 
     if(filename != "")
     {
-        if(c64->StartIECDump(filename.toUtf8()))
+        if(c64->StartIECDump(filename.toLocal8Bit()))
         {
             ui->StopExport->setEnabled(true);
             ui->StartExport->setEnabled(false);

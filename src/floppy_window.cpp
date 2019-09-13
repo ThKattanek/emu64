@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.09.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -158,7 +158,7 @@ void FloppyWindow::LoadIni()
             AktDir[i] = ini->value("AktDir","").toString();
             AktFile[i] = ini->value("AktFile","").toString();
             AktFileName[i] = AktDir[i] + "/" + AktFile[i];
-            d64[i].LoadD64(AktFileName[i].toUtf8());
+            d64[i].LoadD64(AktFileName[i].toLocal8Bit());
 
             // Write Protect für alle Floppys setzen
             c64->floppy[i]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktFileName[i]));
@@ -187,7 +187,7 @@ bool FloppyWindow::SetDiskImage(uint8_t floppynr, QString filename)
     AktFile[floppynr] = fi.fileName();
     AktFileName[floppynr] = AktDir[floppynr] + "/" + AktFile[floppynr];
 
-    d64[floppynr].LoadD64(AktFileName[floppynr].toUtf8());
+    d64[floppynr].LoadD64(AktFileName[floppynr].toLocal8Bit());
 
     c64->floppy[floppynr]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktFileName[floppynr]));
 
@@ -219,14 +219,14 @@ void FloppyWindow::OnSelectFile(QString filename)
         AktFile[FloppyNr] = ui->FileBrowser->GetAktFile();
         if("D64" == AktFileName[FloppyNr].right(3).toUpper())
         {
-            d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toUtf8());
+            d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toLocal8Bit());
             RefreshD64FileList();
             emit ChangeFloppyImage(FloppyNr);
         }
 
         if("G64" == AktFileName[FloppyNr].right(3).toUpper())
         {
-            //d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toUtf8());
+            //d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toLocal8Bit());
             //RefreshD64FileList();
 
 
@@ -311,9 +311,9 @@ void FloppyWindow::OnD64FileStart0(bool)
     uint8_t floppy_nr = static_cast<uint8_t>(ui->FloppySelect->currentIndex());
     QString FileName = tmp_path + "/tmp.prg";
 
-    if(d64[floppy_nr].ExportPrg(file_index,FileName.toUtf8().data()))
+    if(d64[floppy_nr].ExportPrg(file_index,FileName.toLocal8Bit()))
     {
-        c64->LoadAutoRun(floppy_nr,FileName.toUtf8().data());
+        c64->LoadAutoRun(floppy_nr,FileName.toLocal8Bit());
     }
 }
 
@@ -337,9 +337,9 @@ void FloppyWindow::OnD64FileStart3(bool)
     uint8_t floppy_nr = static_cast<uint8_t>(ui->FloppySelect->currentIndex());
     QString FileName = tmp_path + "/tmp.prg";
 
-    if(d64[floppy_nr].ExportPrg(file_index,FileName.toUtf8().data()))
+    if(d64[floppy_nr].ExportPrg(file_index,FileName.toLocal8Bit()))
     {
-        c64->LoadPRG(FileName.toUtf8().data(),nullptr);
+        c64->LoadPRG(FileName.toLocal8Bit(),nullptr);
     }
 }
 
@@ -389,7 +389,7 @@ void FloppyWindow::OnPRGExport(bool)
 
     if(filename != "")
     {
-        if(!d64[floppy_nr].ExportPrg(file_index,filename.toUtf8().data()))
+        if(!d64[floppy_nr].ExportPrg(file_index,filename.toLocal8Bit()))
         {
             QMessageBox::critical(this,"C64 Datei Export","Fehler beim exportieren der C64 Datei.\nDie Datei konnte nicht exortiert.");
         }
@@ -656,7 +656,7 @@ void FloppyWindow::on_CreateNewD64_clicked()
         if(!file.exists())
         {
             D64Class d64;
-            if(!d64.CreateDiskImage(fullpath.toUtf8().data(),diskname.toUtf8().data(),diskid.toUtf8().data()))
+            if(!d64.CreateDiskImage(fullpath.toLocal8Bit(),diskname.toLocal8Bit(),diskid.toLocal8Bit()))
             {
                 QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues Diskimage erstellt werden."));
             }
@@ -672,7 +672,7 @@ void FloppyWindow::on_CreateNewD64_clicked()
             if(QMessageBox::Yes == QMessageBox::question(this,tr("Achtung!"),tr("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
             {
                 D64Class d64;
-                if(!d64.CreateDiskImage(fullpath.toUtf8().data(),diskname.toUtf8().data(),diskid.toUtf8().data()))
+                if(!d64.CreateDiskImage(fullpath.toLocal8Bit(),diskname.toLocal8Bit(),diskid.toLocal8Bit()))
                 {
                     QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues Diskimage erstellt werden."));
                 }

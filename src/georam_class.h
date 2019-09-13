@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -32,8 +32,8 @@ class GEORAMClass
 
     void Remove(void);
     void Insert(void);
-    int LoadRAM(char *filename);
-    int SaveRAM(char *filename);
+    int LoadRAM(const char *filename);
+    int SaveRAM(const char *filename);
     void ClearRAM(void);
 
     private:

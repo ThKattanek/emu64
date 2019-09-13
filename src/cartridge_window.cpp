@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.08.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -200,7 +200,7 @@ void CartridgeWindow::onSelectFile(QString filename)
     char str00[256];
 
     if(crt == nullptr) return;
-    int res = crt->GetCartridgeInfo(filename.toUtf8(),&crt_info);
+    int res = crt->GetCartridgeInfo(filename.toLocal8Bit(),&crt_info);
     switch(res)
     {
     case 0:
@@ -372,12 +372,10 @@ void CartridgeWindow::on_NewEasyFlashCRT_clicked()
 
         fullpath = ui->FileBrowser->GetAktDir() + "/" + filename;
 
-        //qDebug(fullpath.toUtf8());
-
         QFile file(fullpath);
         if(!file.exists())
         {
-            if(c64->CreateNewEasyFlashImage(fullpath.toUtf8().data(), cartridge_name.toUtf8().data()))
+            if(c64->CreateNewEasyFlashImage(fullpath.toLocal8Bit(), cartridge_name.toLocal8Bit()))
             {
                 QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues EasyFlash Image erstellt werden."));
             }
@@ -391,7 +389,7 @@ void CartridgeWindow::on_NewEasyFlashCRT_clicked()
         {
             if(QMessageBox::Yes == QMessageBox::question(this,tr("Achtung!"),tr("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
             {
-                if(c64->CreateNewEasyFlashImage(fullpath.toUtf8().data(), cartridge_name.toUtf8().data()))
+                if(c64->CreateNewEasyFlashImage(fullpath.toLocal8Bit(), cartridge_name.toLocal8Bit()))
                 {
                     QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues EasyFlash Image erstellt werden."));
                 }
@@ -411,7 +409,7 @@ void CartridgeWindow::on_InsertCRT_clicked()
 {
     if(CRTIsSelected)
     {
-        if(0 == c64->LoadCRT(SelCRTFileName.toUtf8().data()))
+        if(0 == c64->LoadCRT(SelCRTFileName.toLocal8Bit()))
         {
             ui->PageFC->setEnabled(false);
             ui->PageEasyFlash->setEnabled(false);

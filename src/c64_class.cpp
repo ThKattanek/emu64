@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.09.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1352,7 +1352,7 @@ void C64Class::ResetC64CycleCounter()
     cycle_counter = 0;
 }
 
-bool C64Class::LoadC64Roms(char *kernalrom, char *basicrom, char *charrom)
+bool C64Class::LoadC64Roms(const char *kernalrom, const char *basicrom, const char *charrom)
 {
     if(!mmu->LoadKernalRom(kernalrom)) return false;
     if(!mmu->LoadBasicRom(basicrom)) return false;
@@ -1360,7 +1360,7 @@ bool C64Class::LoadC64Roms(char *kernalrom, char *basicrom, char *charrom)
     return true;
 }
 
-bool C64Class::LoadFloppyRom(uint8_t floppy_nr, char *dos1541rom)
+bool C64Class::LoadFloppyRom(uint8_t floppy_nr, const char *dos1541rom)
 {
     if(floppy_nr < MAX_FLOPPY_NUM)
     {
@@ -1370,7 +1370,7 @@ bool C64Class::LoadFloppyRom(uint8_t floppy_nr, char *dos1541rom)
     return false;
 }
 
-bool C64Class::LoadDiskImage(uint8_t floppy_nr, char *filename)
+bool C64Class::LoadDiskImage(uint8_t floppy_nr, const char *filename)
 {
     if(floppy_nr < MAX_FLOPPY_NUM)
     {
@@ -1459,7 +1459,7 @@ void C64Class::SetGrafikModi(bool enable_screen_doublesize, bool enable_screen_c
     */
 }
 
-void C64Class::SetSDLWindowName(char *name)
+void C64Class::SetSDLWindowName(const char *name)
 {
     strcpy(sdl_window_name, name);
     SDL_SetWindowTitle(sdl_window, name);
@@ -2475,12 +2475,12 @@ void C64Class::SetWindowSize(int w, int h)
     changed_window_size = true;
 }
 
-bool C64Class::LoadTapeImage(char *filename)
+bool C64Class::LoadTapeImage(const char *filename)
 {
     return tape->LoadTapeImage(filename);
 }
 
-bool C64Class::RecordTapeImage(char *filename)
+bool C64Class::RecordTapeImage(const char *filename)
 {
     return tape->RecordTapeImage(filename);
 }
@@ -2580,7 +2580,7 @@ int SDLThreadLoad(void *userdat)
 }
 
 // ret 0=OK 1=nicht unterstütztes Format 2=D64 n.IO 3=G64 n.IO 4=OK nur es war ein CRT
-int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
+int C64Class::LoadAutoRun(uint8_t floppy_nr, const char *filename)
 {
     char EXT[4];
 
@@ -2673,7 +2673,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, char *filename)
     return 1;
 }
 
-int C64Class::LoadPRG(char *filename, uint16_t *return_start_address)
+int C64Class::LoadPRG(const char *filename, uint16_t *return_start_address)
 {
     uint8_t *RAM = mmu->GetRAMPointer();
     FILE *file;
@@ -2691,7 +2691,7 @@ int C64Class::LoadPRG(char *filename, uint16_t *return_start_address)
     if(0==strcmp("PRG",EXT) || 0==strcmp("C64",EXT))
     {
         LogText(const_cast<char*>(">> PRG laden: "));
-        LogText(filename);
+        LogText(const_cast<char*>(filename));
         LogText(const_cast<char*>("\n"));
 
         uint16_t start_address;
@@ -2732,7 +2732,7 @@ int C64Class::LoadPRG(char *filename, uint16_t *return_start_address)
     if(0==strcmp("T64",EXT))
     {
         LogText(const_cast<char*>(">> T64 laden: "));
-        LogText(filename);
+        LogText(const_cast<char*>(filename));
         LogText(const_cast<char*>("\n"));
 
         char signature[32];
@@ -2814,7 +2814,7 @@ int C64Class::LoadPRG(char *filename, uint16_t *return_start_address)
     if(0==strcmp("P00",EXT))
     {
         LogText(const_cast<char*>(">> P00 laden: "));
-        LogText(filename);
+        LogText(const_cast<char*>(filename));
         LogText(const_cast<char*>("\n"));
 
         char signature[8];
@@ -2866,7 +2866,7 @@ int C64Class::LoadPRG(char *filename, uint16_t *return_start_address)
     return 0x02;
 }
 
-int C64Class::LoadCRT(char *filename)
+int C64Class::LoadCRT(const char *filename)
 {
     reu->Remove();
     geo->Remove();
@@ -2890,7 +2890,7 @@ void C64Class::RemoveCRT()
     HardReset();
 }
 
-int C64Class::CreateNewEasyFlashImage(char *filename, char *crt_name)
+int C64Class::CreateNewEasyFlashImage(const char *filename, const char *crt_name)
 {
     return crt->CreateNewEasyFlashImage(filename, crt_name);
 }
@@ -2920,12 +2920,12 @@ void C64Class::RemoveREU()
     HardReset();
 }
 
-int C64Class::LoadREUImage(char *filename)
+int C64Class::LoadREUImage(const char *filename)
 {
     return reu->LoadRAM(filename);
 }
 
-int C64Class::SaveREUImage(char *filename)
+int C64Class::SaveREUImage(const char *filename)
 {
     return reu->SaveRAM(filename);
 }
@@ -2958,12 +2958,12 @@ void C64Class::RemoveGEORAM()
     HardReset();
 }
 
-int C64Class::LoadGEORAMImage(char *filename)
+int C64Class::LoadGEORAMImage(const char *filename)
 {
     return geo->LoadRAM(filename);
 }
 
-int C64Class::SaveGEORAMImage(char *filename)
+int C64Class::SaveGEORAMImage(const char *filename)
 {
     return geo->SaveRAM(filename);
 }
@@ -3137,7 +3137,7 @@ int C64Class::GetBreakGroupCount()
     return breakgroup_count;
 }
 
-int C64Class::LoadBreakGroups(char *filename)
+int C64Class::LoadBreakGroups(const char *filename)
 {
     FILE *file;
     char Kennung[10];
@@ -3206,7 +3206,7 @@ int C64Class::LoadBreakGroups(char *filename)
     return 0;
 }
 
-bool C64Class::SaveBreakGroups(char *filename)
+bool C64Class::SaveBreakGroups(const char *filename)
 {
     FILE *file;
     char Kennung[]  = "EMU64_BPT";
@@ -3258,7 +3258,7 @@ bool C64Class::SaveBreakGroups(char *filename)
     return true;
 }
 
-bool C64Class::ExportPRG(char *filename, uint16_t start_adresse, uint16_t end_adresse, int source)
+bool C64Class::ExportPRG(const char *filename, uint16_t start_adresse, uint16_t end_adresse, int source)
 {
     FILE *file;
     uint8_t *RAM;
@@ -3307,7 +3307,7 @@ bool C64Class::ExportRAW(char *filename, uint16_t start_adresse, uint16_t end_ad
     return true;
 }
 
-bool C64Class::ExportASM(char *filename, uint16_t start_adresse, uint16_t end_adresse, int source)
+bool C64Class::ExportASM(const char *filename, uint16_t start_adresse, uint16_t end_adresse, int source)
 {
     FILE *file;
 

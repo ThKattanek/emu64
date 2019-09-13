@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.08.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -53,7 +53,7 @@ unsigned char* MMU::GetFarbramPointer(void)
 	return FARB_RAM;
 }
 
-bool MMU::LoadKernalRom(char* filename)
+bool MMU::LoadKernalRom(const char* filename)
 {
 	FILE *file;
         file = fopen(filename, "rb");
@@ -72,7 +72,7 @@ bool MMU::LoadKernalRom(char* filename)
 	return true;
 }
 
-bool MMU::LoadBasicRom(char* filename)
+bool MMU::LoadBasicRom(const char* filename)
 {
 	FILE *file;
         file = fopen(filename, "rb");
@@ -91,7 +91,7 @@ bool MMU::LoadBasicRom(char* filename)
 	return true;
 }
 
-bool MMU::LoadCharRom(char* filename)
+bool MMU::LoadCharRom(const char* filename)
 {
 	FILE *file;
         file = fopen (filename, "rb");

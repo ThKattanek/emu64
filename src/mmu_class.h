@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.08.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -32,9 +32,9 @@ public:
     void ChangeMemMap(void);
     unsigned char* GetFarbramPointer(void);
     unsigned char* GetRAMPointer(void);
-    bool LoadKernalRom(char* filename);
-    bool LoadBasicRom(char* filename);
-    bool LoadCharRom(char* filename);
+    bool LoadKernalRom(const char *filename);
+    bool LoadBasicRom(const char *filename);
+    bool LoadCharRom(const char *filename);
     unsigned char GetReadSource(unsigned char page);
     unsigned char GetWriteDestination(unsigned char page);
     //bool SaveFreez(FILE* File);

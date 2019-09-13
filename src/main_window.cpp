@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.08.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -316,7 +316,7 @@ void MainWindow::OnInit()
     /// C64 Klasse Installieren ... Das HERZ ///
     SplashMessage(tr("C64 Klasse wird initialisiert."),Qt::darkBlue);
     int ret_error;
-    c64 = new C64Class(&ret_error,video_crt_output,bind(&MainWindow::LogText,this,std::placeholders::_1),QString(dataPath).toUtf8());
+    c64 = new C64Class(&ret_error,video_crt_output,bind(&MainWindow::LogText,this,std::placeholders::_1),QString(dataPath).toLocal8Bit());
     if(ret_error != 0)
     {
         ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim Installieren der C64 Klasse"))
@@ -326,7 +326,7 @@ void MainWindow::OnInit()
 
     SetC64ScreenTitle();
     c64->EnableScreenshots(ScreenshotsEnable);
-    c64->SetScreenshotDir(screenshotPath.toUtf8());
+    c64->SetScreenshotDir(screenshotPath.toLocal8Bit());
 
     /// Window Klassen erstellen ///
     /// Unter MAC sollte ohne übergabe des this Zeigers die Klasseb erstellt werden
@@ -413,7 +413,7 @@ void MainWindow::OnInit()
 
     /// C64 Systemroms laden ///
     SplashMessage(tr("C64 Systemroms werden geladen."),Qt::darkBlue);
-    if(!c64->LoadC64Roms((char*)QString(dataPath+"/roms/kernal.rom").toUtf8().data(),(char*)QString(dataPath+"/roms/basic.rom").toUtf8().data(),(char*)QString(dataPath+"/roms/char.rom").toUtf8().data()))
+    if(!c64->LoadC64Roms(QString(dataPath+"/roms/kernal.rom").toLocal8Bit(),QString(dataPath+"/roms/basic.rom").toLocal8Bit(),QString(dataPath+"/roms/char.rom").toLocal8Bit()))
     {
         LogText((char*)"<< ERROR: Fehler beim laden der C64 Roms\n\t");
         LogText(QString(dataPath+"/roms/kernal.rom").toUtf8());LogText("\n\t");
@@ -487,7 +487,7 @@ void MainWindow::OnInit()
             WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(i,0);
 
             w->SetAktFilename(floppy_window->GetAktFilename(i),floppy_window->GetAktD64Name(i));
-            c64->LoadDiskImage(i,floppy_window->GetAktFilename(i).toUtf8().data());
+            c64->LoadDiskImage(i,floppy_window->GetAktFilename(i).toLocal8Bit());
 
             w->SetEnableFloppy(ini->value("Enabled",false).toBool());
             w->SetFloppyVolume(ini->value("VolumeMode",2).toInt());
@@ -593,7 +593,7 @@ void MainWindow::OnMessage(QStringList msg)
         for(int i=0; i<msg.length(); i++)
         {
             char *p = new char[msg.at(i).size()+1];
-            strcpy(p,msg.at(i).toUtf8().data());
+            strcpy(p,msg.at(i).toLocal8Bit());
             list.push_back(p);
         }
         ExecuteCommandLine(list);
@@ -740,7 +740,7 @@ void MainWindow::RetranslateUi()
 
 void MainWindow::SetC64ScreenTitle()
 {
-    c64->SetSDLWindowName(tr("C64 Bildschirm").toUtf8().data());
+    c64->SetSDLWindowName(tr("C64 Bildschirm").toLocal8Bit());
 }
 
 void MainWindow::ExecuteCommandLine(vector<char *> &arg)
@@ -782,7 +782,7 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
                     if(fi->exists())
                     {
                         cout << "Laufwerksnummer: " << lwnr << endl;
-                        cout << "Disk Image: " << fi->fileName().toUtf8().data() << endl;
+                        cout << "Disk Image: " << fi->fileName().toLocal8Bit().data() << endl;
 
                         if(floppy_window->SetDiskImage(lwnr-8, fi->absoluteFilePath()))
                         {
@@ -924,7 +924,7 @@ void MainWindow::on_actionAutostart_triggered()
         QFileInfo file_info = filename;
         lastAutoloadPath = file_info.absolutePath();
 
-        if(c64->LoadAutoRun(0,filename.toUtf8().data()) == 0)
+        if(c64->LoadAutoRun(0,filename.toLocal8Bit()) == 0)
         {
             // Prüfen welche
             if(file_info.suffix().toUpper() == "D64")
@@ -943,7 +943,7 @@ void MainWindow::on_actionC64_Programme_direkt_laden_triggered()
     QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),"",tr("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.frz);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
-        c64->LoadPRG(filename.toUtf8().data(),nullptr);
+        c64->LoadPRG(filename.toLocal8Bit(),nullptr);
     }
 }
 
@@ -1009,7 +1009,7 @@ void MainWindow::OnChangeFloppyImage(int floppynr)
 {
     WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(floppynr,0);
     w->SetAktFilename(floppy_window->GetAktFilename(floppynr),floppy_window->GetAktD64Name(floppynr));
-    c64->LoadDiskImage(floppynr,floppy_window->GetAktFilename(floppynr).toUtf8().data());
+    c64->LoadDiskImage(floppynr,floppy_window->GetAktFilename(floppynr).toLocal8Bit());
 }
 
 void MainWindow::OnResetScreenshotCounter()
@@ -1031,23 +1031,6 @@ void MainWindow::on_actionScreenshot_triggered()
     if(ScreenshotsEnable)
     {
         c64->SaveScreenshot();
-
-        /*
-        int format = setup_window->GetScreenshotFormat();
-        switch (format)
-        {
-        case SCREENSHOT_FORMAT_BMP:
-            c64->SaveScreenshot(QString(screenshotPath + "emu64_" + QVariant(ScreenshotNumber).toString() + ".bmp").toUtf8(),format);
-            break;
-        case SCREENSHOT_FORMAT_PNG:
-            c64->SaveScreenshot(QString(screenshotPath + "emu64_" + QVariant(ScreenshotNumber).toString() + ".png").toUtf8(),format);
-            break;
-        default:
-            break;
-        }
-
-        ScreenshotNumber++;
-        */
     }
     else QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.\nÜberprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !"));
 }
@@ -1077,7 +1060,7 @@ void MainWindow::on_actionREU_laden_triggered()
     QString filename = QFileDialog::getOpenFileName(this,tr("REU Inhalt laden"),QDir::homePath(),tr("REU Image Dateien") + "(*.reu);;" + tr("Alle Dateien") + "(*.*)",nullptr,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
-        if(c64->LoadREUImage(filename.toUtf8().data()) != 0)
+        if(c64->LoadREUImage(filename.toLocal8Bit()) != 0)
             QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des REU Images trat ein Fehler auf!"));
     }
 }
@@ -1094,7 +1077,7 @@ void MainWindow::on_actionREU_speichern_triggered()
     if(!CustomSaveFileDialog::GetSaveFileName(this,tr("REU Inhalt speichern"), filters, &filename, &fileext))
         return;
 
-    if(c64->SaveREUImage(filename.toUtf8().data()) != 0)
+    if(c64->SaveREUImage(filename.toLocal8Bit()) != 0)
         QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des REU Images trat ein Fehler auf!"));
 }
 
@@ -1125,7 +1108,7 @@ void MainWindow::on_actionGEO_laden_triggered()
     QString filename = QFileDialog::getOpenFileName(this,tr("GEORAM Inhalt laden"),QDir::homePath(),tr("GEORAM Image Dateien") + "(*.img);;" + tr("Alle Dateien") + "(*.*)",nullptr,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
-        if(c64->LoadGEORAMImage(filename.toUtf8().data()) != 0)
+        if(c64->LoadGEORAMImage(filename.toLocal8Bit()) != 0)
             QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des GEORAM Images trat ein Fehler auf!"));
     }
 }
@@ -1142,7 +1125,7 @@ void MainWindow::on_actionGEO_speichern_triggered()
     if(!CustomSaveFileDialog::GetSaveFileName(this,tr("GEORAM Inhalt speichern"), filters, &filename, &fileext))
         return;
 
-    if(c64->SaveGEORAMImage(filename.toUtf8().data()) != 0)
+    if(c64->SaveGEORAMImage(filename.toLocal8Bit()) != 0)
         QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des GEORAM Images trat ein Fehler auf!"));
 }
 

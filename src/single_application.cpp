@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.02.2017                //
+// Letzte Änderung am 13.09.201A                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -91,7 +91,7 @@ bool SingleApplication::sendMessage(const QString &message)
 
     QByteArray byteArray;
     byteArray.append(char(message.size()));
-    byteArray.append(message.toUtf8());
+    byteArray.append(message.toLocal8Bit());
     byteArray.append('\0');
 
     //sharedMemory->lock();

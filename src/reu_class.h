@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.08.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -35,8 +35,8 @@ class REUClass
 
     void Insert(void);
     void Remove(void);
-    int LoadRAM(char *filename);
-    int SaveRAM(char *filename);
+    int LoadRAM(const char *filename);
+    int SaveRAM(const char *filename);
     void ClearRAM(void);
     void Reset(void);
     void OneZyklus(void);

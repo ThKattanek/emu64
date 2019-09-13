@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.05.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -44,8 +44,8 @@ public:
     TAPE1530(int samplerate, int puffersize, float cycles_per_second);
     ~TAPE1530();
     void SetC64Zyklen(float cycles_per_second);
-    bool LoadTapeImage(char* filename);
-    bool RecordTapeImage(char* filename);
+    bool LoadTapeImage(const char *filename);
+    bool RecordTapeImage(const char *filename);
     void StopRecordImage();
     unsigned char SetTapeKeys(unsigned char pressed_key);
     void *GetSoundBuffer(void);

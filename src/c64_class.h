@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.08.2019                //
+// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -67,9 +67,9 @@ public:
     void WarpModeLoop();
     void FillAudioBuffer(uint8_t *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
     void KeyEvent(uint8_t  matrix_code, KeyStatus status, bool isAutoShift);
-    bool LoadC64Roms(char *kernalrom, char *basicrom, char *charrom);
-    bool LoadFloppyRom(uint8_t floppy_nr, char *dos1541rom);
-    bool LoadDiskImage(uint8_t floppy_nr, char *filename);
+    bool LoadC64Roms(const char *kernalrom, const char *basicrom, const char *charrom);
+    bool LoadFloppyRom(uint8_t floppy_nr, const char *dos1541rom);
+    bool LoadDiskImage(uint8_t floppy_nr, const char *filename);
     void LoadPRGFromD64(uint8_t floppy_nr, char *c64_filename, int command);
     void SetFloppyWriteProtect(uint8_t floppy_nr, bool status);
     void SetCommandLine(char *c64_command);
@@ -78,7 +78,7 @@ public:
     void WriteC64Byte(uint16_t address, uint8_t value);
     uint8_t* GetRAMPointer(uint16_t address);
     void SetGrafikModi(bool enable_screen_doublesize, bool enable_screen_crt_output, bool filter_enable, uint16_t fullscreen_width = 0, uint16_t fullscreen_height = 0);
-    void SetSDLWindowName(char *name);
+    void SetSDLWindowName(const char *name);
     void SetFullscreen(bool is_fullscreen);
     void ToggleScreenMode();
     void InitGrafik();
@@ -97,8 +97,8 @@ public:
     void GetWindowSize(int *x, int *y);
     void SetWindowSize(int w, int h);
 
-    bool LoadTapeImage(char *filename);
-    bool RecordTapeImage(char* filename);
+    bool LoadTapeImage(const char *filename);
+    bool RecordTapeImage(const char *filename);
     uint8_t SetTapeKeys(uint8_t pressed_key);
     bool GetTapeMotorStatus();
     bool GetTapeRecordLedStatus();
@@ -110,23 +110,23 @@ public:
     void SoftReset();
     void HardReset();
     void SetReset(int status, int hard_reset);
-    int LoadAutoRun(uint8_t floppy_nr, char *filename);
-    int LoadPRG(char *filename, uint16_t *return_start_address);
+    int LoadAutoRun(uint8_t floppy_nr, const char *filename);
+    int LoadPRG(const char *filename, uint16_t *return_start_address);
 
-    int LoadCRT(char *filename);
+    int LoadCRT(const char *filename);
     void RemoveCRT();
-    int CreateNewEasyFlashImage(char *filename, char *crt_name);
+    int CreateNewEasyFlashImage(const char *filename, const char *crt_name);
 
     void InsertREU();
     void RemoveREU();
-    int LoadREUImage(char *filename);
-    int SaveREUImage(char *filename);
+    int LoadREUImage(const char *filename);
+    int SaveREUImage(const char *filename);
     void ClearREURam();
 
     void InsertGEORAM();
     void RemoveGEORAM();
-    int LoadGEORAMImage(char *filename);
-    int SaveGEORAMImage(char *filename);
+    int LoadGEORAMImage(const char *filename);
+    int SaveGEORAMImage(const char *filename);
     void ClearGEORAMRam();
 
     void SetMouse1351Port(unsigned char port);
@@ -149,11 +149,11 @@ public:
     void UpdateBreakGroup();
     void DeleteAllBreakGroups();
     int GetBreakGroupCount();
-    int LoadBreakGroups(char *filename);
-    bool SaveBreakGroups(char *filename);
-    bool ExportPRG(char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
+    int LoadBreakGroups(const char *filename);
+    bool SaveBreakGroups(const char *filename);
+    bool ExportPRG(const char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
     bool ExportRAW(char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
-    bool ExportASM(char* filename, uint16_t start_adresse, uint16_t end_adresse, int source);
+    bool ExportASM(const char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
     void JoystickNewScan();
     void StartRecJoystickMapping(int slot_nr);
     void StopRecJoystickMapping();
