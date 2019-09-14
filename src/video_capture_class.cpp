@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.06.2019                //
+// Letzte Änderung am 14.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,32 +18,33 @@
 
 VideoCaptureClass::VideoCaptureClass()
 {
-    Mutex1 = false;
+    mutex_01 = false;
 
-    CaptureIsActive = false;
-    CaptureIsPause = false;
+    is_capture_cctive = false;
+    is_capture_pause = false;
 
-    FormatCtx = NULL;
-    AudioCodec = VideoCodec = NULL;
-    VideoStream = AudioStream = {0};
+    format_ctx = nullptr;
+    video_codec = audio_codec = nullptr;
+    video_stream = {};
+    audio_stream = {};
 
-    SourceAudioData = new unsigned short[SOURCE_SAMPLE_BUFFER_LEN];
+    source_audio_data = new unsigned short[SOURCE_SAMPLE_BUFFER_LEN];
 
-    AudioBitrate = 128000;
-    VideoBitrate = 4000000;
+    audio_bitrate = 128000;
+    video_bitrate = 4000000;
 
-    VideoPackageCounter = 0;
-    AudioPackageCounter = 0;
+    video_package_counter = 0;
+    audio_package_counter = 0;
 }
 
 VideoCaptureClass::~VideoCaptureClass()
 {
-    if(CaptureIsActive)
+    if(is_capture_cctive)
     {
         cout << "VideoCaptureClass: " << "Stoppen erzwingen!" << endl;
         StopCapture();
 
-        delete[] SourceAudioData;
+        delete[] source_audio_data;
     }
 }
 
@@ -54,195 +55,194 @@ const char* VideoCaptureClass::GetAVVersion()
 
 void VideoCaptureClass::SetVideoBitrate(int video_bitrate)
 {
-    VideoBitrate = video_bitrate;
+    this->video_bitrate = video_bitrate;
 }
 
 void VideoCaptureClass::SetAudioBitrate(int audio_bitrate)
 {
-    AudioBitrate = audio_bitrate;
+    this->audio_bitrate = audio_bitrate;
 }
 
 bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_name, int xw, int yw)
 {
-    if(CaptureIsActive) return false;
+    if(is_capture_cctive) return false;
 
-    while(Mutex1){
+    while(mutex_01){
         SDL_Delay(1);
-    };   // Warten bis Mutex1 Unlocked (false)
-    Mutex1 = true;      // Mutex1 Locken (true)
+    }   // Warten bis Mutex1 Unlocked (false)
+    mutex_01 = true;      // Mutex1 Locken (true)
 
-    VideoXW = xw;
-    VideoYW = yw;
+    video_xw = xw;
+    video_yw = yw;
 
-    HaveVideo = HaveAudio = false;
-    EncodeVideo = EncodeAudio = 0;
+    have_video = have_audio = false;
+    encode_video = encode_audio = 0;
 
-    SourceAudioDataLength = 0;
-    FrameSamplesPt = 0;
+    frame_samples_pt = 0;
 
-    AudioPackageCounter = 0;
-    VideoPackageCounter = 0;
+    audio_package_counter = 0;
+    video_package_counter = 0;
 
-    Options = NULL;
+    options = nullptr;
 
     int ret;
 
     av_register_all();
 
     //
-    avformat_alloc_output_context2(&FormatCtx, NULL, NULL, filename);
-    if (!FormatCtx)
+    avformat_alloc_output_context2(&format_ctx, nullptr, nullptr, filename);
+    if (!format_ctx)
     {
         cerr << "Es konnte das Ausgabe Format nicht anhand des Dateinamens ermittelt werden. Es wird versucht MPEG zu benutzten." << endl;
-        avformat_alloc_output_context2(&FormatCtx, NULL, "mpeg", filename);
+        avformat_alloc_output_context2(&format_ctx, nullptr, codec_name, filename);
     }
-    if (!FormatCtx)
+    if (!format_ctx)
     {
         cerr << "Es konnte kein FormatContext erstellt werden." << endl;
-        Mutex1 = false;      // Mutex1 Unlocken (false)
+        mutex_01 = false;      // Mutex1 Unlocken (false)
         return false;
     }
 
-    OutputFormat = FormatCtx->oformat;
+    output_format = format_ctx->oformat;
 
     // Hinzufügen des Audio und Videostreams mit den Default Format Codecs
     // Und der Initialisierung der Codecs
-    if (OutputFormat->video_codec != AV_CODEC_ID_NONE)
+    if (output_format->video_codec != AV_CODEC_ID_NONE)
     {
-        AddStream(&VideoStream, FormatCtx, &VideoCodec, OutputFormat->video_codec);
-        HaveVideo = true;
-        EncodeVideo = 1;
+        AddStream(&video_stream, format_ctx, &video_codec, output_format->video_codec);
+        have_video = true;
+        encode_video = 1;
     }
-    if (OutputFormat->audio_codec != AV_CODEC_ID_NONE)
+    if (output_format->audio_codec != AV_CODEC_ID_NONE)
     {
-        AddStream(&AudioStream, FormatCtx, &AudioCodec, OutputFormat->audio_codec);
-        HaveAudio = true;
-        EncodeAudio = 1;
+        AddStream(&audio_stream, format_ctx, &audio_codec, output_format->audio_codec);
+        have_audio = true;
+        encode_audio = 1;
     }
 
 
     /* Now that all the parameters are set, we can open the audio and
      * video codecs and allocate the necessary encode buffers. */
-    if (HaveVideo)
-        OpenVideo(FormatCtx, VideoCodec, &VideoStream, Options);
-    if (HaveAudio)
-        OpenAudio(FormatCtx, AudioCodec, &AudioStream, Options);
+    if (have_video)
+        OpenVideo(video_codec, &video_stream, options);
+    if (have_audio)
+        OpenAudio(audio_codec, &audio_stream, options);
 
-    av_dump_format(FormatCtx, 0, filename, 1);
+    av_dump_format(format_ctx, 0, filename, 1);
 
     // Öffnen der Ausgabedatei
-    if (!(OutputFormat->flags & AVFMT_NOFILE))
+    if (!(output_format->flags & AVFMT_NOFILE))
     {
-        ret = avio_open(&FormatCtx->pb, filename, AVIO_FLAG_WRITE);
+        ret = avio_open(&format_ctx->pb, filename, AVIO_FLAG_WRITE);
         if (ret < 0)
         {
             char err_msg[AV_ERROR_MAX_STRING_SIZE];
             cerr << "Ausgabedatei kann nicht geöffnet werden: [" << filename << "[  -- " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
-            Mutex1 = false;      // Mutex1 Unlocken (false)
+            mutex_01 = false;      // Mutex1 Unlocken (false)
             StopCapture();
             return false;
         }
     }
 
     // Schreiben des Stream Headers
-    ret = avformat_write_header(FormatCtx, &Options);
+    ret = avformat_write_header(format_ctx, &options);
     if (ret < 0)
     {
         char err_msg[AV_ERROR_MAX_STRING_SIZE];
         cerr << "Beim öffnen der Ausgabedatei ist ein Fehler aufgetreten.  -- " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
-        Mutex1 = false;      // Mutex1 Unlocken (false)
+        mutex_01 = false;      // Mutex1 Unlocken (false)
         StopCapture();
         return false;
     }
 
     // Ausgabe von aktuellen Aufnahme Parametern
-    cout << "Video Auflösung: " << VideoXW << " x " << VideoYW << endl;
-    cout << "VideoCodec: " << VideoCodec->name << endl;
-    cout << "AudioCodec: " << AudioCodec->name << endl;
-    cout << "AudioFrameSize: " << AudioStream.enc->frame_size << endl;
+    cout << "Video Auflösung: " << video_xw << " x " << video_yw << endl;
+    cout << "VideoCodec: " << video_codec->name << endl;
+    cout << "AudioCodec: " << audio_codec->name << endl;
+    cout << "AudioFrameSize: " << audio_stream.enc->frame_size << endl;
 
-    FrameAudioDataL = new unsigned short[AudioStream.enc->frame_size];
-    FrameAudioDataR = new unsigned short[AudioStream.enc->frame_size];
+    frame_audio_data_left = new int16_t[audio_stream.enc->frame_size];
+    frame_audio_data_right = new int16_t[audio_stream.enc->frame_size];
 
-    CaptureIsActive = true;
+    is_capture_cctive = true;
 
-    Mutex1 = false;      // Mutex1 Unlocken (false)
+    mutex_01 = false;      // Mutex1 Unlocken (false)
     return true;
 }
 
 void VideoCaptureClass::StopCapture()
 {
-    if(!CaptureIsActive) return;
+    if(!is_capture_cctive) return;
 
     cout << "VideoCapture wird gestoppt" << endl;
 
-    CaptureIsActive = false;
+    is_capture_cctive = false;
 
-    while(Mutex1){
+    while(mutex_01){
         SDL_Delay(1);
-    };   // Warten bis Mutex1 Unlocked (false)
-    Mutex1 = true;      // Mutex1 Locken (true)
+    }   // Warten bis Mutex1 Unlocked (false)
+    mutex_01 = true;      // Mutex1 Locken (true)
 
 
     // Trailer schreiben
-    av_write_trailer(FormatCtx);
+    av_write_trailer(format_ctx);
 
     // VideoStream schließen
-    if (HaveVideo)
+    if (have_video)
     {
-        CloseStream(FormatCtx, &VideoStream);
-        VideoStream = {0};
+        CloseStream(&video_stream);
+        video_stream = {};
     }
 
     // AudioStream schließen
-    if (HaveAudio)
+    if (have_audio)
     {
-        CloseStream(FormatCtx, &AudioStream);
-        AudioStream = {0};
+        CloseStream(&audio_stream);
+        audio_stream = {};
     }
 
     // Ausgabedatei schließen
-    if (!(OutputFormat->flags & AVFMT_NOFILE))
+    if (!(output_format->flags & AVFMT_NOFILE))
         /* Close the output file. */
-        avio_closep(&FormatCtx->pb);
+        avio_closep(&format_ctx->pb);
 
-    avformat_free_context(FormatCtx);
-    FormatCtx = NULL;
+    avformat_free_context(format_ctx);
+    format_ctx = nullptr;
 
-    delete[] FrameAudioDataL;
-    delete[] FrameAudioDataR;
+    delete[] frame_audio_data_left;
+    delete[] frame_audio_data_right;
 
-    Mutex1 = false;      // Mutex1 Unlocken (false)
+    mutex_01 = false;      // Mutex1 Unlocken (false)
 
     cout << "VideoCapture wurde gestoppt" << endl;
-    cout << "VideoFrames: " << VideoPackageCounter << endl;
-    cout << "AudioPackages: " << AudioPackageCounter << endl;
+    cout << "VideoFrames: " << video_package_counter << endl;
+    cout << "AudioPackages: " << audio_package_counter << endl;
 }
 
 void VideoCaptureClass::SetCapturePause(bool cpt_pause)
 {
-    CaptureIsPause = cpt_pause;
+    is_capture_pause = cpt_pause;
 }
 
 void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
 {
-    if(!CaptureIsActive || CaptureIsPause) return;
+    if(!is_capture_cctive || is_capture_pause) return;
 
-    while(Mutex1){
+    while(mutex_01){
         SDL_Delay(1);
-    };   // Warten bis Mutex1 Unlocked (false)
-    Mutex1 = true;      // Mutex1 Locken (true)
+    }   // Warten bis Mutex1 Unlocked (false)
+    mutex_01 = true;      // Mutex1 Locken (true)
 
-    SourceVideoData = data;
-    SourceVideoLineSize = linesize;
+    source_video_data = data;
+    source_video_line_size = linesize;
 
-    EncodeVideo = !WriteVideoFrame(FormatCtx, &VideoStream);
-    Mutex1 = false;      // Mutex1 Unlocken (false)
+    encode_video = !WriteVideoFrame(format_ctx, &video_stream);
+    mutex_01 = false;      // Mutex1 Unlocken (false)
 }
 
 void VideoCaptureClass::FillSourceAudioBuffer(int16_t *data, int len)
 {
-    if(!CaptureIsActive || CaptureIsPause) return;
+    if(!is_capture_cctive || is_capture_pause) return;
 
     if(len > SOURCE_SAMPLE_BUFFER_LEN)
     {
@@ -250,23 +250,23 @@ void VideoCaptureClass::FillSourceAudioBuffer(int16_t *data, int len)
         return;
     }
 
-    int n_sample = AudioStream.enc->frame_size;
+    int n_sample = audio_stream.enc->frame_size;
 
     for(int i=0; i<len/2; i++)
     {
-        FrameAudioDataL[FrameSamplesPt] = *data++;
-        FrameAudioDataR[FrameSamplesPt++] = *data++;
-        if(FrameSamplesPt == n_sample)
+        frame_audio_data_left[frame_samples_pt] = *data++;
+        frame_audio_data_right[frame_samples_pt++] = *data++;
+        if(frame_samples_pt == n_sample)
         {
-            FrameSamplesPt = 0;
-            EncodeAudio = !WriteAudioFrame(FormatCtx, &AudioStream);
+            frame_samples_pt = 0;
+            encode_audio = !WriteAudioFrame(format_ctx, &audio_stream);
         }
     }
 }
 
 int VideoCaptureClass::GetRecordedFrameCount()
 {
-    return VideoPackageCounter;
+    return video_package_counter;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -286,13 +286,13 @@ void VideoCaptureClass::AddStream(OutputStream *ost, AVFormatContext *oc, AVCode
     }
 
 
-    ost->st = avformat_new_stream(oc, NULL);
+    ost->st = avformat_new_stream(oc, nullptr);
     if (!ost->st) {
         fprintf(stderr, "Could not allocate stream\n");
         exit(1);
     }
 
-    ost->st->id = oc->nb_streams-1;
+    ost->st->id = static_cast<int>(oc->nb_streams - 1);
     c = avcodec_alloc_context3(*codec);
     if (!c) {
         fprintf(stderr, "Could not alloc an encoding context\n");
@@ -303,7 +303,7 @@ void VideoCaptureClass::AddStream(OutputStream *ost, AVFormatContext *oc, AVCode
     case AVMEDIA_TYPE_AUDIO:
         c->sample_fmt  = (*codec)->sample_fmts ?
             (*codec)->sample_fmts[0] : AV_SAMPLE_FMT_FLTP;
-        c->bit_rate    = AudioBitrate;
+        c->bit_rate    = audio_bitrate;
         c->sample_rate = 44100;
         if ((*codec)->supported_samplerates) {
             c->sample_rate = (*codec)->supported_samplerates[0];
@@ -322,22 +322,22 @@ void VideoCaptureClass::AddStream(OutputStream *ost, AVFormatContext *oc, AVCode
             }
         }
         c->channels        = av_get_channel_layout_nb_channels(c->channel_layout);
-        ost->st->time_base = (AVRational){ 1, c->sample_rate };
+        ost->st->time_base = AVRational{ 1, c->sample_rate };
         break;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     case AVMEDIA_TYPE_VIDEO:
         c->codec_id = codec_id;
-        c->bit_rate = VideoBitrate;
+        c->bit_rate = video_bitrate;
         /* Resolution must be a multiple of two. */
-        c->width    = VideoXW;
-        c->height   = VideoYW;
+        c->width    = video_xw;
+        c->height   = video_yw;
         /* timebase: This is the fundamental unit of time (in seconds) in terms
          * of which frame timestamps are represented. For fixed-fps content,
          * timebase should be 1/framerate and timestamp increments should be
          * identical to 1. */
-        ost->st->time_base = (AVRational){ 1, STREAM_FRAME_RATE };
+        ost->st->time_base = AVRational{ 1, STREAM_FRAME_RATE };
         c->time_base       = ost->st->time_base;
         c->gop_size      = 12; /* emit one intra frame every twelve frames at most */
         c->pix_fmt       = STREAM_PIX_FMT;
@@ -360,7 +360,7 @@ void VideoCaptureClass::AddStream(OutputStream *ost, AVFormatContext *oc, AVCode
         c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 }
 
-void VideoCaptureClass::CloseStream(AVFormatContext *oc, OutputStream *ost)
+void VideoCaptureClass::CloseStream(OutputStream *ost)
 {
     avcodec_free_context(&ost->enc);
     av_frame_free(&ost->frame);
@@ -369,11 +369,11 @@ void VideoCaptureClass::CloseStream(AVFormatContext *oc, OutputStream *ost)
     swr_free(&ost->swr_ctx);
 }
 
-bool VideoCaptureClass::OpenVideo(AVFormatContext *oc, AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg)
+bool VideoCaptureClass::OpenVideo(AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg)
 {
     int ret;
     AVCodecContext *c = ost->enc;
-    AVDictionary *opt = NULL;
+    AVDictionary *opt = nullptr;
     av_dict_copy(&opt, opt_arg, 0);
     /* open the codec */
     ret = avcodec_open2(c, codec, &opt);
@@ -395,7 +395,7 @@ bool VideoCaptureClass::OpenVideo(AVFormatContext *oc, AVCodec *codec, OutputStr
     /* If the output format is not YUV420P, then a temporary YUV420P
      * picture is needed too. It is then converted to the required
      * output format. */
-    ost->tmp_frame = NULL;
+    ost->tmp_frame = nullptr;
     if (c->pix_fmt != AV_PIX_FMT_YUV420P)
     {
         ost->tmp_frame = AllocPicture(AV_PIX_FMT_YUV420P, c->width, c->height);
@@ -423,7 +423,7 @@ AVFrame* VideoCaptureClass::AllocPicture(enum AVPixelFormat pix_fmt, int width, 
     int ret;
     picture = av_frame_alloc();
     if (!picture)
-        return NULL;
+        return nullptr;
     picture->format = pix_fmt;
     picture->width  = width;
     picture->height = height;
@@ -432,17 +432,17 @@ AVFrame* VideoCaptureClass::AllocPicture(enum AVPixelFormat pix_fmt, int width, 
     if (ret < 0)
     {
         cerr << "Could not allocate frame data." << endl;
-        return NULL;
+        return nullptr;
     }
     return picture;
 }
 
-bool VideoCaptureClass::OpenAudio(AVFormatContext *oc, AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg)
+bool VideoCaptureClass::OpenAudio(AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg)
 {
     AVCodecContext *c;
     int nb_samples;
     int ret;
-    AVDictionary *opt = NULL;
+    AVDictionary *opt = nullptr;
     c = ost->enc;
     /* open it */
     av_dict_copy(&opt, opt_arg, 0);
@@ -454,12 +454,6 @@ bool VideoCaptureClass::OpenAudio(AVFormatContext *oc, AVCodec *codec, OutputStr
         cerr << "Could not open audio codec: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
         return false;
     }
-
-    /* init signal generator */
-    ost->t     = 0;
-    ost->tincr = 2 * M_PI * 110.0 / c->sample_rate;
-    /* increment frequency by 110 Hz per second */
-    ost->tincr2 = 2 * M_PI * 110.0 / c->sample_rate / c->sample_rate;
 
     if (c->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE)
     {
@@ -513,7 +507,7 @@ AVFrame* VideoCaptureClass::AllocAudioFrame(enum AVSampleFormat sample_fmt, uint
     if (!frame)
     {
         cerr << "Error allocating an audio frame." << endl;
-        return NULL;
+        return nullptr;
     }
 
     frame->format = sample_fmt;
@@ -526,7 +520,7 @@ AVFrame* VideoCaptureClass::AllocAudioFrame(enum AVSampleFormat sample_fmt, uint
         if (ret < 0)
         {
             cerr << "Error allocating an audio buffer." << endl;
-            return NULL;
+            return nullptr;
         }
     }
     return frame;
@@ -538,7 +532,7 @@ int VideoCaptureClass::WriteVideoFrame(AVFormatContext *oc, OutputStream *ost)
     AVCodecContext *c;
     AVFrame *frame;
     int got_packet = 0;
-    AVPacket pkt = { 0 };
+    AVPacket pkt = {};
     c = ost->enc;
     frame = GetVideoFrame(ost);
     av_init_packet(&pkt);
@@ -563,7 +557,7 @@ int VideoCaptureClass::WriteVideoFrame(AVFormatContext *oc, OutputStream *ost)
         cerr << "Error while writing video frame: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
     }
     else
-        VideoPackageCounter++;
+        video_package_counter++;
 
     return (frame || got_packet) ? 0 : 1;
 }
@@ -571,17 +565,17 @@ int VideoCaptureClass::WriteVideoFrame(AVFormatContext *oc, OutputStream *ost)
 int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
 {
     AVCodecContext *c;
-    AVPacket pkt = { 0 }; // data and size must be 0;
+    AVPacket pkt = {}; // data and size must be 0;
     AVFrame *frame;
-    int ret;
+    int64_t ret;
     int got_packet;
-    int dst_nb_samples;
+    int64_t dst_nb_samples;
     av_init_packet(&pkt);
     c = ost->enc;
 
     frame = GetAudioFrame(ost);
 
-    if(frame == NULL) return 0;
+    if(frame == nullptr) return 0;
 
     if (frame)
     {
@@ -597,14 +591,14 @@ int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
         if (ret < 0)
             exit(1);
         /* convert to destination format */
-        ret = swr_convert(ost->swr_ctx, ost->frame->data, dst_nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
+        ret = swr_convert(ost->swr_ctx, ost->frame->data, static_cast<int>(dst_nb_samples), const_cast<const uint8_t**>(frame->data), frame->nb_samples);
         if (ret < 0)
         {
             fprintf(stderr, "Error while converting\n");
             exit(1);
         }
         frame = ost->frame;
-        frame->pts = av_rescale_q(ost->samples_count, (AVRational){1, c->sample_rate}, c->time_base);
+        frame->pts = av_rescale_q(ost->samples_count, AVRational{1, c->sample_rate}, c->time_base);
         ost->samples_count += dst_nb_samples;
     }
     ret = avcodec_encode_audio2(c, &pkt, frame, &got_packet);
@@ -612,7 +606,7 @@ int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
     if (ret < 0)
     {
         char err_msg[AV_ERROR_MAX_STRING_SIZE];
-        cerr << "Error encoding audio frame: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
+        cerr << "Error encoding audio frame: " << av_make_error_string(err_msg, AV_ERROR_MAX_STRING_SIZE, static_cast<int>(ret)) << endl;
     }
 
     if (got_packet)
@@ -621,11 +615,11 @@ int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
         if (ret < 0)
         {
             char err_msg[AV_ERROR_MAX_STRING_SIZE];
-            cerr << "Error while writing audio frame: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
+            cerr << "Error while writing audio frame: " << av_make_error_string(err_msg, AV_ERROR_MAX_STRING_SIZE, static_cast<int>(ret)) << endl;
         }
         else
         {
-            AudioPackageCounter++;
+            audio_package_counter++;
         }
     }
     return (frame || got_packet) ? 0 : 1;
@@ -637,22 +631,22 @@ int VideoCaptureClass::WriteFrame(AVFormatContext *fmt_ctx, const AVRational *ti
     av_packet_rescale_ts(pkt, *time_base, st->time_base);
     pkt->stream_index = st->index;
     /* Write the compressed frame to the media file. */
-    LogPacket(fmt_ctx, pkt);
+    // LogPacket(fmt_ctx, pkt);
     return av_interleaved_write_frame(fmt_ctx, pkt);
 }
 
+/*
 void VideoCaptureClass::LogPacket(const AVFormatContext *fmt_ctx, const AVPacket *pkt)
 {
     // AVRational *time_base = &fmt_ctx->streams[pkt->stream_index]->time_base;
 
-    /*
     printf("pts:%s pts_time:%s dts:%s dts_time:%s duration:%s duration_time:%s stream_index:%d\n",
            av_ts2str(pkt->pts), av_ts2timestr(pkt->pts, time_base),
            av_ts2str(pkt->dts), av_ts2timestr(pkt->dts, time_base),
            av_ts2str(pkt->duration), av_ts2timestr(pkt->duration, time_base),
            pkt->stream_index);
-    */
 }
+*/
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -685,25 +679,25 @@ AVFrame* VideoCaptureClass::GetVideoFrame(OutputStream *ost)
                                           AV_PIX_FMT_YUV420P,
                                           c->width, c->height,
                                           c->pix_fmt,
-                                          SCALE_FLAGS, NULL, NULL, NULL);
+                                          SCALE_FLAGS, nullptr, nullptr, nullptr);
             if (!ost->sws_ctx) {
                 fprintf(stderr,
                         "Could not initialize the conversion context\n");
                 exit(1);
             }
         }
-        FillyuvImage(ost->tmp_frame, ost->next_pts, c->width, c->height);
+        FillyuvImage(ost->tmp_frame, c->width, c->height);
         sws_scale(ost->sws_ctx,
-                  (const uint8_t * const *)ost->tmp_frame->data, ost->tmp_frame->linesize,
+                  const_cast<const uint8_t * const *>(ost->tmp_frame->data), ost->tmp_frame->linesize,
                   0, c->height, ost->frame->data, ost->frame->linesize);
     } else {
-        FillyuvImage(ost->frame, ost->next_pts, c->width, c->height);
+        FillyuvImage(ost->frame, c->width, c->height);
     }
     ost->frame->pts = ost->next_pts++;
     return ost->frame;
 }
 
-void VideoCaptureClass::FillyuvImage(AVFrame *pict, int frame_index, int width, int height)
+void VideoCaptureClass::FillyuvImage(AVFrame *pict, int width, int height)
 {
     uint8_t *src_pixels;
     uint8_t Y;
@@ -713,10 +707,10 @@ void VideoCaptureClass::FillyuvImage(AVFrame *pict, int frame_index, int width, 
     // Y
     for (int y = 0; y < height; y++)
     {
-        src_pixels = SourceVideoData + y*SourceVideoLineSize;
+        src_pixels = source_video_data + y*source_video_line_size;
         for (int x = 0; x < width; x++)
         {
-            Y =  0.257*src_pixels[2] + 0.504*src_pixels[1] + 0.098*src_pixels[0] + 16;
+            Y =  static_cast<uint8_t>(0.257*src_pixels[2] + 0.504*src_pixels[1] + 0.098*src_pixels[0] + 16);
             src_pixels += 4;
             pict->data[0][y * pict->linesize[0] + x] = Y;
         }
@@ -725,17 +719,17 @@ void VideoCaptureClass::FillyuvImage(AVFrame *pict, int frame_index, int width, 
     // Cb and Cr
     for (int y = 0; y < height; y+=2)
     {
-        src_pixels = SourceVideoData + y*SourceVideoLineSize;
+        src_pixels = source_video_data + y*source_video_line_size;
         for (int x = 0; x < width/2; x++)
         {
-            r = (src_pixels[2]+src_pixels[6]+src_pixels[2+SourceVideoLineSize]+src_pixels[6+SourceVideoLineSize]) / 4;
-            g = (src_pixels[1]+src_pixels[5]+src_pixels[1+SourceVideoLineSize]+src_pixels[5+SourceVideoLineSize]) / 4;
-            b = (src_pixels[0]+src_pixels[4]+src_pixels[0+SourceVideoLineSize]+src_pixels[4+SourceVideoLineSize]) / 4;
+            r = (src_pixels[2]+src_pixels[6]+src_pixels[2+source_video_line_size]+src_pixels[6+source_video_line_size]) / 4;
+            g = (src_pixels[1]+src_pixels[5]+src_pixels[1+source_video_line_size]+src_pixels[5+source_video_line_size]) / 4;
+            b = (src_pixels[0]+src_pixels[4]+src_pixels[0+source_video_line_size]+src_pixels[4+source_video_line_size]) / 4;
 
             src_pixels += 8;
 
-            Cb = -0.148*r - 0.291*g + 0.439*b + 128;
-            Cr = 0.439*r - 0.368*g - 0.071*b + 128;
+            Cb = static_cast<uint8_t>(-0.148*r - 0.291*g + 0.439*b + 128);
+            Cr = static_cast<uint8_t>(0.439*r - 0.368*g - 0.071*b + 128);
             pict->data[1][y/2 * pict->linesize[1] + x] = Cr;
             pict->data[2][y/2 * pict->linesize[2] + x] = Cb;
         }
@@ -746,12 +740,12 @@ AVFrame* VideoCaptureClass::GetAudioFrame(OutputStream *ost)
 {
     AVFrame *frame = ost->tmp_frame;
 
-    int16_t *q = (int16_t*)frame->data[0];
+    int16_t *q = reinterpret_cast<int16_t*>(frame->data[0]);
 
     for (int i = 0; i <frame->nb_samples; i++)
     {
-        *q++ = FrameAudioDataL[i];
-        *q++ = FrameAudioDataR[i];
+        *q++ = frame_audio_data_left[i];
+        *q++ = frame_audio_data_right[i];
         ost->t     += ost->tincr;
         ost->tincr += ost->tincr2;
     }

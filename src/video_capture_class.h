@@ -8,15 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.02.2017                //
+// Letzte Änderung am 14.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #ifndef VIDEO_CAPTURE_CLASS_H
 #define VIDEO_CAPTURE_CLASS_H
-
-#define __STDC_FORMAT_MACROS
 
 #include <iostream>
 #include <SDL2/SDL.h>
@@ -80,53 +78,48 @@ public:
 
 private:
     void AddStream(OutputStream *ost, AVFormatContext *oc, AVCodec **codec, enum AVCodecID codec_id);
-    void CloseStream(AVFormatContext *oc, OutputStream *ost);
-    bool OpenVideo(AVFormatContext *oc, AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
+    void CloseStream(OutputStream *ost);
+    bool OpenVideo(AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
     AVFrame* AllocPicture(enum AVPixelFormat pix_fmt, int width, int height);
-    bool OpenAudio(AVFormatContext *oc, AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
+    bool OpenAudio(AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
     AVFrame* AllocAudioFrame(enum AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
     int WriteVideoFrame(AVFormatContext *oc, OutputStream *ost);
     int WriteAudioFrame(AVFormatContext *oc, OutputStream *ost);
     int WriteFrame(AVFormatContext *fmt_ctx, const AVRational *time_base, AVStream *st, AVPacket *pkt);
-    void LogPacket(const AVFormatContext *fmt_ctx, const AVPacket *pkt);
+    // void LogPacket(const AVFormatContext *fmt_ctx, const AVPacket *pkt);
 
     AVFrame* GetVideoFrame(OutputStream *ost);
-    void FillyuvImage(AVFrame *pict, int frame_index, int width, int height);
+    void FillyuvImage(AVFrame *pict, int width, int height);
     AVFrame* GetAudioFrame(OutputStream *ost);
 
-    bool CaptureIsActive;
-    bool CaptureIsPause;
-    int VideoXW, VideoYW;
+    bool is_capture_cctive;
+    bool is_capture_pause;
+    int video_xw, video_yw;
 
-    bool HaveVideo, HaveAudio;
-    int EncodeVideo, EncodeAudio;
+    bool have_video, have_audio;
+    int encode_video, encode_audio;
 
-    int AudioBitrate, VideoBitrate;
+    int video_bitrate, audio_bitrate;
 
-    AVFormatContext *FormatCtx;
-    AVOutputFormat  *OutputFormat;
-    OutputStream VideoStream, AudioStream;
-    AVCodec *AudioCodec, *VideoCodec;
-    AVDictionary *Options;
+    AVFormatContext *format_ctx;
+    AVOutputFormat  *output_format;
+    OutputStream video_stream, audio_stream;
+    AVCodec *video_codec, *audio_codec;
+    AVDictionary *options;
 
-    unsigned char* SourceVideoData;
-    int SourceVideoLineSize;
+    uint8_t* source_video_data;
+    int source_video_line_size;
 
-    unsigned short* SourceAudioData;
-    int SourceAudioDataLength;
-    int FrameSamplesPt;
+    unsigned short* source_audio_data;
+    int frame_samples_pt;
 
-    unsigned short* FrameAudioDataL;
-    unsigned short* FrameAudioDataR;
+    int16_t* frame_audio_data_left;
+    int16_t* frame_audio_data_right;
 
-    bool Mutex1;
+    bool mutex_01;
 
-    int AudioPackageCounter;
-    int VideoPackageCounter;
-
-//    int NSamples;
-//    int WSamples;
-
+    int audio_package_counter;
+    int video_package_counter;
 };
 
 #endif // VIDEO_CAPTURE_CLASS_H
