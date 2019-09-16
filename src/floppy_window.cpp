@@ -357,6 +357,7 @@ void FloppyWindow::OnPRGExport(bool)
 
     // Alle nichterlaubten Zeichen in einem Dateinamen entfernen.
     char c64_filename[17];
+    int last_space = 0;
     for (int i=0;i<17;i++)
     {
        c64_filename[i] = d64[floppy_nr].d64_files[file_index].Name[i];
@@ -366,8 +367,15 @@ void FloppyWindow::OnPRGExport(bool)
        if(c64_filename[i]=='<') c64_filename[i]=' ';
        if(c64_filename[i]=='>') c64_filename[i]=' ';
        if(c64_filename[i]=='.') c64_filename[i]=' ';
+       if(c64_filename[i]==-96) c64_filename[i]=' ';
+
+       if(c64_filename[i] == ' ')
+           last_space++;
+       else
+           if(c64_filename[i] != 0) last_space=0;
     }
-    c64_filename[16] = 0;
+
+    c64_filename[16-last_space] = 0;
 
     QString filename = QString(c64_filename);
     QString fileext = FileTypes[d64[floppy_nr].d64_files[file_index].Typ & 7];
