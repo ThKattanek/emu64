@@ -381,8 +381,8 @@ void FloppyWindow::OnPRGExport(bool)
     if(c64 == nullptr) return;
 
     QStringList filters;
-    filters << tr("C64 Programmdatei (*.prg *.seq *.usr *.rel *.cbm *.e00 *.del")
-            << tr("Alle Dateien (*.*)");
+    filters << tr("C64 Programmdatei") + " (*.prg *.seq *.usr *.rel *.cbm *.e00 *.del)"
+            << tr("Alle Dateien") + " (*.*)";
 
     if(!CustomSaveFileDialog::GetSaveFileName(this, tr("C64 Datei Exportieren"), filters, &filename, &fileext))
         return;
