@@ -30,6 +30,7 @@ public:
     ~MOS6502(void);
 
     bool OneZyklus(void);
+    void Phi1();
     void Reset(void);
     void ClearJAMFlag(void);
     void GetRegister(REG_STRUCT *reg);
@@ -88,8 +89,10 @@ private:
     unsigned char   YR;
     unsigned char   SP;
     unsigned char   SR;
-    unsigned char   IRQLine;
-    unsigned char   IRQLinePuffer[5];
+
+    unsigned char   irq_state;          // if Größer 0 ist die Leitung low
+    bool            irq_is_low_pegel;
+    bool            irq_is_active;
 
     /// Für OneZyklus ///
 

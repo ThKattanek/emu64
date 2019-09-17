@@ -29,6 +29,7 @@ public:
     MOS6510(void);
     ~MOS6510(void);
     bool OneZyklus();
+    void Phi1();
     void ClearJAMFlag(void);
     void GetRegister(REG_STRUCT *reg);
     void SetRegister(REG_STRUCT *reg);
@@ -95,11 +96,15 @@ private:
     unsigned char   SP;
     unsigned char   SR;
     bool            Interrupts[IntQuellenC64];
-    unsigned char   IRQLine;
-    unsigned char   IRQLinePuffer[5];
 
-    bool            NMIState;
-    unsigned char   NMIStatePuffer[5];
+    unsigned char   irq_state;          // if Größer 0 ist die Leitung low
+    bool            irq_is_low_pegel;
+    bool            irq_is_active;
+
+    bool            nmi_state;
+    bool            nmi_state_old;
+    bool            nmi_fall_edge;
+    bool            nmi_is_active;
 
     bool            EnableDebugCart;
     unsigned char   DebugCartValue;

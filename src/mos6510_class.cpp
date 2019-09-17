@@ -43,13 +43,14 @@ MOS6510::MOS6510(void)
 
     EnableExtInterrupts = false;
 
-    NMIState = false;
-    IRQLine = 0;
-    for(int i=0;i<5;i++)
-    {
-        NMIStatePuffer[i] = false;
-        IRQLinePuffer[i] = 0;
-    }
+    irq_state = 0;
+    irq_is_low_pegel = false;
+    irq_is_active = false;
+
+    nmi_state = false;
+    nmi_state_old = false;
+    nmi_fall_edge = false;
+    nmi_is_active = false;
 
     EnableDebugCart = false;
     WRITE_DEBUG_CART = false;
@@ -81,30 +82,30 @@ void MOS6510::TriggerInterrupt(int typ)
     {
     case CIA_IRQ:
             //Interrupts[CIA_IRQ] = true;
-            IRQLine |= 0x01;
+            irq_state |= 0x01;
             break;
     case CIA_NMI:
             if(Interrupts[CIA_NMI] == true) return;
             Interrupts[CIA_NMI] = true;
-            if((Interrupts[CRT_NMI] == false) && (Interrupts[RESTORE_NMI] == false)) NMIState = true;
+            if((Interrupts[CRT_NMI] == false) && (Interrupts[RESTORE_NMI] == false)) nmi_state = true;
             break;
     case VIC_IRQ:
             //Interrupts[VIC_IRQ] = true;
-            IRQLine |= 0x02;
+            irq_state |= 0x02;
             break;
     case REU_IRQ:
             //Interrupts[REU_IRQ] = true;
-            IRQLine |= 0x04;
+            irq_state |= 0x04;
             break;
     case CRT_NMI:
             if(Interrupts[CRT_NMI] == true) return;
             Interrupts[CRT_NMI] = true;
-            if((Interrupts[CIA_NMI] == false) && (Interrupts[RESTORE_NMI] == false)) NMIState = true;
+            if((Interrupts[CIA_NMI] == false) && (Interrupts[RESTORE_NMI] == false)) nmi_state = true;
             break;
     case RESTORE_NMI:
             if(Interrupts[RESTORE_NMI] == true) return;
             Interrupts[RESTORE_NMI] = true;
-            if((Interrupts[CIA_NMI] == false) && (Interrupts[CRT_NMI] == false)) NMIState = true;
+            if((Interrupts[CIA_NMI] == false) && (Interrupts[CRT_NMI] == false)) nmi_state = true;
             break;
     default:
             break;
@@ -133,27 +134,27 @@ void MOS6510::ClearInterrupt(int typ)
     {
     case CIA_IRQ:
             //Interrupts[CIA_IRQ] = false;
-            IRQLine &= 0xFE;
+            irq_state &= 0xFE;
             break;
     case CIA_NMI:
             Interrupts[CIA_NMI] = false;
-            if(Interrupts[CRT_NMI] == false) NMIState = false;
+            if(Interrupts[CRT_NMI] == false) nmi_state = false;
             break;
     case VIC_IRQ:
             //Interrupts[VIC_IRQ] = false;
-            IRQLine &= 0xFD;
+            irq_state &= 0xFD;
             break;
     case REU_IRQ:
             //Interrupts[REU_IRQ] = false;
-            IRQLine &= 0xFB;
+            irq_state &= 0xFB;
             break;
     case CRT_NMI:
             Interrupts[CRT_NMI] = false;
-            if(Interrupts[CIA_NMI] == false) NMIState = false;
+            if(Interrupts[CIA_NMI] == false) nmi_state = false;
             break;
     case RESTORE_NMI:
             Interrupts[RESTORE_NMI] = false;
-            if((Interrupts[CIA_NMI] == false) && (Interrupts[CRT_NMI] == false)) NMIState = false;
+            if((Interrupts[CIA_NMI] == false) && (Interrupts[CRT_NMI] == false)) nmi_state = false;
             break;
     default:
             break;
@@ -238,7 +239,7 @@ void MOS6510::GetInterneRegister(IREG_STRUCT* ireg)
     ireg->address = Adresse;
     ireg->branch_address = BranchAdresse;
     ireg->tmp_byte = TMPByte;
-    ireg->irq = IRQLine;
+    ireg->irq = irq_state;
     ireg->nmi = Interrupts[CIA_NMI] | Interrupts[CRT_NMI] | Interrupts[RESTORE_NMI];
     ireg->rdy = *RDY;
     ireg->reset = *RESET;
@@ -391,6 +392,7 @@ inline void MOS6510::Write(unsigned short adresse, unsigned char wert)
     WriteProcTbl[(adresse)>>8](adresse,wert);
 }
 
+// Phi2
 bool MOS6510::OneZyklus(void)
 {
     static bool RESET_OLD = false;
@@ -416,10 +418,6 @@ bool MOS6510::OneZyklus(void)
         Interrupts[CRT_NMI] = false;
         Interrupts[RESTORE_NMI] = false;
 
-        IRQLine = 0;
-        for(int i=0;i<5;i++) IRQLinePuffer[i] = 0;
-
-        NMIState = false;
         JAMFlag = false;
         SR = 0x04;
         MCT = ((unsigned char*)MicroCodeTable6510 + (0x100*MCTItemSize));
@@ -427,19 +425,18 @@ bool MOS6510::OneZyklus(void)
     }
     RESET_OLD = *RESET;
 
-    // Unter Index 0 ist immer der aktuelle NMI Zustand in diesem Zyklus
-    // Unter Index 1 ist der Zustand 1 Zklus aus der Vergangenheit
-    // Unter Index 2 ist der Zustand 2 Zyklen aus der Vergangenheit
-    // usw...
-    for(int i=4;i>0;i--) NMIStatePuffer[i] = NMIStatePuffer[i-1];
-    NMIStatePuffer[0] = NMIState;
+    // IRQ auf low Pegel prüfen
+    if(irq_state > 0)
+        irq_is_low_pegel = true;
+    else
+        irq_is_low_pegel = false;
 
-    // Unter Index 0 ist immer der aktuelle IRQ Zustand in diesem Zyklus
-    // Unter Index 1 ist der Zustand 1 Zklus aus der Vergangenheit
-    // Unter Index 2 ist der Zustand 2 Zyklen aus der Vergangenheit
-    // usw...
-    for(int i=4;i>0;i--) IRQLinePuffer[i] = IRQLinePuffer[i-1];
-    IRQLinePuffer[0] = IRQLine;
+    // NMI auf fallende Flanke überprüfen
+    if(nmi_state == true && nmi_state_old == false)
+        nmi_fall_edge = true;
+    else
+        nmi_fall_edge = false;
+    nmi_state_old = nmi_state;
 
     if(!CpuWait)
     {
@@ -451,13 +448,13 @@ bool MOS6510::OneZyklus(void)
 
             CHK_RDY
 
-            if((NMIStatePuffer[1] == true)) // NMIStatePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der NMI schon angelegen haben also vor dem letzten Zyklus des vorigen Befehls
+            if((nmi_is_active == true)) // NMIStatePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der NMI schon angelegen haben also vor dem letzten Zyklus des vorigen Befehls
             {
-                NMIState = false;
+                nmi_is_active = false;
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x102*MCTItemSize));
                 AktOpcode = 0x102;
                 return false;
-            }else if((IRQLinePuffer[1] > 0) && ((SR&4)==0)) // IRQLinePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der IRQ schon anliegen also vor dem letzten Zyklus des vorigen Befehls
+            }else if((irq_is_active == true) && ((SR&4)==0)) // IRQLinePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der IRQ schon anliegen also vor dem letzten Zyklus des vorigen Befehls
             {
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
                 AktOpcode = 0x101;
@@ -1721,6 +1718,18 @@ bool MOS6510::OneZyklus(void)
         else return false;
     }
     return false;
+}
+
+void MOS6510::Phi1()
+{
+    if(irq_is_low_pegel)
+    {
+        irq_is_active = true;
+    }
+    else irq_is_active = false;
+
+    if(nmi_fall_edge)
+        nmi_is_active = true;
 }
 
 MOS6510_PORT::MOS6510_PORT(void)

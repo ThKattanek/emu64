@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.09.2019        		//
+// Letzte Änderung am 11.09.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -791,6 +791,7 @@ bool Floppy1541::OneCycle()
 
     CycleCounter++;
 
+    // PHI1
     via1->OneZyklus();
     via2->OneZyklus();
 
@@ -798,6 +799,8 @@ bool Floppy1541::OneCycle()
 
     if((VIA1_IRQ == true) || (VIA2_IRQ == true)) IRQ = true;
     else IRQ = false;
+
+    cpu->Phi1();
 
     if(!*RESET)
     {
@@ -807,6 +810,7 @@ bool Floppy1541::OneCycle()
         GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
     }
 
+    // PHI2
     bool ret = cpu->OneZyklus();
     if(BreakStatus != 0) *FoundBreakpoint = true;
     return ret;

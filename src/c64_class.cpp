@@ -34,7 +34,7 @@ int SDLThreadWarp(void *userdat);
 #ifdef _WIN32
     #define AudioPufferSize (882)    // 882 bei 44.100 Khz
 #else
-    #define AudioPufferSize (882*2)    // 882 bei 44.100 Khz
+    #define AudioPufferSize (882)    // 882 bei 44.100 Khz
 #endif
 
 #define RecPollingWaitStart 20
@@ -945,6 +945,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             }
             floppy_iec_wire = ~floppy_iec_wire;
 
+            // PHI1
             vic->OneCycle();
             cia1->OneZyklus();
             cia2->OneZyklus();
@@ -952,7 +953,9 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             if(enable_stereo_sid) sid2->OneZyklus();
             reu->OneZyklus();
             tape->OneCycle();
+            cpu->Phi1();
 
+            // PHI2
             if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
             cpu->OneZyklus();
 
@@ -1123,6 +1126,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     if(enable_stereo_sid) sid2->OneZyklus();
                     reu->OneZyklus();
                     tape->OneCycle();
+                    cpu->Phi1();
 
                     if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
                     cpu->OneZyklus();
@@ -1180,6 +1184,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 if(enable_stereo_sid) sid2->OneZyklus();
                 reu->OneZyklus();
                 tape->OneCycle();
+                cpu->Phi1();
 
                 if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
                 cpu->OneZyklus();
@@ -1218,6 +1223,7 @@ loop_wait_next_opc:
                 if(enable_stereo_sid) sid2->OneZyklus();
                 reu->OneZyklus();
                 tape->OneCycle();
+                cpu->Phi1();
 
                 // Prüfen welches die aktuelle CPU ist (CPU,Floppy0,..1,..2,..3)
                 // Diese wird genau um ein Opcode ausgeführt

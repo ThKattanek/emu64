@@ -36,8 +36,9 @@ MOS6502::MOS6502(void)
     SP = 0;
     SR = 32;
 
-    IRQLine = 0;
-    for(int i=0;i<5;i++) IRQLinePuffer[i] = 0;
+    irq_state = 0;              // if Größer 0 ist die Leitung low
+    irq_is_low_pegel = false;
+    irq_is_active = false;
 }
 
 MOS6502::~MOS6502(void)
@@ -53,8 +54,6 @@ void MOS6502::Reset(void)
     XR=0;
     YR=0;
 
-    IRQLine = 0;
-
     MCT = ((unsigned char*)MicroCodeTable6502 + (0x100*MCTItemSize));
     JAMFlag = false;
     AktOpcodePC = PC;
@@ -66,10 +65,10 @@ void MOS6502::TriggerInterrupt(int typ)
     switch (typ)
     {
     case VIA1_IRQ:
-        IRQLine |= 0x01;
+        irq_state |= 0x01;
         break;
     case VIA2_IRQ:
-        IRQLine |= 0x02;
+        irq_state |= 0x02;
         break;
     }
 }
@@ -79,10 +78,10 @@ void MOS6502::ClearInterrupt(int typ)
     switch (typ)
     {
     case VIA1_IRQ:
-        IRQLine &= ~0x01;
+        irq_state &= ~0x01;
         break;
     case VIA2_IRQ:
-        IRQLine &= ~0x02;
+        irq_state &= ~0x02;
         break;
     }
 }
@@ -159,7 +158,7 @@ void MOS6502::GetInterneRegister(IREG_STRUCT* ireg)
     ireg->address = Adresse;
     ireg->branch_address = BranchAdresse;
     ireg->tmp_byte = TMPByte;
-    ireg->irq = IRQLine;
+    ireg->irq = irq_state;
     ireg->reset = *RESET;
 }
 
@@ -247,7 +246,6 @@ bool MOS6502::OneZyklus(void)
 {
     if(!*RESET)
     {
-        IRQLine = 0;
         SR=0x24;
         JAMFlag = false;
         AktOpcodePC = PC;
@@ -256,8 +254,11 @@ bool MOS6502::OneZyklus(void)
         AktOpcode = 0x100;
     }
 
-    for(int i=4;i>0;i--) IRQLinePuffer[i] = IRQLinePuffer[i-1];
-    IRQLinePuffer[0] = IRQLine;
+    // IRQ auf low Pegel prüfen
+    if(irq_state > 0)
+        irq_is_low_pegel = true;
+    else
+        irq_is_low_pegel = false;
 
     switch(*MCT)
     {
@@ -265,7 +266,7 @@ bool MOS6502::OneZyklus(void)
     case 0:
         if(JAMFlag) return false;
 
-        if(IRQLinePuffer[1] > 0 && ((SR&4)==0))
+        if((irq_is_active == true) > 0 && ((SR&4)==0))
         {
             MCT = ((unsigned char*)MicroCodeTable6502 + (0x101*MCTItemSize));
             AktOpcode = 0x101;
@@ -1416,4 +1417,13 @@ bool MOS6502::OneZyklus(void)
         return true;
     }
     else return false;
+}
+
+void MOS6502::Phi1()
+{
+    if(irq_is_low_pegel)
+    {
+        irq_is_active = true;
+    }
+    else irq_is_active = false;
 }
