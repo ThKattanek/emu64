@@ -233,7 +233,8 @@ void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
     source_video_data = data;
     source_video_line_size = linesize;
 
-    SDL_CreateThread(SDLThreadAddCaptureFrame ,"Emu64CaptureThread",this);
+    thread_01 = SDL_CreateThread(SDLThreadAddCaptureFrame ,"Emu64CaptureThread",this);
+    SDL_DetachThread(thread_01);
 }
 
 int SDLThreadAddCaptureFrame(void *userdat){
