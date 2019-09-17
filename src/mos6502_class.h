@@ -94,6 +94,9 @@ private:
     bool            irq_is_low_pegel;
     bool            irq_is_active;
 
+    bool            irq_delay;
+    uint8_t         irq_delay_sr_value;
+
     /// Für OneZyklus ///
 
     unsigned int tmp,tmp1;

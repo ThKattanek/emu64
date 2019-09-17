@@ -101,6 +101,9 @@ private:
     bool            irq_is_low_pegel;
     bool            irq_is_active;
 
+    bool            irq_delay;
+    uint8_t         irq_delay_sr_value;
+
     bool            nmi_state;
     bool            nmi_state_old;
     bool            nmi_fall_edge;

@@ -39,6 +39,9 @@ MOS6502::MOS6502(void)
     irq_state = 0;              // if Größer 0 ist die Leitung low
     irq_is_low_pegel = false;
     irq_is_active = false;
+
+    irq_delay = false;
+    irq_delay_sr_value = 0;
 }
 
 MOS6502::~MOS6502(void)
@@ -272,27 +275,22 @@ bool MOS6502::OneZyklus(void)
             AktOpcode = 0x101;
             return false;
         }
-        else
+
+        if(irq_delay)
         {
-            MCT = ((unsigned char*)MicroCodeTable6502 + (Read(PC)*MCTItemSize));
-            AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
-
-            *HistoryPointer = *HistoryPointer+1;
-            History[*HistoryPointer] = AktOpcodePC;
-
-            PC++;
-
-            // for microcode 71
-            /*
-            if(LastOPC_CLI)
-            {
-                LastOPC_CLI=false;
-                SR &= 0xFB;
-            }
-            */
-
-            return false;
+            irq_delay = false;
+            SR = irq_delay_sr_value;
         }
+
+        MCT = ((unsigned char*)MicroCodeTable6502 + (Read(PC)*MCTItemSize));
+        AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
+
+        *HistoryPointer = *HistoryPointer+1;
+        History[*HistoryPointer] = AktOpcodePC;
+
+        PC++;
+
+        return false;
 
         break;
 
@@ -838,7 +836,9 @@ bool MOS6502::OneZyklus(void)
     //R // TMPByte von Adresse lesen // InterruptFalg=0
     case 71:
         TMPByte = Read(PC);
-        SR &= 0xFB;
+        //SR &= 0xFB;
+        irq_delay_sr_value = SR & 0xFB;
+        irq_delay = true;
         break;
     //R // TMPByte von Adresse lesen // OverflowFalg=0
     case 72:
@@ -858,7 +858,9 @@ bool MOS6502::OneZyklus(void)
     //R // TMPByte von Adresse lesen // InterruptFalg=1
     case 75:
         TMPByte = Read(PC);
-        SR |= 0x04;
+        //SR |= 0x04;
+        irq_delay_sr_value = SR | 0x04;
+        irq_delay = true;
         break;
     //R // TMPByte von Adresse lesen // BIT Operation
     case 76:

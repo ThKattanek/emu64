@@ -46,6 +46,9 @@ MOS6510::MOS6510(void)
     irq_is_low_pegel = false;
     irq_is_active = false;
 
+    irq_delay = false;
+    irq_delay_sr_value = 0;
+
     nmi_state = false;
     nmi_state_old = false;
     nmi_fall_edge = false;
@@ -458,6 +461,12 @@ bool MOS6510::OneZyklus(void)
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
                 AktOpcode = 0x101;
                 return false;
+            }
+
+            if(irq_delay)
+            {
+                irq_delay = false;
+                SR = irq_delay_sr_value;
             }
 
             MCT = ((unsigned char*)MicroCodeTable6510 + (Read(PC)*MCTItemSize));
@@ -1072,7 +1081,9 @@ bool MOS6510::OneZyklus(void)
         case 71:
                 CHK_RDY
                 TMPByte = Read(PC);
-                SR &= 0xFB;
+                //SR &= 0xFB;
+                irq_delay_sr_value = SR & 0xFB;
+                irq_delay = true;
                 break;
         //R // TMPByte von Adresse lesen // OverflowFalg=0
         case 72:
@@ -1096,7 +1107,9 @@ bool MOS6510::OneZyklus(void)
         case 75:
                 CHK_RDY
                 TMPByte = Read(PC);
-                SR |= 0x04;
+                //SR |= 0x04;
+                irq_delay_sr_value = SR | 0x04;
+                irq_delay = true;
                 break;
         //R // TMPByte von Adresse lesen // BIT Operation
         case 76:
