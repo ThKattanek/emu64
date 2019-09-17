@@ -8,13 +8,15 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 14.09.2019                //
+// Letzte Änderung am 17.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "video_capture_class.h"
 #include "video_capture_class.h"
+
+int SDLThreadAddCaptureFrame(void *userdat);
 
 VideoCaptureClass::VideoCaptureClass()
 {
@@ -228,16 +230,21 @@ void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
 {
     if(!is_capture_cctive || is_capture_pause) return;
 
-    while(mutex_01){
-        SDL_Delay(1);
-    }   // Warten bis Mutex1 Unlocked (false)
-    mutex_01 = true;      // Mutex1 Locken (true)
-
     source_video_data = data;
     source_video_line_size = linesize;
 
-    encode_video = !WriteVideoFrame(format_ctx, &video_stream);
-    mutex_01 = false;      // Mutex1 Unlocken (false)
+    SDL_CreateThread(SDLThreadAddCaptureFrame ,"Emu64CaptureThread",this);
+}
+
+int SDLThreadAddCaptureFrame(void *userdat){
+    VideoCaptureClass *cc = static_cast<VideoCaptureClass*>(userdat);
+
+    while(cc->mutex_01){
+    }
+
+    cc->mutex_01 = true;      // Mutex1 Locken (true)
+    cc->encode_video = !cc->WriteVideoFrame(cc->format_ctx, &cc->video_stream);
+    cc->mutex_01 = false;      // Mutex1 Unlocken (false)
 }
 
 void VideoCaptureClass::FillSourceAudioBuffer(int16_t *data, int len)

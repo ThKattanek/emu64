@@ -76,6 +76,13 @@ public:
     void FillSourceAudioBuffer(int16_t *data, int len);
     int GetRecordedFrameCount();
 
+    int WriteVideoFrame(AVFormatContext *oc, OutputStream *ost);
+    int encode_video;
+    AVFormatContext *format_ctx;
+    OutputStream video_stream;
+
+    bool mutex_01;
+
 private:
     void AddStream(OutputStream *ost, AVFormatContext *oc, AVCodec **codec, enum AVCodecID codec_id);
     void CloseStream(OutputStream *ost);
@@ -83,9 +90,10 @@ private:
     AVFrame* AllocPicture(enum AVPixelFormat pix_fmt, int width, int height);
     bool OpenAudio(AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
     AVFrame* AllocAudioFrame(enum AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
-    int WriteVideoFrame(AVFormatContext *oc, OutputStream *ost);
-    int WriteAudioFrame(AVFormatContext *oc, OutputStream *ost);
     int WriteFrame(AVFormatContext *fmt_ctx, const AVRational *time_base, AVStream *st, AVPacket *pkt);
+
+    int WriteAudioFrame(AVFormatContext *oc, OutputStream *ost);
+
     // void LogPacket(const AVFormatContext *fmt_ctx, const AVPacket *pkt);
 
     AVFrame* GetVideoFrame(OutputStream *ost);
@@ -97,15 +105,17 @@ private:
     int video_xw, video_yw;
 
     bool have_video, have_audio;
-    int encode_video, encode_audio;
+    int encode_audio;
 
     int video_bitrate, audio_bitrate;
 
-    AVFormatContext *format_ctx;
+
     AVOutputFormat  *output_format;
-    OutputStream video_stream, audio_stream;
+    OutputStream audio_stream;
     AVCodec *video_codec, *audio_codec;
     AVDictionary *options;
+
+    SDL_Thread *thread_01;
 
     uint8_t* source_video_data;
     int source_video_line_size;
@@ -115,8 +125,6 @@ private:
 
     int16_t* frame_audio_data_left;
     int16_t* frame_audio_data_right;
-
-    bool mutex_01;
 
     int audio_package_counter;
     int video_package_counter;
