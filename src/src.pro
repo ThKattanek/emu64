@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 03.09.2019                //
+# // Letzte Änderung am 17.09.2019                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -156,6 +156,8 @@ HEADERS += \
     label_widget_mod.h \
     main_window.h \
     memory_window.h \
+    micro_code_tbl_6502.h \
+    micro_code_tbl_6510.h \
     mmu_class.h \
     mos6502_class.h \
     mos6510_class.h \
