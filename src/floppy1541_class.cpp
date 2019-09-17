@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.09.2019        		//
+// Letzte Änderung am 17.09.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -770,6 +770,8 @@ bool Floppy1541::OneCycle()
             }
         }
     }
+
+    if(!FloppyEnabled) return true;
 
     // Disk Wechsel Simulieren
     if(DiskChangeSimState != 0)
