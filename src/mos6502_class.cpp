@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 17.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -28,7 +28,7 @@ MOS6502::MOS6502(void)
     AktOpcodePC = 0x0100;
     JAMFlag = false;
     TMPByte = 0;    
-    LastOPC_CLI = false;
+
     PC = 0;
     AC = 0;
     XR = 0;
@@ -839,7 +839,6 @@ bool MOS6502::OneZyklus(void)
     case 71:
         TMPByte = Read(PC);
         SR &= 0xFB;
-        //LastOPC_CLI = true;
         break;
     //R // TMPByte von Adresse lesen // OverflowFalg=0
     case 72:
