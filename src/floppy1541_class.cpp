@@ -22,9 +22,9 @@ const uint8_t Floppy1541::d64_track_zone[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
                    1,1,1,1,1,1,1,
                    2,2,2,2,2,2,
                    3,3,3,3,3,3,3,3,3,3};
-const uint8_t Floppy1541::d64_sector_gap[] = {12, 21, 16, 13};  // von GPZ Code übermommen imggen
-                                                                // 1,10,5,2; // Meine alten Werte
 
+const uint8_t Floppy1541::d64_sector_gap[] = {12, 21, 16, 13};  // von GPZ Code übermommen imggen
+//const uint8_t Floppy1541::d64_sector_gap[] = {1, 10, 5, 2};   // Meine alten Werte
 
 
 Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy_found_breakpoint):
