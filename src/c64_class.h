@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019                //
+// Letzte Änderung am 18.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -464,7 +464,7 @@ private:
     uint16_t        break_status;
     bool            floppy_found_breakpoint;
 
-    int             breakgroup_count;
+    uint8_t         breakgroup_count;
     BREAK_GROUP     *breakgroup[MAX_BREAK_GROUP_NUM];
 
     ////////////////////////////////////////////////////////////

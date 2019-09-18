@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.09.2019        		//
+// Letzte Änderung am 18.09.2019        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -226,7 +226,7 @@ private:
     unsigned short  BreakStatus;
     bool            *FoundBreakpoint;
 
-    int             breakgroup_count;
+    uint8_t         breakgroup_count;
     BREAK_GROUP     *BreakGroup[MAX_BREAK_GROUP_NUM];
 
     ////////////////////////////////////////////////////////////
