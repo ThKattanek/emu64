@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.09.2019                //
+// Letzte Änderung am 19.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -455,22 +455,36 @@ bool MOS6510::OneZyklus(void)
                 nmi_is_active = false;
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x102*MCTItemSize));
                 AktOpcode = 0x102;
+
+                if(irq_delay)
+                {
+                    irq_delay = false;
+                    SR = irq_delay_sr_value;
+                }
+
                 return false;
             }else if((irq_is_active == true) && ((SR&4)==0)) // IRQLinePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der IRQ schon anliegen also vor dem letzten Zyklus des vorigen Befehls
             {
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
                 AktOpcode = 0x101;
+
+                if(irq_delay)
+                {
+                    irq_delay = false;
+                    SR = irq_delay_sr_value;
+                }
+
                 return false;
             }
+
+            MCT = ((unsigned char*)MicroCodeTable6510 + (Read(PC)*MCTItemSize));
+            AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
 
             if(irq_delay)
             {
                 irq_delay = false;
                 SR = irq_delay_sr_value;
             }
-
-            MCT = ((unsigned char*)MicroCodeTable6510 + (Read(PC)*MCTItemSize));
-            AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
 
             *HistoryPointer = *HistoryPointer+1;
             History[*HistoryPointer] = AktOpcodePC;

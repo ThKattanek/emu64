@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.09.2019                //
+// Letzte Änderung am 19.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -273,17 +273,24 @@ bool MOS6502::OneZyklus(void)
         {
             MCT = ((unsigned char*)MicroCodeTable6502 + (0x101*MCTItemSize));
             AktOpcode = 0x101;
+
+            if(irq_delay)
+            {
+                irq_delay = false;
+                SR = irq_delay_sr_value;
+            }
+
             return false;
         }
+
+        MCT = ((unsigned char*)MicroCodeTable6502 + (Read(PC)*MCTItemSize));
+        AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
 
         if(irq_delay)
         {
             irq_delay = false;
             SR = irq_delay_sr_value;
         }
-
-        MCT = ((unsigned char*)MicroCodeTable6502 + (Read(PC)*MCTItemSize));
-        AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
 
         *HistoryPointer = *HistoryPointer+1;
         History[*HistoryPointer] = AktOpcodePC;
