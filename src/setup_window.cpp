@@ -309,10 +309,10 @@ void SetupWindow::LoadINI(C64Class *c64)
         ui->VicGreyDotsEnable->setChecked(bvalue);
         on_VicGreyDotsEnable_toggled(bvalue);
 
-        //FirstLine: VICE - 16, Emu64 - 26
-        //LastLine:  VICE - 288, Emu64 - 292
-        value1 = ini->value("FirstDisplayLinePAL",26).toInt();
-        value2 = ini->value("LastDisplayLinePAL",292).toInt();
+        //FirstLine PAL: VICE - 16, Emu64 - 26
+        //LastLine PAL:  VICE - 288, Emu64 - 292
+        value1 = ini->value("FirstDisplayLinePAL",16).toInt();
+        value2 = ini->value("LastDisplayLinePAL",288).toInt();
         c64->SetVicDisplaySizePal(value1, value2);
 
         value1 = ini->value("FirstDisplayLineNTSC",30).toInt();
