@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.09.2019                //
+// Letzte Änderung am 18.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -269,7 +269,7 @@ bool MOS6502::OneZyklus(void)
     case 0:
         if(JAMFlag) return false;
 
-        if((irq_is_active == true) > 0 && ((SR&4)==0))
+        if((irq_is_active == true) && (irq_delay ? ((irq_delay_sr_value&4)==0) : ((SR&4)==0)))
         {
             MCT = ((unsigned char*)MicroCodeTable6502 + (0x101*MCTItemSize));
             AktOpcode = 0x101;
@@ -280,8 +280,12 @@ bool MOS6502::OneZyklus(void)
                 SR = irq_delay_sr_value;
             }
 
+            irq_delay = false;
+
             return false;
         }
+
+        irq_delay = false;
 
         MCT = ((unsigned char*)MicroCodeTable6502 + (Read(PC)*MCTItemSize));
         AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
@@ -843,8 +847,8 @@ bool MOS6502::OneZyklus(void)
     //R // TMPByte von Adresse lesen // InterruptFalg=0
     case 71:
         TMPByte = Read(PC);
-        //SR &= 0xFB;
-        irq_delay_sr_value = SR & 0xFB;
+        irq_delay_sr_value = SR;
+        SR &= 0xFB;
         irq_delay = true;
         break;
     //R // TMPByte von Adresse lesen // OverflowFalg=0
@@ -865,8 +869,8 @@ bool MOS6502::OneZyklus(void)
     //R // TMPByte von Adresse lesen // InterruptFalg=1
     case 75:
         TMPByte = Read(PC);
-        //SR |= 0x04;
-        irq_delay_sr_value = SR | 0x04;
+        irq_delay_sr_value = SR;
+        SR |= 0x04;
         irq_delay = true;
         break;
     //R // TMPByte von Adresse lesen // BIT Operation

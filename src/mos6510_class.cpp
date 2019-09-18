@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.09.2019                //
+// Letzte Änderung am 18.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -456,35 +456,25 @@ bool MOS6510::OneZyklus(void)
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x102*MCTItemSize));
                 AktOpcode = 0x102;
 
-                if(irq_delay)
-                {
-                    irq_delay = false;
-                    SR = irq_delay_sr_value;
-                }
-
-                return false;
-            }else if((irq_is_active == true) && ((SR&4)==0)) // IRQLinePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der IRQ schon anliegen also vor dem letzten Zyklus des vorigen Befehls
-            {
-                MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
-                AktOpcode = 0x101;
-
-                if(irq_delay)
-                {
-                    irq_delay = false;
-                    SR = irq_delay_sr_value;
-                }
-
+                irq_delay = false;
                 return false;
             }
+            else
+            {
+                if((irq_is_active == true) && (irq_delay ? ((irq_delay_sr_value&4)==0) : ((SR&4)==0))) // IRQLinePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der IRQ schon anliegen also vor dem letzten Zyklus des vorigen Befehls
+                {
+                    MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
+                    AktOpcode = 0x101;
+
+                    irq_delay = false;
+                    return false;
+                }
+            }
+
+            irq_delay = false;
 
             MCT = ((unsigned char*)MicroCodeTable6510 + (Read(PC)*MCTItemSize));
             AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
-
-            if(irq_delay)
-            {
-                irq_delay = false;
-                SR = irq_delay_sr_value;
-            }
 
             *HistoryPointer = *HistoryPointer+1;
             History[*HistoryPointer] = AktOpcodePC;
@@ -1095,8 +1085,8 @@ bool MOS6510::OneZyklus(void)
         case 71:
                 CHK_RDY
                 TMPByte = Read(PC);
-                //SR &= 0xFB;
-                irq_delay_sr_value = SR & 0xFB;
+                irq_delay_sr_value = SR;
+                SR &= 0xFB;
                 irq_delay = true;
                 break;
         //R // TMPByte von Adresse lesen // OverflowFalg=0
@@ -1121,8 +1111,8 @@ bool MOS6510::OneZyklus(void)
         case 75:
                 CHK_RDY
                 TMPByte = Read(PC);
-                //SR |= 0x04;
-                irq_delay_sr_value = SR | 0x04;
+                irq_delay_sr_value = SR;
+                SR |= 0x04;
                 irq_delay = true;
                 break;
         //R // TMPByte von Adresse lesen // BIT Operation
