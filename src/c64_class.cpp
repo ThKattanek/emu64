@@ -820,18 +820,21 @@ void C64Class::WarpModeLoop()
     }
     floppy_iec_wire = ~floppy_iec_wire;
 
+    // PHI1
     vic->OneCycle();
     cia1->OneZyklus();
     cia2->OneZyklus();
-
     sid1->OneZyklus();
     if(enable_stereo_sid) sid2->OneZyklus();
-
     reu->OneZyklus();
     tape->OneCycle();
+    cpu->Phi1();
 
+    // PHI2
     if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
     cpu->OneZyklus();
+
+
 
     ////////////////////////// Testweise //////////////////////////
 
@@ -883,6 +886,15 @@ void C64Class::WarpModeLoop()
     }
     //////////////////////////////////////////////////////////////////////////////
 
+    if(iec_is_dumped)
+    {
+        iec_export_vdc.NextStep();
+        iec_export_vdc.SetWire(0,c64_iec_wire & 16);
+        iec_export_vdc.SetWire(1,c64_iec_wire & 64);
+        iec_export_vdc.SetWire(2,c64_iec_wire & 128);
+        iec_export_vdc.SetWire(3,floppy_iec_wire & 64);
+        iec_export_vdc.SetWire(4,floppy_iec_wire & 128);
+    }
 }
 
 void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
