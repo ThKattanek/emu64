@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019                //
+// Letzte Änderung am 19.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -3938,7 +3938,8 @@ uint8_t C64Class::ReadIO1(uint16_t address)
     switch(io_source)
     {
     case 0: // NO_MODUL
-        return 0;
+        // return 0;
+        return vic->last_read_gp_access;
     case 1: // CRT
         return crt->ReadIO1(address);
     case 2: // REU
@@ -3957,7 +3958,8 @@ uint8_t C64Class::ReadIO2(uint16_t address)
     switch(io_source)
     {
     case 0: // NO_MODUL
-        return 0;
+        //return 0;
+        return vic->last_read_gp_access;
     case 1: // CRT
         return crt->ReadIO2(address);
     case 2: // REU

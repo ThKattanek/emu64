@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.06.2019                //
+// Letzte Änderung am 19.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -362,12 +362,16 @@ inline void VICII::gAccess()
         char_data = 0;
         color_data = 0;
 	}
+
+    last_read_gp_access = gfx_data;
 }
 
 inline void VICII::pAccess(uint8_t sp_nr)
 {
     p_address = static_cast<uint16_t>((*cia2_port_a<<14)|(matrix_base)|0x3F8|sp_nr);
     p_data[sp_nr] = Read(p_address);
+
+    last_read_gp_access = p_data[sp_nr];
 }
 
 inline void VICII::sAccess(uint8_t sp_nr)

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.08.2019                //
+// Letzte Änderung am 19.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -86,6 +86,8 @@ public:
     uint8_t     *video_buffer;
     uint8_t     video_buffer_back[2][VIDEO_BUFFER_SIZE];
     int         current_video_buffer;
+
+    uint8_t     last_read_gp_access;
 
 private:
     void RasterIRQ();
