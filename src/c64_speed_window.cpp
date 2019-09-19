@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019                //
+// Letzte Änderung am 19.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -128,7 +128,7 @@ void C64SpeedWindow::on_Pause_clicked()
 {
     if(c64 == nullptr) return;
 
-    if(pause_status)
+    if(!pause_status)
     {
         pause_status = true;
         ui->Pause->setText(tr("Weiter"));
@@ -145,6 +145,11 @@ void C64SpeedWindow::on_Pause_clicked()
 
 void C64SpeedWindow::on_WarpMode_clicked(bool checked)
 {
+    // Pause Button -> Pause deaktivieren
+    pause_status = false;
+    ui->Pause->setText(tr("Pause"));
+    c64->SetDebugMode(false);
+
     c64->EnableWarpMode(checked);
 }
 
