@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.09.2019                //
+// Letzte Änderung am 22.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -306,8 +306,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
 
     vic_buffer = vic->video_buffer;
 
-    cia2->FloppyIEC = &floppy_iec_wire;
-    cia2->C64IEC = &c64_iec_wire;
+    cia2->floppy_iec_wire = &floppy_iec_wire;
+    cia2->c64_iec_wire = &c64_iec_wire;
 
     iec_export_vdc.AddWire("c64_out_atn",false);
     iec_export_vdc.AddWire("c64_out_clk",false);
@@ -413,18 +413,18 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
     cpu->ResetReady = &c64_reset_ready;
     cpu->ResetReadyAdr = 0xE5CD;
     cpu->EnableExtInterrupts = enable_ext_wires;
-    cia1->RESET = &reset_wire;
+    cia1->reset_wire = &reset_wire;
     cia1->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
     cia1->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
     cia1->VicTriggerLP = std::bind(&VICII::TriggerLightpen,vic);
     cia1->ChangePOTSwitch = std::bind(&C64Class::ChangePOTSwitch,this);
-    cia1->PA = &cia1_port_a;
-    cia1->PB = &cia1_port_b;
-    cia2->RESET = &reset_wire;
+    cia1->pa = &cia1_port_a;
+    cia1->pb = &cia1_port_b;
+    cia2->reset_wire = &reset_wire;
     cia2->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
     cia2->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
-    cia2->PA = &cia2_port_a;
-    cia2->PB = &cia2_port_b;
+    cia2->pa = &cia2_port_a;
+    cia2->pb = &cia2_port_b;
     vic->ba = &rdy_ba_wire;
     vic->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
     vic->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
@@ -442,7 +442,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
 
     /// Tape mit C64 verbinden ///
     tape->CPU_PORT = &cpu_port;
-    cia1->FLAG_PIN = &tape->CassRead;
+    cia1->flag_pin = &tape->CassRead;
 
     /// CRT mit MMU verbinden ///
     crt->c64_ram = mmu->GetRAMPointer();
@@ -490,7 +490,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::functio
     stereo_sid_address = 0xD420;
 
     vic->ba = &rdy_ba_wire;
-    vic->cia2_port_a = cia2->PA->GetOutputBitsPointer();
+    vic->cia2_port_a = cia2->pa->GetOutputBitsPointer();
 
     /// Breakpoints ///
     cpu->BreakStatus = &break_status;
