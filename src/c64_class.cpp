@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.09.2019                //
+// Letzte Änderung am 28.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,9 +17,6 @@
 #include "./c64_keys.h"
 
 #include <QDebug>
-
-#define floppy_asyncron                  // Schaltet die Floppy Asyncron
-#define more_one_floppy_cylce_count 66   // alle "more_one_floppy_cycle_counts" wird 1 FloppyZyklus doppelt ausgeführt
 
 void AudioMix(void *not_used, Uint8 *stream, int laenge);
 int SDLThread(void *userdat);
@@ -777,11 +774,6 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
 
 void C64Class::WarpModeLoop()
 {
-    static uint32_t counter_plus = 0;
-
-    CheckKeys();
-    cycle_counter++;
-
     if(limit_cyles_counter > 0)
     {
         limit_cyles_counter--;
@@ -799,42 +791,7 @@ void C64Class::WarpModeLoop()
         if(DebugCartEvent != nullptr) DebugCartEvent(cpu->GetDebugCartValue());
     }
 
-    /// Für Externe Erweiterungen ///
-    //if(ExtZyklus) ZyklusProcExt();
-
-    floppy_iec_wire = 0;
-    for(int i=0; i<MAX_FLOPPY_NUM; i++)
-    {
-        floppy[i]->OneCycle();
-
-        #ifdef floppy_asyncron
-        counter_plus++;
-        if(counter_plus == more_one_floppy_cylce_count)
-        {
-            counter_plus = 0;
-            floppy[i]->OneCycle();
-        }
-        #endif
-
-        floppy_iec_wire |= ~floppy[i]->FloppyIECLocal;
-    }
-    floppy_iec_wire = ~floppy_iec_wire;
-
-    // PHI1
-    vic->OneCycle();
-    cia1->OneZyklus();
-    cia2->OneZyklus();
-    sid1->OneZyklus();
-    if(enable_stereo_sid) sid2->OneZyklus();
-    reu->OneZyklus();
-    tape->OneCycle();
-    cpu->Phi1();
-
-    // PHI2
-    if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
-    cpu->OneZyklus();
-
-
+    NextSystemCycle();
 
     ////////////////////////// Testweise //////////////////////////
 
@@ -899,8 +856,6 @@ void C64Class::WarpModeLoop()
 
 void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 {
-    static uint32_t counter_plus=0;
-
     sid1->ZeroSoundBufferPos();
     sid2->ZeroSoundBufferPos();
 
@@ -915,9 +870,6 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
     {
         while((sid1->SoundBufferPos < sample_buffer_size_mono) && (debug_mode == false))
         {
-            CheckKeys();
-            cycle_counter++;
-
             if(limit_cyles_counter > 0)
             {
                 limit_cyles_counter--;
@@ -935,42 +887,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 if(DebugCartEvent != nullptr) DebugCartEvent(cpu->GetDebugCartValue());
             }
 
-            /// Für Externe Erweiterungen ///
-            //if(ExtZyklus) ZyklusProcExt();
-
-
-            floppy_iec_wire = 0;
-            for(int i=0; i<MAX_FLOPPY_NUM; i++)
-            {
-                floppy[i]->OneCycle();
-
-                #ifdef floppy_asyncron
-                counter_plus++;
-                if(counter_plus == more_one_floppy_cylce_count)
-                {
-                    counter_plus = 0;
-                    floppy[i]->OneCycle();
-                }
-                #endif
-
-                floppy_iec_wire |= ~floppy[i]->FloppyIECLocal;
-            }
-            floppy_iec_wire = ~floppy_iec_wire;
-
-            // PHI1
-            vic->OneCycle();
-            cia1->OneZyklus();
-            cia2->OneZyklus();
-            sid1->OneZyklus();
-            if(enable_stereo_sid) sid2->OneZyklus();
-            reu->OneZyklus();
-            tape->OneCycle();
-            cpu->Phi1();
-
-            // PHI2
-            if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
-            cpu->OneZyklus();
-
+            NextSystemCycle();
 
             if((break_status != 0) || (floppy_found_breakpoint == true )) if(CheckBreakpoints()) break;
 
@@ -1037,7 +954,6 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             }
 
         }
-
 
         int sample_buffer_size = laenge / (audio_sample_bit_size/8);
 
@@ -1106,42 +1022,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             {
                 for(int i=0;i<static_cast<int>(animation_speed_counter);i++)
                 {
-                    CheckKeys();
-                    cycle_counter++;
-
-                    /// Für Externe Erweiterungen ///
-                    //if(ExtZyklus) ZyklusProcExt();
-
-                    floppy_iec_wire = 0;
-                    for(int i=0; i<MAX_FLOPPY_NUM; i++)
-                    {
-                        floppy[i]->OneCycle();
-
-                        #ifdef floppy_asyncron
-                        counter_plus++;
-                        if(counter_plus == more_one_floppy_cylce_count)
-                        {
-                            counter_plus = 0;
-                            floppy[i]->OneCycle();
-                        }
-                        #endif
-
-                        floppy_iec_wire |= ~floppy[i]->FloppyIECLocal;
-                    }
-                    floppy_iec_wire = ~floppy_iec_wire;
-
-                    vic->OneCycle();
-
-                    cia1->OneZyklus();
-                    cia2->OneZyklus();
-                    sid1->OneZyklus();
-                    if(enable_stereo_sid) sid2->OneZyklus();
-                    reu->OneZyklus();
-                    tape->OneCycle();
-                    cpu->Phi1();
-
-                    if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
-                    cpu->OneZyklus();
+                    NextSystemCycle();
 
                     if((break_status != 0) || (floppy_found_breakpoint == true )) if(CheckBreakpoints()) break;
 
@@ -1165,41 +1046,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             {
                 one_cycle = false;
 
-                CheckKeys();
-                cycle_counter++;
-
-                /// Für Externe Erweiterungen ///
-                //if(ExtZyklus) ZyklusProcExt();
-
-                floppy_iec_wire = 0;
-                for(int i=0; i<MAX_FLOPPY_NUM; i++)
-                {
-                    floppy[i]->OneCycle();
-
-                    #ifdef floppy_asyncron
-                    counter_plus++;
-                    if(counter_plus == more_one_floppy_cylce_count)
-                    {
-                        counter_plus = 0;
-                        floppy[i]->OneCycle();
-                    }
-                    #endif
-
-                    floppy_iec_wire |= ~floppy[i]->FloppyIECLocal;
-                }
-                floppy_iec_wire = ~floppy_iec_wire;
-
-                vic->OneCycle();
-                cia1->OneZyklus();
-                cia2->OneZyklus();
-                sid1->OneZyklus();
-                if(enable_stereo_sid) sid2->OneZyklus();
-                reu->OneZyklus();
-                tape->OneCycle();
-                cpu->Phi1();
-
-                if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
-                cpu->OneZyklus();
+                NextSystemCycle();
 
                 if((break_status != 0) || (floppy_found_breakpoint == true )) CheckBreakpoints();
 
@@ -1220,57 +1067,11 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             {
                 one_opcode = false;
 
-loop_wait_next_opc:
-
-                CheckKeys();
-                cycle_counter++;
-
-                /// Für Externe Erweiterungen ///
-                //if(ExtZyklus) ZyklusProcExt();
-
-                vic->OneCycle();
-                cia1->OneZyklus();
-                cia2->OneZyklus();
-                sid1->OneZyklus();
-                if(enable_stereo_sid) sid2->OneZyklus();
-                reu->OneZyklus();
-                tape->OneCycle();
-                cpu->Phi1();
-
-                // Prüfen welches die aktuelle CPU ist (CPU,Floppy0,..1,..2,..3)
-                // Diese wird genau um ein Opcode ausgeführt
-                if(one_opcode_source > 0)
+                do
                 {
-                    int FloppyNr = one_opcode_source - 1;
-                    floppy_iec_wire = 0;
-                    for(int i=0; i<MAX_FLOPPY_NUM; i++)
-                    {
-                        if(i != FloppyNr)
-                        {
-                            floppy[i]->OneCycle();
-
-                            #ifdef floppy_asyncron
-                            counter_plus++;
-                            if(counter_plus == more_one_floppy_cylce_count)
-                            {
-                                counter_plus = 0;
-                                floppy[i]->OneCycle();
-                            }
-                            #endif
-
-                            floppy_iec_wire |= ~floppy[i]->FloppyIECLocal;
-                        }
-                    }
-                    bool ret = floppy[FloppyNr]->OneCycle();
-                    floppy_iec_wire |= ~floppy[FloppyNr]->FloppyIECLocal;
-                    floppy_iec_wire = ~floppy_iec_wire;
-                    if(!ret)  goto loop_wait_next_opc;
+                    NextSystemCycle();
                 }
-                else
-                {
-                    if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
-                    if(!cpu->OneZyklus()) goto loop_wait_next_opc;
-                }
+                while (!cpu_states[one_opcode_source]);
 
                 if((break_status != 0) || (floppy_found_breakpoint == true )) CheckBreakpoints();
 
@@ -3615,6 +3416,37 @@ int C64Class::GetVicFirstDisplayLineNtsc()
 int C64Class::GetVicLastDisplayLineNtsc()
 {
     return vic->GetVicLastDisplayLineNtsc();
+}
+
+void C64Class::NextSystemCycle()
+{
+    CheckKeys();
+    cycle_counter++;
+
+    /// Für Externe Erweiterungen ///
+    //if(ExtZyklus) ZyklusProcExt();
+
+    floppy_iec_wire = 0;
+    for(int i=0; i<MAX_FLOPPY_NUM; i++)
+    {
+        cpu_states[i+1] = floppy[i]->OneCycle();
+        floppy_iec_wire |= ~floppy[i]->FloppyIECLocal;
+    }
+    floppy_iec_wire = ~floppy_iec_wire;
+
+    // PHI0
+    if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
+    cpu_states[0] = cpu->OneZyklus();
+
+    // PHI1
+    vic->OneCycle();
+    cia1->OneZyklus();
+    cia2->OneZyklus();
+    sid1->OneZyklus();
+    if(enable_stereo_sid) sid2->OneZyklus();
+    reu->OneZyklus();
+    tape->OneCycle();
+    cpu->Phi1();
 }
 
 uint16_t C64Class::DisAss(FILE *file, uint16_t PC, bool line_draw, int source)

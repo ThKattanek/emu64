@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.09.2019                //
+// Letzte Änderung am 28.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -362,6 +362,7 @@ public:
     VideoCaptureClass *video_capture;
 
 private:
+    inline void NextSystemCycle();
     void CalcDistortionGrid();
     void VicRefresh(uint8_t *vic_puffer);
     void CheckKeys();
@@ -488,6 +489,7 @@ private:
     bool        one_cycle;
     bool        one_opcode;
     int         one_opcode_source;
+    bool        cpu_states[5];              // true = Feetch / false = no Feetch ::: Index 0=C64 Cpu, 1-4 Floppy 1-4
 
     bool        warp_mode;
 
