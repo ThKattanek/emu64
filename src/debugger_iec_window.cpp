@@ -8,10 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019                //
+// Letzte Änderung am 28.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
+
+#include <QDesktopWidget>
 
 #include "./debugger_iec_window.h"
 #include "./ui_debugger_iec_window.h"
@@ -23,6 +25,9 @@ DebuggerIECWindow::DebuggerIECWindow(QWidget *parent) :
     c64(nullptr)
 {
     ui->setupUi(this);
+
+    // Center Window
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
 
     icon_off = new QIcon(":/grafik/green_led_off.png");
     icon_on = new QIcon(":/grafik/green_led_on.png");

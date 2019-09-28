@@ -13,6 +13,8 @@
 //                                              //
 //////////////////////////////////////////////////
 
+#include <QDesktopWidget>
+
 #include "./debugger_vic_window.h"
 #include "./ui_debugger_vic_window.h"
 
@@ -22,6 +24,9 @@ DebuggerVicWindow::DebuggerVicWindow(QWidget *parent) :
 {
     c64 = nullptr;
     ui->setupUi(this);
+
+    // Center Window
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
 
     ui->OutputList->setColumnWidth(0,110);
     ui->OutputList->setColumnWidth(1,90);

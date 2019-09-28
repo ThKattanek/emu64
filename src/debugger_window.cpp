@@ -8,10 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.03.2019                //
+// Letzte Änderung am 28.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
+
+#include <QDesktopWidget>
 
 #include "./debugger_window.h"
 #include "./ui_debugger_window.h"
@@ -37,6 +39,9 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     old_make_idx = 0;
 
     ui->setupUi(this);
+
+    // Center Window
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
 
     memory_window = new MemoryWindow(this);
     memory_window->ChangeSource(0);

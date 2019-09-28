@@ -8,10 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 28.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
+
+#include <QDesktopWidget>
 
 #include "./cartridge_new_easyflash_window.h"
 #include "./ui_cartridge_new_easyflash_window.h"
@@ -21,6 +23,9 @@ CRTNewEasyflashWindow::CRTNewEasyflashWindow(QWidget *parent) :
     ui(new Ui::CRTNewEasyflashWindow)
 {
     ui->setupUi(this);
+
+    // Center Window
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
 }
 
 CRTNewEasyflashWindow::~CRTNewEasyflashWindow()

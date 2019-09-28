@@ -8,10 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019                //
+// Letzte Änderung am 28.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
+
+#include <QDesktopWidget>
 
 #include "show_c64_key_mapping_window.h"
 #include "ui_show_c64_key_mapping_window.h"
@@ -22,6 +24,9 @@ ShowC64KeyMappingWindow::ShowC64KeyMappingWindow(QWidget *parent, C64Class *c64)
 {
     this->c64 = c64;
     ui->setupUi(this);
+
+    // Center Window
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
 
     QFontDatabase fontDB;
     fontDB.addApplicationFont(":/fonts/lucon.ttf");

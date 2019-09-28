@@ -8,10 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek       	//
 //                                              //
-// Letzte Änderung am 10.06.2019                //
+// Letzte Änderung am 28.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
+
+#include <QDesktopWidget>
 
 #include "./c64_keyboard_window.h"
 #include "./ui_c64_keyboard_window.h"
@@ -57,6 +59,9 @@ C64KeyboardWindow::C64KeyboardWindow(QWidget *parent, QSettings *ini, C64Class *
     this->ini = ini;
 
     ui->setupUi(this);
+
+    // Center Window
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
 
     for(int i=0; i<7; i++)
         for(int j=0; j<18; j++)

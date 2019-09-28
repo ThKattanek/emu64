@@ -13,6 +13,8 @@
 //                                              //
 //////////////////////////////////////////////////
 
+#include <QDesktopWidget>
+
 #include "setup_window.h"
 #include "ui_setup_window.h"
 
@@ -31,6 +33,9 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoCrtClass *vid
     this->dataPath = dataPath;
 
     ui->setupUi(this);
+
+    // Center Window
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
 
     // VIC Farbmodi zur ComboBox hinzufügen
     ui->C64Farbmodus->addItems(QStringList()<<"Emu64"<<"Emu64 (bis 4.00)"<<"CCS64"<<"PC64"<<"C64S"<<"Vice"<<"Frodo"<<tr("Pepto")<<tr("Schwarz / Weiß"));

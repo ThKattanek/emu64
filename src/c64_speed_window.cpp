@@ -8,10 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.09.2019                //
+// Letzte Änderung am 28.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
+
+#include <QDesktopWidget>
 
 #include "./c64_speed_window.h"
 #include "./ui_c64_speed_window.h"
@@ -24,6 +26,10 @@ C64SpeedWindow::C64SpeedWindow(QWidget *parent, QSettings *ini) :
 
     ui = new Ui::C64SpeedWindow();
     ui->setupUi(this);
+
+    // Center Window
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
+
     ui->C64Speed->setValue(100);
 
     is_one_showed = false;

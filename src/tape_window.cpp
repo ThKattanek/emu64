@@ -8,10 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019                //
+// Letzte Änderung am 28.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
+
+#include <QDesktopWidget>
 
 #include "tape_window.h"
 #include "ui_tape_window.h"
@@ -22,6 +24,9 @@ TapeWindow::TapeWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QString 
 {
     ini = _ini;
     ui->setupUi(this);
+
+    // Center Window
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
 
     this->tmp_path = tmp_path;
     ui->FileBrowser->SetTempDir(tmp_path);

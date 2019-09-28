@@ -8,13 +8,14 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019                //
+// Letzte Änderung am 28.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include <QMessageBox>
 #include <QFontDatabase>
+#include <QDesktopWidget>
 
 #include "./cartridge_window.h"
 #include "./ui_cartridge_window.h"

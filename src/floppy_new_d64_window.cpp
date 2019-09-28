@@ -8,10 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019                //
+// Letzte Änderung am 28.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
+
+#include <QDesktopWidget>
 
 #include "floppy_new_d64_window.h"
 #include "ui_floppy_new_d64_window.h"
@@ -21,6 +23,9 @@ FloppyNewD64Window::FloppyNewD64Window(QWidget *parent) :
     ui(new Ui::FloppyNewD64Window)
 {
     ui->setupUi(this);
+
+    // Center Window
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
 
     QFontDatabase::addApplicationFont(":/fonts/C64_Pro-STYLE.ttf");
     c64_font1 = new QFont("C64 Pro");

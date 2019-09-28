@@ -8,10 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.08.2019                //
+// Letzte Änderung am 28.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
+
+#include <QDesktopWidget>
 
 #include "memory_window.h"
 #include "ui_memory_window.h"
@@ -25,6 +27,10 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
     c64 = 0;
 
     ui->setupUi(this);
+
+    // Center Window
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
+
     ui->MemoryTable->setColumnCount(1);
     ui->MemoryTable->setRowCount(MemZeilenAnz);
 
