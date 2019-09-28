@@ -14,6 +14,7 @@
 //////////////////////////////////////////////////
 
 #include <QDesktopWidget>
+#include <QStyle>
 
 #include "./c64_keyboard_window.h"
 #include "./ui_c64_keyboard_window.h"

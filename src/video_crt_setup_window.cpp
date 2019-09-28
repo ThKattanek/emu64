@@ -13,7 +13,8 @@
 //                                              //
 //////////////////////////////////////////////////
 
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QStyle>
 
 #include "video_crt_setup_window.h"
 #include "ui_video_crt_setup_window.h"
@@ -27,7 +28,7 @@ VideoCrtSetupWindow::VideoCrtSetupWindow(QWidget *parent, C64Class *c64, VideoCr
     ui->setupUi(this);
 
     // Center Window
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
     this->c64 = c64;
     this->video_crt_output = video_crt_output;

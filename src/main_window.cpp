@@ -13,7 +13,8 @@
 //                                              //
 //////////////////////////////////////////////////
 
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QStyle>
 
 #include "./main_window.h"
 #include "./ui_main_window.h"
@@ -36,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *l
     ui->setupUi(this);
 
     // Center Window
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
 #ifdef _WIN32
     setWindowTitle("Emu64 Version " + QString(VERSION_STRING) + " --- [Windows " + QString(ARCHITECTURE_STRING) + "]");

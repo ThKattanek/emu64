@@ -13,7 +13,8 @@
 //                                              //
 //////////////////////////////////////////////////
 
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QStyle>
 
 #include "./debugger_iec_window.h"
 #include "./ui_debugger_iec_window.h"
@@ -27,7 +28,7 @@ DebuggerIECWindow::DebuggerIECWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // Center Window
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
     icon_off = new QIcon(":/grafik/green_led_off.png");
     icon_on = new QIcon(":/grafik/green_led_on.png");

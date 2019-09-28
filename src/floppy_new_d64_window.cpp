@@ -13,7 +13,8 @@
 //                                              //
 //////////////////////////////////////////////////
 
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QStyle>
 
 #include "floppy_new_d64_window.h"
 #include "ui_floppy_new_d64_window.h"
@@ -25,7 +26,7 @@ FloppyNewD64Window::FloppyNewD64Window(QWidget *parent) :
     ui->setupUi(this);
 
     // Center Window
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
     QFontDatabase::addApplicationFont(":/fonts/C64_Pro-STYLE.ttf");
     c64_font1 = new QFont("C64 Pro");

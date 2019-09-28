@@ -13,7 +13,8 @@
 //                                              //
 //////////////////////////////////////////////////
 
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QStyle>
 
 #include "./c64_speed_window.h"
 #include "./ui_c64_speed_window.h"
@@ -28,7 +29,7 @@ C64SpeedWindow::C64SpeedWindow(QWidget *parent, QSettings *ini) :
     ui->setupUi(this);
 
     // Center Window
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
     ui->C64Speed->setValue(100);
 

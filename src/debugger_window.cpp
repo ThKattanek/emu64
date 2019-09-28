@@ -13,7 +13,8 @@
 //                                              //
 //////////////////////////////////////////////////
 
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QStyle>
 
 #include "./debugger_window.h"
 #include "./ui_debugger_window.h"
@@ -41,7 +42,7 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     ui->setupUi(this);
 
     // Center Window
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
     memory_window = new MemoryWindow(this);
     memory_window->ChangeSource(0);

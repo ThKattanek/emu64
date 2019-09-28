@@ -13,7 +13,8 @@
 //                                              //
 //////////////////////////////////////////////////
 
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QStyle>
 
 #include "memory_window.h"
 #include "ui_memory_window.h"
@@ -29,7 +30,7 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // Center Window
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
     ui->MemoryTable->setColumnCount(1);
     ui->MemoryTable->setRowCount(MemZeilenAnz);

@@ -13,7 +13,8 @@
 //                                              //
 //////////////////////////////////////////////////
 
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QStyle>
 
 #include "new_romset_window.h"
 #include "ui_new_romset_window.h"
@@ -27,7 +28,7 @@ NewRomSetWindow::NewRomSetWindow(QWidget *parent, QString *romsetPath) :
     ui->setupUi(this);
 
     // Center Window
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }

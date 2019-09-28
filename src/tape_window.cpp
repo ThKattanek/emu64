@@ -13,7 +13,8 @@
 //                                              //
 //////////////////////////////////////////////////
 
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QStyle>
 
 #include "tape_window.h"
 #include "ui_tape_window.h"
@@ -26,7 +27,7 @@ TapeWindow::TapeWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QString 
     ui->setupUi(this);
 
     // Center Window
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
     this->tmp_path = tmp_path;
     ui->FileBrowser->SetTempDir(tmp_path);

@@ -13,7 +13,8 @@
 //                                              //
 //////////////////////////////////////////////////
 
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QStyle>
 
 #include "./cartridge_new_easyflash_window.h"
 #include "./ui_cartridge_new_easyflash_window.h"
@@ -25,7 +26,7 @@ CRTNewEasyflashWindow::CRTNewEasyflashWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // Center Window
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 }
 
 CRTNewEasyflashWindow::~CRTNewEasyflashWindow()
