@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 14.09.2019                //
+// Letzte Änderung am 29.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -114,8 +114,6 @@ private:
     OutputStream audio_stream;
     AVCodec *video_codec, *audio_codec;
     AVDictionary *options;
-
-    SDL_Thread *thread_01;
 
     uint8_t* source_video_data;
     int source_video_line_size;
