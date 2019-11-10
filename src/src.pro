@@ -24,34 +24,39 @@ QT += widgets
 TARGET = emu64
 TEMPLATE = app
 
-CONFIG += c++11
+CONFIG += lrelease c++11
+
+EMU64_VERSION = 5.0.17
 
 # Versionsnummer ermitteln aus Git Tag Nummer
 GIT_VERSION = $$system(git --git-dir \"../.git\" describe --always --tags)
+isEmpty(GIT_VERSION) {
+  GIT_VERSION = $$EMU64_VERSION
+}
 DEFINES += VERSION_STRING=\\\"$$GIT_VERSION\\\"
 
 message("Emu64 Version: " $$GIT_VERSION)
 
-# Linux Architecture
-linux-g++{
-   !contains(QT_ARCH, x86_64){
-       DEFINES += ARCHITECTURE_STRING=\\\"32Bit\\\"
-       message("Compiling for Linux 32bit system")
-    } else {
-       DEFINES += ARCHITECTURE_STRING=\\\"64Bit\\\"
-       message("Compiling for Linux 64bit system")
-   }
+contains(QT_ARCH, x86_64){
+    EMU64_ARCH = 64Bit
+} else:contains(QT_ARCH, i[3456]86) {
+    EMU64_ARCH = 32Bit
+} else {
+    EMU64_ARCH = Unknown
 }
 
-# Windows Architecture
-win32{
-   !contains(QT_ARCH, x86_64){
-       DEFINES += ARCHITECTURE_STRING=\\\"32Bit\\\"
-       message("Compiling for Windows 32bit system")
-    } else {
-       DEFINES += ARCHITECTURE_STRING=\\\"64Bit\\\"
-       message("Compiling for Windows 64bit system")
-   }
+DEFINES += ARCHITECTURE_STRING=\\\"$$EMU64_ARCH\\\"
+
+win32 {
+    message("Compiling for Windows $$EMU64_ARCH system")
+} else:linux {
+    message("Compiling for Linux $$EMU64_ARCH system")
+} else:freebsd {
+    message("Compiling for FreeBSD $$EMU64_ARCH system")
+} else:unix {
+    message("Compiling for Unix $$EMU64_ARCH system")
+} else {
+    message("Compiling for Unknown $$EMU64_ARCH system")
 }
 
 # Abhängigkeiten
@@ -64,14 +69,11 @@ PKGCONFIG += sdl2 SDL2_image libpng glu libavutil libavformat libavcodec libswre
 
 message("Zip: $$ZIP")
 
-linux-g++{
-    DEFINES += ZIP_SUPPORT=true
-    LIBS += -lquazip5
-}
-
-win32{
-    DEFINES += ZIP_SUPPORT=true
+DEFINES += ZIP_SUPPORT=true
+win32 {
     PKGCONFIG += quazip
+} else {
+    LIBS += -lquazip5
 }
 
 # Quelltexte
@@ -230,16 +232,14 @@ RC_FILE += emu64.rc
 message(Installpath: $$PREFIX)
 DEFINES += DATA_PATH=\\\"$$PREFIX\\\"
 
-win32{
+win32 {
     target.path = $$PREFIX
     roms.path = $$PREFIX/roms
     floppy_sounds.path = $$PREFIX/floppy_sounds
     gfx.path = $$PREFIX/gfx
     txt.path = $$PREFIX
     languages.path = $$PREFIX/languages
-}
-
-linux-g++{
+} else {
     target.path = $$PREFIX/bin
     roms.path = $$PREFIX/share/$$TARGET/roms
     floppy_sounds.path = $$PREFIX/share/$$TARGET/floppy_sounds

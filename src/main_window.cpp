@@ -41,10 +41,16 @@ MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *l
 
 #ifdef _WIN32
     setWindowTitle("Emu64 Version " + QString(VERSION_STRING) + " --- [Windows " + QString(ARCHITECTURE_STRING) + "]");
-#endif
-
-#ifdef __linux__
+#else
+# ifdef __linux__
     setWindowTitle("Emu64 Version " + QString(VERSION_STRING) + " --- [Linux " + QString(ARCHITECTURE_STRING) + "]");
+# else
+#  ifdef __FreeBSD__
+    setWindowTitle("Emu64 Version " + QString(VERSION_STRING) + " --- [FreeBSD " + QString(ARCHITECTURE_STRING) + "]");
+#  else
+    setWindowTitle("Emu64 Version " + QString(VERSION_STRING) + " --- [POSIX (unknown) " + QString(ARCHITECTURE_STRING) + "]");
+#  endif
+# endif
 #endif
 }
 
@@ -158,8 +164,7 @@ void MainWindow::OnInit()
         dataPath = QApplication::applicationDirPath();
     else
         dataPath = custom_dataPath;
-#endif
-#ifdef __linux__
+#else
     if(custom_dataPath == "")
     {
         dataPath = DATA_PATH;
