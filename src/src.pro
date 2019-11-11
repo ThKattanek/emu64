@@ -13,7 +13,7 @@
 # //                                              //
 # //////////////////////////////////////////////////
 
-# PREFIX=/usr/local
+!win32:isEmpty(PREFIX):PREFIX=/usr/local
 
 QT       += core gui
 
@@ -244,7 +244,7 @@ win32 {
     roms.path = $$PREFIX/share/$$TARGET/roms
     floppy_sounds.path = $$PREFIX/share/$$TARGET/floppy_sounds
     gfx.path = $$PREFIX/share/$$TARGET/gfx
-    txt.path = $$PREFIX/share/$$TARGET
+    txt.path = $$PREFIX/share/doc/$$TARGET
     languages.path = $$PREFIX/share/$$TARGET/languages
 }
 
@@ -269,8 +269,8 @@ txt.files += ../änderungen.txt
 # Languages
 languages.files += ../grafik/flaggen/emu64_de.png
 languages.files += ../grafik/flaggen/emu64_en.png
-languages.files += emu64_de.qm
-languages.files += emu64_en.qm
+languages.extra += $(INSTALL_FILE) .qm/emu64_de.qm $(INSTALL_ROOT)$$languages.path;
+languages.extra += $(INSTALL_FILE) .qm/emu64_en.qm $(INSTALL_ROOT)$$languages.path;
 
 INSTALLS += target roms floppy_sounds gfx txt languages
 }
