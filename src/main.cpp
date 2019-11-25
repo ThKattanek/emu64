@@ -108,9 +108,7 @@ int main(int argc, char *argv[])
 #ifdef _WIN32
     FreeConsole();
     QFile LogFile("emu64.log");
-#endif
-
-#ifdef __linux__
+#else
     if(!config_dir.exists())
     {
         QDir dir = QDir::root();
@@ -132,10 +130,16 @@ int main(int argc, char *argv[])
 
 #ifdef _WIN32
     if(log) *log << "*** Emu64 Win32 Binary File ***\n\n";
-#endif
-
-#ifdef __linux__
+#else
+# ifdef __linux__
     if(log) *log << "*** Emu64 Linux Binary File ***\n\n";
+# else
+#  ifdef __FreeBSD__
+    if(log) *log << "*** Emu64 FreeBSD Binary File ***\n\n";
+#  else
+    if(log) *log << "*** Emu64 POSIX (unknown) Binary File ***\n\n";
+#  endif
+# endif
 #endif
 
     if(log != nullptr) *log << "Emu64 Version: " << VERSION_STRING << "\n\n";
