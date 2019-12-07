@@ -3,7 +3,7 @@
 ### [Latest version here](https://github.com/ThKattanek/emu64/releases/latest)
 (Die 32-bit Windows Version läuft auch unter Linux mit Wine (getestet unter Kubuntu 18.04))
 
-Emu64 Homepage: [http://www.emu64-projekt.de](http://www.emu64-projekt.de)
+Emu64 Homepage: [https://forum.emu64.net](https://forum.emu64.net)
 
 Emu64 auf YouTube: [Emu64 News Playlist](https://www.youtube.com/playlist?list=PLPygkia21sCKyHtZ9DGkWhHrq3bF9fMhY) / [Emu64 Tutorial Playlist](https://www.youtube.com/playlist?list=PLPygkia21sCLN7UtYWqpuGRjmC6OTV8mY)
 
