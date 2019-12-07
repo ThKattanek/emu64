@@ -1,5 +1,5 @@
 # EMU64 - Der C64 Emulator
-![Logo](http://www.emu64-projekt.de/images/emu64_logo_120_120.png)
+![Logo](https://forum.emu64.net/images/emu64_logo_120_120.png)
 ### [Latest version here](https://github.com/ThKattanek/emu64/releases/latest)
 (Die 32-bit Windows Version läuft auch unter Linux mit Wine (getestet unter Kubuntu 18.04))
 
