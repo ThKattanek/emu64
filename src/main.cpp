@@ -166,10 +166,12 @@ int main(int argc, char *argv[])
         w = new MainWindow(nullptr, nullptr, log);
     }
 
+    w->start_minimized = start_minimized;
+
     // Wenn --minimized
     if(start_minimized)
     {
-        w->start_minimized = start_minimized;
+
         w->showMinimized();
     }
 
