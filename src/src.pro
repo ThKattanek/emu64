@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 17.09.2019                //
+# // Letzte Änderung am 09.12.2019                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -270,8 +270,18 @@ txt.files += ../änderungen.txt
 # Languages
 languages.files += ../grafik/flaggen/emu64_de.png
 languages.files += ../grafik/flaggen/emu64_en.png
-languages.extra += $(INSTALL_FILE) .qm/emu64_de.qm $(INSTALL_ROOT)$$languages.path;
-languages.extra += $(INSTALL_FILE) .qm/emu64_en.qm $(INSTALL_ROOT)$$languages.path;
+
+## Momentane Lösung für MXE Build. MXE packt die *.qm Files momentan mit ins build/src/release Verzeichnis und nicht ins .qm Verzeichnis
+win32 {
+    languages.files += emu64_de.qm
+    languages.files += emu64_en.qm
+} else {
+    languages.extra += $(INSTALL_FILE) .qm/emu64_de.qm $(INSTALL_ROOT)$$languages.path;
+    languages.extra += $(INSTALL_FILE) .qm/emu64_en.qm $(INSTALL_ROOT)$$languages.path;
+}
 
 INSTALLS += target roms floppy_sounds gfx txt languages
 }
+
+DISTFILES += \
+    ../crossbuild-win-releases.sh

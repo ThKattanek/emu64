@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 01.09.2019                //
+# // Letzte Änderung am 08.12.2019                //
 # // www.emu64-projekt.de                         //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -80,9 +80,6 @@ if [ $i686_ok ]; then
     if [ -d $install_i686_dir ]; then
         rm -rf $install_i686_dir/*
     fi
-
-    # compile ts files
-    lrelease ../src/src.pro
     
     # execute qmake
     cd $build_i686_dir
@@ -125,9 +122,6 @@ if [ $x86_64_ok ]; then
     if [ -d $install_x86_64_dir ]; then
         rm -rf $install_x86_64_dir/*
     fi
-
-    # compile ts files
-    lrelease ../src/src.pro
     
     # execute qmake
     cd $build_x86_64_dir
