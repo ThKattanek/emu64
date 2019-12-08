@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.08.2019                //
+// Letzte Änderung am 08.12.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -67,6 +67,7 @@ public:
     void paintEvent(QPaintEvent *event);
 
     CustomSplashScreen *splash;
+    bool start_minimized;
 
     QTextStream *log;
     void LogText(const char*);

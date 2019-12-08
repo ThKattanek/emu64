@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 28.09.2019                //
+// Letzte Änderung am 08.12.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -37,6 +37,8 @@ int main(int argc, char *argv[])
 
     QTextStream *log = nullptr;
     QDir config_dir = QDir(QDir::homePath() + "/.config/emu64");
+
+    bool start_minimized = false;
 
     CommandLineClass *cmd_line = new CommandLineClass(argc, argv, "emu64",command_list, command_list_count);
 
@@ -68,6 +70,9 @@ int main(int argc, char *argv[])
                         return(-1);
                     }
             }
+
+            if(cmd_line->GetCommand(i) == CMD_MINIMIZED)
+                start_minimized = true;
         }
 
         if(cmd_line->GetCommand(0) == CMD_HELP)
@@ -155,6 +160,13 @@ int main(int argc, char *argv[])
     else
     {
         w = new MainWindow(nullptr, nullptr, log);
+    }
+
+    // Wenn --minimized
+    if(start_minimized)
+    {
+        w->start_minimized = start_minimized;
+        w->showMinimized();
     }
 
     QObject::connect(app,SIGNAL(messageAvailable(QStringList)),w,SLOT(OnMessage(QStringList)));

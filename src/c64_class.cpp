@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 28.09.2019                //
+// Letzte Änderung am 08.12.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -40,10 +40,12 @@ int SDLThreadWarp(void *userdat);
 
 const char* C64Class::screenshot_format_name[] = {"BMP","PNG"};
 
-C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::function<void(char*)> log_function, const char *data_path):
+C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(char*)> log_function, const char *data_path):
     mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
 {
     *ret_error = 0;
+
+    this->start_minimized = start_minimized;
 
     changed_graphic_modi = false;
     changed_window_pos = false;
@@ -1264,6 +1266,7 @@ void C64Class::SetGrafikModi(bool enable_screen_doublesize, bool enable_screen_c
     this->enable_screen_doublesize = enable_screen_doublesize;
     this->enable_screen_crt_output =  enable_screen_crt_output;
     this->enable_screen_filter = enable_screen_filter;
+    this->start_minimized = start_minimized;
     this->fullscreen_width = fullscreen_width;
     this->fullscreen_height = fullscreen_height;
 
@@ -1384,6 +1387,10 @@ void C64Class::InitGrafik()
     if(sdl_window == nullptr)
     {
         LogText("\tInitGrafik: SDL_Window noch nicht vorhanden.\n");
+
+        // Wenn no-gui command
+        // Flag SDL_WINDOW_HIDDEN   -> Window wird nicht dargestellt auch nicht in der Taskleiste
+
         sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
         if(sdl_window == nullptr)
             LogText("\tInitGrafik: Fehler beim erstellen des SDL_Window.\n");
@@ -1404,6 +1411,10 @@ void C64Class::InitGrafik()
         sprintf(out_string,"\tInitGrafik: SDL_Window Groesse wurde gesetzt (%d,%d).\n",current_window_width, current_window_height);
         LogText(out_string);
     }
+
+    // Wenn Minimized Comandline
+    if(start_minimized)
+        SDL_MinimizeWindow(sdl_window);
 
     gl_context = SDL_GL_CreateContext(sdl_window);
     if(gl_context == nullptr)

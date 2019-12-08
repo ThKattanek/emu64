@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 28.09.2019                //
+// Letzte Änderung am 08.12.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -58,7 +58,7 @@ class C64Class
 {
 
 public:
-    C64Class(int *ret_error, VideoCrtClass *video_crt_output, std::function<void(char*)> log_function, const char *data_path);
+    C64Class(int *ret_error, VideoCrtClass *video_crt_output,bool start_minimized, std::function<void(char*)> log_function, const char *data_path);
     ~C64Class();
     void StartEmulation();
     void EndEmulation();
@@ -213,6 +213,8 @@ public:
     int GetVicLastDisplayLineNtsc();
 
     static const char* screenshot_format_name[SCREENSHOT_FORMATS_COUNT];
+
+    bool            start_minimized;
 
     uint16_t        current_window_width;
     uint16_t        current_window_height;
