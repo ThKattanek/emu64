@@ -37,9 +37,19 @@ cd emu64
 git checkout 5.0.17
 mkdir build
 cd build
-lrelease ../src/src.pro
 qmake .. PREFIX="/usr/local"
 make -j8
+sudo make install
+```
+### Wenn folgender Fehler bei "make install" kommt:
+```code
+Aufruf von stat für '.qm/emu64_de.qm' nicht möglich: Datei oder Verzeichnis nicht gefunden
+```
+### Dann:
+```bash
+mkdir src/.qm
+lrelease ../src/src.pro
+cp ../src/*.qm src/.qm
 sudo make install
 ```
 
