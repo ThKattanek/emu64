@@ -80,6 +80,9 @@ if [ $i686_ok ]; then
     if [ -d $install_i686_dir ]; then
         rm -rf $install_i686_dir/*
     fi
+
+    # compile ts files
+    lrelease ../src/src.pro
     
     # execute qmake
     cd $build_i686_dir
@@ -123,6 +126,9 @@ if [ $x86_64_ok ]; then
         rm -rf $install_x86_64_dir/*
     fi
     
+    # compile ts files
+    lrelease ../src/src.pro
+
     # execute qmake
     cd $build_x86_64_dir
     $x86_64_qmake PREFIX=$install_x86_64_dir ../..
