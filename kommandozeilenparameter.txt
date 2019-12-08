@@ -46,6 +46,9 @@ emu64 [PARAMETER]
 --nosplash
     Der SplashScreen wird beim Start nicht angezeigt.
 
+--minimized
+    Emu64 wird mit minimierten Fenstern gestartet.
+
 --exitscreenshot <Dateiname>
     Speichert vor dem beenden noch ein Screenshot als png.
 

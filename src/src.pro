@@ -150,6 +150,7 @@ HEADERS += \
     debugger_iec_window.h \
     debugger_vic_window.h \
     debugger_window.h \
+    emu64_commands.h \
     floppy1541_class.h \
     floppy_new_d64_window.h \
     floppy_window.h \
