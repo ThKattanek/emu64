@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 08.12.2019                //
+# // Letzte Änderung am 22.12.2019                //
 # // www.emu64-projekt.de                         //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -87,7 +87,7 @@ if [ $i686_ok ]; then
     # execute qmake
     cd $build_i686_dir
     $i686_qmake PREFIX=$install_i686_dir ../..
-    make -j8 install
+    make -j24 install
     cd ..
     
     rm -rf $build_i686_dir
@@ -103,7 +103,7 @@ if [ $i686_ok ]; then
     
     # compress as 7z
     echo "Release 32bit as 7z kompressed..."
-    7z a -t7z -m0=LZMA -mmt=on -mx=9 -md=96m -mfb=256 $install_i686_dir".7z" $install_i686_dir
+    7z a -t7z -m0=LZMA -mmt=24 -mx=9 -md=96m -mfb=256 $install_i686_dir".7z" $install_i686_dir
 
     rm -rf $install_i686_dir
 fi
@@ -132,7 +132,7 @@ if [ $x86_64_ok ]; then
     # execute qmake
     cd $build_x86_64_dir
     $x86_64_qmake PREFIX=$install_x86_64_dir ../..
-    make -j8 install
+    make -j24 install
     cd ..
 
     rm -rf $build_x86_64_dir
@@ -148,7 +148,7 @@ if [ $x86_64_ok ]; then
     
     # compress as 7z
     echo "Release 64bit as 7z kompressed..."
-    7z a -t7z -m0=LZMA -mmt=on -mx=9 -md=96m -mfb=256 $install_x86_64_dir".7z" $install_x86_64_dir
+    7z a -t7z -m0=LZMA -mmt=24 -mx=9 -md=96m -mfb=256 $install_x86_64_dir".7z" $install_x86_64_dir
 
     rm -rf $install_x86_64_dir
 fi
