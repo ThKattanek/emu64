@@ -247,6 +247,8 @@ win32 {
     gfx.path = $$PREFIX/share/$$TARGET/gfx
     txt.path = $$PREFIX/share/doc/$$TARGET
     languages.path = $$PREFIX/share/$$TARGET/languages
+    desktop.path = $$PREFIX/share/applications
+    icons.path = $$PREFIX/share/icons/hicolor/64x64/apps
 }
 
 # C64 Roms
@@ -271,6 +273,14 @@ txt.files += ../änderungen.txt
 languages.files += ../grafik/flaggen/emu64_de.png
 languages.files += ../grafik/flaggen/emu64_en.png
 
+# Linux Install Startmenü Eintrag
+## /usr/local/share/icons/hicolor/64x64/apps/
+linux
+{
+    desktop.files += emu64.desktop
+    icons.files += ../grafik/emu64.png
+}
+
 ## Momentane Lösung für MXE Build. MXE packt die *.qm Files momentan mit ins build/src/release Verzeichnis und nicht ins .qm Verzeichnis
 win32 {
     languages.files += emu64_de.qm
@@ -280,7 +290,7 @@ win32 {
     languages.extra += $(INSTALL_FILE) .qm/emu64_en.qm $(INSTALL_ROOT)$$languages.path;
 }
 
-INSTALLS += target roms floppy_sounds gfx txt languages
+INSTALLS += target roms floppy_sounds gfx txt languages icons desktop
 }
 
 DISTFILES += \
