@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 22.12.2019                //
+# // Letzte Änderung am 13.01.2020                //
 # // www.emu64-projekt.de                         //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -106,6 +106,9 @@ if [ $i686_ok ]; then
     7z a -t7z -m0=LZMA -mmt=24 -mx=9 -md=96m -mfb=256 $install_i686_dir".7z" $install_i686_dir
 
     rm -rf $install_i686_dir
+    
+    # SHA512 Hashwert erzeugen
+    sha512sum -b $project_name"_"$version"_win_x32.7z" >> $project_name"_"$version"_win_x32.7z.sha512"
 fi
 
 ### 64Bit Static
@@ -151,6 +154,9 @@ if [ $x86_64_ok ]; then
     7z a -t7z -m0=LZMA -mmt=24 -mx=9 -md=96m -mfb=256 $install_x86_64_dir".7z" $install_x86_64_dir
 
     rm -rf $install_x86_64_dir
+    
+    # SHA512 Hashwert erzeugen
+    sha512sum -b $project_name"_"$version"_win_x64.7z" >> $project_name"_"$version"_win_x64.7z.sha512"
 fi
 
 cd ..
