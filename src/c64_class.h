@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.12.2019                //
+// Letzte Änderung am 23.12.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -38,6 +38,8 @@
 #include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_image.h>
 #include <functional>
+
+#define AudioSampleRate 44100
 
 #define MAX_STRING_LENGTH 1024
 
@@ -344,6 +346,7 @@ public:
     std::function<void(void)> CloseEventC64Screen;
     std::function<void(void)> LimitCyclesEvent;
     std::function<void(unsigned char)> DebugCartEvent;
+    std::function<void(uint8_t *audio_buffer0, uint8_t *audio_buffer1, uint8_t *audio_buffer2, int length)> AudioOutProc;
 
     uint16_t        cpu_pc_history[256];
     uint8_t         cpu_pc_history_pos;

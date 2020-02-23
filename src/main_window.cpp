@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.12.2019                //
+// Letzte Änderung am 23.12.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -123,6 +123,7 @@ MainWindow::~MainWindow()
     delete show_c64keymap_window;
     delete video_capture_window;
     delete sid_dump_window;
+    delete oscilloscope_window;
 
     delete ui;
     delete ini;
@@ -388,6 +389,10 @@ void MainWindow::OnInit()
     sid_dump_window = new SidDumpWindow(this, c64);
     LogText(tr(">> SidDumpWindow wurde erzeugt\n").toUtf8());
 
+    SplashMessage(tr("OscilloscopeWindow wird erstellt."),Qt::darkBlue);
+    oscilloscope_window = new OscilloscopeWindow(this, AudioSampleRate);
+    LogText(tr(">> OscilloscopeWindow wurde erzeugt\n").toUtf8());
+
     ini->beginGroup("MainWindow");
     SplashMessage(tr("Screenshotnummer wird geladen."),Qt::darkBlue);
     uint32_t screenshot_number;
@@ -395,7 +400,6 @@ void MainWindow::OnInit()
     c64->SetScreenshotNumber(screenshot_number);
     ini->endGroup();
     LogText(tr(">> Aktuelle Screenshotnummer wurde geladen\n").toUtf8());
-
 
     //SplashMessage(tr("SetupWindow wird mit INI abgeglichen."),Qt::darkBlue);
     //setup_window->ReSetup();
@@ -473,6 +477,9 @@ void MainWindow::OnInit()
 
     connect(floppy_window,SIGNAL(ChangeFloppyImage(int)),this,SLOT(OnChangeFloppyImage(int)));
     LogText(tr(">> ChangeFloppyImage Event mit MainWindow verknuepft\n").toUtf8());
+
+    /// Audio mit Oszilloskope verbinden
+    c64->AudioOutProc = std::bind(&OscilloscopeWindow::AudioStreamEvent,oscilloscope_window,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4);
 
     ////////// Load from INI ///////////
     SplashMessage(tr("Einstellungen werden von INI geladen und gesetzt."),Qt::darkBlue);
@@ -1170,4 +1177,9 @@ void MainWindow::on_actionVideo_Capture_triggered()
 void MainWindow::on_actionSID_Dump_triggered()
 {
     sid_dump_window->show();
+}
+
+void MainWindow::on_actionAudio_Oszilloskop_triggered()
+{
+    oscilloscope_window->show();
 }

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.12.2019                //
+// Letzte Änderung am 23.12.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -43,6 +43,7 @@
 #include "./show_c64_key_mapping_window.h"
 #include "./video_capture_window.h"
 #include "./sid_dump_window.h"
+#include "./oscilloscope_window.h"
 #include "./custom_save_file_dialog.h"
 #include "./command_line_class.h"
 #include "./emu64_commands.h"
@@ -136,6 +137,8 @@ private slots:
 
     void on_actionSID_Dump_triggered();
 
+    void on_actionAudio_Oszilloskop_triggered();
+
 private:
     /// Funktionen ///
     void changeEvent(QEvent *event);  
@@ -181,6 +184,7 @@ private:
     ShowC64KeyMappingWindow *show_c64keymap_window; // C64 Key Map Window
     VideoCaptureWindow *video_capture_window;       // Window zum Video Aufzeichnen
     SidDumpWindow *sid_dump_window;                 // Window zum Aufzeichnen der geschriebene SID Werte
+    OscilloscopeWindow *oscilloscope_window;        // Window zum Visuallisieren des SID Audiostreams
 
     //QStringList commandLine;                        // Enthält den an Emu64 übergebenen String
 

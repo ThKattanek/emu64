@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.12.2019                //
+// Letzte Änderung am 23.12.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -22,8 +22,6 @@ void AudioMix(void *not_used, Uint8 *stream, int laenge);
 int SDLThread(void *userdat);
 int SDLThreadLoad(void *userdat);
 int SDLThreadWarp(void *userdat);
-
-#define AudioSampleRate 44100
 
 //#define C64Takt 982800  // Genau 50Hz
 #define C64Takt 985248  // 50,124542Hz (Original C64 PAL)
@@ -1094,6 +1092,9 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
         // Audiopuffer mit 0 füllen ();
         memset(stream,0,static_cast<size_t>(laenge));
     }
+
+    // Für Ozi Ausgabe
+    if(AudioOutProc != nullptr) AudioOutProc(reinterpret_cast<uint8_t*>(sid1->SoundBufferV0), reinterpret_cast<uint8_t*>(sid1->SoundBufferV1), reinterpret_cast<uint8_t*>(sid1->SoundBufferV2), laenge / ((audio_sample_bit_size/8)));
 }
 
 void C64Class::KeyEvent(uint8_t matrix_code, KeyStatus key_status, bool isAutoShift)

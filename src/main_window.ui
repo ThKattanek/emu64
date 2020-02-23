@@ -167,7 +167,7 @@ background-position: center
      <x>0</x>
      <y>0</y>
      <width>482</width>
-     <height>20</height>
+     <height>18</height>
     </rect>
    </property>
    <property name="font">
@@ -273,6 +273,7 @@ background-position: center
     <addaction name="menuREU_1764_16MB"/>
     <addaction name="menuGEO_NEO_RAM_2MB"/>
     <addaction name="actionVideo_Capture"/>
+    <addaction name="actionAudio_Oszilloskop"/>
    </widget>
    <widget class="QMenu" name="menuEinstellungen">
     <property name="title">
@@ -1079,6 +1080,11 @@ background-position: center
    </property>
    <property name="visible">
     <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionAudio_Oszilloskop">
+   <property name="text">
+    <string>Audio Oszilloskop</string>
    </property>
   </action>
  </widget>
