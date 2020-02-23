@@ -285,3 +285,15 @@ INSTALLS += target roms floppy_sounds gfx txt languages
 
 DISTFILES += \
     ../crossbuild-win-releases.sh
+
+FORMS += \
+    oscilloscope_widget.ui \
+    oscilloscope_window.ui
+
+HEADERS += \
+    oscilloscope_widget.h \
+    oscilloscope_window.h
+
+SOURCES += \
+    oscilloscope_widget.cpp \
+    oscilloscope_window.cpp
