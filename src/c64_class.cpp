@@ -1094,7 +1094,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
     }
 
     // Für Ozi Ausgabe
-    if(AudioOutProc != nullptr) AudioOutProc(reinterpret_cast<uint8_t*>(sid1->SoundBufferV0), reinterpret_cast<uint8_t*>(sid1->SoundBufferV1), reinterpret_cast<uint8_t*>(sid1->SoundBufferV2), laenge/2);
+    if(AudioOutProc != nullptr) AudioOutProc(reinterpret_cast<uint8_t*>(sid1->SoundBufferV0), reinterpret_cast<uint8_t*>(sid1->SoundBufferV1), reinterpret_cast<uint8_t*>(sid1->SoundBufferV2), laenge / ((audio_sample_bit_size/8)));
 }
 
 void C64Class::KeyEvent(uint8_t matrix_code, KeyStatus key_status, bool isAutoShift)
