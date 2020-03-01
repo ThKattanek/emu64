@@ -1,3 +1,18 @@
+//////////////////////////////////////////////////
+//                                              //
+// Emu64                                        //
+// von Thorsten Kattanek                        //
+//                                              //
+// #file: oscilloscope_window.cpp               //
+//                                              //
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// Letzte Änderung am 01.03.2020                //
+// www.emu64.de                                 //
+//                                              //
+//////////////////////////////////////////////////
+
 #include "oscilloscope_window.h"
 #include "ui_oscilloscope_window.h"
 
@@ -52,6 +67,12 @@ void OscilloscopeWindow::showEvent(QShowEvent *event)
 void OscilloscopeWindow::hideEvent(QHideEvent *event)
 {
     is_hide = true;
+}
+
+void OscilloscopeWindow::RetranslateUi()
+{
+    ui->retranslateUi(this);
+    this->update();
 }
 
 void OscilloscopeWindow::AudioStreamEvent(uint8_t *stream0, uint8_t *stream1,uint8_t *stream2, int length)

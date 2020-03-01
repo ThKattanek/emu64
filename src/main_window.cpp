@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.12.2019                //
+// Letzte Änderung am 01.03.2020                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -749,6 +749,7 @@ void MainWindow::RetranslateUi()
     setup_window->RetranslateUi();
     speed_window->RetranslateUi();
     video_capture_window->RetranslateUi();
+    oscilloscope_window->RetranslateUi();
 
     SetC64ScreenTitle();
 }
