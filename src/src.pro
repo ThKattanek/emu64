@@ -26,7 +26,7 @@ TEMPLATE = app
 
 CONFIG += lrelease c++11
 
-EMU64_VERSION = 5.0.17
+EMU64_VERSION = 5.0.18
 
 # Versionsnummer ermitteln aus Git Tag Nummer
 GIT_VERSION = $$system(git --git-dir \"../.git\" describe --always --tags)
