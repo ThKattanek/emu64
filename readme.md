@@ -1,6 +1,6 @@
 # EMU64 - Der C64 Emulator
 ![Logo](https://forum.emu64.net/images/emu64_logo_120_120.png)
-### [Latest version here](https://github.com/ThKattanek/emu64/releases/latest)
+### [Letzte Offizelle Windows Version hier](https://github.com/ThKattanek/emu64/releases/latest)
 (Die 32-bit Windows Version läuft auch unter Linux mit Wine (getestet unter Kubuntu 18.04))
 
 Emu64 Homepage: [https://forum.emu64.net](https://forum.emu64.net)
@@ -34,7 +34,7 @@ Emu64 auf Facebook: [https://www.facebook.com/Emu64-103321833093172](https://www
 ```bash
 git clone https://github.com/ThKattanek/emu64.git
 cd emu64
-git checkout 5.0.17
+git checkout 5.0.18
 mkdir build
 cd build
 qmake .. PREFIX="/usr/local"

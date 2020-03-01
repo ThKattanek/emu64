@@ -1,3 +1,51 @@
+5.0.18
+------
+
+- Bugfix: SyncFound in Floppy1541Class
+- [issue #170] D64 Directory Liste im FloppyWindow wird jetzt sofort bei Veränderungen im Image aktuallisiert
+- Ocode "BIT" in 6502 & 6510 überarbeitet
+- [issue #173] Fix Soundproblem beim Disk Formatieren
+- Pepto Luminaz Levels eingebaut. First VICII Revision hat nur 5 Luminanz Abstufungen, alle anderen 9
+- Es kann nun gewählt werden ob die Luminanz Level der erste oder der folgenden Revisionen benutz werden
+- Video CRT Emulation überarbeitet und an Pepto angelehnt
+- [issue #171] Alle Dateinamen die aus einem QString nach char* konvertiert werden, erledigt jetzt .toLocal8Bit vorher toUtf8
+- [issue #175] Filename wird jetzt beim Export richtig vorgegeben, und am ende stehende Leerzeichen entfernt
+- NMI & IRQ ueberarbeitet. (6510 & 6502)
+- Bugfix: in der Floppy1541Class, es wurden immer alle Laufwerke emuliert obwohl sie abgeschaltet waren
+- Bugfix: mos6502 + mos6510 irq_delay
+- Bugfix: Warp Modus
+- Bugfix: Debugger - Breakgroups Save & Load geht wieder
+- [issue #181] Pause Button im C64SpeedWindow funktioniert wieder.
+- [issue #180] Beim lesen der CPU aus der Adresse 0xde00 - 0xdfff wird immer der zuletzt gelesene VIC Wert aus der ersten Phase des Taktzyklus gelesen.
+- [issue #185]  Alle Fenster werden beim fehlen der emu64.ini oder des entsprechenden Eintrages in dieser, in der Bildschirmmitte dargestellt.
+- Comandline Befehl --reset-ini kann nun an beliebiger Stelle stehen. Bis jetzt musste --reset-ini an erster stelle stehen um ausgeführt zu werden.
+- [issue #176] Magic Desk Cartridge ist nun implementiert, jedoch erstmal read-only.
+- [issue #106] Neuer Comandline Befehl --minimized hinzugefügt
+- crossbuild-win-releases.sh überarbeitet (SHA512 Checksummen ausgabe)
+- Audio Oszilloskop für SID Ausgabe hinzugefügt
+
+Changes from Zirias
+-------------------
+
+several cross-platform and packaging fixes
+
+ * add "lrelease" to src.pro CONFIG, so it doesn't have to be invoked
+   manually, helping packagers to use their standard qmake-based rules
+ * add hardcoded version string to src.pro which is used when building from
+   a release archive instead of a git repo (which is normal when building
+   packages)
+ * add fallbacks for unknown operating systems and processor
+   architectures, assume unknown operating systems are POSIX compliant
+ * add explicit support for FreeBSD
+
+fix some build/install issues
+
+* on non-windows platforms, enable a default PREFIX of /usr/local
+* move documentation files to $PREFIX/share/doc
+* fix lrelease issue, work around https://bugreports.qt.io/browse/QTBUG-77398
+  by adding explicit install commands for the .qm files
+
+
 5.0.17
 ------
 
