@@ -209,6 +209,20 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
 
     /// SLD Audio Installieren (C64 Emulation) ///
 
+
+    char out_text[1024];
+
+    // Alle Audio Devices in Log auflisten
+    sprintf(out_text, ">> Alle Audio Devices:\n");
+    LogText(out_text);
+
+    int i, count = SDL_GetNumAudioDevices(0);
+    for (i = 0; i < count; ++i)
+    {
+        sprintf(out_text, "\t -Audio device %d: %s\n", i, SDL_GetAudioDeviceName(i, 0));
+        LogText(out_text);
+    }
+
     //  SDL Audio Format
     //  +----------------------sample is signed if set
     //  |
@@ -255,8 +269,6 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
     is_audio_sample_signed = audio_spec_have.format & 0x1000;
     audio_16bit_buffer_size = audio_spec_have.samples * audio_channels;
     audio_16bit_buffer = new int16_t[audio_16bit_buffer_size];
-
-    char out_text[1024];
 
     sprintf(out_text, "\t -Audio Driver: %s\n" , getenv("SDL_AUDIODRIVER"));
     LogText(out_text);
