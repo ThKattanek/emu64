@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.12.2019                //
+// Letzte Änderung am 05.03.2020                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -67,6 +67,7 @@ public:
     void SetLimitCycles(int nCycles);
     void SetEnableDebugCart(bool enable);
     void WarpModeLoop();
+    int GetAudioSampleRate();
     void FillAudioBuffer(uint8_t *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
     void KeyEvent(uint8_t  matrix_code, KeyStatus status, bool isAutoShift);
     bool LoadC64Roms(const char *kernalrom, const char *basicrom, const char *charrom);
@@ -250,9 +251,11 @@ public:
 
     SDL_mutex       *mutex1;  // Dient für das füllen des Soundbuffers
 
+    SDL_AudioDeviceID audio_dev;
     SDL_AudioSpec   audio_spec_want;
     SDL_AudioSpec   audio_spec_have;
 
+    int             audio_frequency;
     uint16_t        audio_sample_bit_size;
     uint16_t        audio_channels;
     bool            is_audio_sample_little_endian;

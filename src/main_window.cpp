@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.03.2020                //
+// Letzte Änderung am 05.03.2020                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -390,7 +390,7 @@ void MainWindow::OnInit()
     LogText(tr(">> SidDumpWindow wurde erzeugt\n").toUtf8());
 
     SplashMessage(tr("OscilloscopeWindow wird erstellt."),Qt::darkBlue);
-    oscilloscope_window = new OscilloscopeWindow(this, AudioSampleRate);
+    oscilloscope_window = new OscilloscopeWindow(this, c64->GetAudioSampleRate());
     LogText(tr(">> OscilloscopeWindow wurde erzeugt\n").toUtf8());
 
     ini->beginGroup("MainWindow");

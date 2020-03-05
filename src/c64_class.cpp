@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.12.2019                //
+// Letzte Änderung am 05.03.2020                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -238,7 +238,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
 
     #endif
 
-    if( SDL_OpenAudio(&audio_spec_want, &audio_spec_have) > 0 )
+    audio_dev =  SDL_OpenAudioDevice(NULL, 0, &audio_spec_want, &audio_spec_have, SDL_AUDIO_ALLOW_ANY_CHANGE);
+    if( audio_dev == 0 )
     {
         LogText(const_cast<char*>("<< ERROR: Fehler beim installieren von SDL_Audio\n"));
         *ret_error = -2;
@@ -246,6 +247,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
     }
     LogText(const_cast<char*>(">> SDL_Audio wurde installiert\n"));
 
+    audio_frequency = audio_spec_have.freq;
     audio_channels = audio_spec_have.channels;
     audio_sample_bit_size = audio_spec_have.format & 0x00ff;
     is_audio_sample_little_endian = audio_spec_have.format & 0x8000;
@@ -257,6 +259,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
     char out_text[1024];
 
     sprintf(out_text, "\t -Audio Driver: %s\n" , getenv("SDL_AUDIODRIVER"));
+    LogText(out_text);
+    sprintf(out_text, "\t -Audio Frequency: %d\n" , audio_frequency);
     LogText(out_text);
     sprintf(out_text, "\t -Audio Channels: %d\n" ,audio_channels);
     LogText(out_text);
@@ -292,14 +296,14 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
     cpu = new MOS6510();
     vic = new VICII();
     int sid_ret_error;
-    sid1 = new MOS6581_8085(0,audio_spec_have.freq,audio_spec_have.samples,&sid_ret_error);
-    sid2 = new MOS6581_8085(1,audio_spec_have.freq,audio_spec_have.samples,&sid_ret_error);
+    sid1 = new MOS6581_8085(0,audio_frequency,audio_spec_have.samples,&sid_ret_error);
+    sid2 = new MOS6581_8085(1,audio_frequency,audio_spec_have.samples,&sid_ret_error);
     cia1 = new MOS6526(0);
     cia2 = new MOS6526(1);
     crt = new CartridgeClass();
     reu = new REUClass();
     geo = new GEORAMClass();
-    tape = new TAPE1530(audio_spec_have.freq,audio_spec_have.samples,C64Takt);
+    tape = new TAPE1530(audio_frequency,audio_spec_have.samples,C64Takt);
 
     vic_buffer = vic->video_buffer;
 
@@ -332,7 +336,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
 
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
-        floppy[i] = new Floppy1541(&reset_wire,audio_spec_have.freq,audio_spec_have.samples,&floppy_found_breakpoint);
+        floppy[i] = new Floppy1541(&reset_wire,audio_frequency,audio_spec_have.samples,&floppy_found_breakpoint);
         floppy[i]->SetResetReady(&floppy_reset_ready[i],0xEBFF);
         floppy[i]->SetC64IEC(&c64_iec_wire);
         floppy[i]->SetDeviceNumber(static_cast<uint8_t>(8+i));
@@ -354,7 +358,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
     cycle_counter = 0;
     limit_cyles_counter = 0;
     debug_animation = false;
-    animation_speed_add = audio_spec_have.samples/AudioSampleRate;
+    animation_speed_add = audio_spec_have.samples/audio_frequency;
     animation_speed_counter = 0;
 
     for(int i=0;i<8;i++)
@@ -540,7 +544,7 @@ void C64Class::StartEmulation()
     sdl_thread = SDL_CreateThread(SDLThread, "C64Thread", this);
     LogText(">> C64Thread wurde gestartet.\n");
 
-    SDL_PauseAudio(0);
+    SDL_PauseAudioDevice(audio_dev, 0);
     LogText(">> SDL Audiostream wurde getartet.\n");
 }
 
@@ -558,8 +562,8 @@ void C64Class::EndEmulation()
     while (!loop_thread_is_end)
         SDL_Delay(1);
 
-    SDL_PauseAudio(1);
-    SDL_CloseAudio();
+    SDL_PauseAudioDevice(audio_dev, 1);
+    SDL_CloseAudioDevice(audio_dev);
 
     CloseSDLJoystick();
     SDL_Quit();
@@ -852,6 +856,11 @@ void C64Class::WarpModeLoop()
         iec_export_vdc.SetWire(3,floppy_iec_wire & 64);
         iec_export_vdc.SetWire(4,floppy_iec_wire & 128);
     }
+}
+
+int C64Class::GetAudioSampleRate()
+{
+    return  audio_frequency;
 }
 
 void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
@@ -2369,7 +2378,7 @@ void C64Class::EnableWarpMode(bool enabled)
     if(warp_mode)
     {
         // WarpMode aktivieren
-        SDL_PauseAudio(1);          // Audiostream pausieren
+        SDL_PauseAudioDevice(audio_dev, 1);     // Audiostream pausieren
         SDL_LockMutex(mutex1);      // Warten auf Mutex1 und sperren
         warp_thread_end = false;
         warp_thread = SDL_CreateThread(SDLThreadWarp,"WarpThread",this);
@@ -2379,7 +2388,7 @@ void C64Class::EnableWarpMode(bool enabled)
         // WarpMode deaktivieren
         warp_thread_end = true;
         SDL_UnlockMutex(mutex1);    // Mutex1 wieder freigeben
-        SDL_PauseAudio(0);          // Audiostream wieder starten
+        SDL_PauseAudioDevice(audio_dev, 0);     // Audiostream wieder starten
     }
 }
 
@@ -2870,7 +2879,7 @@ void C64Class::SetDebugAnimation(bool status)
 void C64Class::SetDebugAnimationSpeed(int cycle_sek)
 {
     animation_speed_counter = 0;
-    animation_speed_add = static_cast<float_t>(audio_spec_have.samples) / static_cast<float_t>(AudioSampleRate) * static_cast<float_t>(cycle_sek);
+    animation_speed_add = static_cast<float_t>(audio_spec_have.samples) / static_cast<float_t>(audio_frequency) * static_cast<float_t>(cycle_sek);
 }
 
 void C64Class::GetC64CpuReg(REG_STRUCT *reg, IREG_STRUCT *ireg)
