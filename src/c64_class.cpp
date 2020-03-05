@@ -267,7 +267,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
     is_audio_sample_little_endian = audio_spec_have.format & 0x8000;
     is_audio_sample_float = audio_spec_have.format & 0x0100;
     is_audio_sample_signed = audio_spec_have.format & 0x1000;
-    audio_16bit_buffer_size = audio_spec_have.samples * audio_channels;
+    audio_16bit_buffer_size = audio_spec_have.samples * 2;
     audio_16bit_buffer = new int16_t[audio_16bit_buffer_size];
 
     sprintf(out_text, "\t -Audio Driver: %s\n" , getenv("SDL_AUDIODRIVER"));
@@ -976,7 +976,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
         }
 
-        int sample_buffer_size = laenge / (audio_sample_bit_size/8);
+        int sample_buffer_size = ((laenge / audio_channels) * 2) / (audio_sample_bit_size/8);
 
         if(enable_stereo_sid)
         {
@@ -1025,13 +1025,49 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
         /// Audio auf Output Stream ausgeben
         if(!is_audio_sample_float && audio_sample_bit_size == 16)
-            memcpy(stream,audio_16bit_buffer,static_cast<size_t>(laenge));
+        {
+            if(audio_channels == 2)
+            {
+                memcpy(stream,audio_16bit_buffer,static_cast<size_t>(laenge));
+            }
+            else if(audio_channels > 2)
+            {
+                int i_src = 0;
+                int i_dst = 0;
+
+                int16_t *int16_stream = reinterpret_cast<int16_t*>(stream);
+                for(int i=0; i<sample_buffer_size_mono; i++)
+                {
+                    int16_stream[i_dst++] = audio_16bit_buffer[i_src++];
+                    int16_stream[i_dst++] = audio_16bit_buffer[i_src++];
+                    for(int j=2; j<audio_channels; j++)
+                        int16_stream[i_dst++] = 0x7fff;
+                }
+            }
+        }
 
         else if(is_audio_sample_float && audio_sample_bit_size == 32)
         {
-            float *float_stream = reinterpret_cast<float*>(stream);
-            for(int i=0; i<sample_buffer_size; i++)
-                float_stream[i] = static_cast<float>(audio_16bit_buffer[i]) / static_cast<float>(0x7fff);
+            if(audio_channels == 2)
+            {
+                float *float_stream = reinterpret_cast<float*>(stream);
+                for(int i=0; i<sample_buffer_size; i++)
+                    float_stream[i] = static_cast<float>(audio_16bit_buffer[i]) / static_cast<float>(0x7fff);
+            }
+            else if(audio_channels > 2)
+            {
+                int i_src = 0;
+                int i_dst = 0;
+
+                float *float_stream = reinterpret_cast<float*>(stream);
+                for(int i=0; i<sample_buffer_size_mono; i++)
+                {
+                    float_stream[i_dst++] = static_cast<float>(audio_16bit_buffer[i_src++]) / static_cast<float>(0x7fff);
+                    float_stream[i_dst++] = static_cast<float>(audio_16bit_buffer[i_src++]) / static_cast<float>(0x7fff);
+                    for(int j=2; j<audio_channels; j++)
+                        float_stream[i_dst++] = 0.0f;
+                }
+            }
         }
     }
     else
@@ -1115,7 +1151,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
     }
 
     // Für Ozi Ausgabe
-    if(AudioOutProc != nullptr) AudioOutProc(reinterpret_cast<uint8_t*>(sid1->SoundBufferV0), reinterpret_cast<uint8_t*>(sid1->SoundBufferV1), reinterpret_cast<uint8_t*>(sid1->SoundBufferV2), laenge / ((audio_sample_bit_size/8)));
+    if(AudioOutProc != nullptr) AudioOutProc(reinterpret_cast<uint8_t*>(sid1->SoundBufferV0), reinterpret_cast<uint8_t*>(sid1->SoundBufferV1), reinterpret_cast<uint8_t*>(sid1->SoundBufferV2), sample_buffer_size_mono);
 }
 
 void C64Class::KeyEvent(uint8_t matrix_code, KeyStatus key_status, bool isAutoShift)
