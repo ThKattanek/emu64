@@ -2588,7 +2588,7 @@ int C64Class::LoadPRG(const char *filename, uint16_t *return_start_address)
         file = fopen (filename, "rb");
         if (file == nullptr)
         {
-            LogText(const_cast<char*>("<< ERROR: Datei konnte nicht geöffnet werden"));
+            LogText(const_cast<char*>("<< ERROR: Datei konnte nicht geöffnet werden\n"));
             return 0x01;
         }
         reading_bytes = fread (&temp,1,2,file);
