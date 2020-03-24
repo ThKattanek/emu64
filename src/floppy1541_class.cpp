@@ -23,13 +23,16 @@ const uint8_t Floppy1541::d64_track_zone[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
                    2,2,2,2,2,2,
                    3,3,3,3,3,3,3,3,3,3};
 
-const uint8_t Floppy1541::d64_sector_gap[] = {12, 21, 16, 13};  // von GPZ Code übermommen imggen
-//const uint8_t Floppy1541::d64_sector_gap[] = {1, 10, 5, 2};   // Meine alten Werte
+//const uint8_t Floppy1541::d64_sector_gap[] = {12, 21, 16, 13};  // von GPZ Code übermommen imggen
+//const uint8_t Floppy1541::d64_sector_gap[] = {9, 12, 17, 8};   // VICE
+const uint8_t Floppy1541::d64_sector_gap[] = {1, 10, 5, 2};   // Meine alten Werte
 
+//onst uint8_t Floppy1541::d64_sector_gap[] = {1, 10, 5, 2};   // Meine alten Werte
+
+const uint8_t Floppy1541::motor_speed[] = {26,28,30,32};
 
 Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy_found_breakpoint):
     FloppyEnabled(false)
-
 {
     RESET = reset;
     GCR_PTR = nullptr;
@@ -106,6 +109,11 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
     UnLoadDiskImage();
 
     AktHalbSpur = 1;
+
+    motor_rotate_speed = motor_speed[d64_track_zone[(AktHalbSpur-1)*2]];
+    motor_rotate_speed_counter = motor_rotate_speed;
+
+    sync_found = false;
 
     /// Für Floppysound ///
 
@@ -250,8 +258,6 @@ bool Floppy1541::LoadDiskImage(const char* filename)
         ImageDirectoryWriteStatus = false;
         ImageTyp = D64;
 
-        SyncFoundCount = 0;
-
         return true;
     }
 
@@ -322,8 +328,6 @@ bool Floppy1541::LoadDiskImage(const char* filename)
         ImageDirectoryWriteStatus = false;
         ImageTyp = G64;
 
-        SyncFoundCount = 0;
-
         return true;
     }
     return false;
@@ -368,61 +372,70 @@ inline void Floppy1541::CheckImageWrite()
 
 inline void Floppy1541::D64ImageToGCRImage()
 {
-    for (int SPUR=1; SPUR<=35; SPUR++)
+    int image_size = 0;
+    int track_size;
+    for (int track = 1; track <= 35; track++)
     {
-        TrackSize[(SPUR-1)*2] = GCR_SECTOR_SIZE*num_sectors[SPUR-1];
-        TrackSize[((SPUR-1)*2)+1] = GCR_SECTOR_SIZE*num_sectors[SPUR-1];
-        for(int SECTOR=0; SECTOR<num_sectors[SPUR-1];SECTOR++)
+        track_size = 0;
+        for(int SECTOR = 0; SECTOR<num_sectors[track-1];SECTOR++)
         {
-            SectorToGCR(SPUR,SECTOR);
+            track_size += SectorToGCR(track, SECTOR);
         }
+
+        TrackSize[(track - 1)*2] = track_size;
+
+        image_size += track_size;
     }
     ImageWriteStatus=false;
     ImageDirectoryWriteStatus=false;
 }
 
-inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
+inline int Floppy1541::SectorToGCR(unsigned int track, unsigned int sector)
 {
     static unsigned char id1 = 0;
     static unsigned char id2 = 0;
     unsigned char block[256];
     unsigned char buffer[4];
-    unsigned char *P = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCR_SECTOR_SIZE;
+
+    unsigned char *P = GCRImage + ((track-1)*2) * GCR_TRACK_SIZE + sector * GCR_SECTOR_SIZE;
+    unsigned char *P_START = P;
 
     unsigned short TRACK_INDEX[]={0,0,21,42,63,84,105,126,147,168,189,210,231,252,273,294,315,336,357,376,395,414,433,452,471,490,508,526,544,562,580,598,615,632,649,666,683};
-    int TEMP;
-    TEMP=TRACK_INDEX[spur]+(sektor);
-    TEMP*=256;
 
-    for (int z=0;z<256;z++) block[z]=D64Image[TEMP+z];
+    // D64 Block nach block[] kopieren
+    for (int z=0;z<256;z++) block[z]=D64Image[(TRACK_INDEX[track]+(sector))*256+z];
+
 
     // Create GCR header (15 Bytes)
     // SYNC
     *P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
     buffer[0] = 0x08;							// Header mark
-    buffer[1] = sektor ^ spur ^ id2 ^ id1;		// Checksum
-    buffer[2] = sektor;
-    buffer[3] = spur;
+    buffer[1] = sector ^ track ^ id2 ^ id1;		// Checksum
+    buffer[2] = sector;
+    buffer[3] = track;
     ConvertToGCR(buffer, P);
     buffer[0] = id2;
     buffer[1] = id1;
     buffer[2] = 0x0F;
     buffer[3] = 0x0F;
     ConvertToGCR(buffer, P+5);
-    P += 9;
+    P += 10;
+
+    memset(P, 0x55, HEADER_GAP_BYTES);
+    P += HEADER_GAP_BYTES;
 
     // Create GCR data (338 Bytes)
     unsigned char SUM;
     // SYNC
     *P++ = 0xFF;                                // SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
     buffer[0] = 0x07;							// Data mark
     SUM = buffer[1] = block[0];
     SUM ^= buffer[2] = block[1];
@@ -447,8 +460,11 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
     ConvertToGCR(buffer, P);
     P += 5;
 
-    unsigned char gap_size = d64_sector_gap[d64_track_zone[spur]];
+    unsigned char gap_size = d64_sector_gap[d64_track_zone[track]];
     memset(P, 0x55, gap_size);							// Gap
+    P += gap_size;
+
+    return P-P_START;
 }
 
 inline void Floppy1541::ConvertToGCR(unsigned char *source_buffer, unsigned char *destination_buffer)
@@ -791,11 +807,65 @@ bool Floppy1541::OneCycle()
 
     CycleCounter++;
 
+
+    /////////////////////////////////////////////////////////////////
+    // Floppy Disk Rotate
+
+    static int ff_counter = 0;
+
+    if(soe)
+    {
+        soe_time--;
+        if(soe_time == 0)
+            soe = false;
+    }
+
+    motor_rotate_speed_counter--;
+    if(motor_rotate_speed_counter == 0)
+    {
+        motor_rotate_speed_counter = motor_rotate_speed;
+        if(DiskMotorOn)
+        {
+            uint8_t gcr_byte = *GCR_PTR++;	// Rotate disk
+            if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
+
+            if(gcr_byte == 0xff)
+            {
+                ff_counter++;
+                if(ff_counter == 2)
+                    sync_found = true;
+            }
+            else
+            {
+                sync_found = false;
+                ff_counter = 0;
+
+                AktGCRWert = gcr_byte;
+            }
+        }
+        else
+        {
+            AktGCRWert = 0;
+        }
+
+        soe = true;
+        soe_time = 3;
+    }
+
+    if(soe != soe_old)
+    if(soe)
+    {
+        //if(via2->GetIO_Zero()&4)
+        cpu->SET_SR_BIT6();
+    }
+
+    soe_old = soe;
+
+    /////////////////////////////////////////////////////////////////
+
     // PHI1
     via1->OneZyklus();
     via2->OneZyklus();
-
-    if(via2->GetIO_Zero()&4) cpu->SET_SR_BIT6();
 
     if((VIA1_IRQ == true) || (VIA2_IRQ == true)) IRQ = true;
     else IRQ = false;
@@ -871,30 +941,10 @@ uint8_t Floppy1541::ReadRom(uint16_t address)
 
 bool Floppy1541::SyncFound()
 {
-    // bool found = false;
+    return sync_found;
 
-    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr)) return false;
-
-    // NEU TEST
     /*
-    if(*GCR_PTR == 0xFF)
-    {
-        SyncFoundCount++;
-        if(SyncFoundCount == 5)
-        {
-            found = true;
-            GCR_PTR --;
-        }
-    }
-    else
-    {
-        SyncFoundCount = 0;
-        GCR_PTR ++;	// Rotate disk
-        if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
-    }
-
-    return found;
-    */
+    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr)) return false;
 
     if(*GCR_PTR == 0xFF)
     {
@@ -912,29 +962,41 @@ L1:
         if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
         return false;
     }
+    */
 }
 
 uint8_t Floppy1541::ReadGCRByte()
 {
+    static int c = 0;
+
+    qDebug() << c++ << QString::number(AktGCRWert, 16);
+
+    return AktGCRWert;
+    /*
     AktGCRWert = *GCR_PTR++;	// Rotate disk
     if (GCR_PTR >= GCRSpurEnde) GCR_PTR = GCRSpurStart;
     return	AktGCRWert;
+    */
 }
 
 void Floppy1541::WriteGCRByte(uint8_t value)
 {
-    ImageWriteStatus = true;
+    //ImageWriteStatus = true;
 
     if(AktHalbSpur == (DIRECTORY_TRACK-1) * 2)
     {
         ImageDirectoryWriteStatus = true;
     }
 
-    GCR_PTR++;	// Rotate disk
+
+
+
+    //GCR_PTR++;	// Rotate disk
     *GCR_PTR = value;
 
 
-    if (GCR_PTR >= GCRSpurEnde) GCR_PTR = GCRSpurStart;
+   // if (GCR_PTR >= GCRSpurEnde) GCR_PTR = GCRSpurStart;
+
 }
 
 void Floppy1541::SpurInc()
@@ -944,6 +1006,9 @@ void Floppy1541::SpurInc()
     AktHalbSpur++;
     GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
     GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
+
+    motor_rotate_speed = motor_speed[d64_track_zone[(AktHalbSpur-1)*2]];
+    motor_rotate_speed_counter = motor_rotate_speed;
 
     if(StepperIncWait)
         StepperIncWait = false;
@@ -958,6 +1023,10 @@ void Floppy1541::SpurDec()
     {
         GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
         GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
+
+        motor_rotate_speed = motor_speed[d64_track_zone[(AktHalbSpur-1)*2]];
+        motor_rotate_speed_counter = motor_rotate_speed;
+        //sync_found = false;
 
         if(stepper_bump != 2)
             stepper_bump++;
@@ -974,6 +1043,10 @@ void Floppy1541::SpurDec()
 
     GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
     GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
+
+    motor_rotate_speed = motor_speed[d64_track_zone[(AktHalbSpur-1)*2]];
+    motor_rotate_speed_counter = motor_rotate_speed;
+    //sync_found = false;
 
     StepperDec = true;
 }

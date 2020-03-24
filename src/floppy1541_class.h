@@ -37,6 +37,8 @@
 
 #define DIRECTORY_TRACK 18
 
+#define HEADER_GAP_BYTES 9
+
 class Floppy1541
 {    
 public:
@@ -107,7 +109,7 @@ public:
     unsigned short  History[256];
     unsigned char   HistoryPointer;
 
-    int SyncFoundCount;
+
 
 private:
 
@@ -115,7 +117,7 @@ private:
 
     void CheckImageWrite();
     void D64ImageToGCRImage();
-    void SectorToGCR(unsigned int spur, unsigned int sektor);
+    int SectorToGCR(unsigned int track, unsigned int sector);
     void ConvertToGCR(unsigned char *source_buffer, unsigned char *destination_buffer);
     void GCRImageToD64Image();
     void GCRToSector(unsigned int spur, unsigned int sektor);
@@ -128,6 +130,10 @@ private:
     static const uint8_t num_sectors[42];
     static const uint8_t d64_track_zone[41];
     static const uint8_t d64_sector_gap[4];
+    static const uint8_t motor_speed[4];
+
+    uint8_t motor_rotate_speed;
+    uint8_t motor_rotate_speed_counter;
 
     bool    FloppyEnabled;
     bool    WriteProtect;
@@ -161,6 +167,7 @@ private:
     char                ImageFileName[FileNameSize];
     int                 ImageTyp;
     unsigned char       AktGCRWert;
+    uint8_t             *AktGCRWrite;
     static const int	NUM_TRACKS = 42;
     static const int	GCR_SECTOR_SIZE = 364;      // SYNC Header Gap SYNC Data Gap (should be 5 SYNC bytes each) ///  ALF Sector in Byte
     static const int	GCR_TRACK_SIZE = 7928;      // Each track in gcr_data has 21 sectors
@@ -173,6 +180,11 @@ private:
     unsigned char       D64Image[D64_IMAGE_SIZE];   // Aktuelles D64 Image
     unsigned char       GCRImage[G64_IMAGE_SIZE];   // Aktuelles GCR Image
     unsigned short      TrackSize[256];
+
+    bool                sync_found;
+    bool                soe;
+    bool                soe_old;
+    int                 soe_time;
 
     /// Für Floppy Sound ///
 
