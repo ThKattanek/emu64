@@ -813,17 +813,18 @@ bool Floppy1541::OneCycle()
 
     static int ff_counter = 0;
 
-    if(soe)
+    if(!soe)
     {
         soe_time--;
         if(soe_time == 0)
-            soe = false;
+            soe = true;
     }
 
     motor_rotate_speed_counter--;
     if(motor_rotate_speed_counter == 0)
     {
         motor_rotate_speed_counter = motor_rotate_speed;
+
         if(DiskMotorOn)
         {
             uint8_t gcr_byte = *GCR_PTR++;	// Rotate disk
@@ -839,23 +840,22 @@ bool Floppy1541::OneCycle()
             {
                 sync_found = false;
                 ff_counter = 0;
-
-                AktGCRWert = gcr_byte;
             }
+
+            AktGCRWert = gcr_byte;
         }
         else
         {
             AktGCRWert = 0;
         }
 
-        soe = true;
+        soe = false;
         soe_time = 3;
     }
 
     if(soe != soe_old)
-    if(soe)
+    if(!soe)
     {
-        //if(via2->GetIO_Zero()&4)
         cpu->SET_SR_BIT6();
     }
 
