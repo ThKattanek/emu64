@@ -984,10 +984,10 @@ L1:
 
 uint8_t Floppy1541::ReadGCRByte()
 {
-    REG_STRUCT r;
-    cpu->GetRegister(&r);
+    IREG_STRUCT ir;
+    cpu->GetInterneRegister(&ir);
 
-    qDebug() << "6502 PC:" << QString::number(r.pc, 16)  << QString::number(AktGCRWert, 16);
+    qDebug() << "6502 PC:" << QString::number(ir.current_opcode_pc, 16)  << QString::number(AktGCRWert, 16);
 
     return AktGCRWert;
     /*
