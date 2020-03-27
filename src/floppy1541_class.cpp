@@ -811,8 +811,6 @@ bool Floppy1541::OneCycle()
     /////////////////////////////////////////////////////////////////
     // Floppy Disk Rotate
 
-    static int ff_counter = 0;
-
     if(!soe)
     {
         soe_time--;
@@ -827,30 +825,49 @@ bool Floppy1541::OneCycle()
 
         if(DiskMotorOn)
         {
-            uint8_t gcr_byte = *GCR_PTR++;	// Rotate disk
+            gcr_byte = *GCR_PTR++;	// Rotate disk
             if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
 
-            if(gcr_byte == 0xff)
+            if((gcr_byte_old == 0xff) && (gcr_byte == 0xff))        // Prüfen auf SYNC (mindesten 2 aufeinanderfolgende 0xFF)
             {
-                ff_counter++;
-                if(ff_counter == 2)
-                    sync_found = true;
+                sync_found = true;
             }
             else
-            {
                 sync_found = false;
-                ff_counter = 0;
-            }
 
             AktGCRWert = gcr_byte;
         }
         else
         {
-            AktGCRWert = 0;
+            sync_found = false;
+            gcr_byte = 0;
         }
 
-        soe = false;
-        soe_time = 3;
+        /////////////////////////////////////
+        ///// SYNC FLANKE PRÜFEN ////////////
+        if(sync_found != sync_found_old)
+        {
+            uint8_t buffer[4];
+            if(sync_found)
+                qDebug() << "SYNC:" << GCR_PTR;
+            else
+            {
+                ConvertToD64(GCR_PTR-1, buffer);
+                if(buffer[0] == 8)
+                    qDebug() << "HEAER_BLOCK -" << "T:" << QString::number(buffer[3] ,10) << "S:" << QString::number(buffer[2] ,10);
+            }
+         }
+        sync_found_old = sync_found;
+        /////////////////////////////////////
+
+        AktGCRWert = gcr_byte;
+        gcr_byte_old = gcr_byte;
+
+        if(!sync_found)
+        {
+            soe = false;
+            soe_time = 3;
+        }
     }
 
     if(soe != soe_old)
@@ -887,7 +904,7 @@ bool Floppy1541::OneCycle()
 }
 
 uint8_t Floppy1541::ReadByte(uint16_t address)
-{
+{ 
     return ReadProcTbl[(address)>>8](address);
 }
 
@@ -967,9 +984,10 @@ L1:
 
 uint8_t Floppy1541::ReadGCRByte()
 {
-    static int c = 0;
+    REG_STRUCT r;
+    cpu->GetRegister(&r);
 
-    qDebug() << c++ << QString::number(AktGCRWert, 16);
+    qDebug() << "6502 PC:" << QString::number(r.pc, 16)  << QString::number(AktGCRWert, 16);
 
     return AktGCRWert;
     /*

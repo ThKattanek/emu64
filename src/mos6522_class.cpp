@@ -346,11 +346,12 @@ unsigned char MOS6522::ReadIO(unsigned short adresse)
                     if (*WriteProtect) WP = 0;
                     else WP = 0x10;
 
-                    if (SyncFound != 0)
+                    if (SyncFound != nullptr)
                     {
                         if (SyncFound()) return (PB & 0x7F) | WP;
                         else return PB | 0x80 | WP;
                     }
+                    break;
                 }
                 case 0x01:
                 case 0x0F:

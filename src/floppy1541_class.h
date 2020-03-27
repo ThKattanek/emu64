@@ -181,10 +181,14 @@ private:
     unsigned char       GCRImage[G64_IMAGE_SIZE];   // Aktuelles GCR Image
     unsigned short      TrackSize[256];
 
+    uint8_t             gcr_byte;
+    uint8_t             gcr_byte_old;
+
     bool                sync_found;
+    bool                sync_found_old;
     bool                soe;
     bool                soe_old;
-    int                 soe_time;
+    int                 soe_time;                   // Counter in Zyklen wann das Signal wieder zurückgenommen wird
 
     /// Für Floppy Sound ///
 
