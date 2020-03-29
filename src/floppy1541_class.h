@@ -37,7 +37,7 @@
 
 #define DIRECTORY_TRACK 18
 
-#define HEADER_GAP_BYTES 9
+#define HEADER_GAP_BYTES 11
 
 class Floppy1541
 {    
@@ -191,6 +191,8 @@ private:
     int                 soe_time;                   // Counter in Zyklen wann das Signal wieder zurückgenommen wird
 
     /// Für Floppy Sound ///
+
+    uint8_t             stepper_bump;
 
     double              Volume;
     bool                StepperIncWait;

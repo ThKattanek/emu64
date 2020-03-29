@@ -25,9 +25,9 @@ const uint8_t Floppy1541::d64_track_zone[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 
 //const uint8_t Floppy1541::d64_sector_gap[] = {12, 21, 16, 13};  // von GPZ Code übermommen imggen
 //const uint8_t Floppy1541::d64_sector_gap[] = {9, 12, 17, 8};   // VICE
-const uint8_t Floppy1541::d64_sector_gap[] = {1, 10, 5, 2};   // Meine alten Werte
+//const uint8_t Floppy1541::d64_sector_gap[] = {1, 10, 5, 2};   // Meine alten Werte
 
-//onst uint8_t Floppy1541::d64_sector_gap[] = {1, 10, 5, 2};   // Meine alten Werte
+const uint8_t Floppy1541::d64_sector_gap[] = {1, 10, 5, 2};   // Meine alten Werte
 
 const uint8_t Floppy1541::motor_speed[] = {26,28,30,32};
 
@@ -112,6 +112,8 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
 
     motor_rotate_speed = motor_speed[d64_track_zone[(AktHalbSpur-1)*2]];
     motor_rotate_speed_counter = motor_rotate_speed;
+
+    stepper_bump = 0;
 
     sync_found = false;
 
@@ -531,7 +533,7 @@ inline void Floppy1541::GCRToSector(unsigned int spur, unsigned int sektor)
 
 inline void Floppy1541::ConvertToD64(unsigned char *source_buffer, unsigned char *destination_buffer)
 {
-    static unsigned char CONV_TBL[32]={32,32,32,32,32,32,32,32,32,8,0,1,32,12,4,5,32,32,2,3,32,15,6,7,32,9,10,11,32,13,14,32};
+    static const unsigned char CONV_TBL[32]={32,32,32,32,32,32,32,32,32,8,0,1,32,12,4,5,32,32,2,3,32,15,6,7,32,9,10,11,32,13,14,32};
     unsigned char GCR5;
     unsigned char TMP1;
 
@@ -1035,8 +1037,6 @@ void Floppy1541::SpurInc()
 
 void Floppy1541::SpurDec()
 {
-    static uint8_t stepper_bump = 0;
-
     if (AktHalbSpur  == 0)
     {
         GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
