@@ -813,11 +813,11 @@ bool Floppy1541::OneCycle()
     /////////////////////////////////////////////////////////////////
     // Floppy Disk Rotate
 
-    if(!soe)
+    if(!byte_ready)
     {
-        soe_time--;
-        if(soe_time == 0)
-            soe = true;
+        byte_ready_time--;
+        if(byte_ready_time == 0)
+            byte_ready = true;
     }
 
     motor_rotate_speed_counter--;
@@ -867,18 +867,20 @@ bool Floppy1541::OneCycle()
 
         if(!sync_found)
         {
-            soe = false;
-            soe_time = 3;
+            byte_ready = false;
+            byte_ready_time = 2;
         }
+        else
+            byte_ready = true;
     }
 
-    if(soe != soe_old)
-    if(!soe)
-    {
-        cpu->SET_SR_BIT6();
-    }
+    if(byte_ready != byte_ready_old)
+        if(!byte_ready)
+        {
+            cpu->SET_SR_BIT6();
+        }
 
-    soe_old = soe;
+    byte_ready_old = byte_ready;
 
     /////////////////////////////////////////////////////////////////
 
@@ -1039,7 +1041,7 @@ void Floppy1541::SpurDec()
 {
     if (AktHalbSpur  == 0)
     {
-        GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
+        GCR_PTR = GCRSpurStart = GCRImage;
         GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
 
         motor_rotate_speed = motor_speed[d64_track_zone[(AktHalbSpur-1)*2]];
@@ -1061,6 +1063,8 @@ void Floppy1541::SpurDec()
 
     GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
     GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
+
+    qDebug() << "GCR:" << GCR_TRACK_SIZE << TrackSize[AktHalbSpur];
 
     motor_rotate_speed = motor_speed[d64_track_zone[(AktHalbSpur-1)*2]];
     motor_rotate_speed_counter = motor_rotate_speed;

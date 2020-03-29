@@ -39,6 +39,8 @@
 
 #define HEADER_GAP_BYTES 11
 
+#define BYTE_READY_TIME 2
+
 class Floppy1541
 {    
 public:
@@ -186,9 +188,9 @@ private:
 
     bool                sync_found;
     bool                sync_found_old;
-    bool                soe;
-    bool                soe_old;
-    int                 soe_time;                   // Counter in Zyklen wann das Signal wieder zurückgenommen wird
+    bool                byte_ready;
+    bool                byte_ready_old;
+    int                 byte_ready_time;                   // Counter in Zyklen wann das Signal wieder zurückgenommen wird
 
     /// Für Floppy Sound ///
 
