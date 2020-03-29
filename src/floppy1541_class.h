@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.09.2019        		//
+// Letzte Änderung am 29.03.2020        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -41,6 +41,9 @@
 
 #define BYTE_READY_TIME 2
 
+#define LO false
+#define HI true
+
 class Floppy1541
 {    
 public:
@@ -68,6 +71,7 @@ public:
     void SetCpuReg(REG_STRUCT *reg);
     void SetResetReady(bool* ResetReady, uint16_t ResetReadyAdr);
     void GetFloppyInfo(FLOPPY_INFO *fi);
+    uint8_t GetFloppySignals();
     uint8_t ReadByte(uint16_t address);
     void WriteByte(uint16_t address, uint8_t value);
     int LoadFloppySounds(const char* motor_sound_filename, const char* motor_on_sound_filename, const char* motor_off_sound_filename, const char* anschlag_sound_filename, const char* stepper_dec_sound_filename, const char* Stepper_inc_sound_filename);

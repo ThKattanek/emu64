@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.08.2019                //
+// Letzte Änderung am 29.03.2020                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,6 +19,9 @@
 #include <functional>
 
 #include "./structs.h"
+
+#define LO false
+#define HI true
 
 class MOS6522
 {
@@ -51,6 +54,7 @@ public:
     unsigned char   *FloppyIEC;
     unsigned char   *C64IEC;
     unsigned char   *Jumper;
+    bool            CA2_Output;
 
 private:
 

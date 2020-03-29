@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.09.2019        		//
+// Letzte Änderung am 29.03.2020        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -115,7 +115,7 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
 
     stepper_bump = 0;
 
-    sync_found = false;
+    sync_found = HI;
 
     /// Für Floppysound ///
 
@@ -593,6 +593,25 @@ void Floppy1541::GetFloppyInfo(FLOPPY_INFO *fi)
     fi->Data = !!(tmp&8);
 }
 
+uint8_t Floppy1541::GetFloppySignals()
+{
+    // Bit0 = Motor, 1=SYNC, 2=SOE, 3=BYTE_READY
+    uint8_t ret = via2->GetIO_Zero();
+    if(ret & 4) ret = 1;
+        else ret = 0;
+
+    if(sync_found == HI)
+        ret |= 2;
+
+    if(via2->CA2_Output == HI)
+        ret |= 4;
+
+    if(byte_ready == HI)
+        ret |= 8;
+
+    return ret;
+}
+
 bool Floppy1541::LoadDosRom(const char *filename)
 {
     FILE *file;
@@ -813,11 +832,11 @@ bool Floppy1541::OneCycle()
     /////////////////////////////////////////////////////////////////
     // Floppy Disk Rotate
 
-    if(!byte_ready)
+    if(byte_ready == LO)
     {
         byte_ready_time--;
         if(byte_ready_time == 0)
-            byte_ready = true;
+            byte_ready = HI;
     }
 
     motor_rotate_speed_counter--;
@@ -832,16 +851,16 @@ bool Floppy1541::OneCycle()
 
             if((gcr_byte_old == 0xff) && (gcr_byte == 0xff))        // Prüfen auf SYNC (mindesten 2 aufeinanderfolgende 0xFF)
             {
-                sync_found = true;
+                sync_found = LO;
             }
             else
-                sync_found = false;
+                sync_found = HI;
 
             AktGCRWert = gcr_byte;
         }
         else
         {
-            sync_found = false;
+            sync_found = HI;
             gcr_byte = 0;
         }
 
@@ -850,7 +869,7 @@ bool Floppy1541::OneCycle()
         if(sync_found != sync_found_old)
         {
             uint8_t buffer[4];
-            if(sync_found)
+            if(sync_found == LO)
                 qDebug() << "SYNC:" << GCR_PTR;
             else
             {
@@ -865,17 +884,17 @@ bool Floppy1541::OneCycle()
         AktGCRWert = gcr_byte;
         gcr_byte_old = gcr_byte;
 
-        if(!sync_found)
+        if(sync_found == HI && via2->CA2_Output)
         {
-            byte_ready = false;
+            byte_ready = LO;
             byte_ready_time = 2;
         }
         else
-            byte_ready = true;
+            byte_ready = HI;
     }
 
     if(byte_ready != byte_ready_old)
-        if(!byte_ready)
+        if(byte_ready == LO)
         {
             cpu->SET_SR_BIT6();
         }
@@ -1046,7 +1065,6 @@ void Floppy1541::SpurDec()
 
         motor_rotate_speed = motor_speed[d64_track_zone[(AktHalbSpur-1)*2]];
         motor_rotate_speed_counter = motor_rotate_speed;
-        //sync_found = false;
 
         if(stepper_bump != 2)
             stepper_bump++;
@@ -1068,7 +1086,6 @@ void Floppy1541::SpurDec()
 
     motor_rotate_speed = motor_speed[d64_track_zone[(AktHalbSpur-1)*2]];
     motor_rotate_speed_counter = motor_rotate_speed;
-    //sync_found = false;
 
     StepperDec = true;
 }
