@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.06.2019                //
+// Letzte Änderung am 01.04.2020                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -262,7 +262,7 @@ struct CHIP_INFO_STRUCT
     unsigned short BankLocation;	// $0000 Normal Cartridge
     unsigned short LoadAdress;
     unsigned short ChipSize;
-    unsigned char* BufferPointer;
+    uint8_t* BufferPointer;
 };
 
 struct CARTRIDGE_INFO_STRUCT

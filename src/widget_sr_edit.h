@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 01.04.2020                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -30,7 +30,7 @@ public:
     explicit WidgetSREdit(QWidget *parent = 0);
     ~WidgetSREdit();
     void RetranslateUi();
-    void SetValue(unsigned char value);
+    void SetValue(uint8_t value);
 
 private:
     void CalcValue(void);
@@ -42,7 +42,7 @@ private:
 
 
  signals:
-    void ChangeValue(unsigned char value);
+    void ChangeValue(uint8_t value);
 
 private slots:
     void on_Bit0_clicked();

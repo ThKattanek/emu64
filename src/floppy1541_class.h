@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.09.2019        		//
+// Letzte Änderung am 01.04.2020       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -97,15 +97,15 @@ public:
     /// Variablen ///
 
     bool            *RESET;
-    unsigned char   FloppyIECLocal;
-    unsigned char   Jumper;
+    uint8_t         FloppyIECLocal;
+    uint8_t         Jumper;
     bool            StepperInc;
     bool            StepperDec;
     bool            StepperAnschlag;
     bool            DiskMotorOn;
 
-    unsigned short  History[256];
-    unsigned char   HistoryPointer;
+    uint16_t        History[256];
+    uint8_t         HistoryPointer;
 
     int SyncFoundCount;
 
@@ -116,10 +116,10 @@ private:
     void CheckImageWrite();
     void D64ImageToGCRImage();
     void SectorToGCR(unsigned int spur, unsigned int sektor);
-    void ConvertToGCR(unsigned char *source_buffer, unsigned char *destination_buffer);
+    void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
     void GCRImageToD64Image();
     void GCRToSector(unsigned int spur, unsigned int sektor);
-    void ConvertToD64(unsigned char *source_buffer, unsigned char *destination_buffer);
+    void ConvertToD64(uint8_t *source_buffer, uint8_t *destination_buffer);
     void RenderFloppySound();
     void StartDiskChange();
 
@@ -138,11 +138,11 @@ private:
 
     REG_STRUCT rs;
 
-    std::function<unsigned char(unsigned short)>  ReadProcTbl[256];
-    std::function<void(unsigned short, unsigned char)> WriteProcTbl[256];
+    std::function<uint8_t(uint16_t)>  ReadProcTbl[256];
+    std::function<void(uint16_t, uint8_t)> WriteProcTbl[256];
 
-    unsigned char RAM[0x800];   // 2KB
-    unsigned char ROM[0x4000];  // 16KB
+    uint8_t RAM[0x800];   // 2KB
+    uint8_t ROM[0x4000];  // 16KB
 
     bool VIA1_IRQ;
     bool VIA2_IRQ;
@@ -160,19 +160,19 @@ private:
 
     char                ImageFileName[FileNameSize];
     int                 ImageTyp;
-    unsigned char       AktGCRWert;
+    uint8_t             AktGCRWert;
     static const int	NUM_TRACKS = 42;
     static const int	GCR_SECTOR_SIZE = 364;      // SYNC Header Gap SYNC Data Gap (should be 5 SYNC bytes each) ///  ALF Sector in Byte
     static const int	GCR_TRACK_SIZE = 7928;      // Each track in gcr_data has 21 sectors
-    unsigned char       AktHalbSpur;                // Aktuelle Halbspur Nummer (2..70)
-    unsigned char *     GCR_PTR;                    // Zeiger auf GCR Daten Unter R/W Kopf
-    unsigned char *     GCRSpurStart;               // Zeiger auf Start der GCR Daten auf Aktuellen Track
-    unsigned char *     GCRSpurEnde;                // Zeiger auf Ende der GCR Daten auf Aktuellen Track
+    uint8_t             AktHalbSpur;                // Aktuelle Halbspur Nummer (2..70)
+    uint8_t *           GCR_PTR;                    // Zeiger auf GCR Daten Unter R/W Kopf
+    uint8_t *           GCRSpurStart;               // Zeiger auf Start der GCR Daten auf Aktuellen Track
+    uint8_t *           GCRSpurEnde;                // Zeiger auf Ende der GCR Daten auf Aktuellen Track
     bool                ImageWriteStatus;           // Sowie in Image geschrieben wird gehts auf true
     bool                ImageDirectoryWriteStatus;  // Sowie in das Image auf Spur 18 geschrieben wird wird es true
-    unsigned char       D64Image[D64_IMAGE_SIZE];   // Aktuelles D64 Image
-    unsigned char       GCRImage[G64_IMAGE_SIZE];   // Aktuelles GCR Image
-    unsigned short      TrackSize[256];
+    uint8_t             D64Image[D64_IMAGE_SIZE];   // Aktuelles D64 Image
+    uint8_t             GCRImage[G64_IMAGE_SIZE];   // Aktuelles GCR Image
+    uint16_t            TrackSize[256];
 
     /// Für Floppy Sound ///
 
@@ -221,9 +221,9 @@ private:
     // Bit 8 = Beim erreichen einer bestommten Raster Zeile
     // Bit 9 = Beim erreichen eines Zyklus in einer Rasterzeile
 
-    unsigned short  Breakpoints[0x10000];
-    unsigned short  BreakWerte[16];
-    unsigned short  BreakStatus;
+    uint16_t        Breakpoints[0x10000];
+    uint16_t        BreakWerte[16];
+    uint16_t        BreakStatus;
     bool            *FoundBreakpoint;
 
     uint8_t         breakgroup_count;

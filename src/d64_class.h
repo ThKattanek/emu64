@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.09.2019      		//
+// Letzte Änderung am 01.04.2020         		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -49,9 +49,9 @@ class D64Class
     void ReadBlock(uint8_t track, uint8_t sector, uint8_t* buffer);
     void OutputBlock(uint8_t* buffer);
     void UpdateImageData();
-    unsigned char d64_image[D64_IMAGE_SIZE];
-    unsigned char block[256];
-    unsigned char block_tmp[256];
+    uint8_t d64_image[D64_IMAGE_SIZE];
+    uint8_t block[256];
+    uint8_t block_tmp[256];
 };
 
 #endif // D64_CLASS_H

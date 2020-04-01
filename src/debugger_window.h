@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019                //
+// Letzte Änderung am 01.04.2020                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -89,7 +89,7 @@ private slots:
     void on_nmi_led_clicked(bool checked);
 
     void onShowContextMenu(const QPoint& pos);
-    void onSr_widget_ValueChange(unsigned char value);
+    void onSr_widget_ValueChange(uint8_t value);
     void onReg_label_clicked(LabelWidgetMod* label);
     void onChangeFloppyStatus();
     void onTimerAnimationRefresh();

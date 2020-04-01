@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.03.2020                //
+// Letzte Änderung am 01.04.2020                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -132,7 +132,7 @@ public:
     int SaveGEORAMImage(const char *filename);
     void ClearGEORAMRam();
 
-    void SetMouse1351Port(unsigned char port);
+    void SetMouse1351Port(uint8_t port);
 
     void ResetC64CycleCounter();
     void SetDebugMode(bool status);
@@ -348,7 +348,7 @@ public:
     std::function<void(char*)> LogText;
     std::function<void(void)> CloseEventC64Screen;
     std::function<void(void)> LimitCyclesEvent;
-    std::function<void(unsigned char)> DebugCartEvent;
+    std::function<void(uint8_t)> DebugCartEvent;
     std::function<void(uint8_t *audio_buffer0, uint8_t *audio_buffer1, uint8_t *audio_buffer2, int length)> AudioOutProc;
 
     uint16_t        cpu_pc_history[256];

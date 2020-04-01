@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.09.2019        		//
+// Letzte Änderung am 01.04.2020        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -259,7 +259,7 @@ bool Floppy1541::LoadDiskImage(const char* filename)
     {
         char  kennung[9];
         char  version;
-        char  trackanzahl;
+        int8_t  trackanzahl;
         unsigned short  tracksize;
         uint32_t trackpos[84];
         uint32_t trackspeed[84];
@@ -383,13 +383,13 @@ inline void Floppy1541::D64ImageToGCRImage()
 
 inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
 {
-    static unsigned char id1 = 0;
-    static unsigned char id2 = 0;
-    unsigned char block[256];
-    unsigned char buffer[4];
-    unsigned char *P = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCR_SECTOR_SIZE;
+    static uint8_t id1 = 0;
+    static uint8_t id2 = 0;
+    uint8_t block[256];
+    uint8_t buffer[4];
+    uint8_t *P = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCR_SECTOR_SIZE;
 
-    unsigned short TRACK_INDEX[]={0,0,21,42,63,84,105,126,147,168,189,210,231,252,273,294,315,336,357,376,395,414,433,452,471,490,508,526,544,562,580,598,615,632,649,666,683};
+    uint16_t TRACK_INDEX[]={0,0,21,42,63,84,105,126,147,168,189,210,231,252,273,294,315,336,357,376,395,414,433,452,471,490,508,526,544,562,580,598,615,632,649,666,683};
     int TEMP;
     TEMP=TRACK_INDEX[spur]+(sektor);
     TEMP*=256;
@@ -416,7 +416,7 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
     P += 9;
 
     // Create GCR data (338 Bytes)
-    unsigned char SUM;
+    uint8_t SUM;
     // SYNC
     *P++ = 0xFF;                                // SYNC
     //*P++ = 0xFF;								// SYNC
@@ -447,11 +447,11 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
     ConvertToGCR(buffer, P);
     P += 5;
 
-    unsigned char gap_size = d64_sector_gap[d64_track_zone[spur]];
+    uint8_t gap_size = d64_sector_gap[d64_track_zone[spur]];
     memset(P, 0x55, gap_size);							// Gap
 }
 
-inline void Floppy1541::ConvertToGCR(unsigned char *source_buffer, unsigned char *destination_buffer)
+inline void Floppy1541::ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer)
 {
     const unsigned short int GCR_TBL[16] = {0x0a, 0x0b, 0x12, 0x13, 0x0e, 0x0f, 0x16, 0x17,0x09, 0x19, 0x1a, 0x1b, 0x0d, 0x1d, 0x1e, 0x15};
     unsigned short int tmp;
@@ -473,7 +473,7 @@ inline void Floppy1541::ConvertToGCR(unsigned char *source_buffer, unsigned char
 
     tmp = (GCR_TBL[*source_buffer >> 4] << 5) | GCR_TBL[*source_buffer & 15];
     *destination_buffer++ |= (tmp >> 8) & 0x03;
-    *destination_buffer = (unsigned char)tmp;
+    *destination_buffer = (uint8_t)tmp;
 }
 
 inline void Floppy1541::GCRImageToD64Image()
@@ -486,10 +486,10 @@ inline void Floppy1541::GCRImageToD64Image()
 inline void Floppy1541::GCRToSector(unsigned int spur, unsigned int sektor)
 {
     const unsigned short TRACK_INDEX[]={0,0,21,42,63,84,105,126,147,168,189,210,231,252,273,294,315,336,357,376,395,414,433,452,471,490,508,526,544,562,580,598,615,632,649,666,683};
-    unsigned char BUFFER[4];
+    uint8_t BUFFER[4];
 
-    unsigned char *gcr = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCR_SECTOR_SIZE;
-    unsigned char *d64 = D64Image + ((TRACK_INDEX[spur]+sektor)*256);
+    uint8_t *gcr = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCR_SECTOR_SIZE;
+    uint8_t *d64 = D64Image + ((TRACK_INDEX[spur]+sektor)*256);
 
     gcr += 11;
 
@@ -513,11 +513,11 @@ inline void Floppy1541::GCRToSector(unsigned int spur, unsigned int sektor)
     *d64 = BUFFER[0];
 }
 
-inline void Floppy1541::ConvertToD64(unsigned char *source_buffer, unsigned char *destination_buffer)
+inline void Floppy1541::ConvertToD64(uint8_t *source_buffer, uint8_t *destination_buffer)
 {
-    static unsigned char CONV_TBL[32]={32,32,32,32,32,32,32,32,32,8,0,1,32,12,4,5,32,32,2,3,32,15,6,7,32,9,10,11,32,13,14,32};
-    unsigned char GCR5;
-    unsigned char TMP1;
+    static uint8_t CONV_TBL[32]={32,32,32,32,32,32,32,32,32,8,0,1,32,12,4,5,32,32,2,3,32,15,6,7,32,9,10,11,32,13,14,32};
+    uint8_t GCR5;
+    uint8_t TMP1;
 
     GCR5=source_buffer[0]>>3;
     TMP1=CONV_TBL[GCR5&31]<<4;
@@ -570,7 +570,7 @@ void Floppy1541::GetFloppyInfo(FLOPPY_INFO *fi)
     fi->Sektor = RAM[0x19];
     fi->Spur = (AktHalbSpur+1)>>1;
 
-    unsigned char tmp = via2->GetIO_Zero();
+    uint8_t tmp = via2->GetIO_Zero();
     fi->Motor = !!(tmp&4);
     fi->Data = !!(tmp&8);
 }

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 01.04.2020                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -67,7 +67,7 @@ void WidgetSREdit::CalcValue(void)
     emit ChangeValue(value);
 }
 
-void WidgetSREdit::SetValue(unsigned char value)
+void WidgetSREdit::SetValue(uint8_t value)
 {
     if(value & 1)
     {
