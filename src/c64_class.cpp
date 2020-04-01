@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////
 //                                              //
 // Emu64                                        //
 // von Thorsten Kattanek                        //
@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.03.2020                //
+// Letzte Änderung am 01.04.2020                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1827,7 +1827,7 @@ void C64Class::SetFullscreenAspectRatio(bool enable)
 void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 {
     static bool joy_center_flag = true;
-    static signed char joy_axis_tbl[5] = {1,1,0,0,-1};
+    int8_t joy_axis_tbl[5] = {1,1,0,0,-1};
 
     SDL_Keymod keymod;
 
@@ -3042,7 +3042,7 @@ int C64Class::LoadBreakGroups(const char *filename)
 {
     FILE *file;
     char Kennung[10];
-    char Version;
+    uint8_t Version;
     uint8_t Groupanzahl;
     size_t reading_elements;
 
@@ -3111,7 +3111,7 @@ bool C64Class::SaveBreakGroups(const char *filename)
 {
     FILE *file;
     char Kennung[]  = "EMU64_BPT";
-    char Version    = 1;
+    uint8_t Version    = 1;
 
     file = fopen (filename, "wb");
     if (file == nullptr)

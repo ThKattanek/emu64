@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 28.09.2019                //
+// Letzte Änderung am 01.04.2020                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -321,7 +321,7 @@ void CartridgeWindow::onChipList_currentChanged(const QModelIndex &current, cons
     if(!current.isValid() || !ChipDataExpand) return;
 
     int adresse = 0;
-    unsigned char *ChipRom = crt_info.ChipInfo[current.row()].BufferPointer;
+    uint8_t *ChipRom = crt_info.ChipInfo[current.row()].BufferPointer;
     int ChipSizeDiv16 = crt_info.ChipInfo[current.row()].ChipSize/16;
 
     for(int i=0; i<ChipSizeDiv16; i++)

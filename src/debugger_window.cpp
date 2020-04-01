@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 28.09.2019                //
+// Letzte Änderung am 01.04.2020                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -108,7 +108,7 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
         ui->DisAssTable->setItem(i, 3, disass_addressing[i]);
     }
 
-    connect(ui->sr_widget, SIGNAL(ChangeValue(unsigned char)), this, SLOT(onSr_widget_ValueChange(unsigned char)));
+    connect(ui->sr_widget, SIGNAL(ChangeValue(uint8_t)), this, SLOT(onSr_widget_ValueChange(uint8_t)));
     connect(ui->pc_out, SIGNAL(clicked(LabelWidgetMod*)), this, SLOT(onReg_label_clicked(LabelWidgetMod*)));
     connect(ui->sp_out, SIGNAL(clicked(LabelWidgetMod*)), this, SLOT(onReg_label_clicked(LabelWidgetMod*)));
     connect(ui->ac_out, SIGNAL(clicked(LabelWidgetMod*)), this, SLOT(onReg_label_clicked(LabelWidgetMod*)));
@@ -437,7 +437,7 @@ void DebuggerWindow::onShowContextMenu(const QPoint& pos)
     }
 }
 
-void DebuggerWindow::onSr_widget_ValueChange(unsigned char value)
+void DebuggerWindow::onSr_widget_ValueChange(uint8_t value)
 {
     on_AnimationStop_clicked();
 
