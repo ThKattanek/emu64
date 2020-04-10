@@ -27,9 +27,9 @@ int SDLThreadWarp(void *userdat);
 #define C64Takt 985248  // 50,124542Hz (Original C64 PAL)
 
 #ifdef _WIN32
-    #define AudioPufferSize (882)    // 882 bei 44.100 Khz
+    #define AudioPufferSize (1024)    // 882 bei 44.100 Khz
 #else
-    #define AudioPufferSize (882)    // 882 bei 44.100 Khz
+    #define AudioPufferSize (1024)    // 882 bei 44.100 Khz
 #endif
 
 #define RecPollingWaitStart 20
@@ -256,12 +256,14 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
     if( audio_dev == 0 )
     {
         LogText(const_cast<char*>("<< ERROR: Fehler beim installieren von SDL_Audio\n"));
-        LogText("SDL_Error: ");
+        LogText("<< SDL_Error: ");
         LogText(const_cast<char*>(SDL_GetError()));
+        LogText("\n");
+        sprintf(out_text, "\t -Audio Buffersize: %d\n" ,audio_spec_have.samples);
+        LogText(out_text);
         *ret_error = -2;
         return;
     }
-    LogText(const_cast<char*>(">> SDL_Audio wurde installiert\n"));
 
     audio_frequency = audio_spec_have.freq;
     audio_channels = audio_spec_have.channels;
