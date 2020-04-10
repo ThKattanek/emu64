@@ -256,6 +256,8 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
     if( audio_dev == 0 )
     {
         LogText(const_cast<char*>("<< ERROR: Fehler beim installieren von SDL_Audio\n"));
+        LogText("SDL_Error: ");
+        LogText(const_cast<char*>(SDL_GetError()));
         *ret_error = -2;
         return;
     }
