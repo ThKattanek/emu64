@@ -173,6 +173,8 @@ private:
 
     QSettings *ini;
 
+    int soundbuffer_size;         // aktuelle Größe des Soundbuffer, wird aus der ini geladen (default 512)
+
     bool ScreenshotsEnable;       // Konnte kein Screenshot Verzeichnis gefunden werden und auch nicht erstellt werden so ist es false
 
     bool RomSetEnable;            // False wenn kein RomSet-Verzeichnis existiert und keins erstellt werden konnte

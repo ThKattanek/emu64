@@ -60,7 +60,7 @@ class C64Class
 {
 
 public:
-    C64Class(int *ret_error, VideoCrtClass *video_crt_output,bool start_minimized, std::function<void(char*)> log_function, const char *data_path);
+    C64Class(int *ret_error,int soundbuffer_size , VideoCrtClass *video_crt_output,bool start_minimized, std::function<void(char*)> log_function, const char *data_path);
     ~C64Class();
     void StartEmulation();
     void EndEmulation();
