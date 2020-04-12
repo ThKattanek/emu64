@@ -346,6 +346,9 @@ int MainWindow::OnInit()
     soundbuffer_size = ini->value("SoundBufferSize",512).toInt();
     ini->endGroup();
 
+    if(soundbuffer_size < 64)
+        soundbuffer_size = 64;
+
     SplashMessage(tr("C64 Klasse wird initialisiert."),Qt::darkBlue);
     int ret_error;
     c64 = new C64Class(&ret_error ,soundbuffer_size ,video_crt_output,start_minimized, bind(&MainWindow::LogText,this,std::placeholders::_1),QString(dataPath).toLocal8Bit());
