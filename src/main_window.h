@@ -73,6 +73,11 @@ public:
     QTextStream *log;
     void LogText(const char*);
 
+    /// Flag wenn keine INI am ende geschrieben werden soll
+    /// Dieses Flag wird in der main.cpp gesetzt und im Destruktor
+    /// von MainWindow abgefragt
+    bool no_write_ini_exit;
+
     /// C64 Klasse ///
     C64Class *c64;
     VideoCrtClass *video_crt_output;
@@ -94,7 +99,7 @@ public:
 
 public slots:
     void OnMessage(QStringList msg);
-    void OnInit();
+    int OnInit();
 
 private slots:
     void on_menu_main_info_triggered();

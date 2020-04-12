@@ -575,8 +575,13 @@ void C64Class::EndEmulation()
 
     /// Loop Thread beenden ///
     loop_thread_end = true;
-    while (!loop_thread_is_end)
+
+    int time_out = 1000;    // 1000ms
+    while (!loop_thread_is_end && time_out > 0)
+    {
         SDL_Delay(1);
+        time_out--;
+    }
 
     SDL_PauseAudioDevice(audio_dev, 1);
     SDL_CloseAudioDevice(audio_dev);
