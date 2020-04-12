@@ -956,11 +956,11 @@ void Floppy1541::SetResetReady(bool* ResetReady, uint16_t ResetReadyAdr)
     cpu->ResetReadyAdr = ResetReadyAdr;
 }
 
-void Floppy1541::WriteNoMem(uint16_t address, uint8_t value)
+void Floppy1541::WriteNoMem(uint16_t /*address*/, uint8_t /*value*/)
 {
 }
 
-uint8_t Floppy1541::ReadNoMem(uint16_t address)
+uint8_t Floppy1541::ReadNoMem(uint16_t /*address*/)
 {
     return 0x0;
 }
