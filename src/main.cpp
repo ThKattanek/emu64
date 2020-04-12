@@ -186,17 +186,22 @@ int main(int argc, char *argv[])
         }
     }
 
+    int ret = 0;
+
     w->log = log;
-    w->OnInit();
+    w->no_write_ini_exit = true;
 
-    if(isFirstInstance)
+    if(w->OnInit() == 0)
     {
-        QStringList msg_list;
-        for(int i=0;i<argc;i++) msg_list << argv[i];
-        w->OnMessage(msg_list);
+        w->no_write_ini_exit = false;
+        if(isFirstInstance)
+        {
+            QStringList msg_list;
+            for(int i=0;i<argc;i++) msg_list << argv[i];
+            w->OnMessage(msg_list);
+        }
+        ret = app->exec();
     }
-
-    int ret = app->exec();
 
     app->deleteSharedMemory();
 

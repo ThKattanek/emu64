@@ -33,6 +33,22 @@ MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *l
 
     this->setGeometry(0,0,0,0);
 
+    ///
+    setup_window = nullptr;
+    video_crt_output = nullptr;
+    info_window = nullptr;
+    video_crt_setup_window = nullptr;
+    floppy_window = nullptr;
+    tape_window = nullptr;
+    c64_keyboard_window = nullptr;
+    cartridge_window = nullptr;
+    debugger_window = nullptr;
+    speed_window = nullptr;
+    show_c64keymap_window = nullptr;
+    video_capture_window = nullptr;
+    sid_dump_window = nullptr;
+    oscilloscope_window = nullptr;
+
     /// Haputfenster UI setzen ///
     ui->setupUi(this);
 
@@ -57,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *l
 MainWindow::~MainWindow()
 {
     //////////// Save to INI ////////////
-    if(ini != nullptr)
+    if(ini != nullptr && no_write_ini_exit == false)
     {
         ini->beginGroup("MainWindow");
         ini->setValue("Geometry",saveGeometry());
@@ -108,22 +124,22 @@ MainWindow::~MainWindow()
 
     /// WindowKlassen schließen ///
 
-    delete setup_window;
-    delete c64;
+    if(setup_window != nullptr) delete setup_window;
+    if(c64 != nullptr) delete c64;
 
-    delete video_crt_output;
-    delete info_window;
-    delete video_crt_setup_window;
-    delete floppy_window;
-    delete tape_window;
-    delete c64_keyboard_window;
-    delete cartridge_window;
-    delete debugger_window;
-    delete speed_window;
-    delete show_c64keymap_window;
-    delete video_capture_window;
-    delete sid_dump_window;
-    delete oscilloscope_window;
+    if(video_crt_output != nullptr) delete video_crt_output;
+    if(info_window != nullptr)delete info_window;
+    if(video_crt_setup_window != nullptr)delete video_crt_setup_window;
+    if(floppy_window != nullptr)delete floppy_window;
+    if(tape_window != nullptr)delete tape_window;
+    if(c64_keyboard_window != nullptr)delete c64_keyboard_window;
+    if(cartridge_window != nullptr)delete cartridge_window;
+    if(debugger_window != nullptr)delete debugger_window;
+    if(speed_window != nullptr)delete speed_window;
+    if(show_c64keymap_window != nullptr)delete show_c64keymap_window;
+    if(video_capture_window != nullptr)delete video_capture_window;
+    if(sid_dump_window != nullptr)delete sid_dump_window;
+    if(oscilloscope_window != nullptr)delete oscilloscope_window;
 
     delete ui;
     delete ini;
@@ -154,7 +170,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
     }
 }
 
-void MainWindow::OnInit()
+int MainWindow::OnInit()
 {
     // Alle Pfade setzen //
 
@@ -328,9 +344,9 @@ void MainWindow::OnInit()
     c64 = new C64Class(&ret_error,video_crt_output,start_minimized, bind(&MainWindow::LogText,this,std::placeholders::_1),QString(dataPath).toLocal8Bit());
     if(ret_error != 0)
     {
-        ErrorMsg(tr("Emu64 Fehler ..."),tr("Fehler beim Installieren der C64 Klasse"))
+        LogText(tr("<< Fehler beim initiallisieren der C64 Klasse.\n").toUtf8());
         this->close();
-        return;
+        return -1;
     }
 
     SetC64ScreenTitle();
@@ -589,7 +605,7 @@ void MainWindow::OnInit()
     {
         LogText(tr("<< C64 Emulation konnte nicht gestartet werden.\n").toUtf8());
         this->close();
-        return;
+        return -1;
     }
 
     LogText(tr(">> C64 Emulation wurde gestartet.\n").toUtf8());
@@ -597,6 +613,8 @@ void MainWindow::OnInit()
     c64->HardReset();
 
     LogText(tr(">> Hardreset wurde ausgefuehrt.\n").toUtf8());
+
+    return 0;
 }
 
 void MainWindow::OnMessage(QStringList msg)
