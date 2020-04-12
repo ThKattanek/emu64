@@ -331,7 +331,6 @@ void SetupWindow::LoadINI(C64Class *c64)
         value = ini->value("ScreenshotFormatNr",SCREENSHOT_FORMAT_PNG).toInt();
         ui->ScreenshotFormat->setCurrentIndex(value);
         ini->endGroup();
-
     }
     ////////////////////////////////////
 

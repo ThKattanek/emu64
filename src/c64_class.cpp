@@ -26,19 +26,13 @@ int SDLThreadWarp(void *userdat);
 //#define C64Takt 982800  // Genau 50Hz
 #define C64Takt 985248  // 50,124542Hz (Original C64 PAL)
 
-#ifdef _WIN32
-    #define AudioPufferSize (1024)    // 882 bei 44.100 Khz
-#else
-    #define AudioPufferSize (1024)    // 882 bei 44.100 Khz
-#endif
-
 #define RecPollingWaitStart 20
 
 #define C64ScreenXW 384         //384
 
 const char* C64Class::screenshot_format_name[] = {"BMP","PNG"};
 
-C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(char*)> log_function, const char *data_path):
+C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(char*)> log_function, const char *data_path):
     mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
 {
     *ret_error = 0;
@@ -256,7 +250,7 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
     audio_spec_want.freq = AudioSampleRate;
     audio_spec_want.format = AUDIO_S16SYS;
     audio_spec_want.channels = 2;
-    audio_spec_want.samples = AudioPufferSize;
+    audio_spec_want.samples = soundbuffer_size;
     audio_spec_want.callback = AudioMix;
     audio_spec_want.userdata = this;
 
@@ -627,7 +621,7 @@ void C64Class::EndEmulation()
     }
 
     SDL_PauseAudioDevice(audio_dev, 1);
-    SDL_CloseAudioDevice(audio_dev);
+    if(audio_dev > 0) SDL_CloseAudioDevice(audio_dev);
 
     CloseSDLJoystick();
     SDL_Quit();
@@ -1511,9 +1505,11 @@ void C64Class::InitGrafik()
 
     LogText("\tInitGrafik: Warten bis Vic-Refresh angehalten wurde.\n");
 
-    while(!vic_refresh_is_holded)
+    int timeout = 1000;
+    while(!vic_refresh_is_holded && timeout > 0)
     {
         SDL_Delay(1);
+        timeout--;
     }
 
     LogText("\tInitGrafik: Vic-Refresh wurde angehalten.\n");
@@ -1762,9 +1758,11 @@ void C64Class::ReleaseGrafik()
     enable_hold_vic_refresh = true;
     vic_refresh_is_holded = false;
 
-    while(!vic_refresh_is_holded)
+    int timeout = 1000;
+    while(!vic_refresh_is_holded && timeout > 0)
     {
           SDL_Delay(1);
+          timeout--;
     }
 
     if(c64_screen != nullptr)

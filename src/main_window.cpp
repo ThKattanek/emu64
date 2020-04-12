@@ -117,7 +117,10 @@ MainWindow::~MainWindow()
             QString name = "C64_KEY_" + QVariant(i).toString();
             ini->setValue(name,(int)c64_key_table[i].SDLKeyCode);
         }
+        ini->endGroup();
 
+        ini->beginGroup("Sound");
+        ini->setValue("SoundBufferSize",soundbuffer_size);
         ini->endGroup();
     }
     /////////////////////////////////////
@@ -339,9 +342,13 @@ int MainWindow::OnInit()
     LogText(tr(">> VideoPal Klasse wurde installiert\n").toUtf8());
 
     /// C64 Klasse Installieren ... Das HERZ ///
+    ini->beginGroup("Sound");
+    soundbuffer_size = ini->value("SoundBufferSize",512).toInt();
+    ini->endGroup();
+
     SplashMessage(tr("C64 Klasse wird initialisiert."),Qt::darkBlue);
     int ret_error;
-    c64 = new C64Class(&ret_error,video_crt_output,start_minimized, bind(&MainWindow::LogText,this,std::placeholders::_1),QString(dataPath).toLocal8Bit());
+    c64 = new C64Class(&ret_error ,soundbuffer_size ,video_crt_output,start_minimized, bind(&MainWindow::LogText,this,std::placeholders::_1),QString(dataPath).toLocal8Bit());
     if(ret_error != 0)
     {
         LogText(tr("<< Fehler beim initiallisieren der C64 Klasse.\n").toUtf8());
