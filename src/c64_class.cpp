@@ -96,7 +96,17 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
 
     current_c64_screen_width = current_window_width = current_c64_screen_height = current_window_height = 0;
 
+    SDL_ClearError();
     mutex1 = SDL_CreateMutex();
+    if(!mutex1)
+    {
+        LogText(const_cast<char*>("<< ERROR: Fehler beim erstellen eines SDL_Mutex.\n"));
+        LogText(const_cast<char*>("<< SDL_Error: "));
+        LogText(const_cast<char*>(SDL_GetError()));
+        LogText(const_cast<char*>("\n"));
+        *ret_error = -1;
+        return;
+    }
 
     sdl_window = nullptr;
     c64_screen = nullptr;
@@ -121,10 +131,14 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
 
     /// SDL Installieren ///
 
+    SDL_ClearError();
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
          LogText(const_cast<char*>("<< ERROR: Fehler beim installieren von SDL2\n"));
-         *ret_error = -1;
+         LogText(const_cast<char*>("<< SDL_Error: "));
+         LogText(const_cast<char*>(SDL_GetError()));
+         LogText(const_cast<char*>("\n"));
+         *ret_error = -2;
          return;
     }
     else
@@ -252,16 +266,17 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
 
     #endif
 
+    SDL_ClearError();
     audio_dev =  SDL_OpenAudioDevice(NULL, 0, &audio_spec_want, &audio_spec_have, SDL_AUDIO_ALLOW_ANY_CHANGE);
     if( audio_dev == 0 )
     {
         LogText(const_cast<char*>("<< ERROR: Fehler beim installieren von SDL_Audio\n"));
-        LogText("<< SDL_Error: ");
+        LogText(const_cast<char*>("<< SDL_Error: "));
         LogText(const_cast<char*>(SDL_GetError()));
-        LogText("\n");
+        LogText(const_cast<char*>("\n"));
         sprintf(out_text, "\t -Audio Buffersize: %d\n" ,audio_spec_have.samples);
         LogText(out_text);
-        *ret_error = -2;
+        *ret_error = -3;
         return;
     }
 
@@ -299,7 +314,17 @@ C64Class::C64Class(int *ret_error, VideoCrtClass *video_crt_output, bool start_m
     sdl_window_icon = IMG_Load(filename);
     if(sdl_window_icon != nullptr)
     {
-        SDL_SetColorKey(sdl_window_icon,SDL_TRUE,SDL_MapRGB(sdl_window_icon->format,0,0,0));
+        SDL_ClearError();
+        if(0 != SDL_SetColorKey(sdl_window_icon,SDL_TRUE,SDL_MapRGB(sdl_window_icon->format,0,0,0)))
+        {
+            LogText(const_cast<char*>("<< ERROR: Fehler beim festlegen des ColorKey im Window Icon.\n"));
+            LogText(const_cast<char*>("<< SDL_Error: "));
+            LogText(const_cast<char*>(SDL_GetError()));
+            LogText(const_cast<char*>("\n"));
+            *ret_error = -4;
+            return;
+        }
+
     }
     else
         LogText(const_cast<char*>("<< ERROR: Fehler beim laden des SLDFenster Icons\n"));
@@ -557,11 +582,23 @@ C64Class::~C64Class()
 void C64Class::StartEmulation()
 {
     /// SLD Thread starten (ab hier startet auch die C64 Emulation ///
+    SDL_ClearError();
     sdl_thread = SDL_CreateThread(SDLThread, "C64Thread", this);
-    LogText(">> C64Thread wurde gestartet.\n");
+    if(sdl_thread == nullptr)
+    {
+        LogText(const_cast<char*>("<< ERROR: SDL Thread (C64Thread) konnte nicht erstellt werden.\n"));
+        LogText(const_cast<char*>("<< SDL_Error: "));
+        LogText(const_cast<char*>(SDL_GetError()));
+        LogText(const_cast<char*>("\n"));
+    }
+    else
+    {
+        LogText(const_cast<char*>(">> C64Thread wurde gestartet.\n"));
 
-    SDL_PauseAudioDevice(audio_dev, 0);
-    LogText(">> SDL Audiostream wurde getartet.\n");
+        SDL_PauseAudioDevice(audio_dev, 0);
+        LogText(const_cast<char*>(">> SDL Audiostream wurde getartet.\n"));
+    }
+    return;
 }
 
 void C64Class::EndEmulation()
@@ -758,7 +795,15 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
 
     if((video_crt_output == nullptr) || (sdl_thread_pause == true)) return;
 
-    SDL_LockSurface(c64_screen);
+    if(SDL_LockSurface(c64_screen) != 0)
+    {
+        LogText(const_cast<char*>("<< ERROR: SDL Surface (VicRefresh) konnte nicht gelockt werden.\n"));
+        LogText(const_cast<char*>("<< SDL_Error: "));
+        LogText(const_cast<char*>(SDL_GetError()));
+        LogText(const_cast<char*>("\n"));
+        return;
+    }
+
     video_crt_output->ConvertVideo(static_cast<void*>(c64_screen->pixels),c64_screen->pitch,vic_puffer,104,current_c64_screen_width,current_c64_screen_height,504,312,false);
 
     this->vic_buffer = vic_puffer;
@@ -779,10 +824,35 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
 
         switch (screenshot_format) {
         case SCREENSHOT_FORMAT_BMP:
-            SDL_SaveBMP(c64_screen, screenshot_filename);
+            SDL_ClearError();
+            if(0 != SDL_SaveBMP(c64_screen, screenshot_filename))
+            {
+                LogText(const_cast<char*>("<< ERROR: Es konnte der Screenshot als BMP nicht gespeichert werden.\n"));
+                LogText(const_cast<char*>("<< SDL_Error: "));
+                LogText(const_cast<char*>(SDL_GetError()));
+                LogText(const_cast<char*>("\n"));
+            }
+            else
+            {
+                LogText(const_cast<char*>(">> Screenshot wurde erfolgreich gespeichert ["));
+                LogText(screenshot_filename);
+                LogText(const_cast<char*>("\n"));
+            }
             break;
         case SCREENSHOT_FORMAT_PNG:
-            SDL_SavePNG(c64_screen, screenshot_filename);
+            if(0 != SDL_SavePNG(c64_screen, screenshot_filename))
+            {
+                LogText(const_cast<char*>("<< ERROR: Es konnte der Screenshot als PNG nicht gespeichert werden.\n"));
+                LogText(const_cast<char*>("<< SDL_Error: "));
+                LogText(const_cast<char*>(SDL_GetError()));
+                LogText(const_cast<char*>("\n"));
+            }
+            else
+            {
+                LogText(const_cast<char*>(">> Screenshot wurde erfolgreich gespeichert ["));
+                LogText(screenshot_filename);
+                LogText(const_cast<char*>("\n"));
+            }
             break;
         default:
 
@@ -830,7 +900,14 @@ void C64Class::WarpModeLoop()
             {
                 if(c64_reset_ready)
                 {
-                    SDL_CreateThread(SDLThreadLoad ,"C64Thread",this);
+                    SDL_ClearError();
+                    if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
+                    {
+                        LogText(const_cast<char*>("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n"));
+                        LogText(const_cast<char*>("<< SDL_Error: "));
+                        LogText(const_cast<char*>(SDL_GetError()));
+                        LogText(const_cast<char*>("\n"));
+                    }
                     wait_reset_ready = false;
                 }
             }
@@ -838,7 +915,14 @@ void C64Class::WarpModeLoop()
             {
                 if((c64_reset_ready == true) && (floppy_reset_ready[0] == true))
                 {
-                    SDL_CreateThread(SDLThreadLoad ,"C64Thread" ,this);
+                    SDL_ClearError();
+                    if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
+                    {
+                        LogText(const_cast<char*>("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n"));
+                        LogText(const_cast<char*>("<< SDL_Error: "));
+                        LogText(const_cast<char*>(SDL_GetError()));
+                        LogText(const_cast<char*>("\n"));
+                    }
                     wait_reset_ready = false;
                 }
             }
@@ -934,7 +1018,14 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     {
                         if(c64_reset_ready)
                         {
-                            SDL_CreateThread(SDLThreadLoad ,"C64Thread",this);
+                            SDL_ClearError();
+                            if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
+                            {
+                                LogText(const_cast<char*>("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n"));
+                                LogText(const_cast<char*>("<< SDL_Error: "));
+                                LogText(const_cast<char*>(SDL_GetError()));
+                                LogText(const_cast<char*>("\n"));
+                            }
                             wait_reset_ready = false;
                         }
                     }
@@ -942,7 +1033,14 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     {
                         if((c64_reset_ready == true) && (floppy_reset_ready[0] == true))
                         {
-                            SDL_CreateThread(SDLThreadLoad ,"C64Thread" ,this);
+                            SDL_ClearError();
+                            if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
+                            {
+                                LogText(const_cast<char*>("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n"));
+                                LogText(const_cast<char*>("<< SDL_Error: "));
+                                LogText(const_cast<char*>(SDL_GetError()));
+                                LogText(const_cast<char*>("\n"));
+                            }
                             wait_reset_ready = false;
                         }
                     }
@@ -3977,14 +4075,23 @@ void C64Class::OpenSDLJoystick()
     if(sdl_joystick_is_open)
     {
         sdl_joystick_is_open = false;
+
+        SDL_ClearError();
         SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
         LogText(const_cast<char*>(">> SDL Subsystem Joystick wurde geschlossen\n"));
+        LogText(const_cast<char*>("<< SDL_Error: "));
+        LogText(const_cast<char*>(SDL_GetError()));
+        LogText(const_cast<char*>("\n"));
     }
 
+    SDL_ClearError();
     if(SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
     {
         sdl_joystick_is_open = false;
         LogText(const_cast<char*>("<< ERROR: SDL Subsystem Joystick konnte nicht geöffnet werden\n"));
+        LogText(const_cast<char*>("<< SDL_Error: "));
+        LogText(const_cast<char*>(SDL_GetError()));
+        LogText(const_cast<char*>("\n"));
     }
     else
     {
@@ -4035,8 +4142,12 @@ void C64Class::CloseSDLJoystick()
     if(sdl_joystick_is_open)
     {
         sdl_joystick_is_open = false;
+        SDL_ClearError();
         SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
         LogText(const_cast<char*>(">> SDL Subsystem Joystick wurde geschlossen\n"));
+        LogText(const_cast<char*>("<< SDL_Error: "));
+        LogText(const_cast<char*>(SDL_GetError()));
+        LogText(const_cast<char*>("\n"));
     }
     sdl_joystick_stop_update = true;
 }
