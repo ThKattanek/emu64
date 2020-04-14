@@ -15,7 +15,7 @@
 
 !win32:isEmpty(PREFIX):PREFIX=/usr/local
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4){
 

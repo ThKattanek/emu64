@@ -18,7 +18,6 @@
 
 #include "./custom_splashscreen.h"
 #include <QBitmap>
-#include <QTimer>
 
 #include "./command_line_class.h"   // Klasse zur Auswertung der KomandLine
 #include "./emu64_commands.h"       // Struktur mit allen verfügbaren Kommandos
@@ -34,6 +33,10 @@ int main(int argc, char *argv[])
 #if (!defined(SINGLE_THREADED_PLAYBACK) and defined(Q_WS_X11))
     XInitThreads();
 #endif
+
+    QCoreApplication::setOrganizationName("ThKattanek");
+    QCoreApplication::setApplicationName("Emu64");
+    QCoreApplication::setApplicationVersion(VERSION_STRING);
 
     QTextStream *log = nullptr;
     QDir config_dir = QDir(QDir::homePath() + "/.config/emu64");
@@ -88,7 +91,7 @@ int main(int argc, char *argv[])
     }
 
     SingleApplication *app;
-    app = new SingleApplication (argc, argv,  "Emu64_By_Thorsten_Kattanek");
+    app = new SingleApplication (argc, argv);
 
     bool isFirstInstance;
 
@@ -96,7 +99,9 @@ int main(int argc, char *argv[])
     {
         if (app->alreadyExists())
         {
-            for(int i=0;i<argc;i++) app->sendMessage(argv[i]);
+	    QStringList args;
+            for(int i=0;i<argc;i++) args << argv[i];
+	    app->sendMessages(args);
             isFirstInstance = false;
             return 0;
         }
@@ -203,12 +208,11 @@ int main(int argc, char *argv[])
         ret = app->exec();
     }
 
-    app->deleteSharedMemory();
-
     if(w->IsLimitCyclesEvent) ret = 1;
     if(w->IsDebugCartEvent) ret = w->DebugCartValue;
 
     delete w;
+    delete app;
 
     cout << "ExitCode: 0x" << std::hex << ret << endl;
     return ret;
