@@ -1446,7 +1446,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
         }
         else bg = c64->GetBreakGroup(bg_index);
 
-        if(column == 1)
+        if(column == 0 || 1)
         {
             QString tmp_str = item->text(1);
             bool ok;
