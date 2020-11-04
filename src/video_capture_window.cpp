@@ -13,7 +13,7 @@
 //                                              //
 //////////////////////////////////////////////////
 
-#include <QDesktopWidget>
+#include <QWidget>
 
 #include "./video_capture_window.h"
 #include "./ui_video_capture_window.h"

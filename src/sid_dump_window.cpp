@@ -13,7 +13,7 @@
 # //                                              //
 # //////////////////////////////////////////////////
 
-#include <QDesktopWidget>
+#include <QWidget>
 
 #include "sid_dump_window.h"
 #include "ui_sid_dump_window.h"

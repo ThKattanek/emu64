@@ -15,7 +15,7 @@
 
 #include <QMessageBox>
 #include <QFontDatabase>
-#include <QDesktopWidget>
+#include <QWidget>
 
 #include "./cartridge_window.h"
 #include "./ui_cartridge_window.h"
