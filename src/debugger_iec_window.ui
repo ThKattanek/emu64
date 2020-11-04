@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>286</width>
-    <height>87</height>
+    <width>281</width>
+    <height>92</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -398,6 +398,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>inkl. interne Floppy [8] Singnale</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

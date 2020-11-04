@@ -8,18 +8,21 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.08.2016                //
+// Letzte Änderung am 29.03.2020                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "mos6522_class.h"
 
+#include <QDebug>
+
 MOS6522::MOS6522(unsigned char via_nr):
     DiskMotorOn(0),
     FloppyIEC(0),
     C64IEC(0),
-    Jumper(0)
+    Jumper(0),
+    CA2_Output(false)
 {
     VIANummer = via_nr;
     Reset();
@@ -47,6 +50,8 @@ void MOS6522::Reset()
 
     ATNState = false;
     IECInterrupt = false;
+
+    CA2_Output = HI;
 }
 
 void MOS6522::OneZyklus()
@@ -253,6 +258,19 @@ void MOS6522::WriteIO(unsigned short adresse, unsigned char wert)
                 TimerB = TimerBLatch;
                 break;
             }
+            case 0x0C:
+            {
+                switch(wert & 0x0e)
+                {
+                case 0x0c:
+                    CA2_Output = LO;
+                    break;
+                case 0x0e:
+                    CA2_Output = HI;
+                    break;
+                }
+                break;
+            }
             case 0x0D:
             {
                 IO[0x0D]&= ~wert;
@@ -346,11 +364,12 @@ unsigned char MOS6522::ReadIO(unsigned short adresse)
                     if (*WriteProtect) WP = 0;
                     else WP = 0x10;
 
-                    if (SyncFound != 0)
+                    if (SyncFound != nullptr)
                     {
-                        if (SyncFound()) return (PB & 0x7F) | WP;
+                        if (!SyncFound()) return (PB & 0x7F) | WP;
                         else return PB | 0x80 | WP;
                     }
+                    break;
                 }
                 case 0x01:
                 case 0x0F:
