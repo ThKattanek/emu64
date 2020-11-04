@@ -69,7 +69,7 @@ PKGCONFIG += sdl2 SDL2_image libpng glu libavutil libavformat libavcodec libswre
 
 message("Zip: $$ZIP")
 
-DEFINES += ZIP_SUPPORT=true
+#DEFINES += ZIP_SUPPORT=true
 win32 {
     PKGCONFIG += quazip
 } else {
