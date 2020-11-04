@@ -95,16 +95,16 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     {
         view_code_address[i] = 0;
         disass_pc[i] = new QTableWidgetItem();
-        disass_pc[i]->setBackgroundColor(table_back_color);
+        disass_pc[i]->setBackground(table_back_color);
         ui->DisAssTable->setItem(i, 0, disass_pc[i]);
         disass_memory[i] = new QTableWidgetItem();
-        disass_memory[i]->setBackgroundColor(table_back_color);
+        disass_memory[i]->setBackground(table_back_color);
         ui->DisAssTable->setItem(i, 1, disass_memory[i]);
         disass_mnemonic[i] = new QTableWidgetItem();
-        disass_mnemonic[i]->setBackgroundColor(table_back_color);
+        disass_mnemonic[i]->setBackground(table_back_color);
         ui->DisAssTable->setItem(i, 2, disass_mnemonic[i]);
         disass_addressing[i] = new QTableWidgetItem();
-        disass_addressing[i]->setBackgroundColor(table_back_color);
+        disass_addressing[i]->setBackground(table_back_color);
         ui->DisAssTable->setItem(i, 3, disass_addressing[i]);
     }
 
@@ -203,8 +203,8 @@ void DebuggerWindow::onTimerAnimationRefresh()
                 ui->ChangeSource->setCurrentIndex(0);
                 if(i < ui->BreakpointTree->topLevelItemCount())
                 {
-                    ui->BreakpointTree->topLevelItem(i)->setBackgroundColor(0, QColor(0, 255, 0));
-                    ui->BreakpointTree->topLevelItem(i)->setBackgroundColor(1, QColor(1, 255, 0));
+                    ui->BreakpointTree->topLevelItem(i)->setBackground(0, QColor(0, 255, 0));
+                    ui->BreakpointTree->topLevelItem(i)->setBackground(1, QColor(1, 255, 0));
                     ui->BreakpointTree->topLevelItem(i)->setText(1, tr("ERFÜLLT !"));
                 }
             }
@@ -222,8 +222,8 @@ void DebuggerWindow::onTimerAnimationRefresh()
                         ui->ChangeSource->setCurrentIndex(i+1);
                         if(ii < ui->BreakpointTree->topLevelItemCount())
                         {
-                            ui->BreakpointTree->topLevelItem(ii)->setBackgroundColor(0, QColor(0, 255, 0));
-                            ui->BreakpointTree->topLevelItem(ii)->setBackgroundColor(1, QColor(1, 255, 0));
+                            ui->BreakpointTree->topLevelItem(ii)->setBackground(0, QColor(0, 255, 0));
+                            ui->BreakpointTree->topLevelItem(ii)->setBackground(1, QColor(1, 255, 0));
                             ui->BreakpointTree->topLevelItem(ii)->setText(1, tr("ERFÜLLT !"));
                         }
                     }
@@ -630,30 +630,30 @@ void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
 
     if(find)
     {
-        disass_pc[old_make_idx]->setBackgroundColor(table_back_color);
-        disass_memory[old_make_idx]->setBackgroundColor(table_back_color);
-        disass_mnemonic[old_make_idx]->setBackgroundColor(table_back_color);
-        disass_addressing[old_make_idx]->setBackgroundColor(table_back_color);
+        disass_pc[old_make_idx]->setBackground(table_back_color);
+        disass_memory[old_make_idx]->setBackground(table_back_color);
+        disass_mnemonic[old_make_idx]->setBackground(table_back_color);
+        disass_addressing[old_make_idx]->setBackground(table_back_color);
 
-        disass_pc[akt_make_idx]->setBackgroundColor(table_position_color);
-        disass_memory[akt_make_idx]->setBackgroundColor(table_position_color);
-        disass_mnemonic[akt_make_idx]->setBackgroundColor(table_position_color);
-        disass_addressing[akt_make_idx]->setBackgroundColor(table_position_color);
+        disass_pc[akt_make_idx]->setBackground(table_position_color);
+        disass_memory[akt_make_idx]->setBackground(table_position_color);
+        disass_mnemonic[akt_make_idx]->setBackground(table_position_color);
+        disass_addressing[akt_make_idx]->setBackground(table_position_color);
 
         old_make_idx = akt_make_idx;
         pc = old_adresse;
     }
     else
     {
-        disass_pc[old_make_idx]->setBackgroundColor(table_back_color);
-        disass_memory[old_make_idx]->setBackgroundColor(table_back_color);
-        disass_mnemonic[old_make_idx]->setBackgroundColor(table_back_color);
-        disass_addressing[old_make_idx]->setBackgroundColor(table_back_color);
+        disass_pc[old_make_idx]->setBackground(table_back_color);
+        disass_memory[old_make_idx]->setBackground(table_back_color);
+        disass_mnemonic[old_make_idx]->setBackground(table_back_color);
+        disass_addressing[old_make_idx]->setBackground(table_back_color);
 
-        disass_pc[0]->setBackgroundColor(table_position_color);
-        disass_memory[0]->setBackgroundColor(table_position_color);
-        disass_mnemonic[0]->setBackgroundColor(table_position_color);
-        disass_addressing[0]->setBackgroundColor(table_position_color);
+        disass_pc[0]->setBackground(table_position_color);
+        disass_memory[0]->setBackground(table_position_color);
+        disass_mnemonic[0]->setBackground(table_position_color);
+        disass_addressing[0]->setBackground(table_position_color);
 
         old_make_idx = akt_make_idx = 0;
         pc = old_adresse = address;
@@ -689,11 +689,11 @@ void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
 
         if(!(tmp&8))
         {
-            disass_mnemonic[i]->setTextColor(QColor(0,0,0));
+            disass_mnemonic[i]->setForeground(QColor(0,0,0));
         }
         else
         {
-            disass_mnemonic[i]->setTextColor(QColor(255,0,0));
+            disass_mnemonic[i]->setForeground(QColor(255,0,0));
         }
 
         tmp >>= 4;
@@ -1407,7 +1407,7 @@ void DebuggerWindow::AddBreakpointTreeChild(QTreeWidgetItem *parent, uint16_t va
     item->setDisabled(false);
     item->setToolTip(0,tooltip);
     item->setToolTip(1,tr("Doppelklick um Werte zu verändern."));
-    item->setBackgroundColor(1,QColor(200,200,255));
+    item->setBackground(1,QColor(200,200,255));
     item->setForeground(1,QColor(200,0,0));
     parent->addChild(item);
 }
@@ -1467,13 +1467,13 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                         bg->iPC = integer;
                         sprintf(str_00,"$%4.4X",integer);
                         item->setText(1,QString(str_00));
-                        item->setBackgroundColor(1,QColor(200,200,255));
+                        item->setBackground(1,QColor(200,200,255));
                         item->setForeground(1,QColor(200,0,0));
                     }
                     else
                     {
                         item->setCheckState(0,Qt::Unchecked);
-                        item->setBackgroundColor(1,QColor(200,0,0));
+                        item->setBackground(1,QColor(200,0,0));
                         item->setForeground(1,QColor(200,200,200));
                     }
                 }
@@ -1495,20 +1495,20 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                             bg->iAC = integer;
                             sprintf(str_00,"$%2.2X",integer);
                             item->setText(1,QString(str_00));
-                            item->setBackgroundColor(1,QColor(200,200,255));
+                            item->setBackground(1,QColor(200,200,255));
                             item->setForeground(1,QColor(200,0,0));
                         }
                         else
                         {
                             item->setCheckState(0,Qt::Unchecked);
-                            item->setBackgroundColor(1,QColor(200,0,0));
+                            item->setBackground(1,QColor(200,0,0));
                             item->setForeground(1,QColor(200,200,200));
                         }
                     }
                     else
                     {
                         item->setCheckState(0,Qt::Unchecked);
-                        item->setBackgroundColor(1,QColor(200,0,0));
+                        item->setBackground(1,QColor(200,0,0));
                         item->setForeground(1,QColor(200,200,200));
                     }
                 }
@@ -1529,20 +1529,20 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                             bg->iXR = integer;
                             sprintf(str_00,"$%2.2X",integer);
                             item->setText(1,QString(str_00));
-                            item->setBackgroundColor(1,QColor(200,200,255));
+                            item->setBackground(1,QColor(200,200,255));
                             item->setForeground(1,QColor(200,0,0));
                         }
                         else
                         {
                             item->setCheckState(0,Qt::Unchecked);
-                            item->setBackgroundColor(1,QColor(200,0,0));
+                            item->setBackground(1,QColor(200,0,0));
                             item->setForeground(1,QColor(200,200,200));
                         }
                     }
                     else
                     {
                         item->setCheckState(0,Qt::Unchecked);
-                        item->setBackgroundColor(1,QColor(200,0,0));
+                        item->setBackground(1,QColor(200,0,0));
                         item->setForeground(1,QColor(200,200,200));
                     }
                 }
@@ -1563,20 +1563,20 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                             bg->iYR = integer;
                             sprintf(str_00,"$%2.2X",integer);
                             item->setText(1,QString(str_00));
-                            item->setBackgroundColor(1,QColor(200,200,255));
+                            item->setBackground(1,QColor(200,200,255));
                             item->setForeground(1,QColor(200,0,0));
                         }
                         else
                         {
                             item->setCheckState(0,Qt::Unchecked);
-                            item->setBackgroundColor(1,QColor(200,0,0));
+                            item->setBackground(1,QColor(200,0,0));
                             item->setForeground(1,QColor(200,200,200));
                         }
                     }
                     else
                     {
                         item->setCheckState(0,Qt::Unchecked);
-                        item->setBackgroundColor(1,QColor(200,0,0));
+                        item->setBackground(1,QColor(200,0,0));
                         item->setForeground(1,QColor(200,200,200));
                     }
                 }
@@ -1595,13 +1595,13 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                         bg->iRAdresse = integer;
                         sprintf(str_00,"$%4.4X",integer);
                         item->setText(1,QString(str_00));
-                        item->setBackgroundColor(1,QColor(200,200,255));
+                        item->setBackground(1,QColor(200,200,255));
                         item->setForeground(1,QColor(200,0,0));
                     }
                     else
                     {
                         item->setCheckState(0,Qt::Unchecked);
-                        item->setBackgroundColor(1,QColor(200,0,0));
+                        item->setBackground(1,QColor(200,0,0));
                         item->setForeground(1,QColor(200,200,200));
                     }
                 }
@@ -1620,13 +1620,13 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                         bg->iWAdresse = integer;
                         sprintf(str_00,"$%4.4X",integer);
                         item->setText(1,QString(str_00));
-                        item->setBackgroundColor(1,QColor(200,200,255));
+                        item->setBackground(1,QColor(200,200,255));
                         item->setForeground(1,QColor(200,0,0));
                     }
                     else
                     {
                         item->setCheckState(0,Qt::Unchecked);
-                        item->setBackgroundColor(1,QColor(200,0,0));
+                        item->setBackground(1,QColor(200,0,0));
                         item->setForeground(1,QColor(200,200,200));
                     }
                 }
@@ -1647,20 +1647,20 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                             bg->iRWert = integer;
                             sprintf(str_00,"$%2.2X",integer);
                             item->setText(1,QString(str_00));
-                            item->setBackgroundColor(1,QColor(200,200,255));
+                            item->setBackground(1,QColor(200,200,255));
                             item->setForeground(1,QColor(200,0,0));
                         }
                         else
                         {
                             item->setCheckState(0,Qt::Unchecked);
-                            item->setBackgroundColor(1,QColor(200,0,0));
+                            item->setBackground(1,QColor(200,0,0));
                             item->setForeground(1,QColor(200,200,200));
                         }
                     }
                     else
                     {
                         item->setCheckState(0,Qt::Unchecked);
-                        item->setBackgroundColor(1,QColor(200,0,0));
+                        item->setBackground(1,QColor(200,0,0));
                         item->setForeground(1,QColor(200,200,200));
                     }
                 }
@@ -1681,20 +1681,20 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                             bg->iWWert = integer;
                             sprintf(str_00,"$%2.2X",integer);
                             item->setText(1,QString(str_00));
-                            item->setBackgroundColor(1,QColor(200,200,255));
+                            item->setBackground(1,QColor(200,200,255));
                             item->setForeground(1,QColor(200,0,0));
                         }
                         else
                         {
                             item->setCheckState(0,Qt::Unchecked);
-                            item->setBackgroundColor(1,QColor(200,0,0));
+                            item->setBackground(1,QColor(200,0,0));
                             item->setForeground(1,QColor(200,200,200));
                         }
                     }
                     else
                     {
                         item->setCheckState(0,Qt::Unchecked);
-                        item->setBackgroundColor(1,QColor(200,0,0));
+                        item->setBackground(1,QColor(200,0,0));
                         item->setForeground(1,QColor(200,200,200));
                     }
                 }
@@ -1715,20 +1715,20 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                             bg->iRZ = integer;
                             sprintf(str_00,"%d",integer);
                             item->setText(1,QString(str_00));
-                            item->setBackgroundColor(1,QColor(200,200,255));
+                            item->setBackground(1,QColor(200,200,255));
                             item->setForeground(1,QColor(200,0,0));
                         }
                         else
                         {
                             item->setCheckState(0,Qt::Unchecked);
-                            item->setBackgroundColor(1,QColor(200,0,0));
+                            item->setBackground(1,QColor(200,0,0));
                             item->setForeground(1,QColor(200,200,200));
                         }
                     }
                     else
                     {
                         item->setCheckState(0,Qt::Unchecked);
-                        item->setBackgroundColor(1,QColor(200,0,0));
+                        item->setBackground(1,QColor(200,0,0));
                         item->setForeground(1,QColor(200,200,200));
                     }
                 }
@@ -1749,20 +1749,20 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                             bg->iRZZyklus = integer;
                             sprintf(str_00,"%d",integer);
                             item->setText(1,QString(str_00));
-                            item->setBackgroundColor(1,QColor(200,200,255));
+                            item->setBackground(1,QColor(200,200,255));
                             item->setForeground(1,QColor(200,0,0));
                         }
                         else
                         {
                             item->setCheckState(0,Qt::Unchecked);
-                            item->setBackgroundColor(1,QColor(200,0,0));
+                            item->setBackground(1,QColor(200,0,0));
                             item->setForeground(1,QColor(200,200,200));
                         }
                     }
                     else
                     {
                         item->setCheckState(0,Qt::Unchecked);
-                        item->setBackgroundColor(1,QColor(200,0,0));
+                        item->setBackground(1,QColor(200,0,0));
                         item->setForeground(1,QColor(200,200,200));
                     }
                 }
@@ -1782,8 +1782,8 @@ void DebuggerWindow::ClearAllBreakpointBackcolors()
 {
     for(int i=0;i<ui->BreakpointTree->topLevelItemCount();i++)
     {
-        ui->BreakpointTree->topLevelItem(i)->setBackgroundColor(0,QColor(255,255,255));
-        ui->BreakpointTree->topLevelItem(i)->setBackgroundColor(1,QColor(255,255,255));
+        ui->BreakpointTree->topLevelItem(i)->setBackground(0,QColor(255,255,255));
+        ui->BreakpointTree->topLevelItem(i)->setBackground(1,QColor(255,255,255));
         ui->BreakpointTree->topLevelItem(i)->setText(1,"");
     }
 }
@@ -2072,13 +2072,13 @@ void DebuggerWindow::RefreshGUI(void)
             for(int i=0;i<DISASS_ROW;i++)
             {
                 disass_pc[i]->setText("");
-                disass_pc[i]->setBackgroundColor(table_back_color);
+                disass_pc[i]->setBackground(table_back_color);
                 disass_memory[i]->setText("");
-                disass_memory[i]->setBackgroundColor(table_back_color);
+                disass_memory[i]->setBackground(table_back_color);
                 disass_mnemonic[i]->setText("");
-                disass_mnemonic[i]->setBackgroundColor(table_back_color);
+                disass_mnemonic[i]->setBackground(table_back_color);
                 disass_addressing[i]->setText("");
-                disass_addressing[i]->setBackgroundColor(table_back_color);
+                disass_addressing[i]->setBackground(table_back_color);
             }
             ui->ExportGroup->setEnabled(false);
 
