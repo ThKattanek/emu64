@@ -351,12 +351,6 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     iec_export_vdc.AddWire("floppy_out_clk",false);
     iec_export_vdc.AddWire("floppy_out_data",false);
 
-    iec_export_vdc.AddWire("floppy_int_motor",false);
-    iec_export_vdc.AddWire("floppy_int_sync",false);
-    iec_export_vdc.AddWire("floppy_int_soe",false);
-    iec_export_vdc.AddWire("floppy_int_byte_ready",false);
-    iec_export_vdc.AddWire("floppy_int_reset",false);
-
     /// Floppy mit C64 verbinden ///
 
     sprintf(filename,"%s1541.rom",rom_path);
@@ -1079,13 +1073,6 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 iec_export_vdc.SetWire(2,c64_iec_wire & 128);
                 iec_export_vdc.SetWire(3,floppy_iec_wire & 64);
                 iec_export_vdc.SetWire(4,floppy_iec_wire & 128);
-
-                uint8_t floppy_signals = floppy[0]->GetFloppySignals();
-                iec_export_vdc.SetWire(5,floppy_signals & 1);   // Motor
-                iec_export_vdc.SetWire(6,floppy_signals & 2);   // SYNC
-                iec_export_vdc.SetWire(7,floppy_signals & 4);   // SOE
-                iec_export_vdc.SetWire(8,floppy_signals & 8);   // BYTE_READY
-                iec_export_vdc.SetWire(9,reset_wire);           // BYTE_READY
             }
 
         }

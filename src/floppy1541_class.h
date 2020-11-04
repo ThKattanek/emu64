@@ -37,13 +37,6 @@
 
 #define DIRECTORY_TRACK 18
 
-#define HEADER_GAP_BYTES 11
-
-#define BYTE_READY_TIME 2
-
-#define LO false
-#define HI true
-
 class Floppy1541
 {    
 public:
@@ -71,7 +64,6 @@ public:
     void SetCpuReg(REG_STRUCT *reg);
     void SetResetReady(bool* ResetReady, uint16_t ResetReadyAdr);
     void GetFloppyInfo(FLOPPY_INFO *fi);
-    uint8_t GetFloppySignals();
     uint8_t ReadByte(uint16_t address);
     void WriteByte(uint16_t address, uint8_t value);
     int LoadFloppySounds(const char* motor_sound_filename, const char* motor_on_sound_filename, const char* motor_off_sound_filename, const char* anschlag_sound_filename, const char* stepper_dec_sound_filename, const char* Stepper_inc_sound_filename);
@@ -115,7 +107,7 @@ public:
     uint16_t        History[256];
     uint8_t         HistoryPointer;
 
-
+    int SyncFoundCount;
 
 private:
 
@@ -123,7 +115,7 @@ private:
 
     void CheckImageWrite();
     void D64ImageToGCRImage();
-    int SectorToGCR(unsigned int track, unsigned int sector);
+    void SectorToGCR(unsigned int spur, unsigned int sektor);
     void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
     void GCRImageToD64Image();
     void GCRToSector(unsigned int spur, unsigned int sektor);
@@ -136,10 +128,6 @@ private:
     static const uint8_t num_sectors[42];
     static const uint8_t d64_track_zone[41];
     static const uint8_t d64_sector_gap[4];
-    static const uint8_t motor_speed[4];
-
-    uint8_t motor_rotate_speed;
-    uint8_t motor_rotate_speed_counter;
 
     bool    FloppyEnabled;
     bool    WriteProtect;
@@ -173,7 +161,6 @@ private:
     char                ImageFileName[FileNameSize];
     int                 ImageTyp;
     uint8_t             AktGCRWert;
-    uint8_t             *AktGCRWrite;
     static const int	NUM_TRACKS = 42;
     static const int	GCR_SECTOR_SIZE = 364;      // SYNC Header Gap SYNC Data Gap (should be 5 SYNC bytes each) ///  ALF Sector in Byte
     static const int	GCR_TRACK_SIZE = 7928;      // Each track in gcr_data has 21 sectors
@@ -187,18 +174,7 @@ private:
     uint8_t             GCRImage[G64_IMAGE_SIZE];   // Aktuelles GCR Image
     uint16_t            TrackSize[256];
 
-    uint8_t             gcr_byte;
-    uint8_t             gcr_byte_old;
-
-    bool                sync_found;
-    bool                sync_found_old;
-    bool                byte_ready;
-    bool                byte_ready_old;
-    int                 byte_ready_time;                   // Counter in Zyklen wann das Signal wieder zurückgenommen wird
-
     /// Für Floppy Sound ///
-
-    uint8_t             stepper_bump;
 
     double              Volume;
     bool                StepperIncWait;
