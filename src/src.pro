@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 09.12.2019                //
+# // Letzte Änderung am 05.11.2020                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -20,6 +20,10 @@ QT       += core gui network
 greaterThan(QT_MAJOR_VERSION, 4){
 
 QT += widgets
+
+greaterThan(QT_MAJOR_VERSION, 5){
+   QT += core5compat
+}
 
 TARGET = emu64
 TEMPLATE = app
@@ -69,12 +73,32 @@ PKGCONFIG += sdl2 SDL2_image libpng glu libavutil libavformat libavcodec libswre
 
 message("Zip: $$ZIP")
 
-#DEFINES += ZIP_SUPPORT=true
-win32 {
-    PKGCONFIG += quazip
-} else {
-    LIBS += -lquazip5
+equals(QT_MAJOR_VERSION, 5) {
+
+    DEFINES += ZIP_SUPPORT
+
+    win32 {
+        PKGCONFIG += quazip
+    } else {
+        LIBS += -lquazip5
+    }
+
+    message("QT5 is active")
 }
+
+equals(QT_MAJOR_VERSION, 6) {
+
+    #DEFINES += ZIP_SUPPORT
+
+    #win32 {
+    #    PKGCONFIG += quazip
+    #} else {
+    #    LIBS += -lquazip6
+    #}
+
+    message("QT6 is active")
+}
+
 
 # Quelltexte
 

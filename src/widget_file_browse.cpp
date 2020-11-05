@@ -355,7 +355,6 @@ QString WidgetFileBrowse::rootPathName(const QString &aPath)
     {
         strRootPathName = reg.cap(1);
     }
-
     return strRootPathName;
 }
 
