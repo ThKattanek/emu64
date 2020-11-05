@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 28.09.2019                //
+// Letzte Änderung am 05.11.2020                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -495,9 +495,10 @@ void FloppyWindow::RefreshD64FileList()
         label->setStyleSheet("color: rgb(100, 100, 255);");
 
         // Adresse setzen
-        QString str;
-        str.sprintf(" $%04X",d64[floppy].d64_files[i].Adresse);
-        ui->D64FileTable->setCellWidget(i,4,new QLabel(str));
+
+        char str00[8];
+        sprintf(str00, " $%04X",d64[floppy].d64_files[i].Adresse);
+        ui->D64FileTable->setCellWidget(i,4,new QLabel(QString(str00)));
         ui->D64FileTable->cellWidget(i,4)->setFont(*c64_font);
         label = static_cast<QLabel*>(ui->D64FileTable->cellWidget(i,4));
         label->setAlignment(Qt::AlignTop);
