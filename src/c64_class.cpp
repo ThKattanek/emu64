@@ -23,7 +23,6 @@ int SDLThread(void *userdat);
 int SDLThreadLoad(void *userdat);
 int SDLThreadWarp(void *userdat);
 
-//#define C64Takt 982800  // Genau 50Hz
 #define C64Takt 985248  // 50,124542Hz (Original C64 PAL)
 
 #define RecPollingWaitStart 20
@@ -383,6 +382,8 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     }
 
     /// Init Vars ///
+    c64_frequency = C64Takt;
+    c64_speed = 100;
     cpu_pc_history_pos = 0;
     io_source = 0;
     c64_command_line_lenght = 0;
@@ -505,7 +506,7 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     sid_volume = 1.0f;
 
     sid1->RESET = &reset_wire;
-    sid1->SetC64Zyklen(C64Takt);     // PAL 63*312*50 = 982800
+    sid1->SetC64Zyklen(c64_frequency);     // PAL 63*312*50 = 982800
     sid1->SetChipType(MOS_8580);
     sid1->SoundOutputEnable = true;
     sid1->CycleExact = true;
@@ -514,7 +515,7 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     sid1->SetPotXY(poti_x, poti_y);
 
     sid2->RESET = &reset_wire;
-    sid2->SetC64Zyklen(C64Takt);     // PAL 63*312*50 = 982800
+    sid2->SetC64Zyklen(c64_frequency);     // PAL 63*312*50 = 982800
     sid2->SetChipType(MOS_8580);
     sid2->SoundOutputEnable = true;
     sid2->CycleExact = true;
@@ -1584,7 +1585,7 @@ void C64Class::InitGrafik()
         LogText("\tInitGrafik: GLContext wurde erstellt.\n");
 
     // OpenGL Initialisieren //
-    //SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,1);
+    // SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,1);
 
     glShadeModel(GL_SMOOTH);
     glEnable(GL_TEXTURE_2D);
@@ -2514,11 +2515,18 @@ void C64Class::SetTapeSoundVolume(float_t volume)
     tape->SetTapeSoundVolume(volume);
 }
 
+void C64Class::SetC64Frequency(int c64_frequency)
+{
+    this->c64_frequency = c64_frequency;
+    SetC64Speed(c64_speed);
+}
+
 void C64Class::SetC64Speed(int speed)
 {
-    sid1->SetC64Zyklen(C64Takt*(speed/100.f));
-    sid2->SetC64Zyklen(C64Takt*(speed/100.f));
-    tape->SetC64Zyklen(C64Takt*(speed/100.f));
+    c64_speed = speed;
+    sid1->SetC64Zyklen(c64_frequency*(speed/100.f));
+    sid2->SetC64Zyklen(c64_frequency*(speed/100.f));
+    tape->SetC64Zyklen(c64_frequency*(speed/100.f));
 }
 
 void C64Class::EnableWarpMode(bool enabled)

@@ -91,6 +91,7 @@ public:
     void SetWindowAspectRatio(bool enable);
     void SetFullscreenAspectRatio(bool enable);
     void AnalyzeSDLEvent(SDL_Event *event);
+    void SetC64Frequency(int c64_frequency);
     void SetC64Speed(int speed);
     void EnableWarpMode(bool enabled);
     void SetDistortion(float_t value);
@@ -312,6 +313,10 @@ public:
 
     uint8_t         *vic_buffer;
     VideoCrtClass   *video_crt_output;
+
+    int             c64_frequency;   // Normaler PAL Takt ist 985248 Hz (985248 / (312 Rz * 63 Cycles) = 50,124542 Hz)
+                                     // 50 Hz Syncroner Takt ist 982800 Hz
+    int             c64_speed;
 
     MMU             *mmu;
     MOS6510         *cpu;

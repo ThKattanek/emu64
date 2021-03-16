@@ -24,7 +24,7 @@
     <rect>
      <x>5</x>
      <y>5</y>
-     <width>401</width>
+     <width>421</width>
      <height>351</height>
     </rect>
    </property>
@@ -34,7 +34,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>4</number>
    </property>
    <property name="documentMode">
     <bool>false</bool>
@@ -839,6 +839,7 @@
       </property>
       <property name="font">
        <font>
+        <pointsize>10</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
@@ -852,21 +853,68 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QWidget" name="Lan64Tab">
+   <widget class="QWidget" name="TestTab">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <attribute name="title">
-     <string>Lan64</string>
+     <string>Testbereich</string>
     </attribute>
-   </widget>
-   <widget class="QWidget" name="GB64Tab">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <attribute name="title">
-     <string>GameBase64</string>
+    <attribute name="toolTip">
+     <string>Hier können neue Funktionen getestet werden.</string>
     </attribute>
+    <widget class="QGroupBox" name="groupBox_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>171</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Emu64 Timing</string>
+     </property>
+     <widget class="QSpinBox" name="cycles_per_second">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>151</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>10000000</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="default_50hz">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>60</y>
+        <width>51</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>50 FPS</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="default_pal_c64">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>60</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>50,124542 FPS</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
   </widget>
  </widget>

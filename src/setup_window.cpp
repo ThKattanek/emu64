@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.06.2020                //
+// Letzte Änderung am 16.03.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -331,6 +331,12 @@ void SetupWindow::LoadINI(C64Class *c64)
         value = ini->value("ScreenshotFormatNr",SCREENSHOT_FORMAT_PNG).toInt();
         ui->ScreenshotFormat->setCurrentIndex(value);
         ini->endGroup();
+
+        ini->beginGroup("Testarea");
+        value1 = ini->value("C64CyclesPerSecond",985248).toInt();
+        ui->cycles_per_second->setValue(value1);
+        c64->SetC64Frequency(value1);
+        ini->endGroup();
     }
     ////////////////////////////////////
 
@@ -429,6 +435,10 @@ void SetupWindow::SaveINI()
 
         ini->beginGroup("MainWindow");
         ini->setValue("ScreenshotFormatNr",ui->ScreenshotFormat->currentIndex());
+        ini->endGroup();
+
+        ini->beginGroup("Testarea");
+        ini->setValue("C64CyclesPerSecond",ui->cycles_per_second->value());
         ini->endGroup();
     }
 }
@@ -900,4 +910,19 @@ void SetupWindow::on_VicSprBgrCollisionEnable_toggled(bool checked)
 void SetupWindow::on_VicGreyDotsEnable_toggled(bool checked)
 {
     c64->SetVicConfig(VIC_GREY_DOTS_ON, checked);
+}
+
+void SetupWindow::on_default_pal_c64_clicked()
+{
+    ui->cycles_per_second->setValue(985248);
+}
+
+void SetupWindow::on_default_50hz_clicked()
+{
+    ui->cycles_per_second->setValue(982800);
+}
+
+void SetupWindow::on_cycles_per_second_valueChanged(int arg1)
+{
+    c64->SetC64Frequency(arg1);
 }
