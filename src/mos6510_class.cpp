@@ -733,7 +733,7 @@ bool MOS6510::OneZyklus(void)
                 idxReg = YR;
                 break;
         //R // TMPByte von Adresse holen // Fix Adresse Hi MCT+1 // AC or TMPByte //
-        case 37:
+        case 37:            
                 CHK_RDY
                 if((Adresse&0xFF) >= idxReg)
                 {
