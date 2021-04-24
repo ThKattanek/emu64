@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>411</width>
-    <height>361</height>
+    <width>432</width>
+    <height>392</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,7 +25,7 @@
      <x>5</x>
      <y>5</y>
      <width>421</width>
-     <height>351</height>
+     <height>381</height>
     </rect>
    </property>
    <property name="font">
@@ -34,7 +34,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>0</number>
    </property>
    <property name="documentMode">
     <bool>false</bool>
@@ -456,7 +456,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>20</y>
+        <y>30</y>
         <width>177</width>
         <height>21</height>
        </rect>
@@ -472,7 +472,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>40</y>
+        <y>50</y>
         <width>177</width>
         <height>21</height>
        </rect>
@@ -484,27 +484,11 @@
        <string>Texturgröße verdoppeln</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="WVsync">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>60</y>
-        <width>106</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Vertikal Sync</string>
-      </property>
-     </widget>
      <widget class="QCheckBox" name="WAspectRatio">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>80</y>
+        <y>70</y>
         <width>177</width>
         <height>21</height>
        </rect>
@@ -520,7 +504,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>100</y>
+        <y>90</y>
         <width>141</width>
         <height>21</height>
        </rect>
@@ -539,7 +523,7 @@
       <property name="geometry">
        <rect>
         <x>160</x>
-        <y>100</y>
+        <y>90</y>
         <width>42</width>
         <height>22</height>
        </rect>
@@ -558,7 +542,7 @@
       <property name="geometry">
        <rect>
         <x>210</x>
-        <y>100</y>
+        <y>90</y>
         <width>31</width>
         <height>20</height>
        </rect>
@@ -577,7 +561,7 @@
        <x>10</x>
        <y>180</y>
        <width>381</width>
-       <height>51</height>
+       <height>61</height>
       </rect>
      </property>
      <property name="font">
@@ -592,7 +576,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>20</y>
+        <y>30</y>
         <width>177</width>
         <height>21</height>
        </rect>
@@ -612,7 +596,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>270</y>
+       <y>290</y>
        <width>381</width>
        <height>51</height>
       </rect>
@@ -693,8 +677,8 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>240</y>
-       <width>121</width>
+       <y>260</y>
+       <width>151</width>
        <height>21</height>
       </rect>
      </property>
@@ -703,6 +687,22 @@
      </property>
      <property name="text">
       <string>Filter aktivieren</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="Vsync">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>260</y>
+       <width>141</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Vertikal Sync</string>
      </property>
     </widget>
    </widget>

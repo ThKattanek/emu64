@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.04.2020                //
+// Letzte Änderung am 24.04.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -689,6 +689,12 @@ int SDLThread(void *userdat)
             c64->LogText(">> SDLThread: InitGrafik Start.\n");
             c64->InitGrafik();
             c64->LogText(">> SDLThread: InitGrafik Ende.\n");
+        }
+
+        if(c64->changed_vsync)
+        {
+            c64->changed_vsync = false;
+            c64->ChangeVSync();
         }
 
         if(c64->changed_window_pos)
@@ -1732,10 +1738,25 @@ void C64Class::InitGrafik()
             LogText("\tInitGrafik: Textur konnte nicht erstellt werden.\n");
     }
 
+    // VSYNC
+    if(enable_vsync)
+        SDL_GL_SetSwapInterval(1);
+    else
+        SDL_GL_SetSwapInterval(0);
+
     /// VicRefresh wieder zulassen ///
     enable_hold_vic_refresh = false;
 
     LogText("\tInitGrafik: Vic-Refresh wurde wieder freigegeben.\n");
+}
+
+void C64Class::ChangeVSync()
+{
+    // VSYNC
+    if(enable_vsync)
+        SDL_GL_SetSwapInterval(1);
+    else
+        SDL_GL_SetSwapInterval(0);
 }
 
 void C64Class::ReleaseGrafik()
@@ -1910,6 +1931,12 @@ void C64Class::SetFocusToC64Window()
 void C64Class::SetWindowAspectRatio(bool enable)
 {
     enable_window_aspect_ratio = enable;
+}
+
+void C64Class::SetVSync(bool enable)
+{
+    enable_vsync = enable;
+    changed_vsync = true;
 }
 
 void C64Class::SetFullscreenAspectRatio(bool enable)

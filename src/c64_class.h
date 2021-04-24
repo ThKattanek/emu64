@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.04.2020                //
+// Letzte Änderung am 24.04.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -85,10 +85,12 @@ public:
     void SetFullscreen(bool is_fullscreen);
     void ToggleScreenMode();
     void InitGrafik();
+    void ChangeVSync();
     void ReleaseGrafik();
     void DrawC64Screen();
     void SetFocusToC64Window();
     void SetWindowAspectRatio(bool enable);
+    void SetVSync(bool enable);
     void SetFullscreenAspectRatio(bool enable);
     void AnalyzeSDLEvent(SDL_Event *event);
     void SetC64Frequency(int c64_frequency);
@@ -232,6 +234,8 @@ public:
     uint16_t        fullscreen_height;
     bool            enable_fullscreen;
     bool            changed_graphic_modi;
+    bool            enable_vsync;
+    bool            changed_vsync;
     bool            changed_window_pos;
     bool            changed_window_size;
     bool            enable_hold_vic_refresh;

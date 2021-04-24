@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.03.2021                //
+// Letzte Änderung am 24.04.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -291,6 +291,10 @@ void SetupWindow::LoadINI(C64Class *c64)
         ui->SidFilterEnable->setChecked(bvalue);
         on_SidFilterEnable_toggled(bvalue);
 
+        bvalue = ini->value("VSync",false).toBool();
+        ui->Vsync->setChecked(bvalue);
+        on_Vsync_clicked(bvalue);
+
         ini->endGroup();
 
         ini->beginGroup("VIC");
@@ -418,6 +422,8 @@ void SetupWindow::SaveINI()
         ini->setValue("6ChannelMode",ui->Sid6ChannelMode->isChecked());
         ini->setValue("CycleExact",ui->SidCycleExactEnable->isChecked());
         ini->setValue("Filter",ui->SidFilterEnable->isChecked());
+        ini->setValue("VSync",ui->Vsync->isCheckable());
+
         ini->endGroup();
 
         ini->beginGroup("VIC");
@@ -925,4 +931,9 @@ void SetupWindow::on_default_50hz_clicked()
 void SetupWindow::on_cycles_per_second_valueChanged(int arg1)
 {
     c64->SetC64Frequency(arg1);
+}
+
+void SetupWindow::on_Vsync_clicked(bool checked)
+{
+    c64->SetVSync(checked);
 }

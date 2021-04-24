@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.08.2019                //
+// Letzte Änderung am 24.04.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -77,22 +77,17 @@ private slots:
     void on_SelectRomSet_currentIndexChanged(const QString &arg1);
     void on_DeleteRomSet_clicked();
     void on_NewRomSet_clicked();
-
     void on_VicSpriteViewEnable_toggled(bool checked);
-
     void on_VicBorderViewEnable_toggled(bool checked);
-
     void on_VicSprSprCollisionEnable_toggled(bool checked);
-
     void on_VicSprBgrCollisionEnable_toggled(bool checked);
-
     void on_VicGreyDotsEnable_toggled(bool checked);
-
     void on_default_pal_c64_clicked();
-
     void on_default_50hz_clicked();
-
     void on_cycles_per_second_valueChanged(int arg1);
+
+
+    void on_Vsync_clicked(bool checked);
 
 private:
     void UpdateToolTips();
