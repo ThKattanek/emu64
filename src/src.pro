@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 05.11.2020                //
+# // Letzte Änderung am 28.04.2021                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -66,7 +66,7 @@ win32 {
 # Abhängigkeiten
 
 CONFIG += link_pkgconfig
-PKGCONFIG += sdl2 SDL2_image libpng glu libavutil libavformat libavcodec libswresample libswscale
+PKGCONFIG += sdl2 SDL2_image libpng glu libavutil libavformat libavcodec libswresample libswscale gl
 
 # Für Win32 / Libs ohne PKCONFIG angeben
 #LIBS += -lsdl2 -lsdl2main -lsdl2_image -lpng -lglu32 -lopengl32 -lavutil -lavformat -lavcodec -lswresample -lswscale
