@@ -291,10 +291,6 @@ void SetupWindow::LoadINI(C64Class *c64)
         ui->SidFilterEnable->setChecked(bvalue);
         on_SidFilterEnable_toggled(bvalue);
 
-        bvalue = ini->value("VSync",false).toBool();
-        ui->Vsync->setChecked(bvalue);
-        on_Vsync_clicked(bvalue);
-
         ini->endGroup();
 
         ini->beginGroup("VIC");
@@ -328,6 +324,10 @@ void SetupWindow::LoadINI(C64Class *c64)
         value1 = ini->value("FirstDisplayLineNTSC",30).toInt();
         value2 = ini->value("LastDisplayLineNTSC",288).toInt();
         c64->SetVicDisplaySizeNtsc(value1, value2);
+
+		bvalue = ini->value("VSync",false).toBool();
+		ui->Vsync->setChecked(bvalue);
+		on_Vsync_clicked(bvalue);
 
         ini->endGroup();
 
@@ -422,7 +422,6 @@ void SetupWindow::SaveINI()
         ini->setValue("6ChannelMode",ui->Sid6ChannelMode->isChecked());
         ini->setValue("CycleExact",ui->SidCycleExactEnable->isChecked());
         ini->setValue("Filter",ui->SidFilterEnable->isChecked());
-        ini->setValue("VSync",ui->Vsync->isCheckable());
 
         ini->endGroup();
 
@@ -437,6 +436,8 @@ void SetupWindow::SaveINI()
         ini->setValue("LastDisplayLinePAL",c64->GetVicLastDisplayLinePal());
         ini->setValue("FirstDisplayLineNTSC",c64->GetVicFirstDisplayLineNtsc());
         ini->setValue("LastDisplayLineNTSC",c64->GetVicLastDisplayLineNtsc());
+
+		ini->setValue("VSync",ui->Vsync->isChecked());
         ini->endGroup();
 
         ini->beginGroup("MainWindow");
