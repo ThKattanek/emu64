@@ -1464,8 +1464,8 @@ void C64Class::SetFullscreen(bool is_fullscreen)
         SDL_GetWindowSize(sdl_window, &size_w, &size_h);
         SDL_GetWindowPosition(sdl_window, &pos_x, &pos_y);
 
-        SDL_ShowCursor(false);
-        SDL_SetWindowFullscreen(sdl_window,SDL_WINDOW_FULLSCREEN_DESKTOP);
+		SDL_ShowCursor(false);
+		SDL_SetWindowFullscreen(sdl_window,SDL_WINDOW_FULLSCREEN_DESKTOP);
     }
     else
     {

@@ -911,7 +911,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>50,124542 FPS</string>
+       <string>50,125 FPS</string>
       </property>
      </widget>
     </widget>
