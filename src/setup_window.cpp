@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.04.2021                //
+// Letzte Änderung am 30.04.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -71,6 +71,21 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoCrtClass *vid
     }
 
     FillRomSetCombo();
+
+	// Fullscreen Video Displays and Modes
+	int num_displays = c64->GetNumDisplays();
+
+	ui->DisplayList->clear();
+
+	for(int i = 0; i < MAX_VIDEO_DISPLAYS; i++)
+		video_display_mode_index[i] = 0;
+
+	for(int i = 0; i < num_displays && i < MAX_VIDEO_DISPLAYS; i++)
+	{
+		ui->DisplayList->addItem(QString(c64->GetDisplayName(i)) + "  [" + QString::number(i,10) + "]");
+	}
+
+	is_filled_display_mode_list = false;
 }
 
 SetupWindow::~SetupWindow()
@@ -329,6 +344,17 @@ void SetupWindow::LoadINI(C64Class *c64)
 		ui->Vsync->setChecked(bvalue);
 		on_Vsync_clicked(bvalue);
 
+
+		char display_name[64];
+		for(int i=0; i<MAX_VIDEO_DISPLAYS; i++)
+		{
+			sprintf(display_name, "VideoDisplay_%d_FullscreenVideoMode",i);
+			video_display_mode_index[i] = ini->value(display_name,0).toInt();
+			c64->SetFullscreenDisplayMode(i,video_display_mode_index[i]);
+		}
+
+		ui->VideoModes->setCurrentIndex(video_display_mode_index[0]);
+
         ini->endGroup();
 
         ini->beginGroup("MainWindow");
@@ -438,6 +464,14 @@ void SetupWindow::SaveINI()
         ini->setValue("LastDisplayLineNTSC",c64->GetVicLastDisplayLineNtsc());
 
 		ini->setValue("VSync",ui->Vsync->isChecked());
+
+		char display_name[64];
+		for(int i=0; i<MAX_VIDEO_DISPLAYS; i++)
+		{
+			sprintf(display_name, "VideoDisplay_%d_FullscreenVideoMode",i);
+			ini->setValue(QString(display_name), video_display_mode_index[i]);
+		}
+
         ini->endGroup();
 
         ini->beginGroup("MainWindow");
@@ -937,4 +971,34 @@ void SetupWindow::on_cycles_per_second_valueChanged(int arg1)
 void SetupWindow::on_Vsync_clicked(bool checked)
 {
     c64->SetVSync(checked);
+}
+
+void SetupWindow::on_DisplayList_currentIndexChanged(int index)
+{
+	int num_video_modes = c64->GetNumDisplayModes(index);
+
+	int w, h, refresh_rate;
+	uint32_t format;
+
+	is_filled_display_mode_list = true;
+	ui->VideoModes->clear();
+	for(int i = 0; i < num_video_modes; i++)
+	{
+		c64->GetDisplayMode(index, i, w, h, refresh_rate, format);
+		ui->VideoModes->addItem(QString::number(w) + " x " + QString::number(h) + " " + QString::number(SDL_BITSPERPIXEL(format)) + "-Bits" + " " + QString::number(refresh_rate) + " Hz");
+	}
+	is_filled_display_mode_list = false;
+
+	ui->VideoModes->setCurrentIndex(video_display_mode_index[index]);
+}
+
+void SetupWindow::on_VideoModes_currentIndexChanged(int index)
+{
+	if(c64 != nullptr)
+	{
+		c64->SetFullscreenDisplayMode(ui->DisplayList->currentIndex(),index);
+
+		if(!is_filled_display_mode_list)
+			video_display_mode_index[ui->DisplayList->currentIndex()] = index;
+	}
 }

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.04.2021                //
+// Letzte Änderung am 30.04.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -53,6 +53,8 @@
 #define SCREEN_RATIO_4_3 1.34f        // Screenratio 4:3 (1,33333)
 #define SCREEN_RATIO_5_4 1.25f        // Screenratio 5:4 (1,25)
 #define SCREEN_RATIO_16_9 1.777f      // Screenratio 16:9 (1,777)
+
+#define MAX_VIDEO_DISPLAYS 8				  // Anzahl der Maximal unterstützen Video Displays
 
 enum SCREENSHOT_FORMATS {SCREENSHOT_FORMAT_BMP, SCREENSHOT_FORMAT_PNG, SCREENSHOT_FORMATS_COUNT};
 
@@ -102,6 +104,11 @@ public:
     void SetWindowPos(int x, int y);
     void GetWindowSize(int *x, int *y);
     void SetWindowSize(int w, int h);
+	int GetNumDisplays();
+	const char* GetDisplayName(int display_index);
+	int GetNumDisplayModes(int display_index);
+	int GetDisplayMode(int display_index, int mode_index, int &w, int &h, int &refresh_rate, uint32_t &format);
+	void SetFullscreenDisplayMode(int display_index, int mode_index);
 
     bool LoadTapeImage(const char *filename);
     bool RecordTapeImage(const char *filename);
@@ -248,6 +255,8 @@ public:
     SDL_Window      *sdl_window;
     SDL_Surface     *sdl_window_icon;
     SDL_GLContext   gl_context;
+
+	SDL_DisplayMode fullscreen_display_mode[MAX_VIDEO_DISPLAYS];
 
     int             sdl_window_pos_x;
     int             sdl_window_pos_y;

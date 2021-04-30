@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.04.2021                //
+// Letzte Änderung am 30.04.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -85,9 +85,9 @@ private slots:
     void on_default_pal_c64_clicked();
     void on_default_50hz_clicked();
     void on_cycles_per_second_valueChanged(int arg1);
-
-
     void on_Vsync_clicked(bool checked);
+	void on_DisplayList_currentIndexChanged(int index);
+	void on_VideoModes_currentIndexChanged(int index);
 
 private:
     void UpdateToolTips();
@@ -95,8 +95,10 @@ private:
     QStringList GetAllRomsetNames(const QString *romset_dir);
     bool RemoveDir(const QString & dirName);
 
-    Ui::SetupWindow *ui;
+	int video_display_mode_index[MAX_VIDEO_DISPLAYS];
+	bool is_filled_display_mode_list;
 
+    Ui::SetupWindow *ui;
     QString *romsetPath;
     QString *dataPath;
     VideoCrtClass *video_crt_output;

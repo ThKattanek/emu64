@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.04.2021                //
+// Letzte Änderung am 30.04.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1456,21 +1456,34 @@ void C64Class::SetSDLWindowName(const char *name)
 void C64Class::SetFullscreen(bool is_fullscreen)
 {
     static int size_w, size_h, pos_x, pos_y;
+	static SDL_DisplayMode window_display_mode;
 
-    enable_fullscreen = is_fullscreen;
+	if(is_fullscreen)
+	{
+		if(0 == SDL_GetCurrentDisplayMode(0, &window_display_mode))
+		{
+			enable_fullscreen = is_fullscreen;
+		}
+		else return;
+	}
 
     if(is_fullscreen)
     {
         SDL_GetWindowSize(sdl_window, &size_w, &size_h);
         SDL_GetWindowPosition(sdl_window, &pos_x, &pos_y);
-
 		SDL_ShowCursor(false);
-		SDL_SetWindowFullscreen(sdl_window,SDL_WINDOW_FULLSCREEN_DESKTOP);
+
+		int current_video_display = SDL_GetWindowDisplayIndex(sdl_window);
+		if(current_video_display >= MAX_VIDEO_DISPLAYS)
+			current_video_display = 0;
+
+		SDL_SetWindowDisplayMode(sdl_window, &fullscreen_display_mode[current_video_display]);
+		SDL_SetWindowFullscreen(sdl_window,SDL_WINDOW_FULLSCREEN);
     }
     else
     {
         SDL_ShowCursor(true);
-        SDL_SetWindowFullscreen(sdl_window,0);
+		SDL_SetWindowFullscreen(sdl_window,0);
 
         sdl_window_pos_x = pos_x;
         sdl_window_pos_y = pos_y;
@@ -2493,7 +2506,58 @@ void C64Class::SetWindowSize(int w, int h)
 {
     sdl_window_size_width = w;
     sdl_window_size_height = h;
-    changed_window_size = true;
+	changed_window_size = true;
+}
+
+int C64Class::GetNumDisplays()
+{
+	return SDL_GetNumVideoDisplays();
+}
+
+const char *C64Class::GetDisplayName(int display_index)
+{
+	return SDL_GetDisplayName(display_index);
+}
+
+int C64Class::GetNumDisplayModes(int display_index)
+{
+	return SDL_GetNumDisplayModes(display_index);
+}
+
+int C64Class::GetDisplayMode(int display_index, int mode_index, int &w, int &h, int &refresh_rate, uint32_t &format)
+{
+	SDL_DisplayMode display_mode = { SDL_PIXELFORMAT_UNKNOWN, 0, 0, 0, 0 };
+
+	if(0 == SDL_GetDisplayMode(display_index, mode_index, &display_mode))
+	{
+		w = display_mode.w;
+		h = display_mode.h;
+		refresh_rate = display_mode.refresh_rate;
+		format = display_mode.format;
+	}
+	else
+	{
+		w = 0;
+		h = 0;
+		refresh_rate = 0;
+		format = 0;
+	}
+	return 0;
+}
+
+void C64Class::SetFullscreenDisplayMode(int display_index, int mode_index)
+{
+	if(display_index >= MAX_VIDEO_DISPLAYS || mode_index < 0)
+		return;
+
+	SDL_DisplayMode display_mode;
+
+	if(0 == SDL_GetDisplayMode(display_index, mode_index, &display_mode))
+	{
+		fullscreen_display_mode[display_index] = display_mode;
+	}
+
+	//cout << "SetDisplayMode: " << display_index << ";" << mode_index << endl;
 }
 
 bool C64Class::LoadTapeImage(const char *filename)
