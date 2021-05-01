@@ -111,11 +111,11 @@ void SetupWindow::LoadINI(C64Class *c64)
         char group_name[32];
         ui->VJoySlots->setRowCount(MAX_VJOY_NUM);
         ui->VJoySlots->setColumnCount(5);
-        ui->VJoySlots->setColumnWidth(0,125);
-        ui->VJoySlots->setColumnWidth(1,45);
-        ui->VJoySlots->setColumnWidth(2,45);
-        ui->VJoySlots->setColumnWidth(3,54);
-        ui->VJoySlots->setColumnWidth(4,59);
+		ui->VJoySlots->setColumnWidth(0,130);
+		ui->VJoySlots->setColumnWidth(1,50);
+		ui->VJoySlots->setColumnWidth(2,50);
+		ui->VJoySlots->setColumnWidth(3,90);
+		ui->VJoySlots->setColumnWidth(4,90);
 
         QStringList header_label;
         //header_label << tr("Bezeichnung") << "Port 1" << "Port 2" << "" << "";
