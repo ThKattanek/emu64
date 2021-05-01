@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 30.04.2021                //
+// Letzte Änderung am 01.05.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -193,18 +193,18 @@ void SetupWindow::LoadINI(C64Class *c64)
         value = ini->value("NoPALColorMode",7).toInt();
         ui->C64Farbmodus->setCurrentIndex(value);
 
-        bvalue = ini->value("WindowPalMode",0).toBool();
+		bvalue = ini->value("WindowPalMode",1).toBool();
         ui->WPal->setChecked(bvalue);
         video_crt_output->start_c64_is_palmode = bvalue;
 
-        bvalue = ini->value("WindowDoubleSizeMode",0).toBool();
+		bvalue = ini->value("WindowDoubleSizeMode",1).toBool();
         ui->WDouble->setChecked(bvalue);
         video_crt_output->start_c64_is_doublesize = bvalue;
 
-        bvalue = ini->value("WindowFilter",0).toBool();
+		bvalue = ini->value("WindowFilter",1).toBool();
         ui->WFilter->setChecked(bvalue);
 
-        bvalue = ini->value("WindowAspectRatio",0).toBool();
+		bvalue = ini->value("WindowAspectRatio",0).toBool();
         ui->WAspectRatio->setChecked(bvalue);
         c64->SetWindowAspectRatio(bvalue);
 
@@ -222,7 +222,7 @@ void SetupWindow::LoadINI(C64Class *c64)
         ui->MausPort->setCurrentIndex(value);
         c64->SetMouse1351Port(value);
 
-        bvalue = ini->value("AutoMouseHide",false).toBool();
+		bvalue = ini->value("AutoMouseHide",true).toBool();
         value = ini->value("AutoMouseHideTime",3).toInt();
 
         if(!bvalue)

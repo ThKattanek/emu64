@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 28.09.2019                //
+// Letzte Änderung am 01.05.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -44,11 +44,11 @@ VideoCrtSetupWindow::VideoCrtSetupWindow(QWidget *parent, C64Class *c64, VideoCr
         ini->beginGroup("TVSetupWindow");
         if(ini->contains("Geometry")) setGeometry(ini->value("Geometry").toRect());
 
-        value = ini->value("Saettigung",75).toInt();
+		value = ini->value("Saettigung",50).toInt();
         if(ui->saettigung_scroll->value() == value) on_saettigung_scroll_valueChanged(value);
         ui->saettigung_scroll->setValue(value);
 
-        value = ini->value("Helligkeit",40).toInt();
+		value = ini->value("Helligkeit",50).toInt();
         if(ui->helligkeit_scroll->value() == value) on_helligkeit_scroll_valueChanged(value);
         ui->helligkeit_scroll->setValue(value);
 
@@ -60,11 +60,11 @@ VideoCrtSetupWindow::VideoCrtSetupWindow(QWidget *parent, C64Class *c64, VideoCr
         if(ui->horblurY_scroll->value() == value) on_horblurY_scroll_valueChanged(value);
         ui->horblurY_scroll->setValue(value);
 
-        value = ini->value("HorBlurUV",4).toInt();
+		value = ini->value("HorBlurUV",3).toInt();
         if(ui->horblurUV_scroll->value() == value) on_horblurUV_scroll_valueChanged(value);
         ui->horblurUV_scroll->setValue(value);
 
-        value = ini->value("PhaseLineOffset",840).toInt();
+		value = ini->value("PhaseLineOffset",1000).toInt();
         if(ui->phase_scroll->value() == value) on_phase_scroll_valueChanged(value);
         ui->phase_scroll->setValue(value);
 
@@ -192,7 +192,7 @@ void VideoCrtSetupWindow::on_Reset_clicked()
     ui->horblurY_scroll->setValue(2);
     ui->horblurUV_scroll->setValue(3);
     ui->phase_scroll->setValue(1000);
-    ui->scanline_scroll->setValue(60);
+	ui->scanline_scroll->setValue(75);
     ui->distortion_scroll->setValue(100);
     ui->FirstVicRevision->setChecked(false);
 }
