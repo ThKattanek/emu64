@@ -13,11 +13,6 @@
     <height>275</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <pointsize>8</pointsize>
-   </font>
-  </property>
   <property name="mouseTracking">
    <bool>false</bool>
   </property>
@@ -60,11 +55,6 @@ background-position: center
    <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QTableWidget" name="FloppyTabel">
@@ -102,13 +92,6 @@ background-position: center
      <width>0</width>
      <height>0</height>
     </size>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
    </property>
    <property name="autoFillBackground">
     <bool>false</bool>
@@ -163,15 +146,8 @@ background-position: center
      <x>0</x>
      <y>0</y>
      <width>519</width>
-     <height>23</height>
+     <height>27</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
    </property>
    <property name="toolTip">
     <string/>
@@ -186,13 +162,6 @@ background-position: center
     <bool>false</bool>
    </property>
    <widget class="QMenu" name="menu_main_help">
-    <property name="font">
-     <font>
-      <family>Arial</family>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
     <property name="title">
      <string>Hilfe</string>
     </property>
@@ -284,13 +253,6 @@ background-position: center
     <addaction name="actionFenster_Optionen"/>
    </widget>
    <widget class="QMenu" name="menuSprache">
-    <property name="font">
-     <font>
-      <family>Arial</family>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
     <property name="title">
      <string>Sprache</string>
     </property>
@@ -329,13 +291,6 @@ background-position: center
    <property name="statusTip">
     <string>Infos zur aktuellen Emu64 Version.</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
    </property>
@@ -356,13 +311,6 @@ background-position: center
    </property>
    <property name="statusTip">
     <string>Hier können Sie C64 Diskimages auswählen oder bearbeiten. [D64,G64,ZIP]</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
    </property>
    <property name="shortcut">
     <string notr="true">Alt+D</string>
@@ -391,13 +339,6 @@ background-position: center
    <property name="statusTip">
     <string>Alle Funktionen der Datasette 1530. [TAP,WAV]</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="shortcut">
     <string notr="true">Alt+K</string>
    </property>
@@ -422,13 +363,6 @@ background-position: center
    <property name="statusTip">
     <string>Hier können Sie ein Steckmodul in den Emu64 einsetzen. [CRT]</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="shortcut">
     <string notr="true">Alt+M</string>
    </property>
@@ -445,13 +379,6 @@ background-position: center
    </property>
    <property name="statusTip">
     <string>Die schnellste möglichkeit ein C64 Programm zu laden und zu starten. [PRG,T64,P00,FRZ,D64,G64]</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
    </property>
    <property name="shortcut">
     <string notr="true">Alt+R</string>
@@ -476,13 +403,6 @@ background-position: center
    <property name="statusTip">
     <string>Hier wird das Programm direkt in den Speicher geladen ohne C64 Laderoutiene. [PRG,T64,P00,FRZ]</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="shortcut">
     <string notr="true">Alt+L</string>
    </property>
@@ -504,13 +424,6 @@ background-position: center
    <property name="statusTip">
     <string>Führt ein Softreset des C64 durch. Das C64 RAM wird dabei nicht gelöscht.</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="shortcut">
     <string notr="true">F12</string>
    </property>
@@ -531,13 +444,6 @@ background-position: center
    </property>
    <property name="statusTip">
     <string>Führt ein Hardreset des C64 durch. Das C64 RAM wird dabei gelöscht. Es gleicht dem Ein- und Auschalten des C64.</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
    </property>
    <property name="shortcut">
     <string notr="true">Shift+F12</string>
@@ -566,13 +472,6 @@ background-position: center
    <property name="statusTip">
     <string>Beendet den Emu64.</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="shortcut">
     <string notr="true">Alt+X</string>
    </property>
@@ -589,13 +488,6 @@ background-position: center
    </property>
    <property name="statusTip">
     <string>Den aktuellen Zustand des C64 speichern, um zu einem späteren Zeitpunkt wieder zu laden.</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
    </property>
    <property name="shortcut">
     <string notr="true"/>
@@ -618,13 +510,6 @@ background-position: center
    <property name="statusTip">
     <string>Erzeugt ein Bildschirmfoto vom C64 Bildschirm.</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="shortcut">
     <string>F11</string>
    </property>
@@ -642,14 +527,6 @@ background-position: center
    <property name="statusTip">
     <string>Zeichnen Sie alle SID (Sound Interface Device) Signale auf um sie später mit dem  mitgelieferten SID Player abzuspielen.</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>9</pointsize>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
    </property>
@@ -663,13 +540,6 @@ background-position: center
    </property>
    <property name="statusTip">
     <string>Schaltet in den SID Player Modus. Damit wird der Emu64 zu einem vollwertigen SID Player.</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
@@ -689,13 +559,6 @@ background-position: center
    <property name="statusTip">
     <string>Sehr Komfortabler Debugger und Disassembler.</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
    </property>
@@ -714,13 +577,6 @@ background-position: center
    <property name="statusTip">
     <string>Hier können Sie die C64 Geschwindigkeit sufenlos von 5% bis 500% einstellen.</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
    </property>
@@ -734,13 +590,6 @@ background-position: center
    </property>
    <property name="statusTip">
     <string>Integrierter 2Pass Assembler der an TurboAss angelehnt ist.</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
@@ -756,13 +605,6 @@ background-position: center
    <property name="statusTip">
     <string>Hiermit kann man Programme vom PC zum C64 übertragen.</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
    </property>
@@ -776,13 +618,6 @@ background-position: center
    </property>
    <property name="statusTip">
     <string>Eine Virtuelle C64 Tastatur, diese zeigt auch alle C64 Symbole.</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
@@ -798,13 +633,6 @@ background-position: center
    <property name="statusTip">
     <string>Mit diesem Tool können sie die den Ton und das Videobild aufnehmen.</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
    </property>
@@ -818,13 +646,6 @@ background-position: center
    </property>
    <property name="statusTip">
     <string>Hier stellen sie den Emu64 nach ihren wünschen ein.</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
@@ -843,13 +664,6 @@ background-position: center
    <property name="statusTip">
     <string>Hiermit kann man das Aussehen der Videoausgabe verändern. Z.B.: Sättigung, Helligkeit und Kontrast.</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
    </property>
@@ -863,13 +677,6 @@ background-position: center
    </property>
    <property name="statusTip">
     <string>Emu64 wird im Vollbild ausgeführt.</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
    </property>
    <property name="shortcut">
     <string notr="true">Alt+Return</string>
@@ -888,13 +695,6 @@ background-position: center
    <property name="statusTip">
     <string>Hiermit können Sie die komplette Tastaturbelegung(C64) ändern.</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
    </property>
@@ -909,13 +709,6 @@ background-position: center
    <property name="statusTip">
     <string>Hiermit wird die Tastaturbelegung auf Standardwerte zurück gesetzt.</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
    </property>
@@ -929,13 +722,6 @@ background-position: center
    </property>
    <property name="statusTip">
     <string>Funktionen die die Emu64 Fenster beeinflussen.</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
@@ -955,13 +741,6 @@ background-position: center
    <property name="statusTip">
     <string>Öffnet das Emu64 Handbuch.</string>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
    </property>
@@ -975,13 +754,6 @@ background-position: center
    </property>
    <property name="statusTip">
     <string>Über dieses Tool ist es möglich auf alle Spiele die es in der GameBase64 gibt zuzugreifen.</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
