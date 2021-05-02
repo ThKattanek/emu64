@@ -42,7 +42,6 @@ VideoCrtSetupWindow::VideoCrtSetupWindow(QWidget *parent, C64Class *c64, VideoCr
         bool bvalue;
 
         ini->beginGroup("TVSetupWindow");
-        if(ini->contains("Geometry")) setGeometry(ini->value("Geometry").toRect());
 
 		value = ini->value("Saettigung",50).toInt();
         if(ui->saettigung_scroll->value() == value) on_saettigung_scroll_valueChanged(value);
@@ -95,7 +94,6 @@ VideoCrtSetupWindow::~VideoCrtSetupWindow()
     if(ini != nullptr)
     {
         ini->beginGroup("TVSetupWindow");
-        if(isOneShowed) ini->setValue("Geometry",geometry());
         ini->setValue("Saettigung",ui->saettigung_scroll->value());
         ini->setValue("Helligkeit",ui->helligkeit_scroll->value());
         ini->setValue("Kontrast",ui->kontrast_scroll->value());
