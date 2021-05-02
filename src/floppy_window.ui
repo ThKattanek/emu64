@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>692</width>
+    <width>727</width>
     <height>424</height>
    </rect>
   </property>
@@ -166,6 +166,7 @@
           <widget class="QLabel" name="DiskName">
            <property name="font">
             <font>
+             <family>Noto Sans</family>
              <weight>75</weight>
              <bold>true</bold>
             </font>
@@ -211,7 +212,7 @@
        <item>
         <widget class="QTableWidget" name="D64FileTable">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -265,6 +266,9 @@
          <property name="showGrid">
           <bool>false</bool>
          </property>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>20</number>
+         </attribute>
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
          </attribute>

@@ -569,16 +569,16 @@ void FloppyWindow::SetD64BigSize(bool enable)
         yellow_led = yellow_led_big;
         red_led = red_led_big;
 
-        ui->D64FileTable->setMinimumWidth(395 * 2);
-        ui->D64FileTable->setMaximumWidth(395 * 2);
+		ui->D64FileTable->setMinimumWidth(395 * 2);
+		ui->D64FileTable->setMaximumWidth(395 * 2);
 
-        ui->D64FileTable->setColumnWidth(0,20 * 2);
-        ui->D64FileTable->setColumnWidth(1,145 * 2);
-        ui->D64FileTable->setColumnWidth(2,30 * 2);
-        ui->D64FileTable->setColumnWidth(3,30 * 2);
-        ui->D64FileTable->setColumnWidth(4,55 * 2);
-        ui->D64FileTable->setColumnWidth(5,45 * 2);
-        ui->D64FileTable->setColumnWidth(6,45 * 2);
+		ui->D64FileTable->setColumnWidth(0,20 * 2);
+		ui->D64FileTable->setColumnWidth(1,145 * 2);
+		ui->D64FileTable->setColumnWidth(2,30 * 2);
+		ui->D64FileTable->setColumnWidth(3,30 * 2);
+		ui->D64FileTable->setColumnWidth(4,55 * 2);
+		ui->D64FileTable->setColumnWidth(5,45 * 2);
+		ui->D64FileTable->setColumnWidth(6,45 * 2);
     }
     else
     {
@@ -588,16 +588,16 @@ void FloppyWindow::SetD64BigSize(bool enable)
         yellow_led = yellow_led_small;
         red_led = red_led_small;
 
-        ui->D64FileTable->setMinimumWidth(395);
-        ui->D64FileTable->setMaximumWidth(395);
+		ui->D64FileTable->setMinimumWidth(395);
+		ui->D64FileTable->setMaximumWidth(395);
 
-        ui->D64FileTable->setColumnWidth(0,20);
-        ui->D64FileTable->setColumnWidth(1,145);
-        ui->D64FileTable->setColumnWidth(2,30);
-        ui->D64FileTable->setColumnWidth(3,30);
-        ui->D64FileTable->setColumnWidth(4,55);
-        ui->D64FileTable->setColumnWidth(5,45);
-        ui->D64FileTable->setColumnWidth(6,45);
+		ui->D64FileTable->setColumnWidth(0,20);
+		ui->D64FileTable->setColumnWidth(1,145);
+		ui->D64FileTable->setColumnWidth(2,30);
+		ui->D64FileTable->setColumnWidth(3,30);
+		ui->D64FileTable->setColumnWidth(4,55);
+		ui->D64FileTable->setColumnWidth(5,45);
+		ui->D64FileTable->setColumnWidth(6,45);
     }
 }
 
