@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>519</width>
-    <height>275</height>
+    <width>538</width>
+    <height>253</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -79,6 +79,9 @@ background-position: center
       <attribute name="verticalHeaderVisible">
        <bool>false</bool>
       </attribute>
+      <attribute name="verticalHeaderMinimumSectionSize">
+       <number>10</number>
+      </attribute>
       <attribute name="verticalHeaderHighlightSections">
        <bool>false</bool>
       </attribute>
@@ -145,7 +148,7 @@ background-position: center
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>519</width>
+     <width>538</width>
      <height>27</height>
     </rect>
    </property>
