@@ -985,7 +985,7 @@ void SetupWindow::on_DisplayList_currentIndexChanged(int index)
 	for(int i = 0; i < num_video_modes; i++)
 	{
 		c64->GetDisplayMode(index, i, w, h, refresh_rate, format);
-		ui->VideoModes->addItem(QString::number(w) + " x " + QString::number(h) + " " + QString::number(SDL_BITSPERPIXEL(format)) + "-Bits" + " " + QString::number(refresh_rate) + " Hz");
+		ui->VideoModes->addItem(QString::number(w) + " x " + QString::number(h) + " " + QString::number(SDL_BITSPERPIXEL(format)) + "-Bits" + " " + QString::number(refresh_rate) + "Hz");
 	}
 	is_filled_display_mode_list = false;
 
