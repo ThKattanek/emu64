@@ -1002,3 +1002,22 @@ void SetupWindow::on_VideoModes_currentIndexChanged(int index)
 			video_display_mode_index[ui->DisplayList->currentIndex()] = index;
 	}
 }
+
+void SetupWindow::on_SettingUserPalette_clicked()
+{
+	UserPaletteWindow *user_palette_window = new UserPaletteWindow(this);
+	if(user_palette_window != nullptr)
+	{
+		if(user_palette_window->exec())
+		{
+			// OK
+			qDebug() << "OK";
+		}
+		else
+		{
+			// Cancel
+			qDebug() << "Cancel";
+		}
+		delete user_palette_window;
+	}
+}

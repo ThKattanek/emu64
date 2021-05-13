@@ -29,6 +29,7 @@
 #include "video_crt_class.h"
 #include "c64_class.h"
 #include "new_romset_window.h"
+#include "user_palette_window.h"
 
 namespace Ui {
     class SetupWindow;
@@ -88,6 +89,8 @@ private slots:
     void on_Vsync_clicked(bool checked);
 	void on_DisplayList_currentIndexChanged(int index);
 	void on_VideoModes_currentIndexChanged(int index);
+
+	void on_SettingUserPalette_clicked();
 
 private:
     void UpdateToolTips();

@@ -321,13 +321,19 @@ DISTFILES += \
     ../crossbuild-win-releases.sh
 
 FORMS += \
+    color_button.ui \
     oscilloscope_widget.ui \
-    oscilloscope_window.ui
+    oscilloscope_window.ui \
+    user_palette_window.ui
 
 HEADERS += \
+    color_button.h \
     oscilloscope_widget.h \
-    oscilloscope_window.h
+    oscilloscope_window.h \
+    user_palette_window.h
 
 SOURCES += \
+    color_button.cpp \
     oscilloscope_widget.cpp \
-    oscilloscope_window.cpp
+    oscilloscope_window.cpp \
+    user_palette_window.cpp

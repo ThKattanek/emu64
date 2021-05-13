@@ -15,6 +15,13 @@ public:
 	explicit UserPaletteWindow(QWidget *parent = nullptr);
 	~UserPaletteWindow();
 
+private slots:
+	void on_red_slider_valueChanged(int value);
+
+	void on_green_slider_valueChanged(int value);
+
+	void on_blue_slider_valueChanged(int value);
+
 private:
 	Ui::UserPaletteWindow *ui;
 };
