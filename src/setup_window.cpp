@@ -1005,13 +1005,48 @@ void SetupWindow::on_VideoModes_currentIndexChanged(int index)
 
 void SetupWindow::on_SettingUserPalette_clicked()
 {
+	// Colodore Palette als Default
+	uint8_t default_palette[4 * 16] = {0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0x00, 0x81, 0x33, 0x38, 0x00, 0x75, 0xce, 0xc8, 0x00, 0x8e, 0x3c, 0x97, 0x00,
+	0x56, 0xac, 0x4d, 0x00, 0x2e, 0x2c, 0x9b, 0x00, 0xed, 0xf1, 0x71, 0x00, 0x8e, 0x50, 0x29, 0x00, 0x55, 0x38, 0x00, 0x00,
+	0xc4, 0x6c, 0x71, 0x00, 0x4a, 0x4a, 0x4a, 0x00, 0x7b, 0x7b, 0x7b, 0x00, 0x9a, 0xff, 0x9f, 0x00, 0x70, 0x6d, 0xeb, 0x00,
+	0xb2, 0xb2, 0xb2, 0x00};
+
 	UserPaletteWindow *user_palette_window = new UserPaletteWindow(this);
+
+
+	char key_name[32];
+	QColor default_color = Qt::white;
+
+	ini->beginGroup("C64UserPalette");
+	for(int i=0; i<16; i++)
+	{
+		sprintf(key_name, "Color_%2.2d", i);
+
+		default_color.setRed(default_palette[i*4+0]);
+		default_color.setGreen(default_palette[i*4+1]);
+		default_color.setBlue(default_palette[i*4+2]);
+
+		QColor color = ini->value(key_name, default_color.rgba()).toUInt();
+		user_palette_window->SetColor(i,color);
+	}
+	ini->endGroup();
+
 	if(user_palette_window != nullptr)
 	{
 		if(user_palette_window->exec())
 		{
 			// OK
 			qDebug() << "OK";
+
+			ini->beginGroup("C64UserPalette");
+			for(int i=0; i<16; i++)
+			{
+				sprintf(key_name, "Color_%2.2d", i);
+
+				QColor color = user_palette_window->GetColor(i);
+				ini->setValue(key_name, color.rgba());
+			}
+			ini->endGroup();
 		}
 		else
 		{
