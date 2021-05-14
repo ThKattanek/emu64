@@ -33,6 +33,8 @@ private slots:
 private:
 	Ui::UserPaletteWindow *ui;
 	ColorButton *color_buttons[16];
+
+	int current_select_color;
 };
 
 #endif // USER_PALETTE_WINDOW_H

@@ -7,18 +7,6 @@ UserPaletteWindow::UserPaletteWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	on_red_slider_valueChanged(0);
-	on_blue_slider_valueChanged(0);
-	on_green_slider_valueChanged(0);
-
-	ui->red_slider->setMaximum(255);
-	ui->green_slider->setMaximum(255);
-	ui->blue_slider->setMaximum(255);
-
-	ui->red_out->setMaximum(255);
-	ui->green_out->setMaximum(255);
-	ui->blue_out->setMaximum(255);
-
 	color_buttons[0] = ui->color_button_0;
 	color_buttons[1] = ui->color_button_1;
 	color_buttons[2] = ui->color_button_2;
@@ -36,10 +24,25 @@ UserPaletteWindow::UserPaletteWindow(QWidget *parent) :
 	color_buttons[14] = ui->color_button_14;
 	color_buttons[15] = ui->color_button_15;
 
+	on_red_slider_valueChanged(0);
+	on_blue_slider_valueChanged(0);
+	on_green_slider_valueChanged(0);
+
+	ui->red_slider->setMaximum(255);
+	ui->green_slider->setMaximum(255);
+	ui->blue_slider->setMaximum(255);
+
+	ui->red_out->setMaximum(255);
+	ui->green_out->setMaximum(255);
+	ui->blue_out->setMaximum(255);
+
 	for(int i=0; i<16; i++)
 	{
 		color_buttons[i]->SetColorNumber(i);
 	}
+
+	current_select_color = 3;
+	color_buttons[current_select_color]->Select();
 }
 
 UserPaletteWindow::~UserPaletteWindow()
@@ -52,6 +55,12 @@ void UserPaletteWindow::SetColor(int color_number, QColor color)
 	if(color_number >= 0 && color_number < 16)
 	{
 		color_buttons[color_number]->SetColor(color);
+		if(color_number == current_select_color)
+		{
+			on_red_slider_valueChanged(color.red());
+			on_green_slider_valueChanged(color.green());
+			on_blue_slider_valueChanged(color.blue());
+		}
 	}
 }
 
@@ -68,16 +77,31 @@ QColor UserPaletteWindow::GetColor(int color_number)
 void UserPaletteWindow::on_red_slider_valueChanged(int value)
 {
 	ui->red_out->setValue(value);
+
+	QColor color = color_buttons[current_select_color]->GetColor();
+	color.setRed(value);
+	color_buttons[current_select_color]->SetColor(color);
+	color_buttons[current_select_color]->update();
 }
 
 void UserPaletteWindow::on_green_slider_valueChanged(int value)
 {
 	ui->green_out->setValue(value);
+
+	QColor color = color_buttons[current_select_color]->GetColor();
+	color.setGreen(value);
+	color_buttons[current_select_color]->SetColor(color);
+	color_buttons[current_select_color]->update();
 }
 
 void UserPaletteWindow::on_blue_slider_valueChanged(int value)
 {
 	ui->blue_out->setValue(value);
+
+	QColor color = color_buttons[current_select_color]->GetColor();
+	color.setBlue(value);
+	color_buttons[current_select_color]->SetColor(color);
+	color_buttons[current_select_color]->update();
 }
 
 void UserPaletteWindow::on_red_out_valueChanged(int arg1)
