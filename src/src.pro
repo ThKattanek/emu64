@@ -162,6 +162,7 @@ HEADERS += \
     am29f040_class.h \
     button_mod.h \
     c64_class.h \
+    c64_colors.h \
     c64_keyboard_window.h \
     c64_speed_window.h \
     command_line_class.h \
