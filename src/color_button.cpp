@@ -14,6 +14,8 @@ ColorButton::ColorButton(QWidget *parent) :
 	this->setMinimumHeight(50);
 
 	color_number = 0;
+
+	is_selected = false;
 }
 
 void ColorButton::paintEvent(QPaintEvent *event)
@@ -23,11 +25,27 @@ void ColorButton::paintEvent(QPaintEvent *event)
 
 	p.setRenderHint(QPainter::Antialiasing);
 
-	p.drawRoundedRect(0,0,this->width()-1, this->height()-1, 10, 10);
+	QPen pen;
+
+	if(is_selected)
+	{
+		pen.setColor(Qt::red);
+		pen.setWidth(2);
+	}
+	else
+	{
+		pen.setColor(Qt::black);
+		pen.setWidth(1);
+	}
+
+	p.setPen(pen);
+
+	p.drawRoundedRect(1,1,this->width()-2, this->height()-2, 10, 10);
 
 	QPainterPath path;
 	path.addRoundedRect(QRect(5,5,this->width()-11, this->height()-11),5,5);
-	QPen pen(color, 1);
+	pen.setColor(color);
+	pen.setWidth(1);
 	p.setPen(pen);
 	p.fillPath(path, color);
 	p.drawPath(path);
@@ -65,4 +83,14 @@ QColor ColorButton::GetColor()
 void ColorButton::SetColorNumber(int color_number)
 {
 	this->color_number = color_number;
+}
+
+void ColorButton::Select()
+{
+	is_selected = true;
+}
+
+void ColorButton::DisSelect()
+{
+	is_selected = false;
 }

@@ -21,11 +21,16 @@ public:
 
 	void SetColorNumber(int color_number);
 
+	void Select();
+	void DisSelect();
+
 private:
 	Ui::ColorButton *ui;
 
 	QColor color;
 	int color_number;
+
+	bool is_selected;
 };
 
 #endif // COLOR_BUTTON_H
