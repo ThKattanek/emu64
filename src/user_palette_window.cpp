@@ -44,7 +44,7 @@ UserPaletteWindow::UserPaletteWindow(QWidget *parent) :
 		connect(color_buttons[i], SIGNAL(Clicked(int)), this, SLOT(ColorButtonClicked(int)));
 	}
 
-	current_select_color = 3;
+	current_select_color = 0;
 	color_buttons[current_select_color]->Select();
 }
 
