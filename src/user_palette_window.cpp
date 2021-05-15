@@ -1,6 +1,8 @@
 #include "user_palette_window.h"
 #include "ui_user_palette_window.h"
 
+#include <QDebug>
+
 UserPaletteWindow::UserPaletteWindow(QWidget *parent) :
 	QDialog(parent),
 	ui(new Ui::UserPaletteWindow)
@@ -39,6 +41,7 @@ UserPaletteWindow::UserPaletteWindow(QWidget *parent) :
 	for(int i=0; i<16; i++)
 	{
 		color_buttons[i]->SetColorNumber(i);
+		connect(color_buttons[i], SIGNAL(Clicked(int)), this, SLOT(ColorButtonClicked(int)));
 	}
 
 	current_select_color = 3;
@@ -117,4 +120,21 @@ void UserPaletteWindow::on_green_out_valueChanged(int arg1)
 void UserPaletteWindow::on_blue_out_valueChanged(int arg1)
 {
 	ui->blue_slider->setValue(arg1);
+}
+
+void UserPaletteWindow::ColorButtonClicked(int color_number)
+{
+	current_select_color = color_number;
+	for(int i=0; i<16; i++)
+	{
+		if(i != color_number)
+			color_buttons[i]->DisSelect();
+	}
+
+	QColor color = color_buttons[color_number]->GetColor();
+
+	on_red_slider_valueChanged(color.red());
+	on_green_slider_valueChanged(color.green());
+	on_blue_slider_valueChanged(color.blue());
+
 }

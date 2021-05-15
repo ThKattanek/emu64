@@ -2,6 +2,7 @@
 #define COLOR_BUTTON_H
 
 #include <QWidget>
+#include <QMouseEvent>
 
 namespace Ui {
 class ColorButton;
@@ -23,6 +24,12 @@ public:
 
 	void Select();
 	void DisSelect();
+
+signals:
+	void Clicked(int color_number);
+
+protected:
+	void mousePressEvent(QMouseEvent *event) override;
 
 private:
 	Ui::ColorButton *ui;

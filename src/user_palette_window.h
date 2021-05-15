@@ -23,12 +23,11 @@ private slots:
 	void on_red_slider_valueChanged(int value);
 	void on_green_slider_valueChanged(int value);
 	void on_blue_slider_valueChanged(int value);
-
 	void on_red_out_valueChanged(int arg1);
-
 	void on_green_out_valueChanged(int arg1);
-
 	void on_blue_out_valueChanged(int arg1);
+
+	void ColorButtonClicked(int color_number);
 
 private:
 	Ui::UserPaletteWindow *ui;

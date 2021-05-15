@@ -3,6 +3,7 @@
 
 #include <QPainter>
 #include <QPainterPath>
+#include <QDebug>
 
 ColorButton::ColorButton(QWidget *parent) :
 	QWidget(parent),
@@ -88,9 +89,20 @@ void ColorButton::SetColorNumber(int color_number)
 void ColorButton::Select()
 {
 	is_selected = true;
+	this->update();
 }
 
 void ColorButton::DisSelect()
 {
 	is_selected = false;
+	this->update();
+}
+
+void ColorButton::mousePressEvent(QMouseEvent *event)
+{
+	if(event->buttons() & Qt::LeftButton)
+	{
+		Select();
+		emit Clicked(color_number);
+	}
 }
