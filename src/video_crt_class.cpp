@@ -47,6 +47,7 @@ VideoCrtClass::VideoCrtClass()
 {
     is_first_pal_vic_revision = false;
 
+	enable_user_palette = false;
     current_color_palette_mumber = 0;
     is_double2x = false;
     contrast = 0.8f;
@@ -143,7 +144,17 @@ void VideoCrtClass::EnableVideoDoubleSize(bool enabled)
 
 void VideoCrtClass::EnableCrtOutput(bool enabled)
 {
-    is_crt_output = enabled;
+	is_crt_output = enabled;
+}
+
+void VideoCrtClass::EnableUserPalette(bool enabled)
+{
+	enable_user_palette = enabled;
+}
+
+void VideoCrtClass::SetUserPaletteColor(int color_number, uint8_t r, uint8_t g, uint8_t b)
+{
+	user_palette[color_number] = 0xFF000000 | static_cast<uint32_t>(b<<16 | g<<8 | r);
 }
 
 float *VideoCrtClass::GetC64YUVPalette()
@@ -431,10 +442,20 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
             out_buffer_scanline = (static_cast<uint32_t*>(Outpuffer) + (((y*2)+1)*(Pitch/4)));
             for(int x=0;x<(OutXW/2);x++)
             {
-                *(out_buffer++) = palette[video_source[x] & 0x0F];
-                *(out_buffer++) = palette[video_source[x] & 0x0F];
-                *(out_buffer_scanline++) = palette[video_source[x] & 0x0F];
-                *(out_buffer_scanline++) = palette[video_source[x] & 0x0F];
+				if(!enable_user_palette)
+				{
+					*(out_buffer++) = palette[video_source[x] & 0x0F];
+					*(out_buffer++) = palette[video_source[x] & 0x0F];
+					*(out_buffer_scanline++) = palette[video_source[x] & 0x0F];
+					*(out_buffer_scanline++) = palette[video_source[x] & 0x0F];
+				}
+				else
+				{
+					*(out_buffer++) = user_palette[video_source[x] & 0x0F];
+					*(out_buffer++) = user_palette[video_source[x] & 0x0F];
+					*(out_buffer_scanline++) = user_palette[video_source[x] & 0x0F];
+					*(out_buffer_scanline++) = user_palette[video_source[x] & 0x0F];
+				}
             }
             video_source = video_source+InXW;
         }
@@ -446,7 +467,14 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
             out_buffer = (static_cast<uint32_t*>(Outpuffer) + ((y)*Pitch/4));
             for(int x=0;x<(OutXW);x++)
             {
-                *(out_buffer++) = palette[video_source[x] & 0x0F];
+				if(!enable_user_palette)
+				{
+					*(out_buffer++) = palette[video_source[x] & 0x0F];
+				}
+				else
+				{
+					*(out_buffer++) = user_palette[video_source[x] & 0x0F];
+				}
             }
             video_source = video_source+InXW;
         }

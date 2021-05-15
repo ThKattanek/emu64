@@ -56,6 +56,8 @@ public:
         void SetC64Palette(uint8_t palnr);
         void EnableVideoDoubleSize(bool enabled);
         void EnableCrtOutput(bool enabled);
+		void EnableUserPalette(bool enabled);
+		void SetUserPaletteColor(int color_number, uint8_t r, uint8_t g, uint8_t b);
         float *GetC64YUVPalette();
 
         bool start_c64_is_doublesize;
@@ -73,7 +75,12 @@ private:
         //////// Normaler Palettenmodus //////////
         uint32_t	palette[256];
         uint8_t		current_color_palette_mumber;
-        //////////////////////////////////////////
+		//////////////////////////////////////////
+
+		////////// User Palettenmodus ////////////
+		uint32_t	user_palette[256];
+		bool enable_user_palette;
+		//////////////////////////////////////////
 
         float		c64_yuv_palette0[16*3];
         float		c64_yuv_palette1[16*3];

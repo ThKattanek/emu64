@@ -92,6 +92,8 @@ private slots:
 
 	void on_SettingUserPalette_clicked();
 
+	void on_EnableUserPalette_clicked(bool checked);
+
 private:
     void UpdateToolTips();
     void FillRomSetCombo();
