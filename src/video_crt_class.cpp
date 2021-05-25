@@ -170,9 +170,13 @@ inline void VideoCrtClass::ConvertYUVToRGB(COLOR_STRUCT *color_out)
     float _r, _g, _b;
 
     // from yuv to rgb
-    r = static_cast<int16_t>(_y + 0.0f *_u + 1.140f *_v);
-    g = static_cast<int16_t>(_y - 0.396f * _u - 0.581f * _v);
-    b = static_cast<int16_t>(_y + 2.029f * _u);
+	// R = Y + 1.140V
+	// G = Y - 0.395U - 0.581V
+	// B = Y + 2.032U
+
+	r = static_cast<int16_t>(_y + 1.140f *_v);
+	g = static_cast<int16_t>(_y - 0.395f * _u - 0.581f * _v);
+	b = static_cast<int16_t>(_y + 2.032f * _u);
 
     // gamma correction
 
@@ -201,7 +205,24 @@ inline void VideoCrtClass::ConvertYUVToRGB(COLOR_STRUCT *color_out)
     color_out->r = r;
     color_out->g = g;
     color_out->b = b;
-    color_out->a = 0.0f;
+	color_out->a = 0.0f;
+}
+
+void VideoCrtClass::ConvertRGBToYUV()
+{
+	/*
+	Y = 0.299R + 0.587G + 0.114B
+	U = 0.492 (B-Y)
+	V = 0.877 (R-Y)
+
+	It can also be represented as:
+
+	Y =  0.299R + 0.587G + 0.114B
+	U = -0.147R - 0.289G + 0.436B
+	V =  0.615R - 0.515G - 0.100B
+	*/
+
+
 }
 
 inline void VideoCrtClass::CreateVicIIColors(void)
@@ -215,7 +236,10 @@ inline void VideoCrtClass::CreateVicIIColors(void)
     for(int i=0;i<16;i++)
     {
         c64_yuv_palette0[i*3+1] = 0;
-        c64_yuv_palette0[i*3+2] = 0;
+		c64_yuv_palette0[i*3+2] = 0;
+
+		c64_yuv_palette1[i*3+1] = 0;
+		c64_yuv_palette1[i*3+2] = 0;
 
         float color_angle = COLOR_ANGLES[i];
 
@@ -419,7 +443,7 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
                 case 1:
                     for(int x=0;x<(OutXW);x++)
                     {
-                        *(out_buffer++) = BlurTable1[w0][w1][w2][w3];
+						*(out_buffer++) = BlurTable1[w0][w1][w2][w3];
                         w3 = w2;
                         w2 = w1;
                         w1 = w0;
