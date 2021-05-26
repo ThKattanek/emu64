@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.05.2021                //
+// Letzte Änderung am 26.05.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -79,6 +79,9 @@ VideoCrtSetupWindow::VideoCrtSetupWindow(QWidget *parent, C64Class *c64, VideoCr
         ui->FirstVicRevision->setChecked(bvalue);
         video_crt_output->SetFirstVicRevision(bvalue);
 
+		bvalue = ini->value("UserPaletteCRTMode",false).toBool();
+		ui->enable_user_palette_crt_mode->setChecked(bvalue);
+
         ini->endGroup();
     }
 
@@ -103,6 +106,7 @@ VideoCrtSetupWindow::~VideoCrtSetupWindow()
         ini->setValue("Scanline",ui->scanline_scroll->value());
         ini->setValue("Distortion",ui->distortion_scroll->value());
         ini->setValue("FirstVICRevision",ui->FirstVicRevision->isChecked());
+		ini->setValue("UserPaletteCRTMode",ui->enable_user_palette_crt_mode->isChecked());
         ini->endGroup();
     }
     ///////////////////////////////
@@ -196,3 +200,33 @@ void VideoCrtSetupWindow::on_Reset_clicked()
 }
 
 
+
+void VideoCrtSetupWindow::on_enable_user_palette_crt_mode_toggled(bool checked)
+{
+	video_crt_output->EnableUserPaletteCrtMode(checked);
+	if(checked)
+	{
+		ui->helligkeit_scroll->setEnabled(false);
+		ui->helligkeit_out->setEnabled(false);
+		ui->kontrast_scroll->setEnabled(false);
+		ui->kontrast_out->setEnabled(false);
+		ui->saettigung_scroll->setEnabled(false);
+		ui->saettigung_out->setEnabled(false);
+		ui->phase_scroll->setEnabled(false);
+		ui->phase_out->setEnabled(false);
+		ui->FirstVicRevision->setEnabled(false);
+	}
+	else
+	{
+		ui->helligkeit_scroll->setEnabled(true);
+		ui->helligkeit_out->setEnabled(true);
+		ui->kontrast_scroll->setEnabled(true);
+		ui->kontrast_out->setEnabled(true);
+		ui->saettigung_scroll->setEnabled(true);
+		ui->saettigung_out->setEnabled(true);
+		ui->phase_scroll->setEnabled(true);
+		ui->phase_out->setEnabled(true);
+		ui->FirstVicRevision->setEnabled(true);
+	}
+
+}

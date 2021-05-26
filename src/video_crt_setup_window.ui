@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>592</width>
-    <height>351</height>
+    <width>563</width>
+    <height>357</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -51,8 +51,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>570</width>
-        <height>329</height>
+        <width>541</width>
+        <height>335</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -668,17 +668,57 @@
         </layout>
        </item>
        <item>
-        <widget class="QCheckBox" name="FirstVicRevision">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Schaltet auf die allererste PAL VIC II Version um. Diese hatte lediglich 5 Luminanz Abstufungen, die nachfolgenden hatten dann 9.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <widget class="QCheckBox" name="FirstVicRevision">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Schaltet auf die allererste PAL VIC II Version um. Diese hatte lediglich 5 Luminanz Abstufungen, die nachfolgenden hatten dann 9.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(0,0, 128);</string>
+           </property>
+           <property name="text">
+            <string>PAL VIC Revision 1</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="enable_user_palette_crt_mode">
+           <property name="styleSheet">
+            <string notr="true">color: rgb(0,0, 128);</string>
+           </property>
+           <property name="text">
+            <string>Benutze User Palette</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="styleSheet">
-          <string notr="true">color: rgb(0,0, 128);</string>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
          </property>
-         <property name="text">
-          <string>PAL VIC Revision 1</string>
-         </property>
-        </widget>
+        </spacer>
        </item>
        <item>
         <widget class="QPushButton" name="Reset">
@@ -699,19 +739,6 @@
           <string>Alles wieder auf Standard Werte zurücksetzen</string>
          </property>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>

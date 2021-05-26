@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019        		//
+// Letzte Änderung am 26.05.2021        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -48,6 +48,8 @@ private slots:
     void on_distortion_scroll_valueChanged(int value);
     void on_FirstVicRevision_clicked(bool checked);
     void on_Reset_clicked();
+
+	void on_enable_user_palette_crt_mode_toggled(bool checked);
 
 private:
     void showEvent(QShowEvent* event);
