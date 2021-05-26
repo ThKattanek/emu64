@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019                //
+// Letzte Änderung am 26.05.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -48,6 +48,7 @@ VideoCrtClass::VideoCrtClass()
     is_first_pal_vic_revision = false;
 
 	enable_user_palette = false;
+	enable_user_palette_crt_mode = false;
     current_color_palette_mumber = 0;
     is_double2x = false;
     contrast = 0.8f;
@@ -150,11 +151,19 @@ void VideoCrtClass::EnableCrtOutput(bool enabled)
 void VideoCrtClass::EnableUserPalette(bool enabled)
 {
 	enable_user_palette = enabled;
+	CreateVicIIColors();
+}
+
+void VideoCrtClass::EnableUserPaletteCrtMode(bool enabled)
+{
+	enable_user_palette_crt_mode = enabled;
+	CreateVicIIColors();
 }
 
 void VideoCrtClass::SetUserPaletteColor(int color_number, uint8_t r, uint8_t g, uint8_t b)
 {
 	user_palette[color_number] = 0xFF000000 | static_cast<uint32_t>(b<<16 | g<<8 | r);
+	CreateVicIIColors();
 }
 
 float *VideoCrtClass::GetC64YUVPalette()
@@ -235,36 +244,70 @@ inline void VideoCrtClass::CreateVicIIColors(void)
 
     for(int i=0;i<16;i++)
     {
-        c64_yuv_palette0[i*3+1] = 0;
-		c64_yuv_palette0[i*3+2] = 0;
+		if(!enable_user_palette_crt_mode)
+		{
+			// Keine Userpalette Origianle C64 Farbwerte für CRT Modus benutzen
+			c64_yuv_palette0[i*3+1] = 0;
+			c64_yuv_palette0[i*3+2] = 0;
 
-		c64_yuv_palette1[i*3+1] = 0;
-		c64_yuv_palette1[i*3+2] = 0;
+			c64_yuv_palette1[i*3+1] = 0;
+			c64_yuv_palette1[i*3+2] = 0;
 
-        float color_angle = COLOR_ANGLES[i];
+			float color_angle = COLOR_ANGLES[i];
 
-        if(color_angle != 0.0f)
-        {
-            float angle = ( origin + color_angle * sector ) * radian;
-            c64_yuv_palette0[i*3+1] = cosf( angle ) * saturation;
-            c64_yuv_palette0[i*3+2] = sinf( angle ) * saturation;
+			if(color_angle != 0.0f)
+			{
+				float angle = ( origin + color_angle * sector ) * radian;
+				c64_yuv_palette0[i*3+1] = cosf( angle ) * saturation;
+				c64_yuv_palette0[i*3+2] = sinf( angle ) * saturation;
 
-            c64_yuv_palette1[i*3+1] = cosf( angle + Offs) * saturation;
-            c64_yuv_palette1[i*3+2] = sinf( angle + Offs) * saturation;
-        }
+				c64_yuv_palette1[i*3+1] = cosf( angle + Offs) * saturation;
+				c64_yuv_palette1[i*3+2] = sinf( angle + Offs) * saturation;
+			}
 
-        if(is_first_pal_vic_revision)
-            c64_yuv_palette0[i*3+0] = c64_yuv_palette1[i*3+0] = 8 * LUMA_TABLE[0][i] + brightness;
-        else
-            c64_yuv_palette0[i*3+0] = c64_yuv_palette1[i*3+0] = 8 * LUMA_TABLE[1][i] + brightness;
+			if(is_first_pal_vic_revision)
+				c64_yuv_palette0[i*3+0] = c64_yuv_palette1[i*3+0] = 8 * LUMA_TABLE[0][i] + brightness;
+			else
+				c64_yuv_palette0[i*3+0] = c64_yuv_palette1[i*3+0] = 8 * LUMA_TABLE[1][i] + brightness;
 
-        c64_yuv_palette0[i*3+0] *= contrast + screen;
-        c64_yuv_palette0[i*3+1] *= contrast + screen;
-        c64_yuv_palette0[i*3+2] *= contrast + screen;
+			c64_yuv_palette0[i*3+0] *= contrast + screen;
+			c64_yuv_palette0[i*3+1] *= contrast + screen;
+			c64_yuv_palette0[i*3+2] *= contrast + screen;
 
-        c64_yuv_palette1[i*3+0] *= contrast + screen;
-        c64_yuv_palette1[i*3+1] *= contrast + screen;
-        c64_yuv_palette1[i*3+2] *= contrast + screen;
+			c64_yuv_palette1[i*3+0] *= contrast + screen;
+			c64_yuv_palette1[i*3+1] *= contrast + screen;
+			c64_yuv_palette1[i*3+2] *= contrast + screen;
+		}
+		else
+		{
+			/*
+			Y = 0.299R + 0.587G + 0.114B
+			U = 0.492 (B-Y)
+			V = 0.877 (R-Y)
+				It can also be represented as:
+			Y =  0.299R + 0.587G + 0.114B
+			U = -0.147R - 0.289G + 0.436B
+			V =  0.615R - 0.515G - 0.100B
+			*/
+
+			uint8_t r = (user_palette[i] & 0x000000ff);
+			uint8_t g = ((user_palette[i] >> 8) & 0x000000ff);
+			uint8_t b = ((user_palette[i] >> 16) & 0x000000ff);
+
+			float y = 0.299f * r + 0.587f * g + 0.114 * b;
+			float u = 0.492 * (b - y);
+			float v = 0.877 * (r - y);
+
+			c64_yuv_palette0[i*3+0] = y;
+			c64_yuv_palette0[i*3+1] = u ;
+			c64_yuv_palette0[i*3+2] = v ;
+
+			c64_yuv_palette1[i*3+0] = y;
+			c64_yuv_palette1[i*3+1] = u ;
+			c64_yuv_palette1[i*3+2] = v ;
+		}
+
+
     }
 
     int x[4];

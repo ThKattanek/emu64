@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019                //
+// Letzte Änderung am 26.05.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -57,6 +57,7 @@ public:
         void EnableVideoDoubleSize(bool enabled);
         void EnableCrtOutput(bool enabled);
 		void EnableUserPalette(bool enabled);
+		void EnableUserPaletteCrtMode(bool enabled);
 		void SetUserPaletteColor(int color_number, uint8_t r, uint8_t g, uint8_t b);
         float *GetC64YUVPalette();
 
@@ -65,6 +66,7 @@ public:
 
 private:
         inline void ConvertYUVToRGB(COLOR_STRUCT *color_out);
+		inline void ConvertRGBToYUV();
 
         bool                is_double2x;
         bool                is_crt_output;
@@ -79,7 +81,8 @@ private:
 
 		////////// User Palettenmodus ////////////
 		uint32_t	user_palette[256];
-		bool enable_user_palette;
+		bool enable_user_palette;					// im Palettenmodus nicht CRT Modus
+		bool enable_user_palette_crt_mode;			// im CRT Modus
 		//////////////////////////////////////////
 
         float		c64_yuv_palette0[16*3];
