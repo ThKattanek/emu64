@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.05.2021                //
+// Letzte Änderung am 26.05.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -523,9 +523,19 @@ void SetupWindow::on_C64Farbmodus_currentIndexChanged(int index)
     video_crt_output->SetC64Palette(index);
 }
 
-void SetupWindow::on_WPal_toggled(bool)
+void SetupWindow::on_WPal_toggled(bool checked)
 {
     emit ChangeGrafikModi(false,ui->WPal->isChecked(),ui->WDouble->isChecked(),ui->WFilter->isChecked());
+	if(checked)
+	{
+		ui->EnableUserPalette->setEnabled(false);
+		ui->C64Farbmodus->setEnabled(false);
+	}
+	else
+	{
+		ui->EnableUserPalette->setEnabled(true);
+		ui->C64Farbmodus->setEnabled(true);
+	}
 }
 
 void SetupWindow::on_WDouble_toggled(bool)

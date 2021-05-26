@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 30.04.2021                //
+// Letzte Änderung am 26.05.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -89,10 +89,9 @@ private slots:
     void on_Vsync_clicked(bool checked);
 	void on_DisplayList_currentIndexChanged(int index);
 	void on_VideoModes_currentIndexChanged(int index);
-
 	void on_SettingUserPalette_clicked();
-
 	void on_EnableUserPalette_clicked(bool checked);
+
 
 private:
     void UpdateToolTips();
