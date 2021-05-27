@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>605</width>
-    <height>24</height>
+    <height>43</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -106,10 +106,10 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>1</y>
-     <width>9</width>
-     <height>9</height>
+     <x>95</x>
+     <y>0</y>
+     <width>17</width>
+     <height>17</height>
     </rect>
    </property>
    <property name="statusTip">
@@ -134,10 +134,10 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>11</y>
-     <width>9</width>
-     <height>9</height>
+     <x>95</x>
+     <y>10</y>
+     <width>17</width>
+     <height>17</height>
     </rect>
    </property>
    <property name="statusTip">
@@ -298,9 +298,9 @@ border-right-color: rgb(50, 50, 50);</string>
    <property name="geometry">
     <rect>
      <x>370</x>
-     <y>1</y>
-     <width>24</width>
-     <height>24</height>
+     <y>0</y>
+     <width>20</width>
+     <height>20</height>
     </rect>
    </property>
    <property name="statusTip">
