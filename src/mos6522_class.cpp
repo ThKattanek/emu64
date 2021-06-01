@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 06.08.2016                //
+// Letzte Änderung am 01.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -47,6 +47,10 @@ void MOS6522::Reset()
 
     ATNState = false;
     IECInterrupt = false;
+
+	counter_sample_pb3 = 0;
+	addition_sample_pb3 = 0;
+	rms_pb3 = 0.0f;
 }
 
 void MOS6522::OneZyklus()
@@ -107,11 +111,30 @@ void MOS6522::OneZyklus()
         if(VIANummer == 0)ClearInterrupt(VIA1_IRQ);
         else ClearInterrupt(VIA2_IRQ);
     }
+
+	if(VIANummer == 1)
+	{
+
+		/// Mittelwertbildung PB3 ///
+
+		counter_sample_pb3++;
+		addition_sample_pb3 += (IO[0] >> 3) & 1;
+		if(counter_sample_pb3 == 10000)
+		{
+			counter_sample_pb3 = 0;
+			rms_pb3 = addition_sample_pb3 / 10000.0f;
+		}
+	}
 }
 
 unsigned char MOS6522::GetIO_Zero(void)
 {
-    return IO[0];
+	return IO[0];
+}
+
+float MOS6522::GetIOPB3_RMS()
+{
+	return rms_pb3;
 }
 
 void MOS6522::WriteIO(unsigned short adresse, unsigned char wert)

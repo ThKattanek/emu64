@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.08.2019                //
+// Letzte Änderung am 01.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -31,6 +31,7 @@ public:
 
     void Reset(void);
     unsigned char GetIO_Zero(void);
+	float GetIOPB3_RMS(void);
     void OneZyklus(void);
     void WriteIO(unsigned short adresse, unsigned char);
     unsigned char ReadIO(unsigned short adresse);
@@ -71,6 +72,13 @@ private:
     unsigned char   OldIECLines;
     bool            OldATNState;
     unsigned char   TmpByte;
+
+	/// Spezial ///
+	/// Annahme das PB3 ein PWM Signal ausgibt bei VIA2 [LED RW]
+
+	uint32_t counter_sample_pb3;
+	uint32_t addition_sample_pb3;
+	float rms_pb3;
 };
 
 #endif // MOS6522_CLASS_H
