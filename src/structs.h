@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.04.2020                //
+// Letzte Änderung am 01.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -209,6 +209,7 @@ struct FLOPPY_INFO
 {
     bool            Motor;
     bool            Data;
+	float			Data_RMS;
     unsigned char   Spur;
     unsigned char   Sektor;
 };
