@@ -14,7 +14,6 @@ class ColorButton : public QWidget
 
 public:
 	explicit ColorButton(QWidget *parent = nullptr);
-	void paintEvent(QPaintEvent *event);
 	~ColorButton();
 
 	void SetColor(QColor color);
@@ -29,6 +28,7 @@ signals:
 	void Clicked(int color_number);
 
 protected:
+	void paintEvent(QPaintEvent *event) override;
 	void mousePressEvent(QMouseEvent *event) override;
 
 private:
