@@ -275,6 +275,9 @@ border-right-color: rgb(50, 50, 50);</string>
      <height>7</height>
     </rect>
    </property>
+   <property name="statusTip">
+    <string>Anzeige für den Status des Diskmotors.</string>
+   </property>
   </widget>
   <widget class="WidgetLED" name="rw_led" native="true">
    <property name="geometry">
@@ -284,6 +287,9 @@ border-right-color: rgb(50, 50, 50);</string>
      <width>18</width>
      <height>7</height>
     </rect>
+   </property>
+   <property name="statusTip">
+    <string>Anzeige für den Schreib-/Lesezugriff.</string>
    </property>
   </widget>
  </widget>
