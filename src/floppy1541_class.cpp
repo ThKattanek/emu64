@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.04.2020        		//
+// Letzte Änderung am 01.06.2021	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -573,6 +573,7 @@ void Floppy1541::GetFloppyInfo(FLOPPY_INFO *fi)
     uint8_t tmp = via2->GetIO_Zero();
     fi->Motor = !!(tmp&4);
     fi->Data = !!(tmp&8);
+	fi->Data_RMS = via2->GetIOPB3_RMS();
 }
 
 bool Floppy1541::LoadDosRom(const char *filename)
