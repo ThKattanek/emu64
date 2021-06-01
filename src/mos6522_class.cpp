@@ -119,9 +119,9 @@ void MOS6522::OneZyklus()
 
 		counter_sample_pb3++;
 		addition_sample_pb3 += (IO[0] >> 3) & 1;
-		if(counter_sample_pb3 == 10000)
+		if(counter_sample_pb3 == 50000)
 		{
-			rms_pb3 = addition_sample_pb3 / 10000.0f;
+			rms_pb3 = addition_sample_pb3 / 50000.0f;
 			counter_sample_pb3 = 0;
 			addition_sample_pb3 = 0;
 			if(rms_pb3 > 1.0f) rms_pb3 = 1.0f;
