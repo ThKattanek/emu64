@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 01.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -79,8 +79,6 @@ private:
     bool MotorLED;
     bool RWLED;
 
-    bool old_MotorLED;
-    bool old_RWLED;
     unsigned char old_Sektor;
     unsigned char old_Spur;
 

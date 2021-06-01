@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>605</width>
-    <height>43</height>
+    <height>26</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -98,62 +98,6 @@
    </property>
    <property name="text">
     <string notr="true"/>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="MotorLED">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>95</x>
-     <y>0</y>
-     <width>17</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="statusTip">
-    <string>Anzeige für den Status des Diskmotors.</string>
-   </property>
-   <property name="text">
-    <string notr="true"/>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>9</width>
-     <height>9</height>
-    </size>
-   </property>
-   <property name="flat">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="RWLED">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>95</x>
-     <y>10</y>
-     <width>17</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="statusTip">
-    <string>Anzeige für den Schreib- /Lesezugriff.</string>
-   </property>
-   <property name="text">
-    <string notr="true"/>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>9</width>
-     <height>9</height>
-    </size>
-   </property>
-   <property name="flat">
-    <bool>true</bool>
    </property>
   </widget>
   <widget class="QLabel" name="TrackOut">
@@ -322,7 +266,35 @@ border-right-color: rgb(50, 50, 50);</string>
     <bool>true</bool>
    </property>
   </widget>
+  <widget class="WidgetLED" name="motor_led" native="true">
+   <property name="geometry">
+    <rect>
+     <x>93</x>
+     <y>3</y>
+     <width>18</width>
+     <height>7</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="WidgetLED" name="rw_led" native="true">
+   <property name="geometry">
+    <rect>
+     <x>93</x>
+     <y>13</y>
+     <width>18</width>
+     <height>7</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WidgetLED</class>
+   <extends>QWidget</extends>
+   <header>widget_led.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="emu64.qrc"/>
  </resources>

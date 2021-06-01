@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.08.2019                //
+// Letzte Änderung am 01.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -44,27 +44,27 @@ WidgetFloppyStatus::WidgetFloppyStatus(QWidget *parent, int floppy_nr, Floppy154
     iGreenLedOff = new QIcon(":/grafik/green_off_32.png");
     iGreenLedOn = new QIcon(":/grafik/green_on_32.png");
 
-    iYellowLedOff = new QIcon(":/grafik/yellow_off_32.png");
-    iYellowLedOn = new QIcon(":/grafik/yellow_on_32.png");
-
     iVol_mute = new QIcon(":/grafik/audio_volume_mute.png");
     iVol_low = new QIcon(":/grafik/audio_volume_low.png");
     iVol_medium = new QIcon(":/grafik/audio_volume_medium.png");
     iVol_high = new QIcon(":/grafik/audio_volume_high.png");
 
+	/// yellow
+	ui->rw_led->SetColorOff(QColor(70,60,20));
+	ui->rw_led->SetColorOn(QColor(240,230,120));
+	// green
+	ui->motor_led->SetColorOff(QColor(20,60,20));
+	ui->motor_led->SetColorOn(QColor(50,240,20));
+
     SetFloppyVolume(2);
 
     ui->PowerLED->setIcon(*iGreenLedOff);
-    ui->MotorLED->setIcon(*iGreenLedOff);
-    ui->RWLED->setIcon(*iYellowLedOff);
 
-    old_MotorLED = false;
-    old_RWLED = false;
     old_Sektor = 0;
     old_Spur = 0;
 
     timer = new QTimer(this);
-    timer->setInterval(20);
+	timer->setInterval(10);
 
     connect(timer,SIGNAL(timeout()),this,SLOT(onTimer()));
 }
@@ -89,19 +89,12 @@ void WidgetFloppyStatus::onTimer()
 
     floppy->GetFloppyInfo(&info);
 
-    if(old_MotorLED != info.Motor)
-    {
-        if(info.Motor) ui->MotorLED->setIcon(*iGreenLedOn);
-        else ui->MotorLED->setIcon(*iGreenLedOff);
-        old_MotorLED = info.Motor;
-    }
+	if(info.Motor)
+		ui->motor_led->SetBrightness(1.0f);
+	else
+		ui->motor_led->SetBrightness(0.0f);
 
-    if(old_RWLED != info.Data)
-    {
-        if(info.Data) ui->RWLED->setIcon(*iYellowLedOn);
-        else ui->RWLED->setIcon(*iYellowLedOff);
-        old_RWLED = info.Data;
-    }
+	ui->rw_led->SetBrightness(info.Data_RMS);
 
     if(old_Spur != (info.Spur))
     {
@@ -171,8 +164,9 @@ void WidgetFloppyStatus::SetEnableFloppy(bool status)
     {
         PowerLED = false;
         ui->PowerLED->setIcon(*iGreenLedOff);
-        ui->MotorLED->setIcon(*iGreenLedOff);
-        ui->RWLED->setIcon(*iYellowLedOff);
+		ui->motor_led->SetBrightness(0.0f);
+		ui->rw_led->SetBrightness(0.0f);
+
         floppy->SetEnableFloppy(false);
         timer->stop();
     }

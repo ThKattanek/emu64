@@ -325,16 +325,19 @@ FORMS += \
     color_button.ui \
     oscilloscope_widget.ui \
     oscilloscope_window.ui \
-    user_palette_window.ui
+    user_palette_window.ui \
+    widget_led.ui
 
 HEADERS += \
     color_button.h \
     oscilloscope_widget.h \
     oscilloscope_window.h \
-    user_palette_window.h
+    user_palette_window.h \
+    widget_led.h
 
 SOURCES += \
     color_button.cpp \
     oscilloscope_widget.cpp \
     oscilloscope_window.cpp \
-    user_palette_window.cpp
+    user_palette_window.cpp \
+    widget_led.cpp
