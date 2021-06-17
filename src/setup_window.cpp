@@ -1064,6 +1064,7 @@ void SetupWindow::on_SettingUserPalette_clicked()
 		default_color.setBlue(default_palette[i*4+2]);
 
 		QColor color = ini->value(key_name, default_color.rgba()).toUInt();
+		user_palette_window->SetDefaultColor(i,default_color);
 		user_palette_window->SetColor(i,color);
 	}
 	ini->endGroup();

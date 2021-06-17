@@ -53,6 +53,12 @@ UserPaletteWindow::~UserPaletteWindow()
 	delete ui;
 }
 
+void UserPaletteWindow::SetDefaultColor(int color_number, QColor color)
+{
+	if(color_number >= 0 && color_number < 16)
+		color_buttons[color_number]->SetDefaultColor(color);
+}
+
 void UserPaletteWindow::SetColor(int color_number, QColor color)
 {
 	if(color_number >= 0 && color_number < 16)
@@ -137,4 +143,13 @@ void UserPaletteWindow::ColorButtonClicked(int color_number)
 	on_green_slider_valueChanged(color.green());
 	on_blue_slider_valueChanged(color.blue());
 
+}
+
+void UserPaletteWindow::on_SetDefaultColors_clicked()
+{
+	for(int i=0; i<16; i++)
+	{
+		color_buttons[i]->ResetColor();
+
+	}
 }

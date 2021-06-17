@@ -163,6 +163,13 @@
    <item row="3" column="0">
     <widget class="ColorButton" name="color_button_12" native="true"/>
    </item>
+   <item row="5" column="3">
+    <widget class="QPushButton" name="SetDefaultColors">
+     <property name="text">
+      <string>Zurücksetzen</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>

@@ -71,9 +71,20 @@ ColorButton::~ColorButton()
 	delete ui;
 }
 
+void ColorButton::SetDefaultColor(QColor color)
+{
+	default_color = color;
+}
+
 void ColorButton::SetColor(QColor color)
 {
 	this->color = color;
+}
+
+void ColorButton::ResetColor()
+{
+	color = default_color;
+	update();
 }
 
 QColor ColorButton::GetColor()

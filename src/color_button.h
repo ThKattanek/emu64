@@ -16,7 +16,9 @@ public:
 	explicit ColorButton(QWidget *parent = nullptr);
 	~ColorButton();
 
+	void SetDefaultColor(QColor color);
 	void SetColor(QColor color);
+	void ResetColor();
 	QColor GetColor();
 
 	void SetColorNumber(int color_number);
@@ -34,6 +36,7 @@ protected:
 private:
 	Ui::ColorButton *ui;
 
+	QColor default_color;
 	QColor color;
 	int color_number;
 
