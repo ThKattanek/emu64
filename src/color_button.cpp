@@ -63,6 +63,9 @@ void ColorButton::paintEvent(QPaintEvent *event)
 	p.setBrush(Qt::black);
 	p.drawPath(path1);
 
+	p.setBrush(default_color);
+	p.drawEllipse(width()-25, height()-25,16,16);
+
 	p.end();
 }
 
