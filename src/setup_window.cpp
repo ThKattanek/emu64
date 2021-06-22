@@ -1103,7 +1103,7 @@ void SetupWindow::on_SettingUserPalette_clicked()
 				video_crt_output->SetUserPaletteColor(i,old_color[i].red(), old_color[i].green(), old_color[i].blue());
 		}
 
-		disconnect(user_palette_window, SIGNAL(ChangeColor(int,QCOlor)), this, SLOT(OnChangeUserColor(int, QColor)));
+		disconnect(user_palette_window, SIGNAL(ChangeColor(int,QColor)), this, SLOT(OnChangeUserColor(int, QColor)));
 
 		delete user_palette_window;
 	}
