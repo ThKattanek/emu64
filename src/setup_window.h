@@ -91,6 +91,7 @@ private slots:
 	void on_VideoModes_currentIndexChanged(int index);
 	void on_SettingUserPalette_clicked();
 	void on_EnableUserPalette_clicked(bool checked);
+	void OnChangeUserColor(int color_number, QColor color);
 
 
 private:

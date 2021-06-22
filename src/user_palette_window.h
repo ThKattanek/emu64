@@ -20,6 +20,9 @@ public:
 	void SetColor(int color_number, QColor color);
 	QColor GetColor(int color_number);
 
+signals:
+	void ChangeColor(int color_number, QColor color);
+
 private slots:
 	void on_red_slider_valueChanged(int value);
 	void on_green_slider_valueChanged(int value);

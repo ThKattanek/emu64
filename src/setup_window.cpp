@@ -1071,6 +1071,12 @@ void SetupWindow::on_SettingUserPalette_clicked()
 
 	if(user_palette_window != nullptr)
 	{
+		QColor old_color[16];
+		for(int i=0; i<16; i++)
+			old_color[i] = user_palette_window->GetColor(i);
+
+		connect(user_palette_window, SIGNAL(ChangeColor(int,QColor)), this, SLOT(OnChangeUserColor(int, QColor)));
+
 		if(user_palette_window->exec())
 		{
 			// OK
@@ -1093,7 +1099,12 @@ void SetupWindow::on_SettingUserPalette_clicked()
 		else
 		{
 			// Cancel
+			for(int i=0; i<16; i++)
+				video_crt_output->SetUserPaletteColor(i,old_color[i].red(), old_color[i].green(), old_color[i].blue());
 		}
+
+		disconnect(user_palette_window, SIGNAL(ChangeColor(int,QCOlor)), this, SLOT(OnChangeUserColor(int, QColor)));
+
 		delete user_palette_window;
 	}
 }
@@ -1101,4 +1112,9 @@ void SetupWindow::on_SettingUserPalette_clicked()
 void SetupWindow::on_EnableUserPalette_clicked(bool checked)
 {
 	video_crt_output->EnableUserPalette(checked);
+}
+
+void SetupWindow::OnChangeUserColor(int color_number, QColor color)
+{
+	video_crt_output->SetUserPaletteColor(color_number, color.red(), color.green(), color.blue());
 }

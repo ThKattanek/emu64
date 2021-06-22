@@ -91,6 +91,8 @@ void UserPaletteWindow::on_red_slider_valueChanged(int value)
 	color.setRed(value);
 	color_buttons[current_select_color]->SetColor(color);
 	color_buttons[current_select_color]->update();
+
+	emit ChangeColor(current_select_color, color);
 }
 
 void UserPaletteWindow::on_green_slider_valueChanged(int value)
@@ -101,6 +103,8 @@ void UserPaletteWindow::on_green_slider_valueChanged(int value)
 	color.setGreen(value);
 	color_buttons[current_select_color]->SetColor(color);
 	color_buttons[current_select_color]->update();
+
+	emit ChangeColor(current_select_color, color);
 }
 
 void UserPaletteWindow::on_blue_slider_valueChanged(int value)
@@ -111,6 +115,8 @@ void UserPaletteWindow::on_blue_slider_valueChanged(int value)
 	color.setBlue(value);
 	color_buttons[current_select_color]->SetColor(color);
 	color_buttons[current_select_color]->update();
+
+	emit ChangeColor(current_select_color, color);
 }
 
 void UserPaletteWindow::on_red_out_valueChanged(int arg1)
