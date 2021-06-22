@@ -156,6 +156,6 @@ void UserPaletteWindow::on_SetDefaultColors_clicked()
 	for(int i=0; i<16; i++)
 	{
 		color_buttons[i]->ResetColor();
-
+		emit ChangeColor(i, color_buttons[i]->GetColor());
 	}
 }
