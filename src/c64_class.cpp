@@ -3571,6 +3571,10 @@ bool C64Class::StartVideoRecord(const char *filename, int audio_bitrate, int vid
 {
     if(video_capture != nullptr)
     {
+		c64_frequency_temp = c64_frequency;
+		c64_frequency = 982800;	// Auf genau 50 Hz stellen !!
+		SetC64Speed(c64_speed);
+
         video_capture->SetAudioBitrate(audio_bitrate);
         video_capture->SetVideoBitrate(video_bitrate);
 
@@ -3589,6 +3593,9 @@ void C64Class::StopVideoRecord()
     if(video_capture != nullptr)
     {
         video_capture->StopCapture();
+
+		c64_frequency = c64_frequency_temp;
+		SetC64Speed(c64_speed);
     }
 }
 

@@ -332,6 +332,9 @@ public:
 
     int             c64_frequency;   // Normaler PAL Takt ist 985248 Hz (985248 / (312 Rz * 63 Cycles) = 50,124542 Hz)
                                      // 50 Hz Syncroner Takt ist 982800 Hz
+
+	int				c64_frequency_temp;	// Dient zum zwischenspeichern der C64 Frequenz beim Videorecord.
+
     int             c64_speed;
 
     MMU             *mmu;
