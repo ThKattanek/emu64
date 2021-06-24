@@ -98,6 +98,8 @@ public:
     void SetC64Frequency(int c64_frequency);
     void SetC64Speed(int speed);
     void EnableWarpMode(bool enabled);
+	void ToggleWarpMode();
+	bool IsWarpMode();
     void SetDistortion(float_t value);
     void SetMouseHiddenTime(int time);  // Time in ms // Bei 0 Wird der Cursor nicht mehr ausgeblendet
     void GetWindowPos(int *x, int *y);

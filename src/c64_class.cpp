@@ -2250,6 +2250,15 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 				}
 				break;
 
+			case SDLK_w:				// HotKey [ALT+W] toggle warpmode
+				// if ALT pressed down
+				if(KMOD_LALT == (SDL_GetModState() & KMOD_LALT))
+				{
+					is_hotkey = true;
+					ToggleWarpMode();
+				}
+				break;
+
             default:
                 break;
             }
@@ -2649,10 +2658,23 @@ void C64Class::EnableWarpMode(bool enabled)
     else
     {
         // WarpMode deaktivieren
-        warp_thread_end = true;
+		warp_thread_end = true;
         SDL_UnlockMutex(mutex1);    // Mutex1 wieder freigeben
         SDL_PauseAudioDevice(audio_dev, 0);     // Audiostream wieder starten
-    }
+	}
+}
+
+void C64Class::ToggleWarpMode()
+{
+	if(warp_mode == true)
+		EnableWarpMode(false);
+	else
+		EnableWarpMode(true);
+}
+
+bool C64Class::IsWarpMode()
+{
+	return warp_mode;
 }
 
 int SDLThreadLoad(void *userdat)
