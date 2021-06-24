@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.05.2021                //
+// Letzte Änderung am 24.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -46,8 +46,10 @@ public:
     void LoadINI(C64Class *c64);
     void SaveINI();
     void ReSetup(void);
-
     int GetScreenshotFormat();
+
+protected:
+	void showEvent(QShowEvent *event);
 
 signals:
     void ChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool filter);

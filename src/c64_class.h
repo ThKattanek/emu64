@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 30.04.2021                //
+// Letzte Änderung am 24.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -171,6 +171,7 @@ public:
     void StartRecJoystickMapping(int slot_nr);
     void StopRecJoystickMapping();
     void ClearJoystickMapping(int slot_nr);
+	void SwapJoyPorts();
     void IncMouseHiddenCounter();
 
     void StartRecKeyMap(uint8_t keymatrix_code);

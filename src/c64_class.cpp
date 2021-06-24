@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 30.04.2021                //
+// Letzte Änderung am 24.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1964,6 +1964,8 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
     SDL_Keymod keymod;
 
+	bool is_hotkey = false;
+
     switch (event->type)
     {
         case SDL_WINDOWEVENT:
@@ -2227,7 +2229,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
                 break;
 
-              case SDLK_RETURN:
+			case SDLK_RETURN:
 
                 keymod = SDL_GetModState();
 
@@ -2238,6 +2240,15 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
                 return_key_is_down = true;
                 break;
+
+			case SDLK_j:				// HotKey [ALT+J] swap joyports
+				// if ALT pressed down
+				if(KMOD_LALT == (SDL_GetModState() & KMOD_LALT))
+				{
+					is_hotkey = true;
+					SwapJoyPorts();
+				}
+				break;
 
             default:
                 break;
@@ -2264,7 +2275,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                     c64_key_table[((rec_matrix_code & 0xF0)>>1) + (rec_matrix_code & 0x07)].SDLKeyCode = event->key.keysym.sym;
                     key_map_is_rec = false;
                 }
-                else
+				else if (!is_hotkey)	// nur wenn es kein HotKey war
                 {
                     /// Auf RESTORE KEY TESTEN
                     if(c64_key_table[64].SDLKeyCode == event->key.keysym.sym)
@@ -4112,7 +4123,15 @@ void C64Class::ClearJoystickMapping(int slot_nr)
         virtual_joys[slot_nr].HatValue[i] = 0;
         virtual_joys[slot_nr].AxisNr[i] = 0;
         virtual_joys[slot_nr].AxisValue[i] = 0;
-    }
+	}
+}
+
+void C64Class::SwapJoyPorts()
+{
+	int temp = virtual_port1;
+	virtual_port1 = virtual_port2;
+	virtual_port2 = temp;
+	LogText(">> JoyPorts vertauscht\n");
 }
 
 void C64Class::IncMouseHiddenCounter()

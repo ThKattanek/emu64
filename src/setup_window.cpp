@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.05.2021                //
+// Letzte Änderung am 24.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -555,7 +555,27 @@ void SetupWindow::ReSetup()
 
 int SetupWindow::GetScreenshotFormat()
 {
-    return ui->ScreenshotFormat->currentIndex();
+	return ui->ScreenshotFormat->currentIndex();
+}
+
+void SetupWindow::showEvent(QShowEvent *event)
+{
+	for(int i=0;i<MAX_VJOY_NUM;i++)
+	{
+		ui->VJoySlots->item(i,1)->setBackground(QBrush(QColor(255,255,255)));
+		ui->VJoySlots->item(i,1)->setText("");
+
+		ui->VJoySlots->item(i,2)->setBackground(QBrush(QColor(255,255,255)));
+		ui->VJoySlots->item(i,2)->setText("");
+	}
+
+	int row = c64->virtual_port1;
+	ui->VJoySlots->item(row,1)->setBackground(QBrush(QColor(50,255,50)));
+	ui->VJoySlots->item(row,1)->setText("Port 1");
+
+	row = c64->virtual_port2;
+	ui->VJoySlots->item(row,2)->setBackground(QBrush(QColor(50,255,50)));
+	ui->VJoySlots->item(row,2)->setText("Port 2");
 }
 
 void SetupWindow::on_ResetSShotCounter_clicked()
