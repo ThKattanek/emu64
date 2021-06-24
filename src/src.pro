@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 28.04.2021                //
+# // Letzte Änderung am 24.06.2021                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -291,6 +291,7 @@ gfx.files += ../grafik/sdl_icon.png
 
 # TXT
 txt.files += ../kommandozeilenparameter.txt
+txt.files += ../hotkeys.txt
 txt.files += ../LICENSE
 txt.files += ../änderungen.txt
 

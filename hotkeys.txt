@@ -1,0 +1,5 @@
+HotKeys im C64 Screen
+Stand: 24.06.2021
+
+ALT+J   -> Tauscht die Joystick Port Belegung (Port1 <-> Port2)
+ALT+W   -> Schaltet Warp Mode an oder aus
