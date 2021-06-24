@@ -2384,7 +2384,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             case SDL_BUTTON_LEFT:
 
                 // Wenn Linke STRG Taste gedrück dann Mouse 1351 umschalten
-                if(KMOD_LCTRL == SDL_GetModState())
+				if(KMOD_LCTRL == (SDL_GetModState() & KMOD_LCTRL))
                 {
                     enable_mouse_1351 = !enable_mouse_1351;
                     SDL_SetRelativeMouseMode(SDL_bool(enable_mouse_1351));
