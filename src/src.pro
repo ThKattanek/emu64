@@ -207,6 +207,7 @@ HEADERS += \
     tape_new_window.h \
     tape_window.h \
     tree_widget_mod.h \
+    utils.h \
     video_crt_setup_window.h \
     vcd_class.h \
     video_capture_class.h \
@@ -334,6 +335,7 @@ HEADERS += \
     oscilloscope_widget.h \
     oscilloscope_window.h \
     user_palette_window.h \
+    utils.h \
     widget_led.h
 
 SOURCES += \
