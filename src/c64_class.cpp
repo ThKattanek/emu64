@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.06.2021                //
+// Letzte Änderung am 25.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -2792,7 +2792,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, const char *filename)
     {
         KillCommandLine();
 
-        LoadCRT(filename);
+		// LoadCRT(filename);
         return 4;
     }
     return 1;
@@ -2991,12 +2991,12 @@ int C64Class::LoadPRG(const char *filename, uint16_t *return_start_address)
     return 0x02;
 }
 
-int C64Class::LoadCRT(const char *filename)
+int C64Class::LoadCRT(FILE *file)
 {
     reu->Remove();
     geo->Remove();
 
-    int ret = crt->LoadCartridgeImage(filename);
+	int ret = crt->LoadCartridgeImage(file);
     if(ret == 0)
     {
         io_source = 1;
@@ -3015,9 +3015,9 @@ void C64Class::RemoveCRT()
     HardReset();
 }
 
-int C64Class::CreateNewEasyFlashImage(const char *filename, const char *crt_name)
+int C64Class::CreateNewEasyFlashImage(FILE *file, const char *crt_name)
 {
-    return crt->CreateNewEasyFlashImage(filename, crt_name);
+	return crt->CreateNewEasyFlashImage(file, crt_name);
 }
 
 void C64Class::InsertREU()

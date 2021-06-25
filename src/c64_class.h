@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.06.2021                //
+// Letzte Änderung am 25.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -128,9 +128,9 @@ public:
     int LoadAutoRun(uint8_t floppy_nr, const char *filename);
     int LoadPRG(const char *filename, uint16_t *return_start_address);
 
-    int LoadCRT(const char *filename);
+	int LoadCRT(FILE *file);
     void RemoveCRT();
-    int CreateNewEasyFlashImage(const char *filename, const char *crt_name);
+	int CreateNewEasyFlashImage(FILE *file, const char *crt_name);
 
     void InsertREU();
     void RemoveREU();

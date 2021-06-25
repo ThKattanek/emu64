@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 07.08.2019                //
+// Letzte Änderung am 25.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -31,11 +31,11 @@ public:
     // Funktionen
     bool *GetFlash040Dirty(uint16_t nr);
     uint8_t* GetFlash040Byte(uint16_t nr);
-    int LoadCartridgeImage(const char* filename);
+	int LoadCartridgeImage(FILE *file);
     void RemoveCartridgeImage();
-    int CreateNewEasyFlashImage(const char* filename, const char* crt_name);
-    int WriteEasyFlashImage(const char* filename);
-    int GetCartridgeInfo(const char* filename, CARTRIDGE_INFO_STRUCT *crt_info);
+	int CreateNewEasyFlashImage(FILE *file, const char* crt_name);
+	int WriteEasyFlashImage(FILE *file, CARTRIDGE_INFO_STRUCT *cartridge_info);
+	int GetCartridgeInfo(FILE *file, CARTRIDGE_INFO_STRUCT *crt_info);
     void SetEasyFlashJumper(bool enable);
     void Reset();
     void Freeze();

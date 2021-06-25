@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.04.2020                //
+// Letzte Änderung am 25.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,6 +19,7 @@
 
 #include "./cartridge_window.h"
 #include "./ui_cartridge_window.h"
+#include "./utils.h"
 
 CartridgeWindow::CartridgeWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QString tmp_path) :
     QDialog(parent),
@@ -201,117 +202,122 @@ void CartridgeWindow::onSelectFile(QString filename)
     char str00[256];
 
     if(crt == nullptr) return;
-    int res = crt->GetCartridgeInfo(filename.toLocal8Bit(),&crt_info);
-    switch(res)
-    {
-    case 0:
-        CRTIsSelected = true;
-        SelCRTFileName = filename;
 
-        ui->CRTInfo->topLevelItem(0)->setText(1,crt_info.Name);
-        ui->CRTInfo->topLevelItem(1)->setText(1,crt_info.Version);
-        ui->CRTInfo->topLevelItem(2)->setText(1,"[" + QVariant(crt_info.HardwareType).toString() + "] " + crt_info.HardwareTypeString);
-        ui->CRTInfo->topLevelItem(3)->setText(1,QVariant(crt_info.EXROM).toString());
-        ui->CRTInfo->topLevelItem(4)->setText(1,QVariant(crt_info.GAME).toString());
-        ui->CRTInfo->topLevelItem(5)->setText(1,QVariant(crt_info.ChipCount).toString());
+	FILE *file = qfopen(filename, "rb");
+	if(file != nullptr)
+	{
+		int res = crt->GetCartridgeInfo(file,&crt_info);
+		switch(res)
+		{
+		case 0:
+			CRTIsSelected = true;
+			SelCRTFileName = filename;
 
-        ui->ChipList->clear();
-        for(int i=0;i<crt_info.ChipCount;i++)
-        {
-            QTreeWidgetItem *item = new QTreeWidgetItem(ui->ChipList);
-            sprintf(str00,"%2.2d",i);
-            item->setText(0,str00);
-            item->setTextAlignment(0,Qt::AlignHCenter);
+			ui->CRTInfo->topLevelItem(0)->setText(1,crt_info.Name);
+			ui->CRTInfo->topLevelItem(1)->setText(1,crt_info.Version);
+			ui->CRTInfo->topLevelItem(2)->setText(1,"[" + QVariant(crt_info.HardwareType).toString() + "] " + crt_info.HardwareTypeString);
+			ui->CRTInfo->topLevelItem(3)->setText(1,QVariant(crt_info.EXROM).toString());
+			ui->CRTInfo->topLevelItem(4)->setText(1,QVariant(crt_info.GAME).toString());
+			ui->CRTInfo->topLevelItem(5)->setText(1,QVariant(crt_info.ChipCount).toString());
 
-            switch(crt_info.ChipInfo[i].Type)
-            {
-            case 0:
-                item->setText(1,"ROM");
-                break;
-            case 1:
-                item->setText(1,"RAM");
-                break;
-            case 2:
-                item->setText(1,"F-ROM");
-                break;
-            default:
-                item->setText(1,"???");
-                break;
+			ui->ChipList->clear();
+			for(int i=0;i<crt_info.ChipCount;i++)
+			{
+				QTreeWidgetItem *item = new QTreeWidgetItem(ui->ChipList);
+				sprintf(str00,"%2.2d",i);
+				item->setText(0,str00);
+				item->setTextAlignment(0,Qt::AlignHCenter);
 
-            }
-            item->setTextAlignment(1,Qt::AlignHCenter);
+				switch(crt_info.ChipInfo[i].Type)
+				{
+				case 0:
+					item->setText(1,"ROM");
+					break;
+				case 1:
+					item->setText(1,"RAM");
+					break;
+				case 2:
+					item->setText(1,"F-ROM");
+					break;
+				default:
+					item->setText(1,"???");
+					break;
 
-            sprintf(str00,"$%2.2X",crt_info.ChipInfo[i].BankLocation);
-            item->setText(2,str00);
-            item->setTextAlignment(2,Qt::AlignHCenter);
+				}
+				item->setTextAlignment(1,Qt::AlignHCenter);
 
-            sprintf(str00,"$%4.4X",crt_info.ChipInfo[i].LoadAdress);
-            item->setText(3,str00);
+				sprintf(str00,"$%2.2X",crt_info.ChipInfo[i].BankLocation);
+				item->setText(2,str00);
+				item->setTextAlignment(2,Qt::AlignHCenter);
 
-            sprintf(str00,"$%4.4X",crt_info.ChipInfo[i].ChipSize);
-            item->setText(4,str00);
+				sprintf(str00,"$%4.4X",crt_info.ChipInfo[i].LoadAdress);
+				item->setText(3,str00);
 
-            ui->ChipList->addTopLevelItem(item);
-        }
-        ui->ChipList->setCurrentIndex(ui->ChipList->model()->index(0,0,QModelIndex()));
+				sprintf(str00,"$%4.4X",crt_info.ChipInfo[i].ChipSize);
+				item->setText(4,str00);
 
-        switch(crt_info.HardwareType)
-        {
-        case 1: // Action Replay
-            if(!win_exp)
-            {
-                this->resize(this->width()+200,this->height());
-                this->setMinimumWidth(this->minimumWidth()+200);
-            }
-            ui->MoreCRTPage->setMinimumWidth(200);
-            ui->MoreCRTPage->setCurrentIndex(2);
-            win_exp = true;
-            break;
-        case 3: // FC_III
-            if(!win_exp)
-            {
-                this->resize(this->width()+200,this->height());
-                this->setMinimumWidth(this->minimumWidth()+200);
-            }
-            ui->MoreCRTPage->setMinimumWidth(200);
-            ui->MoreCRTPage->setCurrentIndex(1);
-            win_exp = true;
-            break;
-        case 32: // EasyFlash
-            if(!win_exp)
-            {
-                this->resize(this->width()+200,this->height());
-                this->setMinimumWidth(this->minimumWidth()+200);
-            }
-            ui->MoreCRTPage->setMinimumWidth(200);
-            ui->MoreCRTPage->setCurrentIndex(0);
-            win_exp = true;
-            break;
-        default:
-            if(win_exp)
-            {
-                this->setMinimumWidth(this->minimumWidth()-200);
-                this->resize(this->width()-200,this->height());
-            }
-            ui->MoreCRTPage->setMinimumWidth(0);
-            win_exp = false;
-            break;
-        }
+				ui->ChipList->addTopLevelItem(item);
+			}
+			ui->ChipList->setCurrentIndex(ui->ChipList->model()->index(0,0,QModelIndex()));
 
-        break;
-    case 1:
-        CRTIsSelected = false;
-        /* Fehler beim öffnene */
-        break;
-    case 2:
-        CRTIsSelected = false;
-        /* Unbekanntes Format */
-        break;
-    case 3:
-        CRTIsSelected = false;
-        /* Kein ROM Image */
-        break;
-    }
+			switch(crt_info.HardwareType)
+			{
+			case 1: // Action Replay
+				if(!win_exp)
+				{
+					this->resize(this->width()+200,this->height());
+					this->setMinimumWidth(this->minimumWidth()+200);
+				}
+				ui->MoreCRTPage->setMinimumWidth(200);
+				ui->MoreCRTPage->setCurrentIndex(2);
+				win_exp = true;
+				break;
+			case 3: // FC_III
+				if(!win_exp)
+				{
+					this->resize(this->width()+200,this->height());
+					this->setMinimumWidth(this->minimumWidth()+200);
+				}
+				ui->MoreCRTPage->setMinimumWidth(200);
+				ui->MoreCRTPage->setCurrentIndex(1);
+				win_exp = true;
+				break;
+			case 32: // EasyFlash
+				if(!win_exp)
+				{
+					this->resize(this->width()+200,this->height());
+					this->setMinimumWidth(this->minimumWidth()+200);
+				}
+				ui->MoreCRTPage->setMinimumWidth(200);
+				ui->MoreCRTPage->setCurrentIndex(0);
+				win_exp = true;
+				break;
+			default:
+				if(win_exp)
+				{
+					this->setMinimumWidth(this->minimumWidth()-200);
+					this->resize(this->width()-200,this->height());
+				}
+				ui->MoreCRTPage->setMinimumWidth(0);
+				win_exp = false;
+				break;
+			}
+
+			break;
+		case 1:
+			CRTIsSelected = false;
+			/* Fehler beim öffnene */
+			break;
+		case 2:
+			CRTIsSelected = false;
+			/* Unbekanntes Format */
+			break;
+		case 3:
+			CRTIsSelected = false;
+			/* Kein ROM Image */
+			break;
+		}
+	}
 }
 
 void CartridgeWindow::onChipList_currentChanged(const QModelIndex &current, const QModelIndex &)
@@ -376,7 +382,8 @@ void CartridgeWindow::on_NewEasyFlashCRT_clicked()
         QFile file(fullpath);
         if(!file.exists())
         {
-            if(c64->CreateNewEasyFlashImage(fullpath.toLocal8Bit(), cartridge_name.toLocal8Bit()))
+			FILE *file = qfopen(fullpath, "wb");
+			if(c64->CreateNewEasyFlashImage(file, cartridge_name.toLocal8Bit()))
             {
                 QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues EasyFlash Image erstellt werden."));
             }
@@ -390,7 +397,8 @@ void CartridgeWindow::on_NewEasyFlashCRT_clicked()
         {
             if(QMessageBox::Yes == QMessageBox::question(this,tr("Achtung!"),tr("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
             {
-                if(c64->CreateNewEasyFlashImage(fullpath.toLocal8Bit(), cartridge_name.toLocal8Bit()))
+				FILE *file = qfopen(fullpath, "wb");
+				if(c64->CreateNewEasyFlashImage(file, cartridge_name.toLocal8Bit()))
                 {
                     QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues EasyFlash Image erstellt werden."));
                 }
@@ -410,26 +418,33 @@ void CartridgeWindow::on_InsertCRT_clicked()
 {
     if(CRTIsSelected)
     {
-        if(0 == c64->LoadCRT(SelCRTFileName.toLocal8Bit()))
-        {
-            ui->PageFC->setEnabled(false);
-            ui->PageEasyFlash->setEnabled(false);
-            ui->PageAR->setEnabled(false);
-            insterted_hwtyp = crt_info.HardwareType;
-            switch(insterted_hwtyp)
-            {
-            case 1:
-                ui->PageAR->setEnabled(true);
-                break;
-            case 3:
-                ui->PageFC->setEnabled(true);
-                break;
-            case 32:
-                ui->PageEasyFlash->setEnabled(true);
-                break;
-            }
-        }
-        else QMessageBox::warning(this,tr("CRT Fehler"),tr("Fehler beim Laden des ausgewählten CRT Files"));
+		FILE *file = qfopen(SelCRTFileName, "rb");
+		if(file != nullptr)
+		{
+			if(0 == c64->LoadCRT(file))
+			{
+				ui->PageFC->setEnabled(false);
+				ui->PageEasyFlash->setEnabled(false);
+				ui->PageAR->setEnabled(false);
+				insterted_hwtyp = crt_info.HardwareType;
+				switch(insterted_hwtyp)
+				{
+				case 1:
+					ui->PageAR->setEnabled(true);
+					break;
+				case 3:
+					ui->PageFC->setEnabled(true);
+					break;
+				case 32:
+					ui->PageEasyFlash->setEnabled(true);
+					break;
+				}
+			}
+			else QMessageBox::warning(this,tr("CRT Fehler"),tr("Fehler beim Laden des ausgewählten CRT Files"));
+
+			fclose(file);
+		}
+		else QMessageBox::critical(this,"ERROR","Fehler beim öffnen des CRT");
     }
 }
 
