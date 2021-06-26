@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.06.2021	       		//
+// Letzte Änderung am 26.06.2021	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -34,6 +34,7 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
     RESET = reset;
     GCR_PTR = nullptr;
     breakgroup_count = 0;
+	image_file = nullptr;
 
     CycleCounter = 0;
 
@@ -203,143 +204,139 @@ void Floppy1541::SetFloppySoundVolume(float_t volume)
     Volume = volume;
 }
 
-bool Floppy1541::LoadDiskImage(const char* filename)
+bool Floppy1541::LoadDiskImage(FILE *file, int typ)
 {
-    FILE *file;
-    char EXT[4];
-    size_t reading_elements;
+	size_t reading_elements;
 
-    int len = (int)strlen(filename);
+	UnLoadDiskImage();
 
-    strcpy(EXT,filename+len-3); /* FIXME: crash if len < 3 */
+	image_file = file;
 
-    EXT[0]=toupper(EXT[0]);
-    EXT[1]=toupper(EXT[1]);
-    EXT[2]=toupper(EXT[2]);
+	switch(typ)
+	{
+	case D64:
+		// Diskwechsel simulieren
+		StartDiskChange();
 
-    CheckImageWrite();
-    strcpy(ImageFileName,filename);
+		if (file == nullptr)
+			return false;
 
-    if(0==strcmp("D64",EXT))
-    {
-        // Diskwechsel simulieren
-        StartDiskChange();
+		for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i]=0x00;
 
-        file = fopen(filename, "rb");
-        if (file == NULL)
-        {
-            return false;
-        }
+		reading_elements = fread (D64Image,1,D64_IMAGE_SIZE,file);
+		if(reading_elements != D64_IMAGE_SIZE)
+		{
+			//fclose(file);
+			return false;
+		}
 
-        for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i]=0x00;
+		//fclose(file);
+		D64ImageToGCRImage();
 
-        reading_elements = fread (D64Image,1,D64_IMAGE_SIZE,file);
-        if(reading_elements != D64_IMAGE_SIZE)
-        {
-            fclose(file);
-            return false;
-        }
+		GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
+		GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
 
-        fclose(file);
-        D64ImageToGCRImage();
+		ImageWriteStatus = false;
+		ImageDirectoryWriteStatus = false;
+		ImageTyp = D64;
 
-        GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
-        GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
+		SyncFoundCount = 0;
 
-        ImageWriteStatus = false;
-        ImageDirectoryWriteStatus = false;
-        ImageTyp = D64;
+		return true;
+		break;
 
-        SyncFoundCount = 0;
+	case G64:
+		char  kennung[9];
+		char  version;
+		int8_t  trackanzahl;
+		unsigned short  tracksize;
+		uint32_t trackpos[84];
+		uint32_t trackspeed[84];
 
-        return true;
-    }
+		// Diskwechsel simulieren
+		StartDiskChange();
 
-    if(0==strcmp("G64",EXT))
-    {
-        char  kennung[9];
-        char  version;
-        int8_t  trackanzahl;
-        unsigned short  tracksize;
-        uint32_t trackpos[84];
-        uint32_t trackspeed[84];
+		if (file == nullptr)
+			return false;
 
-        // Diskwechsel simulieren
-        StartDiskChange();
+		for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i]=0x00;
 
-        file = fopen(filename, "rb");
-        if (file == NULL)
-        {
-            return false;
-        }
+		reading_elements = fread (kennung,1,8,file);
+		kennung[8]=0;
 
-        for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i]=0x00;
+		if(0 != strcmp("GCR-1541",kennung))
+		{
+			//MessageBox(0,"Fehlerhaftes G64 Image","Error!",0);
+			return false;
+		}
 
-        reading_elements = fread (kennung,1,8,file);
-        kennung[8]=0;
+		reading_elements = fread (&version,1,1,file);
+		if(version != 0)
+		{
+			//MessageBox(0,"Dies Version unterstützt nur G64 Images Version 1","Error!",0);
+			return false;
+		}
 
-        if(0 != strcmp("GCR-1541",kennung))
-        {
-            //MessageBox(0,"Fehlerhaftes G64 Image","Error!",0);
-            return false;
-        }
+		reading_elements = fread (&trackanzahl,1,1,file);
+		if(trackanzahl > 84)
+		{
+			//MessageBox(0,"Das Image enthält zuviele Tracks!","Error!",0);
+		}
 
-        reading_elements = fread (&version,1,1,file);
-        if(version != 0)
-        {
-            //MessageBox(0,"Dies Version unterstützt nur G64 Images Version 1","Error!",0);
-            return false;
-        }
+		reading_elements = fread (&tracksize,1,2,file);
+		if(tracksize != 7928)
+		{
+			//MessageBox(0,"Unbekannte Trackgröße","Error!",0);
+		}
 
-        reading_elements = fread (&trackanzahl,1,1,file);
-        if(trackanzahl > 84)
-        {
-            //MessageBox(0,"Das Image enthält zuviele Tracks!","Error!",0);
-        }
+		reading_elements = fread (&trackpos,4,84,file);
+		reading_elements = fread (&trackspeed,4,84,file);
 
-        reading_elements = fread (&tracksize,1,2,file);
-        if(tracksize != 7928)
-        {
-            //MessageBox(0,"Unbekannte Trackgröße","Error!",0);
-        }
+		for(int i=0;i<trackanzahl;i++)
+		{
+			if(trackpos[i] != 0)
+			{
+				fseek(file,trackpos[i],SEEK_SET);
+				reading_elements = fread(&TrackSize[i],1,2,file);
+				reading_elements = fread(GCRImage+(i*tracksize),1,tracksize-2,file);
+			}
+		}
 
-        reading_elements = fread (&trackpos,4,84,file);
-        reading_elements = fread (&trackspeed,4,84,file);
+		//fclose(file);
 
-        for(int i=0;i<trackanzahl;i++)
-        {
-            if(trackpos[i] != 0)
-            {
-                fseek(file,trackpos[i],SEEK_SET);
-                reading_elements = fread(&TrackSize[i],1,2,file);
-                reading_elements = fread(GCRImage+(i*tracksize),1,tracksize-2,file);
-            }
-        }
+		ImageWriteStatus = false;
+		ImageDirectoryWriteStatus = false;
+		ImageTyp = G64;
 
-        fclose(file);
+		SyncFoundCount = 0;
 
-        ImageWriteStatus = false;
-        ImageDirectoryWriteStatus = false;
-        ImageTyp = G64;
-
-        SyncFoundCount = 0;
-
-        return true;
-    }
+		return true;
+		break;
+	}
     return false;
 }
 
 void Floppy1541::UnLoadDiskImage()
 {
+	if(image_file == nullptr)
+		return;
+
     CheckImageWrite();
-    for(int i=0;i<D64_IMAGE_SIZE;i++) D64Image[i] = 0;
-    for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i] = 0;
+
+	for(int i=0;i<D64_IMAGE_SIZE;i++)
+		D64Image[i] = 0;
+	for(int i=0;i<G64_IMAGE_SIZE;i++)
+		GCRImage[i] = 0;
     WriteProtect = false;
+
+	fclose(image_file);
+	image_file = nullptr;
 }
 
 inline void Floppy1541::CheckImageWrite()
 {
-    FILE *File;
+	if(image_file == nullptr)
+		return;
 
     if(ImageWriteStatus && !WriteProtectAkt)
     {
@@ -347,17 +344,8 @@ inline void Floppy1541::CheckImageWrite()
         {
         case D64:
             GCRImageToD64Image();
-
-            File = fopen (ImageFileName, "wb");
-            if(File == nullptr)
-            {
-                //MessageBox(0,"Fehler beim schreiben des Aktuellen Images","Emu64 Fehler",0);
-                return;
-            }
-
-            fwrite(D64Image,1,D64_IMAGE_SIZE,File);
-
-            fclose(File);
+			fseek(image_file, 0, SEEK_SET);
+			fwrite(D64Image,1,D64_IMAGE_SIZE, image_file);
             break;
 
         case G64:

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.06.2021                //
+// Letzte Änderung am 26.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -74,7 +74,7 @@ public:
     void KeyEvent(uint8_t  matrix_code, KeyStatus status, bool isAutoShift);
     bool LoadC64Roms(const char *kernalrom, const char *basicrom, const char *charrom);
     bool LoadFloppyRom(uint8_t floppy_nr, const char *dos1541rom);
-    bool LoadDiskImage(uint8_t floppy_nr, const char *filename);
+	bool LoadDiskImage(uint8_t floppy_nr, FILE *file, int typ);
     void LoadPRGFromD64(uint8_t floppy_nr, char *c64_filename, int command);
     void SetFloppyWriteProtect(uint8_t floppy_nr, bool status);
     void SetCommandLine(char *c64_command);

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.04.2020       		//
+// Letzte Änderung am 26.06.2021	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -25,6 +25,7 @@
 #include "./mos6522_class.h"
 #include "./structs.h"
 
+#define NO_IMAGE -1
 #define D64 0
 #define G64 1
 #define MAX_BREAK_GROUP_NUM 255
@@ -53,7 +54,7 @@ public:
     void* GetSoundBuffer();
     void ZeroSoundBufferPos();
     void SetFloppySoundVolume(float_t volume);
-    bool LoadDiskImage(const char* filename);
+	bool LoadDiskImage(FILE *file, int typ);		// 0=D64 , 1=G64
     void UnLoadDiskImage();
     void SetC64IEC(uint8_t* port);
     void SetDeviceNumber(uint8_t number);
@@ -158,7 +159,7 @@ private:
 
     #define             FileNameSize 1024
 
-    char                ImageFileName[FileNameSize];
+	FILE *              image_file;
     int                 ImageTyp;
     uint8_t             AktGCRWert;
     static const int	NUM_TRACKS = 42;

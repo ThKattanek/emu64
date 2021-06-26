@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.06.2021                //
+// Letzte Änderung am 26.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1357,11 +1357,11 @@ bool C64Class::LoadFloppyRom(uint8_t floppy_nr, const char *dos1541rom)
     return false;
 }
 
-bool C64Class::LoadDiskImage(uint8_t floppy_nr, const char *filename)
+bool C64Class::LoadDiskImage(uint8_t floppy_nr, FILE *file, int typ)
 {
     if(floppy_nr < MAX_FLOPPY_NUM)
     {
-        return floppy[floppy_nr]->LoadDiskImage(filename);
+		return floppy[floppy_nr]->LoadDiskImage(file, typ);
     }
     return false;
 }
@@ -2718,7 +2718,8 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, const char *filename)
 
     if(0==strcmp("D64",EXT))
     {
-        if(!LoadDiskImage(floppy_nr,filename)) return 2;
+		/*
+		if(!LoadDiskImage(floppy_nr,filename)) return 2;
 
         KillCommandLine();
         auto_load_mode = 0;
@@ -2727,11 +2728,13 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, const char *filename)
         wait_reset_ready = true;
         c64_reset_ready = false;
         floppy_reset_ready[0] = false;
+		*/
         return 0;
     }
 
     if(0==strcmp("G64",EXT))
     {
+		/*
         if(!LoadDiskImage(floppy_nr,filename)) return 3;
 
         KillCommandLine();
@@ -2741,6 +2744,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, const char *filename)
         wait_reset_ready = true;
         c64_reset_ready = false;
         floppy_reset_ready[0] = false;
+		*/
         return 0;
     }
 

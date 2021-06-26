@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.03.2020                //
+// Letzte Änderung am 26.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,6 +18,7 @@
 
 #include "./main_window.h"
 #include "./ui_main_window.h"
+#include "./utils.h"
 
 static QMutex mutex_log_text;
 
@@ -528,7 +529,18 @@ int MainWindow::OnInit()
             WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(i,0);
 
             w->SetAktFilename(floppy_window->GetAktFilename(i),floppy_window->GetAktD64Name(i));
-            c64->LoadDiskImage(i,floppy_window->GetAktFilename(i).toLocal8Bit());
+
+			QFileInfo file_info(floppy_window->GetAktFilename(i));
+
+			int typ = NO_IMAGE;
+			if(file_info.completeSuffix().toUpper() == "D64")
+				typ = D64;
+
+			if(file_info.completeSuffix().toUpper() == "G64")
+				typ = G64;
+
+			FILE *file = qfopen(floppy_window->GetAktFilename(i), "r+b");
+			c64->LoadDiskImage(i,file, typ);
 
             w->SetEnableFloppy(ini->value("Enabled",false).toBool());
             w->SetFloppyVolume(ini->value("VolumeMode",2).toInt());
@@ -1053,7 +1065,18 @@ void MainWindow::OnChangeFloppyImage(int floppynr)
 {
     WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(floppynr,0);
     w->SetAktFilename(floppy_window->GetAktFilename(floppynr),floppy_window->GetAktD64Name(floppynr));
-    c64->LoadDiskImage(floppynr,floppy_window->GetAktFilename(floppynr).toLocal8Bit());
+
+	QFileInfo file_info(floppy_window->GetAktFilename(floppynr));
+
+	int typ = NO_IMAGE;
+	if(file_info.completeSuffix().toUpper() == "D64")
+		typ = D64;
+
+	if(file_info.completeSuffix().toUpper() == "G64")
+		typ = G64;
+
+	FILE *file = qfopen(floppy_window->GetAktFilename(floppynr), "r+b");
+	c64->LoadDiskImage(floppynr,file, typ);
 }
 
 void MainWindow::OnResetScreenshotCounter()
