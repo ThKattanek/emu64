@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 05.11.2020                //
+// Letzte Änderung am 26.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,6 +18,7 @@
 
 #include "./floppy_window.h"
 #include "./ui_floppy_window.h"
+#include "./utils.h"
 
 #define MAX_D64_FILES 128
 
@@ -164,7 +165,9 @@ void FloppyWindow::LoadIni()
             AktDir[i] = ini->value("AktDir","").toString();
             AktFile[i] = ini->value("AktFile","").toString();
             AktFileName[i] = AktDir[i] + "/" + AktFile[i];
-            d64[i].LoadD64(AktFileName[i].toLocal8Bit());
+
+			FILE *file = qfopen(AktFileName[i], "rb");
+			d64[i].LoadD64(file);
 
             // Write Protect für alle Floppys setzen
             c64->floppy[i]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktFileName[i]));
@@ -193,7 +196,8 @@ bool FloppyWindow::SetDiskImage(uint8_t floppynr, QString filename)
     AktFile[floppynr] = fi.fileName();
     AktFileName[floppynr] = AktDir[floppynr] + "/" + AktFile[floppynr];
 
-    d64[floppynr].LoadD64(AktFileName[floppynr].toLocal8Bit());
+	FILE *file = qfopen(AktFileName[floppynr], "rb");
+	d64[floppynr].LoadD64(file);
 
     c64->floppy[floppynr]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktFileName[floppynr]));
 
@@ -225,7 +229,8 @@ void FloppyWindow::OnSelectFile(QString filename)
         AktFile[FloppyNr] = ui->FileBrowser->GetAktFile();
         if("D64" == AktFileName[FloppyNr].right(3).toUpper())
         {
-            d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toLocal8Bit());
+			FILE *file = qfopen(AktFileName[FloppyNr], "rb");
+			d64[FloppyNr].LoadD64(file);
             RefreshD64FileList();
             emit ChangeFloppyImage(FloppyNr);
         }
@@ -671,32 +676,40 @@ void FloppyWindow::on_CreateNewD64_clicked()
         if(!file.exists())
         {
             D64Class d64;
-            if(!d64.CreateDiskImage(fullpath.toLocal8Bit(),diskname.toLocal8Bit(),diskid.toLocal8Bit()))
-            {
-                QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues Diskimage erstellt werden."));
-            }
-            else
-            {
-                ui->FileBrowser->SetAktDir(ui->FileBrowser->GetAktDir());
-                ui->FileBrowser->SetAktFile(ui->FileBrowser->GetAktDir(),filename);
-                RefreshD64FileList();
-            }
+			FILE *file = qfopen(fullpath, "wb");
+			if(file != nullptr)
+			{
+				if(!d64.CreateDiskImage(file, diskname.toLocal8Bit(), diskid.toLocal8Bit()))
+				{
+					QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues Diskimage erstellt werden."));
+				}
+				else
+				{
+					ui->FileBrowser->SetAktDir(ui->FileBrowser->GetAktDir());
+					ui->FileBrowser->SetAktFile(ui->FileBrowser->GetAktDir(),filename);
+					RefreshD64FileList();
+				}
+			}
         }
         else
         {
             if(QMessageBox::Yes == QMessageBox::question(this,tr("Achtung!"),tr("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
             {
                 D64Class d64;
-                if(!d64.CreateDiskImage(fullpath.toLocal8Bit(),diskname.toLocal8Bit(),diskid.toLocal8Bit()))
-                {
-                    QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues Diskimage erstellt werden."));
-                }
-                else
-                {
-                    ui->FileBrowser->SetAktDir(ui->FileBrowser->GetAktDir());
-                    ui->FileBrowser->SetAktFile(ui->FileBrowser->GetAktDir(),filename);
-                    RefreshD64FileList();
-                }
+				FILE *file = qfopen(fullpath, "wb");
+				if(file != nullptr)
+				{
+					if(!d64.CreateDiskImage(file,diskname.toLocal8Bit(),diskid.toLocal8Bit()))
+					{
+						QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues Diskimage erstellt werden."));
+					}
+					else
+					{
+						ui->FileBrowser->SetAktDir(ui->FileBrowser->GetAktDir());
+						ui->FileBrowser->SetAktFile(ui->FileBrowser->GetAktDir(),filename);
+						RefreshD64FileList();
+					}
+				}
             }
         }
     }

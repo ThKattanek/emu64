@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.04.2020         		//
+// Letzte Änderung am 26.06.2021         		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -33,13 +33,12 @@ class D64Class
     public:
     D64Class();
     ~D64Class();
-    bool CreateDiskImage(const char* filename, const char* diskname, const char* diskid);
-    int LoadD64(const char* filename);
+	bool CreateDiskImage(FILE *file, const char* diskname, const char* diskid);
+	int LoadD64(FILE *file);
     void ReLoad(uint8_t* d64_image_buffer);
     void UnLoadD64();
     bool ExportPrg(int file_number, const char* filename);
 
-    char        filename[1024];
     char        d64_name[D64_NAME_LENGHT+1];
     uint16_t    file_count;
     uint32_t    d64_size;
