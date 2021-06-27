@@ -3,9 +3,6 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#ifndef V1541C_UTILS_H
-#define V1541C_UTILS_H
-
 #ifdef _WIN32
 #include <windows.h>
 #include <QRegularExpression>
@@ -23,8 +20,6 @@
 #define qfopen(n,m) fopen((n).toLocal8Bit().data(), m)
 #define qfname(n) ((n).toLocal8Bit().data())
 #define qfnsan(n) ((n).replace('/', '_'))
-#endif
-
 #endif
 
 #endif // UTILS_H
