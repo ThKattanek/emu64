@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019                //
+// Letzte Änderung am 27.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -30,7 +30,7 @@
 enum TAPE_IMAGE_TYP
 {
     TAP,
-    WAV
+	WAV
 };
 
 #define REW_SPEED 12 // 15-Fache Geschwindigkeit
@@ -44,8 +44,8 @@ public:
     TAPE1530(int samplerate, int puffersize, float cycles_per_second);
     ~TAPE1530();
     void SetC64Zyklen(float cycles_per_second);
-    bool LoadTapeImage(const char *filename);
-    bool RecordTapeImage(const char *filename);
+	bool LoadTapeImage(FILE *file, int typ);
+	bool RecordTapeImage(FILE *file);
     void StopRecordImage();
     unsigned char SetTapeKeys(unsigned char pressed_key);
     void *GetSoundBuffer(void);
@@ -66,8 +66,7 @@ private:
     void CalcTime2CounterTbl(void);
     void CalcTapeLenTime();
 
-    FILE            *file;
-    FILE            *recfile;
+	FILE            *image_file;
 
     float           cycles_per_second;
 

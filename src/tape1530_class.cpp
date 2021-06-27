@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019                //
+// Letzte Änderung am 27.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -54,8 +54,8 @@ TAPE1530::TAPE1530(int samplerate, int puffersize, float cycles_per_second)
     for(int i=0; i<(puffersize*2); i++)
         SoundBuffer[i] = 0;
 
-    file = NULL;
-    recfile = NULL;
+	image_file = nullptr;
+
     WaitCounter = 0;
 
     PressedKeys = 0;
@@ -81,17 +81,21 @@ void TAPE1530::SetC64Zyklen(float cycles_per_second)
     PlayFrequenzFaktor = 4294967296.0 / cycles_per_second;     // 2^32 / Samplerate;
 }
 
-bool TAPE1530::LoadTapeImage(const char *filename)
+bool TAPE1530::LoadTapeImage(FILE *file, int typ)
 {
-    char EXT[4];
     size_t reading_elements;
 
-    if(file != NULL)
+	if(file == nullptr)
+		return false;
+
+	if(image_file != nullptr)
     {
-        fclose(file);
+		fclose(image_file);
         IsTapeInsert = false;
         WritePotected = true;
     }
+
+	image_file = file;
 
     WAVEFormatTag = 0;
     WAVEChannels = 0;
@@ -101,181 +105,166 @@ bool TAPE1530::LoadTapeImage(const char *filename)
     WAVEBitPerSample = 0;
     WAVEDataSize = 0;
 
-    int len = (int)strlen(filename);
-    strcpy(EXT,filename+len-3);
-
-    EXT[0]=toupper(EXT[0]);
-    EXT[1]=toupper(EXT[1]);
-    EXT[2]=toupper(EXT[2]);
-
     TapeLenTime = 0;
     TapeLenCount = 0;
 
-    if(0==strcmp("TAP",EXT))
-    {
-        char Kennung[13];
+	char Kennung[13];
+	unsigned long reading_bytes;
 
-        file = fopen(filename, "rb");
-        if (file == NULL)
-        {
-            return false;
-        }
+	switch(typ)
+	{
+	case TAP:
+		reading_elements = fread(Kennung,1,12,file);
 
-        reading_elements = fread(Kennung,1,12,file);
-        if(reading_elements){}
+		Kennung[12]=0;
+		if(0!=strcmp("C64-TAPE-RAW",Kennung))
+		{
+			fclose(image_file);
+			image_file = nullptr;
+			return false;
+		}
 
-        Kennung[12]=0;
-        if(0!=strcmp("C64-TAPE-RAW",Kennung))
-        {
-            fclose(file);
-            return false;
-        }
+		reading_elements = fread(&TapeVersion,1,1,file);
+		fseek(file,0x10,SEEK_SET);
+		reading_elements = fread(&TapeBufferSize,1,4,file);
 
-        reading_elements = fread(&TapeVersion,1,1,file);
-        fseek(file,0x10,SEEK_SET);
-        reading_elements = fread(&TapeBufferSize,1,4,file);
+		// Speicher für TapeBuffer reservieren vorher evtl. alten wieder freigeben
+		if(TapeBuffer != NULL)
+			delete[] TapeBuffer;
 
-        // Speicher für TapeBuffer reservieren vorher evtl. alten wieder freigeben
-        if(TapeBuffer != NULL)
-            delete[] TapeBuffer;
+		TapeBuffer = new unsigned char[TapeBufferSize];
+		if(TapeBuffer == NULL) return false;
 
-        TapeBuffer = new unsigned char[TapeBufferSize];
-        if(TapeBuffer == NULL) return false;
+		// Tape Daten in Buffer laden
+		reading_bytes = fread (TapeBuffer,1,TapeBufferSize,file);
+		if(reading_bytes != TapeBufferSize)
+		{
+			std::cout << "Tapeimage ist defekt !" << std::endl << "Anzahl der Daten stimmt nicht mit der Anzahl im Tape Header überein." << std::endl;
+			return false;
+		}
 
-        // Tape Daten in Buffer laden
-        unsigned long reading_bytes = fread (TapeBuffer,1,TapeBufferSize,file);
-        if(reading_bytes != TapeBufferSize)
-        {
-            std::cout << "Tapeimage ist defekt !" << std::endl << "Anzahl der Daten stimmt nicht mit der Anzahl im Tape Header überein." << std::endl;
-            return false;
-        }
+		WaitCounter = 0;
 
-        WaitCounter = 0;
+		TapeType = 0;
+		IsTapeInsert = true;
+		TapeBufferPos = 0;
+		TapePosCycles = 0;
 
-        TapeType = 0;
-        IsTapeInsert = true;
-        TapeBufferPos = 0;
-        TapePosCycles = 0;
+		TapePosIsStart = true;
+		TapePosIsEnd = false;
 
-        TapePosIsStart = true;
-        TapePosIsEnd = false;
+		CalcTapeLenTime();
 
-        CalcTapeLenTime();
+		fclose(image_file);
+		image_file = nullptr;
 
-        fclose(file);
-        file = NULL;
+		return true;
+		break;
 
-        return true;
-    }
+	case WAV:
+		reading_elements = fread(Kennung,1,4,file);
+		Kennung[4]=0;
+		if(0!=strcmp("RIFF",Kennung))
+		{
+			fclose(image_file);
+			image_file = nullptr;
+			return false;
+		}
 
-    if(0==strcmp("WAV",EXT))
-    {
-        char Kennung[5];
+		fseek(file,4,SEEK_CUR);
 
-        file = fopen(filename, "rb");
-        if (file == NULL)
-        {
-            return false;
-        }
+		reading_elements = fread(Kennung,1,4,file);
+		Kennung[4]=0;
+		if(0!=strcmp("WAVE",Kennung))
+		{
+			fclose(image_file);
+			image_file = nullptr;
+			return false;
+		}
 
-        reading_elements = fread(Kennung,1,4,file);
-        Kennung[4]=0;
-        if(0!=strcmp("RIFF",Kennung))
-        {
-            fclose(file);
-            return false;
-        }
+		reading_elements = fread(Kennung,1,4,file);
+		Kennung[4]=0;
+		if(0!=strcmp("fmt ",Kennung))
+		{
+			fclose(image_file);
+			image_file = nullptr;
+			return false;
+		}
 
-        fseek(file,4,SEEK_CUR);
+		fseek(file,4,SEEK_CUR);
 
-        reading_elements = fread(Kennung,1,4,file);
-        Kennung[4]=0;
-        if(0!=strcmp("WAVE",Kennung))
-        {
-            fclose(file);
-            return false;
-        }
+		reading_elements = fread(&WAVEFormatTag,1,2,file);
+		if(WAVEFormatTag != 1) return false;
 
-        reading_elements = fread(Kennung,1,4,file);
-        Kennung[4]=0;
-        if(0!=strcmp("fmt ",Kennung))
-        {
-            fclose(file);
-            return false;
-        }
+		reading_elements = fread(&WAVEChannels,1,2,file);
 
-        fseek(file,4,SEEK_CUR);
+		reading_elements = fread(&WAVESampleRate,1,4,file);
+		reading_elements = fread(&WAVEBytePerSek,1,4,file);
+		reading_elements = fread(&WAVEBlockAlign,1,2,file);
+		reading_elements = fread(&WAVEBitPerSample,1,2,file);
 
-        reading_elements = fread(&WAVEFormatTag,1,2,file);
-        if(WAVEFormatTag != 1) return false;
+		reading_elements = fread(Kennung,1,4,file);
+		Kennung[4]=0;
+		if(0!=strcmp("data",Kennung))
+		{
+			fclose(image_file);
+			image_file = nullptr;
+			return false;
+		}
 
-        reading_elements = fread(&WAVEChannels,1,2,file);
+		reading_elements = fread(&WAVEDataSize,1,4,file);
 
-        reading_elements = fread(&WAVESampleRate,1,4,file);
-        reading_elements = fread(&WAVEBytePerSek,1,4,file);
-        reading_elements = fread(&WAVEBlockAlign,1,2,file);
-        reading_elements = fread(&WAVEBitPerSample,1,2,file);
+		TapeType = 1;
+		IsTapeInsert = true;
 
-        reading_elements = fread(Kennung,1,4,file);
-        Kennung[4]=0;
-        if(0!=strcmp("data",Kennung))
-        {
-            fclose(file);
-            return false;
-        }
+		TapePosIsStart = true;
+		TapePosIsEnd = false;
 
-        reading_elements = fread(&WAVEDataSize,1,4,file);
+		WaveCounter = 0.0f;
+		AddWaveWert = (double)WAVESampleRate / cycles_per_second;
 
-        TapeType = 1;
-        IsTapeInsert = true;
-
-        TapePosIsStart = true;
-        TapePosIsEnd = false;
-
-        WaveCounter = 0.0f;
-        AddWaveWert = (double)WAVESampleRate / cycles_per_second;
-
-        return true;
-    }
+		return true;
+		break;
+	}
     return false;
 }
 
-bool TAPE1530::RecordTapeImage(const char *filename)
+bool TAPE1530::RecordTapeImage(FILE *file)
 {
-    if(recfile != NULL) return false;
+	if(file == nullptr)
+		return false;
 
-    // Datei zum schreiben öffnen
-    recfile = fopen(filename, "wb");
-    if (recfile == NULL)
-        return false;
+	StopRecordImage();
+
+	image_file = file;
 
     char Kennung[] = "C64-TAPE-RAW";
     unsigned int WriteDWord = 0;
 
     // 0x00: Kennung
-    fwrite(Kennung,1,12,recfile);
+	fwrite(Kennung, 1, 12, image_file);
     // 0x0C: Version + 0x0D: Future expansion
-    fwrite(&WriteDWord,1,4,recfile);
+	fwrite(&WriteDWord, 1, 4, image_file);
     // 0x10: Platzhalter Datasize
-    fwrite(&WriteDWord,1,4,recfile);
+	fwrite(&WriteDWord, 1, 4, image_file);
     // 0x14: Daten
 
-    TapePosCycles = RecCyclesCounter = RecTapeSize = 0;
-    IsRecTapeInsert = true;
+	TapePosCycles = RecCyclesCounter = RecTapeSize = 0;
+	IsRecTapeInsert = true;
 
-    return true;
+	return true;
 }
 
 void TAPE1530::StopRecordImage()
 {
-    if(recfile != NULL)
+	if(image_file != nullptr && IsRecTapeInsert == true)
     {
         // Datasize eintragen
-        fseek(recfile,0x10,SEEK_SET);
-        fwrite(&RecTapeSize,1,4,recfile);
+		fseek(image_file, 0x10, SEEK_SET);
+		fwrite(&RecTapeSize, 1, 4, image_file);
 
-        fclose(recfile);
-        recfile = NULL;
+		fclose(image_file);
+		image_file = nullptr;
     }
     IsRecTapeInsert = false;
 }
@@ -409,7 +398,7 @@ void TAPE1530::OneCycle()
                         switch(WAVEBitPerSample)
                         {
                             case 8:
-                            redingbytes = fread(&ReadByte,1,1,file);
+							redingbytes = fread(&ReadByte, 1, 1, image_file);
                             if((i == WAVEDataChannel) || (WAVEChannels == 1))
                             {
                                 if(ReadByte < WAVELowPeek8Bit) WaveStatus = Low;
@@ -425,7 +414,7 @@ void TAPE1530::OneCycle()
                             break;
 
                             case 16:
-                             redingbytes = fread(&ReadWord,1,2,file);
+							 redingbytes = fread(&ReadWord, 1, 2, image_file);
                             if((i == WAVEDataChannel) || (WAVEChannels == 1))
                             {
                                 ReadWord += 0x8000;
@@ -521,15 +510,15 @@ void TAPE1530::OneCycle()
                     {
                         WriteByte = 0;
                         WriteWord = (unsigned short)(RecCyclesCounter << 8);
-                        fwrite(&WriteByte,1,1,recfile);
-                        fwrite(&WriteWord,1,3,recfile);
+						fwrite(&WriteByte, 1, 1, image_file);
+						fwrite(&WriteWord, 1, 3, image_file);
                         RecTapeSize += 4;
                     }
                     else
                     {
                         WriteByte = (unsigned char)(RecCyclesCounter >> 3);
                         WriteByte++;
-                        fwrite(&WriteByte,1,1,recfile);
+						fwrite(&WriteByte, 1, 1, image_file);
                         RecTapeSize ++;
                     }
                     RecCyclesCounter = 0;
