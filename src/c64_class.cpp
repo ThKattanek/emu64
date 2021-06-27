@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.06.2021                //
+// Letzte Änderung am 27.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -2580,14 +2580,14 @@ void C64Class::SetFullscreenDisplayMode(int display_index, int mode_index)
 	//cout << "SetDisplayMode: " << display_index << ";" << mode_index << endl;
 }
 
-bool C64Class::LoadTapeImage(const char *filename)
+bool C64Class::LoadTapeImage(FILE *file, int typ)
 {
-    return tape->LoadTapeImage(filename);
+	return tape->LoadTapeImage(file, typ);
 }
 
-bool C64Class::RecordTapeImage(const char *filename)
+bool C64Class::RecordTapeImage(FILE *file)
 {
-    return tape->RecordTapeImage(filename);
+	return tape->RecordTapeImage(file);
 }
 
 uint8_t C64Class::SetTapeKeys(uint8_t pressed_key)

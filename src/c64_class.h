@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.06.2021                //
+// Letzte Änderung am 27.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -112,8 +112,8 @@ public:
 	int GetDisplayMode(int display_index, int mode_index, int &w, int &h, int &refresh_rate, uint32_t &format);
 	void SetFullscreenDisplayMode(int display_index, int mode_index);
 
-    bool LoadTapeImage(const char *filename);
-    bool RecordTapeImage(const char *filename);
+	bool LoadTapeImage(FILE *file, int typ);
+	bool RecordTapeImage(FILE* file);
     uint8_t SetTapeKeys(uint8_t pressed_key);
     bool GetTapeMotorStatus();
     bool GetTapeRecordLedStatus();
