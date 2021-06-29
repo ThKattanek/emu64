@@ -8,13 +8,14 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.06.2021                //
+// Letzte Änderung am 29.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "./c64_class.h"
 #include "./c64_keys.h"
+#include "./c64_file_types.h"
 
 #include <QDebug>
 
@@ -2688,14 +2689,14 @@ int SDLThreadLoad(void *userdat)
         c64->SetCommandLine(c64->auto_load_command_line);
         break;
     case 1:
-        c64->LoadPRG(c64->auto_load_filename,&PRGStartAdresse);
+		c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse);
         if(PRGStartAdresse <= 0x0801) sprintf(c64->auto_load_command_line,"RUN%c",13);
         else sprintf(c64->auto_load_command_line,"SYS %d%c",PRGStartAdresse,13);
         c64->SetCommandLine(c64->auto_load_command_line);
         break;
     case 2:
-        c64->LoadPRG(c64->auto_load_filename,&PRGStartAdresse);
-        //if(LoadPRG(c64->AutoLoadFilename,&PRGStartAdresse) == 5) return 4; Behandlung wenn mehr als 1 File in T64
+		c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse);
+		//if(c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse) == 5) return 4; //Behandlung wenn mehr als 1 File in T64
         if(PRGStartAdresse <= 0x0801) sprintf(c64->auto_load_command_line,"RUN%c",13);
         else sprintf(c64->auto_load_command_line,"SYS %d%c",PRGStartAdresse,13);
         c64->SetCommandLine(c64->auto_load_command_line);
@@ -2705,293 +2706,267 @@ int SDLThreadLoad(void *userdat)
 }
 
 // ret 0=OK 1=nicht unterstütztes Format 2=D64 n.IO 3=G64 n.IO 4=OK nur es war ein CRT
-int C64Class::LoadAutoRun(uint8_t floppy_nr, const char *filename)
+int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, int typ)
 {
-    char EXT[4];
+	switch(typ)
+	{
+	case D64:
+		if(!LoadDiskImage(floppy_nr, file, typ)) return 2;
 
-    size_t len = strlen(filename);
-    strcpy(EXT,filename+len-3);
+		KillCommandLine();
+		auto_load_mode = 0;
+		sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
+		HardReset();
+		wait_reset_ready = true;
+		c64_reset_ready = false;
+		floppy_reset_ready[0] = false;
 
-    EXT[0]=static_cast<char>(toupper(EXT[0]));
-    EXT[1]=static_cast<char>(toupper(EXT[1]));
-    EXT[2]=static_cast<char>(toupper(EXT[2]));
+		return 0;
+		break;
 
-    if(0==strcmp("D64",EXT))
-    {
-		/*
-		if(!LoadDiskImage(floppy_nr,filename)) return 2;
+	case G64:
+		if(!LoadDiskImage(floppy_nr, file, typ)) return 3;
 
-        KillCommandLine();
-        auto_load_mode = 0;
-        sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
-        HardReset();
-        wait_reset_ready = true;
-        c64_reset_ready = false;
-        floppy_reset_ready[0] = false;
-		*/
-        return 0;
-    }
+		KillCommandLine();
+		auto_load_mode = 0;
+		sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
+		HardReset();
+		wait_reset_ready = true;
+		c64_reset_ready = false;
+		floppy_reset_ready[0] = false;
 
-    if(0==strcmp("G64",EXT))
-    {
-		/*
-        if(!LoadDiskImage(floppy_nr,filename)) return 3;
+		return 0;
+		break;
 
-        KillCommandLine();
-        auto_load_mode = 0;
-        sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
-        HardReset();
-        wait_reset_ready = true;
-        c64_reset_ready = false;
-        floppy_reset_ready[0] = false;
-		*/
-        return 0;
-    }
+	case PRG: case C64:
+		KillCommandLine();
+		auto_load_mode = 1;
 
-    if(0==strcmp("PRG",EXT) || 0==strcmp("C64",EXT))
-    {
-        KillCommandLine();
-        auto_load_mode = 1;
-        strcpy(auto_load_filename,filename);
-        HardReset();
-        wait_reset_ready = true;
-        c64_reset_ready = false;
-        floppy_reset_ready[0] = false;
-        return 0;
-    }
+		strcpy(auto_load_filename,filename);
+		auto_load_file = file;
+		auto_load_file_typ = typ;
 
-    if(0==strcmp("T64",EXT))
-    {
-        KillCommandLine();
-        auto_load_mode = 2;
-        strcpy(auto_load_filename,filename);
-        HardReset();
-        wait_reset_ready = true;
-        c64_reset_ready = false;
-        floppy_reset_ready[0] = false;
-        return 0;
-    }
+		HardReset();
+		wait_reset_ready = true;
+		c64_reset_ready = false;
+		floppy_reset_ready[0] = false;
+		return 0;
+		break;
 
-    if(0==strcmp("P00",EXT))
-    {
-        KillCommandLine();
-        auto_load_mode = 1;
-        strcpy(auto_load_filename,filename);
-        HardReset();
-        wait_reset_ready = true;
-        c64_reset_ready = false;
-        floppy_reset_ready[0] = false;
-        return 0;
-    }
+	case T64:
+		KillCommandLine();
+		auto_load_mode = 2;
 
-    if(0==strcmp("FRZ",EXT))
-    {
-        KillCommandLine();
+		strcpy(auto_load_filename, filename);
+		auto_load_file = file;
+		auto_load_file_typ = typ;
 
-        //LoadFreez(filename,FreezReturn);
-        return 0;
-    }
+		HardReset();
+		wait_reset_ready = true;
+		c64_reset_ready = false;
+		floppy_reset_ready[0] = false;
+		return 0;
+		break;
 
-    if(0==strcmp("CRT",EXT))
-    {
-        KillCommandLine();
+	case P00:
+		KillCommandLine();
+		auto_load_mode = 1;
 
-		// LoadCRT(filename);
-        return 4;
-    }
+		strcpy(auto_load_filename, filename);
+		auto_load_file = file;
+		auto_load_file_typ = typ;
+
+		HardReset();
+		wait_reset_ready = true;
+		c64_reset_ready = false;
+		floppy_reset_ready[0] = false;
+		return 0;
+		break;
+
+	case FRZ:
+		//KillCommandLine();
+		//LoadFreez(filename,FreezReturn);
+		return 0;
+		break;
+
+	case CRT:
+		KillCommandLine();
+		LoadCRT(file);
+		return 4;
+		break;
+	}
     return 1;
 }
 
-int C64Class::LoadPRG(const char *filename, uint16_t *return_start_address)
+int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *return_start_address)
 {
     uint8_t *RAM = mmu->GetRAMPointer();
-    FILE *file;
-    char EXT[4];
-
-    size_t len = strlen(filename);
-    strcpy(EXT,filename+len-3);
-
-    EXT[0]=static_cast<char>(toupper(EXT[0]));
-    EXT[1]=static_cast<char>(toupper(EXT[1]));
-    EXT[2]=static_cast<char>(toupper(EXT[2]));
-
     char str00[256];
 
-    if(0==strcmp("PRG",EXT) || 0==strcmp("C64",EXT))
-    {
-        LogText(const_cast<char*>(">> PRG laden: "));
-        LogText(const_cast<char*>(filename));
-        LogText(const_cast<char*>("\n"));
+	uint16_t start_address;
+	uint16_t end_address;
+	size_t reading_bytes;
+	uint8_t temp[2];
+	char signature[32];
+	uint16_t T64Entries;
+	int FileStartOffset;
 
-        uint16_t start_address;
-        size_t reading_bytes;
-        uint8_t temp[2];
-        file = fopen (filename, "rb");
-        if (file == nullptr)
-        {
-            LogText(const_cast<char*>("<< ERROR: Datei konnte nicht geöffnet werden\n"));
-            return 0x01;
-        }
-        reading_bytes = fread (&temp,1,2,file);
-        start_address = static_cast<uint16_t>(temp[0]|(temp[1]<<8));
-        if(return_start_address != nullptr) *return_start_address = start_address;
+	if(file == nullptr)
+	{
+		LogText(const_cast<char*>("<< ERROR: Datei konnte nicht geöffnet werden\n"));
+		return 0x01;
+	}
 
-        reading_bytes=fread (RAM+start_address,1,0xFFFF-start_address,file);
+	switch(typ)
+	{
+	case PRG: case C64:
+		LogText(const_cast<char*>(">> PRG laden: "));
+		LogText(const_cast<char*>(filename));
+		LogText(const_cast<char*>("\n"));
 
-        RAM[0x2B] = 0x01;
-        RAM[0x2C] = 0x08;
+		reading_bytes = fread (&temp,1,2,file);
+		start_address = static_cast<uint16_t>(temp[0]|(temp[1]<<8));
+		if(return_start_address != nullptr) *return_start_address = start_address;
 
-        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",start_address,start_address);
-        LogText(str00);
+		reading_bytes=fread (RAM+start_address,1,0xFFFF-start_address,file);
 
-        start_address += static_cast<uint16_t>(reading_bytes);
-        RAM[0x2D] = static_cast<uint8_t>(start_address);
-        RAM[0x2E] = static_cast<uint8_t>(start_address>>8);
-        RAM[0xAE] = static_cast<uint8_t>(start_address);
-        RAM[0xAF] = static_cast<uint8_t>(start_address>>8);
+		RAM[0x2B] = 0x01;
+		RAM[0x2C] = 0x08;
 
-        fclose(file);
+		sprintf(str00,">>   SartAdresse: $%4.4X(%d)",start_address,start_address);
+		LogText(str00);
 
-        sprintf(str00,"EndAdresse: $%4.4X(%d)\n", start_address, start_address);
-        LogText(str00);
+		start_address += static_cast<uint16_t>(reading_bytes);
+		RAM[0x2D] = static_cast<uint8_t>(start_address);
+		RAM[0x2E] = static_cast<uint8_t>(start_address>>8);
+		RAM[0xAE] = static_cast<uint8_t>(start_address);
+		RAM[0xAF] = static_cast<uint8_t>(start_address>>8);
 
-        return 0x00;
-    }
+		fclose(file);
+		file = nullptr;
 
-    if(0==strcmp("T64",EXT))
-    {
-        LogText(const_cast<char*>(">> T64 laden: "));
-        LogText(const_cast<char*>(filename));
-        LogText(const_cast<char*>("\n"));
+		sprintf(str00,"EndAdresse: $%4.4X(%d)\n", start_address, start_address);
+		LogText(str00);
 
-        char signature[32];
-        size_t reading_bytes;
-        uint16_t T64Entries;
-        uint16_t start_address;
-        uint16_t end_address;
-        int FileStartOffset;
+		return 0x00;
+		break;
 
-        file = fopen (filename, "rb");
-        if (file == nullptr)
-        {
-            LogText(const_cast<char*>("<< ERROR: Datei konnte nicht geöffnet werden"));
-                return 0x01;
-        }
+		// T64
+	case T64:
+		LogText(const_cast<char*>(">> T64 laden: "));
+		LogText(const_cast<char*>(filename));
+		LogText(const_cast<char*>("\n"));
 
-        reading_bytes = fread(signature,1,32,file);
-        if(reading_bytes != 32)
-        {
-            cout << "Error T64 0x02" << endl;
-            fclose(file);
-            return 0x02;
-        }
+		reading_bytes = fread(signature,1,32,file);
+		if(reading_bytes != 32)
+		{
+			cout << "Error T64 0x02" << endl;
+			fclose(file);
+			file = nullptr;
+			return 0x02;
+		}
 
-        // Es gibt irgendwie zu viele verschiedene Kennungen :(
-        /*
-        if((strcmp(Kennung, "C64 tape image file") != 0) && (strcmp(Kennung, "C64S tape image file") != 0))
-        {
-            cout << "Error T64 0x03" << endl;
-            fclose(file);
-            return 0x03;
-        }
-        */
+		// Es gibt irgendwie zu viele verschiedene Kennungen :(
+		/*
+		if((strcmp(Kennung, "C64 tape image file") != 0) && (strcmp(Kennung, "C64S tape image file") != 0))
+		{
+			cout << "Error T64 0x03" << endl;
+			fclose(file);
+			return 0x03;
+		}
+		*/
 
-        fseek(file,4,SEEK_CUR);
-        reading_bytes = fread(&T64Entries,1,2,file);
+		fseek(file,4,SEEK_CUR);
+		reading_bytes = fread(&T64Entries,1,2,file);
 
-        if(T64Entries==0)
-        {
-                fclose(file);
-                return 0x04;
-        }
+		if(T64Entries==0)
+		{
+			fclose(file);
+			file = nullptr;
+			return 0x04;
+		}
 
-        /*
-        if(T64Entries>1)
-        {
-                fclose(file);
-                return 0x05;
-        }
-        */
+		/*
+		if(T64Entries>1)
+		{
+			fclose(file);
+			file = nullptr;
+			return 0x05;
+		}
+		*/
 
-        fseek(file,0x42,SEEK_SET);
-        reading_bytes = fread(&start_address,1,2,file);
-        if(return_start_address != nullptr) *return_start_address = start_address;
-        reading_bytes = fread(&end_address,1,2,file);
-        fseek(file,2,SEEK_CUR);
-        reading_bytes = fread(&FileStartOffset,1,4,file);
+		fseek(file,0x42,SEEK_SET);
+		reading_bytes = fread(&start_address,1,2,file);
+		if(return_start_address != nullptr) *return_start_address = start_address;
+		reading_bytes = fread(&end_address,1,2,file);
+		fseek(file,2,SEEK_CUR);
+		reading_bytes = fread(&FileStartOffset,1,4,file);
 
-        fseek(file,FileStartOffset,SEEK_SET);
-        reading_bytes = fread(RAM + start_address,1,end_address - start_address,file);
-        fclose(file);
+		fseek(file,FileStartOffset,SEEK_SET);
+		reading_bytes = fread(RAM + start_address,1,end_address - start_address,file);
 
-        RAM[0x2B] = 0x01;
-        RAM[0x2C] = 0x08;
+		fclose(file);
+		file = nullptr;
 
-        RAM[0x2D] = static_cast<uint8_t>(end_address);
-        RAM[0x2E] = static_cast<uint8_t>(end_address>>8);
-        RAM[0xAE] = static_cast<uint8_t>(end_address);
-        RAM[0xAF] = static_cast<uint8_t>(end_address>>8);
+		RAM[0x2B] = 0x01;
+		RAM[0x2C] = 0x08;
 
-        sprintf(str00,">>   SartAdresse: $%4.4X(%d)", start_address, start_address);
-        LogText(str00);
-        sprintf(str00,"EndAdresse: $%4.4X(%d)\n", end_address, end_address);
-        LogText(str00);
+		RAM[0x2D] = static_cast<uint8_t>(end_address);
+		RAM[0x2E] = static_cast<uint8_t>(end_address>>8);
+		RAM[0xAE] = static_cast<uint8_t>(end_address);
+		RAM[0xAF] = static_cast<uint8_t>(end_address>>8);
 
-        return 0x00;
-    }
+		sprintf(str00,">>   SartAdresse: $%4.4X(%d)", start_address, start_address);
+		LogText(str00);
+		sprintf(str00,"EndAdresse: $%4.4X(%d)\n", end_address, end_address);
+		LogText(str00);
 
-    if(0==strcmp("P00",EXT))
-    {
-        LogText(const_cast<char*>(">> P00 laden: "));
-        LogText(const_cast<char*>(filename));
-        LogText(const_cast<char*>("\n"));
+		return 0x00;
+		break;
 
-        char signature[8];
-        uint16_t start_address;
-        size_t reading_bytes;
-        uint8_t temp[2];
-        file = fopen (filename, "rb");
-        if (file == nullptr)
-        {
-            LogText(const_cast<char*>("<< ERROR: Datei konnte nicht geöffnet werden"));
-                return 0x01;
-        }
+	case P00:
+		LogText(const_cast<char*>(">> P00 laden: "));
+		LogText(const_cast<char*>(filename));
+		LogText(const_cast<char*>("\n"));
 
-        reading_bytes = fread(signature,1,7,file);
-        signature[7]=0;
-        if(0!=strcmp("C64File",signature))
-        {
-                fclose(file);
-                return 0x06;
-        }
+		reading_bytes = fread(signature,1,7,file);
+		signature[7]=0;
+		if(0!=strcmp("C64File",signature))
+		{
+				fclose(file);
+				file = nullptr;
+				return 0x06;
+		}
 
-        fseek(file,0x1A,SEEK_SET);
+		fseek(file,0x1A,SEEK_SET);
 
-        reading_bytes = fread (&temp,1,2,file);
-        start_address = static_cast<uint16_t>(temp[0]|(temp[1]<<8));
-        if(return_start_address != nullptr) *return_start_address = start_address;
+		reading_bytes = fread (&temp,1,2,file);
+		start_address = static_cast<uint16_t>(temp[0]|(temp[1]<<8));
+		if(return_start_address != nullptr) *return_start_address = start_address;
 
-        reading_bytes=fread (RAM+start_address,1,0xFFFF,file);
+		reading_bytes=fread (RAM+start_address,1,0xFFFF,file);
 
-        RAM[0x2B] = 0x01;
-        RAM[0x2C] = 0x08;
+		RAM[0x2B] = 0x01;
+		RAM[0x2C] = 0x08;
 
-        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",start_address,start_address);
-        LogText(str00);
+		sprintf(str00,">>   SartAdresse: $%4.4X(%d)",start_address,start_address);
+		LogText(str00);
 
-        start_address += static_cast<uint16_t>(reading_bytes);
-        RAM[0x2D] = static_cast<uint8_t>(start_address);
-        RAM[0x2E] = static_cast<uint8_t>(start_address>>8);
-        RAM[0xAE] = static_cast<uint8_t>(start_address);
-        RAM[0xAF] = static_cast<uint8_t>(start_address>>8);
+		start_address += static_cast<uint16_t>(reading_bytes);
+		RAM[0x2D] = static_cast<uint8_t>(start_address);
+		RAM[0x2E] = static_cast<uint8_t>(start_address>>8);
+		RAM[0xAE] = static_cast<uint8_t>(start_address);
+		RAM[0xAF] = static_cast<uint8_t>(start_address>>8);
 
-        fclose(file);
+		fclose(file);
+		file = nullptr;
 
-        sprintf(str00,"EndAdresse: $%4.4X(%d)\n",start_address,start_address);
-        LogText(str00);
+		sprintf(str00,"EndAdresse: $%4.4X(%d)\n",start_address,start_address);
+		LogText(str00);
 
-        return 0x00;
-    }
+		return 0x00;
+		break;
+	}
     return 0x02;
 }
 

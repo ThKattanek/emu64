@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.06.2021                //
+// Letzte Änderung am 29.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -125,8 +125,8 @@ public:
     void SoftReset();
     void HardReset();
     void SetReset(int status, int hard_reset);
-    int LoadAutoRun(uint8_t floppy_nr, const char *filename);
-    int LoadPRG(const char *filename, uint16_t *return_start_address);
+	int LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, int typ);
+	int LoadPRG(FILE *file, const char* filename, int typ, uint16_t *return_start_address);	// Filename ist nur für Logausgabe / Ausschlaggebend ist FILE*
 
 	int LoadCRT(FILE *file);
     void RemoveCRT();
@@ -363,6 +363,8 @@ public:
     uint8_t         auto_load_mode;
     char            auto_load_command_line[MAX_STRING_LENGTH];
     char            auto_load_filename[MAX_STRING_LENGTH];
+	FILE*			auto_load_file;
+	int				auto_load_file_typ;
 
     bool            loop_thread_end;
     bool            loop_thread_is_end;
