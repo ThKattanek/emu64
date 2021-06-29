@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.12.2019                //
+// Letzte Änderung am 29.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -152,6 +152,7 @@ private:
     void SetC64ScreenTitle(void);
     void ExecuteCommandLine(vector<char*> &arg);
     void SplashMessage(const QString &message, const QColor &color);
+	void AutoLoadAndRun(QString filename);
 
     /// Varialen ///
     QTranslator appTranslator;   // Application Translator

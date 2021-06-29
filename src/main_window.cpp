@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.06.2021                //
+// Letzte Änderung am 29.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,6 +18,7 @@
 
 #include "./main_window.h"
 #include "./ui_main_window.h"
+#include "./c64_file_types.h"
 #include "./utils.h"
 
 static QMutex mutex_log_text;
@@ -532,7 +533,7 @@ int MainWindow::OnInit()
 
 			QFileInfo file_info(floppy_window->GetAktFilename(i));
 
-			int typ = NO_IMAGE;
+			int typ = NO_C64_FILE;
 			if(file_info.completeSuffix().toUpper() == "D64")
 				typ = D64;
 
@@ -818,7 +819,7 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
         case CMD_ARG:
             break;
         case CMD_AUTOSTART:
-            c64->LoadAutoRun(0,cmd_line->GetArg(i+1));
+			AutoLoadAndRun(cmd_line->GetArg(i+1));
             break;
         case CMD_HARDRESET:
             c64->HardReset();
@@ -865,6 +866,7 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
             }
             else
                 cout << "Die angebene Datei existiert nicht." << endl;
+			delete fi;
             break;
         case CMD_UMOUNT_CRT:
             cartridge_window->DisconnectCrt();
@@ -929,7 +931,55 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
 
 void MainWindow::SplashMessage(const QString &message, const QColor &color)
 {
-    if(splash != nullptr) splash->ShowStatusMessage(message,color);
+	if(splash != nullptr) splash->ShowStatusMessage(message,color);
+}
+
+void MainWindow::AutoLoadAndRun(QString filename)
+{
+	cartridge_window->DisconnectCrt();
+
+	// akutelles Autostart Verzeichnis abspeichern
+	QFileInfo file_info(filename);
+	lastAutoloadPath = file_info.absolutePath();
+
+	int typ = NO_C64_FILE;
+
+	if(file_info.completeSuffix().toUpper() == "PRG")
+		typ = PRG;
+
+	if(file_info.completeSuffix().toUpper() == "C64")
+		typ = C64;
+
+	if(file_info.completeSuffix().toUpper() == "T64")
+		typ = T64;
+
+	if(file_info.completeSuffix().toUpper() == "P00")
+		typ = P00;
+
+	if(file_info.completeSuffix().toUpper() == "D64")
+		typ = D64;
+
+	if(file_info.completeSuffix().toUpper() == "G64")
+		typ = G64;
+
+	if(file_info.completeSuffix().toUpper() == "CRT")
+		typ = CRT;
+
+	if(file_info.completeSuffix().toUpper() == "FRZ")
+		typ = FRZ;
+
+	FILE *file = qfopen(filename, "rb");
+
+	if(c64->LoadAutoRun(0, file, filename.toLocal8Bit(), typ) == 0)
+	{
+		// Prüfen welche
+		if(typ == D64)
+		{
+			WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(0,0);
+			w->SetEnableFloppy(true);
+			floppy_window->SetDiskImage(0,filename);
+		}
+	}
 }
 
 void MainWindow::on_menu_main_info_triggered()
@@ -973,23 +1023,10 @@ void MainWindow::on_actionAutostart_triggered()
         lastAutoloadPath = QDir::homePath();
     }
 
-    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),lastAutoloadPath,tr("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.d64 *.g64 *.frz);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
+	QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),lastAutoloadPath,tr("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.d64 *.g64 *.crt *.frz);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
-        // akutelles Autostart Verzeichnis abspeichern
-        QFileInfo file_info = filename;
-        lastAutoloadPath = file_info.absolutePath();
-
-        if(c64->LoadAutoRun(0,filename.toLocal8Bit()) == 0)
-        {
-            // Prüfen welche
-            if(file_info.suffix().toUpper() == "D64")
-            {
-                WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(0,0);
-                w->SetEnableFloppy(true);
-                floppy_window->SetDiskImage(0,filename);
-            }
-        }
+		AutoLoadAndRun(filename);
         c64->SetFocusToC64Window();
     }
 }
@@ -999,7 +1036,24 @@ void MainWindow::on_actionC64_Programme_direkt_laden_triggered()
     QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),"",tr("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.frz);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
-        c64->LoadPRG(filename.toLocal8Bit(),nullptr);
+		QFileInfo file_info(filename);
+
+		int typ = NO_C64_FILE;
+		if(file_info.completeSuffix().toUpper() == "PRG")
+			typ = PRG;
+
+		if(file_info.completeSuffix().toUpper() == "C64")
+			typ = C64;
+
+		if(file_info.completeSuffix().toUpper() == "T64")
+			typ = T64;
+
+		if(file_info.completeSuffix().toUpper() == "P00")
+			typ = P00;
+
+		FILE *file = qfopen(filename, "rb");
+
+		c64->LoadPRG(file, filename.toLocal8Bit(), typ, nullptr);
     }
 }
 
@@ -1068,7 +1122,7 @@ void MainWindow::OnChangeFloppyImage(int floppynr)
 
 	QFileInfo file_info(floppy_window->GetAktFilename(floppynr));
 
-	int typ = NO_IMAGE;
+	int typ = NO_C64_FILE;
 	if(file_info.completeSuffix().toUpper() == "D64")
 		typ = D64;
 
