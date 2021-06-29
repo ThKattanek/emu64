@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.06.2021                //
+// Letzte Änderung am 29.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -26,12 +26,6 @@
 #endif
 
 #include "mos6510_class.h"
-
-enum TAPE_IMAGE_TYP
-{
-    TAP,
-	WAV
-};
 
 #define REW_SPEED 12 // 15-Fache Geschwindigkeit
 #define FFW_SPEED 12 // 15-Fache Geschwindigkeit

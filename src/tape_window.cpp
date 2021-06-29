@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.06.2021                //
+// Letzte Änderung am 29.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,6 +18,7 @@
 
 #include "tape_window.h"
 #include "ui_tape_window.h"
+#include "./c64_file_types.h"
 #include "./utils.h"
 
 TapeWindow::TapeWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QString tmp_path) :
@@ -126,7 +127,7 @@ void TapeWindow::OnSelectFile(QString filename)
 
 	QFileInfo file_info(filename);
 
-	int typ = NO_IMAGE;
+	int typ = NO_C64_FILE;
 	if(file_info.completeSuffix().toUpper() == "TAP")
 		typ = TAP;
 

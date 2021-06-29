@@ -8,12 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 27.06.2021                //
+// Letzte Änderung am 29.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "tape1530_class.h"
+#include "./tape1530_class.h"
+#include "./c64_file_types.h"
 
 TAPE1530::TAPE1530(int samplerate, int puffersize, float cycles_per_second)
 {
@@ -145,7 +146,7 @@ bool TAPE1530::LoadTapeImage(FILE *file, int typ)
 
 		WaitCounter = 0;
 
-		TapeType = 0;
+		TapeType = TAP;
 		IsTapeInsert = true;
 		TapeBufferPos = 0;
 		TapePosCycles = 0;
@@ -214,7 +215,7 @@ bool TAPE1530::LoadTapeImage(FILE *file, int typ)
 
 		reading_elements = fread(&WAVEDataSize,1,4,file);
 
-		TapeType = 1;
+		TapeType = WAV;
 		IsTapeInsert = true;
 
 		TapePosIsStart = true;
