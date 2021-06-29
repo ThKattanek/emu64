@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.06.2021                //
+// Letzte Änderung am 29.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,6 +18,7 @@
 
 #include "./floppy_window.h"
 #include "./ui_floppy_window.h"
+#include "./c64_file_types.h"
 #include "./utils.h"
 
 #define MAX_D64_FILES 128
@@ -320,11 +321,13 @@ void FloppyWindow::OnD64FileStart0(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
     uint8_t floppy_nr = static_cast<uint8_t>(ui->FloppySelect->currentIndex());
-    QString FileName = tmp_path + "/tmp.prg";
+	QString filename = tmp_path + "/tmp.prg";
 
-    if(d64[floppy_nr].ExportPrg(file_index,FileName.toLocal8Bit()))
+	if(d64[floppy_nr].ExportPrg(file_index,filename.toLocal8Bit()))
     {
-        c64->LoadAutoRun(floppy_nr,FileName.toLocal8Bit());
+		FILE *file = qfopen(filename, "rb");
+
+		c64->LoadAutoRun(floppy_nr, file, filename.toLocal8Bit(), PRG);
     }
 }
 
@@ -346,11 +349,28 @@ void FloppyWindow::OnD64FileStart3(bool)
 {
     int file_index = ui->D64FileTable->currentIndex().row();
     uint8_t floppy_nr = static_cast<uint8_t>(ui->FloppySelect->currentIndex());
-    QString FileName = tmp_path + "/tmp.prg";
+	QString filename = tmp_path + "/tmp.prg";
 
-    if(d64[floppy_nr].ExportPrg(file_index,FileName.toLocal8Bit()))
+	if(d64[floppy_nr].ExportPrg(file_index,filename.toLocal8Bit()))
     {
-        c64->LoadPRG(FileName.toLocal8Bit(),nullptr);
+		QFileInfo file_info(filename);
+
+		int typ = NO_C64_FILE;
+		if(file_info.completeSuffix().toUpper() == "PRG")
+			typ = PRG;
+
+		if(file_info.completeSuffix().toUpper() == "C64")
+			typ = C64;
+
+		if(file_info.completeSuffix().toUpper() == "T64")
+			typ = T64;
+
+		if(file_info.completeSuffix().toUpper() == "P00")
+			typ = P00;
+
+		FILE *file = qfopen(filename, "rb");
+
+		c64->LoadPRG(file, filename.toLocal8Bit(), typ, nullptr);
     }
 }
 

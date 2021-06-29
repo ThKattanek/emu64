@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.06.2021	       		//
+// Letzte Änderung am 29.06.2021	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -25,9 +25,6 @@
 #include "./mos6522_class.h"
 #include "./structs.h"
 
-#define NO_IMAGE -1
-#define D64 0
-#define G64 1
 #define MAX_BREAK_GROUP_NUM 255
 
 #define D64_IMAGE_SIZE 174848

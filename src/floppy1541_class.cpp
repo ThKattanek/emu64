@@ -8,12 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.06.2021	       		//
+// Letzte Änderung am 29.06.2021	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "./floppy1541_class.h"
+#include "./c64_file_types.h"
 
 #include <QDebug>
 
