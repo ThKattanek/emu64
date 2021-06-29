@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 24.06.2021                //
+# // Letzte Änderung am 29.06.2021                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -108,6 +108,7 @@ SOURCES += \
     c64_class.cpp \
     c64_keyboard_window.cpp \
     c64_speed_window.cpp \
+    color_button.cpp \
     command_line_class.cpp \
     cartridge_class.cpp \
     cartridge_new_easyflash_window.cpp \
@@ -135,6 +136,8 @@ SOURCES += \
     mos6569_class.cpp \
     mos6581_8085_class.cpp \
     new_romset_window.cpp \
+    oscilloscope_widget.cpp \
+    oscilloscope_window.cpp \
     reu_class.cpp \
     savepng.c \
     setup_window.cpp \
@@ -146,6 +149,7 @@ SOURCES += \
     tape_new_window.cpp \
     tape_window.cpp \
     tree_widget_mod.cpp \
+    user_palette_window.cpp \
     video_crt_setup_window.cpp \
     vcd_class.cpp \
     video_capture_class.cpp \
@@ -154,6 +158,7 @@ SOURCES += \
     widget_bit_leiste.cpp \
     widget_file_browse.cpp \
     widget_floppy_status.cpp \
+     widget_led.cpp \
     widget_memory_zeile.cpp \
     widget_sr_edit.cpp \
     widget_tape_counter.cpp
@@ -163,8 +168,10 @@ HEADERS += \
     button_mod.h \
     c64_class.h \
     c64_colors.h \
+    c64_file_types.h \
     c64_keyboard_window.h \
     c64_speed_window.h \
+    color_button.h \
     command_line_class.h \
     cartridge_class.h \
     cartridge_new_easyflash_window.h \
@@ -195,6 +202,8 @@ HEADERS += \
     mos6569_class.h \
     mos6581_8085_class.h \
     new_romset_window.h \
+    oscilloscope_widget.h \
+    oscilloscope_window.h \
     reu_class.h \
     savepng.h \
     setup_window.h \
@@ -207,6 +216,7 @@ HEADERS += \
     tape_new_window.h \
     tape_window.h \
     tree_widget_mod.h \
+    user_palette_window.h \
     utils.h \
     video_crt_setup_window.h \
     vcd_class.h \
@@ -216,6 +226,7 @@ HEADERS += \
     widget_bit_leiste.h \
     widget_file_browse.h \
     widget_floppy_status.h \
+    widget_led.h \
     widget_memory_zeile.h \
     widget_sr_edit.h \
     widget_tape_counter.h
@@ -225,6 +236,7 @@ FORMS += \
     c64_speed_window.ui \
     cartridge_new_easyflash_window.ui \
     cartridge_window.ui \
+    color_button.ui \
     debugger_iec_window.ui \
     debugger_vic_window.ui \
     debugger_window.ui \
@@ -234,16 +246,20 @@ FORMS += \
     main_window.ui \
     memory_window.ui \
     new_romset_window.ui \
+    oscilloscope_widget.ui \
+    oscilloscope_window.ui \
     setup_window.ui \
     show_c64_key_mapping_window.ui \
     sid_dump_window.ui \
     tape_new_window.ui \
     tape_window.ui \
+    user_palette_window.ui \
     video_crt_setup_window.ui \
     video_capture_window.ui \
     widget_bit_leiste.ui \
     widget_file_browse.ui \
     widget_floppy_status.ui \
+    widget_led.ui \
     widget_memory_zeile.ui \
     widget_sr_edit.ui \
     widget_tape_counter.ui
@@ -322,25 +338,3 @@ INSTALLS += target roms floppy_sounds gfx txt languages icons desktop
 
 DISTFILES += \
     ../crossbuild-win-releases.sh
-
-FORMS += \
-    color_button.ui \
-    oscilloscope_widget.ui \
-    oscilloscope_window.ui \
-    user_palette_window.ui \
-    widget_led.ui
-
-HEADERS += \
-    color_button.h \
-    oscilloscope_widget.h \
-    oscilloscope_window.h \
-    user_palette_window.h \
-    utils.h \
-    widget_led.h
-
-SOURCES += \
-    color_button.cpp \
-    oscilloscope_widget.cpp \
-    oscilloscope_window.cpp \
-    user_palette_window.cpp \
-    widget_led.cpp
