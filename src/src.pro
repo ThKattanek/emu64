@@ -30,6 +30,10 @@ TEMPLATE = app
 
 CONFIG += lrelease c++11
 
+win32 {
+    CONFIG += console
+}
+
 EMU64_VERSION = 5.0.18
 
 # Versionsnummer ermitteln aus Git Tag Nummer
