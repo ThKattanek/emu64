@@ -971,7 +971,7 @@ void MainWindow::AutoLoadAndRun(QString filename)
 	if(file_info.completeSuffix().toUpper() == "FRZ")
 		typ = FRZ;
 
-	QMessageBox::information(this,"Test",filename);
+	// QMessageBox::information(this,"Test",filename);
 
 	FILE *file = qfopen(filename, "rb");
 
