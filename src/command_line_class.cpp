@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.04.2020                //
+// Letzte Änderung am 04.07.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -86,7 +86,7 @@ CommandLineClass::CommandLineClass(int argc, char *argv[], const char *app_name,
             {
                // printf("%s: Ungültige Option -- %s\n",app_name,command);
 
-                printf("%s: Ungültige Anzahl der Argumente von -- \"%s\"\n",app_name, this->command_arg[i]);
+				printf("%s: Ungueltige Anzahl der Argumente von -- \"%s\"\n",app_name, this->command_arg[i]);
                 command_count = -1;
                 break;
             }
@@ -201,7 +201,7 @@ int CommandLineClass::GetArgInt(int number, bool *err)
 
 void CommandLineClass::ShowHelp()
 {
-    printf("\nProgrammaufruf: %s [OPTIONS]\n\nFolgende Optionen stehen Ihnen zur Verfügung:\n\n", app_name);
+	printf("\nProgrammaufruf: %s [OPTIONS]\n\nFolgende Optionen stehen Ihnen zur Verfuegung:\n\n", app_name);
 
     for(int i=0; i<all_commands_list_count; i++)
     {
@@ -336,11 +336,11 @@ void CommandLineClass::OutUnknowOptionError(const char *command, bool is_long)
     if(!is_long)
     {
         // Short Option
-        printf("%s: Ungültige Option -- %s\n",app_name,command);
+		printf("%s: Ungueltige Option -- %s\n",app_name,command);
     }
     else
     {
         // Long Option
-        printf("%s: Ungültige Option \"--%s\"\n",app_name,command);
+		printf("%s: Ungueltige Option \"--%s\"\n",app_name,command);
     }
 }

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.06.2021                //
+// Letzte Änderung am 04.07.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -642,18 +642,8 @@ int MainWindow::OnInit()
 
 void MainWindow::OnMessage(QStringList msg)
 {
-    vector<char*> list;
-
     if(c64 != nullptr)
-    {
-        for(int i=0; i<msg.length(); i++)
-        {
-            char *p = new char[msg.at(i).size()+1];
-            strcpy(p,msg.at(i).toLocal8Bit());
-            list.push_back(p);
-        }
-        ExecuteCommandLine(list);
-    }
+		ExecuteCommandLine(msg);
 }
 
 void MainWindow::LogText(const char *log_text)
@@ -800,16 +790,29 @@ void MainWindow::SetC64ScreenTitle()
     c64->SetSDLWindowName(tr("C64 Bildschirm").toLocal8Bit());
 }
 
-void MainWindow::ExecuteCommandLine(vector<char *> &arg)
+void MainWindow::ExecuteCommandLine(QStringList string_list)
 {
-    CommandLineClass *cmd_line = new CommandLineClass(arg.size(), arg.data(), "emu64",command_list, command_list_count);
+	char** arg;
+	int argc = string_list.length();
+
+	arg = new char*[string_list.length()];
+
+	for(int i=0; i<argc; i++)
+	{
+		arg[i] = new char[string_list.at(i).size()+1];
+		strcpy(arg[i],string_list.at(i).toLatin1().data());
+	}
+
+	CommandLineClass *cmd_line = new CommandLineClass(argc, arg, "emu64",command_list, command_list_count);
 
     bool error;
     int lwnr,adr,val;
-    char *filename;
+	QString filename;
     QFileInfo *fi;
 
     bool loop_break = false;
+
+	if(cmd_line == nullptr) return;
 
     for(int i=0; i<cmd_line->GetCommandCount() && !loop_break; i++)
     {
@@ -819,7 +822,7 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
         case CMD_ARG:
             break;
         case CMD_AUTOSTART:
-			AutoLoadAndRun(cmd_line->GetArg(i+1));
+			AutoLoadAndRun(string_list[i+2]);
             break;
         case CMD_HARDRESET:
             c64->HardReset();
@@ -829,7 +832,7 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
             break;
         case CMD_MOUNT_DISK:
             lwnr = cmd_line->GetArgInt(i+1, &error);
-            filename = cmd_line->GetArg(i+2);
+			filename = string_list[i+3];
 
             if(!error)
             {
@@ -855,7 +858,7 @@ void MainWindow::ExecuteCommandLine(vector<char *> &arg)
             }
             break;
         case CMD_MOUNT_CRT:
-            filename = cmd_line->GetArg(i+1);
+			filename = string_list[i+2];
             fi = new QFileInfo(filename);
             if(fi->exists())
             {
@@ -968,10 +971,14 @@ void MainWindow::AutoLoadAndRun(QString filename)
 	if(file_info.completeSuffix().toUpper() == "FRZ")
 		typ = FRZ;
 
+	QMessageBox::information(this,"Test",filename);
+
 	FILE *file = qfopen(filename, "rb");
 
 	if(c64->LoadAutoRun(0, file, filename.toLocal8Bit(), typ) == 0)
 	{
+		cout << "AUTOLOAD: " << typ << ", FILE: " << file << endl;
+
 		// Prüfen welche
 		if(typ == D64)
 		{

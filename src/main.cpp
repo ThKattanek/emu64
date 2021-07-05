@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.12.2019                //
+// Letzte Änderung am 04.07.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -62,14 +62,14 @@ int main(int argc, char *argv[])
                 QFile *config_file = new QFile(config_dir.path() + "/emu64.ini");
                 if(!config_file->exists())
                 {
-                    cout << "emu64.ini existiert nicht, muss deshalb nicht gelöscht werden." << endl;
+					cout << "emu64.ini existiert nicht, muss deshalb nicht geloescht werden." << endl;
                 }
                 else
                     if(config_file->remove())
-                        cout << "emu64.ini wurde gelöscht." << endl;
+						cout << "emu64.ini wurde geloescht." << endl;
                     else
                     {
-                        cout << "emu64.ini konnte nicht gelöscht werden." << endl;
+						cout << "emu64.ini konnte nicht geloescht werden." << endl;
                         return(-1);
                     }
             }
