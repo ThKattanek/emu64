@@ -1,3 +1,47 @@
+5.0.19
+------
+
+- altes SLD_OpenAudio durch aktuelles SDL_OpenAudioDevice ersetzt
+- Ausgabe aller Audio Devices im Emu64 Logfile
+- Bugfix: [#188] Soundproblem wenn das Audio Device mehr als 2 Kanäle hat wurde behoben
+- Bugfix: C64::LoadPRG LoadError LogOut add \n
+- Bugfix: [#191] fixed in c64_class.cpp char --> signed char // char ist nicht immer signed char
+- teilweise korrektur unsigned char -> uint8_t char -> int8_t wenn kein String
+- fixed compiler warnings
+- SDL2 Fehlermeldung wird in emu64.log ausgegeben wenn SDL_OpenAudioDevice fehlschlägt.
+- Bugfix: [#192] AudioBufferSize von 882 auf 1024 geändert. Laut SDL2 muss diese eine 2er Potenz sein.
+- Bugfix: [#192] Emu64 wird jetzt sauber beendet, auch wenn in der C64Class::OnInit ein Fehler auftritt. Das Log sollte dann auch sauber geschrieben sein.
+- SDL Fehler werden nun besser geloggt.
+- Soundbuffer Size wird jetzt über die emu64.ini geladen, als default ist 512 angesetzt.
+- Sollte eine Soundpuffergröße kleiner als 64 in der ini eingetragen sein, so wird die Soundbuffergröße auf 64 gesetzt.
+- By Felix Palmen: Move SingleApplication from sharedmemory to socket
+- Bugfix: im Debugger wird beim aendern eines Breakpoint Eintrags dieser nun auch gleich uebernommen (voerher musste man den Haken erst weg nehmen und wieder setzen)
+- [#198] Colodore Palette hinzugefügt (Nicht CRT Modus)
+- Obsolete Qt Methoden ausgewechselt setBackgroundColor -> setBackground / setTextColoer -> setForeground
+- diverse anpassungen um Emu64 mit Qt6 zu kompilieren. ZIP Suppoert erstmal für QT6 deaktiviert da es noch probleme mit quazip gibt // DEFINES += ZIP_SUPPORT=true --> auskommentiert 
+- Es sind nun die Zyklen pro Sekunde für die C64 Emulation einstellbar
+- VSync kann nun wieder in den Einstellungen eingestellt aktiviert werden
+- src.pro angepasst für aktuelles mxe build
+- Vollbildmodi können jetzt wieder gesetzt werden. Und zwar für jeden Bildschirm einzeln.
+- MainWindow angepasst
+- SetupWindow abgepasst
+- VideoCrtSetupWindow angepasst
+- VideoCrtSetupWindow: Ausgabewert fuer Phasen Verschiebung auf 2 Nachkommastellen gekuerzt.
+- FloppyWindow "None Blindmodus" korrigiert
+- C64SpeedWindow angepasst
+- C64 Userpalette kann nun im Emu64 angepasst werden
+- CRT Modus kann auch die Userpalette verwenden
+- Bugfix fix: wenn der Farb-Winkel (color_angle) in ungeraden Zeile gleich Null war, war der Farbwert undefiert (Fehlfarben).
+- Bugfix: Floppy Anzeige Motor + R/W LED -> Form von rund nach eckig
+- Floppy Read/Write LED kann nun PWM darstellen. (LED Fading Effekte)
+- BugFix: C64 Maus lässt sich wieder per STRG-Left und Maustaste aktivieren.
+- [#201] Neuer HotKey ALT-J JoyPorts werden vertausch.
+- [#202] Neuer HotKey ALT+W Toggle Warp Mode
+- Textfile hotkeys.txt hinzugefuegt
+- [#189] Vor der Videoaufnahme wird die C64 Frequenz auf genau 50 FPS gestellt. Somit gibt es kein auseinanderziehen der Audio und Videospur.
+- Konsole für Win32 Verion aktivieren. Somit sieht man wieder in der CMD oder PowerShell die Ausgaeb der Help.
+- SDL_Init nur mit Video, Audio und Gamecontroller. Somit lässt sich Emu64 auch unter WINE starten.
+
 5.0.18
 ------
 

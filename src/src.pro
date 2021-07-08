@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 29.06.2021                //
+# // Letzte Änderung am 08.07.2021                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -34,7 +34,7 @@ win32 {
     CONFIG += console
 }
 
-EMU64_VERSION = 5.0.18
+EMU64_VERSION = 5.0.19
 
 # Versionsnummer ermitteln aus Git Tag Nummer
 GIT_VERSION = $$system(git --git-dir \"../.git\" describe --always --tags)
