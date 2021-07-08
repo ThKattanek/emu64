@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.06.2021                //
+// Letzte Änderung am 08.07.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -126,7 +126,7 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     /// SDL Installieren ///
 
     SDL_ClearError();
-    if(SDL_Init(SDL_INIT_EVERYTHING) < 0)
+	if(SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
     {
          LogText(const_cast<char*>("<< ERROR: Fehler beim installieren von SDL2\n"));
          LogText(const_cast<char*>("<< SDL_Error: "));
