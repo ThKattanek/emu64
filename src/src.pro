@@ -343,3 +343,9 @@ INSTALLS += target roms floppy_sounds gfx txt languages icons desktop
 
 DISTFILES += \
     ../crossbuild-win-releases.sh
+
+HEADERS += \
+	floppy1581_class.h
+
+SOURCES += \
+	floppy1581_class.cpp
