@@ -174,6 +174,7 @@ HEADERS += \
     c64_colors.h \
     c64_file_types.h \
     c64_keyboard_window.h \
+    c64_keys.h \
     c64_speed_window.h \
     color_button.h \
     command_line_class.h \
