@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 08.07.2021                //
+# // Letzte Änderung am 18.08.2021                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
