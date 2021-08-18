@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.06.2019                //
+// Letzte Änderung am 18.08.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -27,9 +27,9 @@ C64_KEYS c64_key_table[C64_KEY_COUNT] ={
     {0x01,SDLK_RETURN,false},               /// RETURN
     {0x02,SDLK_RIGHT,false},                /// CRSR_R
     {0x03,SDLK_F7,false},                   /// F7
-    {0x04,SDLK_F1,false},                   /// F5
+	{0x06,SDLK_F5,false},                   /// F5
     {0x05,SDLK_F3,false},                   /// F3
-    {0x06,SDLK_F5,false},                   /// F1
+	{0x04,SDLK_F1,false},                   /// F1
     {0x07,SDLK_DOWN,false},                 /// CRSR_D
 
     {0x10,SDLK_3,false},                    /// 3
