@@ -8,13 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.06.2021                //
+// Letzte Änderung am 18.08.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "./cartridge_class.h"
-#include <stdio.h>
 #include <cstring>
 
 static const char* TYPE_STRING[34] = { "Normal Cartridge","Action Replay","KCS Power Cartridge",

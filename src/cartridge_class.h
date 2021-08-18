@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.06.2021                //
+// Letzte Änderung am 18.08.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,6 +17,7 @@
 #define CARTRIDGE_CLASS_H
 
 #include <functional>
+#include <cstdio>
 
 #include "./structs.h"
 #include "./am29f040_class.h"
