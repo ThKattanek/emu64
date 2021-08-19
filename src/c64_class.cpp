@@ -371,15 +371,15 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
 
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
-        floppy[i] = new Floppy1541(&reset_wire,audio_frequency,audio_spec_have.samples,&floppy_found_breakpoint);
-        floppy[i]->SetResetReady(&floppy_reset_ready[i],0xEBFF);
-        floppy[i]->SetC64IEC(&c64_iec_wire);
-        floppy[i]->SetDeviceNumber(static_cast<uint8_t>(8+i));
-        floppy[i]->LoadDosRom(filename);
-        //floppy[i]->LoadFloppySounds((char*)"floppy_sounds/motor.raw",(char*)"floppy_sounds/motor_on.raw",(char*)"floppy_sounds/motor_off.raw",(char*)"floppy_sounds/anschlag.raw",(char*)"floppy_sounds/stepper_inc.raw",(char*)"floppy_sounds/stepper_dec.raw");
-        floppy[i]->LoadFloppySounds(motor_filename,motor_on_filename,motor_off_filename,bumper_filename,stepper_inc_filename,stepper_dec_filename);
-        floppy[i]->SetEnableFloppy(false);
-        floppy[i]->SetEnableFloppySound(true);
+		floppy1541[i] = new Floppy1541(&reset_wire,audio_frequency,audio_spec_have.samples,&floppy_found_breakpoint);
+		floppy1541[i]->SetResetReady(&floppy_reset_ready[i],0xEBFF);
+		floppy1541[i]->SetC64IEC(&c64_iec_wire);
+		floppy1541[i]->SetDeviceNumber(static_cast<uint8_t>(8+i));
+		floppy1541[i]->LoadDosRom(filename);
+		//floppy1541[i]->LoadFloppySounds((char*)"floppy_sounds/motor.raw",(char*)"floppy_sounds/motor_on.raw",(char*)"floppy_sounds/motor_off.raw",(char*)"floppy_sounds/anschlag.raw",(char*)"floppy_sounds/stepper_inc.raw",(char*)"floppy_sounds/stepper_dec.raw");
+		floppy1541[i]->LoadFloppySounds(motor_filename,motor_on_filename,motor_off_filename,bumper_filename,stepper_inc_filename,stepper_dec_filename);
+		floppy1541[i]->SetEnableFloppy(false);
+		floppy1541[i]->SetEnableFloppySound(true);
     }
 
     /// Init Vars ///
@@ -551,7 +551,7 @@ C64Class::~C64Class()
 
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
-        if(floppy[i] != nullptr) delete floppy[i];
+		if(floppy1541[i] != nullptr) delete floppy1541[i];
     }
 
     if(mmu != nullptr) delete mmu;
@@ -898,7 +898,7 @@ void C64Class::WarpModeLoop()
         zyklen_counter = 0;
         if(wait_reset_ready)
         {
-            if(!floppy[0]->GetEnableFloppy())
+			if(!floppy1541[0]->GetEnableFloppy())
             {
                 if(c64_reset_ready)
                 {
@@ -976,7 +976,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
     sid2->ZeroSoundBufferPos();
 
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
-        floppy[i]->ZeroSoundBufferPos();
+		floppy1541[i]->ZeroSoundBufferPos();
 
     tape->ZeroSoundBufferPos();
 
@@ -1016,7 +1016,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 zyklen_counter = 0;
                 if(wait_reset_ready)
                 {
-                    if(!floppy[0]->GetEnableFloppy())
+					if(!floppy1541[0]->GetEnableFloppy())
                     {
                         if(c64_reset_ready)
                         {
@@ -1126,7 +1126,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
         for(int i=0; i<MAX_FLOPPY_NUM; i++)
         {
-            if(floppy[i]->GetEnableFloppySound()) SDL_MixAudioFormat(reinterpret_cast<uint8_t*>(audio_16bit_buffer),reinterpret_cast<uint8_t*>(floppy[i]->GetSoundBuffer()), AUDIO_S16,static_cast<uint32_t>(sample_buffer_size*2),SDL_MIX_MAXVOLUME);
+			if(floppy1541[i]->GetEnableFloppySound()) SDL_MixAudioFormat(reinterpret_cast<uint8_t*>(audio_16bit_buffer),reinterpret_cast<uint8_t*>(floppy1541[i]->GetSoundBuffer()), AUDIO_S16,static_cast<uint32_t>(sample_buffer_size*2),SDL_MIX_MAXVOLUME);
         }
 
         /// Tapesound dazu mixen ///
@@ -1352,7 +1352,7 @@ bool C64Class::LoadFloppyRom(uint8_t floppy_nr, const char *dos1541rom)
 {
     if(floppy_nr < MAX_FLOPPY_NUM)
     {
-        if(!floppy[floppy_nr]->LoadDosRom(dos1541rom)) return false;
+		if(!floppy1541[floppy_nr]->LoadDosRom(dos1541rom)) return false;
         return true;
     }
     return false;
@@ -1362,7 +1362,7 @@ bool C64Class::LoadDiskImage(uint8_t floppy_nr, FILE *file, int typ)
 {
     if(floppy_nr < MAX_FLOPPY_NUM)
     {
-		return floppy[floppy_nr]->LoadDiskImage(file, typ);
+		return floppy1541[floppy_nr]->LoadDiskImage(file, typ);
     }
     return false;
 }
@@ -1394,7 +1394,7 @@ void C64Class::LoadPRGFromD64(uint8_t floppy_nr, char *c64_filename, int command
 void C64Class::SetFloppyWriteProtect(uint8_t floppy_nr, bool status)
 {
     if(floppy_nr < 4)
-        floppy[floppy_nr]->SetWriteProtect(status);
+		floppy1541[floppy_nr]->SetWriteProtect(status);
 }
 
 void C64Class::SetCommandLine(char *c64_command)
@@ -3091,7 +3091,7 @@ void C64Class::SetDebugMode(bool status)
         one_opcode = false;
         sid1->SoundOutputEnable = false;
         sid2->SoundOutputEnable = false;
-        for(int i=0; i<MAX_FLOPPY_NUM; i++) floppy[i]->SetEnableFloppySound(false);
+		for(int i=0; i<MAX_FLOPPY_NUM; i++) floppy1541[i]->SetEnableFloppySound(false);
     }
     else
     {
@@ -3099,7 +3099,7 @@ void C64Class::SetDebugMode(bool status)
         one_opcode = false;
         sid1->SoundOutputEnable = true;
         sid2->SoundOutputEnable = true;
-        for(int i=0; i<MAX_FLOPPY_NUM; i++) floppy[i]->SetEnableFloppySound(true);
+		for(int i=0; i<MAX_FLOPPY_NUM; i++) floppy1541[i]->SetEnableFloppySound(true);
     }
 }
 
@@ -3219,9 +3219,9 @@ void C64Class::UpdateBreakGroup()
 
     for(int i=0;i<MAX_FLOPPY_NUM;i++)
     {
-        if(floppy[i]->GetEnableFloppy())
+		if(floppy1541[i]->GetEnableFloppy())
         {
-            floppy[i]->UpdateBreakGroup();
+			floppy1541[i]->UpdateBreakGroup();
         }
     }
 }
@@ -3369,7 +3369,7 @@ bool C64Class::ExportPRG(const char *filename, uint16_t start_adresse, uint16_t 
 
     if(source > 0)
     {
-        RAM = floppy[source-1]->GetRamPointer();
+		RAM = floppy1541[source-1]->GetRamPointer();
     }
     else RAM = mmu->GetRAMPointer();
 
@@ -3394,7 +3394,7 @@ bool C64Class::ExportRAW(char *filename, uint16_t start_adresse, uint16_t end_ad
 
     if(source > 0)
     {
-        RAM = floppy[source-1]->GetRamPointer();
+		RAM = floppy1541[source-1]->GetRamPointer();
     }
     else RAM = mmu->GetRAMPointer();
 
@@ -3721,8 +3721,8 @@ void C64Class::NextSystemCycle()
     floppy_iec_wire = 0;
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
-        cpu_states[i+1] = floppy[i]->OneCycle();
-        floppy_iec_wire |= ~floppy[i]->FloppyIECLocal;
+		cpu_states[i+1] = floppy1541[i]->OneCycle();
+		floppy_iec_wire |= ~floppy1541[i]->FloppyIECLocal;
     }
     floppy_iec_wire = ~floppy_iec_wire;
 
@@ -3762,9 +3762,9 @@ uint16_t C64Class::DisAss(FILE *file, uint16_t PC, bool line_draw, int source)
 
     if(source > 0)
     {
-        ram0 = floppy[source-1]->ReadByte(PC+0);
-        ram1 = floppy[source-1]->ReadByte(PC+1);
-        ram2 = floppy[source-1]->ReadByte(PC+2);
+		ram0 = floppy1541[source-1]->ReadByte(PC+0);
+		ram1 = floppy1541[source-1]->ReadByte(PC+1);
+		ram2 = floppy1541[source-1]->ReadByte(PC+2);
     }
     else
     {
@@ -3945,9 +3945,9 @@ bool C64Class::CheckBreakpoints()
     int floppy_break = 0;
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
-        if(floppy[i]->GetEnableFloppy())
+		if(floppy1541[i]->GetEnableFloppy())
         {
-            if(floppy[i]->CheckBreakpoints()) floppy_break |= 1;
+			if(floppy1541[i]->CheckBreakpoints()) floppy_break |= 1;
         }
     }
 
@@ -3961,7 +3961,7 @@ bool C64Class::CheckBreakpoints()
             one_opcode = false;
             sid1->SoundOutputEnable = false;
             sid2->SoundOutputEnable = false;
-            for(int i=0; i<MAX_FLOPPY_NUM; i++) floppy[i]->SetEnableFloppySound(false);
+			for(int i=0; i<MAX_FLOPPY_NUM; i++) floppy1541[i]->SetEnableFloppySound(false);
             if(BreakpointProc != nullptr) BreakpointProc();
             return true;
         }

@@ -171,7 +171,7 @@ void FloppyWindow::LoadIni()
 			d64[i].LoadD64(file);
 
             // Write Protect für alle Floppys setzen
-            c64->floppy[i]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktFileName[i]));
+            c64->floppy1541[i]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktFileName[i]));
 
             ini->endGroup();
         }
@@ -182,7 +182,7 @@ void FloppyWindow::LoadIni()
         RefreshD64FileList();
 
         // Write Protect nochmal für alle Floppy 0 setzen
-        c64->floppy[0]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktDir[0] + "/" + AktFile[0]));
+        c64->floppy1541[0]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktDir[0] + "/" + AktFile[0]));
     }
     ////////////////////////////////////
 }
@@ -200,7 +200,7 @@ bool FloppyWindow::SetDiskImage(uint8_t floppynr, QString filename)
 	FILE *file = qfopen(AktFileName[floppynr], "rb");
 	d64[floppynr].LoadD64(file);
 
-    c64->floppy[floppynr]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktFileName[floppynr]));
+    c64->floppy1541[floppynr]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktFileName[floppynr]));
 
     ui->FloppySelect->setCurrentIndex(floppynr);
     ui->FileBrowser->SetAktDir(AktDir[floppynr]);
@@ -451,9 +451,9 @@ void FloppyWindow::OnCheckWriteDiskImageDir()
 {
     int floppy_nr = ui->FloppySelect->currentIndex();
 
-    if(c64->floppy[floppy_nr]->CheckImageDirectoryWrite())
+    if(c64->floppy1541[floppy_nr]->CheckImageDirectoryWrite())
     {
-       d64[ui->FloppySelect->currentIndex()].ReLoad(c64->floppy[floppy_nr]->GetCurrentD64ImageBuffer());
+       d64[ui->FloppySelect->currentIndex()].ReLoad(c64->floppy1541[floppy_nr]->GetCurrentD64ImageBuffer());
        RefreshD64FileList();
     }
 }

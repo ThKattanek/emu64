@@ -172,7 +172,7 @@ void DebuggerWindow::onTimerAnimationRefresh()
             if(current_source > 0)
             {
                 floppy_cpu_reg[currnet_floppy_nr].reg_mask = REG_MASK_ALL;
-                c64->floppy[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr], &floppy_cpu_ireg[currnet_floppy_nr]);
+                c64->floppy1541[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr], &floppy_cpu_ireg[currnet_floppy_nr]);
                 FillDisassemblyList(floppy_cpu_ireg[currnet_floppy_nr].current_opcode_pc, false);
             }
             else
@@ -212,11 +212,11 @@ void DebuggerWindow::onTimerAnimationRefresh()
 
         for(int i=0; i<MAX_FLOPPY_NUM; i++)
         {
-            if(c64->floppy[i]->GetEnableFloppy())
+            if(c64->floppy1541[i]->GetEnableFloppy())
             {
-                for(int ii=0; ii<c64->floppy[i]->GetBreakGroupCount(); ii++)
+                for(int ii=0; ii<c64->floppy1541[i]->GetBreakGroupCount(); ii++)
                 {
-                    BREAK_GROUP *bg = c64->floppy[i]->GetBreakGroup(ii);
+                    BREAK_GROUP *bg = c64->floppy1541[i]->GetBreakGroup(ii);
                     if(bg->bTrue)
                     {
                         ui->ChangeSource->setCurrentIndex(i+1);
@@ -296,7 +296,7 @@ void DebuggerWindow::UpdateRegister()
     {
         /// Floppy's ///
 
-        if(!c64->floppy[currnet_floppy_nr]->GetEnableFloppy()) return;
+        if(!c64->floppy1541[currnet_floppy_nr]->GetEnableFloppy()) return;
 
         sprintf(str00,"$%4.4X", floppy_cpu_reg[currnet_floppy_nr].pc);
         ui->pc_out->setText(QString(str00));
@@ -454,7 +454,7 @@ void DebuggerWindow::onSr_widget_ValueChange(uint8_t value)
 
     if(current_source > 0)
     {
-        c64->floppy[currnet_floppy_nr]->SetCpuReg(&cpu_reg);
+        c64->floppy1541[currnet_floppy_nr]->SetCpuReg(&cpu_reg);
     }
     else c64->cpu->SetRegister(&cpu_reg);
 }
@@ -560,8 +560,8 @@ void DebuggerWindow::on_EingabeFeld_returnPressed()
 
     if(current_source > 0)
     {
-        c64->floppy[currnet_floppy_nr]->SetCpuReg(&cpu_reg);
-        c64->floppy[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr], &floppy_cpu_ireg[currnet_floppy_nr]);
+        c64->floppy1541[currnet_floppy_nr]->SetCpuReg(&cpu_reg);
+        c64->floppy1541[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr], &floppy_cpu_ireg[currnet_floppy_nr]);
     }
     else
     {
@@ -592,7 +592,7 @@ void DebuggerWindow::on_CycleCounterReset_clicked()
 {
     if(current_source > 0)
     {
-        c64->floppy[currnet_floppy_nr]->ResetCycleCounter();
+        c64->floppy1541[currnet_floppy_nr]->ResetCycleCounter();
     }
     else
     {
@@ -613,7 +613,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
 
     if(current_source > 0)
     {
-        if(!c64->floppy[current_source-1]->GetEnableFloppy()) return;
+        if(!c64->floppy1541[current_source-1]->GetEnableFloppy()) return;
     }
 
     if(!new_refresh)
@@ -672,9 +672,9 @@ void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
         if(current_source > 0)
         {
             currnet_floppy_nr = current_source - 1;
-            ram0 = c64->floppy[currnet_floppy_nr]->ReadByte(pc+0);
-            ram1 = c64->floppy[currnet_floppy_nr]->ReadByte(pc+1);
-            ram2 = c64->floppy[currnet_floppy_nr]->ReadByte(pc+2);
+            ram0 = c64->floppy1541[currnet_floppy_nr]->ReadByte(pc+0);
+            ram1 = c64->floppy1541[currnet_floppy_nr]->ReadByte(pc+1);
+            ram2 = c64->floppy1541[currnet_floppy_nr]->ReadByte(pc+2);
         }
         else
         {
@@ -816,11 +816,11 @@ void DebuggerWindow::FillHistoryList(uint8_t index)
 
     if(current_source > 0)
     {
-        if(!c64->floppy[currnet_floppy_nr]->GetEnableFloppy()) return;
-        hp = c64->floppy[currnet_floppy_nr]->HistoryPointer;
+        if(!c64->floppy1541[currnet_floppy_nr]->GetEnableFloppy()) return;
+        hp = c64->floppy1541[currnet_floppy_nr]->HistoryPointer;
         for(int i=0; i<HISTORY_ROW; i++)
         {
-            sprintf(str00, "$%4.4X", c64->floppy[currnet_floppy_nr]->History[hp--]);
+            sprintf(str00, "$%4.4X", c64->floppy1541[currnet_floppy_nr]->History[hp--]);
             ui->HistoryList->item(i)->setText(QString(str00));
         }
     }
@@ -845,10 +845,10 @@ void DebuggerWindow::on_ChangeSource_currentIndexChanged(int index)
 
         if(c64 == nullptr) return;
         break_point_update_enable = false;
-        int anz = c64->floppy[currnet_floppy_nr]->GetBreakGroupCount();
+        int anz = c64->floppy1541[currnet_floppy_nr]->GetBreakGroupCount();
         for(int i=0;i<anz;i++)
         {
-            BREAK_GROUP *bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(i);
+            BREAK_GROUP *bg = c64->floppy1541[currnet_floppy_nr]->GetBreakGroup(i);
             AddBreakpointTreeRoot(bg->Name, bg);
         }
         break_point_update_enable = true;
@@ -1193,8 +1193,8 @@ bool DebuggerWindow::Assemble(QString address, QString mnemonic, QString address
 
             if(current_source > 0)
             {
-                c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address), opcode[0]);
-                c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address)+1, static_cast<uint8_t>(jmp_adress));
+                c64->floppy1541[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address), opcode[0]);
+                c64->floppy1541[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address)+1, static_cast<uint8_t>(jmp_adress));
             }
             else
             {
@@ -1216,7 +1216,7 @@ bool DebuggerWindow::Assemble(QString address, QString mnemonic, QString address
             case 0:
                 if(current_source > 0)
                 {
-                    c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address), opcode[i]);
+                    c64->floppy1541[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address), opcode[i]);
                 }
                 else
                 {
@@ -1227,8 +1227,8 @@ bool DebuggerWindow::Assemble(QString address, QString mnemonic, QString address
             case 1: case 3: case 6: case 7: case 8: case 11:
                 if(current_source > 0)
                 {
-                    c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address), opcode[i]);
-                    c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address)+1, static_cast<uint8_t>(address_value));
+                    c64->floppy1541[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address), opcode[i]);
+                    c64->floppy1541[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address)+1, static_cast<uint8_t>(address_value));
                 }
                 else
                 {
@@ -1240,9 +1240,9 @@ bool DebuggerWindow::Assemble(QString address, QString mnemonic, QString address
             case 2: case 4: case 5: case 10:
                 if(current_source > 0)
                 {
-                    c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address), opcode[i]);
-                    c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address)+1, static_cast<uint8_t>(address_value));
-                    c64->floppy[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address)+2, static_cast<uint8_t>(address_value>>8));
+                    c64->floppy1541[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address), opcode[i]);
+                    c64->floppy1541[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address)+1, static_cast<uint8_t>(address_value));
+                    c64->floppy1541[currnet_floppy_nr]->WriteByte(static_cast<uint16_t>(start_address)+2, static_cast<uint8_t>(address_value>>8));
                 }
                 else
                 {
@@ -1321,13 +1321,13 @@ void DebuggerWindow::on_AddBreakpoint_clicked()
 
     if(current_source > 0)
     {
-        index = c64->floppy[currnet_floppy_nr]->AddBreakGroup();
+        index = c64->floppy1541[currnet_floppy_nr]->AddBreakGroup();
     }
     else index = c64->AddBreakGroup();
 
     if(index > -1)
     {
-        if(current_source > 0) bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(index);
+        if(current_source > 0) bg = c64->floppy1541[currnet_floppy_nr]->GetBreakGroup(index);
         else bg = c64->GetBreakGroup(index);
 
         QString Name = tr("Haltepunkt (") + QVariant(auto_num[current_source]++).toString() + ")";
@@ -1361,7 +1361,7 @@ void DebuggerWindow::on_DelBreakpoint_clicked()
         if(QMessageBox::Yes == QMessageBox::question(this,tr("Haltepunkt löschen..."),tr("Möchten Sie den folgenden Haltepunkt löschen?\n") + ">> " + Name + " <<",QMessageBox::Yes | QMessageBox::No))
         {
             ui->BreakpointTree->takeTopLevelItem(bg_index);
-            if(current_source > 0) c64->floppy[currnet_floppy_nr]->DelBreakGroup(bg_index);
+            if(current_source > 0) c64->floppy1541[currnet_floppy_nr]->DelBreakGroup(bg_index);
             else c64->DelBreakGroup(bg_index);
         }
     }
@@ -1425,7 +1425,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
         BREAK_GROUP *bg;
         if(current_source > 0)
         {
-            bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(bg_index);
+            bg = c64->floppy1541[currnet_floppy_nr]->GetBreakGroup(bg_index);
         }
         else bg = c64->GetBreakGroup(bg_index);
 
@@ -1442,7 +1442,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
         BREAK_GROUP *bg;
         if(current_source > 0)
         {
-            bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(bg_index);
+            bg = c64->floppy1541[currnet_floppy_nr]->GetBreakGroup(bg_index);
         }
         else bg = c64->GetBreakGroup(bg_index);
 
@@ -1801,14 +1801,14 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
 
     ui->BreakpointTree->clear();
 
-    if(current_source > 0) c64->floppy[currnet_floppy_nr]->DeleteAllBreakGroups();
+    if(current_source > 0) c64->floppy1541[currnet_floppy_nr]->DeleteAllBreakGroups();
     else c64->DeleteAllBreakGroups();
 
     QString filename = QFileDialog::getOpenFileName(this, tr("Haltepunkte öffnen"), QDir::homePath(), tr("Emu64 Haltepunkt Datei ") + "(*.bpt)", nullptr, QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
        int ret;
-       if(current_source > 0) ret = c64->floppy[currnet_floppy_nr]->LoadBreakGroups(filename.toLocal8Bit());
+       if(current_source > 0) ret = c64->floppy1541[currnet_floppy_nr]->LoadBreakGroups(filename.toLocal8Bit());
        else ret = c64->LoadBreakGroups(filename.toLocal8Bit());
 
        if(ret != 0)
@@ -1834,10 +1834,10 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
            /// Alle Haltepunke ins TreeWidget einfügen ///
            if(current_source > 0)
            {
-               int count = c64->floppy[currnet_floppy_nr]->GetBreakGroupCount();
+               int count = c64->floppy1541[currnet_floppy_nr]->GetBreakGroupCount();
                for(int i=0; i<count; i++)
                {
-                   BREAK_GROUP *bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(i);
+                   BREAK_GROUP *bg = c64->floppy1541[currnet_floppy_nr]->GetBreakGroup(i);
                    AddBreakpointTreeRoot(bg->Name,bg);
                }
            }
@@ -1872,7 +1872,7 @@ void DebuggerWindow::on_SaveBreakpoints_clicked()
 
     if(current_source > 0)
     {
-        if(!c64->floppy[currnet_floppy_nr]->SaveBreakGroups(filename.toLocal8Bit()))
+        if(!c64->floppy1541[currnet_floppy_nr]->SaveBreakGroups(filename.toLocal8Bit()))
             QMessageBox::warning(this,tr("Fehler..."),tr("Die Haltepunkte konnten nicht gespeichert werden."));
     }
     else
@@ -1887,7 +1887,7 @@ void DebuggerWindow::on_DelAllBreakpoints_clicked()
     if(ui->BreakpointTree->topLevelItemCount() > 0)
         if(QMessageBox::Yes == QMessageBox::question(this, tr("Achtung..."), tr("Es werden alle Haltepunkte gelöscht !\nMöchten Sie fortfahren?"),QMessageBox::Yes | QMessageBox::No))
         {
-            if(current_source > 0) c64->floppy[currnet_floppy_nr]->DeleteAllBreakGroups();
+            if(current_source > 0) c64->floppy1541[currnet_floppy_nr]->DeleteAllBreakGroups();
             else c64->DeleteAllBreakGroups();
             ui->BreakpointTree->clear();
         }
@@ -1979,7 +1979,7 @@ void DebuggerWindow::RefreshGUI(void)
     {
         /// Floppy's ///
         floppy_cpu_reg[currnet_floppy_nr].reg_mask = REG_MASK_ALL;
-        c64->floppy[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr],&floppy_cpu_ireg[currnet_floppy_nr]);
+        c64->floppy1541[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr],&floppy_cpu_ireg[currnet_floppy_nr]);
 
         /// Register Group ///
         ui->RegisterGroup->setTitle(tr("CPU 6502 Register"));
@@ -2013,7 +2013,7 @@ void DebuggerWindow::RefreshGUI(void)
         ui->exrom_led->setVisible(false);
         ui->game_led->setVisible(false);
 
-        if(c64->floppy[current_source-1]->GetEnableFloppy())
+        if(c64->floppy1541[current_source-1]->GetEnableFloppy())
         {
             ui->label_floppy_off->setVisible(false);
             ui->RegisterGroup->setEnabled(true);

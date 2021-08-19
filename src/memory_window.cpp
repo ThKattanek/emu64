@@ -130,7 +130,7 @@ void MemoryWindow::onChangeValue(unsigned short adresse, unsigned char wert)
 {
     if(AktSource > 0)
     {
-        c64->floppy[AktFloppyNr]->WriteByte(adresse,wert);
+        c64->floppy1541[AktFloppyNr]->WriteByte(adresse,wert);
     }
     else
     {
@@ -151,7 +151,7 @@ void MemoryWindow::UpdateMemoryList(void)
     {
         if(AktSource > 0)
         {
-            for(int x=0;x<16;x++) puffer[x] = c64->floppy[AktFloppyNr]->ReadByte(AktViewAdresse + (i*16) + x);
+            for(int x=0;x<16;x++) puffer[x] = c64->floppy1541[AktFloppyNr]->ReadByte(AktViewAdresse + (i*16) + x);
         }
         else
         {

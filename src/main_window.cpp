@@ -479,7 +479,7 @@ int MainWindow::OnInit()
     {
         SplashMessage(tr("Floppy: ") + QVariant(i).toString() + "wird in Tabelle eingefuegt",Qt::darkBlue);
 		ui->FloppyTabel->setRowHeight(i,24);
-        WidgetFloppyStatus *w = new WidgetFloppyStatus(this,i,c64->floppy[i]);
+        WidgetFloppyStatus *w = new WidgetFloppyStatus(this,i,c64->floppy1541[i]);
         w->SetGeraeteID(i+8);
         ui->FloppyTabel->setCellWidget(i,0,w);
         ui->FloppyTabel->setColumnWidth(0,w->width());

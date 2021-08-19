@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.06.2021                //
+// Letzte Änderung am 18.08.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -26,6 +26,7 @@
 #include "./reu_class.h"
 #include "./georam_class.h"
 #include "./floppy1541_class.h"
+#include "./floppy1581_class.h"
 #include "./tape1530_class.h"
 #include "./cpu_info.h"
 #include "./vcd_class.h"
@@ -347,7 +348,7 @@ public:
     CartridgeClass  *crt;
     REUClass        *reu;
     GEORAMClass     *geo;
-    Floppy1541      *floppy[MAX_FLOPPY_NUM];
+	Floppy1541      *floppy1541[MAX_FLOPPY_NUM];
     TAPE1530        *tape;
 
     bool            enable_stereo_sid;
