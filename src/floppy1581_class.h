@@ -33,6 +33,8 @@ public:
 	/// Funktionen ///
 
 	Floppy1581(bool *reset);
+	~Floppy1581();
+
 	void SetC64IEC(uint8_t *iec);
 	void SetResetReady(bool* ResetReady, uint16_t ResetReadyAdr);
 	void SetDeviceNumber(uint8_t number);

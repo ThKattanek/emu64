@@ -53,6 +53,11 @@ Floppy1581::Floppy1581(bool *reset)
 	}
 }
 
+Floppy1581::~Floppy1581()
+{
+	if(cpu != nullptr) delete cpu;
+}
+
 void Floppy1581::SetC64IEC(uint8_t *iec)
 {
 

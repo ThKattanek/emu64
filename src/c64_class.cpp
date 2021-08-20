@@ -568,6 +568,7 @@ C64Class::~C64Class()
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
 		if(floppy1541[i] != nullptr) delete floppy1541[i];
+		if(floppy1581[i] != nullptr) delete floppy1581[i];
     }
 
     if(mmu != nullptr) delete mmu;
