@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.07.2021                //
+// Letzte Änderung am 20.08.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -353,8 +353,6 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
 
     /// Floppy mit C64 verbinden ///
 
-    sprintf(filename,"%s1541.rom",rom_path);
-
     char motor_filename[FILENAME_MAX];
     char motor_on_filename[FILENAME_MAX];
     char motor_off_filename[FILENAME_MAX];
@@ -369,18 +367,33 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     sprintf(stepper_inc_filename,"%sstepper_inc.raw",floppy_sound_path);
     sprintf(stepper_dec_filename,"%sstepper_dec.raw",floppy_sound_path);
 
+	sprintf(filename,"%s1541.rom",rom_path);
+
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
+		// 1541
 		floppy1541[i] = new Floppy1541(&reset_wire,audio_frequency,audio_spec_have.samples,&floppy_found_breakpoint);
-		floppy1541[i]->SetResetReady(&floppy_reset_ready[i],0xEBFF);
+		floppy1541[i]->SetResetReady(&floppy1541_reset_ready[i],0xEBFF);
 		floppy1541[i]->SetC64IEC(&c64_iec_wire);
 		floppy1541[i]->SetDeviceNumber(static_cast<uint8_t>(8+i));
 		floppy1541[i]->LoadDosRom(filename);
-		//floppy1541[i]->LoadFloppySounds((char*)"floppy_sounds/motor.raw",(char*)"floppy_sounds/motor_on.raw",(char*)"floppy_sounds/motor_off.raw",(char*)"floppy_sounds/anschlag.raw",(char*)"floppy_sounds/stepper_inc.raw",(char*)"floppy_sounds/stepper_dec.raw");
 		floppy1541[i]->LoadFloppySounds(motor_filename,motor_on_filename,motor_off_filename,bumper_filename,stepper_inc_filename,stepper_dec_filename);
 		floppy1541[i]->SetEnableFloppy(false);
 		floppy1541[i]->SetEnableFloppySound(true);
     }
+
+	sprintf(filename,"%s1581.rom",rom_path);
+
+	for(int i=0; i<MAX_FLOPPY_NUM; i++)
+	{
+		// 1581
+		floppy1581[i] = new Floppy1581(&reset_wire);
+		floppy1581[i]->SetResetReady(&floppy1581_reset_ready[i],0xFFFF);
+		floppy1581[i]->SetC64IEC(&c64_iec_wire);
+		floppy1581[i]->SetDeviceNumber(static_cast<uint8_t>(8+i));
+		floppy1581[i]->LoadDosRom(filename);
+		floppy1581[i]->SetEnableFloppy(false);
+	}
 
     /// Init Vars ///
     c64_frequency = C64Takt;
@@ -915,7 +928,7 @@ void C64Class::WarpModeLoop()
             }
             else
             {
-                if((c64_reset_ready == true) && (floppy_reset_ready[0] == true))
+				if((c64_reset_ready == true) && (floppy1541_reset_ready[0] == true))
                 {
                     SDL_ClearError();
                     if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
@@ -1033,7 +1046,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     }
                     else
                     {
-                        if((c64_reset_ready == true) && (floppy_reset_ready[0] == true))
+						if((c64_reset_ready == true) && (floppy1541_reset_ready[0] == true))
                         {
                             SDL_ClearError();
                             if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
@@ -2719,7 +2732,8 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
 		HardReset();
 		wait_reset_ready = true;
 		c64_reset_ready = false;
-		floppy_reset_ready[0] = false;
+		floppy1541_reset_ready[0] = false;
+		floppy1581_reset_ready[0] = false;
 
 		return 0;
 		break;
@@ -2733,7 +2747,8 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
 		HardReset();
 		wait_reset_ready = true;
 		c64_reset_ready = false;
-		floppy_reset_ready[0] = false;
+		floppy1541_reset_ready[0] = false;
+		floppy1581_reset_ready[0] = false;
 
 		return 0;
 		break;
@@ -2749,7 +2764,8 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
 		HardReset();
 		wait_reset_ready = true;
 		c64_reset_ready = false;
-		floppy_reset_ready[0] = false;
+		floppy1541_reset_ready[0] = false;
+		floppy1581_reset_ready[0] = false;
 		return 0;
 		break;
 
@@ -2764,7 +2780,8 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
 		HardReset();
 		wait_reset_ready = true;
 		c64_reset_ready = false;
-		floppy_reset_ready[0] = false;
+		floppy1541_reset_ready[0] = false;
+		floppy1581_reset_ready[0] = false;
 		return 0;
 		break;
 
@@ -2779,7 +2796,8 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
 		HardReset();
 		wait_reset_ready = true;
 		c64_reset_ready = false;
-		floppy_reset_ready[0] = false;
+		floppy1541_reset_ready[0] = false;
+		floppy1581_reset_ready[0] = false;
 		return 0;
 		break;
 

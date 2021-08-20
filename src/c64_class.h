@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.08.2021                //
+// Letzte Änderung am 20.08.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -349,6 +349,7 @@ public:
     REUClass        *reu;
     GEORAMClass     *geo;
 	Floppy1541      *floppy1541[MAX_FLOPPY_NUM];
+	Floppy1581      *floppy1581[MAX_FLOPPY_NUM];
     TAPE1530        *tape;
 
     bool            enable_stereo_sid;
@@ -506,7 +507,8 @@ private:
     ////////////////////////////////////////////////////////////
 
     bool        c64_reset_ready;
-    bool        floppy_reset_ready[MAX_FLOPPY_NUM];
+	bool        floppy1541_reset_ready[MAX_FLOPPY_NUM];
+	bool        floppy1581_reset_ready[MAX_FLOPPY_NUM];
 
     char        c64_command_line[MAX_STRING_LENGTH];
     uint16_t    c64_command_line_lenght;
