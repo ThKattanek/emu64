@@ -89,5 +89,12 @@ void Floppy1581::SetEnableFloppy(bool status)
 
 	FloppyEnabled = status;
 	if(!status)
-		FloppyIECLocal = 0xFF;
+		FloppyIECLocal = 0xff;
+}
+
+bool Floppy1581::OneCycle()
+{
+	if(!FloppyEnabled) return true;
+
+	return true;
 }

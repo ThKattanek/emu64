@@ -526,7 +526,7 @@ private:
     bool        one_cycle;
     bool        one_opcode;
     int         one_opcode_source;
-    bool        cpu_states[5];              // true = Feetch / false = no Feetch ::: Index 0=C64 Cpu, 1-4 Floppy 1-4
+	bool        cpu_states[9];              // true = Feetch / false = no Feetch ::: Index 0=C64 Cpu, 1-4 Floppy1541 1-4, 5-8 Floppy1581
 
     bool        warp_mode;
 

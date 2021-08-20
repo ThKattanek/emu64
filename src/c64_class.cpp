@@ -395,6 +395,9 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
 		floppy1581[i]->SetEnableFloppy(false);
 	}
 
+	// Testweise
+	floppy1581[0]->SetEnableFloppy(true);
+
     /// Init Vars ///
     c64_frequency = C64Takt;
     c64_speed = 100;
@@ -3739,8 +3742,13 @@ void C64Class::NextSystemCycle()
     floppy_iec_wire = 0;
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
+		// 1541
 		cpu_states[i+1] = floppy1541[i]->OneCycle();
 		floppy_iec_wire |= ~floppy1541[i]->FloppyIECLocal;
+
+		// 1581
+		cpu_states[i+5] = floppy1581[i]->OneCycle();
+		floppy_iec_wire |= ~floppy1581[i]->FloppyIECLocal;
     }
     floppy_iec_wire = ~floppy_iec_wire;
 

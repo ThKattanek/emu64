@@ -22,6 +22,7 @@
 #include <functional>
 
 #include "./structs.h"
+#include "./mos6502_class.h"
 
 class Floppy1581
 {
@@ -34,6 +35,7 @@ public:
 	void SetDeviceNumber(uint8_t number);
 	bool LoadDosRom(const char* filename);
 	void SetEnableFloppy(bool status);
+	bool OneCycle();
 
 	/// Variablen ///
 
@@ -44,7 +46,7 @@ public:
 private:
 	bool    FloppyEnabled;
 
-	uint8_t RAM[0x0800];	// 2KB
+	uint8_t RAM[0x2000];	// 8KB
 	uint8_t ROM[0x8000];	// 32KB
 };
 
