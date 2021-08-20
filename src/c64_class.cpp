@@ -388,7 +388,7 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
 	{
 		// 1581
 		floppy1581[i] = new Floppy1581(&reset_wire);
-		floppy1581[i]->SetResetReady(&floppy1581_reset_ready[i],0xFFFF);
+		floppy1581[i]->SetResetReady(&floppy1581_reset_ready[i],0x95A3);
 		floppy1581[i]->SetC64IEC(&c64_iec_wire);
 		floppy1581[i]->SetDeviceNumber(static_cast<uint8_t>(8+i));
 		floppy1581[i]->LoadDosRom(filename);
