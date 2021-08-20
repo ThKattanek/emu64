@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.06.2021	       		//
+// Letzte Änderung am 20.08.2021	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -786,9 +786,6 @@ bool Floppy1541::OneCycle()
     via2->OneZyklus();
 
     if(via2->GetIO_Zero()&4) cpu->SET_SR_BIT6();
-
-    if((VIA1_IRQ == true) || (VIA2_IRQ == true)) IRQ = true;
-    else IRQ = false;
 
     cpu->Phi1();
 

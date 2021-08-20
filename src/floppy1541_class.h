@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.06.2021	       		//
+// Letzte Änderung am 20.08.2021	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -141,10 +141,6 @@ private:
 
     uint8_t RAM[0x800];   // 2KB
     uint8_t ROM[0x4000];  // 16KB
-
-    bool VIA1_IRQ;
-    bool VIA2_IRQ;
-    bool IRQ;
 
     int CycleCounter;
 
