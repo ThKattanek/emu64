@@ -3747,6 +3747,7 @@ void C64Class::NextSystemCycle()
 		floppy_iec_wire |= ~floppy1541[i]->FloppyIECLocal;
 
 		// 1581
+		cpu_states[i+5] = floppy1581[i]->OneCycle();	// 2x weil die 1581 mit 2MHz läuft
 		cpu_states[i+5] = floppy1581[i]->OneCycle();
 		floppy_iec_wire |= ~floppy1581[i]->FloppyIECLocal;
     }
