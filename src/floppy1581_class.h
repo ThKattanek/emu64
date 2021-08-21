@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.08.2021	       		//
+// Letzte Änderung am 21.08.2021	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -23,6 +23,8 @@
 
 #include "./structs.h"
 #include "./mos6502_class.h"
+#include "./mos8520_class.h"
+#include "./wd1770_class.h"
 
 #define MAX_BREAK_GROUP_NUM 255
 
@@ -79,6 +81,8 @@ private:
 	int CycleCounter;
 
 	MOS6502 *cpu;
+	MOS8520 *cia;
+	WD1770  *disk_controller;
 
 	/////////////////////// BREAKPOINTS ////////////////////////
 

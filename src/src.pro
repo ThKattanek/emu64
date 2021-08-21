@@ -345,7 +345,11 @@ DISTFILES += \
     ../crossbuild-win-releases.sh
 
 HEADERS += \
-	floppy1581_class.h
+	floppy1581_class.h \
+	mos8520_class.h \
+	wd1770_class.h
 
 SOURCES += \
-	floppy1581_class.cpp
+	floppy1581_class.cpp \
+	mos8520_class.cpp \
+	wd1770_class.cpp

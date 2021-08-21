@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.08.2021	       		//
+// Letzte Änderung am 21.08.2021	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -23,8 +23,12 @@ Floppy1581::Floppy1581(bool *reset)
 	CycleCounter = 0;
 
 	cpu = new MOS6502();
+	cia = new MOS8520();
+	disk_controller = new WD1770;
 
 	cpu->RESET = reset;
+	cia->reset = reset;
+	disk_controller->reset = reset;
 
 	cpu->ReadProcTbl = ReadProcTbl;
 	cpu->WriteProcTbl = WriteProcTbl;
@@ -37,25 +41,39 @@ Floppy1581::Floppy1581(bool *reset)
 
 	for(int i=0;i<256;i++)
 	{
-		ReadProcTbl[i] = std::bind(&Floppy1581::ReadNoMem,this,std::placeholders::_1);
-		WriteProcTbl[i] = std::bind(&Floppy1581::WriteNoMem,this,std::placeholders::_1,std::placeholders::_2);
+		ReadProcTbl[i] = std::bind(&Floppy1581::ReadNoMem, this, std::placeholders::_1);
+		WriteProcTbl[i] = std::bind(&Floppy1581::WriteNoMem, this, std::placeholders::_1, std::placeholders::_2);
 	}
 
 	for(int i=0;i<32;i++)
 	{
-		ReadProcTbl[i] = std::bind(&Floppy1581::ReadRam,this,std::placeholders::_1);
-		WriteProcTbl[i] = std::bind(&Floppy1581::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+		ReadProcTbl[i] = std::bind(&Floppy1581::ReadRam, this, std::placeholders::_1);
+		WriteProcTbl[i] = std::bind(&Floppy1581::WriteRam, this,std::placeholders::_1, std::placeholders::_2);
 	}
 
 	for(int i=0;i<128;i++)
 	{
-		 ReadProcTbl[i+0x80] = std::bind(&Floppy1581::ReadRom,this,std::placeholders::_1);
+		 ReadProcTbl[i+0x80] = std::bind(&Floppy1581::ReadRom, this, std::placeholders::_1);
 	}
+
+	// MOS8520 0x4000 - 0x5FFF
+	ReadProcTbl[0x40] = std::bind(&MOS8520::ReadIO, cia,std::placeholders::_1);
+	WriteProcTbl[0x40] = std::bind(&MOS8520::WriteIO, cia,std::placeholders::_1, std::placeholders::_2);
+	ReadProcTbl[0x50] = std::bind(&MOS8520::ReadIO, cia, std::placeholders::_1);
+	WriteProcTbl[0x50] = std::bind(&MOS8520::WriteIO, cia, std::placeholders::_1, std::placeholders::_2);
+
+	// MOS8520 0x6000 - 0x7FFF
+	ReadProcTbl[0x60] = std::bind(&WD1770::ReadIO, disk_controller, std::placeholders::_1);
+	WriteProcTbl[0x60] = std::bind(&WD1770::WriteIO, disk_controller, std::placeholders::_1, std::placeholders::_2);
+	ReadProcTbl[0x70] = std::bind(&WD1770::ReadIO, disk_controller, std::placeholders::_1);
+	WriteProcTbl[0x70] = std::bind(&WD1770::WriteIO, disk_controller, std::placeholders::_1, std::placeholders::_2);
 }
 
 Floppy1581::~Floppy1581()
 {
 	if(cpu != nullptr) delete cpu;
+	if(cia != nullptr) delete cia;
+	if(disk_controller != nullptr) delete disk_controller;
 }
 
 void Floppy1581::SetC64IEC(uint8_t *iec)
@@ -141,7 +159,8 @@ bool Floppy1581::OneCycle()
 	CycleCounter++;
 
 	// PHI1
-	//cia->OneZyklus();
+	cia->OneZyklus();
+	disk_controller->OneZyklus();
 
 	if(CIA_IRQ == true) IRQ = true;
 	else IRQ = false;
