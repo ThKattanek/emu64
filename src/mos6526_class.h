@@ -19,7 +19,7 @@
 #include <cstring>
 #include <functional>
 
-#include "./mos6526_port.h"
+#include "./cia_port.h"
 #include "./structs.h"
 
 #define ClockCounterPAL 98438

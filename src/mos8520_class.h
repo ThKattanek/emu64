@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.08.2021                //
+// Letzte Änderung am 23.08.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,6 +19,8 @@
 #include <inttypes.h>
 #include <functional>
 #include <iostream>
+
+#include "./cia_port.h"
 
 using namespace std;
 
@@ -39,6 +41,21 @@ public:
 	// Variablen
 
 	bool	*reset;
+
+	PORT        pa;
+	PORT        pb;
+	uint8_t     pa_latch;
+	uint8_t     pb_latch;
+
+private:
+
+	// Funktionen
+
+	// Variablen
+
+	uint8_t     io[16];
+	uint8_t     ddr_a;
+	uint8_t     ddr_b;
 };
 
 #endif // MOS8520_H
