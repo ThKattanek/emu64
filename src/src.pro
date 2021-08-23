@@ -112,6 +112,7 @@ SOURCES += \
     c64_class.cpp \
     c64_keyboard_window.cpp \
     c64_speed_window.cpp \
+	cia_port.cpp \
     color_button.cpp \
     command_line_class.cpp \
     cartridge_class.cpp \
@@ -136,7 +137,6 @@ SOURCES += \
     mos6510_class.cpp \
     mos6522_class.cpp \
     mos6526_class.cpp \
-    mos6526_port.cpp \
     mos6569_class.cpp \
     mos6581_8085_class.cpp \
     new_romset_window.cpp \
@@ -176,6 +176,7 @@ HEADERS += \
     c64_keyboard_window.h \
     c64_keys.h \
     c64_speed_window.h \
+    cia_port.h \
     color_button.h \
     command_line_class.h \
     cartridge_class.h \
@@ -203,7 +204,6 @@ HEADERS += \
     mos6510_class.h \
     mos6522_class.h \
     mos6526_class.h \
-    mos6526_port.h \
     mos6569_class.h \
     mos6581_8085_class.h \
     new_romset_window.h \
@@ -346,10 +346,15 @@ DISTFILES += \
 
 HEADERS += \
 	floppy1581_class.h \
+	floppy1581_window.h \
 	mos8520_class.h \
 	wd1770_class.h
 
 SOURCES += \
 	floppy1581_class.cpp \
+	floppy1581_window.cpp \
 	mos8520_class.cpp \
 	wd1770_class.cpp
+
+FORMS += \
+	floppy1581_window.ui

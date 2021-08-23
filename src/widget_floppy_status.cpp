@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.06.2021                //
+// Letzte Änderung am 23.08.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -83,7 +83,7 @@ void WidgetFloppyStatus::RetranslateUi()
 
 void WidgetFloppyStatus::onTimer()
 {
-    FLOPPY_INFO info;
+	FLOPPY_1541_INFO info;
     #define MAX_STRLEN 16
     char str[MAX_STRLEN+1] = "";
 

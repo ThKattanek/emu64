@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.07.2021                //
+// Letzte Änderung am 23.08.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *l
     info_window = nullptr;
     video_crt_setup_window = nullptr;
     floppy_window = nullptr;
+	floppy1581_window = nullptr;
     tape_window = nullptr;
     c64_keyboard_window = nullptr;
     cartridge_window = nullptr;
@@ -134,17 +135,18 @@ MainWindow::~MainWindow()
 
     if(video_crt_output != nullptr) delete video_crt_output;
     if(info_window != nullptr)delete info_window;
-    if(video_crt_setup_window != nullptr)delete video_crt_setup_window;
-    if(floppy_window != nullptr)delete floppy_window;
-    if(tape_window != nullptr)delete tape_window;
-    if(c64_keyboard_window != nullptr)delete c64_keyboard_window;
-    if(cartridge_window != nullptr)delete cartridge_window;
-    if(debugger_window != nullptr)delete debugger_window;
-    if(speed_window != nullptr)delete speed_window;
-    if(show_c64keymap_window != nullptr)delete show_c64keymap_window;
-    if(video_capture_window != nullptr)delete video_capture_window;
-    if(sid_dump_window != nullptr)delete sid_dump_window;
-    if(oscilloscope_window != nullptr)delete oscilloscope_window;
+	if(video_crt_setup_window != nullptr) delete video_crt_setup_window;
+	if(floppy_window != nullptr) delete floppy_window;
+	if(floppy1581_window != nullptr) delete floppy1581_window;
+	if(tape_window != nullptr) delete tape_window;
+	if(c64_keyboard_window != nullptr) delete c64_keyboard_window;
+	if(cartridge_window != nullptr) delete cartridge_window;
+	if(debugger_window != nullptr) delete debugger_window;
+	if(speed_window != nullptr) delete speed_window;
+	if(show_c64keymap_window != nullptr) delete show_c64keymap_window;
+	if(video_capture_window != nullptr) delete video_capture_window;
+	if(sid_dump_window != nullptr) delete sid_dump_window;
+	if(oscilloscope_window != nullptr) delete oscilloscope_window;
 
     delete ui;
     delete ini;
@@ -379,6 +381,11 @@ int MainWindow::OnInit()
     SplashMessage(tr("FloppyWindow wird erstellt."),Qt::darkBlue);
     floppy_window = new FloppyWindow(this,ini,c64,emu64_tmp.path());
     LogText(tr(">> FloppyWindow wurde erzeugt\n").toUtf8());
+
+	SplashMessage(tr("Floppy1581Window wird erstellt."),Qt::darkBlue);
+	floppy1581_window = new Floppy1581Window(this, c64);
+	floppy1581_window->show();
+	LogText(tr(">> Floppy1581Window wurde erzeugt\n").toUtf8());
 
     SplashMessage(tr("TapeWindow wird erstellt."),Qt::darkBlue);
     tape_window = new TapeWindow(this,ini,c64,emu64_tmp.path());

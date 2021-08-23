@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Floppy1581Window</class>
+ <widget class="QDialog" name="Floppy1581Window">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>332</width>
+    <height>85</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Floppy 1581 Test Window</string>
+  </property>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

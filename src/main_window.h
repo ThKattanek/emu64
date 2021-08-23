@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.07.2021                //
+// Letzte Änderung am 23.08.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -34,6 +34,7 @@
 #include "./info_window.h"
 #include "./video_crt_setup_window.h"
 #include "./floppy_window.h"
+#include "./floppy1581_window.h"
 #include "./c64_keyboard_window.h"
 #include "./cartridge_window.h"
 #include "./debugger_window.h"
@@ -183,6 +184,7 @@ private:
     InfoWindow *info_window;                        // Info Fenster Klasse (wird vom MainWindow als Modal gestartet)
     VideoCrtSetupWindow *video_crt_setup_window;    // Video CRT Einstellungsfenster
     FloppyWindow *floppy_window;                    // Floppy Editor / Auswahl
+	Floppy1581Window *floppy1581_window;			// Floppy 1581 Test Window --> Nur solange wie die Implementierung dauert
     TapeWindow *tape_window;                        // Datasette
     C64KeyboardWindow *c64_keyboard_window;         // Virtuelle C64 Tastatur
     CartridgeWindow *cartridge_window;              // CRT Auswahl Fenster
