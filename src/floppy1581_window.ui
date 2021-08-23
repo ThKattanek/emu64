@@ -6,14 +6,34 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>332</width>
-    <height>85</height>
+    <width>263</width>
+    <height>101</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Floppy 1581 Test Window</string>
   </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="WidgetLED" name="led_red" native="true"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="WidgetLED" name="led_green" native="true"/>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WidgetLED</class>
+   <extends>QWidget</extends>
+   <header>widget_led.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

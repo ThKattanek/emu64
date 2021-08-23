@@ -382,8 +382,9 @@ int MainWindow::OnInit()
     floppy_window = new FloppyWindow(this,ini,c64,emu64_tmp.path());
     LogText(tr(">> FloppyWindow wurde erzeugt\n").toUtf8());
 
+	// Zu Testzwecken ...
 	SplashMessage(tr("Floppy1581Window wird erstellt."),Qt::darkBlue);
-	floppy1581_window = new Floppy1581Window(this, c64);
+	floppy1581_window = new Floppy1581Window(this, c64->floppy1581[0]);
 	floppy1581_window->show();
 	LogText(tr(">> Floppy1581Window wurde erzeugt\n").toUtf8());
 

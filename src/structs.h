@@ -216,8 +216,8 @@ struct FLOPPY_1541_INFO
 
 struct FLOPPY_1581_INFO
 {
-	bool			Power_Led;	// VC1581
-	bool			Data_Led;	// VC1581
+	bool			Power_Led;		// VC1581
+	bool			Activate_Led;	// VC1581
 };
 
 struct D64_FILES

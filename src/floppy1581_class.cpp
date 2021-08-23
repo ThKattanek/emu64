@@ -182,8 +182,15 @@ bool Floppy1581::OneCycle()
 
 void Floppy1581::GetFloppyInfo(FLOPPY_1581_INFO *fi)
 {
-	fi->Power_Led = true;
-	fi->Data_Led = true;
+	if(cia->pa.GetOutput() & 0x20)
+		fi->Power_Led = false;
+	else
+		fi->Power_Led = true;
+
+	if(cia->pa.GetOutput() & 0x40)
+		fi->Activate_Led = false;
+	else
+		fi->Activate_Led = false;
 }
 
 void Floppy1581::WriteNoMem(uint16_t /*address*/, uint8_t /*value*/)
