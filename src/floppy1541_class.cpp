@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.08.2021	       		//
+// Letzte Änderung am 23.08.2021	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -554,7 +554,7 @@ void Floppy1541::SetWriteProtect(bool status)
     WriteProtect = WriteProtectAkt = status;
 }
 
-void Floppy1541::GetFloppyInfo(FLOPPY_INFO *fi)
+void Floppy1541::GetFloppyInfo(FLOPPY_1541_INFO *fi)
 {
     fi->Sektor = RAM[0x19];
     fi->Spur = (AktHalbSpur+1)>>1;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.06.2021                //
+// Letzte Änderung am 23.08.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -205,13 +205,19 @@ struct BREAK_GROUP
     boolean         bTrue;
 };
 
-struct FLOPPY_INFO
+struct FLOPPY_1541_INFO
 {
     bool            Motor;
     bool            Data;
 	float			Data_RMS;
     unsigned char   Spur;
     unsigned char   Sektor;
+};
+
+struct FLOPPY_1581_INFO
+{
+	bool			Power_Led;	// VC1581
+	bool			Data_Led;	// VC1581
 };
 
 struct D64_FILES

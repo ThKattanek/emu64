@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.08.2021	       		//
+// Letzte Änderung am 23.08.2021	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -61,7 +61,7 @@ public:
     void GetCpuReg(REG_STRUCT *reg, IREG_STRUCT *ireg);
     void SetCpuReg(REG_STRUCT *reg);
     void SetResetReady(bool* ResetReady, uint16_t ResetReadyAdr);
-    void GetFloppyInfo(FLOPPY_INFO *fi);
+	void GetFloppyInfo(FLOPPY_1541_INFO *fi);
     uint8_t ReadByte(uint16_t address);
     void WriteByte(uint16_t address, uint8_t value);
     int LoadFloppySounds(const char* motor_sound_filename, const char* motor_on_sound_filename, const char* motor_off_sound_filename, const char* anschlag_sound_filename, const char* stepper_dec_sound_filename, const char* Stepper_inc_sound_filename);
