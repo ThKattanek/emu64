@@ -8,12 +8,14 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.06.2019                //
+// Letzte Änderung am 23.08.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
+///
+/// Für MOS6526 und MOS8520
 
-#include "mos6526_port.h"
+#include "cia_port.h"
 
 PORT::PORT()
 {
