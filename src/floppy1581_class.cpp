@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.08.2021	       		//
+// Letzte Änderung am 23.08.2021	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -178,6 +178,12 @@ bool Floppy1581::OneCycle()
 	return ret;
 
 	return true;
+}
+
+void Floppy1581::GetFloppyInfo(FLOPPY_1581_INFO *fi)
+{
+	fi->Power_Led = true;
+	fi->Data_Led = true;
 }
 
 void Floppy1581::WriteNoMem(uint16_t /*address*/, uint8_t /*value*/)

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.08.2021	       		//
+// Letzte Änderung am 23.08.2021	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -43,6 +43,8 @@ public:
 	bool LoadDosRom(const char* filename);
 	void SetEnableFloppy(bool status);
 	bool OneCycle();
+
+	void GetFloppyInfo(FLOPPY_1581_INFO *fi);
 
 	/// Wird mit den einzelnen Chips verbunden via "bind" ///
 
