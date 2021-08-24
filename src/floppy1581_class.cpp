@@ -183,12 +183,12 @@ bool Floppy1581::OneCycle()
 void Floppy1581::GetFloppyInfo(FLOPPY_1581_INFO *fi)
 {
 	if(cia->pa.GetOutput() & 0x20)
-		fi->Power_Led = false;
-	else
 		fi->Power_Led = true;
+	else
+		fi->Power_Led = false;
 
 	if(cia->pa.GetOutput() & 0x40)
-		fi->Activate_Led = false;
+		fi->Activate_Led = true;
 	else
 		fi->Activate_Led = false;
 }
