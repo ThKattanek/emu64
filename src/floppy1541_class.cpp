@@ -209,7 +209,8 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
 {
 	size_t reading_elements;
 
-	UnLoadDiskImage();
+	if(typ != -1)
+		UnLoadDiskImage();
 
 	image_file = file;
 

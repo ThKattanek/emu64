@@ -241,7 +241,6 @@ void FloppyWindow::OnSelectFile(QString filename)
             //d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toLocal8Bit());
             //RefreshD64FileList();
 
-
             // D64 File-Anzeige löschen
             ui->D64FileTable->clear();
 
