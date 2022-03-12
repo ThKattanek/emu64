@@ -128,10 +128,10 @@ void TapeWindow::OnSelectFile(QString filename)
 	QFileInfo file_info(filename);
 
 	int typ = NO_C64_FILE;
-	if(file_info.completeSuffix().toUpper() == "TAP")
+	if(file_info.suffix().toUpper() == "TAP")
 		typ = TAP;
 
-	if(file_info.completeSuffix().toUpper() == "WAV")
+	if(file_info.suffix().toUpper() == "WAV")
 		typ = WAV;
 
 	FILE *file = qfopen(filename, "rb");

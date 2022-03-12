@@ -534,10 +534,10 @@ int MainWindow::OnInit()
 			QFileInfo file_info(floppy_window->GetAktFilename(i));
 
 			int typ = NO_C64_FILE;
-			if(file_info.completeSuffix().toUpper() == "D64")
+			if(file_info.suffix().toUpper() == "D64")
 				typ = D64;
 
-			if(file_info.completeSuffix().toUpper() == "G64")
+			if(file_info.suffix().toUpper() == "G64")
 				typ = G64;
 
 			FILE *file = qfopen(floppy_window->GetAktFilename(i), "r+b");
@@ -947,28 +947,28 @@ void MainWindow::AutoLoadAndRun(QString filename)
 
 	int typ = NO_C64_FILE;
 
-	if(file_info.completeSuffix().toUpper() == "PRG")
+	if(file_info.suffix().toUpper() == "PRG")
 		typ = PRG;
 
-	if(file_info.completeSuffix().toUpper() == "C64")
+	if(file_info.suffix().toUpper() == "C64")
 		typ = C64;
 
-	if(file_info.completeSuffix().toUpper() == "T64")
+	if(file_info.suffix().toUpper() == "T64")
 		typ = T64;
 
-	if(file_info.completeSuffix().toUpper() == "P00")
+	if(file_info.suffix().toUpper() == "P00")
 		typ = P00;
 
-	if(file_info.completeSuffix().toUpper() == "D64")
+	if(file_info.suffix().toUpper() == "D64")
 		typ = D64;
 
-	if(file_info.completeSuffix().toUpper() == "G64")
+	if(file_info.suffix().toUpper() == "G64")
 		typ = G64;
 
-	if(file_info.completeSuffix().toUpper() == "CRT")
+	if(file_info.suffix().toUpper() == "CRT")
 		typ = CRT;
 
-	if(file_info.completeSuffix().toUpper() == "FRZ")
+	if(file_info.suffix().toUpper() == "FRZ")
 		typ = FRZ;
 
 	// QMessageBox::information(this,"Test",filename);
@@ -1046,16 +1046,16 @@ void MainWindow::on_actionC64_Programme_direkt_laden_triggered()
 		QFileInfo file_info(filename);
 
 		int typ = NO_C64_FILE;
-		if(file_info.completeSuffix().toUpper() == "PRG")
+		if(file_info.suffix().toUpper() == "PRG")
 			typ = PRG;
 
-		if(file_info.completeSuffix().toUpper() == "C64")
+		if(file_info.suffix().toUpper() == "C64")
 			typ = C64;
 
-		if(file_info.completeSuffix().toUpper() == "T64")
+		if(file_info.suffix().toUpper() == "T64")
 			typ = T64;
 
-		if(file_info.completeSuffix().toUpper() == "P00")
+		if(file_info.suffix().toUpper() == "P00")
 			typ = P00;
 
 		FILE *file = qfopen(filename, "rb");
@@ -1130,10 +1130,10 @@ void MainWindow::OnChangeFloppyImage(int floppynr)
 	QFileInfo file_info(floppy_window->GetAktFilename(floppynr));
 
 	int typ = NO_C64_FILE;
-	if(file_info.completeSuffix().toUpper() == "D64")
+	if(file_info.suffix().toUpper() == "D64")
 		typ = D64;
 
-	if(file_info.completeSuffix().toUpper() == "G64")
+	if(file_info.suffix().toUpper() == "G64")
 		typ = G64;
 
 	FILE *file = qfopen(floppy_window->GetAktFilename(floppynr), "r+b");
