@@ -292,6 +292,34 @@ border-right-color: rgb(50, 50, 50);</string>
     <string>Anzeige für den Schreib-/Lesezugriff.</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="Error">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>0</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="statusTip">
+    <string>Lautstärke der Floppygeräusche.</string>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string notr="true"/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="flat">
+    <bool>true</bool>
+   </property>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>

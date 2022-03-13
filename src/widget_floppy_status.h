@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.06.2021                //
+// Letzte Änderung am 12.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -53,6 +53,8 @@ private slots:
     void on_EjectImage_clicked();
     void on_Volume_clicked();
 
+	void on_Error_clicked();
+
 private:
 
     Ui::WidgetFloppyStatus *ui;
@@ -71,6 +73,8 @@ private:
     QIcon *iVol_low;
     QIcon *iVol_medium;
     QIcon *iVol_high;
+
+	QIcon *iError;
 
     int  FloppySoundVolumeMode;
 

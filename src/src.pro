@@ -343,3 +343,6 @@ INSTALLS += target roms floppy_sounds gfx txt languages icons desktop
 
 DISTFILES += \
     ../crossbuild-win-releases.sh
+
+HEADERS += \
+	dos_error_messages.h
