@@ -913,6 +913,17 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
 			c64->video_crt_output->EnableCrtOutput(false);
 			setup_window->DisableVideoCRT();
 			break;
+		case CMD_SET_PALETTE:
+			val = cmd_line->GetArgInt(i+1, &error);
+			if(error) break;
+
+			if(val < 0 || val > 9)
+			{
+				cmd_line->OutErrorMsg("Die Palettennummer muss zwischen 0 und 9 sein.","--help");
+				break;
+			}
+			video_crt_output->SetC64Palette(val);
+			break;
         case CMD_EXIT_SCREENSHOT:
             c64->SetExitScreenshot(cmd_line->GetArg(i+1));
             break;

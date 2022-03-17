@@ -52,6 +52,12 @@ emu64 [PARAMETER]
 --video-filter-off
     Es wird die Video CRT Emulation temporär ausgeschaltet.
 
+--set-palette <Palettennummer>
+    Setzt eine von den internen C64 Farb Paletten.
+
+    0=EMU64-NEU 1=EMU64-ALT 2=CCS64 3=PC64 4=C64S
+    5=VICE 6=FRODO 7=PEPTO 8=Colodore 9=SW
+
 --exitscreenshot <Dateiname>
     Speichert vor dem beenden noch ein Screenshot als png.
 
