@@ -49,6 +49,9 @@ emu64 [PARAMETER]
 --minimized
     Emu64 wird mit minimierten Fenstern gestartet.
 
+--video-filter-off
+    Es wird die Video CRT Emulation temporär ausgeschaltet.
+
 --exitscreenshot <Dateiname>
     Speichert vor dem beenden noch ein Screenshot als png.
 
@@ -76,4 +79,4 @@ emu64 [PARAMETER]
 
 
 
-by Th.Kattanek (C)2017
+by Th.Kattanek (C)2022

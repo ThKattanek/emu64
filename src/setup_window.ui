@@ -23,7 +23,7 @@
       <bool>true</bool>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -52,8 +52,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>505</width>
-            <height>662</height>
+            <width>509</width>
+            <height>671</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -369,8 +369,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>505</width>
-            <height>662</height>
+            <width>509</width>
+            <height>671</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -385,7 +385,6 @@
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
-                  <weight>75</weight>
                   <bold>true</bold>
                  </font>
                 </property>
@@ -475,8 +474,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>505</width>
-            <height>662</height>
+            <width>509</width>
+            <height>671</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_7">
@@ -776,8 +775,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>505</width>
-            <height>662</height>
+            <width>509</width>
+            <height>671</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_13">

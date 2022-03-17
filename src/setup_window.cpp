@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.06.2021                //
+// Letzte Änderung am 17.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -556,6 +556,11 @@ void SetupWindow::ReSetup()
 int SetupWindow::GetScreenshotFormat()
 {
 	return ui->ScreenshotFormat->currentIndex();
+}
+
+void SetupWindow::DisableVideoCRT()
+{
+	ui->WPal->setDisabled(true);
 }
 
 void SetupWindow::showEvent(QShowEvent *event)

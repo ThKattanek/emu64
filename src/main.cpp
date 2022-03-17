@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.07.2021                //
+// Letzte Änderung am 17.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -176,7 +176,6 @@ int main(int argc, char *argv[])
     // Wenn --minimized
     if(start_minimized)
     {
-
         w->showMinimized();
     }
 

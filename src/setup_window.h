@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 24.06.2021                //
+// Letzte Änderung am 17.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -47,6 +47,7 @@ public:
     void SaveINI();
     void ReSetup(void);
     int GetScreenshotFormat();
+	void DisableVideoCRT();
 
 protected:
 	void showEvent(QShowEvent *event);

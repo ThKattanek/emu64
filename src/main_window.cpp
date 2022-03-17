@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.07.2021                //
+// Letzte Änderung am 17.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -909,7 +909,10 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             }
             c64->SetLimitCycles(val);
             break;
-
+		case CMD_VIDEO_FILTER_OFF:
+			c64->video_crt_output->EnableCrtOutput(false);
+			setup_window->DisableVideoCRT();
+			break;
         case CMD_EXIT_SCREENSHOT:
             c64->SetExitScreenshot(cmd_line->GetArg(i+1));
             break;
