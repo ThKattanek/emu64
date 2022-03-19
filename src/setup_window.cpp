@@ -563,6 +563,11 @@ void SetupWindow::DisableVideoCRT()
 	ui->WPal->setDisabled(true);
 }
 
+void SetupWindow::DisableTextureDouble()
+{
+	ui->WDouble->setDisabled(true);
+}
+
 void SetupWindow::showEvent(QShowEvent *event)
 {
 	for(int i=0;i<MAX_VJOY_NUM;i++)

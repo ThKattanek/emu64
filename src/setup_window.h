@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.03.2022                //
+// Letzte Änderung am 19.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -47,7 +47,8 @@ public:
     void SaveINI();
     void ReSetup(void);
     int GetScreenshotFormat();
-	void DisableVideoCRT();
+	void DisableVideoCRT();			// Die Einstellmöglichkeit im Setup Window wird verhindert (--video-filter-off)
+	void DisableTextureDouble();	// Die Einstellmöglichkeit im Setup Window wird verhindert (--texture-double-off)
 
 protected:
 	void showEvent(QShowEvent *event);
