@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.06.2021                //
+// Letzte Änderung am 19.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -514,9 +514,10 @@ private:
     bool        c64_command_line_count_s;
 
     uint32_t    cycle_counter;
-    int         limit_cyles_counter;        // Dieser Counter wird wenn er > 0 ist bei jeden Zyklus um 1 runtergezählt
-                                            // Wechselt er von 1 auf 0 wird die Emulation angehalten und ein Ergeignis ausgelöst
-    bool        debug_mode;
+	int         limit_cycles_counter;        // Dieser Counter wird wenn er > 0 ist bei jeden Zyklus um 1 runtergezählt
+	bool		hold_next_system_cycle;		 // Wird dieses Flag gesetzt wird verhindert das ein C64 Cylce ausgeführt wird
+
+	bool        debug_mode;
     bool        debug_animation;
     float_t     animation_speed_add;
     float_t     animation_speed_counter;

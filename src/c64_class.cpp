@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 08.07.2021                //
+// Letzte Änderung am 19.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -393,7 +393,8 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     c64_command_line_count_s = false;
     debug_mode = one_cycle = one_opcode = false;
     cycle_counter = 0;
-    limit_cyles_counter = 0;
+	limit_cycles_counter = 0;
+	hold_next_system_cycle = false;
     debug_animation = false;
     animation_speed_add = audio_spec_have.samples/audio_frequency;
     animation_speed_counter = 0;
@@ -600,11 +601,14 @@ void C64Class::StartEmulation()
 void C64Class::EndEmulation()
 {
     EnableWarpMode(false);
-    if(enable_exit_screenshot)
-    {
-        SwapRBSurface(c64_screen);
-        SDL_SavePNG(c64_screen, exit_screenshot_filename);
-    }
+
+	if(enable_exit_screenshot)
+	{
+		hold_next_system_cycle = true;
+		SwapRBSurface(c64_screen);
+		SDL_SavePNG(c64_screen, exit_screenshot_filename);
+		hold_next_system_cycle = false;
+	}
 
     /// Loop Thread beenden ///
     loop_thread_end = true;
@@ -625,7 +629,7 @@ void C64Class::EndEmulation()
 
 void C64Class::SetLimitCycles(int nCycles)
 {
-    limit_cyles_counter = nCycles;
+	limit_cycles_counter = nCycles;
 }
 
 void C64Class::SetEnableDebugCart(bool enable)
@@ -871,10 +875,10 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
 
 void C64Class::WarpModeLoop()
 {
-    if(limit_cyles_counter > 0)
+	if(limit_cycles_counter > 0)
     {
-        limit_cyles_counter--;
-        if(limit_cyles_counter == 0)
+		limit_cycles_counter--;
+		if(limit_cycles_counter == 0)
         {
             // Event auslösen
             if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
@@ -986,10 +990,10 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
     {
         while((sid1->SoundBufferPos < sample_buffer_size_mono) && (debug_mode == false))
         {
-            if(limit_cyles_counter > 0)
+			if(limit_cycles_counter > 0)
             {
-                limit_cyles_counter--;
-                if(limit_cyles_counter == 0)
+				limit_cycles_counter--;
+				if(limit_cycles_counter == 0)
                 {
                     // Event auslösen
                     if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
@@ -3713,6 +3717,10 @@ int C64Class::GetVicLastDisplayLineNtsc()
 void C64Class::NextSystemCycle()
 {
     CheckKeys();
+
+	if(hold_next_system_cycle)
+		return;
+
     cycle_counter++;
 
     /// Für Externe Erweiterungen ///
