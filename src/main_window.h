@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.07.2021                //
+// Letzte Änderung am 19.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -197,6 +197,7 @@ private:
     //QStringList commandLine;                        // Enthält den an Emu64 übergebenen String
 
     bool isFirstPaintEvent;
+	bool isCommandDoubleTextureOff;
 };
 
 #endif // MAINWINDOW_H

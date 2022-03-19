@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *l
     this->log = log;
 
     isFirstPaintEvent = false;
+	isCommandDoubleTextureOff = false;
 
     this->setGeometry(0,0,0,0);
 
@@ -78,7 +79,7 @@ MainWindow::~MainWindow()
     if(ini != nullptr && no_write_ini_exit == false)
     {
         ini->beginGroup("MainWindow");
-        ini->setValue("Geometry",saveGeometry());
+		ini->setValue("Geometry",saveGeometry());
         ini->setValue("State",saveState());
         ini->setValue("ScreenshotCounter",c64->GetScreenshotNumber());
         ini->setValue("LastAutoloadDir",lastAutoloadPath);
@@ -105,8 +106,11 @@ MainWindow::~MainWindow()
         ini->beginGroup("C64Screen");
         ini->setValue("PosX",x);
         ini->setValue("PosY",y);
-        ini->setValue("SizeW",w);
-        ini->setValue("SizeH",h);
+		if(!isCommandDoubleTextureOff)
+		{
+			ini->setValue("SizeW",w);
+			ini->setValue("SizeH",h);
+		}
         ini->endGroup();
 
         C64_KEYS* c64_key_table = c64->GetC64KeyTable();
@@ -909,11 +913,14 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             }
             c64->SetLimitCycles(val);
             break;
-		case CMD_TEXTURE_DOUBLE_OFF:
-			c64->SetGrafikModi(false,c64->enable_screen_crt_output,c64->enable_screen_filter,0,0);
+		case CMD_DOUBLE_TEXTURE_OFF:
+			isCommandDoubleTextureOff = true;
+			c64->enable_screen_doublesize = false;
+			c64->SetGrafikModi(c64->enable_screen_doublesize,c64->enable_screen_crt_output,c64->enable_screen_filter,0,0);
 			setup_window->DisableTextureDouble();
 			break;
 		case CMD_VIDEO_FILTER_OFF:
+			c64->enable_screen_crt_output = false;
 			c64->video_crt_output->EnableCrtOutput(false);
 			setup_window->DisableVideoCRT();
 			break;
