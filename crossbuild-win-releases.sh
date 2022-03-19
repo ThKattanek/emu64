@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 13.01.2020                //
+# // Letzte Änderung am 20.03.2022                //
 # // www.emu64-projekt.de                         //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -19,6 +19,12 @@
 # excample: crossbuild-win-releases.sh ~/mxe
 
 declare project_name=emu64
+
+# configuration
+declare x32=true
+declare x64=true
+
+declare compress=true
 
 # Version
 version=$(git describe --always --tags)
@@ -64,7 +70,7 @@ else
 fi
 
 #### 32Bit Static
-if [ $i686_ok ]; then
+if [ $i686_ok ] && [ $x32 = true ]; then
     echo "Creating a i686-Static windows binary ..."
     
     # check and create a build dir
@@ -102,17 +108,18 @@ if [ $i686_ok ]; then
     rm -f $install_i686_dir/LICENSE
     
     # compress as 7z
-    echo "Release 32bit as 7z kompressed..."
-    7z a -t7z -m0=LZMA -mmt=24 -mx=9 -md=96m -mfb=256 $install_i686_dir".7z" $install_i686_dir
-
-    rm -rf $install_i686_dir
+    if [ $compress = true ]; then
+        echo "Release 32bit as 7z kompressed..."
+        7z a -t7z -m0=LZMA -mmt=24 -mx=9 -md=96m -mfb=256 $install_i686_dir".7z" $install_i686_dir
+        rm -rf $install_i686_dir
     
-    # SHA512 Hashwert erzeugen
-    sha512sum -b $project_name"_"$version"_win_x32.7z" >> $project_name"_"$version"_win_x32.7z.sha512"
+        # SHA512 Hashwert erzeugen
+        sha512sum -b $project_name"_"$version"_win_x32.7z" >> $project_name"_"$version"_win_x32.7z.sha512"
+    fi
 fi
 
 ### 64Bit Static
-if [ $x86_64_ok ]; then
+if [ $x86_64_ok ] && [ $x64 = true ]; then
     echo "Creating a x86_64-Static windows binary ..."
 
     # check and create a build dir
@@ -150,13 +157,14 @@ if [ $x86_64_ok ]; then
     rm -f $install_x86_64_dir/LICENSE
     
     # compress as 7z
-    echo "Release 64bit as 7z kompressed..."
-    7z a -t7z -m0=LZMA -mmt=24 -mx=9 -md=96m -mfb=256 $install_x86_64_dir".7z" $install_x86_64_dir
-
-    rm -rf $install_x86_64_dir
+    if [ $compress = true ]; then
+        echo "Release 64bit as 7z kompressed..."
+        7z a -t7z -m0=LZMA -mmt=24 -mx=9 -md=96m -mfb=256 $install_x86_64_dir".7z" $install_x86_64_dir
+        rm -rf $install_x86_64_dir
     
-    # SHA512 Hashwert erzeugen
-    sha512sum -b $project_name"_"$version"_win_x64.7z" >> $project_name"_"$version"_win_x64.7z.sha512"
+        # SHA512 Hashwert erzeugen
+        sha512sum -b $project_name"_"$version"_win_x64.7z" >> $project_name"_"$version"_win_x64.7z.sha512"
+    fi
 fi
 
 cd ..
