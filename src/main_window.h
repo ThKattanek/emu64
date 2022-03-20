@@ -99,7 +99,7 @@ public:
 
 public slots:
     void OnMessage(QStringList msg);
-    int OnInit();
+	int OnInit(bool nogui);
 
 private slots:
     void on_menu_main_info_triggered();
@@ -161,6 +161,8 @@ private:
     QString configPath;          // Pfad für emu64.ini und emu64.log
     QString dataPath;            // Pfad für alle Emu64 Daten
     QString custom_dataPath;     // Pfad für alle Emu64 Daten -> Wenn er per Komandozeile angegeben wurde (--data-path)
+
+	bool nogui;					 // Wenn die GUI nicht angezeigt wird
 
     //QString appPath;           // Pfad der emu64 Datei
     QString langPath;            // Pfad für alle Sprachfiles

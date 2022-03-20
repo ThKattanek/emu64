@@ -46,11 +46,14 @@ emu64 [PARAMETER]
 --nosplash
     Der SplashScreen wird beim Start nicht angezeigt.
 
+--nogui
+    Es werden keine Fenster angezeigt. Also Vorsicht, sollte nur mit --limitcycles verwendet werden.
+
 --minimized
     Emu64 wird mit minimierten Fenstern gestartet.
 
 --double-texture-off
-    Die Video Ausgabe Texture wird temporär nicht verdoppelt. Die Fenstergrße wird beim beenden nicht gespeichert.
+    Die Video Ausgabe Texture wird temporär nicht verdoppelt. Die Fenstergröße wird beim beenden nicht gespeichert.
 
 --video-filter-off
     Es wird die Video CRT Emulation temporär ausgeschaltet.

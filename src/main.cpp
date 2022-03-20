@@ -76,6 +76,9 @@ int main(int argc, char *argv[])
 
             if(cmd_line->GetCommand(i) == CMD_MINIMIZED)
                 start_minimized = true;
+
+			if(cmd_line->GetCommand(i) == CMD_NOGUI)
+				nogui = true;
         }
 
         if(cmd_line->GetCommand(0) == CMD_HELP)
@@ -156,7 +159,7 @@ int main(int argc, char *argv[])
 
     MainWindow *w;
 
-    if(!cmd_line->FoundCommand(CMD_NOSPLASH))
+	if(!cmd_line->FoundCommand(CMD_NOSPLASH) && !cmd_line->FoundCommand(CMD_NOGUI))
     {
         QPixmap image(":/splash");
         CustomSplashScreen *splash = new CustomSplashScreen(image);
@@ -195,7 +198,7 @@ int main(int argc, char *argv[])
     w->log = log;
     w->no_write_ini_exit = true;
 
-    if(w->OnInit() == 0)
+	if(w->OnInit(cmd_line->FoundCommand(CMD_NOGUI)) == 0)
     {
         w->no_write_ini_exit = false;
         if(isFirstInstance)
@@ -204,6 +207,7 @@ int main(int argc, char *argv[])
             for(int i=0;i<argc;i++) msg_list << argv[i];
             w->OnMessage(msg_list);
         }
+
         ret = app->exec();
     }
 

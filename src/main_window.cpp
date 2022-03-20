@@ -179,10 +179,11 @@ void MainWindow::paintEvent(QPaintEvent *event)
     }
 }
 
-int MainWindow::OnInit()
+int MainWindow::OnInit(bool nogui)
 {
-    // Alle Pfade setzen //
+	this->nogui = nogui;
 
+    // Alle Pfade setzen //
     configPath = QDir::homePath() + "/.config/emu64";
 
 #ifdef _WIN32
@@ -620,7 +621,8 @@ int MainWindow::OnInit()
     if(splash != nullptr) splash->close();
     LogText(tr(">> Splashsreen wurde geschlossen.\n").toUtf8());
 
-    this->show();
+	if(!nogui)
+		this->show();
 
     /////////////////////////////////////
     SplashMessage(tr("C64 EMULATION WIRD NUN GESTARTET."),Qt::darkBlue);
@@ -1031,7 +1033,8 @@ void MainWindow::on_menu_main_info_triggered()
 void MainWindow::on_actionBeenden_triggered()
 {
     if(!debugger_window->isHidden()) debugger_window->hide();
-    showNormal();
+	if(!nogui)
+		showNormal();
     close();
 }
 

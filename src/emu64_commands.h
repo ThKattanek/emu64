@@ -20,7 +20,7 @@
 enum CMD_COMMAND {CMD_HELP,CMD_VERSION,CMD_MULTIPLE_INSTANCE,CMD_NOSPLASH,CMD_MINIMIZED,CMD_SOFTRESET,CMD_HARDRESET,\
                  CMD_MOUNT_DISK,CMD_MOUNT_CRT,CMD_UMOUNT_CRT,CMD_POKE_64,CMD_LIMITCYCLES,CMD_AUTOSTART,\
 				 CMD_EXIT_SCREENSHOT,CMD_DEBUG_CART,CMD_WARP_MODE,CMD_RESET_INI,CMD_VIDEOCAPTURE,CMD_DATA_PATH,CMD_VIDEO_FILTER_OFF,CMD_SET_PALETTE,\
-				 CMD_DOUBLE_TEXTURE_OFF};
+				 CMD_DOUBLE_TEXTURE_OFF, CMD_NOGUI};
 static const CMD_STRUCT command_list[]{
     {CMD_AUTOSTART,"a","autostart","Laedt ein C64 Programm (prg,t00 ...) und startet es gleich.",1},
     {CMD_MOUNT_DISK,"m","mount-disk","Mountet ein Diskimage. --mount-disk <Laufwerksnummer (8-11)> <Dateiname>",2},
@@ -32,6 +32,7 @@ static const CMD_STRUCT command_list[]{
     {CMD_POKE_64,"","poke64","Schreibt ein Byte an eine C64 Adresse. --poke64 <Adresse (0-65535)> <Wert (0-255)>",2},
     {CMD_LIMITCYCLES,"","limitcycles","Beendet den Emulator nach n Zyklen mit Exitcode 1. --limitcycles <nZyklen>",1},
     {CMD_NOSPLASH,"","nosplash","Der SplashScreen wird beim Start nicht angezeigt.",0},
+	{CMD_NOGUI,"","nogui","Es werden keine Fenster angezeigt. Also Vorsicht, sollte nur mit --limitcycles verwendet werden.",0},
     {CMD_MINIMIZED,"","minimized","Emu64 wird mit mimimierten Fenstern gestartet.",0},
 	{CMD_DOUBLE_TEXTURE_OFF,"","double-texture-off","Die Video Ausgabe Texture wird temporär nicht verdoppelt.",0},
 	{CMD_VIDEO_FILTER_OFF,"","video-filter-off","Es wird die Video CRT Emulation temporär ausgeschaltet.",0},
