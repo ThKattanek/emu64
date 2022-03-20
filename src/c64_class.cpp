@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.03.2022                //
+// Letzte Änderung am 20.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1575,10 +1575,12 @@ void C64Class::InitGrafik()
         LogText("\tInitGrafik: SDL_Window noch nicht vorhanden.\n");
 
         // Wenn no-gui command
-        // Flag SDL_WINDOW_HIDDEN   -> Window wird nicht dargestellt auch nicht in der Taskleiste
+		if(start_hidden_window)
+			sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_HIDDEN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+		else
+			sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
-        sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
-        if(sdl_window == nullptr)
+		if(sdl_window == nullptr)
             LogText("\tInitGrafik: Fehler beim erstellen des SDL_Window.\n");
         else
         {

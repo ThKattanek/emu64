@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.03.2022                //
+// Letzte Änderung am 20.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -231,6 +231,7 @@ public:
     static const char* screenshot_format_name[SCREENSHOT_FORMATS_COUNT];
 
     bool            start_minimized;
+	bool			start_hidden_window;
 
     uint16_t        current_window_width;
     uint16_t        current_window_height;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.03.2022                //
+// Letzte Änderung am 20.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -365,6 +365,8 @@ int MainWindow::OnInit(bool nogui)
         this->close();
         return -1;
     }
+
+	c64->start_hidden_window = nogui;
 
     SetC64ScreenTitle();
     c64->EnableScreenshots(ScreenshotsEnable);
