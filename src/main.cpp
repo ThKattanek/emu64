@@ -76,9 +76,6 @@ int main(int argc, char *argv[])
 
             if(cmd_line->GetCommand(i) == CMD_MINIMIZED)
                 start_minimized = true;
-
-			if(cmd_line->GetCommand(i) == CMD_NOGUI)
-				nogui = true;
         }
 
         if(cmd_line->GetCommand(0) == CMD_HELP)
