@@ -24,7 +24,7 @@ declare project_name=emu64
 declare x32=true
 declare x64=true
 
-declare public_release=false
+declare public_release=true
 
 # Version
 version=$(git describe --always --tags)
