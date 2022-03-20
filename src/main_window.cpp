@@ -882,6 +882,12 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
         case CMD_UMOUNT_CRT:
             cartridge_window->DisconnectCrt();
             break;
+		case CMD_ENABLE_GEORAM:
+			c64->InsertGEORAM();
+			break;
+		case CMD_ENABLE_REU:
+			c64->InsertREU();
+			break;
         case CMD_WARP_MODE:
             c64->EnableWarpMode(true);
             break;

@@ -42,6 +42,8 @@ int main(int argc, char *argv[])
     QDir config_dir = QDir(QDir::homePath() + "/.config/emu64");
 
     bool start_minimized = false;
+	bool enable_reu = false;
+	bool enable_georam = false;
 
     CommandLineClass *cmd_line = new CommandLineClass(argc, argv, "emu64",command_list, command_list_count);
 
@@ -76,6 +78,12 @@ int main(int argc, char *argv[])
 
             if(cmd_line->GetCommand(i) == CMD_MINIMIZED)
                 start_minimized = true;
+
+			if(cmd_line->GetCommand(i) == CMD_ENABLE_GEORAM)
+				enable_georam = true;
+
+			if(cmd_line->GetCommand(i) == CMD_ENABLE_REU)
+				enable_reu = true;
         }
 
         if(cmd_line->GetCommand(0) == CMD_HELP)
@@ -83,12 +91,19 @@ int main(int argc, char *argv[])
             cmd_line->ShowHelp();
             return(0x0);
         }
+
         if(cmd_line->GetCommand(0) == CMD_VERSION)
         {
             printf("Version: %s\n\n",VERSION_STRING);
             return(0x0);
         }
     }
+
+	if(enable_georam == true && enable_reu == true)
+	{
+		cout << "Es können nicht '--enable-georam' und '--enable-reu' gleichzeitig gesetzt werden." << endl;
+		return(-1);
+	}
 
     SingleApplication *app;
     app = new SingleApplication (argc, argv);
