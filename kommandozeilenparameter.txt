@@ -70,6 +70,12 @@ emu64 [PARAMETER]
 --debugcart
     Beendet den Emu64 bei einem Schreibzugriff auf $d7ff und gibt den Wert als Exitcode zurück.
 
+--enable-georam
+    Aktiviert die GEORAM.
+
+--enable-reu
+    Aktiviert die REU.
+
 --multiple-instance
     Ermöglicht das starten mehrerer Emu64 Instanzen.
 
