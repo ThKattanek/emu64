@@ -1601,7 +1601,7 @@ void C64Class::InitGrafik()
     }
 
     // Wenn Minimized Comandline
-    if(start_minimized)
+	if(start_minimized && !start_hidden_window)
         SDL_MinimizeWindow(sdl_window);
 
     gl_context = SDL_GL_CreateContext(sdl_window);

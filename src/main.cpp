@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.03.2022                //
+// Letzte Änderung am 20.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
     w->start_minimized = start_minimized;
 
     // Wenn --minimized
-    if(start_minimized)
+	if(start_minimized && !cmd_line->FoundCommand(CMD_NOGUI))
     {
         w->showMinimized();
     }
