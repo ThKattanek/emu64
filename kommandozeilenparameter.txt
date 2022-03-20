@@ -76,6 +76,12 @@ emu64 [PARAMETER]
 --enable-reu
     Aktiviert die REU.
 
+--set-sidtype
+    Setzt den Typ des ersten SID's.
+
+    0=MOS-6581
+    1=MOS-8085
+
 --multiple-instance
     Ermöglicht das starten mehrerer Emu64 Instanzen.
 

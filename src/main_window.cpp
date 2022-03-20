@@ -888,6 +888,17 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
 		case CMD_ENABLE_REU:
 			c64->InsertREU();
 			break;
+		case CMD_SET_SIDTYPE:
+			val = cmd_line->GetArgInt(i+1, &error);
+			if(error) break;
+
+			if(val < 0 || val > 1)
+			{
+				cmd_line->OutErrorMsg("Der Sidtype muss zwischen 0 und 1 sein.","--help");
+				break;
+			}
+			c64->SetFirstSidTyp(val);
+			break;
         case CMD_WARP_MODE:
             c64->EnableWarpMode(true);
             break;
