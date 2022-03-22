@@ -8,13 +8,15 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.03.2022	       		//
+// Letzte Änderung am 22.03.2022	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "./floppy1541_class.h"
 #include "./c64_file_types.h"
+
+#include <iostream>
 
 #include <QDebug>
 
@@ -23,6 +25,12 @@ const uint8_t Floppy1541::d64_track_zone[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
                    1,1,1,1,1,1,1,
                    2,2,2,2,2,2,
                    3,3,3,3,3,3,3,3,3,3};
+
+// Zeiger auf Track Anfang //	<------------------------- Track 1-17 ----------------------> <------ Track 18-24 ------> <---- Track 25-30 ----> <---- Track 31-36 ---->
+const uint16_t track_index[]={0,0,21,42,63,84,105,126,147,168,189,210,231,252,273,294,315,336,357,376,395,414,433,452,471,490,508,526,544,562,580,598,615,632,649,666,683};
+
+// Sektoren pro Track //			  <------------------ Track 1-17 ------------------> <--- Track 18-24 --> <- Track 25-30 -> <-  31-35   ->
+static uint16_t track_max_sector[36]={0,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,19,19,19,19,19,19,19,18,18,18,18,18,18,17,17,17,17,17};
 
 const uint8_t Floppy1541::d64_sector_gap[] = {12, 21, 16, 13};  // von GPZ Code übermommen imggen
 //const uint8_t Floppy1541::d64_sector_gap[] = {1, 10, 5, 2};   // Meine alten Werte
@@ -358,30 +366,31 @@ inline void Floppy1541::CheckImageWrite()
 
 inline void Floppy1541::D64ImageToGCRImage()
 {
-    for (int SPUR=1; SPUR<=35; SPUR++)
+	uint16_t disk_id = GetDiskIDFromBAM();
+
+	for (int track=1; track<=35; track++)
     {
-        TrackSize[(SPUR-1)*2] = GCR_SECTOR_SIZE*num_sectors[SPUR-1];
-        TrackSize[((SPUR-1)*2)+1] = GCR_SECTOR_SIZE*num_sectors[SPUR-1];
-        for(int SECTOR=0; SECTOR<num_sectors[SPUR-1];SECTOR++)
+		TrackSize[(track-1)*2] = GCR_SECTOR_SIZE*num_sectors[track-1];
+		TrackSize[((track-1)*2)+1] = GCR_SECTOR_SIZE*num_sectors[track-1];
+		for(int sector=0; sector<num_sectors[track-1];sector++)
         {
-            SectorToGCR(SPUR,SECTOR);
+			SectorToGCR(track, sector, disk_id);
         }
     }
     ImageWriteStatus=false;
     ImageDirectoryWriteStatus=false;
 }
 
-inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor)
+inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor, uint16_t disk_id)
 {
-    static uint8_t id1 = 0;
-    static uint8_t id2 = 0;
+	uint8_t id1 = disk_id;
+	uint8_t id2 = disk_id >> 8;
     uint8_t block[256];
     uint8_t buffer[4];
     uint8_t *P = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCR_SECTOR_SIZE;
 
-    uint16_t TRACK_INDEX[]={0,0,21,42,63,84,105,126,147,168,189,210,231,252,273,294,315,336,357,376,395,414,433,452,471,490,508,526,544,562,580,598,615,632,649,666,683};
     int TEMP;
-    TEMP=TRACK_INDEX[spur]+(sektor);
+	TEMP=track_index[spur]+(sektor);
     TEMP*=256;
 
     for (int z=0;z<256;z++) block[z]=D64Image[TEMP+z];
@@ -475,11 +484,10 @@ inline void Floppy1541::GCRImageToD64Image()
 
 inline void Floppy1541::GCRToSector(unsigned int spur, unsigned int sektor)
 {
-    const unsigned short TRACK_INDEX[]={0,0,21,42,63,84,105,126,147,168,189,210,231,252,273,294,315,336,357,376,395,414,433,452,471,490,508,526,544,562,580,598,615,632,649,666,683};
     uint8_t BUFFER[4];
 
     uint8_t *gcr = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCR_SECTOR_SIZE;
-    uint8_t *d64 = D64Image + ((TRACK_INDEX[spur]+sektor)*256);
+	uint8_t *d64 = D64Image + ((track_index[spur]+sektor)*256);
 
     gcr += 11;
 
@@ -1048,7 +1056,26 @@ void Floppy1541::StartDiskChange()
 {
     DiskChangeSimState = DISK_CHANGE_STATE_COUNTS;
     DiskChangeSimCycleCounter = DISK_CHANGE_STATE_CYCLES;
-    WriteProtect = !WriteProtect;
+	WriteProtect = !WriteProtect;
+}
+
+uint16_t Floppy1541::GetDiskIDFromBAM()
+{
+	// position for BAM
+	uint8_t track = 18;
+	uint8_t sector = 0;
+
+	uint16_t disk_id;
+
+	int index;
+
+	index = track_index[track] + sector;
+	index *= 256;
+
+	disk_id = D64Image[index + 162];
+	disk_id |= D64Image[index + 163] << 8;
+
+	return disk_id;
 }
 
 int16_t Floppy1541::AddBreakGroup()

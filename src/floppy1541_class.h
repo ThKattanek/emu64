@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.06.2021	       		//
+// Letzte Änderung am 22.03.2022	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -113,13 +113,15 @@ private:
 
     void CheckImageWrite();
     void D64ImageToGCRImage();
-    void SectorToGCR(unsigned int spur, unsigned int sektor);
+	void SectorToGCR(unsigned int spur, unsigned int sektor, uint16_t disk_id);
     void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
     void GCRImageToD64Image();
     void GCRToSector(unsigned int spur, unsigned int sektor);
     void ConvertToD64(uint8_t *source_buffer, uint8_t *destination_buffer);
     void RenderFloppySound();
     void StartDiskChange();
+
+	uint16_t GetDiskIDFromBAM();
 
     /// Variablen ///
 
