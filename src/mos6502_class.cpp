@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.09.2019                //
+// Letzte Änderung am 22.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1353,22 +1353,23 @@ bool MOS6502::OneZyklus(void)
         PC++;
         break;
     //W // Illegal [SHY]
-    case 134:
-        Write(Adresse,YR & ((((Adresse) + XR) >> 8)));
-        break;
-    //W // Illegal [SHX]
-    case 135:
-        Write(Adresse,XR & ((((Adresse) + YR) >> 8)));
-        break;
-    //W // Illegal [SHA]
-    case 136:
-        Write(Adresse,AC & XR & ((((Adresse) + YR) >> 8)));
-        break;
-    //W // Illegal [SHS]
-    case 137:
-        Write(Adresse,AC & XR & ((((Adresse) + YR) >> 8)));
-        SP = AC & XR;
-        break;
+	case 134:
+		Write(Adresse, YR & ((Adresse >> 8) + 1)); // Fixed
+		break;
+	//W // Illegal [SHX]
+	case 135:
+		Write(Adresse, XR & ((Adresse >> 8) + 1)); // Fixed
+		break;
+	//W // Illegal [SHA]
+	case 136:
+		Write(Adresse, AC & XR & ((Adresse >> 8) + 1)); // Fixed
+		break;
+	//W // Illegal [SHS]
+	case 137:
+		XR = AC & XR;
+		SP = XR;
+		Write(Adresse, XR & ((Adresse >> 8) + 1)); // Fixed
+		break;
     //R // Illegal [ANC]
     case 138:
         AC &= Read(PC);
