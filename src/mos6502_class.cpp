@@ -1354,21 +1354,20 @@ bool MOS6502::OneZyklus(void)
         break;
     //W // Illegal [SHY]
 	case 134:
-		Write(Adresse, YR & ((Adresse >> 8) + 1)); // Fixed
+		Write(Adresse, YR & ((Adresse >> 8) + 1));
 		break;
 	//W // Illegal [SHX]
 	case 135:
-		Write(Adresse, XR & ((Adresse >> 8) + 1)); // Fixed
+		Write(Adresse, XR & ((Adresse >> 8) + 1));
 		break;
 	//W // Illegal [SHA]
 	case 136:
-		Write(Adresse, AC & XR & ((Adresse >> 8) + 1)); // Fixed
+		Write(Adresse, AC & XR & ((Adresse >> 8) + 1));
 		break;
 	//W // Illegal [SHS]
 	case 137:
-		XR = AC & XR;
-		SP = XR;
-		Write(Adresse, XR & ((Adresse >> 8) + 1)); // Fixed
+		SP = AC & XR;
+		Write(Adresse, AC & XR & ((Adresse >> 8) + 1));
 		break;
     //R // Illegal [ANC]
     case 138:
