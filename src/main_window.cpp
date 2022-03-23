@@ -985,8 +985,6 @@ void MainWindow::SplashMessage(const QString &message, const QColor &color)
 
 void MainWindow::AutoLoadAndRun(QString filename)
 {
-	cartridge_window->DisconnectCrt();
-
 	// akutelles Autostart Verzeichnis abspeichern
 	QFileInfo file_info(filename);
 	lastAutoloadPath = file_info.absolutePath();
