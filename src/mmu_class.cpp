@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019                //
+// Letzte Änderung am 23.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -31,6 +31,8 @@ MMU::MMU(void)
     Cia2IOReadProc = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
 
     InitProcTables();
+
+	srand (time(NULL));
 }
 
 MMU::~MMU(void)
@@ -41,11 +43,7 @@ void MMU::Reset()
 {
 	CPU_PORT->Reset();
 	ChangeMemMap();
-	for(int i=0;i<0x10000;i++)
-	{
-		if(i & 0x40) RAM[i] = 0xFF;
-		else RAM[i] = 0x00;
-	}
+	InitRam(0xff, 64, 1, 256, 0); // Funktioniert mit allen VICE RamPattern Tests
 }
 
 unsigned char* MMU::GetFarbramPointer(void)
@@ -1057,4 +1055,27 @@ unsigned char MMU::ReadOpenAdress(unsigned short)
 void MMU::WriteOpenAdress(unsigned short, unsigned char)
 {
 	return;
+}
+
+void MMU::InitRam(uint8_t init_value, uint16_t invert_value_every, uint16_t random_pattern_legth, uint16_t repeat_random_pattern, uint16_t random_chance)
+{
+	uint8_t a,b,value;
+	for(int i=0; i <= 0xffff; i++)
+	{
+		value = init_value;
+		a = b = 0;
+		if((i / invert_value_every) & 1) value ^= 0xff;
+		if((i % repeat_random_pattern) < random_pattern_legth) a = rand() % 256;
+
+		if (random_chance)
+		{
+			uint8_t mask = 0x80;
+			for(int j=0; j<8; j++)
+			{
+				if(rand() % 1001 < random_chance) b |= mask;
+				mask >>= 1;
+			}
+		}
+		RAM[i] = value ^ a ^ b;
+	}
 }
