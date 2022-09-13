@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.03.2022                //
+// Letzte Änderung am 13.09.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -620,7 +620,7 @@ void C64Class::EndEmulation()
         time_out--;
     }
 
-    SDL_PauseAudioDevice(audio_dev, 1);
+	SDL_PauseAudioDevice(audio_dev, 1);
     if(audio_dev > 0) SDL_CloseAudioDevice(audio_dev);
 
     CloseSDLJoystick();
@@ -2654,11 +2654,12 @@ void C64Class::EnableWarpMode(bool enabled)
     // WarpMode setzen
     warp_mode = enabled;
 
+	SDL_LockMutex(mutex1);      // Warten auf Mutex1 und sperren
+
     if(warp_mode)
     {
         // WarpMode aktivieren
         SDL_PauseAudioDevice(audio_dev, 1);     // Audiostream pausieren
-        SDL_LockMutex(mutex1);      // Warten auf Mutex1 und sperren
         warp_thread_end = false;
         warp_thread = SDL_CreateThread(SDLThreadWarp,"WarpThread",this);
     }
@@ -2666,9 +2667,10 @@ void C64Class::EnableWarpMode(bool enabled)
     {
         // WarpMode deaktivieren
 		warp_thread_end = true;
-        SDL_UnlockMutex(mutex1);    // Mutex1 wieder freigeben
         SDL_PauseAudioDevice(audio_dev, 0);     // Audiostream wieder starten
 	}
+
+	SDL_UnlockMutex(mutex1);    // Mutex1 wieder freigeben
 }
 
 void C64Class::ToggleWarpMode()
