@@ -56,6 +56,8 @@ MOS6510::MOS6510(void)
 
 	EnableDebugCart = false;
 	WRITE_DEBUG_CART = false;
+
+	shxy_dma = false;
 }
 
 MOS6510::~MOS6510(void)
@@ -557,6 +559,15 @@ bool MOS6510::OneZyklus(void)
 		break;
 		//R // TMPByte von Adresse holen
 		case 13:
+				// Prüfen ob DMA statt findet
+				if(!shxy_dma)
+				{
+				if(!*RDY && !CpuWait)
+					shxy_dma = true;
+				else
+					shxy_dma = false;
+				}
+
 				CHK_RDY
 				TMPByte = Read(Adresse);
 				break;
@@ -1637,12 +1648,38 @@ bool MOS6510::OneZyklus(void)
 				break;
 		//W // Illegal [SHY]
 		case 134:
-				Write(Adresse, YR & ((Adresse >> 8) + 1));
+				if((Adresse & 0xFF) < XR)
+				{
+					// page boundary crossing
+					axa_byte = (Adresse >> 8) & YR;
+					Adresse = (Adresse & 0xFF) | axa_byte << 8;
+				}
+				else
+					axa_byte = YR & ((Adresse >> 8) + 1);
+				if(shxy_dma)
+				{
+					axa_byte = YR;
+					shxy_dma = false;
+				}
+				Write(Adresse, axa_byte);
 				break;
 		//W // Illegal [SHX]
 		case 135:
-				Write(Adresse, XR & ((Adresse >> 8) + 1));
-				break;
+			if((Adresse & 0xFF) < YR)
+			{
+				// page boundary crossing
+				axa_byte = (Adresse >> 8) & XR;
+				Adresse = (Adresse & 0xFF) | axa_byte << 8;
+			}
+			else
+				axa_byte = XR & ((Adresse >> 8) + 1);
+			if(shxy_dma)
+			{
+				axa_byte = XR;
+				shxy_dma = false;
+			}
+			Write(Adresse, axa_byte);
+			break;
 		//W // Illegal [SHA]
 		case 136:
 				Write(Adresse, AC & XR & ((Adresse >> 8) + 1));

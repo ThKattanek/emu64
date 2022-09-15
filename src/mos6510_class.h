@@ -111,6 +111,9 @@ private:
 
     bool            EnableDebugCart;
     unsigned char   DebugCartValue;
+
+	bool			shxy_dma;
+	uint8_t			axa_byte;
 };
 
 #define SetAdresseLo(wert) Adresse = ((Adresse&0xFF00)|wert)
