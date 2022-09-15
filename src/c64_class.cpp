@@ -2654,8 +2654,6 @@ void C64Class::EnableWarpMode(bool enabled)
     // WarpMode setzen
     warp_mode = enabled;
 
-	SDL_LockMutex(mutex1);      // Warten auf Mutex1 und sperren
-
     if(warp_mode)
     {
         // WarpMode aktivieren
@@ -2669,8 +2667,6 @@ void C64Class::EnableWarpMode(bool enabled)
 		warp_thread_end = true;
         SDL_PauseAudioDevice(audio_dev, 0);     // Audiostream wieder starten
 	}
-
-	SDL_UnlockMutex(mutex1);    // Mutex1 wieder freigeben
 }
 
 void C64Class::ToggleWarpMode()
