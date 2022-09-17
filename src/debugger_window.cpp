@@ -1804,7 +1804,7 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
     if(current_source > 0) c64->floppy[currnet_floppy_nr]->DeleteAllBreakGroups();
     else c64->DeleteAllBreakGroups();
 
-    QString filename = QFileDialog::getOpenFileName(this, tr("Haltepunkte öffnen"), QDir::homePath(), tr("Emu64 Haltepunkt Datei ") + "(*.bpt)", nullptr, QFileDialog::DontUseNativeDialog);
+	QString filename = QFileDialog::getOpenFileName(this, tr("Haltepunkte öffnen"), nullptr, tr("Emu64 Haltepunkt Datei ") + "(*.bpt)", nullptr, QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
        int ret;
