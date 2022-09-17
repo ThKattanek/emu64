@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019                //
+// Letzte Änderung am 23.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -109,6 +109,8 @@ private:
     unsigned char ReadVicRam(unsigned short adresse);
     unsigned char ReadOpenAdress(unsigned short adresse);
     void WriteOpenAdress(unsigned short adresse, unsigned char wert);
+
+	void InitRam(uint8_t init_value, uint16_t invert_value_every, uint16_t random_pattern_legth, uint16_t repeat_random_pattern, uint16_t random_chance);
 
     /// Variablen ///
     unsigned char RAM[0x10000];			// 64KB

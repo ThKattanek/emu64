@@ -46,14 +46,41 @@ emu64 [PARAMETER]
 --nosplash
     Der SplashScreen wird beim Start nicht angezeigt.
 
+--nogui
+    Es werden keine Fenster angezeigt. Also Vorsicht, sollte nur mit --limitcycles verwendet werden.
+
 --minimized
     Emu64 wird mit minimierten Fenstern gestartet.
+
+--double-texture-off
+    Die Video Ausgabe Texture wird temporär nicht verdoppelt. Die Fenstergröße wird beim beenden nicht gespeichert.
+
+--video-filter-off
+    Es wird die Video CRT Emulation temporär ausgeschaltet.
+
+--set-palette <Palettennummer>
+    Setzt eine von den internen C64 Farb Paletten.
+
+    0=EMU64-NEU 1=EMU64-ALT 2=CCS64 3=PC64 4=C64S
+    5=VICE 6=FRODO 7=PEPTO 8=Colodore 9=SW
 
 --exitscreenshot <Dateiname>
     Speichert vor dem beenden noch ein Screenshot als png.
 
 --debugcart
     Beendet den Emu64 bei einem Schreibzugriff auf $d7ff und gibt den Wert als Exitcode zurück.
+
+--enable-georam
+    Aktiviert die GEORAM.
+
+--enable-reu
+    Aktiviert die REU.
+
+--set-sidtype
+    Setzt den Typ des ersten SID's.
+
+    0=MOS-6581
+    1=MOS-8085
 
 --multiple-instance
     Ermöglicht das starten mehrerer Emu64 Instanzen.
@@ -76,4 +103,4 @@ emu64 [PARAMETER]
 
 
 
-by Th.Kattanek (C)2017
+by Th.Kattanek (C)2022

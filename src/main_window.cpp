@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.08.2021                //
+// Letzte Änderung am 20.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *l
     this->log = log;
 
     isFirstPaintEvent = false;
+	isCommandDoubleTextureOff = false;
 
     this->setGeometry(0,0,0,0);
 
@@ -79,7 +80,7 @@ MainWindow::~MainWindow()
     if(ini != nullptr && no_write_ini_exit == false)
     {
         ini->beginGroup("MainWindow");
-        ini->setValue("Geometry",saveGeometry());
+		ini->setValue("Geometry",saveGeometry());
         ini->setValue("State",saveState());
         ini->setValue("ScreenshotCounter",c64->GetScreenshotNumber());
         ini->setValue("LastAutoloadDir",lastAutoloadPath);
@@ -106,8 +107,11 @@ MainWindow::~MainWindow()
         ini->beginGroup("C64Screen");
         ini->setValue("PosX",x);
         ini->setValue("PosY",y);
-        ini->setValue("SizeW",w);
-        ini->setValue("SizeH",h);
+		if(!isCommandDoubleTextureOff)
+		{
+			ini->setValue("SizeW",w);
+			ini->setValue("SizeH",h);
+		}
         ini->endGroup();
 
         C64_KEYS* c64_key_table = c64->GetC64KeyTable();
@@ -177,10 +181,11 @@ void MainWindow::paintEvent(QPaintEvent *event)
     }
 }
 
-int MainWindow::OnInit()
+int MainWindow::OnInit(bool nogui)
 {
-    // Alle Pfade setzen //
+	this->nogui = nogui;
 
+    // Alle Pfade setzen //
     configPath = QDir::homePath() + "/.config/emu64";
 
 #ifdef _WIN32
@@ -363,6 +368,8 @@ int MainWindow::OnInit()
         return -1;
     }
 
+	c64->start_hidden_window = nogui;
+
     SetC64ScreenTitle();
     c64->EnableScreenshots(ScreenshotsEnable);
     c64->SetScreenshotDir(screenshotPath.toLocal8Bit());
@@ -542,10 +549,10 @@ int MainWindow::OnInit()
 			QFileInfo file_info(floppy_window->GetAktFilename(i));
 
 			int typ = NO_C64_FILE;
-			if(file_info.completeSuffix().toUpper() == "D64")
+			if(file_info.suffix().toUpper() == "D64")
 				typ = D64;
 
-			if(file_info.completeSuffix().toUpper() == "G64")
+			if(file_info.suffix().toUpper() == "G64")
 				typ = G64;
 
 			FILE *file = qfopen(floppy_window->GetAktFilename(i), "r+b");
@@ -624,7 +631,8 @@ int MainWindow::OnInit()
     if(splash != nullptr) splash->close();
     LogText(tr(">> Splashsreen wurde geschlossen.\n").toUtf8());
 
-    this->show();
+	if(!nogui)
+		this->show();
 
     /////////////////////////////////////
     SplashMessage(tr("C64 EMULATION WIRD NUN GESTARTET."),Qt::darkBlue);
@@ -882,6 +890,23 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
         case CMD_UMOUNT_CRT:
             cartridge_window->DisconnectCrt();
             break;
+		case CMD_ENABLE_GEORAM:
+			c64->InsertGEORAM();
+			break;
+		case CMD_ENABLE_REU:
+			c64->InsertREU();
+			break;
+		case CMD_SET_SIDTYPE:
+			val = cmd_line->GetArgInt(i+1, &error);
+			if(error) break;
+
+			if(val < 0 || val > 1)
+			{
+				cmd_line->OutErrorMsg("Der Sidtype muss zwischen 0 und 1 sein.","--help");
+				break;
+			}
+			c64->SetFirstSidTyp(val);
+			break;
         case CMD_WARP_MODE:
             c64->EnableWarpMode(true);
             break;
@@ -917,7 +942,28 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             }
             c64->SetLimitCycles(val);
             break;
+		case CMD_DOUBLE_TEXTURE_OFF:
+			isCommandDoubleTextureOff = true;
+			c64->enable_screen_doublesize = false;
+			c64->SetGrafikModi(c64->enable_screen_doublesize,c64->enable_screen_crt_output,c64->enable_screen_filter,0,0);
+			setup_window->DisableTextureDouble();
+			break;
+		case CMD_VIDEO_FILTER_OFF:
+			c64->enable_screen_crt_output = false;
+			c64->video_crt_output->EnableCrtOutput(false);
+			setup_window->DisableVideoCRT();
+			break;
+		case CMD_SET_PALETTE:
+			val = cmd_line->GetArgInt(i+1, &error);
+			if(error) break;
 
+			if(val < 0 || val > 9)
+			{
+				cmd_line->OutErrorMsg("Die Palettennummer muss zwischen 0 und 9 sein.","--help");
+				break;
+			}
+			video_crt_output->SetC64Palette(val);
+			break;
         case CMD_EXIT_SCREENSHOT:
             c64->SetExitScreenshot(cmd_line->GetArg(i+1));
             break;
@@ -947,36 +993,34 @@ void MainWindow::SplashMessage(const QString &message, const QColor &color)
 
 void MainWindow::AutoLoadAndRun(QString filename)
 {
-	cartridge_window->DisconnectCrt();
-
 	// akutelles Autostart Verzeichnis abspeichern
 	QFileInfo file_info(filename);
 	lastAutoloadPath = file_info.absolutePath();
 
 	int typ = NO_C64_FILE;
 
-	if(file_info.completeSuffix().toUpper() == "PRG")
+	if(file_info.suffix().toUpper() == "PRG")
 		typ = PRG;
 
-	if(file_info.completeSuffix().toUpper() == "C64")
+	if(file_info.suffix().toUpper() == "C64")
 		typ = C64;
 
-	if(file_info.completeSuffix().toUpper() == "T64")
+	if(file_info.suffix().toUpper() == "T64")
 		typ = T64;
 
-	if(file_info.completeSuffix().toUpper() == "P00")
+	if(file_info.suffix().toUpper() == "P00")
 		typ = P00;
 
-	if(file_info.completeSuffix().toUpper() == "D64")
+	if(file_info.suffix().toUpper() == "D64")
 		typ = D64;
 
-	if(file_info.completeSuffix().toUpper() == "G64")
+	if(file_info.suffix().toUpper() == "G64")
 		typ = G64;
 
-	if(file_info.completeSuffix().toUpper() == "CRT")
+	if(file_info.suffix().toUpper() == "CRT")
 		typ = CRT;
 
-	if(file_info.completeSuffix().toUpper() == "FRZ")
+	if(file_info.suffix().toUpper() == "FRZ")
 		typ = FRZ;
 
 	// QMessageBox::information(this,"Test",filename);
@@ -1014,7 +1058,8 @@ void MainWindow::on_menu_main_info_triggered()
 void MainWindow::on_actionBeenden_triggered()
 {
     if(!debugger_window->isHidden()) debugger_window->hide();
-    showNormal();
+	if(!nogui)
+		showNormal();
     close();
 }
 
@@ -1054,16 +1099,16 @@ void MainWindow::on_actionC64_Programme_direkt_laden_triggered()
 		QFileInfo file_info(filename);
 
 		int typ = NO_C64_FILE;
-		if(file_info.completeSuffix().toUpper() == "PRG")
+		if(file_info.suffix().toUpper() == "PRG")
 			typ = PRG;
 
-		if(file_info.completeSuffix().toUpper() == "C64")
+		if(file_info.suffix().toUpper() == "C64")
 			typ = C64;
 
-		if(file_info.completeSuffix().toUpper() == "T64")
+		if(file_info.suffix().toUpper() == "T64")
 			typ = T64;
 
-		if(file_info.completeSuffix().toUpper() == "P00")
+		if(file_info.suffix().toUpper() == "P00")
 			typ = P00;
 
 		FILE *file = qfopen(filename, "rb");
@@ -1138,10 +1183,10 @@ void MainWindow::OnChangeFloppyImage(int floppynr)
 	QFileInfo file_info(floppy_window->GetAktFilename(floppynr));
 
 	int typ = NO_C64_FILE;
-	if(file_info.completeSuffix().toUpper() == "D64")
+	if(file_info.suffix().toUpper() == "D64")
 		typ = D64;
 
-	if(file_info.completeSuffix().toUpper() == "G64")
+	if(file_info.suffix().toUpper() == "G64")
 		typ = G64;
 
 	FILE *file = qfopen(floppy_window->GetAktFilename(floppynr), "r+b");

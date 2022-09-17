@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.08.2021                //
+// Letzte Änderung am 13.09.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -409,7 +409,8 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     c64_command_line_count_s = false;
     debug_mode = one_cycle = one_opcode = false;
     cycle_counter = 0;
-    limit_cyles_counter = 0;
+	limit_cycles_counter = 0;
+	hold_next_system_cycle = false;
     debug_animation = false;
     animation_speed_add = audio_spec_have.samples/audio_frequency;
     animation_speed_counter = 0;
@@ -617,11 +618,14 @@ void C64Class::StartEmulation()
 void C64Class::EndEmulation()
 {
     EnableWarpMode(false);
-    if(enable_exit_screenshot)
-    {
-        SwapRBSurface(c64_screen);
-        SDL_SavePNG(c64_screen, exit_screenshot_filename);
-    }
+
+	if(enable_exit_screenshot)
+	{
+		hold_next_system_cycle = true;
+		SwapRBSurface(c64_screen);
+		SDL_SavePNG(c64_screen, exit_screenshot_filename);
+		hold_next_system_cycle = false;
+	}
 
     /// Loop Thread beenden ///
     loop_thread_end = true;
@@ -633,7 +637,7 @@ void C64Class::EndEmulation()
         time_out--;
     }
 
-    SDL_PauseAudioDevice(audio_dev, 1);
+	SDL_PauseAudioDevice(audio_dev, 1);
     if(audio_dev > 0) SDL_CloseAudioDevice(audio_dev);
 
     CloseSDLJoystick();
@@ -642,7 +646,7 @@ void C64Class::EndEmulation()
 
 void C64Class::SetLimitCycles(int nCycles)
 {
-    limit_cyles_counter = nCycles;
+	limit_cycles_counter = nCycles;
 }
 
 void C64Class::SetEnableDebugCart(bool enable)
@@ -888,10 +892,10 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
 
 void C64Class::WarpModeLoop()
 {
-    if(limit_cyles_counter > 0)
+	if(limit_cycles_counter > 0)
     {
-        limit_cyles_counter--;
-        if(limit_cyles_counter == 0)
+		limit_cycles_counter--;
+		if(limit_cycles_counter == 0)
         {
             // Event auslösen
             if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
@@ -1003,10 +1007,10 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
     {
         while((sid1->SoundBufferPos < sample_buffer_size_mono) && (debug_mode == false))
         {
-            if(limit_cyles_counter > 0)
+			if(limit_cycles_counter > 0)
             {
-                limit_cyles_counter--;
-                if(limit_cyles_counter == 0)
+				limit_cycles_counter--;
+				if(limit_cycles_counter == 0)
                 {
                     // Event auslösen
                     if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
@@ -1588,10 +1592,12 @@ void C64Class::InitGrafik()
         LogText("\tInitGrafik: SDL_Window noch nicht vorhanden.\n");
 
         // Wenn no-gui command
-        // Flag SDL_WINDOW_HIDDEN   -> Window wird nicht dargestellt auch nicht in der Taskleiste
+		if(start_hidden_window)
+			sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_HIDDEN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+		else
+			sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
-        sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
-        if(sdl_window == nullptr)
+		if(sdl_window == nullptr)
             LogText("\tInitGrafik: Fehler beim erstellen des SDL_Window.\n");
         else
         {
@@ -1612,7 +1618,7 @@ void C64Class::InitGrafik()
     }
 
     // Wenn Minimized Comandline
-    if(start_minimized)
+	if(start_minimized && !start_hidden_window)
         SDL_MinimizeWindow(sdl_window);
 
     gl_context = SDL_GL_CreateContext(sdl_window);
@@ -2669,7 +2675,6 @@ void C64Class::EnableWarpMode(bool enabled)
     {
         // WarpMode aktivieren
         SDL_PauseAudioDevice(audio_dev, 1);     // Audiostream pausieren
-        SDL_LockMutex(mutex1);      // Warten auf Mutex1 und sperren
         warp_thread_end = false;
         warp_thread = SDL_CreateThread(SDLThreadWarp,"WarpThread",this);
     }
@@ -2677,7 +2682,6 @@ void C64Class::EnableWarpMode(bool enabled)
     {
         // WarpMode deaktivieren
 		warp_thread_end = true;
-        SDL_UnlockMutex(mutex1);    // Mutex1 wieder freigeben
         SDL_PauseAudioDevice(audio_dev, 0);     // Audiostream wieder starten
 	}
 }
@@ -3735,6 +3739,10 @@ int C64Class::GetVicLastDisplayLineNtsc()
 void C64Class::NextSystemCycle()
 {
     CheckKeys();
+
+	if(hold_next_system_cycle)
+		return;
+
     cycle_counter++;
 
     /// Für Externe Erweiterungen ///

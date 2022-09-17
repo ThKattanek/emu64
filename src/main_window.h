@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.08.2021                //
+// Letzte Änderung am 19.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -100,7 +100,7 @@ public:
 
 public slots:
     void OnMessage(QStringList msg);
-    int OnInit();
+	int OnInit(bool nogui);
 
 private slots:
     void on_menu_main_info_triggered();
@@ -163,6 +163,8 @@ private:
     QString dataPath;            // Pfad für alle Emu64 Daten
     QString custom_dataPath;     // Pfad für alle Emu64 Daten -> Wenn er per Komandozeile angegeben wurde (--data-path)
 
+	bool nogui;					 // Wenn die GUI nicht angezeigt wird
+
     //QString appPath;           // Pfad der emu64 Datei
     QString langPath;            // Pfad für alle Sprachfiles
     //QString system_tmp_path;     // Pfad für alle Temporären Dateien die Emu64 erzeugt (Wird beim Start und Ende geleert)
@@ -199,6 +201,7 @@ private:
     //QStringList commandLine;                        // Enthält den an Emu64 übergebenen String
 
     bool isFirstPaintEvent;
+	bool isCommandDoubleTextureOff;
 };
 
 #endif // MAINWINDOW_H

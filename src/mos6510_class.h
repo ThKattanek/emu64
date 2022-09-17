@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.09.2019                //
+// Letzte Änderung am 15.09.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -111,6 +111,9 @@ private:
 
     bool            EnableDebugCart;
     unsigned char   DebugCartValue;
+
+	bool			shxy_dma;
+	uint8_t			axa_byte;
 };
 
 #define SetAdresseLo(wert) Adresse = ((Adresse&0xFF00)|wert)

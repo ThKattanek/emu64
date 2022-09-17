@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.08.2021                //
+// Letzte Änderung am 12.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -212,6 +212,8 @@ struct FLOPPY_1541_INFO
 	float			Data_RMS;
     unsigned char   Spur;
     unsigned char   Sektor;
+	bool			ErrorFlag;
+	char	    	ErrorMsg[36];
 };
 
 struct FLOPPY_1581_INFO

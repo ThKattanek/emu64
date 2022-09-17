@@ -241,7 +241,6 @@ void FloppyWindow::OnSelectFile(QString filename)
             //d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toLocal8Bit());
             //RefreshD64FileList();
 
-
             // D64 File-Anzeige löschen
             ui->D64FileTable->clear();
 
@@ -356,16 +355,16 @@ void FloppyWindow::OnD64FileStart3(bool)
 		QFileInfo file_info(filename);
 
 		int typ = NO_C64_FILE;
-		if(file_info.completeSuffix().toUpper() == "PRG")
+		if(file_info.suffix().toUpper() == "PRG")
 			typ = PRG;
 
-		if(file_info.completeSuffix().toUpper() == "C64")
+		if(file_info.suffix().toUpper() == "C64")
 			typ = C64;
 
-		if(file_info.completeSuffix().toUpper() == "T64")
+		if(file_info.suffix().toUpper() == "T64")
 			typ = T64;
 
-		if(file_info.completeSuffix().toUpper() == "P00")
+		if(file_info.suffix().toUpper() == "P00")
 			typ = P00;
 
 		FILE *file = qfopen(filename, "rb");

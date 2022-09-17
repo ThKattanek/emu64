@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.07.2021                //
+// Letzte Änderung am 20.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -42,6 +42,8 @@ int main(int argc, char *argv[])
     QDir config_dir = QDir(QDir::homePath() + "/.config/emu64");
 
     bool start_minimized = false;
+	bool enable_reu = false;
+	bool enable_georam = false;
 
     CommandLineClass *cmd_line = new CommandLineClass(argc, argv, "emu64",command_list, command_list_count);
 
@@ -76,6 +78,12 @@ int main(int argc, char *argv[])
 
             if(cmd_line->GetCommand(i) == CMD_MINIMIZED)
                 start_minimized = true;
+
+			if(cmd_line->GetCommand(i) == CMD_ENABLE_GEORAM)
+				enable_georam = true;
+
+			if(cmd_line->GetCommand(i) == CMD_ENABLE_REU)
+				enable_reu = true;
         }
 
         if(cmd_line->GetCommand(0) == CMD_HELP)
@@ -83,12 +91,19 @@ int main(int argc, char *argv[])
             cmd_line->ShowHelp();
             return(0x0);
         }
+
         if(cmd_line->GetCommand(0) == CMD_VERSION)
         {
             printf("Version: %s\n\n",VERSION_STRING);
             return(0x0);
         }
     }
+
+	if(enable_georam == true && enable_reu == true)
+	{
+		cout << "Es können nicht '--enable-georam' und '--enable-reu' gleichzeitig gesetzt werden." << endl;
+		return(-1);
+	}
 
     SingleApplication *app;
     app = new SingleApplication (argc, argv);
@@ -156,7 +171,7 @@ int main(int argc, char *argv[])
 
     MainWindow *w;
 
-    if(!cmd_line->FoundCommand(CMD_NOSPLASH))
+	if(!cmd_line->FoundCommand(CMD_NOSPLASH) && !cmd_line->FoundCommand(CMD_NOGUI))
     {
         QPixmap image(":/splash");
         CustomSplashScreen *splash = new CustomSplashScreen(image);
@@ -174,9 +189,8 @@ int main(int argc, char *argv[])
     w->start_minimized = start_minimized;
 
     // Wenn --minimized
-    if(start_minimized)
+	if(start_minimized && !cmd_line->FoundCommand(CMD_NOGUI))
     {
-
         w->showMinimized();
     }
 
@@ -196,7 +210,7 @@ int main(int argc, char *argv[])
     w->log = log;
     w->no_write_ini_exit = true;
 
-    if(w->OnInit() == 0)
+	if(w->OnInit(cmd_line->FoundCommand(CMD_NOGUI)) == 0)
     {
         w->no_write_ini_exit = false;
         if(isFirstInstance)
@@ -205,6 +219,7 @@ int main(int argc, char *argv[])
             for(int i=0;i<argc;i++) msg_list << argv[i];
             w->OnMessage(msg_list);
         }
+
         ret = app->exec();
     }
 

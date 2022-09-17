@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 13.01.2020                //
+# // Letzte Änderung am 20.03.2022                //
 # // www.emu64-projekt.de                         //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -19,6 +19,12 @@
 # excample: crossbuild-win-releases.sh ~/mxe
 
 declare project_name=emu64
+
+# configuration
+declare x32=true
+declare x64=true
+
+declare public_release=true
 
 # Version
 version=$(git describe --always --tags)
@@ -42,7 +48,9 @@ export PATH=$mxe_path/usr/bin:$PATH
 if [ ! -d ./public_release ]; then
 mkdir ./public_release; 
 else
-    rm -rf ./public_release/*
+    if [ $public_release = true ]; then
+        rm -rf ./public_release/*
+    fi
 fi
 
 cd public_release
@@ -64,7 +72,7 @@ else
 fi
 
 #### 32Bit Static
-if [ $i686_ok ]; then
+if [ $i686_ok ] && [ $x32 = true ]; then
     echo "Creating a i686-Static windows binary ..."
     
     # check and create a build dir
@@ -72,15 +80,21 @@ if [ $i686_ok ]; then
     if [ ! -d $build_i686_dir ]; then
     mkdir $build_i686_dir; 
     else
-        rm -rf $build_i686_dir/*
+        if [ $public_release = true ]; then
+            rm -rf $build_i686_dir/*
+        fi
     fi
 
     # check and delete if exist a install dir
-    declare install_i686_dir=$PWD"/"$project_name"_"$version"_win_x32"
-    if [ -d $install_i686_dir ]; then
-        rm -rf $install_i686_dir/*
+    if [ $public_release = true ]; then
+        declare install_i686_dir=$PWD"/"$project_name"_"$version"_win_x32"
+        if [ -d $install_i686_dir ]; then
+            rm -rf $install_i686_dir/*
+        fi
+    else
+        declare install_i686_dir=$PWD"/"$project_name"_win_x32"
     fi
-
+    
     # compile ts files
     lrelease ../src/src.pro
     
@@ -90,7 +104,9 @@ if [ $i686_ok ]; then
     make -j24 install
     cd ..
     
-    rm -rf $build_i686_dir
+    if [ $public_release = true ]; then
+        rm -rf $build_i686_dir
+    fi
 
     # Convert Unicode to Windows
     echo "Convert Unicode TXT to Windows with awk..."
@@ -102,17 +118,18 @@ if [ $i686_ok ]; then
     rm -f $install_i686_dir/LICENSE
     
     # compress as 7z
-    echo "Release 32bit as 7z kompressed..."
-    7z a -t7z -m0=LZMA -mmt=24 -mx=9 -md=96m -mfb=256 $install_i686_dir".7z" $install_i686_dir
-
-    rm -rf $install_i686_dir
+    if [ $public_release = true ]; then
+        echo "Release 32bit as 7z kompressed..."
+        7z a -t7z -m0=LZMA -mmt=24 -mx=9 -md=96m -mfb=256 $install_i686_dir".7z" $install_i686_dir
+        rm -rf $install_i686_dir
     
-    # SHA512 Hashwert erzeugen
-    sha512sum -b $project_name"_"$version"_win_x32.7z" >> $project_name"_"$version"_win_x32.7z.sha512"
+        # SHA512 Hashwert erzeugen
+        sha512sum -b $project_name"_"$version"_win_x32.7z" >> $project_name"_"$version"_win_x32.7z.sha512"
+    fi
 fi
 
 ### 64Bit Static
-if [ $x86_64_ok ]; then
+if [ $x86_64_ok ] && [ $x64 = true ]; then
     echo "Creating a x86_64-Static windows binary ..."
 
     # check and create a build dir
@@ -120,13 +137,19 @@ if [ $x86_64_ok ]; then
     if [ ! -d $build_x86_64_dir ]; then
     mkdir $build_x86_64_dir;
     else
-        rm -rf $build_x86_64_dir/*
+        if [ $public_release = true ]; then
+            rm -rf $build_x86_64_dir/*
+        fi
     fi
 
     # check and delete if exist a install dir
-    declare install_x86_64_dir=$PWD"/"$project_name"_"$version"_win_x64"
-    if [ -d $install_x86_64_dir ]; then
-        rm -rf $install_x86_64_dir/*
+    if [ $public_release = true ]; then
+        declare install_x86_64_dir=$PWD"/"$project_name"_"$version"_win_x64"
+        if [ -d $install_x86_64_dir ]; then
+            rm -rf $install_x86_64_dir/*
+        fi
+    else
+        declare install_x86_64_dir=$PWD"/"$project_name"_win_x64"
     fi
     
     # compile ts files
@@ -138,8 +161,10 @@ if [ $x86_64_ok ]; then
     make -j24 install
     cd ..
 
-    rm -rf $build_x86_64_dir
-
+    if [ $public_release = true ]; then
+        rm -rf $build_x86_64_dir
+    fi
+        
     # Convert Unicode to Windows
     echo "Convert Unicode TXT to Windows with awk..."
     mv $install_x86_64_dir/kommandozeilenparameter.txt $install_x86_64_dir/kommandozeilenparameter_unicode.txt
@@ -150,17 +175,20 @@ if [ $x86_64_ok ]; then
     rm -f $install_x86_64_dir/LICENSE
     
     # compress as 7z
-    echo "Release 64bit as 7z kompressed..."
-    7z a -t7z -m0=LZMA -mmt=24 -mx=9 -md=96m -mfb=256 $install_x86_64_dir".7z" $install_x86_64_dir
-
-    rm -rf $install_x86_64_dir
+    if [ $public_release = true ]; then
+        echo "Release 64bit as 7z kompressed..."
+        7z a -t7z -m0=LZMA -mmt=24 -mx=9 -md=96m -mfb=256 $install_x86_64_dir".7z" $install_x86_64_dir
+        rm -rf $install_x86_64_dir
     
-    # SHA512 Hashwert erzeugen
-    sha512sum -b $project_name"_"$version"_win_x64.7z" >> $project_name"_"$version"_win_x64.7z.sha512"
+        # SHA512 Hashwert erzeugen
+        sha512sum -b $project_name"_"$version"_win_x64.7z" >> $project_name"_"$version"_win_x64.7z.sha512"
+    fi
 fi
 
 cd ..
 
-echo "--> Die fertigen Pakete befinden sich im Verzeichnis 'public_release' !"
-echo ""
-echo "E.N.D.E"
+if [ $public_release = true ]; then
+    echo "--> Die fertigen Pakete befinden sich im Verzeichnis 'public_release' !"
+    echo ""
+    echo "E.N.D.E"
+fi

@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 18.08.2021                //
+# // Letzte Änderung am 19.03.2022                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -299,12 +299,15 @@ win32 {
 }
 
 # C64 Roms
+roms.CONFIG += nostrip
 roms.files += ../roms/*
 
 # Floppy Sounds
+floppy_sounds.CONFIG += nostrip
 floppy_sounds.files = ../floppy_sounds/*
 
 # GFX
+gfx.CONFIG += nostrip
 gfx.files += ../grafik/kreis0.png
 gfx.files += ../grafik/kreis1.png
 gfx.files += ../grafik/pfeil0.png
@@ -312,12 +315,14 @@ gfx.files += ../grafik/pfeil1.png
 gfx.files += ../grafik/sdl_icon.png
 
 # TXT
+txt.CONFIG += nostrip
 txt.files += ../kommandozeilenparameter.txt
 txt.files += ../hotkeys.txt
 txt.files += ../LICENSE
 txt.files += ../änderungen.txt
 
 # Languages
+languages.CONFIG += nostrip
 languages.files += ../grafik/flaggen/emu64_de.png
 languages.files += ../grafik/flaggen/emu64_en.png
 
@@ -325,7 +330,10 @@ languages.files += ../grafik/flaggen/emu64_en.png
 ## /usr/local/share/icons/hicolor/64x64/apps/
 linux
 {
+    desktop.CONFIG += nostrip
     desktop.files += emu64.desktop
+
+    icons.CONFIG += nostrip
     icons.files += ../grafik/emu64.png
 }
 
@@ -345,6 +353,7 @@ DISTFILES += \
     ../crossbuild-win-releases.sh
 
 HEADERS += \
+	dos_error_messages.h \
 	floppy1581_class.h \
 	floppy1581_window.h \
 	mos8520_class.h \
@@ -358,3 +367,4 @@ SOURCES += \
 
 FORMS += \
 	floppy1581_window.ui
+

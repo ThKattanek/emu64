@@ -8,16 +8,18 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.08.2021                //
+// Letzte Änderung am 12.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include <QFontDatabase>
+#include <QMessageBox>
 #include <QTimer>
 
 #include "widget_floppy_status.h"
 #include "ui_widget_floppy_status.h"
+#include "dos_error_messages.h"
 
 WidgetFloppyStatus::WidgetFloppyStatus(QWidget *parent, int floppy_nr, Floppy1541 *_floppy) :
     QWidget(parent),
@@ -48,6 +50,13 @@ WidgetFloppyStatus::WidgetFloppyStatus(QWidget *parent, int floppy_nr, Floppy154
     iVol_low = new QIcon(":/grafik/audio_volume_low.png");
     iVol_medium = new QIcon(":/grafik/audio_volume_medium.png");
     iVol_high = new QIcon(":/grafik/audio_volume_high.png");
+
+	// Error
+	iError = new QIcon(":/grafik/warning.png");
+	ui->Error->setIcon(*iError);
+	ui->Error->setToolTip(tr("Fehlerkanal anzeigen."));
+	ui->Error->setStatusTip("Fehlerkanal anzeigen.");
+	ui->Error->hide();
 
 	/// yellow
 	ui->rw_led->SetColorOff(QColor(70,60,20));
@@ -109,6 +118,12 @@ void WidgetFloppyStatus::onTimer()
         ui->SekcorOut->setText(str);
         old_Sektor = info.Sektor;
     }
+
+	// Icon Anzeigen wenn Floppy Ram $026D != 0
+	if(info.ErrorFlag != 0)
+		ui->Error->show();
+	else
+		ui->Error->hide();
 }
 
 void WidgetFloppyStatus::SetGeraeteID(unsigned char id)
@@ -166,6 +181,7 @@ void WidgetFloppyStatus::SetEnableFloppy(bool status)
         ui->PowerLED->setIcon(*iGreenLedOff);
 		ui->motor_led->SetBrightness(0.0f);
 		ui->rw_led->SetBrightness(0.0f);
+		ui->Error->hide();
 
         floppy->SetEnableFloppy(false);
         timer->stop();
@@ -184,7 +200,7 @@ void WidgetFloppyStatus::on_Volume_clicked()
 {
     if(FloppySoundVolumeMode == 3) FloppySoundVolumeMode = 0;
     else FloppySoundVolumeMode++;
-    SetFloppyVolume(FloppySoundVolumeMode);
+	SetFloppyVolume(FloppySoundVolumeMode);
 }
 
 void WidgetFloppyStatus::SetFloppyVolume(int mode)
@@ -226,3 +242,25 @@ int WidgetFloppyStatus::GetFloppyVolume(void)
 {
     return FloppySoundVolumeMode;
 }
+
+void WidgetFloppyStatus::on_Error_clicked()
+{
+	FLOPPY_1541_INFO fi;
+	floppy->GetFloppyInfo(&fi);
+
+	uint8_t error_number = (fi.ErrorMsg[0] - 0x30) * 10 + (fi.ErrorMsg[1] - 0x30);
+
+	int i=0;
+	bool found = false;
+	while(i < DOS_ERROR_COUNT && !found)
+	{
+		if(dos_error_numbers[i] == error_number)
+			found = true;
+		else
+			i++;
+	}
+
+	if(found)
+		QMessageBox::warning(this,"Floppy #" + QVariant(FloppyNr + 8).toString() + tr(" Fehlerkanal"), dos_error_msg[i]);
+}
+
