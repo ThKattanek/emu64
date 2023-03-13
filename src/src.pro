@@ -8,12 +8,16 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 19.03.2022                //
+# // Letzte Änderung am 13.03.2023                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
 
-!win32:isEmpty(PREFIX):PREFIX=/usr/local
+isEmpty(APPIMAGE_PATH){
+    !win32:isEmpty(PREFIX):PREFIX=/usr/local
+}else{
+    PREFIX=$$APPIMAGE_PATH/usr
+}
 
 QT       += core gui network
 
@@ -278,7 +282,12 @@ RC_FILE += emu64.rc
 # Installation
 
 message(Installpath: $$PREFIX)
-DEFINES += DATA_PATH=\\\"$$PREFIX\\\"
+
+isEmpty(APPIMAGE_PATH){
+    DEFINES += DATA_PATH=\\\"$$PREFIX\\\"
+}else{
+    DEFINES += DATA_PATH=\\\"/usr\\\"
+}
 
 win32 {
     target.path = $$PREFIX
@@ -350,7 +359,9 @@ INSTALLS += target roms floppy_sounds gfx txt languages icons desktop
 }
 
 DISTFILES += \
-    ../crossbuild-win-releases.sh
+    ../create_linux_appimage.sh \
+    ../crossbuild-win-releases.sh \
+    AppRun
 
 HEADERS += \
 	dos_error_messages.h

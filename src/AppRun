@@ -2,4 +2,4 @@
 SELF=$(readlink -f "$0")
 HERE=${SELF%/*}
 EXEC="${HERE}/usr/bin/emu64"
-exec "${EXEC}"
+exec "${EXEC}" --data-path ${HERE}/usr/share/emu64
