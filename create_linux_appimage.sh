@@ -45,11 +45,24 @@ cp ../src/AppRun ./AppDir
 cp ../src/emu64.desktop ./AppDir          
 cp ../grafik/emu64.png ./AppDir
 
+# linuxdeploy 
 if [ ! -f ./linuxdeploy-x86_64.AppImage ]; then
     wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
     chmod u+x ./linuxdeploy-x86_64.AppImage
 fi
-ARCH=$ARCH VERSION=$VERSION ./linuxdeploy-x86_64.AppImage --appdir ./AppDir --output appimage
+
+# linuxdeploy qt plugin
+if [ ! -f ./linuxdeploy-plugin-qt-x86_64.AppImage ]; then
+    wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+    chmod u+x ./linuxdeploy-plugin-qt-x86_64.AppImage
+fi
+
+# ohne Qt
+# ARCH=$ARCH VERSION=$VERSION ./linuxdeploy-x86_64.AppImage --appdir ./AppDir --output appimage
+# mit libc im appimage
+# ARCH=$ARCH VERSION=$VERSION ./linuxdeploy-x86_64.AppImage --appdir ./AppDir -l /lib/x86_64-linux-gnu/libc.so.6 -l /lib/x86_64-linux-gnu/libm.so.6 -l /lib/x86_64-linux-gnu/libstdc++.so.6 -l /lib/x86_64-linux-gnu/libgcc_s.so.1 --plugin qt --output appimage
+
+ARCH=$ARCH VERSION=$VERSION ./linuxdeploy-x86_64.AppImage --appdir ./AppDir --plugin qt --output appimage
 
 rm -rf AppDir
 
