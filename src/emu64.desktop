@@ -6,5 +6,4 @@ Comment[de]=Ein C64 Emulator
 Icon=emu64
 TryExec=emu64
 Exec=emu64 %f
-MimeType=application/x-geogebra-file;application/x-geogebra-tool;
 Categories=Game;System;

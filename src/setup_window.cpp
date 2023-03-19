@@ -429,7 +429,7 @@ void SetupWindow::SaveINI()
         {
             sprintf(group_name,"VJSlot_%2.2d",i);
             ini->beginGroup(group_name);
-            ini->setValue("Name",c64->virtual_joys[i].Name);
+			ini->setValue("Name",QString(c64->virtual_joys[i].Name));
             ini->setValue("Type",QByteArray((const char*)c64->virtual_joys[i].Type,5));
             ini->setValue("JoyIndex",QByteArray((const char*)c64->virtual_joys[i].JoyIndex,5));
             ini->setValue("KeyDown",QByteArray((const char*)c64->virtual_joys[i].KeyDown,5));
