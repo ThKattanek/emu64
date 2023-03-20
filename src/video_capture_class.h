@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.09.2019                //
+// Letzte Änderung am 20.03.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -31,6 +31,7 @@ using namespace std;
 
 extern "C"
 {
+    #include <libavcodec/avcodec.h>
     #include <libavutil/avassert.h>
     #include <libavutil/channel_layout.h>
     #include <libavutil/opt.h>
@@ -84,11 +85,11 @@ public:
     bool mutex_01;
 
 private:
-    void AddStream(OutputStream *ost, AVFormatContext *oc, AVCodec **codec, enum AVCodecID codec_id);
+    void AddStream(OutputStream *ost, AVFormatContext *oc, const AVCodec **codec, enum AVCodecID codec_id);
     void CloseStream(OutputStream *ost);
-    bool OpenVideo(AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
+    bool OpenVideo(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
     AVFrame* AllocPicture(enum AVPixelFormat pix_fmt, int width, int height);
-    bool OpenAudio(AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
+    bool OpenAudio(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
     AVFrame* AllocAudioFrame(enum AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
     int WriteFrame(AVFormatContext *fmt_ctx, const AVRational *time_base, AVStream *st, AVPacket *pkt);
 
@@ -110,9 +111,9 @@ private:
     int video_bitrate, audio_bitrate;
 
 
-    AVOutputFormat  *output_format;
+    const AVOutputFormat  *output_format;
     OutputStream audio_stream;
-    AVCodec *video_codec, *audio_codec;
+    const AVCodec *video_codec, *audio_codec;
     AVDictionary *options;
 
     uint8_t* source_video_data;

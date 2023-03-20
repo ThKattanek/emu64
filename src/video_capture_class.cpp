@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.09.2019                //
+// Letzte Änderung am 20.03.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -87,7 +87,9 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
 
     int ret;
 
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 9, 100)
     av_register_all();
+#endif
 
     //
     avformat_alloc_output_context2(&format_ctx, nullptr, nullptr, filename);
@@ -267,7 +269,7 @@ int VideoCaptureClass::GetRecordedFrameCount()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void VideoCaptureClass::AddStream(OutputStream *ost, AVFormatContext *oc, AVCodec **codec, enum AVCodecID codec_id)
+void VideoCaptureClass::AddStream(OutputStream *ost, AVFormatContext *oc, const AVCodec **codec, enum AVCodecID codec_id)
 {
     AVCodecContext *c;
     int i;
@@ -363,7 +365,7 @@ void VideoCaptureClass::CloseStream(OutputStream *ost)
     swr_free(&ost->swr_ctx);
 }
 
-bool VideoCaptureClass::OpenVideo(AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg)
+bool VideoCaptureClass::OpenVideo(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg)
 {
     int ret;
     AVCodecContext *c = ost->enc;
@@ -431,7 +433,7 @@ AVFrame* VideoCaptureClass::AllocPicture(enum AVPixelFormat pix_fmt, int width, 
     return picture;
 }
 
-bool VideoCaptureClass::OpenAudio(AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg)
+bool VideoCaptureClass::OpenAudio(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg)
 {
     AVCodecContext *c;
     int nb_samples;
@@ -532,7 +534,10 @@ int VideoCaptureClass::WriteVideoFrame(AVFormatContext *oc, OutputStream *ost)
     av_init_packet(&pkt);
 
     /* encode the image */
-    ret = avcodec_encode_video2(c, &pkt, frame, &got_packet);
+    ret = avcodec_receive_packet(c, &pkt);
+    if (ret == 0) got_packet = 1;
+    if (ret == AVERROR(EAGAIN)) ret = 0;
+    if (ret == 0) ret = avcodec_send_frame(c, frame);
     if (ret < 0)
     {
         char err_msg[AV_ERROR_MAX_STRING_SIZE];
@@ -562,7 +567,7 @@ int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
     AVPacket pkt = {}; // data and size must be 0;
     AVFrame *frame;
     int64_t ret;
-    int got_packet;
+    int got_packet = 0;
     int64_t dst_nb_samples;
     av_init_packet(&pkt);
     c = ost->enc;
@@ -595,7 +600,10 @@ int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
         frame->pts = av_rescale_q(ost->samples_count, AVRational{1, c->sample_rate}, c->time_base);
         ost->samples_count += dst_nb_samples;
     }
-    ret = avcodec_encode_audio2(c, &pkt, frame, &got_packet);
+    ret = avcodec_receive_packet(c, &pkt);
+    if (ret == 0) got_packet = 1;
+    if (ret == AVERROR(EAGAIN)) ret = 0;
+    if (ret == 0) ret = avcodec_send_frame(c, frame);
 
     if (ret < 0)
     {
