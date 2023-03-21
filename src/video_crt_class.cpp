@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.05.2021                //
+// Letzte Änderung am 21.03.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -59,7 +59,7 @@ VideoCrtClass::VideoCrtClass()
     sector = 360.0f/16.0f;
     origin = sector/2.0f;
     radian = static_cast<float>(MATH_PI)/180.0f;
-    screen = 1.0f/5.0f;
+	screen = 1.0f/5.0f;
 }
 
 VideoCrtClass::~VideoCrtClass(void)
@@ -236,6 +236,30 @@ void VideoCrtClass::ConvertRGBToYUV()
 
 inline void VideoCrtClass::CreateVicIIColors(void)
 {
+	for(int i=0; i<16; i++)
+	{
+		c64_yuv_colors[i].u = 0;
+
+		float color_angle = COLOR_ANGLES[i];
+
+		if(color_angle != 0.0f)
+		{
+			float angle = ( origin + color_angle * sector ) * radian;
+			c64_yuv_colors[i].u = cosf( angle );
+			c64_yuv_colors[i].v = sinf( angle );
+		}
+		else
+		{
+			c64_yuv_colors[i].u = c64_yuv_colors[i].v = 0.0f;
+		}
+
+		if(is_first_pal_vic_revision)
+			c64_yuv_colors[i].y = 8 * LUMA_TABLE[0][i];
+		else
+			c64_yuv_colors[i].y = 8 * LUMA_TABLE[1][i];
+	}
+
+	/*
     COLOR_STRUCT color_out;
 
     // Für Phase Alternating Line
@@ -280,15 +304,13 @@ inline void VideoCrtClass::CreateVicIIColors(void)
 		}
 		else
 		{
-			/*
-			Y = 0.299R + 0.587G + 0.114B
-			U = 0.492 (B-Y)
-			V = 0.877 (R-Y)
-				It can also be represented as:
-			Y =  0.299R + 0.587G + 0.114B
-			U = -0.147R - 0.289G + 0.436B
-			V =  0.615R - 0.515G - 0.100B
-			*/
+			// Y = 0.299R + 0.587G + 0.114B
+			// U = 0.492 (B-Y)
+			// V = 0.877 (R-Y)
+			//  	It can also be represented as:
+			//  Y =  0.299R + 0.587G + 0.114B
+			//  U = -0.147R - 0.289G + 0.436B
+			//  V =  0.615R - 0.515G - 0.100B
 
 			uint8_t r = (user_palette[i] & 0x000000ff);
 			uint8_t g = ((user_palette[i] >> 8) & 0x000000ff);
@@ -306,8 +328,6 @@ inline void VideoCrtClass::CreateVicIIColors(void)
 			c64_yuv_palette1[i*3+1] = u ;
 			c64_yuv_palette1[i*3+2] = v ;
 		}
-
-
     }
 
     int x[4];
@@ -411,96 +431,76 @@ inline void VideoCrtClass::CreateVicIIColors(void)
             }
         }
     }
+	*/
 }
 
 void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOutPuffer,int VICOutPufferOffset,int OutXW,int OutYW,int InXW,int,bool)
 {
-    static uint8_t w0,w1,w2,w3;
+	// Outbuffer -> uint32 (ABGR)
+
     video_source = VICOutPuffer;
     video_source += VICOutPufferOffset;
 
     if(is_crt_output)
     {
-        if(is_double2x)
-        {
-            for(int y=0;y<(OutYW/2);y++)
-            {
-                out_buffer = (static_cast<uint32_t*>(Outpuffer) + ((y*2)*Pitch/4));
-                out_buffer_scanline = (static_cast<uint32_t*>(Outpuffer) + (((y*2)+1)*(Pitch/4)));
+		if(is_double2x)
+		{
+			for(int y=0;y<(OutYW/2);y++)
+			{
+				out_buffer = (static_cast<uint32_t*>(Outpuffer) + ((y*2)*Pitch/4));
+				out_buffer_scanline = (static_cast<uint32_t*>(Outpuffer) + (((y*2)+1)*(Pitch/4)));
 
-                w0 = w1 = w2 = w3 = *video_source & 0x0F;
+				for(int x=0;x<(OutXW/2);x++)
+				{
+					*(out_buffer++) = 0xff0000ff;
+					*(out_buffer++) = 0xff0000ff;
 
-                switch(y&1)
-                {
-                case 0:
-                    for(int x=0;x<(OutXW/2);x++)
-                    {
-                        *(out_buffer++) = BlurTable0[w0][w1][w2][w3];
-                        *(out_buffer++) = BlurTable0[w0][w1][w2][w3];
-                        *(out_buffer_scanline++) = BlurTable0S[w0][w1][w2][w3];
-                        *(out_buffer_scanline++) = BlurTable0S[w0][w1][w2][w3];
-                        w3 = w2;
-                        w2 = w1;
-                        w1 = w0;
-                        w0 = *(video_source+x+1) & 0x0F;
-                    }
-                    break;
-                case 1:
-                    for(int x=0;x<(OutXW/2);x++)
-                    {
-                        *(out_buffer++) = BlurTable1[w0][w1][w2][w3];
-                        *(out_buffer++) = BlurTable1[w0][w1][w2][w3];
-                        *(out_buffer_scanline++) = BlurTable1S[w0][w1][w2][w3];
-                        *(out_buffer_scanline++) = BlurTable1S[w0][w1][w2][w3];
-                        w3 = w2;
-                        w2 = w1;
-                        w1 = w0;
-                        w0 = *(video_source+x+1) & 0x0F;
-                    }
-                    break;
-                }
-                video_source = video_source+InXW;
-            }
-        }
-        else
-        { 
-            for(int y=0;y<OutYW;y++)
-            {
-                out_buffer = (static_cast<uint32_t*>(Outpuffer) + ((y)*Pitch/4));
-                out_buffer_scanline = (static_cast<uint32_t*>(Outpuffer) + (((y*2)+1)*(Pitch/4)));
+					*(out_buffer_scanline++) = 0xffffffff;
+					*(out_buffer_scanline++) = 0xffffffff;
+				}
+				video_source = video_source+InXW;
+			}
+		}
+		else
+		{
+			for(int y=0;y<OutYW;y++)
+			{
+				out_buffer = (static_cast<uint32_t*>(Outpuffer) + ((y)*Pitch/4));
+				for(int x=0;x<(OutXW);x++)
+				{
+					// from yuv to rgb
+					// R = Y + 1.140V
+					// G = Y - 0.395U - 0.581V
+					// B = Y + 2.032U
 
-                w0 = w1 = w2 = w3 = *video_source & 0x0F;
+					float r = c64_yuv_colors[video_source[x]].y + 1.140f * c64_yuv_colors[video_source[x]].v;
+					float g = c64_yuv_colors[video_source[x]].y - 0.395f * c64_yuv_colors[video_source[x]].u - 0.581f * c64_yuv_colors[video_source[x]].v;
+					float b = c64_yuv_colors[video_source[x]].y + 2.032f * c64_yuv_colors[video_source[x]].u;
 
-                switch(y&1)
-                {
-                case 0:
-                    for(int x=0;x<(OutXW);x++)
-                    {
-                        *(out_buffer++) = BlurTable0[w0][w1][w2][w3];
-                        w3 = w2;
-                        w2 = w1;
-                        w1 = w0;
-                        w0 = *(video_source+x+1) & 0x0F;
-                    }
-                    break;
-                case 1:
-                    for(int x=0;x<(OutXW);x++)
-                    {
-						*(out_buffer++) = BlurTable1[w0][w1][w2][w3];
-                        w3 = w2;
-                        w2 = w1;
-                        w1 = w0;
-                        w0 = *(video_source+x+1) & 0x0F;
-                    }
-                    break;
-                }
-                video_source = video_source+InXW;
-            }
-        }
+					r= r * !(r<0);
+					g= g * !(g<0);
+					b= b * !(b<0);
+
+					r=r*(!(r>255)) + 255 * (r>255);
+					g=g*(!(g>255)) + 255 * (g>255);
+					b=b*(!(b>255)) + 255 * (b>255);
+
+					uint32_t rgb;
+					rgb =  static_cast<uint32_t>(r);       // Rot
+					rgb |= static_cast<uint32_t>(g)<<8;    // Grün
+					rgb |= static_cast<uint32_t>(b)<<16;   // Blau
+
+					rgb |= 0xFF000000;
+
+					*(out_buffer++) = rgb;
+				}
+				video_source = video_source+InXW;
+			}
+		}
     }
+	else
     //////////////////////////////////////////////////////////////////////////
     ///////////////////// AUSGABE ÜBER NORMALE FARBPALETTE ///////////////////
-    else
     if(is_double2x)
     {
         for(int y=0;y<(OutYW/2);y++)

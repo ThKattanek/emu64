@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.05.2021                //
+// Letzte Änderung am 21.03.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -36,6 +36,11 @@ typedef struct COLOR_STRUCT
     float a;
 
 } COLOR_STRUCT, *LPCOLOR_STRUCT;
+
+typedef struct YUV_COLOR
+{
+	float y,u,v;
+} YUV_COLOR, *LPYUV_COLOR;
 
 class VideoCrtClass
 {
@@ -120,10 +125,13 @@ private:
         int32_t phase_alternating_line;		// 0 - 2000
         float   scanline;
 
-        // NEU //
         uint32_t BlurTable0[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
         uint32_t BlurTable1[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
         uint32_t BlurTable0S[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
         uint32_t BlurTable1S[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
+
+		// NEW //
+
+		YUV_COLOR c64_yuv_colors[16];
 };
 #endif // VIDEOCRT_CLASS_H
