@@ -473,9 +473,17 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
 					// G = Y - 0.395U - 0.581V
 					// B = Y + 2.032U
 
-					float r = c64_yuv_colors[video_source[x]].y + 1.140f * c64_yuv_colors[video_source[x]].v;
-					float g = c64_yuv_colors[video_source[x]].y - 0.395f * c64_yuv_colors[video_source[x]].u - 0.581f * c64_yuv_colors[video_source[x]].v;
-					float b = c64_yuv_colors[video_source[x]].y + 2.032f * c64_yuv_colors[video_source[x]].u;
+					float y = c64_yuv_colors[video_source[x] & 0x0f].y + brightness;
+					float u = c64_yuv_colors[video_source[x] & 0x0f].u * saturation;
+					float v = c64_yuv_colors[video_source[x] & 0x0f].v * saturation;
+
+					y *= contrast + screen;
+					u *= contrast + screen;
+					v *= contrast + screen;
+
+					float r = y + 1.140f * v;
+					float g = y - 0.395f * u - 0.581f * v;
+					float b = y + 2.032f * u;
 
 					r= r * !(r<0);
 					g= g * !(g<0);
