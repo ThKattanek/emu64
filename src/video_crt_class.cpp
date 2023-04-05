@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.03.2023                //
+// Letzte Änderung am 05.04.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -59,7 +59,8 @@ VideoCrtClass::VideoCrtClass()
     sector = 360.0f/16.0f;
     origin = sector/2.0f;
     radian = static_cast<float>(MATH_PI)/180.0f;
-	screen = 1.0f/5.0f;
+
+	enable_pal_delay_line = true;
 }
 
 VideoCrtClass::~VideoCrtClass(void)
@@ -105,7 +106,6 @@ void VideoCrtClass::SetScanline(int value)
 void VideoCrtClass::SetSaturation(float value)
 {
     saturation = value * 100.0f;
-    saturation *=   1.0f - screen;
 }
 
 void VideoCrtClass::SetBrightness(float value)
@@ -158,6 +158,11 @@ void VideoCrtClass::EnableUserPaletteCrtMode(bool enabled)
 {
 	enable_user_palette_crt_mode = enabled;
 	CreateVicIIColors();
+}
+
+void VideoCrtClass::EnablePalDelayLine(bool enabled)
+{
+	enable_pal_delay_line = enabled;
 }
 
 void VideoCrtClass::SetUserPaletteColor(int color_number, uint8_t r, uint8_t g, uint8_t b)
@@ -236,27 +241,40 @@ void VideoCrtClass::ConvertRGBToYUV()
 
 inline void VideoCrtClass::CreateVicIIColors(void)
 {
+	float offset =((static_cast<float>(phase_alternating_line) / 1000.0f ) - 1.0f) * 2.0f;
+
 	for(int i=0; i<16; i++)
 	{
-		c64_yuv_colors[i].u = 0;
+		c64_yuv_colors_0[i].u = 0;
 
 		float color_angle = COLOR_ANGLES[i];
 
 		if(color_angle != 0.0f)
 		{
 			float angle = ( origin + color_angle * sector ) * radian;
-			c64_yuv_colors[i].u = cosf( angle );
-			c64_yuv_colors[i].v = sinf( angle );
+			c64_yuv_colors_0[i].u = cosf( angle );
+			c64_yuv_colors_0[i].v = sinf( angle );
 		}
 		else
 		{
-			c64_yuv_colors[i].u = c64_yuv_colors[i].v = 0.0f;
+			c64_yuv_colors_0[i].u = c64_yuv_colors_0[i].v = 0.0f;
+		}
+
+		if(color_angle != 0.0f)
+		{
+			float angle = ( origin + color_angle * sector ) * radian;
+			c64_yuv_colors_1[i].u = cosf( angle + offset);
+			c64_yuv_colors_1[i].v = sinf( angle + offset);
+		}
+		else
+		{
+			c64_yuv_colors_1[i].u = c64_yuv_colors_0[i].v = 0.0f;
 		}
 
 		if(is_first_pal_vic_revision)
-			c64_yuv_colors[i].y = 8 * LUMA_TABLE[0][i];
+			c64_yuv_colors_0[i].y = c64_yuv_colors_1[i].y = 8 * LUMA_TABLE[0][i];
 		else
-			c64_yuv_colors[i].y = 8 * LUMA_TABLE[1][i];
+			c64_yuv_colors_0[i].y = c64_yuv_colors_1[i].y = 8 * LUMA_TABLE[1][i];
 	}
 
 	/*
@@ -438,6 +456,10 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
 {
 	// Outbuffer -> uint32 (ABGR)
 
+	float _y,_u,_v;
+	float r,g,b;
+	uint32_t rgb;
+
     video_source = VICOutPuffer;
     video_source += VICOutPufferOffset;
 
@@ -452,11 +474,93 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
 
 				for(int x=0;x<(OutXW/2);x++)
 				{
-					*(out_buffer++) = 0xff0000ff;
-					*(out_buffer++) = 0xff0000ff;
+					// from yuv to rgb
+					// R = Y + 1.140V
+					// G = Y - 0.395U - 0.581V
+					// B = Y + 2.032U
 
-					*(out_buffer_scanline++) = 0xffffffff;
-					*(out_buffer_scanline++) = 0xffffffff;
+					// Pixel
+					if((y) & 1)
+					{
+						_y = c64_yuv_colors_0[video_source[x] & 0x0f].y + brightness;
+						_u = c64_yuv_colors_0[video_source[x] & 0x0f].u;
+						_v = c64_yuv_colors_0[video_source[x] & 0x0f].v;
+					}
+					else
+					{
+						_y = c64_yuv_colors_1[video_source[x] & 0x0f].y + brightness;
+						_u = c64_yuv_colors_1[video_source[x] & 0x0f].u;
+						_v = c64_yuv_colors_1[video_source[x] & 0x0f].v;
+					}
+
+					/// PAL DELAY LINE
+					if(enable_pal_delay_line)
+					{
+						_ut = (_u + _uo[x]) / 2.0f;
+						_vt = (_v + _vo[x]) / 2.0f;
+
+						_uo[x] = _u;
+						_vo[x] = _v;
+
+						_u = _ut * saturation;
+						_v = _vt * saturation;
+					}
+					else
+					{
+						_u *= saturation;
+						_v *= saturation;
+					}
+
+					_y *= contrast;
+					_u *= contrast;
+					_v *= contrast;
+
+					r = _y + 1.140f * _v;
+					g = _y - 0.395f * _u - 0.581f * _v;
+					b = _y + 2.032f * _u;
+
+					r = r * !(r<0);
+					g = g * !(g<0);
+					b = b * !(b<0);
+
+					r = r * (!(r>255)) + 255 * (r>255);
+					g = g * (!(g>255)) + 255 * (g>255);
+					b = b * (!(b>255)) + 255 * (b>255);
+
+
+					rgb =  static_cast<uint32_t>(r);       // Rot
+					rgb |= static_cast<uint32_t>(g)<<8;    // Grün
+					rgb |= static_cast<uint32_t>(b)<<16;   // Blau
+
+					rgb |= 0xFF000000;
+
+					*(out_buffer++) = rgb;
+					*(out_buffer++) = rgb;
+
+					// Scanline
+					////////////////////////////////////////////////
+					_y *= scanline;
+
+					r = _y + 1.140f * _v;
+					g = _y - 0.395f * _u - 0.581f * _v;
+					b = _y + 2.032f * _u;
+
+					r = r * !(r<0);
+					g = g * !(g<0);
+					b = b * !(b<0);
+
+					r = r * (!(r>255)) + 255 * (r>255);
+					g = g * (!(g>255)) + 255 * (g>255);
+					b = b * (!(b>255)) + 255 * (b>255);
+
+					rgb =  static_cast<uint32_t>(r);       // Rot
+					rgb |= static_cast<uint32_t>(g)<<8;    // Grün
+					rgb |= static_cast<uint32_t>(b)<<16;   // Blau
+
+					rgb |= 0xFF000000;
+
+					*(out_buffer_scanline++) = rgb;
+					*(out_buffer_scanline++) = rgb;
 				}
 				video_source = video_source+InXW;
 			}
@@ -473,27 +577,54 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
 					// G = Y - 0.395U - 0.581V
 					// B = Y + 2.032U
 
-					float y = c64_yuv_colors[video_source[x] & 0x0f].y + brightness;
-					float u = c64_yuv_colors[video_source[x] & 0x0f].u * saturation;
-					float v = c64_yuv_colors[video_source[x] & 0x0f].v * saturation;
+					// Pixel
+					if(y & 1)
+					{
+						_y = c64_yuv_colors_0[video_source[x] & 0x0f].y + brightness;
+						_u = c64_yuv_colors_0[video_source[x] & 0x0f].u;
+						_v = c64_yuv_colors_0[video_source[x] & 0x0f].v;
+					}
+					else
+					{
+						_y = c64_yuv_colors_1[video_source[x] & 0x0f].y + brightness;
+						_u = c64_yuv_colors_1[video_source[x] & 0x0f].u;
+						_v = c64_yuv_colors_1[video_source[x] & 0x0f].v;
+					}
 
-					y *= contrast + screen;
-					u *= contrast + screen;
-					v *= contrast + screen;
+					/// PAL DELAY LINE
+					if(enable_pal_delay_line)
+					{
+						_ut = (_u + _uo[x]) / 2.0f;
+						_vt = (_v + _vo[x]) / 2.0f;
 
-					float r = y + 1.140f * v;
-					float g = y - 0.395f * u - 0.581f * v;
-					float b = y + 2.032f * u;
+						_uo[x] = _u;
+						_vo[x] = _v;
 
-					r= r * !(r<0);
-					g= g * !(g<0);
-					b= b * !(b<0);
+						_u = _ut * saturation;
+						_v = _vt * saturation;
+					}
+					else
+					{
+						_u *= saturation;
+						_v *= saturation;
+					}
 
-					r=r*(!(r>255)) + 255 * (r>255);
-					g=g*(!(g>255)) + 255 * (g>255);
-					b=b*(!(b>255)) + 255 * (b>255);
+					_y *= contrast;
+					_u *= contrast;
+					_v *= contrast;
 
-					uint32_t rgb;
+					r = _y + 1.140f * _v;
+					g = _y - 0.395f * _u - 0.581f * _v;
+					b = _y + 2.032f * _u;
+
+					r = r * !(r<0);
+					g = g * !(g<0);
+					b = b * !(b<0);
+
+					r = r * (!(r>255)) + 255 * (r>255);
+					g = g * (!(g>255)) + 255 * (g>255);
+					b = b * (!(b>255)) + 255 * (b>255);
+
 					rgb =  static_cast<uint32_t>(r);       // Rot
 					rgb |= static_cast<uint32_t>(g)<<8;    // Grün
 					rgb |= static_cast<uint32_t>(b)<<16;   // Blau

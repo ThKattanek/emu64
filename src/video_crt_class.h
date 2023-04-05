@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.03.2023                //
+// Letzte Änderung am 05.04.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -63,6 +63,7 @@ public:
         void EnableCrtOutput(bool enabled);
 		void EnableUserPalette(bool enabled);
 		void EnableUserPaletteCrtMode(bool enabled);
+		void EnablePalDelayLine(bool enabled);
 		void SetUserPaletteColor(int color_number, uint8_t r, uint8_t g, uint8_t b);
         float *GetC64YUVPalette();
 
@@ -104,7 +105,7 @@ private:
         float  _y1,_u1,_v1;
         float  _y2,_u2,_v2;
         float   _ut,_vt;
-        float   _uo[1024],_vo[1024];
+		float   _uo[1024],_vo[1024];
         int16_t r,g,b;
         float   blur_y_sum;
         float   blur_u_sum;
@@ -113,10 +114,10 @@ private:
         float sector;
         float origin;
         float radian;
-        float screen;
 
         //// Einstellbare Werte
         bool    is_first_pal_vic_revision;  // true = first VIC revision, false = all revisions > 1
+		bool	enable_pal_delay_line;		// true = pal delay line is eanable (u+v)
         float	saturation;                 // 0 - 1
         float	brightness;                 // 0 - 1
         float	contrast;                   // 0 - 1
@@ -132,6 +133,7 @@ private:
 
 		// NEW //
 
-		YUV_COLOR c64_yuv_colors[16];
+		YUV_COLOR c64_yuv_colors_0[16];
+		YUV_COLOR c64_yuv_colors_1[16];
 };
 #endif // VIDEOCRT_CLASS_H
