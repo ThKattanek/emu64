@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.05.2021                //
+// Letzte Änderung am 11.04.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -81,6 +81,15 @@ VideoCrtSetupWindow::VideoCrtSetupWindow(QWidget *parent, C64Class *c64, VideoCr
 
 		bvalue = ini->value("UserPaletteCRTMode",false).toBool();
 		ui->enable_user_palette_crt_mode->setChecked(bvalue);
+        video_crt_output->EnableUserPaletteCrtMode(bvalue);
+
+        bvalue = ini->value("PalDelayLine",true).toBool();
+        ui->pal_delayline->setChecked(bvalue);
+        video_crt_output->EnablePalDelayLine(bvalue);
+
+        bvalue = ini->value("PalDelayLineUOnly", false).toBool();
+        ui->pal_delayline_u_only->setChecked(bvalue);
+        video_crt_output->PalDelayLineUOnly(bvalue);
 
         ini->endGroup();
     }
@@ -107,6 +116,8 @@ VideoCrtSetupWindow::~VideoCrtSetupWindow()
         ini->setValue("Distortion",ui->distortion_scroll->value());
         ini->setValue("FirstVICRevision",ui->FirstVicRevision->isChecked());
 		ini->setValue("UserPaletteCRTMode",ui->enable_user_palette_crt_mode->isChecked());
+        ini->setValue("PalDelayLine",ui->pal_delayline->isChecked());
+        ini->setValue("PalDelayLineUOnly",ui->pal_delayline_u_only->isChecked());
         ini->endGroup();
     }
     ///////////////////////////////
@@ -192,11 +203,18 @@ void VideoCrtSetupWindow::on_Reset_clicked()
     ui->helligkeit_scroll->setValue(50);
     ui->kontrast_scroll->setValue(50);
     ui->horblurY_scroll->setValue(2);
-    ui->horblurUV_scroll->setValue(3);
+    ui->horblurUV_scroll->setValue(4);
     ui->phase_scroll->setValue(1000);
 	ui->scanline_scroll->setValue(75);
     ui->distortion_scroll->setValue(100);
     ui->FirstVicRevision->setChecked(false);
+    on_FirstVicRevision_clicked(false);
+
+    ui->pal_delayline->setChecked(true);
+    on_pal_delayline_clicked(true);
+
+    ui->pal_delayline_u_only->setChecked(false);
+    on_pal_delayline_u_only_clicked(false);
 }
 
 
@@ -230,3 +248,15 @@ void VideoCrtSetupWindow::on_enable_user_palette_crt_mode_toggled(bool checked)
 	}
 
 }
+
+void VideoCrtSetupWindow::on_pal_delayline_clicked(bool checked)
+{
+    video_crt_output->EnablePalDelayLine(checked);
+}
+
+
+void VideoCrtSetupWindow::on_pal_delayline_u_only_clicked(bool checked)
+{
+    video_crt_output->PalDelayLineUOnly(checked);
+}
+

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 10.04.2023                //
+// Letzte Änderung am 11.04.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -64,6 +64,7 @@ public:
 		void EnableUserPalette(bool enabled);
 		void EnableUserPaletteCrtMode(bool enabled);
 		void EnablePalDelayLine(bool enabled);
+        void PalDelayLineUOnly(bool enabled);
 		void SetUserPaletteColor(int color_number, uint8_t r, uint8_t g, uint8_t b);
         float *GetC64YUVPalette();
 
@@ -118,6 +119,7 @@ private:
         //// Einstellbare Werte
         bool    is_first_pal_vic_revision;  // true = first VIC revision, false = all revisions > 1
 		bool	enable_pal_delay_line;		// true = pal delay line is eanable (u+v)
+        bool    pal_delay_line_u_only;      // true = pal delay liny is u only
         float	saturation;                 // 0 - 1
         float	brightness;                 // 0 - 1
         float	contrast;                   // 0 - 1
