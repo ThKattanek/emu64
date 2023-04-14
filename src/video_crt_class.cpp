@@ -489,41 +489,51 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
                 _u0 = _u1 = _u2 = _u3 = c64_yuv_colors_0[video_source[0] & 0x0f].u;
                 _v0 = _v1 = _v2 = _v3 = c64_yuv_colors_0[video_source[0] & 0x0f].v;
 
-				for(int x=0;x<(OutXW/2);x++)
+                for(int x=0;x<(OutXW);x++)
 				{
 					// from yuv to rgb
 					// R = Y + 1.140V
 					// G = Y - 0.395U - 0.581V
 					// B = Y + 2.032U
 
+                    int _x = x/2;
+
 					// Pixel
-					if((y) & 1)
+                    if((y) & 0)
 					{
-                        _y0 = c64_yuv_colors_0[video_source[x] & 0x0f].y;
-                        _u0 = c64_yuv_colors_0[video_source[x] & 0x0f].u;
-                        _v0 = c64_yuv_colors_0[video_source[x] & 0x0f].v;
+                        _y0 = c64_yuv_colors_0[video_source[_x] & 0x0f].y;
 
-                        _uf1 = c64_yuv_colors_0[video_source[x+1] & 0x0f].u;
-                        _uf2 = c64_yuv_colors_0[video_source[x+2] & 0x0f].u;
-                        _uf3 = c64_yuv_colors_0[video_source[x+3] & 0x0f].u;
+                        if((x & 1) == 0)
+                        {
+                            _u0 = c64_yuv_colors_0[video_source[_x] & 0x0f].u;
+                            _v0 = c64_yuv_colors_0[video_source[_x] & 0x0f].v;
 
-                        _vf1 = c64_yuv_colors_0[video_source[x+1] & 0x0f].v;
-                        _vf2 = c64_yuv_colors_0[video_source[x+2] & 0x0f].v;
-                        _vf3 = c64_yuv_colors_0[video_source[x+3] & 0x0f].v;
+                            _uf1 = c64_yuv_colors_0[video_source[_x+1] & 0x0f].u;
+                            _uf2 = c64_yuv_colors_0[video_source[_x+2] & 0x0f].u;
+                            _uf3 = c64_yuv_colors_0[video_source[_x+3] & 0x0f].u;
+
+                            _vf1 = c64_yuv_colors_0[video_source[_x+1] & 0x0f].v;
+                            _vf2 = c64_yuv_colors_0[video_source[_x+2] & 0x0f].v;
+                            _vf3 = c64_yuv_colors_0[video_source[-x+3] & 0x0f].v;
+                        }
 					}
 					else
 					{
-                        _y0 = c64_yuv_colors_1[video_source[x] & 0x0f].y;
-                        _u0 = c64_yuv_colors_1[video_source[x] & 0x0f].u;
-                        _v0 = c64_yuv_colors_1[video_source[x] & 0x0f].v;
+                        _y0 = c64_yuv_colors_1[video_source[_x] & 0x0f].y;
 
-                        _uf1 = c64_yuv_colors_1[video_source[x+1] & 0x0f].u;
-                        _uf2 = c64_yuv_colors_1[video_source[x+2] & 0x0f].u;
-                        _uf3 = c64_yuv_colors_1[video_source[x+3] & 0x0f].u;
+                        if((x & 1) == 0)
+                        {
+                            _u0 = c64_yuv_colors_1[video_source[_x] & 0x0f].u;
+                            _v0 = c64_yuv_colors_1[video_source[_x] & 0x0f].v;
 
-                        _vf1 = c64_yuv_colors_1[video_source[x+1] & 0x0f].v;
-                        _vf2 = c64_yuv_colors_1[video_source[x+2] & 0x0f].v;
-                        _vf3 = c64_yuv_colors_1[video_source[x+3] & 0x0f].v;
+                            _uf1 = c64_yuv_colors_1[video_source[_x+1] & 0x0f].u;
+                            _uf2 = c64_yuv_colors_1[video_source[_x+2] & 0x0f].u;
+                            _uf3 = c64_yuv_colors_1[video_source[_x+3] & 0x0f].u;
+
+                            _vf1 = c64_yuv_colors_1[video_source[_x+1] & 0x0f].v;
+                            _vf2 = c64_yuv_colors_1[video_source[_x+2] & 0x0f].v;
+                            _vf3 = c64_yuv_colors_1[video_source[_x+3] & 0x0f].v;
+                        }
                     }
 
                     // y blur
@@ -637,7 +647,6 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
 					rgb |= 0xFF000000;
 
 					*(out_buffer++) = rgb;
-					*(out_buffer++) = rgb;
 
 					// Scanline
 					////////////////////////////////////////////////
@@ -661,7 +670,6 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
 
 					rgb |= 0xFF000000;
 
-					*(out_buffer_scanline++) = rgb;
 					*(out_buffer_scanline++) = rgb;
 				}
 				video_source = video_source+InXW;
