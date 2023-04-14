@@ -499,41 +499,33 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
                     int _x = x/2;
 
 					// Pixel
-                    if((y) & 0)
+                    if(y & 1)
 					{
                         _y0 = c64_yuv_colors_0[video_source[_x] & 0x0f].y;
+                        _u0 = c64_yuv_colors_0[video_source[_x] & 0x0f].u;
+                        _v0 = c64_yuv_colors_0[video_source[_x] & 0x0f].v;
 
-                        if((x & 1) == 0)
-                        {
-                            _u0 = c64_yuv_colors_0[video_source[_x] & 0x0f].u;
-                            _v0 = c64_yuv_colors_0[video_source[_x] & 0x0f].v;
+                        _uf1 = c64_yuv_colors_0[video_source[_x+1] & 0x0f].u;
+                        _uf2 = c64_yuv_colors_0[video_source[_x+2] & 0x0f].u;
+                        _uf3 = c64_yuv_colors_0[video_source[_x+3] & 0x0f].u;
 
-                            _uf1 = c64_yuv_colors_0[video_source[_x+1] & 0x0f].u;
-                            _uf2 = c64_yuv_colors_0[video_source[_x+2] & 0x0f].u;
-                            _uf3 = c64_yuv_colors_0[video_source[_x+3] & 0x0f].u;
-
-                            _vf1 = c64_yuv_colors_0[video_source[_x+1] & 0x0f].v;
-                            _vf2 = c64_yuv_colors_0[video_source[_x+2] & 0x0f].v;
-                            _vf3 = c64_yuv_colors_0[video_source[-x+3] & 0x0f].v;
-                        }
+                        _vf1 = c64_yuv_colors_0[video_source[_x+1] & 0x0f].v;
+                        _vf2 = c64_yuv_colors_0[video_source[_x+2] & 0x0f].v;
+                        _vf3 = c64_yuv_colors_0[video_source[-x+3] & 0x0f].v;
 					}
 					else
-					{
+                    {
                         _y0 = c64_yuv_colors_1[video_source[_x] & 0x0f].y;
+                        _u0 = c64_yuv_colors_1[video_source[_x] & 0x0f].u;
+                        _v0 = c64_yuv_colors_1[video_source[_x] & 0x0f].v;
 
-                        if((x & 1) == 0)
-                        {
-                            _u0 = c64_yuv_colors_1[video_source[_x] & 0x0f].u;
-                            _v0 = c64_yuv_colors_1[video_source[_x] & 0x0f].v;
+                        _uf1 = c64_yuv_colors_1[video_source[_x+1] & 0x0f].u;
+                        _uf2 = c64_yuv_colors_1[video_source[_x+2] & 0x0f].u;
+                        _uf3 = c64_yuv_colors_1[video_source[_x+3] & 0x0f].u;
 
-                            _uf1 = c64_yuv_colors_1[video_source[_x+1] & 0x0f].u;
-                            _uf2 = c64_yuv_colors_1[video_source[_x+2] & 0x0f].u;
-                            _uf3 = c64_yuv_colors_1[video_source[_x+3] & 0x0f].u;
-
-                            _vf1 = c64_yuv_colors_1[video_source[_x+1] & 0x0f].v;
-                            _vf2 = c64_yuv_colors_1[video_source[_x+2] & 0x0f].v;
-                            _vf3 = c64_yuv_colors_1[video_source[_x+3] & 0x0f].v;
-                        }
+                        _vf1 = c64_yuv_colors_1[video_source[_x+1] & 0x0f].v;
+                        _vf2 = c64_yuv_colors_1[video_source[_x+2] & 0x0f].v;
+                        _vf3 = c64_yuv_colors_1[video_source[_x+3] & 0x0f].v;
                     }
 
                     // y blur
