@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.04.2023                //
+// Letzte Änderung am 14.04.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -511,7 +511,7 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
 
                         _vf1 = c64_yuv_colors_0[video_source[_x+1] & 0x0f].v;
                         _vf2 = c64_yuv_colors_0[video_source[_x+2] & 0x0f].v;
-                        _vf3 = c64_yuv_colors_0[video_source[-x+3] & 0x0f].v;
+                        _vf3 = c64_yuv_colors_0[video_source[_x+3] & 0x0f].v;
 					}
 					else
                     {
