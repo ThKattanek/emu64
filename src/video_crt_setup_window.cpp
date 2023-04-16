@@ -214,7 +214,8 @@ void VideoCrtSetupWindow::on_Reset_clicked()
     ui->distortion_scroll->setValue(100);
     ui->FirstVicRevision->setChecked(false);
     on_FirstVicRevision_clicked(false);
-
+    ui->enable_user_palette_crt_mode->setChecked(false);
+    on_enable_user_palette_crt_mode_toggled(false);
     ui->pal_delayline->setChecked(true);
     on_pal_delayline_clicked(true);
 
