@@ -92,8 +92,6 @@ MainWindow::~MainWindow()
         ini->setValue("Version_Build", version_number[3]);
         ini->endGroup();
 
-        ini->endGroup();
-
         char group_name[32];
         bool value;
 
