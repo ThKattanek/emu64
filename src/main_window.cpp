@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.03.2022                //
+// Letzte Änderung am 16.04.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -71,6 +71,9 @@ MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *l
 #  endif
 # endif
 #endif
+
+    // Fill version_major, version_minor and version_micro
+    ParseVersionNumber(QString(VERSION_STRING));
 }
 
 MainWindow::~MainWindow()
@@ -83,6 +86,12 @@ MainWindow::~MainWindow()
         ini->setValue("State",saveState());
         ini->setValue("ScreenshotCounter",c64->GetScreenshotNumber());
         ini->setValue("LastAutoloadDir",lastAutoloadPath);
+        ini->setValue("Version_Major", version_number[0]);
+        ini->setValue("Version_Minor", version_number[1]);
+        ini->setValue("Version_Micro", version_number[2]);
+        ini->setValue("Version_Build", version_number[3]);
+        ini->endGroup();
+
         ini->endGroup();
 
         char group_name[32];
@@ -1029,8 +1038,118 @@ void MainWindow::AutoLoadAndRun(QString filename)
 			WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(0,0);
 			w->SetEnableFloppy(true);
 			floppy_window->SetDiskImage(0,filename);
-		}
-	}
+        }
+    }
+}
+
+bool MainWindow::ParseVersionNumber(QString version_string)
+{
+    int version_pos = 0;
+    bool conv_to_int_is_ok;
+    int num;
+
+    version_number[3] = 0;
+
+    int substr_pos = 0;
+    for(int i=0; i<version_string.length(); i++)
+    {
+        if(version_string[i] == '.')
+        {
+            num = version_string.mid(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+            if(conv_to_int_is_ok)
+            {
+                if(version_pos < 4)
+                    version_number[version_pos] = num;
+                version_pos++;
+            }
+            substr_pos = i+1;
+        }
+    }
+    version_string = version_string.mid(substr_pos, version_string.length() - substr_pos);
+
+    substr_pos = 0;
+    for(int i=0; i<version_string.length(); i++)
+    {
+        if(version_string[i] == '-')
+        {
+            num = version_string.mid(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+            if(conv_to_int_is_ok)
+            {
+                if(version_pos < 4)
+                    version_number[version_pos] = num;
+                version_pos++;
+            }
+            substr_pos = i+1;
+        }
+    }
+    version_string = version_string.mid(substr_pos, version_string.length() - substr_pos);
+
+    if(version_pos < 3)
+    {
+        num = version_string.toInt(&conv_to_int_is_ok, 10);
+        if(conv_to_int_is_ok)
+        {
+            if(version_pos < 3)
+                version_number[version_pos] = num;
+            version_pos++;
+        }
+    }
+
+    if((version_pos < 3) || (version_pos > 4))
+    {
+        version_number_is_ok = false;
+        return false;
+    }
+
+    version_number_is_ok = true;
+    return true;
+}
+
+int MainWindow::CompareIniVersionNumber()
+{
+    // compare result from version number in the ini file. INI Version: 0 = is equal, -1 is lesser, 1 = is greater
+    if(version_number_is_ok)
+    {
+        ini->beginGroup("MainWindow");
+        int ini_version[4];
+        ini_version[0] = ini->value("Version_Major", 0).toInt();
+        ini_version[1] = ini->value("Version_Minor", 0).toInt();
+        ini_version[2] = ini->value("Version_Micro", 0).toInt();
+        ini_version[3] = ini->value("Version_Build", 0).toInt();
+        ini->endGroup();
+
+        if(ini_version[0] > version_number[0])
+            return 1;
+        if(ini_version[0] < version_number[0])
+            return -1;
+        if(ini_version[0] == version_number[0])
+        {
+            if(ini_version[1] > version_number[1])
+                return 1;
+            if(ini_version[1] < version_number[1])
+                return -1;
+            if(ini_version[1] == version_number[1])
+            {
+                if(ini_version[2] > version_number[2])
+                    return 1;
+                if(ini_version[2] < version_number[2])
+                    return -1;
+                if(ini_version[2] == version_number[2])
+                {
+                    if(ini_version[3] > version_number[3])
+                        return 1;
+                    if(ini_version[3] < version_number[3])
+                        return -1;
+                    if(ini_version[3] == version_number[3])
+                        return 0;
+                }
+            }
+        }
+    }
+    else
+        return 0;
+
+    return 0;
 }
 
 void MainWindow::on_menu_main_info_triggered()
