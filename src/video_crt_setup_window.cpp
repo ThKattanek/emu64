@@ -199,12 +199,12 @@ void VideoCrtSetupWindow::on_FirstVicRevision_clicked(bool checked)
 
 void VideoCrtSetupWindow::on_Reset_clicked()
 {
-    ui->saettigung_scroll->setValue(50);
-    ui->helligkeit_scroll->setValue(50);
-    ui->kontrast_scroll->setValue(50);
+    ui->saettigung_scroll->setValue(40);
+    ui->helligkeit_scroll->setValue(45);
+    ui->kontrast_scroll->setValue(55);
     ui->horblurY_scroll->setValue(2);
     ui->horblurUV_scroll->setValue(4);
-    ui->phase_scroll->setValue(1000);
+    ui->phase_scroll->setValue(1222);
 	ui->scanline_scroll->setValue(75);
     ui->distortion_scroll->setValue(100);
     ui->FirstVicRevision->setChecked(false);
@@ -216,8 +216,6 @@ void VideoCrtSetupWindow::on_Reset_clicked()
     ui->pal_delayline_u_only->setChecked(false);
     on_pal_delayline_u_only_clicked(false);
 }
-
-
 
 void VideoCrtSetupWindow::on_enable_user_palette_crt_mode_toggled(bool checked)
 {
