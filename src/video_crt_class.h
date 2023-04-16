@@ -16,15 +16,7 @@
 #ifndef VIDEOCRT_CLASS_H
 #define VIDEOCRT_CLASS_H
 
-#include "structs.h"
 #include <stdint.h>
-
-struct VIC_COLOR_STRUCT
-{
-    float luminace;
-    float angel;
-    float direction;
-};
 
 typedef struct COLOR_STRUCT
 {
@@ -44,7 +36,6 @@ typedef struct YUV_COLOR
 
 class VideoCrtClass
 {
-
 public:
         VideoCrtClass();
         ~VideoCrtClass();
@@ -72,6 +63,8 @@ public:
         bool start_c64_is_palmode;
 
 private:
+        void CreateVicIIColors(void);
+
         inline void ConvertYUVToRGB(COLOR_STRUCT *color_out);
 		inline void ConvertRGBToYUV();
 
@@ -92,25 +85,14 @@ private:
 		bool enable_user_palette_crt_mode;			// im CRT Modus
 		//////////////////////////////////////////
 
-        float		c64_yuv_palette0[16*3];
-        float		c64_yuv_palette1[16*3];
-
-        void CreateVicIIColors(void);
-
-        float blur_y_mul;
-        float blur_uv_mul;
-
-        uint32_t rgb;
-        float _y,_u,_v;
-
-        float  _y1,_u1,_v1;
-        float  _y2,_u2,_v2;
+        float   _y,_u,_v;
+        float   _y1,_u1,_v1;
         float   _ut,_vt;
 		float   _uo[1024],_vo[1024];
         int16_t r,g,b;
-        float   blur_y_sum;
-        float   blur_u_sum;
-        float   blur_v_sum;
+
+        YUV_COLOR c64_yuv_colors_0[16];
+        YUV_COLOR c64_yuv_colors_1[16];
 
         float sector;
         float origin;
@@ -127,15 +109,5 @@ private:
         int32_t	hor_blur_wuv;
         int32_t phase_alternating_line;		// 0 - 2000
         float   scanline;
-
-        uint32_t BlurTable0[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
-        uint32_t BlurTable1[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
-        uint32_t BlurTable0S[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
-        uint32_t BlurTable1S[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
-
-		// NEW //
-
-		YUV_COLOR c64_yuv_colors_0[16];
-		YUV_COLOR c64_yuv_colors_1[16];
 };
 #endif // VIDEOCRT_CLASS_H
