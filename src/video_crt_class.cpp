@@ -47,11 +47,10 @@ VideoCrtClass::VideoCrtClass()
 {
     is_first_pal_vic_revision = false;
 
-	enable_user_palette = false;
-	enable_user_palette_crt_mode = false;
+    enable_user_palette = false;
+    enable_user_palette_crt_mode = false;
     current_color_palette_mumber = 0;
     is_double2x = false;
-    contrast = 0.8f;
 
     hor_blur_wy = 0;
     hor_blur_wuv = 0;
@@ -62,6 +61,8 @@ VideoCrtClass::VideoCrtClass()
 
     enable_pal_delay_line = false;
     pal_delay_line_u_only = false;
+
+    CreateVicIIColors();
 }
 
 VideoCrtClass::~VideoCrtClass(void)
@@ -145,6 +146,7 @@ void VideoCrtClass::EnableVideoDoubleSize(bool enabled)
 void VideoCrtClass::EnableCrtOutput(bool enabled)
 {
 	is_crt_output = enabled;
+    CreateVicIIColors();
 }
 
 void VideoCrtClass::EnableUserPalette(bool enabled)
@@ -267,7 +269,7 @@ inline void VideoCrtClass::CreateVicIIColors(void)
             }
             else
             {
-                c64_yuv_colors_1[i].u = c64_yuv_colors_0[i].v = 0.0f;
+                c64_yuv_colors_1[i].u = c64_yuv_colors_1[i].v = 0.0f;
             }
 
             if(is_first_pal_vic_revision)
