@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.03.2022                //
+// Letzte Änderung am 16.04.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -71,6 +71,9 @@ MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *l
 #  endif
 # endif
 #endif
+
+    // Fill version_major, version_minor and version_micro
+    ParseVersionNumber(QString(VERSION_STRING));
 }
 
 MainWindow::~MainWindow()
@@ -83,6 +86,10 @@ MainWindow::~MainWindow()
         ini->setValue("State",saveState());
         ini->setValue("ScreenshotCounter",c64->GetScreenshotNumber());
         ini->setValue("LastAutoloadDir",lastAutoloadPath);
+        ini->setValue("Version_Major", version_number.major);
+        ini->setValue("Version_Minor", version_number.minor);
+        ini->setValue("Version_Micro", version_number.micro);
+        ini->setValue("Version_Build", version_number.build);
         ini->endGroup();
 
         char group_name[32];
@@ -626,6 +633,8 @@ int MainWindow::OnInit(bool nogui)
 	if(!nogui)
 		this->show();
 
+    FixedVersionSettings();
+
     /////////////////////////////////////
     SplashMessage(tr("C64 EMULATION WIRD NUN GESTARTET."),Qt::darkBlue);
 
@@ -1029,8 +1038,145 @@ void MainWindow::AutoLoadAndRun(QString filename)
 			WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(0,0);
 			w->SetEnableFloppy(true);
 			floppy_window->SetDiskImage(0,filename);
-		}
-	}
+        }
+    }
+}
+
+bool MainWindow::ParseVersionNumber(QString version_string)
+{
+    int version_pos = 0;
+    bool conv_to_int_is_ok;
+    int num;
+
+    int version_number[4];
+
+    version_number[3] = 0;
+
+    int substr_pos = 0;
+    for(int i=0; i<version_string.length(); i++)
+    {
+        if(version_string[i] == '.')
+        {
+            num = version_string.mid(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+            if(conv_to_int_is_ok)
+            {
+                if(version_pos < 4)
+                    version_number[version_pos] = num;
+                version_pos++;
+            }
+            substr_pos = i+1;
+        }
+    }
+    version_string = version_string.mid(substr_pos, version_string.length() - substr_pos);
+
+    substr_pos = 0;
+    for(int i=0; i<version_string.length(); i++)
+    {
+        if(version_string[i] == '-')
+        {
+            num = version_string.mid(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+            if(conv_to_int_is_ok)
+            {
+                if(version_pos < 4)
+                    version_number[version_pos] = num;
+                version_pos++;
+            }
+            substr_pos = i+1;
+        }
+    }
+    version_string = version_string.mid(substr_pos, version_string.length() - substr_pos);
+
+    if(version_pos < 3)
+    {
+        num = version_string.toInt(&conv_to_int_is_ok, 10);
+        if(conv_to_int_is_ok)
+        {
+            if(version_pos < 3)
+                version_number[version_pos] = num;
+            version_pos++;
+        }
+    }
+
+    if((version_pos < 3) || (version_pos > 4))
+    {
+        version_number_is_ok = false;
+        return false;
+    }
+
+    this->version_number = VERSION_NUMBER{version_number[0], version_number[1], version_number[2], version_number[3]};
+
+    version_number_is_ok = true;
+    return true;
+}
+
+int MainWindow::CompareVersionNumber(const VERSION_NUMBER* version1, const VERSION_NUMBER* version2)
+{
+    // compare result from version number in the ini file. INI Version: 0 = is equal, -1 is lesser, 1 = is greater
+    if(version_number_is_ok)
+    {
+
+
+        if(version1->major > version2->major)
+            return 1;
+        if(version1->major < version2->major)
+            return -1;
+        if(version1->major == version2->major)
+        {
+            if(version1->minor > version2->minor)
+                return 1;
+            if(version1->minor < version2->minor)
+                return -1;
+            if(version1->minor == version2->minor)
+            {
+                if(version1->micro > version2->micro)
+                    return 1;
+                if(version1->micro < version2->micro)
+                    return -1;
+                if(version1->micro == version2->micro)
+                {
+                    if(version1->build > version2->build)
+                        return 1;
+                    if(version1->build < version2->build)
+                        return -1;
+                    if(version1->build == version2->build)
+                        return 0;
+                }
+            }
+        }
+    }
+    else
+        return 0;
+
+    return 0;
+}
+
+void MainWindow::FixedVersionSettings()
+{
+    VERSION_NUMBER ini_version;
+
+    ini->beginGroup("MainWindow");
+    ini_version.major = ini->value("Version_Major", 0).toInt();
+    ini_version.minor = ini->value("Version_Minor", 0).toInt();
+    ini_version.micro = ini->value("Version_Micro", 0).toInt();
+    ini_version.build = ini->value("Version_Build", 0).toInt();
+    ini->endGroup();
+
+    if(CompareVersionNumber(&ini_version, &version_number) == -1)
+    {
+        VERSION_NUMBER fix_version;
+
+        // the ini file is older as this emu64 build
+        // fixed for 5.0.19.65
+        fix_version = {5,0,19,65};
+        if((CompareVersionNumber(&version_number, &fix_version) == 0) || (CompareVersionNumber(&version_number, &fix_version) == 1))
+        {
+            if(CompareVersionNumber(&ini_version, &fix_version) == -1)
+            {
+                /// all fixed settings from version 5.0.19.65
+                video_crt_setup_window->ResetAllSettings();
+            }
+        }
+    }
 }
 
 void MainWindow::on_menu_main_info_triggered()

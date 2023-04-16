@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.05.2021                //
+// Letzte Änderung am 16.04.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -47,11 +47,10 @@ VideoCrtClass::VideoCrtClass()
 {
     is_first_pal_vic_revision = false;
 
-	enable_user_palette = false;
-	enable_user_palette_crt_mode = false;
+    enable_user_palette = false;
+    enable_user_palette_crt_mode = false;
     current_color_palette_mumber = 0;
     is_double2x = false;
-    contrast = 0.8f;
 
     hor_blur_wy = 0;
     hor_blur_wuv = 0;
@@ -59,7 +58,11 @@ VideoCrtClass::VideoCrtClass()
     sector = 360.0f/16.0f;
     origin = sector/2.0f;
     radian = static_cast<float>(MATH_PI)/180.0f;
-    screen = 1.0f/5.0f;
+
+    enable_pal_delay_line = false;
+    pal_delay_line_u_only = false;
+
+    CreateVicIIColors();
 }
 
 VideoCrtClass::~VideoCrtClass(void)
@@ -87,14 +90,12 @@ void VideoCrtClass::SetHorizontalBlurY(int wblur)
 {
     if(wblur > 5) wblur = 5;
     hor_blur_wy = wblur;
-    blur_y_mul = 1.0f/(hor_blur_wy);
 }
 
 void VideoCrtClass::SetHorizontalBlurUV(int wblur)
 {
     if(wblur > 5) wblur = 5;
     hor_blur_wuv = wblur;
-    blur_uv_mul = 1.0f/(hor_blur_wuv);
 }
 
 void VideoCrtClass::SetScanline(int value)
@@ -105,7 +106,6 @@ void VideoCrtClass::SetScanline(int value)
 void VideoCrtClass::SetSaturation(float value)
 {
     saturation = value * 100.0f;
-    saturation *=   1.0f - screen;
 }
 
 void VideoCrtClass::SetBrightness(float value)
@@ -146,6 +146,7 @@ void VideoCrtClass::EnableVideoDoubleSize(bool enabled)
 void VideoCrtClass::EnableCrtOutput(bool enabled)
 {
 	is_crt_output = enabled;
+    CreateVicIIColors();
 }
 
 void VideoCrtClass::EnableUserPalette(bool enabled)
@@ -160,15 +161,20 @@ void VideoCrtClass::EnableUserPaletteCrtMode(bool enabled)
 	CreateVicIIColors();
 }
 
+void VideoCrtClass::EnablePalDelayLine(bool enabled)
+{
+    enable_pal_delay_line = enabled;
+}
+
+void VideoCrtClass::PalDelayLineUOnly(bool enabled)
+{
+    pal_delay_line_u_only = enabled;
+}
+
 void VideoCrtClass::SetUserPaletteColor(int color_number, uint8_t r, uint8_t g, uint8_t b)
 {
 	user_palette[color_number] = 0xFF000000 | static_cast<uint32_t>(b<<16 | g<<8 | r);
 	CreateVicIIColors();
-}
-
-float *VideoCrtClass::GetC64YUVPalette()
-{
-    return c64_yuv_palette0;
 }
 
 inline void VideoCrtClass::ConvertYUVToRGB(COLOR_STRUCT *color_out)
@@ -230,277 +236,456 @@ void VideoCrtClass::ConvertRGBToYUV()
 	U = -0.147R - 0.289G + 0.436B
 	V =  0.615R - 0.515G - 0.100B
 	*/
-
-
 }
 
 inline void VideoCrtClass::CreateVicIIColors(void)
 {
-    COLOR_STRUCT color_out;
+	float offset =((static_cast<float>(phase_alternating_line) / 1000.0f ) - 1.0f) * 2.0f;
 
-    // Für Phase Alternating Line
-    // --> pahphase_alternating_line 0 - 2000 ==== Offs Umrechnen nach -2.0f - 2.0f
-    float Offs =((static_cast<float>(phase_alternating_line) / 1000.0f ) - 1.0f) * 2.0f;
-
-    for(int i=0;i<16;i++)
+	for(int i=0; i<16; i++)
     {
-		if(!enable_user_palette_crt_mode)
-		{
-			// Keine Userpalette Origianle C64 Farbwerte für CRT Modus benutzen
-			c64_yuv_palette0[i*3+1] = 0;
-			c64_yuv_palette0[i*3+2] = 0;
-
-			c64_yuv_palette1[i*3+1] = 0;
-			c64_yuv_palette1[i*3+2] = 0;
-
-			float color_angle = COLOR_ANGLES[i];
-
-			if(color_angle != 0.0f)
-			{
-				float angle = ( origin + color_angle * sector ) * radian;
-				c64_yuv_palette0[i*3+1] = cosf( angle ) * saturation;
-				c64_yuv_palette0[i*3+2] = sinf( angle ) * saturation;
-
-				c64_yuv_palette1[i*3+1] = cosf( angle + Offs) * saturation;
-				c64_yuv_palette1[i*3+2] = sinf( angle + Offs) * saturation;
-			}
-
-			if(is_first_pal_vic_revision)
-				c64_yuv_palette0[i*3+0] = c64_yuv_palette1[i*3+0] = 8 * LUMA_TABLE[0][i] + brightness;
-			else
-				c64_yuv_palette0[i*3+0] = c64_yuv_palette1[i*3+0] = 8 * LUMA_TABLE[1][i] + brightness;
-
-			c64_yuv_palette0[i*3+0] *= contrast + screen;
-			c64_yuv_palette0[i*3+1] *= contrast + screen;
-			c64_yuv_palette0[i*3+2] *= contrast + screen;
-
-			c64_yuv_palette1[i*3+0] *= contrast + screen;
-			c64_yuv_palette1[i*3+1] *= contrast + screen;
-			c64_yuv_palette1[i*3+2] *= contrast + screen;
-		}
-		else
-		{
-			/*
-			Y = 0.299R + 0.587G + 0.114B
-			U = 0.492 (B-Y)
-			V = 0.877 (R-Y)
-				It can also be represented as:
-			Y =  0.299R + 0.587G + 0.114B
-			U = -0.147R - 0.289G + 0.436B
-			V =  0.615R - 0.515G - 0.100B
-			*/
-
-			uint8_t r = (user_palette[i] & 0x000000ff);
-			uint8_t g = ((user_palette[i] >> 8) & 0x000000ff);
-			uint8_t b = ((user_palette[i] >> 16) & 0x000000ff);
-
-			float y = 0.299f * r + 0.587f * g + 0.114 * b;
-			float u = 0.492 * (b - y);
-			float v = 0.877 * (r - y);
-
-			c64_yuv_palette0[i*3+0] = y;
-			c64_yuv_palette0[i*3+1] = u ;
-			c64_yuv_palette0[i*3+2] = v ;
-
-			c64_yuv_palette1[i*3+0] = y;
-			c64_yuv_palette1[i*3+1] = u ;
-			c64_yuv_palette1[i*3+2] = v ;
-		}
-
-
-    }
-
-    int x[4];
-    for(x[0]=0;x[0]<16;x[0]++)
-    {
-        for(x[1]=0;x[1]<16;x[1]++)
+        if(!enable_user_palette_crt_mode)
         {
-            for(x[2]=0;x[2]<16;x[2]++)
+            c64_yuv_colors_0[i].u = 0;
+
+            float color_angle = COLOR_ANGLES[i];
+
+            if(color_angle != 0.0f)
             {
-                for(x[3]=0;x[3]<16;x[3]++)
-                {
-                    /// Tabelle 0 für Gerade Zeile
-                    _y = c64_yuv_palette0[x[0]*3];
-                    _u = c64_yuv_palette0[x[0]*3+1];
-                    _v = c64_yuv_palette0[x[0]*3+2];
-
-                    // UV BLUR
-                    for(int i=1; i<hor_blur_wuv ; i++)
-                    {
-                        _u += c64_yuv_palette0[x[i]*3+1];
-                        _v += c64_yuv_palette0[x[i]*3+2];
-                    }
-
-                    _u /= hor_blur_wuv;
-                    _v /= hor_blur_wuv;
-
-                    // Y BLUR
-                    float HoBlurWYIntension = 0.75f;
-                    if(hor_blur_wy > 1)
-                    {
-                        _y *= HoBlurWYIntension;
-                        float intension_add = (1.0f - HoBlurWYIntension) / (hor_blur_wy-1);
-                        for(int i=1; i<hor_blur_wy ; i++)
-                        {
-                            _y += c64_yuv_palette0[x[i]*3] * i * intension_add;
-                        }
-                    }
-
-                    ConvertYUVToRGB(&color_out);
-
-                    rgb =  static_cast<uint32_t>(color_out.r);       // Rot
-                    rgb |= static_cast<uint32_t>(color_out.g)<<8;    // Grün
-                    rgb |= static_cast<uint32_t>(color_out.b)<<16;   // Blau
-
-                    BlurTable0[x[0]][x[1]][x[2]][x[3]] = rgb | 0xFF000000;
-
-                    /// Tabelle 1 für Gerade Zeile
-                    _y *= scanline;
-
-                    ConvertYUVToRGB(&color_out);
-
-                    rgb =  static_cast<uint32_t>(color_out.r);       // Rot
-                    rgb |= static_cast<uint32_t>(color_out.g)<<8;    // Grün
-                    rgb |= static_cast<uint32_t>(color_out.b)<<16;   // Blau
-
-                    BlurTable0S[x[0]][x[1]][x[2]][x[3]] = rgb | 0xFF000000;
-
-                    /// Tabelle 1 für Ungerade Zeilen
-                    _y = c64_yuv_palette1[x[0]*3];
-                    _u = c64_yuv_palette1[x[0]*3+1];
-                    _v = c64_yuv_palette1[x[0]*3+2];
-
-                    // UV BLUR
-                    for(int i=1; i<hor_blur_wuv ; i++)
-                    {
-                        _u += c64_yuv_palette1[x[i]*3+1];
-                        _v += c64_yuv_palette1[x[i]*3+2];
-                    }
-                    _u /= hor_blur_wuv;
-                    _v /= hor_blur_wuv;
-
-                    // Y BLUR
-                    if(hor_blur_wy > 1)
-                    {
-                        _y *= HoBlurWYIntension;
-                        float intension_add = (1.0f - HoBlurWYIntension) / (hor_blur_wy-1);
-                        for(int i=1; i<hor_blur_wy ; i++)
-                        {
-                             _y += c64_yuv_palette0[x[i]*3] * i * intension_add;
-                        }
-                    }
-
-                    ConvertYUVToRGB(&color_out);
-
-                    rgb =  static_cast<uint32_t>(color_out.r);       // Rot
-                    rgb |= static_cast<uint32_t>(color_out.g)<<8;    // Grün
-                    rgb |= static_cast<uint32_t>(color_out.b)<<16;   // Blau
-
-                    BlurTable1[x[0]][x[1]][x[2]][x[3]] = rgb | 0xFF000000;
-
-                    _y *= scanline;
-
-                    ConvertYUVToRGB(&color_out);
-
-                    rgb = static_cast<uint32_t>(color_out.r);       // Rot
-                    rgb |= static_cast<uint32_t>(color_out.g)<<8;    // Grün
-                    rgb |= static_cast<uint32_t>(color_out.b)<<16;   // Blau
-
-                    BlurTable1S[x[0]][x[1]][x[2]][x[3]] = rgb | 0xFF000000;
-                }
+                float angle = ( origin + color_angle * sector ) * radian;
+                c64_yuv_colors_0[i].u = cosf( angle );
+                c64_yuv_colors_0[i].v = sinf( angle );
             }
+            else
+            {
+                c64_yuv_colors_0[i].u = c64_yuv_colors_0[i].v = 0.0f;
+            }
+
+            if(color_angle != 0.0f)
+            {
+                float angle = ( origin + color_angle * sector ) * radian;
+                c64_yuv_colors_1[i].u = cosf( angle + offset);
+                c64_yuv_colors_1[i].v = sinf( angle + offset);
+            }
+            else
+            {
+                c64_yuv_colors_1[i].u = c64_yuv_colors_1[i].v = 0.0f;
+            }
+
+            if(is_first_pal_vic_revision)
+                c64_yuv_colors_0[i].y = c64_yuv_colors_1[i].y = 8 * LUMA_TABLE[0][i];
+            else
+                c64_yuv_colors_0[i].y = c64_yuv_colors_1[i].y = 8 * LUMA_TABLE[1][i];
         }
-    }
+        else
+        {
+            // Y = 0.299R + 0.587G + 0.114B
+            // U = 0.492 (B-Y)
+            // V = 0.877 (R-Y)
+            //  	It can also be represented as:
+            //  Y =  0.299R + 0.587G + 0.114B
+            //  U = -0.147R - 0.289G + 0.436B
+            //  V =  0.615R - 0.515G - 0.100B
+
+            uint8_t r = (user_palette[i] & 0x000000ff);
+            uint8_t g = ((user_palette[i] >> 8) & 0x000000ff);
+            uint8_t b = ((user_palette[i] >> 16) & 0x000000ff);
+
+            float y = 0.299f * r + 0.587f * g + 0.114 * b;
+            float u = 0.492 * (b - y);
+            float v = 0.877 * (r - y);
+
+            c64_yuv_colors_0[i].y = y;
+            c64_yuv_colors_0[i].u = u ;
+            c64_yuv_colors_0[i].v = v ;
+
+            c64_yuv_colors_1[i].y = y;
+            c64_yuv_colors_1[i].u = u ;
+            c64_yuv_colors_1[i].v = v ;
+        }
+	}
 }
 
 void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOutPuffer,int VICOutPufferOffset,int OutXW,int OutYW,int InXW,int,bool)
 {
-    static uint8_t w0,w1,w2,w3;
+	// Outbuffer -> uint32 (ABGR)
+
+	float _y,_u,_v;
+	float r,g,b;
+	uint32_t rgb;
+
+    float _y0,_y1,_y2,_y3;
+    float _u0,_u1,_u2,_u3;
+    float _v0,_v1,_v2,_v3;
+
+    float _uf1,_uf2,_uf3;
+    float _vf1,_vf2,_vf3;
+
     video_source = VICOutPuffer;
     video_source += VICOutPufferOffset;
 
     if(is_crt_output)
     {
-        if(is_double2x)
-        {
-            for(int y=0;y<(OutYW/2);y++)
-            {
-                out_buffer = (static_cast<uint32_t*>(Outpuffer) + ((y*2)*Pitch/4));
-                out_buffer_scanline = (static_cast<uint32_t*>(Outpuffer) + (((y*2)+1)*(Pitch/4)));
+		if(is_double2x)
+		{
+			for(int y=0;y<(OutYW/2);y++)
+			{
+				out_buffer = (static_cast<uint32_t*>(Outpuffer) + ((y*2)*Pitch/4));
+				out_buffer_scanline = (static_cast<uint32_t*>(Outpuffer) + (((y*2)+1)*(Pitch/4)));
 
-                w0 = w1 = w2 = w3 = *video_source & 0x0F;
+                _y0 = _y1 = _y2 = _y3 = c64_yuv_colors_0[video_source[0] & 0x0f].y;
+                _u0 = _u1 = _u2 = _u3 = c64_yuv_colors_0[video_source[0] & 0x0f].u;
+                _v0 = _v1 = _v2 = _v3 = c64_yuv_colors_0[video_source[0] & 0x0f].v;
 
-                switch(y&1)
-                {
-                case 0:
-                    for(int x=0;x<(OutXW/2);x++)
-                    {
-                        *(out_buffer++) = BlurTable0[w0][w1][w2][w3];
-                        *(out_buffer++) = BlurTable0[w0][w1][w2][w3];
-                        *(out_buffer_scanline++) = BlurTable0S[w0][w1][w2][w3];
-                        *(out_buffer_scanline++) = BlurTable0S[w0][w1][w2][w3];
-                        w3 = w2;
-                        w2 = w1;
-                        w1 = w0;
-                        w0 = *(video_source+x+1) & 0x0F;
-                    }
-                    break;
-                case 1:
-                    for(int x=0;x<(OutXW/2);x++)
-                    {
-                        *(out_buffer++) = BlurTable1[w0][w1][w2][w3];
-                        *(out_buffer++) = BlurTable1[w0][w1][w2][w3];
-                        *(out_buffer_scanline++) = BlurTable1S[w0][w1][w2][w3];
-                        *(out_buffer_scanline++) = BlurTable1S[w0][w1][w2][w3];
-                        w3 = w2;
-                        w2 = w1;
-                        w1 = w0;
-                        w0 = *(video_source+x+1) & 0x0F;
-                    }
-                    break;
-                }
-                video_source = video_source+InXW;
-            }
-        }
-        else
-        { 
-            for(int y=0;y<OutYW;y++)
-            {
-                out_buffer = (static_cast<uint32_t*>(Outpuffer) + ((y)*Pitch/4));
-                out_buffer_scanline = (static_cast<uint32_t*>(Outpuffer) + (((y*2)+1)*(Pitch/4)));
+                for(int x=0;x<(OutXW);x++)
+				{
+					// from yuv to rgb
+					// R = Y + 1.140V
+					// G = Y - 0.395U - 0.581V
+					// B = Y + 2.032U
 
-                w0 = w1 = w2 = w3 = *video_source & 0x0F;
+                    int _x = x/2;
 
-                switch(y&1)
-                {
-                case 0:
-                    for(int x=0;x<(OutXW);x++)
+					// Pixel
+                    if(y & 1)
+					{
+                        _y0 = c64_yuv_colors_0[video_source[_x] & 0x0f].y;
+                        _u0 = c64_yuv_colors_0[video_source[_x] & 0x0f].u;
+                        _v0 = c64_yuv_colors_0[video_source[_x] & 0x0f].v;
+
+                        _uf1 = c64_yuv_colors_0[video_source[_x+1] & 0x0f].u;
+                        _uf2 = c64_yuv_colors_0[video_source[_x+2] & 0x0f].u;
+                        _uf3 = c64_yuv_colors_0[video_source[_x+3] & 0x0f].u;
+
+                        _vf1 = c64_yuv_colors_0[video_source[_x+1] & 0x0f].v;
+                        _vf2 = c64_yuv_colors_0[video_source[_x+2] & 0x0f].v;
+                        _vf3 = c64_yuv_colors_0[video_source[_x+3] & 0x0f].v;
+					}
+					else
                     {
-                        *(out_buffer++) = BlurTable0[w0][w1][w2][w3];
-                        w3 = w2;
-                        w2 = w1;
-                        w1 = w0;
-                        w0 = *(video_source+x+1) & 0x0F;
+                        _y0 = c64_yuv_colors_1[video_source[_x] & 0x0f].y;
+                        _u0 = c64_yuv_colors_1[video_source[_x] & 0x0f].u;
+                        _v0 = c64_yuv_colors_1[video_source[_x] & 0x0f].v;
+
+                        _uf1 = c64_yuv_colors_1[video_source[_x+1] & 0x0f].u;
+                        _uf2 = c64_yuv_colors_1[video_source[_x+2] & 0x0f].u;
+                        _uf3 = c64_yuv_colors_1[video_source[_x+3] & 0x0f].u;
+
+                        _vf1 = c64_yuv_colors_1[video_source[_x+1] & 0x0f].v;
+                        _vf2 = c64_yuv_colors_1[video_source[_x+2] & 0x0f].v;
+                        _vf3 = c64_yuv_colors_1[video_source[_x+3] & 0x0f].v;
                     }
-                    break;
-                case 1:
-                    for(int x=0;x<(OutXW);x++)
+
+                    // y blur
+                    switch(hor_blur_wy)
                     {
-						*(out_buffer++) = BlurTable1[w0][w1][w2][w3];
-                        w3 = w2;
-                        w2 = w1;
-                        w1 = w0;
-                        w0 = *(video_source+x+1) & 0x0F;
+                    case 1:
+                        _y = _y0;
+                        break;
+                    case 2:
+                        _y = (_y0 + _y1) / 2;
+                        _y1 = _y;
+                        break;
+                    case 3:
+                        _y = (_y0 + _y1 + _y2) / 3;
+                        _y2 = _y1;
+                        _y1 = _y;
+                        break;
+                    case 4:
+                        _y = (_y0 + _y1 + _y2 + _y3) / 4;
+                        _y3 = _y2;
+                        _y2 = _y1;
+                        _y1 = _y;
+                        break;
+                    default:
+                        _y = _y0;
+                        break;
                     }
-                    break;
-                }
-                video_source = video_source+InXW;
-            }
-        }
+
+                    // uv blur
+                    switch(hor_blur_wuv)
+                    {
+                    case 1:
+                        _u = _u0;
+                        _v = _v0;
+                        break;
+                    case 2:
+                        _u = (_u0 + _u1 + _uf1) / 3;
+                        _u1 = _u;
+                        _v = (_v0 + _v1 + _vf1) / 3;
+                        _v1 = _v;
+                        break;
+                    case 3:
+                        _u = (_u0 + _u1 + _u2 + _uf1 + _uf2) / 5;
+                        _u2 = _u1;
+                        _u1 = _u;
+                        _v = (_v0 + _v1 + _v2 + _vf1 + _vf2) / 5;
+                        _v2 = _v1;
+                        _v1 = _v;
+                        break;
+                    case 4:
+                        _u = (_u0 + _u1 + _u2 + _u3 + _uf1 + _uf2 + _uf3) / 7;
+                        _u3 = _u2;
+                        _u2 = _u1;
+                        _u1 = _u;
+                        _v = (_v0 + _v1 + _v2 + _v3 + _vf1 + _vf2 + _vf3) / 7;
+                        _v3 = _v2;
+                        _v2 = _v1;
+                        _v1 = _v;
+                        break;
+                    default:
+                        _u = _u0;
+                        _v = _v0;
+                        break;
+                    }
+
+                    /// PAL DELAY LINE
+                    if(enable_pal_delay_line)
+                    {
+                        if(!pal_delay_line_u_only)
+                        {
+                            _ut = (_u + _uo[x]) / 2.0f;
+                            _uo[x] = _u;
+                            _u = _ut;
+
+                            _vt = (_v + _vo[x]) / 2.0f;
+                            _vo[x] = _v;
+                            _v = _vt;
+                        }
+                        else
+                        {
+                            _ut = (_u + _uo[x]) / 2.0f;
+                            _uo[x] = _u;
+                            _u = _ut;
+                        }
+                    }
+
+                    if(!enable_user_palette_crt_mode)
+                    {
+                        _y += brightness;
+                        _u *= saturation;
+                        _v *= saturation;
+                        _y *= contrast;
+                        _u *= contrast;
+                        _v *= contrast;
+                    }
+
+					r = _y + 1.140f * _v;
+					g = _y - 0.395f * _u - 0.581f * _v;
+					b = _y + 2.032f * _u;
+
+					r = r * !(r<0);
+					g = g * !(g<0);
+					b = b * !(b<0);
+
+					r = r * (!(r>255)) + 255 * (r>255);
+					g = g * (!(g>255)) + 255 * (g>255);
+					b = b * (!(b>255)) + 255 * (b>255);
+
+
+					rgb =  static_cast<uint32_t>(r);       // Rot
+					rgb |= static_cast<uint32_t>(g)<<8;    // Grün
+					rgb |= static_cast<uint32_t>(b)<<16;   // Blau
+
+					rgb |= 0xFF000000;
+
+					*(out_buffer++) = rgb;
+
+					// Scanline
+					////////////////////////////////////////////////
+					_y *= scanline;
+
+					r = _y + 1.140f * _v;
+					g = _y - 0.395f * _u - 0.581f * _v;
+					b = _y + 2.032f * _u;
+
+					r = r * !(r<0);
+					g = g * !(g<0);
+					b = b * !(b<0);
+
+					r = r * (!(r>255)) + 255 * (r>255);
+					g = g * (!(g>255)) + 255 * (g>255);
+					b = b * (!(b>255)) + 255 * (b>255);
+
+					rgb =  static_cast<uint32_t>(r);       // Rot
+					rgb |= static_cast<uint32_t>(g)<<8;    // Grün
+					rgb |= static_cast<uint32_t>(b)<<16;   // Blau
+
+					rgb |= 0xFF000000;
+
+					*(out_buffer_scanline++) = rgb;
+				}
+				video_source = video_source+InXW;
+			}
+		}
+		else
+		{
+			for(int y=0;y<OutYW;y++)
+			{
+				out_buffer = (static_cast<uint32_t*>(Outpuffer) + ((y)*Pitch/4));
+
+                _y0 = _y1 = _y2 = _y3 = c64_yuv_colors_0[video_source[0] & 0x0f].y;
+                _u0 = _u1 = _u2 = _u3 = c64_yuv_colors_0[video_source[0] & 0x0f].u;
+                _v0 = _v1 = _v2 = _v3 = c64_yuv_colors_0[video_source[0] & 0x0f].v;
+
+				for(int x=0;x<(OutXW);x++)
+				{
+					// from yuv to rgb
+					// R = Y + 1.140V
+					// G = Y - 0.395U - 0.581V
+					// B = Y + 2.032U
+
+					// Pixel
+					if(y & 1)
+					{
+                        _y0 = c64_yuv_colors_0[video_source[x] & 0x0f].y;
+                        _u0 = c64_yuv_colors_0[video_source[x] & 0x0f].u;
+                        _v0 = c64_yuv_colors_0[video_source[x] & 0x0f].v;
+
+                        _uf1 = c64_yuv_colors_0[video_source[x+1] & 0x0f].u;
+                        _uf2 = c64_yuv_colors_0[video_source[x+2] & 0x0f].u;
+                        _uf3 = c64_yuv_colors_0[video_source[x+3] & 0x0f].u;
+
+                        _vf1 = c64_yuv_colors_0[video_source[x+1] & 0x0f].v;
+                        _vf2 = c64_yuv_colors_0[video_source[x+2] & 0x0f].v;
+                        _vf3 = c64_yuv_colors_0[video_source[x+3] & 0x0f].v;
+					}
+					else
+					{
+                        _y0 = c64_yuv_colors_1[video_source[x] & 0x0f].y;
+                        _u0 = c64_yuv_colors_1[video_source[x] & 0x0f].u;
+                        _v0 = c64_yuv_colors_1[video_source[x] & 0x0f].v;
+
+                        _uf1 = c64_yuv_colors_1[video_source[x+1] & 0x0f].u;
+                        _uf2 = c64_yuv_colors_1[video_source[x+2] & 0x0f].u;
+                        _uf3 = c64_yuv_colors_1[video_source[x+3] & 0x0f].u;
+
+                        _vf1 = c64_yuv_colors_1[video_source[x+1] & 0x0f].v;
+                        _vf2 = c64_yuv_colors_1[video_source[x+2] & 0x0f].v;
+                        _vf3 = c64_yuv_colors_1[video_source[x+3] & 0x0f].v;
+					}
+
+                    // y blur
+                    switch(hor_blur_wy)
+                    {
+                    case 1:
+                        _y = _y0;
+                        break;
+                    case 2:
+                        _y = (_y0 + _y1) / 2;
+                        _y1 = _y;
+                        break;
+                    case 3:
+                        _y = (_y0 + _y1 + _y2) / 3;
+                        _y2 = _y1;
+                        _y1 = _y;
+                        break;
+                    case 4:
+                        _y = (_y0 + _y1 + _y2 + _y3) / 4;
+                        _y3 = _y2;
+                        _y2 = _y1;
+                        _y1 = _y;
+                        break;
+                    default:
+                        _y = _y0;
+                        break;
+                    }
+
+                    // uv blur
+                    switch(hor_blur_wuv)
+                    {
+                    case 1:
+                        _u = _u0;
+                        _v = _v0;
+                        break;
+                    case 2:
+                        _u = (_u0 + _u1 + _uf1) / 3;
+                        _u1 = _u;
+                        _v = (_v0 + _v1 + _vf1) / 3;
+                        _v1 = _v;
+                        break;
+                    case 3:
+                        _u = (_u0 + _u1 + _u2 + _uf1 + _uf2) / 5;
+                        _u2 = _u1;
+                        _u1 = _u;
+                        _v = (_v0 + _v1 + _v2 + _vf1 + _vf2) / 5;
+                        _v2 = _v1;
+                        _v1 = _v;
+                        break;
+                    case 4:
+                        _u = (_u0 + _u1 + _u2 + _u3 + _uf1 + _uf2 + _uf3) / 7;
+                        _u3 = _u2;
+                        _u2 = _u1;
+                        _u1 = _u;
+                        _v = (_v0 + _v1 + _v2 + _v3 + _vf1 + _vf2 + _vf3) / 7;
+                        _v3 = _v2;
+                        _v2 = _v1;
+                        _v1 = _v;
+                        break;
+                    default:
+                        _u = _u0;
+                        _v = _v0;
+                        break;
+                    }
+
+					/// PAL DELAY LINE
+					if(enable_pal_delay_line)
+					{
+                        if(!pal_delay_line_u_only)
+                        {
+                            _ut = (_u + _uo[x]) / 2.0f;
+                            _uo[x] = _u;
+                            _u = _ut;
+
+                            _vt = (_v + _vo[x]) / 2.0f;
+                            _vo[x] = _v;
+                            _v = _vt;
+                        }
+                        else
+                        {
+                            _ut = (_u + _uo[x]) / 2.0f;
+                            _uo[x] = _u;
+                            _u = _ut;
+                        }
+					}
+
+                    if(!enable_user_palette_crt_mode)
+                    {
+                        _y += brightness;
+                        _u *= saturation;
+                        _v *= saturation;
+                        _y *= contrast;
+                        _u *= contrast;
+                        _v *= contrast;
+                    }
+
+					r = _y + 1.140f * _v;
+					g = _y - 0.395f * _u - 0.581f * _v;
+					b = _y + 2.032f * _u;
+
+					r = r * !(r<0);
+					g = g * !(g<0);
+					b = b * !(b<0);
+
+					r = r * (!(r>255)) + 255 * (r>255);
+					g = g * (!(g>255)) + 255 * (g>255);
+					b = b * (!(b>255)) + 255 * (b>255);
+
+					rgb =  static_cast<uint32_t>(r);       // Rot
+					rgb |= static_cast<uint32_t>(g)<<8;    // Grün
+					rgb |= static_cast<uint32_t>(b)<<16;   // Blau
+
+					rgb |= 0xFF000000;
+
+					*(out_buffer++) = rgb;
+				}
+				video_source = video_source+InXW;
+			}
+		}
     }
+	else
     //////////////////////////////////////////////////////////////////////////
     ///////////////////// AUSGABE ÜBER NORMALE FARBPALETTE ///////////////////
-    else
     if(is_double2x)
     {
         for(int y=0;y<(OutYW/2);y++)

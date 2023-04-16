@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.03.2022                //
+// Letzte Änderung am 16.04.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -29,6 +29,7 @@
 #include <stdlib.h>
 
 /// Windows ///
+#include "./structs.h"
 #include "./custom_splashscreen.h"
 #include "./widget_floppy_status.h"
 #include "./info_window.h"
@@ -130,19 +131,15 @@ private slots:
     void on_actionGEO_loeschen_triggered();
     void on_actionVollbild_triggered();
     void on_actionBandlaufwerk_1530_triggered();
+    void on_actionC64_Tastenbelegung_Show_triggered();
+    void on_actionVideo_Capture_triggered();
+    void on_actionSID_Dump_triggered();
+    void on_actionAudio_Oszilloskop_triggered();
 
     void OnChangeGrafikModi(bool fullscreen, bool palmode, bool doublemode, bool filter);
     void OnChangeFloppyImage(int floppynr);
     void OnResetScreenshotCounter(void);
     void OnSetupFished(int result);
-
-    void on_actionC64_Tastenbelegung_Show_triggered();
-
-    void on_actionVideo_Capture_triggered();
-
-    void on_actionSID_Dump_triggered();
-
-    void on_actionAudio_Oszilloskop_triggered();
 
 private:
     /// Funktionen ///
@@ -153,8 +150,14 @@ private:
 	void ExecuteCommandLine(QStringList string_list);
     void SplashMessage(const QString &message, const QColor &color);
 	void AutoLoadAndRun(QString filename);
+    bool ParseVersionNumber(QString version_string);
+    int CompareVersionNumber(const VERSION_NUMBER *version1, const VERSION_NUMBER *version2); // compare result from version number in the ini file. INI Version: 0 = is equal, -1 is lesser, 1 = is greater
+    void FixedVersionSettings();
 
-    /// Varialen ///
+    /// Variablen ///
+    VERSION_NUMBER version_number;
+    bool version_number_is_ok;   // is false then is the version number bad
+
     QTranslator appTranslator;   // Application Translator
     QTranslator qtTranslator;    // Qt library Translator
 

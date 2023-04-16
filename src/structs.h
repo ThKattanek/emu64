@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.03.2022                //
+// Letzte Änderung am 16.04.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -338,6 +338,14 @@ struct C64_KEYS
     unsigned char MatrixCode;
     int SDLKeyCode;
     bool          Shift;
+};
+
+struct VERSION_NUMBER
+{
+    int major;
+    int minor;
+    int micro;
+    int build;
 };
 
 #endif // STRUCTS_H

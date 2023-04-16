@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.05.2021                //
+// Letzte Änderung am 16.04.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,15 +16,7 @@
 #ifndef VIDEOCRT_CLASS_H
 #define VIDEOCRT_CLASS_H
 
-#include "structs.h"
 #include <stdint.h>
-
-struct VIC_COLOR_STRUCT
-{
-    float luminace;
-    float angel;
-    float direction;
-};
 
 typedef struct COLOR_STRUCT
 {
@@ -37,9 +29,13 @@ typedef struct COLOR_STRUCT
 
 } COLOR_STRUCT, *LPCOLOR_STRUCT;
 
+typedef struct YUV_COLOR
+{
+	float y,u,v;
+} YUV_COLOR, *LPYUV_COLOR;
+
 class VideoCrtClass
 {
-
 public:
         VideoCrtClass();
         ~VideoCrtClass();
@@ -58,6 +54,8 @@ public:
         void EnableCrtOutput(bool enabled);
 		void EnableUserPalette(bool enabled);
 		void EnableUserPaletteCrtMode(bool enabled);
+		void EnablePalDelayLine(bool enabled);
+        void PalDelayLineUOnly(bool enabled);
 		void SetUserPaletteColor(int color_number, uint8_t r, uint8_t g, uint8_t b);
         float *GetC64YUVPalette();
 
@@ -65,6 +63,8 @@ public:
         bool start_c64_is_palmode;
 
 private:
+        void CreateVicIIColors(void);
+
         inline void ConvertYUVToRGB(COLOR_STRUCT *color_out);
 		inline void ConvertRGBToYUV();
 
@@ -85,33 +85,23 @@ private:
 		bool enable_user_palette_crt_mode;			// im CRT Modus
 		//////////////////////////////////////////
 
-        float		c64_yuv_palette0[16*3];
-        float		c64_yuv_palette1[16*3];
-
-        void CreateVicIIColors(void);
-
-        float blur_y_mul;
-        float blur_uv_mul;
-
-        uint32_t rgb;
-        float _y,_u,_v;
-
-        float  _y1,_u1,_v1;
-        float  _y2,_u2,_v2;
+        float   _y,_u,_v;
+        float   _y1,_u1,_v1;
         float   _ut,_vt;
-        float   _uo[1024],_vo[1024];
+		float   _uo[1024],_vo[1024];
         int16_t r,g,b;
-        float   blur_y_sum;
-        float   blur_u_sum;
-        float   blur_v_sum;
+
+        YUV_COLOR c64_yuv_colors_0[16];
+        YUV_COLOR c64_yuv_colors_1[16];
 
         float sector;
         float origin;
         float radian;
-        float screen;
 
         //// Einstellbare Werte
         bool    is_first_pal_vic_revision;  // true = first VIC revision, false = all revisions > 1
+		bool	enable_pal_delay_line;		// true = pal delay line is eanable (u+v)
+        bool    pal_delay_line_u_only;      // true = pal delay liny is u only
         float	saturation;                 // 0 - 1
         float	brightness;                 // 0 - 1
         float	contrast;                   // 0 - 1
@@ -119,11 +109,5 @@ private:
         int32_t	hor_blur_wuv;
         int32_t phase_alternating_line;		// 0 - 2000
         float   scanline;
-
-        // NEU //
-        uint32_t BlurTable0[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
-        uint32_t BlurTable1[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
-        uint32_t BlurTable0S[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
-        uint32_t BlurTable1S[16][16][16][16];	// 16 ^ 4 (Für Maximal 4 Pixel Blur)
 };
 #endif // VIDEOCRT_CLASS_H
