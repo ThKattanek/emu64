@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.04.2023                //
+// Letzte Änderung am 16.04.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -133,6 +133,11 @@ void VideoCrtSetupWindow::RetranslateUi()
 {
     ui->retranslateUi(this);
     this->update();
+}
+
+void VideoCrtSetupWindow::ResetAllSettings()
+{
+    on_Reset_clicked();
 }
 
 void VideoCrtSetupWindow::on_saettigung_scroll_valueChanged(int value)

@@ -29,6 +29,7 @@
 #include <stdlib.h>
 
 /// Windows ///
+#include "./structs.h"
 #include "./custom_splashscreen.h"
 #include "./widget_floppy_status.h"
 #include "./info_window.h"
@@ -150,10 +151,11 @@ private:
     void SplashMessage(const QString &message, const QColor &color);
 	void AutoLoadAndRun(QString filename);
     bool ParseVersionNumber(QString version_string);
-    int CompareIniVersionNumber(); // compare result from version number in the ini file. INI Version: 0 = is equal, -1 is lesser, 1 = is greater
+    int CompareVersionNumber(const VERSION_NUMBER *version1, const VERSION_NUMBER *version2); // compare result from version number in the ini file. INI Version: 0 = is equal, -1 is lesser, 1 = is greater
+    void FixedVersionSettings();
 
     /// Variablen ///
-    int version_number[4];       // [0] = major, [1] = minor, [2] = micro, [3] = build
+    VERSION_NUMBER version_number;
     bool version_number_is_ok;   // is false then is the version number bad
 
     QTranslator appTranslator;   // Application Translator
