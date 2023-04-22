@@ -472,12 +472,17 @@ void DebuggerWindow::onReg_label_clicked(LabelWidgetMod* label)
     if(label->objectName() == "yr_out") current_edit_reg = 4;
     if(label->objectName() == "sr_out") current_edit_reg = 5;
 
-    ui->EingabeFeld->setGeometry(label->geometry());
+    QRect geometry = label->geometry();
+
+    geometry.setHeight(geometry.height()+5);
+
+    ui->EingabeFeld->setGeometry(geometry);
 
     ui->EingabeFeld->setText(label->text());
     ui->EingabeFeld->selectAll();
-    ui->EingabeFeld->show();
+
     ui->EingabeFeld->setFocus();
+    ui->EingabeFeld->show();
 }
 
 void DebuggerWindow::on_EingabeFeld_returnPressed()

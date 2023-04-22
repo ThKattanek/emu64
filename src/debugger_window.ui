@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1295</width>
-    <height>908</height>
+    <height>915</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -149,15 +149,134 @@
           </property>
           <item>
            <layout class="QGridLayout" name="gridLayout">
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
             <property name="spacing">
              <number>3</number>
             </property>
+            <item row="0" column="2">
+             <widget class="QLabel" name="label_irq">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>Zeigt den Inhalt des IRQ Hardware Vektors $FFFE an.</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 150);</string>
+              </property>
+              <property name="text">
+               <string notr="true">IRQ:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2">
+             <widget class="QLabel" name="label_0318">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>Zeigt den Inhalt des NMI Vektors $0318 an.</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 150);</string>
+              </property>
+              <property name="text">
+               <string notr="true">0318:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="LabelWidgetMod" name="yr_out">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>10</pointsize>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>Um den Wert zu ändern, bitte drauf klicken und mit RETURN bestätigen.
+Es können folgende Zahlenformate eingegeben werden.
+
+- ohne Vorzeichen Dezimalsystem (Bsp. 128)
+- $ Hexadezinal System (Bsp. $a7)</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 150);
+background-color: rgb(220,220, 255);</string>
+              </property>
+              <property name="text">
+               <string notr="true">$00</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_sp">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>Zeigt den aktuellen Inhalt des Stackzeiger Registers + $100 an.</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 150);</string>
+              </property>
+              <property name="text">
+               <string notr="true">SP:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="LabelWidgetMod" name="sp_out">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>10</pointsize>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>Um den Wert zu ändern, bitte drauf klicken und mit RETURN bestätigen.
+Es können folgende Zahlenformate eingegeben werden.
+
+- ohne Vorzeichen Dezimalsystem (Bsp. 128)
+- $ Hexadezinal System (Bsp. $a7)</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 150);
+background-color: rgb(220,220, 255);</string>
+              </property>
+              <property name="text">
+               <string notr="true">$0100</string>
+              </property>
+             </widget>
+            </item>
             <item row="3" column="3">
              <widget class="QLabel" name="_0318_out">
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>9</pointsize>
+                <pointsize>10</pointsize>
                 <bold>true</bold>
                </font>
               </property>
@@ -169,12 +288,122 @@
               </property>
              </widget>
             </item>
+            <item row="2" column="1">
+             <widget class="LabelWidgetMod" name="ac_out">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>10</pointsize>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>Um den Wert zu ändern, bitte drauf klicken und mit RETURN bestätigen.
+Es können folgende Zahlenformate eingegeben werden.
+
+- ohne Vorzeichen Dezimalsystem (Bsp. 128)
+- $ Hexadezinal System (Bsp. $a7)</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 150);
+background-color: rgb(220,220, 255);</string>
+              </property>
+              <property name="text">
+               <string notr="true">$00</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QLabel" name="label_0314">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>Zeigt den Inhalt des IRQ Vektors $0314 an.</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 150);</string>
+              </property>
+              <property name="text">
+               <string notr="true">0314:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_yr">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>Zeigt den aktuellen Inhalt des Y Registers an.</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 150);</string>
+              </property>
+              <property name="text">
+               <string notr="true">YR:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="LabelWidgetMod" name="pc_out">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>10</pointsize>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>Um den Wert zu ändern, bitte drauf klicken und mit RETURN bestätigen.
+Es können folgende Zahlenformate eingegeben werden.
+
+- ohne Vorzeichen Dezimalsystem (Bsp. 128)
+- $ Hexadezinal System (Bsp. $a7)</string>
+              </property>
+              <property name="statusTip">
+               <string/>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 150);
+background-color: rgb(220,220, 255);</string>
+              </property>
+              <property name="text">
+               <string notr="true">$FFFF</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QLabel" name="label_nmi">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="toolTip">
+               <string>Zeigt den Inhalt des NMI Hardware Vektors $FFFA an.</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 150);</string>
+              </property>
+              <property name="text">
+               <string notr="true">NMI:</string>
+              </property>
+             </widget>
+            </item>
             <item row="2" column="0">
              <widget class="QLabel" name="label_ac">
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>9</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="toolTip">
@@ -201,31 +430,12 @@
               </property>
              </spacer>
             </item>
-            <item row="2" column="2">
-             <widget class="QLabel" name="label_nmi">
+            <item row="3" column="1">
+             <widget class="LabelWidgetMod" name="xr_out">
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>9</pointsize>
-               </font>
-              </property>
-              <property name="toolTip">
-               <string>Zeigt den Inhalt des NMI Hardware Vektors $FFFA an.</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 150);</string>
-              </property>
-              <property name="text">
-               <string notr="true">NMI:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="LabelWidgetMod" name="ac_out">
-              <property name="font">
-               <font>
-                <family>Arial</family>
-                <pointsize>9</pointsize>
+                <pointsize>10</pointsize>
                 <bold>true</bold>
                </font>
               </property>
@@ -250,214 +460,7 @@ background-color: rgb(220,220, 255);</string>
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>9</pointsize>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 150);</string>
-              </property>
-              <property name="text">
-               <string notr="true">$FFFF</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_xr">
-              <property name="font">
-               <font>
-                <family>Arial</family>
-                <pointsize>9</pointsize>
-               </font>
-              </property>
-              <property name="toolTip">
-               <string>Zeigt den aktuellen Inhalt des X Registers an.</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 150);</string>
-              </property>
-              <property name="text">
-               <string notr="true">XR:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="LabelWidgetMod" name="xr_out">
-              <property name="font">
-               <font>
-                <family>Arial</family>
-                <pointsize>9</pointsize>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="toolTip">
-               <string>Um den Wert zu ändern, bitte drauf klicken und mit RETURN bestätigen.
-Es können folgende Zahlenformate eingegeben werden.
-
-- ohne Vorzeichen Dezimalsystem (Bsp. 128)
-- $ Hexadezinal System (Bsp. $a7)</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 150);
-background-color: rgb(220,220, 255);</string>
-              </property>
-              <property name="text">
-               <string notr="true">$00</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="LabelWidgetMod" name="sp_out">
-              <property name="font">
-               <font>
-                <family>Arial</family>
-                <pointsize>9</pointsize>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="toolTip">
-               <string>Um den Wert zu ändern, bitte drauf klicken und mit RETURN bestätigen.
-Es können folgende Zahlenformate eingegeben werden.
-
-- ohne Vorzeichen Dezimalsystem (Bsp. 128)
-- $ Hexadezinal System (Bsp. $a7)</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 150);
-background-color: rgb(220,220, 255);</string>
-              </property>
-              <property name="text">
-               <string notr="true">$0100</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="LabelWidgetMod" name="pc_out">
-              <property name="font">
-               <font>
-                <family>Arial</family>
-                <pointsize>9</pointsize>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="toolTip">
-               <string>Um den Wert zu ändern, bitte drauf klicken und mit RETURN bestätigen.
-Es können folgende Zahlenformate eingegeben werden.
-
-- ohne Vorzeichen Dezimalsystem (Bsp. 128)
-- $ Hexadezinal System (Bsp. $a7)</string>
-              </property>
-              <property name="statusTip">
-               <string/>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 150);
-background-color: rgb(220,220, 255);</string>
-              </property>
-              <property name="text">
-               <string notr="true">$FFFF</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="3">
-             <widget class="QLabel" name="_0314_out">
-              <property name="font">
-               <font>
-                <family>Arial</family>
-                <pointsize>9</pointsize>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 150);</string>
-              </property>
-              <property name="text">
-               <string notr="true">$FFFF</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="label_yr">
-              <property name="font">
-               <font>
-                <family>Arial</family>
-                <pointsize>9</pointsize>
-               </font>
-              </property>
-              <property name="toolTip">
-               <string>Zeigt den aktuellen Inhalt des Y Registers an.</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 150);</string>
-              </property>
-              <property name="text">
-               <string notr="true">YR:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="2">
-             <widget class="QLabel" name="label_0318">
-              <property name="font">
-               <font>
-                <family>Arial</family>
-                <pointsize>9</pointsize>
-               </font>
-              </property>
-              <property name="toolTip">
-               <string>Zeigt den Inhalt des NMI Vektors $0318 an.</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 150);</string>
-              </property>
-              <property name="text">
-               <string notr="true">0318:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <widget class="QLabel" name="label_irq">
-              <property name="font">
-               <font>
-                <family>Arial</family>
-                <pointsize>9</pointsize>
-               </font>
-              </property>
-              <property name="toolTip">
-               <string>Zeigt den Inhalt des IRQ Hardware Vektors $FFFE an.</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 150);</string>
-              </property>
-              <property name="text">
-               <string notr="true">IRQ:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="2">
-             <widget class="QLabel" name="label_0314">
-              <property name="font">
-               <font>
-                <family>Arial</family>
-                <pointsize>9</pointsize>
-               </font>
-              </property>
-              <property name="toolTip">
-               <string>Zeigt den Inhalt des IRQ Vektors $0314 an.</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 150);</string>
-              </property>
-              <property name="text">
-               <string notr="true">0314:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="3">
-             <widget class="QLabel" name="irq_out">
-              <property name="font">
-               <font>
-                <family>Arial</family>
-                <pointsize>9</pointsize>
+                <pointsize>10</pointsize>
                 <bold>true</bold>
                </font>
               </property>
@@ -474,7 +477,7 @@ background-color: rgb(220,220, 255);</string>
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>9</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="toolTip">
@@ -488,47 +491,56 @@ background-color: rgb(220,220, 255);</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_sp">
+            <item row="1" column="3">
+             <widget class="QLabel" name="_0314_out">
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>9</pointsize>
+                <pointsize>10</pointsize>
+                <bold>true</bold>
                </font>
-              </property>
-              <property name="toolTip">
-               <string>Zeigt den aktuellen Inhalt des Stackzeiger Registers + $100 an.</string>
               </property>
               <property name="styleSheet">
                <string notr="true">color: rgb(0, 0, 150);</string>
               </property>
               <property name="text">
-               <string notr="true">SP:</string>
+               <string notr="true">$FFFF</string>
               </property>
              </widget>
             </item>
-            <item row="4" column="1">
-             <widget class="LabelWidgetMod" name="yr_out">
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_xr">
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>9</pointsize>
-                <bold>true</bold>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="toolTip">
-               <string>Um den Wert zu ändern, bitte drauf klicken und mit RETURN bestätigen.
-Es können folgende Zahlenformate eingegeben werden.
-
-- ohne Vorzeichen Dezimalsystem (Bsp. 128)
-- $ Hexadezinal System (Bsp. $a7)</string>
+               <string>Zeigt den aktuellen Inhalt des X Registers an.</string>
               </property>
               <property name="styleSheet">
-               <string notr="true">color: rgb(0, 0, 150);
-background-color: rgb(220,220, 255);</string>
+               <string notr="true">color: rgb(0, 0, 150);</string>
               </property>
               <property name="text">
-               <string notr="true">$00</string>
+               <string notr="true">XR:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QLabel" name="irq_out">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>10</pointsize>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 150);</string>
+              </property>
+              <property name="text">
+               <string notr="true">$FFFF</string>
               </property>
              </widget>
             </item>
@@ -544,7 +556,7 @@ background-color: rgb(220,220, 255);</string>
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>9</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="toolTip">
@@ -566,7 +578,7 @@ background-color: rgb(220,220, 255);</string>
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>9</pointsize>
+                <pointsize>10</pointsize>
                 <bold>true</bold>
                </font>
               </property>
@@ -593,6 +605,36 @@ background-color: rgb(220,220, 255);</string>
              </spacer>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="EingabeFeld">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <family>Noto Sans</family>
+              <pointsize>10</pointsize>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">border: 1px solid rgb(0,0,0);
+background-color: rgb(255, 255, 255);</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="readOnly">
+             <bool>false</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -2193,36 +2235,6 @@ border-right-color: rgb(255, 255, 255);</string>
         <string>Auf Null stellen</string>
        </property>
       </widget>
-     </widget>
-     <widget class="QLineEdit" name="EingabeFeld">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>16</width>
-        <height>14</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Noto Sans</family>
-        <pointsize>9</pointsize>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border: 1px solid rgb(0,0,0);
-background-color: rgb(255, 255, 255);</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="readOnly">
-       <bool>false</bool>
-      </property>
      </widget>
     </widget>
    </item>
