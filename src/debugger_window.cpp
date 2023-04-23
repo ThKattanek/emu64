@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.04.2020                //
+// Letzte Änderung am 23.04.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -26,7 +26,8 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     ui(new Ui::DebuggerWindow),
     memory_window(nullptr),
     vic_window(nullptr),
-    iec_window(nullptr)
+    iec_window(nullptr),
+    input_window(nullptr)
 {    
     this->ini = ini;
     c64 = nullptr;
@@ -44,6 +45,8 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     // Center Window
     setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
+    input_window = new InputBoxWindow(this);
+
     memory_window = new MemoryWindow(this);
     memory_window->ChangeSource(0);
 
@@ -57,7 +60,6 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
 
     icon_off = new QIcon(":/grafik/blue_led_off.png");
     icon_on = new QIcon(":/grafik/blue_led_on.png");
-    ui->EingabeFeld->hide();
 
     QFontDatabase fontDB;
     fontDB.addApplicationFont(":/fonts/lucon.ttf");
@@ -441,8 +443,6 @@ void DebuggerWindow::onSr_widget_ValueChange(uint8_t value)
 {
     on_AnimationStop_clicked();
 
-    ui->EingabeFeld->hide();
-
     REG_STRUCT cpu_reg;
     cpu_reg.reg_mask = REG_MASK_SR;
     cpu_reg.sr = value;
@@ -455,8 +455,13 @@ void DebuggerWindow::onSr_widget_ValueChange(uint8_t value)
     if(current_source > 0)
     {
         c64->floppy[currnet_floppy_nr]->SetCpuReg(&cpu_reg);
+        c64->floppy[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr], &floppy_cpu_ireg[currnet_floppy_nr]);
     }
-    else c64->cpu->SetRegister(&cpu_reg);
+    else
+    {
+        c64->cpu->SetRegister(&cpu_reg);
+        c64->cpu->GetRegister(&c64_cpu_reg);
+    }
 }
 
 void DebuggerWindow::onReg_label_clicked(LabelWidgetMod* label)
@@ -472,123 +477,114 @@ void DebuggerWindow::onReg_label_clicked(LabelWidgetMod* label)
     if(label->objectName() == "yr_out") current_edit_reg = 4;
     if(label->objectName() == "sr_out") current_edit_reg = 5;
 
-    QRect geometry = label->geometry();
-
-    geometry.setHeight(geometry.height()+5);
-
-    ui->EingabeFeld->setGeometry(geometry);
-
-    ui->EingabeFeld->setText(label->text());
-    ui->EingabeFeld->selectAll();
-
-    ui->EingabeFeld->setFocus();
-    ui->EingabeFeld->show();
-}
-
-void DebuggerWindow::on_EingabeFeld_returnPressed()
-{
-    if(current_edit_reg == -1)
-    {
-        ui->EingabeFeld->hide();
-        return;
-    }
-
-    bool ok;
-    QString in_str = ui->EingabeFeld->text();
-    uint16_t value;
-
-    if(in_str.left(1) == "$") in_str.replace(0, 1, "0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
-
-    value = in_str.toUShort(&ok, 0);
-
-    if(!ok)
-    {
-        QMessageBox::warning(this, tr("Eingabefehler..."), tr("Es wurde kein gültiges Zahlenformat benutzt !"));
-        return;
-    }
-
-    REG_STRUCT cpu_reg;
-
     switch(current_edit_reg)
     {
     case 0:
-        cpu_reg.reg_mask = REG_MASK_PC;
-        cpu_reg.pc = value;
+        input_window->setWindowTitle(tr("Program Counter (PC)"));
+        input_window->setRange_max(0xffff);
+        if(current_source > 0)
+            input_window->setValue(floppy_cpu_reg[currnet_floppy_nr].pc);
+        else
+            input_window->setValue(c64_cpu_reg.pc);
         break;
     case 1:
-        if(value > 0x100) value -= 0x100;
-        if(value > 0xFF)
-        {
-            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Der Wert muss zwischen 0 und 511 liegen !"));
-            return;
-        }
-        cpu_reg.reg_mask = REG_MASK_SP;
-        cpu_reg.sp = static_cast<uint8_t>(value);
+        input_window->setWindowTitle(tr("Stack Pointer (SP)"));
+        input_window->setRange_max(0xff);
+        if(current_source > 0)
+            input_window->setValue(floppy_cpu_reg[currnet_floppy_nr].sp);
+        else
+            input_window->setValue(c64_cpu_reg.sp);
         break;
     case 2:
-        if(value > 0xFF)
-        {
-            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Der Wert muss zwischen 0 und 255 liegen !"));
-            return;
-        }
-        cpu_reg.reg_mask = REG_MASK_AC;
-        cpu_reg.ac = static_cast<uint8_t>(value);
+        input_window->setWindowTitle(tr("Accumulator (AC)"));
+        input_window->setRange_max(0xff);
+        if(current_source > 0)
+            input_window->setValue(floppy_cpu_reg[currnet_floppy_nr].ac);
+        else
+            input_window->setValue(c64_cpu_reg.ac);
         break;
     case 3:
-        if(value > 0xFF)
-        {
-            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Der Wert muss zwischen 0 und 255 liegen !"));
-            return;
-        }
-        cpu_reg.reg_mask = REG_MASK_XR;
-        cpu_reg.xr = static_cast<uint8_t>(value);
+        input_window->setWindowTitle(tr("X Register (XR)"));
+        input_window->setRange_max(0xff);
+        if(current_source > 0)
+            input_window->setValue(floppy_cpu_reg[currnet_floppy_nr].xr);
+        else
+            input_window->setValue(c64_cpu_reg.xr);
         break;
     case 4:
-        if(value > 0xFF)
-        {
-            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Der Wert muss zwischen 0 und 255 liegen !"));
-            return;
-        }
-        cpu_reg.reg_mask = REG_MASK_YR;
-        cpu_reg.yr = static_cast<uint8_t>(value);
+        input_window->setWindowTitle(tr("Y Register (YR)"));
+        input_window->setRange_max(0xff);
+        if(current_source > 0)
+            input_window->setValue(floppy_cpu_reg[currnet_floppy_nr].yr);
+        else
+            input_window->setValue(c64_cpu_reg.yr);
         break;
     case 5:
-        if(value > 0xFF)
-        {
-            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Der Wert muss zwischen 0 und 255 liegen !"));
-            return;
-        }
-        cpu_reg.reg_mask = REG_MASK_SR;
-        cpu_reg.sr = static_cast<uint8_t>(value);
+        input_window->setWindowTitle(tr("Status Register (SR)"));
+        input_window->setRange_max(0xff);
+        if(current_source > 0)
+            input_window->setValue(floppy_cpu_reg[currnet_floppy_nr].sr);
+        else
+            input_window->setValue(c64_cpu_reg.sr);
         break;
     }
 
-    if(current_source > 0)
+    if(input_window->exec())
     {
-        c64->floppy[currnet_floppy_nr]->SetCpuReg(&cpu_reg);
-        c64->floppy[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr], &floppy_cpu_ireg[currnet_floppy_nr]);
-    }
-    else
-    {
-        c64->cpu->SetRegister(&cpu_reg);
-        c64->cpu->GetRegister(&c64_cpu_reg);
-    }
+        uint64_t value = input_window->getValue();
+        REG_STRUCT cpu_reg;
 
-    current_edit_reg = -1;
-    ui->EingabeFeld->hide();
-    UpdateRegister();
+        switch(current_edit_reg)
+        {
+        case 0:
+            cpu_reg.reg_mask = REG_MASK_PC;
+            cpu_reg.pc = value;
+            break;
+        case 1:
+            cpu_reg.reg_mask = REG_MASK_SP;
+            cpu_reg.sp = static_cast<uint8_t>(value);
+            break;
+        case 2:
+            cpu_reg.reg_mask = REG_MASK_AC;
+            cpu_reg.ac = static_cast<uint8_t>(value);
+            break;
+        case 3:
+            cpu_reg.reg_mask = REG_MASK_XR;
+            cpu_reg.xr = static_cast<uint8_t>(value);
+            break;
+        case 4:
+            cpu_reg.reg_mask = REG_MASK_YR;
+            cpu_reg.yr = static_cast<uint8_t>(value);
+            break;
+        case 5:
+            cpu_reg.reg_mask = REG_MASK_SR;
+            cpu_reg.sr = static_cast<uint8_t>(value);
+            break;
+        }
+
+        if(current_source > 0)
+        {
+            c64->floppy[currnet_floppy_nr]->SetCpuReg(&cpu_reg);
+            c64->floppy[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr], &floppy_cpu_ireg[currnet_floppy_nr]);
+        }
+        else
+        {
+            c64->cpu->SetRegister(&cpu_reg);
+            c64->cpu->GetRegister(&c64_cpu_reg);
+        }
+
+        UpdateRegister();
+    }
 }
 
 void DebuggerWindow::on_OneZyklus_clicked()
 {
-    ui->EingabeFeld->hide();
     ClearAllBreakpointBackcolors();
     c64->OneCycle();
 }
 
 void DebuggerWindow::on_OneOpcode_clicked()
 {
-    ui->EingabeFeld->hide();
     ClearAllBreakpointBackcolors();
     c64->OneOpcode(current_source);
 }
@@ -1279,7 +1275,6 @@ void DebuggerWindow::on_AnimationStart_clicked()
     ui->AssAdresseIn->setEnabled(false);
     ui->AssMnemonicIn->setEnabled(false);
     ui->AssAdressierungIn->setEnabled(false);
-    ui->EingabeFeld->setVisible(false);
 
     c64->SetDebugAnimation(true);
 }
@@ -2139,7 +2134,6 @@ void DebuggerWindow::RefreshGUI(void)
         FillDisassemblyList(c64_cpu_ireg.current_opcode_pc,false);
     }
 
-    ui->EingabeFeld->hide();
     UpdateRegister();
     FillHistoryList(static_cast<uint8_t>(ui->HistoryScroll->value()));
     memory_window->UpdateMemoryList();

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.04.2020                //
+// Letzte Änderung am 23.04.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -30,6 +30,7 @@
 #include "./memory_window.h"
 #include "./debugger_vic_window.h"
 #include "./debugger_iec_window.h"
+#include "./input_box_window.h"
 
 #define DISASS_ROW 20
 #define HISTORY_ROW 7
@@ -60,7 +61,6 @@ public:
 
 private slots:
     void on_OneOpcode_clicked();
-    void on_EingabeFeld_returnPressed();
     void on_OneZyklus_clicked();
     void on_CycleCounterReset_clicked();
     void on_ChangeSource_currentIndexChanged(int index);
@@ -109,6 +109,7 @@ private:
 
     C64Class *c64;
     Ui::DebuggerWindow *ui;
+    InputBoxWindow *input_window;
     MemoryWindow *memory_window;
     DebuggerVicWindow *vic_window;
     DebuggerIECWindow *iec_window;
