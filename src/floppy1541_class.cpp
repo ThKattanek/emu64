@@ -829,12 +829,18 @@ void Floppy1541::WriteByte(uint16_t address, uint8_t value)
     WriteProcTbl[(address)>>8](address,value);
 }
 
-void Floppy1541::GetCpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg)
+void Floppy1541::GetCpuReg(REG_STRUCT *reg, IREG_STRUCT *ireg)
 {
     if(!FloppyEnabled) return;
-    cpu->GetInterneRegister(ireg);
-    ireg->cycle_counter = CycleCounter;
-    cpu->GetRegister(reg);
+
+    if(ireg != nullptr)
+    {
+        cpu->GetInterneRegister(ireg);
+        ireg->cycle_counter = CycleCounter;
+    }
+
+    if(reg != nullptr)
+        cpu->GetRegister(reg);
 }
 
 void Floppy1541::SetCpuReg(REG_STRUCT *reg)
