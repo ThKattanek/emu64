@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1295</width>
-    <height>915</height>
+    <height>946</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -605,36 +605,6 @@ background-color: rgb(220,220, 255);</string>
              </spacer>
             </item>
            </layout>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="EingabeFeld">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="font">
-             <font>
-              <family>Noto Sans</family>
-              <pointsize>10</pointsize>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">border: 1px solid rgb(0,0,0);
-background-color: rgb(255, 255, 255);</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="readOnly">
-             <bool>false</bool>
-            </property>
-           </widget>
           </item>
          </layout>
         </widget>
