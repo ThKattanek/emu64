@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1256</width>
-    <height>946</height>
+    <width>772</width>
+    <height>711</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -37,6 +37,18 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="leftMargin">
+      <number>2</number>
+     </property>
+     <property name="topMargin">
+      <number>2</number>
+     </property>
+     <property name="rightMargin">
+      <number>2</number>
+     </property>
+     <property name="bottomMargin">
+      <number>2</number>
+     </property>
      <item>
       <widget class="QComboBox" name="ChangeSource">
        <item>
@@ -103,8 +115,17 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <property name="sizeConstraint">
-      <enum>QLayout::SetFixedSize</enum>
+     <property name="leftMargin">
+      <number>2</number>
+     </property>
+     <property name="topMargin">
+      <number>2</number>
+     </property>
+     <property name="rightMargin">
+      <number>2</number>
+     </property>
+     <property name="bottomMargin">
+      <number>2</number>
      </property>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -113,6 +134,12 @@
        </property>
        <item>
         <widget class="QGroupBox" name="RegisterGroup">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -625,6 +652,12 @@ background-color: rgb(220,220, 255);</string>
            <property name="enabled">
             <bool>true</bool>
            </property>
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
             <string>VIC</string>
            </property>
@@ -632,6 +665,12 @@ background-color: rgb(220,220, 255);</string>
          </item>
          <item>
           <widget class="QPushButton" name="SID">
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
             <string>SID</string>
            </property>
@@ -639,6 +678,12 @@ background-color: rgb(220,220, 255);</string>
          </item>
          <item>
           <widget class="QPushButton" name="CIA1">
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
             <string>CIA 1</string>
            </property>
@@ -646,6 +691,12 @@ background-color: rgb(220,220, 255);</string>
          </item>
          <item>
           <widget class="QPushButton" name="CIA2">
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
             <string>CIA 2</string>
            </property>
@@ -653,6 +704,12 @@ background-color: rgb(220,220, 255);</string>
          </item>
          <item>
           <widget class="QPushButton" name="VIA1">
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
             <string notr="true">VIA 1</string>
            </property>
@@ -660,6 +717,12 @@ background-color: rgb(220,220, 255);</string>
          </item>
          <item>
           <widget class="QPushButton" name="VIA2">
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
             <string notr="true">VIA 2</string>
            </property>
@@ -683,7 +746,26 @@ background-color: rgb(220,220, 255);</string>
       </layout>
      </item>
      <item>
+      <spacer name="horizontalSpacer_11">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <widget class="QGroupBox" name="IRegisterGroup">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>400</width>
@@ -842,6 +924,18 @@ background-color: rgb(220,220, 255);</string>
           </item>
           <item row="2" column="5">
            <widget class="QPushButton" name="wait_led">
+            <property name="minimumSize">
+             <size>
+              <width>17</width>
+              <height>17</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>17</width>
+              <height>17</height>
+             </size>
+            </property>
             <property name="font">
              <font>
               <family>Arial</family>
@@ -949,23 +1043,6 @@ background-color: rgb(220,220, 255);</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QLabel" name="micro_code_out">
-            <property name="font">
-             <font>
-              <family>Arial</family>
-              <pointsize>10</pointsize>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: rgb(0, 0, 150);</string>
-            </property>
-            <property name="text">
-             <string notr="true">0</string>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="3">
            <widget class="QLabel" name="tmp_byte_out">
             <property name="font">
@@ -1064,10 +1141,27 @@ Hier wird die Sprungadresse der Brachbefehle gebildet.</string>
             <property name="sizeHint" stdset="0">
              <size>
               <width>40</width>
-              <height>20</height>
+              <height>15</height>
              </size>
             </property>
            </spacer>
+          </item>
+          <item row="3" column="1" colspan="2">
+           <widget class="QLabel" name="micro_code_out">
+            <property name="font">
+             <font>
+              <family>Arial</family>
+              <pointsize>10</pointsize>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: rgb(0, 0, 150);</string>
+            </property>
+            <property name="text">
+             <string notr="true">0</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -1121,1061 +1215,1181 @@ p, li { white-space: pre-wrap; }
     </layout>
    </item>
    <item>
-    <widget class="QFrame" name="frame">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>696</height>
-      </size>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <property name="leftMargin">
+      <number>2</number>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
+     <property name="topMargin">
+      <number>2</number>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+     <property name="rightMargin">
+      <number>2</number>
      </property>
-     <widget class="QGroupBox" name="groupBox_3">
-      <property name="geometry">
-       <rect>
-        <x>5</x>
-        <y>200</y>
-        <width>181</width>
-        <height>96</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Debugger Steuerung</string>
-      </property>
-      <widget class="QPushButton" name="OneZyklus">
-       <property name="geometry">
-        <rect>
-         <x>7</x>
-         <y>22</y>
-         <width>29</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>Es wird genau ein C64 Zyklus abgearbeitet.</string>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="icon">
-        <iconset resource="emu64.qrc">
-         <normaloff>:/grafik/one_zyklus.png</normaloff>:/grafik/one_zyklus.png</iconset>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="OneOpcode">
-       <property name="geometry">
-        <rect>
-         <x>42</x>
-         <y>22</y>
-         <width>29</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>Es wird genau ein Opcode abgearbeitet.</string>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="icon">
-        <iconset resource="emu64.qrc">
-         <normaloff>:/grafik/one_opcode.png</normaloff>:/grafik/one_opcode.png</iconset>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="AnimationStart">
-       <property name="geometry">
-        <rect>
-         <x>77</x>
-         <y>22</y>
-         <width>29</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>Die Programmausführung wird animiert. 
-Die Geschwindigkeit ist Einstellbar.</string>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="icon">
-        <iconset resource="emu64.qrc">
-         <normaloff>:/grafik/animation.png</normaloff>:/grafik/animation.png</iconset>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="AnimationStop">
-       <property name="geometry">
-        <rect>
-         <x>112</x>
-         <y>22</y>
-         <width>29</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>Die animierte Programmausführung wird gestoppt.</string>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="icon">
-        <iconset resource="emu64.qrc">
-         <normaloff>:/grafik/stop.png</normaloff>:/grafik/stop.png</iconset>
-       </property>
-      </widget>
-      <widget class="QScrollBar" name="AnimationSpeed">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>50</y>
-         <width>161</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>Hiermit stellen sie die Animationsgeschwindigkeit ein.
-In Zyklen pro Sekunde.</string>
-       </property>
-       <property name="minimum">
-        <number>1</number>
-       </property>
-       <property name="maximum">
-        <number>985248</number>
-       </property>
-       <property name="pageStep">
-        <number>1000</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_anispeed">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>70</y>
-         <width>41</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Speed:</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="anispeed_out">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>70</y>
-         <width>126</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string notr="true">TextLabel</string>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QPushButton" name="MemEdit">
-      <property name="geometry">
-       <rect>
-        <x>451</x>
-        <y>624</y>
-        <width>45</width>
-        <height>45</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Öffnet das Speicher Edit Fenster.</string>
-      </property>
-      <property name="text">
-       <string notr="true"/>
-      </property>
-      <property name="icon">
-       <iconset resource="emu64.qrc">
-        <normaloff>:/grafik/memory_icon.png</normaloff>:/grafik/memory_icon.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>32</width>
-        <height>32</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QGroupBox" name="VerlaufGroup">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>170</y>
-        <width>86</width>
-        <height>126</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Verlauf</string>
-      </property>
-      <widget class="QScrollBar" name="HistoryScroll">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>20</y>
-         <width>16</width>
-         <height>96</height>
-        </rect>
-       </property>
-       <property name="maximum">
-        <number>255</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-      <widget class="QListWidget" name="HistoryList">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>51</width>
-         <height>99</height>
-        </rect>
-       </property>
-       <property name="verticalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="horizontalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QGroupBox" name="BreakGroup">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>300</y>
-        <width>261</width>
-        <height>311</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Haltepunkte</string>
-      </property>
-      <widget class="QPushButton" name="AddBreakpoint">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>277</y>
-         <width>30</width>
-         <height>30</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>Fügt ein Haltepunkt hinzu.</string>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="icon">
-        <iconset resource="emu64.qrc">
-         <normaloff>:/grafik/plus_icon.png</normaloff>:/grafik/plus_icon.png</iconset>
-       </property>
-       <property name="iconSize">
+     <property name="bottomMargin">
+      <number>2</number>
+     </property>
+     <item>
+      <widget class="QGroupBox" name="groupBox_3">
+       <property name="minimumSize">
         <size>
-         <width>22</width>
-         <height>22</height>
+         <width>0</width>
+         <height>0</height>
         </size>
        </property>
-      </widget>
-      <widget class="QPushButton" name="DelBreakpoint">
-       <property name="geometry">
-        <rect>
-         <x>35</x>
-         <y>277</y>
-         <width>30</width>
-         <height>30</height>
-        </rect>
+       <property name="title">
+        <string>Debugger Steuerung</string>
        </property>
-       <property name="toolTip">
-        <string>Entfernt ein Haltepunkt.</string>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="icon">
-        <iconset resource="emu64.qrc">
-         <normaloff>:/grafik/minus_icon.png</normaloff>:/grafik/minus_icon.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>22</width>
-         <height>22</height>
-        </size>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="LoadBreakpoints">
-       <property name="geometry">
-        <rect>
-         <x>226</x>
-         <y>277</y>
-         <width>30</width>
-         <height>30</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>Lädt Haltepunkte aus einer Datei.</string>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="icon">
-        <iconset resource="emu64.qrc">
-         <normaloff>:/grafik/open_24x24.png</normaloff>:/grafik/open_24x24.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>22</width>
-         <height>22</height>
-        </size>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="SaveBreakpoints">
-       <property name="geometry">
-        <rect>
-         <x>196</x>
-         <y>277</y>
-         <width>30</width>
-         <height>30</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>Speichert alle erstellten Haltepunkte in einer Datei ab.</string>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="icon">
-        <iconset resource="emu64.qrc">
-         <normaloff>:/grafik/save_24x24.png</normaloff>:/grafik/save_24x24.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>22</width>
-         <height>22</height>
-        </size>
-       </property>
-      </widget>
-      <widget class="QTreeWidget" name="BreakpointTree">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>25</y>
-         <width>251</width>
-         <height>251</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Liste aller Haltepunkte.</string>
-       </property>
-       <property name="editTriggers">
-        <set>QAbstractItemView::DoubleClicked</set>
-       </property>
-       <property name="tabKeyNavigation">
-        <bool>false</bool>
-       </property>
-       <property name="animated">
-        <bool>true</bool>
-       </property>
-       <attribute name="headerVisible">
-        <bool>false</bool>
-       </attribute>
-       <column>
-        <property name="text">
-         <string notr="true">1</string>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <property name="leftMargin">
+         <number>2</number>
         </property>
-       </column>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item row="1" column="0" colspan="4">
+         <widget class="QScrollBar" name="AnimationSpeed">
+          <property name="toolTip">
+           <string>Hiermit stellen sie die Animationsgeschwindigkeit ein.
+In Zyklen pro Sekunde.</string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>985248</number>
+          </property>
+          <property name="pageStep">
+           <number>1000</number>
+          </property>
+          <property name="tracking">
+           <bool>true</bool>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="invertedControls">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="AnimationStart">
+          <property name="toolTip">
+           <string>Die Programmausführung wird animiert. 
+Die Geschwindigkeit ist Einstellbar.</string>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="icon">
+           <iconset resource="emu64.qrc">
+            <normaloff>:/grafik/animation.png</normaloff>:/grafik/animation.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QPushButton" name="OneZyklus">
+          <property name="toolTip">
+           <string>Es wird genau ein C64 Zyklus abgearbeitet.</string>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="icon">
+           <iconset resource="emu64.qrc">
+            <normaloff>:/grafik/one_zyklus.png</normaloff>:/grafik/one_zyklus.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QPushButton" name="AnimationStop">
+          <property name="toolTip">
+           <string>Die animierte Programmausführung wird gestoppt.</string>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="icon">
+           <iconset resource="emu64.qrc">
+            <normaloff>:/grafik/stop.png</normaloff>:/grafik/stop.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="4">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QLabel" name="label_anispeed">
+            <property name="text">
+             <string>Speed:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="anispeed_out">
+            <property name="text">
+             <string notr="true">TextLabel</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="OneOpcode">
+          <property name="toolTip">
+           <string>Es wird genau ein Opcode abgearbeitet.</string>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="icon">
+           <iconset resource="emu64.qrc">
+            <normaloff>:/grafik/one_opcode.png</normaloff>:/grafik/one_opcode.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </widget>
-      <widget class="QPushButton" name="DelAllBreakpoints">
-       <property name="geometry">
-        <rect>
-         <x>65</x>
-         <y>277</y>
-         <width>30</width>
-         <height>30</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>Löscht alle Haltepunkte.</string>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="icon">
-        <iconset resource="emu64.qrc">
-         <normaloff>:/grafik/remove_24x24.png</normaloff>:/grafik/remove_24x24.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>22</width>
-         <height>22</height>
-        </size>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QGroupBox" name="LeitungenGroup">
-      <property name="geometry">
-       <rect>
-        <x>190</x>
-        <y>170</y>
-        <width>225</width>
-        <height>71</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Leitungen</string>
-      </property>
-      <widget class="QLabel" name="label_irq_2">
-       <property name="geometry">
-        <rect>
-         <x>37</x>
-         <y>21</y>
-         <width>29</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Zeigt den aktuellen Programm Zähler an.</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 150);</string>
-       </property>
-       <property name="text">
-        <string notr="true">IRQ:</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_nmi_2">
-       <property name="geometry">
-        <rect>
-         <x>37</x>
-         <y>35</y>
-         <width>29</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Zeigt den aktuellen Programm Zähler an.</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 150);</string>
-       </property>
-       <property name="text">
-        <string notr="true">NMI:</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_ba">
-       <property name="geometry">
-        <rect>
-         <x>37</x>
-         <y>49</y>
-         <width>29</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Zeigt den aktuellen Programm Zähler an.</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 150);</string>
-       </property>
-       <property name="text">
-        <string notr="true">RDY:</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="irq_led">
-       <property name="geometry">
-        <rect>
-         <x>65</x>
-         <y>22</y>
-         <width>12</width>
-         <height>12</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="nmi_led">
-       <property name="geometry">
-        <rect>
-         <x>65</x>
-         <y>36</y>
-         <width>12</width>
-         <height>12</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="rdy_led">
-       <property name="geometry">
-        <rect>
-         <x>65</x>
-         <y>50</y>
-         <width>12</width>
-         <height>12</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_reset">
-       <property name="geometry">
-        <rect>
-         <x>90</x>
-         <y>20</y>
-         <width>43</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Zeigt den aktuellen Programm Zähler an.</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 150);</string>
-       </property>
-       <property name="text">
-        <string notr="true">RESET:</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_exrom">
-       <property name="geometry">
-        <rect>
-         <x>154</x>
-         <y>21</y>
-         <width>50</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Zeigt den aktuellen Programm Zähler an.</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 150);</string>
-       </property>
-       <property name="text">
-        <string notr="true">EXROM:</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_game">
-       <property name="geometry">
-        <rect>
-         <x>154</x>
-         <y>35</y>
-         <width>50</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Zeigt den aktuellen Programm Zähler an.</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 150);</string>
-       </property>
-       <property name="text">
-        <string notr="true">GAME:</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="reset_led">
-       <property name="geometry">
-        <rect>
-         <x>135</x>
-         <y>22</y>
-         <width>12</width>
-         <height>12</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="exrom_led">
-       <property name="geometry">
-        <rect>
-         <x>203</x>
-         <y>22</y>
-         <width>12</width>
-         <height>12</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="game_led">
-       <property name="geometry">
-        <rect>
-         <x>203</x>
-         <y>36</y>
-         <width>12</width>
-         <height>12</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="IEC">
-       <property name="geometry">
-        <rect>
-         <x>90</x>
-         <y>45</y>
-         <width>56</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>IEC BUS</string>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="man_lines">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>21</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>Ist hier ein Haken gesetzt, so werden alle 3 Leitungen
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QGroupBox" name="LeitungenGroup">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Leitungen</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
+          <property name="horizontalSpacing">
+           <number>6</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>0</number>
+          </property>
+          <item row="2" column="1">
+           <widget class="QPushButton" name="nmi_led">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>17</width>
+              <height>17</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>17</width>
+              <height>17</height>
+             </size>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QPushButton" name="rdy_led">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>17</width>
+              <height>17</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>17</width>
+              <height>17</height>
+             </size>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QPushButton" name="game_led">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>17</width>
+              <height>17</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>17</width>
+              <height>17</height>
+             </size>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLabel" name="label_game">
+            <property name="font">
+             <font>
+              <family>Arial</family>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Zeigt den aktuellen Programm Zähler an.</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: rgb(0, 0, 150);</string>
+            </property>
+            <property name="text">
+             <string notr="true">GAME:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_irq_2">
+            <property name="font">
+             <font>
+              <family>Arial</family>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Zeigt den aktuellen Programm Zähler an.</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: rgb(0, 0, 150);</string>
+            </property>
+            <property name="text">
+             <string notr="true">IRQ:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4">
+           <widget class="QLabel" name="label_exrom">
+            <property name="font">
+             <font>
+              <family>Arial</family>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Zeigt den aktuellen Programm Zähler an.</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: rgb(0, 0, 150);</string>
+            </property>
+            <property name="text">
+             <string notr="true">EXROM:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_ba">
+            <property name="font">
+             <font>
+              <family>Arial</family>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Zeigt den aktuellen Programm Zähler an.</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: rgb(0, 0, 150);</string>
+            </property>
+            <property name="text">
+             <string notr="true">RDY:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="7">
+           <spacer name="horizontalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="3">
+           <widget class="QPushButton" name="reset_led">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>17</width>
+              <height>17</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>17</width>
+              <height>17</height>
+             </size>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="label_reset">
+            <property name="font">
+             <font>
+              <family>Arial</family>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Zeigt den aktuellen Programm Zähler an.</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: rgb(0, 0, 150);</string>
+            </property>
+            <property name="text">
+             <string notr="true">RESET:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QCheckBox" name="man_lines">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>Ist hier ein Haken gesetzt, so werden alle 3 Leitungen
 IRQ;NMI;RDY zu den Customchips getrennt. So hat man die
 möglichkeit die Leitungen manuell zu setzen. Dies dient nur zu
 Testzwecken.</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QGroupBox" name="DisassGroup">
-      <property name="geometry">
-       <rect>
-        <x>5</x>
-        <y>300</y>
-        <width>232</width>
-        <height>311</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Disassembler / Assembler</string>
-      </property>
-      <widget class="QScrollBar" name="DisAssScroll">
-       <property name="geometry">
-        <rect>
-         <x>212</x>
-         <y>21</y>
-         <width>16</width>
-         <height>261</height>
-        </rect>
-       </property>
-       <property name="maximum">
-        <number>65790</number>
-       </property>
-       <property name="pageStep">
-        <number>256</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-      <widget class="QTableWidget" name="DisAssTable">
-       <property name="geometry">
-        <rect>
-         <x>7</x>
-         <y>21</y>
-         <width>204</width>
-         <height>262</height>
-        </rect>
-       </property>
-       <property name="contextMenuPolicy">
-        <enum>Qt::CustomContextMenu</enum>
-       </property>
-       <property name="verticalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="horizontalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
-       </property>
-       <property name="selectionMode">
-        <enum>QAbstractItemView::NoSelection</enum>
-       </property>
-       <property name="selectionBehavior">
-        <enum>QAbstractItemView::SelectRows</enum>
-       </property>
-       <property name="gridStyle">
-        <enum>Qt::SolidLine</enum>
-       </property>
-       <attribute name="horizontalHeaderVisible">
-        <bool>false</bool>
-       </attribute>
-       <attribute name="horizontalHeaderMinimumSectionSize">
-        <number>23</number>
-       </attribute>
-       <attribute name="verticalHeaderVisible">
-        <bool>false</bool>
-       </attribute>
-       <attribute name="verticalHeaderMinimumSectionSize">
-        <number>13</number>
-       </attribute>
-       <attribute name="verticalHeaderDefaultSectionSize">
-        <number>13</number>
-       </attribute>
-       <attribute name="verticalHeaderHighlightSections">
-        <bool>false</bool>
-       </attribute>
-      </widget>
-      <widget class="QLineEdit" name="AssAdresseIn">
-       <property name="geometry">
-        <rect>
-         <x>52</x>
-         <y>285</y>
-         <width>51</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::ClickFocus</enum>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 200);</string>
-       </property>
-       <property name="inputMethodHints">
-        <set>Qt::ImhNone</set>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="maxLength">
-        <number>10</number>
-       </property>
-       <property name="echoMode">
-        <enum>QLineEdit::Normal</enum>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="AssMnemonicIn">
-       <property name="geometry">
-        <rect>
-         <x>105</x>
-         <y>285</y>
-         <width>36</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::ClickFocus</enum>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 200);</string>
-       </property>
-       <property name="inputMethodHints">
-        <set>Qt::ImhNone</set>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="maxLength">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="AssAdressierungIn">
-       <property name="geometry">
-        <rect>
-         <x>145</x>
-         <y>285</y>
-         <width>66</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::ClickFocus</enum>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 200);</string>
-       </property>
-       <property name="inputMethodHints">
-        <set>Qt::ImhNone</set>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="maxLength">
-        <number>10</number>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>287</y>
-         <width>41</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Noto Sans</family>
-         <pointsize>12</pointsize>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 150);</string>
-       </property>
-       <property name="text">
-        <string>ASM</string>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QGroupBox" name="ExportGroup">
-      <property name="geometry">
-       <rect>
-        <x>5</x>
-        <y>616</y>
-        <width>232</width>
-        <height>53</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Export</string>
-      </property>
-      <widget class="QLabel" name="label_export_von">
-       <property name="geometry">
-        <rect>
-         <x>8</x>
-         <y>22</y>
-         <width>25</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Von:</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="ExportStartIn">
-       <property name="geometry">
-        <rect>
-         <x>36</x>
-         <y>20</y>
-         <width>50</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 200);</string>
-       </property>
-       <property name="text">
-        <string notr="true">$0000</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_export_bis">
-       <property name="geometry">
-        <rect>
-         <x>92</x>
-         <y>22</y>
-         <width>21</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Bis:</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="ExportEndIn">
-       <property name="geometry">
-        <rect>
-         <x>116</x>
-         <y>20</y>
-         <width>50</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 200);</string>
-       </property>
-       <property name="text">
-        <string notr="true">$FFFF</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="ExportDisAss">
-       <property name="geometry">
-        <rect>
-         <x>180</x>
-         <y>15</y>
-         <width>30</width>
-         <height>30</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>Export als Disassembler-Listing oder PRG</string>
-       </property>
-       <property name="statusTip">
-        <string/>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="icon">
-        <iconset resource="emu64.qrc">
-         <normaloff>:/grafik/export_24x24.png</normaloff>:/grafik/export_24x24.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>22</width>
-         <height>22</height>
-        </size>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QGroupBox" name="CycleGroup">
-      <property name="geometry">
-       <rect>
-        <x>190</x>
-        <y>247</y>
-        <width>225</width>
-        <height>50</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Zyklen Zähler</string>
-      </property>
-      <widget class="QLabel" name="CycleCounter_Out">
-       <property name="geometry">
-        <rect>
-         <x>7</x>
-         <y>21</y>
-         <width>106</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>12</pointsize>
-         <bold>true</bold>
-         <kerning>true</kerning>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(0, 64, 0);
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_nmi_2">
+            <property name="font">
+             <font>
+              <family>Arial</family>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Zeigt den aktuellen Programm Zähler an.</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: rgb(0, 0, 150);</string>
+            </property>
+            <property name="text">
+             <string notr="true">NMI:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="irq_led">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>17</width>
+              <height>17</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>17</width>
+              <height>17</height>
+             </size>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="5">
+           <widget class="QPushButton" name="exrom_led">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>17</width>
+              <height>17</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>17</width>
+              <height>17</height>
+             </size>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="6">
+           <widget class="QPushButton" name="IEC">
+            <property name="text">
+             <string>IEC BUS</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="CycleGroup">
+         <property name="title">
+          <string>Zyklen Zähler</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>0</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="CycleCounter_Out">
+            <property name="font">
+             <font>
+              <family>Arial</family>
+              <pointsize>12</pointsize>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(0, 64, 0);
 color: rgb(85, 255, 0);
 border: 1px solid white;
 border-top-color: rgb(150, 150,150);
 border-left-color: rgb(150, 150,150);
 border-bottom-color: rgb(255, 255, 255);
 border-right-color: rgb(255, 255, 255);</string>
+            </property>
+            <property name="text">
+             <string notr="true">0000000000</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="CycleCounterReset">
+            <property name="text">
+             <string>Auf Null stellen</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <spacer name="horizontalSpacer_8">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="VerlaufGroup">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="text">
-        <string notr="true">0000000000</string>
+       <property name="title">
+        <string>Verlauf</string>
        </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item>
+         <widget class="QListWidget" name="HistoryList">
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QScrollBar" name="HistoryScroll">
+          <property name="maximum">
+           <number>255</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
-      <widget class="QPushButton" name="CycleCounterReset">
-       <property name="geometry">
-        <rect>
-         <x>120</x>
-         <y>20</y>
-         <width>99</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Ubuntu</family>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Auf Null stellen</string>
-       </property>
-      </widget>
-     </widget>
-    </widget>
+     </item>
+    </layout>
    </item>
    <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <widget class="QGroupBox" name="DisassGroup">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>Disassembler / Assembler</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>0</number>
+          </property>
+          <item row="1" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="font">
+               <font>
+                <family>Noto Sans</family>
+                <pointsize>12</pointsize>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 150);</string>
+              </property>
+              <property name="text">
+               <string>ASM</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="AssAdresseIn">
+              <property name="focusPolicy">
+               <enum>Qt::ClickFocus</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 200);</string>
+              </property>
+              <property name="inputMethodHints">
+               <set>Qt::ImhNone</set>
+              </property>
+              <property name="text">
+               <string notr="true"/>
+              </property>
+              <property name="maxLength">
+               <number>10</number>
+              </property>
+              <property name="echoMode">
+               <enum>QLineEdit::Normal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="AssMnemonicIn">
+              <property name="focusPolicy">
+               <enum>Qt::ClickFocus</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 200);</string>
+              </property>
+              <property name="inputMethodHints">
+               <set>Qt::ImhNone</set>
+              </property>
+              <property name="text">
+               <string notr="true"/>
+              </property>
+              <property name="maxLength">
+               <number>3</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="AssAdressierungIn">
+              <property name="focusPolicy">
+               <enum>Qt::ClickFocus</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(0, 0, 200);</string>
+              </property>
+              <property name="inputMethodHints">
+               <set>Qt::ImhNone</set>
+              </property>
+              <property name="text">
+               <string notr="true"/>
+              </property>
+              <property name="maxLength">
+               <number>10</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_9">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="0">
+           <widget class="QTableWidget" name="DisAssTable">
+            <property name="contextMenuPolicy">
+             <enum>Qt::CustomContextMenu</enum>
+            </property>
+            <property name="verticalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+            <property name="horizontalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+            <property name="editTriggers">
+             <set>QAbstractItemView::NoEditTriggers</set>
+            </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::NoSelection</enum>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
+            <property name="gridStyle">
+             <enum>Qt::SolidLine</enum>
+            </property>
+            <attribute name="horizontalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+            <attribute name="horizontalHeaderMinimumSectionSize">
+             <number>23</number>
+            </attribute>
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+            <attribute name="verticalHeaderMinimumSectionSize">
+             <number>13</number>
+            </attribute>
+            <attribute name="verticalHeaderDefaultSectionSize">
+             <number>13</number>
+            </attribute>
+            <attribute name="verticalHeaderHighlightSections">
+             <bool>false</bool>
+            </attribute>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QScrollBar" name="DisAssScroll">
+            <property name="maximum">
+             <number>65790</number>
+            </property>
+            <property name="pageStep">
+             <number>256</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="ExportGroup">
+         <property name="title">
+          <string>Export</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_10">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_export_von">
+            <property name="text">
+             <string>Von:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="ExportStartIn">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(0, 0, 200);</string>
+            </property>
+            <property name="text">
+             <string notr="true">$0000</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_export_bis">
+            <property name="text">
+             <string>Bis:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="ExportEndIn">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(0, 0, 200);</string>
+            </property>
+            <property name="text">
+             <string notr="true">$FFFF</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="ExportDisAss">
+            <property name="toolTip">
+             <string>Export als Disassembler-Listing oder PRG</string>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+            <property name="icon">
+             <iconset resource="emu64.qrc">
+              <normaloff>:/grafik/export_24x24.png</normaloff>:/grafik/export_24x24.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_10">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QGroupBox" name="BreakGroup">
+         <property name="title">
+          <string>Haltepunkte</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_7">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
+          <item row="0" column="0" colspan="5">
+           <widget class="QTreeWidget" name="BreakpointTree">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>300</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Arial</family>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="toolTip">
+             <string>Liste aller Haltepunkte.</string>
+            </property>
+            <property name="editTriggers">
+             <set>QAbstractItemView::DoubleClicked</set>
+            </property>
+            <property name="tabKeyNavigation">
+             <bool>false</bool>
+            </property>
+            <property name="animated">
+             <bool>true</bool>
+            </property>
+            <attribute name="headerVisible">
+             <bool>false</bool>
+            </attribute>
+            <column>
+             <property name="text">
+              <string notr="true">1</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QPushButton" name="SaveBreakpoints">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Speichert alle erstellten Haltepunkte in einer Datei ab.</string>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+            <property name="icon">
+             <iconset resource="emu64.qrc">
+              <normaloff>:/grafik/save_24x24.png</normaloff>:/grafik/save_24x24.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4">
+           <widget class="QPushButton" name="LoadBreakpoints">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Lädt Haltepunkte aus einer Datei.</string>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+            <property name="icon">
+             <iconset resource="emu64.qrc">
+              <normaloff>:/grafik/open_24x24.png</normaloff>:/grafik/open_24x24.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="DelBreakpoint">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Entfernt ein Haltepunkt.</string>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+            <property name="icon">
+             <iconset resource="emu64.qrc">
+              <normaloff>:/grafik/minus_icon.png</normaloff>:/grafik/minus_icon.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QPushButton" name="DelAllBreakpoints">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Löscht alle Haltepunkte.</string>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+            <property name="icon">
+             <iconset resource="emu64.qrc">
+              <normaloff>:/grafik/remove_24x24.png</normaloff>:/grafik/remove_24x24.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="4">
+           <widget class="QPushButton" name="MemEdit">
+            <property name="toolTip">
+             <string>Öffnet das Speicher Edit Fenster.</string>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+            <property name="icon">
+             <iconset resource="emu64.qrc">
+              <normaloff>:/grafik/memory_icon.png</normaloff>:/grafik/memory_icon.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="AddBreakpoint">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Fügt ein Haltepunkt hinzu.</string>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+            <property name="icon">
+             <iconset resource="emu64.qrc">
+              <normaloff>:/grafik/plus_icon.png</normaloff>:/grafik/plus_icon.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <spacer name="horizontalSpacer_12">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::MinimumExpanding</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
