@@ -18,6 +18,7 @@
 
 #include <QTreeWidgetItem>
 #include <QTableWidgetItem>
+#include <QListWidget>
 #include <QSettings>
 #include <QMenu>
 #include <QTimer>
@@ -33,7 +34,28 @@
 #include "./input_box_window.h"
 
 #define DISASS_ROW 20
-#define HISTORY_ROW 7
+//#define HISTORY_ROW 7
+
+class QNewListWidget : public QListWidget
+{
+    Q_OBJECT
+public:
+
+    QNewListWidget( QWidget* Parent = nullptr ) :
+        QListWidget( Parent )
+    {
+    }
+
+signals:
+    void resize(int width, int height);
+
+protected:
+
+    virtual void resizeEvent( QResizeEvent* e )
+    {
+      emit resize(this->width(), this->height());
+    }
+};
 
 namespace Ui {
     class DebuggerWindow;
@@ -93,6 +115,7 @@ private slots:
     void onReg_label_clicked(LabelWidgetMod* label);
     void onChangeFloppyStatus();
     void onTimerAnimationRefresh();
+    void onResizeHistoryList(int weidth, int height);
 
 private:
 
@@ -135,6 +158,7 @@ private:
     bool new_breakpoint_found;
     int32_t current_source;
     int32_t currnet_floppy_nr;
+    int16_t history_rows;
 };
 
 #endif // DEBUGGER_WINDOW_H

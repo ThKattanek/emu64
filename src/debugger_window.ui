@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>772</width>
-    <height>711</height>
+    <width>774</width>
+    <height>760</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -1855,7 +1855,7 @@ border-right-color: rgb(255, 255, 255);</string>
          <number>2</number>
         </property>
         <item>
-         <widget class="QListWidget" name="HistoryList">
+         <widget class="QNewListWidget" name="HistoryList">
           <property name="verticalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
           </property>
@@ -2006,6 +2006,12 @@ border-right-color: rgb(255, 255, 255);</string>
           </item>
           <item row="0" column="0">
            <widget class="QTableWidget" name="DisAssTable">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>260</height>
+             </size>
+            </property>
             <property name="contextMenuPolicy">
              <enum>Qt::CustomContextMenu</enum>
             </property>
@@ -2407,6 +2413,11 @@ border-right-color: rgb(255, 255, 255);</string>
    <class>LabelWidgetMod</class>
    <extends>QLabel</extends>
    <header>label_widget_mod.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QNewListWidget</class>
+   <extends>QListWidget</extends>
+   <header>debugger_window.h</header>
   </customwidget>
  </customwidgets>
  <resources>

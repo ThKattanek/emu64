@@ -20,6 +20,7 @@
 #include "./ui_debugger_window.h"
 #include "./micro_code_tbl_6510.h"
 #include "./micro_code_string_tbl_6510.h"
+#include "qdebug.h"
 
 DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     QDialog(parent),
@@ -86,12 +87,9 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     new_breakpoint_found = false;
 
     ui->HistoryList->setFont(font1);
-    for(int i=0; i<HISTORY_ROW; i++)
-    {
-        QListWidgetItem *item = new QListWidgetItem(ui->HistoryList);
-        item->setText(QVariant(i).toString());
-        ui->HistoryList->addItem(item);
-    }
+
+    history_rows = 0;
+    connect(ui->HistoryList, SIGNAL(resize(int,int)),this,SLOT(onResizeHistoryList(int,int)));
 
     for(int i=0; i<DISASS_ROW; i++)
     {
@@ -234,6 +232,27 @@ void DebuggerWindow::onTimerAnimationRefresh()
         }
         show();
     }
+}
+
+void DebuggerWindow::onResizeHistoryList(int weidth, int height)
+{
+    ui->HistoryList->clear();
+
+    QListWidgetItem *item = new QListWidgetItem(ui->HistoryList);
+    ui->HistoryList->addItem(item);
+
+    QRect rect = ui->HistoryList->visualItemRect(ui->HistoryList->item(0));
+
+    history_rows = ui->HistoryList->height() / rect.height();
+
+    for(int i=1; i<history_rows; i++)
+    {
+        QListWidgetItem *item = new QListWidgetItem(ui->HistoryList);
+        item->setText(QVariant(i).toString());
+        ui->HistoryList->addItem(item);
+    }
+
+    FillHistoryList(static_cast<uint8_t>(ui->HistoryScroll->value()));
 }
 
 void DebuggerWindow::RetranslateUi()
@@ -815,11 +834,14 @@ void DebuggerWindow::FillHistoryList(uint8_t index)
     char str00[10];
     uint8_t hp;
 
+   // int row_count = ui->HistoryList->height() / rect.height();
+
     if(current_source > 0)
     {
         if(!c64->floppy[currnet_floppy_nr]->GetEnableFloppy()) return;
         hp = c64->floppy[currnet_floppy_nr]->HistoryPointer;
-        for(int i=0; i<HISTORY_ROW; i++)
+        //for(int i=0; i<HISTORY_ROW; i++)
+        for(int i=0; i<history_rows; i++)
         {
             sprintf(str00, "$%4.4X", c64->floppy[currnet_floppy_nr]->History[hp--]);
             ui->HistoryList->item(i)->setText(QString(str00));
@@ -828,7 +850,8 @@ void DebuggerWindow::FillHistoryList(uint8_t index)
     else
     {
         hp = c64->cpu_pc_history_pos - index;
-        for(int i=0; i<HISTORY_ROW; i++)
+        //for(int i=0; i<HISTORY_ROW; i++)
+        for(int i=0; i<history_rows; i++)
         {
             sprintf(str00, "$%4.4X", c64->cpu_pc_history[hp--]);
             ui->HistoryList->item(i)->setText(QString(str00));
@@ -2066,7 +2089,7 @@ void DebuggerWindow::RefreshGUI(void)
             ui->CycleCounter_Out->setText("");
 
             ui->VerlaufGroup->setEnabled(false);
-            for(int i=0;i<HISTORY_ROW;i++) ui->HistoryList->item(i)->setText("");
+            for(int i=0;i<history_rows;i++) ui->HistoryList->item(i)->setText("");
 
             ui->DisassGroup->setEnabled(false);
             for(int i=0;i<DISASS_ROW;i++)
