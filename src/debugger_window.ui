@@ -1856,6 +1856,12 @@ border-right-color: rgb(255, 255, 255);</string>
         </property>
         <item>
          <widget class="QNewListWidget" name="HistoryList">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>9</pointsize>
+           </font>
+          </property>
           <property name="verticalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
           </property>
