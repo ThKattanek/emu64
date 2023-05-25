@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.05.2023                //
+// Letzte Änderung am 25.05.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -69,12 +69,16 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     ui->MCodeHelp->setFont(font1);
 
     ui->DisAssTable->setColumnCount(4);
-    ui->DisAssTable->setColumnWidth(0, 44);
-    ui->DisAssTable->setColumnWidth(1, 70);
-    ui->DisAssTable->setColumnWidth(2, 30);
-    ui->DisAssTable->setColumnWidth(3, 57);
 
     ui->DisAssTable->setFont(font1);
+
+    int font1_width = ui->DisAssTable->fontMetrics().averageCharWidth() + 3;
+
+    ui->DisAssTable->setColumnWidth(0, 5 * font1_width);
+    ui->DisAssTable->setColumnWidth(1, 8 * font1_width);
+    ui->DisAssTable->setColumnWidth(2, 3 * font1_width);
+    ui->DisAssTable->setColumnWidth(3, 7 * font1_width);
+
     ui->DisAssTable->setRowCount(DISASS_ROW);
 
     ui->AssAdresseIn->setFont(font1);
