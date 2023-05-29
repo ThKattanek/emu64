@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>897</width>
-    <height>760</height>
+    <width>780</width>
+    <height>847</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -35,19 +35,31 @@
    <string>Debugger / Disassembler </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>4</number>
+   </property>
+   <property name="topMargin">
+    <number>4</number>
+   </property>
+   <property name="rightMargin">
+    <number>4</number>
+   </property>
+   <property name="bottomMargin">
+    <number>4</number>
+   </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="leftMargin">
-      <number>2</number>
+      <number>4</number>
      </property>
      <property name="topMargin">
-      <number>2</number>
+      <number>4</number>
      </property>
      <property name="rightMargin">
-      <number>2</number>
+      <number>4</number>
      </property>
      <property name="bottomMargin">
-      <number>2</number>
+      <number>4</number>
      </property>
      <item>
       <widget class="QComboBox" name="ChangeSource">
@@ -116,21 +128,33 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <property name="leftMargin">
-      <number>2</number>
+      <number>4</number>
      </property>
      <property name="topMargin">
-      <number>2</number>
+      <number>4</number>
      </property>
      <property name="rightMargin">
-      <number>2</number>
+      <number>4</number>
      </property>
      <property name="bottomMargin">
-      <number>2</number>
+      <number>4</number>
      </property>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="spacing">
-        <number>3</number>
+        <number>6</number>
+       </property>
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
        </property>
        <item>
         <widget class="QGroupBox" name="RegisterGroup">
@@ -160,33 +184,33 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <property name="spacing">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="leftMargin">
-           <number>0</number>
+           <number>4</number>
           </property>
           <property name="topMargin">
-           <number>0</number>
+           <number>4</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>4</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>4</number>
           </property>
           <item>
            <layout class="QGridLayout" name="gridLayout">
             <property name="leftMargin">
-             <number>2</number>
+             <number>4</number>
             </property>
             <property name="topMargin">
-             <number>2</number>
+             <number>4</number>
             </property>
             <property name="rightMargin">
-             <number>2</number>
+             <number>4</number>
             </property>
             <property name="bottomMargin">
-             <number>2</number>
+             <number>4</number>
             </property>
             <property name="horizontalSpacing">
              <number>6</number>
@@ -585,7 +609,19 @@ background-color: rgb(220,220, 255);</string>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
             <property name="spacing">
-             <number>3</number>
+             <number>6</number>
+            </property>
+            <property name="leftMargin">
+             <number>4</number>
+            </property>
+            <property name="topMargin">
+             <number>4</number>
+            </property>
+            <property name="rightMargin">
+             <number>4</number>
+            </property>
+            <property name="bottomMargin">
+             <number>4</number>
             </property>
             <item>
              <widget class="QLabel" name="label_sr">
@@ -647,6 +683,18 @@ background-color: rgb(220,220, 255);</string>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
+         <property name="topMargin">
+          <number>4</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
+          <number>4</number>
+         </property>
          <item>
           <widget class="QPushButton" name="VIC">
            <property name="enabled">
@@ -798,33 +846,33 @@ background-color: rgb(220,220, 255);</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <property name="spacing">
-         <number>0</number>
+         <number>6</number>
         </property>
         <property name="leftMargin">
-         <number>0</number>
+         <number>4</number>
         </property>
         <property name="topMargin">
-         <number>0</number>
+         <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>0</number>
+         <number>4</number>
         </property>
         <property name="bottomMargin">
-         <number>0</number>
+         <number>4</number>
         </property>
         <item>
          <layout class="QGridLayout" name="gridLayout_2">
           <property name="leftMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="topMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="rightMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="bottomMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="horizontalSpacing">
            <number>6</number>
@@ -1235,16 +1283,16 @@ p, li { white-space: pre-wrap; }
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <property name="leftMargin">
-      <number>2</number>
+      <number>4</number>
      </property>
      <property name="topMargin">
-      <number>2</number>
+      <number>4</number>
      </property>
      <property name="rightMargin">
-      <number>2</number>
+      <number>4</number>
      </property>
      <property name="bottomMargin">
-      <number>2</number>
+      <number>4</number>
      </property>
      <item>
       <widget class="QGroupBox" name="groupBox_3">
@@ -1259,16 +1307,19 @@ p, li { white-space: pre-wrap; }
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
         <property name="leftMargin">
-         <number>2</number>
+         <number>4</number>
         </property>
         <property name="topMargin">
-         <number>2</number>
+         <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>2</number>
+         <number>4</number>
         </property>
         <property name="bottomMargin">
-         <number>2</number>
+         <number>4</number>
+        </property>
+        <property name="verticalSpacing">
+         <number>4</number>
         </property>
         <item row="1" column="0" colspan="4">
          <widget class="QScrollBar" name="AnimationSpeed">
@@ -1341,6 +1392,18 @@ Die Geschwindigkeit ist Einstellbar.</string>
         </item>
         <item row="4" column="0" colspan="4">
          <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <property name="leftMargin">
+           <number>4</number>
+          </property>
+          <property name="topMargin">
+           <number>4</number>
+          </property>
+          <property name="rightMargin">
+           <number>4</number>
+          </property>
+          <property name="bottomMargin">
+           <number>4</number>
+          </property>
           <item>
            <widget class="QLabel" name="label_anispeed">
             <property name="text">
@@ -1402,6 +1465,18 @@ Die Geschwindigkeit ist Einstellbar.</string>
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_5">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
        <item>
         <widget class="QGroupBox" name="LeitungenGroup">
          <property name="sizePolicy">
@@ -1415,16 +1490,16 @@ Die Geschwindigkeit ist Einstellbar.</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_5">
           <property name="leftMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="topMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="rightMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="bottomMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="horizontalSpacing">
            <number>6</number>
@@ -1782,16 +1857,16 @@ Testzwecken.</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
           <property name="leftMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="topMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="rightMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="bottomMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="verticalSpacing">
            <number>0</number>
@@ -1861,16 +1936,16 @@ border-right-color: rgb(255, 255, 255);</string>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_7">
         <property name="leftMargin">
-         <number>2</number>
+         <number>4</number>
         </property>
         <property name="topMargin">
-         <number>2</number>
+         <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>2</number>
+         <number>4</number>
         </property>
         <property name="bottomMargin">
-         <number>2</number>
+         <number>4</number>
         </property>
         <item>
          <widget class="QNewListWidget" name="HistoryList">
@@ -1905,8 +1980,32 @@ border-right-color: rgb(255, 255, 255);</string>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <property name="leftMargin">
+      <number>4</number>
+     </property>
+     <property name="topMargin">
+      <number>4</number>
+     </property>
+     <property name="rightMargin">
+      <number>4</number>
+     </property>
+     <property name="bottomMargin">
+      <number>4</number>
+     </property>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_7">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
        <item>
         <widget class="QGroupBox" name="DisassGroup">
          <property name="minimumSize">
@@ -1920,16 +2019,16 @@ border-right-color: rgb(255, 255, 255);</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
           <property name="leftMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="topMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="rightMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="bottomMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="verticalSpacing">
            <number>6</number>
@@ -1937,16 +2036,16 @@ border-right-color: rgb(255, 255, 255);</string>
           <item row="1" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout_9">
             <property name="leftMargin">
-             <number>2</number>
+             <number>4</number>
             </property>
             <property name="topMargin">
-             <number>2</number>
+             <number>4</number>
             </property>
             <property name="rightMargin">
-             <number>2</number>
+             <number>4</number>
             </property>
             <property name="bottomMargin">
-             <number>2</number>
+             <number>4</number>
             </property>
             <item>
              <widget class="QLabel" name="label">
@@ -2115,16 +2214,16 @@ border-right-color: rgb(255, 255, 255);</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_10">
           <property name="leftMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="topMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="rightMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="bottomMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <item>
            <widget class="QLabel" name="label_export_von">
@@ -2203,6 +2302,18 @@ border-right-color: rgb(255, 255, 255);</string>
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_6">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
        <item>
         <widget class="QGroupBox" name="BreakGroup">
          <property name="title">
@@ -2210,16 +2321,16 @@ border-right-color: rgb(255, 255, 255);</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_7">
           <property name="leftMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="topMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="rightMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <property name="bottomMargin">
-           <number>2</number>
+           <number>4</number>
           </property>
           <item row="0" column="0" colspan="5">
            <widget class="QTreeWidget" name="BreakpointTree">
