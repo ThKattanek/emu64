@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 09.05.2023                //
+// Letzte Änderung am 30.05.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -33,7 +33,7 @@
 #include "./debugger_iec_window.h"
 #include "./input_box_window.h"
 
-#define DISASS_ROW 20
+#define MAX_DISASS_ROW 255
 //#define HISTORY_ROW 7
 
 class QNewListWidget : public QListWidget
@@ -43,6 +43,27 @@ public:
 
     QNewListWidget( QWidget* Parent = nullptr ) :
         QListWidget( Parent )
+    {
+    }
+
+signals:
+    void resize(int width, int height);
+
+protected:
+
+    virtual void resizeEvent( QResizeEvent* e )
+    {
+      emit resize(this->width(), this->height());
+    }
+};
+
+class QNewTableWidget : public QTableWidget
+{
+    Q_OBJECT
+public:
+
+    QNewTableWidget( QWidget* Parent = nullptr ) :
+        QTableWidget( Parent )
     {
     }
 
@@ -116,6 +137,7 @@ private slots:
     void onChangeFloppyStatus();
     void onTimerAnimationRefresh();
     void onResizeHistoryList(int weidth, int height);
+    void onResizeDisassList(int weidth, int height);
 
 private:
 
@@ -143,13 +165,13 @@ private:
     QIcon *icon_off;
     QIcon *icon_on;
     QMenu *context_diss_assList;
-    QTableWidgetItem *disass_pc[DISASS_ROW];
-    QTableWidgetItem *disass_memory[DISASS_ROW];
-    QTableWidgetItem *disass_mnemonic[DISASS_ROW];
-    QTableWidgetItem *disass_addressing[DISASS_ROW];
+    QTableWidgetItem *disass_pc[MAX_DISASS_ROW];
+    QTableWidgetItem *disass_memory[MAX_DISASS_ROW];
+    QTableWidgetItem *disass_mnemonic[MAX_DISASS_ROW];
+    QTableWidgetItem *disass_addressing[MAX_DISASS_ROW];
     QColor table_back_color;
     QColor table_position_color;
-    uint16_t view_code_address[DISASS_ROW];
+    uint16_t view_code_address[MAX_DISASS_ROW];
     uint16_t old_adresse;
     int32_t old_make_idx;
     QTimer *timer1;
@@ -159,6 +181,7 @@ private:
     int32_t current_source;
     int32_t currnet_floppy_nr;
     int16_t history_rows;
+    int16_t disass_rows;
 };
 
 #endif // DEBUGGER_WINDOW_H

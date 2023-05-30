@@ -1321,7 +1321,63 @@ p, li { white-space: pre-wrap; }
         <property name="verticalSpacing">
          <number>4</number>
         </property>
-        <item row="1" column="0" colspan="4">
+        <item row="0" column="2">
+         <widget class="QPushButton" name="AnimationStart">
+          <property name="toolTip">
+           <string>Die Programmausführung wird animiert. 
+Die Geschwindigkeit ist Einstellbar.</string>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="icon">
+           <iconset resource="emu64.qrc">
+            <normaloff>:/grafik/animation.png</normaloff>:/grafik/animation.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="OneOpcode">
+          <property name="toolTip">
+           <string>Es wird genau ein Opcode abgearbeitet.</string>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="icon">
+           <iconset resource="emu64.qrc">
+            <normaloff>:/grafik/one_opcode.png</normaloff>:/grafik/one_opcode.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="0">
+         <widget class="QPushButton" name="OneZyklus">
+          <property name="toolTip">
+           <string>Es wird genau ein C64 Zyklus abgearbeitet.</string>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="icon">
+           <iconset resource="emu64.qrc">
+            <normaloff>:/grafik/one_zyklus.png</normaloff>:/grafik/one_zyklus.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="4">
          <widget class="QScrollBar" name="AnimationSpeed">
           <property name="toolTip">
            <string>Hiermit stellen sie die Animationsgeschwindigkeit ein.
@@ -1347,50 +1403,7 @@ In Zyklen pro Sekunde.</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
-         <widget class="QPushButton" name="AnimationStart">
-          <property name="toolTip">
-           <string>Die Programmausführung wird animiert. 
-Die Geschwindigkeit ist Einstellbar.</string>
-          </property>
-          <property name="text">
-           <string notr="true"/>
-          </property>
-          <property name="icon">
-           <iconset resource="emu64.qrc">
-            <normaloff>:/grafik/animation.png</normaloff>:/grafik/animation.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QPushButton" name="OneZyklus">
-          <property name="toolTip">
-           <string>Es wird genau ein C64 Zyklus abgearbeitet.</string>
-          </property>
-          <property name="text">
-           <string notr="true"/>
-          </property>
-          <property name="icon">
-           <iconset resource="emu64.qrc">
-            <normaloff>:/grafik/one_zyklus.png</normaloff>:/grafik/one_zyklus.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3">
-         <widget class="QPushButton" name="AnimationStop">
-          <property name="toolTip">
-           <string>Die animierte Programmausführung wird gestoppt.</string>
-          </property>
-          <property name="text">
-           <string notr="true"/>
-          </property>
-          <property name="icon">
-           <iconset resource="emu64.qrc">
-            <normaloff>:/grafik/stop.png</normaloff>:/grafik/stop.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0" colspan="4">
+        <item row="5" column="0" colspan="4">
          <layout class="QHBoxLayout" name="horizontalLayout_6">
           <property name="leftMargin">
            <number>4</number>
@@ -1404,13 +1417,6 @@ Die Geschwindigkeit ist Einstellbar.</string>
           <property name="bottomMargin">
            <number>4</number>
           </property>
-          <item>
-           <widget class="QLabel" name="label_anispeed">
-            <property name="text">
-             <string>Speed:</string>
-            </property>
-           </widget>
-          </item>
           <item>
            <widget class="QLabel" name="anispeed_out">
             <property name="text">
@@ -1433,32 +1439,26 @@ Die Geschwindigkeit ist Einstellbar.</string>
           </item>
          </layout>
         </item>
-        <item row="0" column="1">
-         <widget class="QPushButton" name="OneOpcode">
+        <item row="0" column="3">
+         <widget class="QPushButton" name="AnimationStop">
           <property name="toolTip">
-           <string>Es wird genau ein Opcode abgearbeitet.</string>
+           <string>Die animierte Programmausführung wird gestoppt.</string>
           </property>
           <property name="text">
            <string notr="true"/>
           </property>
           <property name="icon">
            <iconset resource="emu64.qrc">
-            <normaloff>:/grafik/one_opcode.png</normaloff>:/grafik/one_opcode.png</iconset>
+            <normaloff>:/grafik/stop.png</normaloff>:/grafik/stop.png</iconset>
           </property>
          </widget>
         </item>
-        <item row="5" column="1">
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_anispeed">
+          <property name="text">
+           <string>Speed:</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -2143,7 +2143,7 @@ border-right-color: rgb(255, 255, 255);</string>
            </layout>
           </item>
           <item row="0" column="0">
-           <widget class="QTableWidget" name="DisAssTable">
+           <widget class="QNewTableWidget" name="DisAssTable">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -2567,6 +2567,11 @@ border-right-color: rgb(255, 255, 255);</string>
   <customwidget>
    <class>QNewListWidget</class>
    <extends>QListWidget</extends>
+   <header>debugger_window.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QNewTableWidget</class>
+   <extends>QTableWidget</extends>
    <header>debugger_window.h</header>
   </customwidget>
  </customwidgets>

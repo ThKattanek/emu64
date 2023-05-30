@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.05.2023                //
+// Letzte Änderung am 30.05.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -79,7 +79,8 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     ui->DisAssTable->setColumnWidth(2, 3 * font1_width);
     ui->DisAssTable->setColumnWidth(3, 7 * font1_width);
 
-    ui->DisAssTable->setRowCount(DISASS_ROW);
+    disass_rows = 1;
+    ui->DisAssTable->setRowCount(disass_rows);
 
     ui->AssAdresseIn->setFont(font1);
     ui->AssMnemonicIn->setFont(font1);
@@ -95,22 +96,8 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     history_rows = 0;
     connect(ui->HistoryList, SIGNAL(resize(int,int)),this,SLOT(onResizeHistoryList(int,int)));
 
-    for(int i=0; i<DISASS_ROW; i++)
-    {
-        view_code_address[i] = 0;
-        disass_pc[i] = new QTableWidgetItem();
-        disass_pc[i]->setBackground(table_back_color);
-        ui->DisAssTable->setItem(i, 0, disass_pc[i]);
-        disass_memory[i] = new QTableWidgetItem();
-        disass_memory[i]->setBackground(table_back_color);
-        ui->DisAssTable->setItem(i, 1, disass_memory[i]);
-        disass_mnemonic[i] = new QTableWidgetItem();
-        disass_mnemonic[i]->setBackground(table_back_color);
-        ui->DisAssTable->setItem(i, 2, disass_mnemonic[i]);
-        disass_addressing[i] = new QTableWidgetItem();
-        disass_addressing[i]->setBackground(table_back_color);
-        ui->DisAssTable->setItem(i, 3, disass_addressing[i]);
-    }
+    disass_rows = 0;
+    connect(ui->DisAssTable, SIGNAL(resize(int,int)), this,SLOT(onResizeDisassList(int,int)));
 
     connect(ui->sr_widget, SIGNAL(ChangeValue(uint8_t)), this, SLOT(onSr_widget_ValueChange(uint8_t)));
     connect(ui->pc_out, SIGNAL(clicked(LabelWidgetMod*)), this, SLOT(onReg_label_clicked(LabelWidgetMod*)));
@@ -247,7 +234,7 @@ void DebuggerWindow::onResizeHistoryList(int weidth, int height)
 
     QRect rect = ui->HistoryList->visualItemRect(ui->HistoryList->item(0));
 
-    history_rows = ui->HistoryList->height() / rect.height();
+    history_rows = height / rect.height();
 
     for(int i=1; i<history_rows; i++)
     {
@@ -257,6 +244,53 @@ void DebuggerWindow::onResizeHistoryList(int weidth, int height)
     }
 
     FillHistoryList(static_cast<uint8_t>(ui->HistoryScroll->value()));
+}
+
+void DebuggerWindow::onResizeDisassList(int weidth, int height)
+{
+    ui->DisAssTable->clear();
+
+    view_code_address[0] = 0;
+    disass_pc[0] = new QTableWidgetItem();
+    disass_pc[0]->setBackground(table_back_color);
+    ui->DisAssTable->setItem(0, 0, disass_pc[0]);
+    disass_memory[0] = new QTableWidgetItem();
+    disass_memory[0]->setBackground(table_back_color);
+    ui->DisAssTable->setItem(0, 1, disass_memory[0]);
+    disass_mnemonic[0] = new QTableWidgetItem();
+    disass_mnemonic[0]->setBackground(table_back_color);
+    ui->DisAssTable->setItem(0, 2, disass_mnemonic[0]);
+    disass_addressing[0] = new QTableWidgetItem();
+    disass_addressing[0]->setBackground(table_back_color);
+    ui->DisAssTable->setItem(0, 3, disass_addressing[0]);
+
+    QRect rect = ui->DisAssTable->visualItemRect(disass_addressing[0]);
+
+    qDebug() << "H: " << rect.height();
+
+    disass_rows = height / rect.height();
+    ui->DisAssTable->setRowCount(disass_rows);
+
+    for(int i=1; i<disass_rows; i++)
+    {
+        view_code_address[i] = 0;
+        disass_pc[i] = new QTableWidgetItem();
+        disass_pc[i]->setBackground(table_back_color);
+        ui->DisAssTable->setItem(i, 0, disass_pc[i]);
+        disass_memory[i] = new QTableWidgetItem();
+        disass_memory[i]->setBackground(table_back_color);
+        ui->DisAssTable->setItem(i, 1, disass_memory[i]);
+        disass_mnemonic[i] = new QTableWidgetItem();
+        disass_mnemonic[i]->setBackground(table_back_color);
+        ui->DisAssTable->setItem(i, 2, disass_mnemonic[i]);
+        disass_addressing[i] = new QTableWidgetItem();
+        disass_addressing[i]->setBackground(table_back_color);
+        ui->DisAssTable->setItem(i, 3, disass_addressing[i]);
+    }
+
+    old_make_idx = 0;
+
+    FillDisassemblyList(ui->DisAssScroll->value(), false);
 }
 
 void DebuggerWindow::RetranslateUi()
@@ -627,6 +661,9 @@ void DebuggerWindow::on_CycleCounterReset_clicked()
 
 void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
 {
+    if(disass_rows == 0)
+        return;
+
     uint16_t pc = address;
     char str00[50];
     uint16_t tmp;
@@ -642,7 +679,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
 
     if(!new_refresh)
     {
-        for(int i=0;i<DISASS_ROW;i++)
+        for(int i=0;i<disass_rows;i++)
         {
             if(view_code_address[i] == address)
             {
@@ -687,7 +724,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
     uint8_t ram1;
     uint8_t ram2;
 
-    for(int i=0; i<DISASS_ROW; i++)
+    for(int i=0; i<disass_rows; i++)
     {
         view_code_address[i] = pc;
         sprintf(str00, "$%4.4X", pc);
@@ -2096,7 +2133,7 @@ void DebuggerWindow::RefreshGUI(void)
             for(int i=0;i<history_rows;i++) ui->HistoryList->item(i)->setText("");
 
             ui->DisassGroup->setEnabled(false);
-            for(int i=0;i<DISASS_ROW;i++)
+            for(int i=0;i<disass_rows;i++)
             {
                 disass_pc[i]->setText("");
                 disass_pc[i]->setBackground(table_back_color);
