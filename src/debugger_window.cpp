@@ -250,28 +250,16 @@ void DebuggerWindow::onResizeDisassList(int weidth, int height)
 {
     ui->DisAssTable->clear();
 
-    view_code_address[0] = 0;
-    disass_pc[0] = new QTableWidgetItem();
-    disass_pc[0]->setBackground(table_back_color);
-    ui->DisAssTable->setItem(0, 0, disass_pc[0]);
-    disass_memory[0] = new QTableWidgetItem();
-    disass_memory[0]->setBackground(table_back_color);
-    ui->DisAssTable->setItem(0, 1, disass_memory[0]);
-    disass_mnemonic[0] = new QTableWidgetItem();
-    disass_mnemonic[0]->setBackground(table_back_color);
-    ui->DisAssTable->setItem(0, 2, disass_mnemonic[0]);
-    disass_addressing[0] = new QTableWidgetItem();
-    disass_addressing[0]->setBackground(table_back_color);
-    ui->DisAssTable->setItem(0, 3, disass_addressing[0]);
+    int row_height = ui->DisAssTable->fontInfo().pixelSize();
 
-    QRect rect = ui->DisAssTable->visualItemRect(disass_addressing[0]);
+    disass_rows = height / row_height;
 
-    qDebug() << "H: " << rect.height();
+    if(disass_rows > MAX_DISASS_ROW)
+        disass_rows = MAX_DISASS_ROW;
 
-    disass_rows = height / rect.height();
     ui->DisAssTable->setRowCount(disass_rows);
 
-    for(int i=1; i<disass_rows; i++)
+    for(int i=0; i<disass_rows; i++)
     {
         view_code_address[i] = 0;
         disass_pc[i] = new QTableWidgetItem();
@@ -286,6 +274,7 @@ void DebuggerWindow::onResizeDisassList(int weidth, int height)
         disass_addressing[i] = new QTableWidgetItem();
         disass_addressing[i]->setBackground(table_back_color);
         ui->DisAssTable->setItem(i, 3, disass_addressing[i]);
+        ui->DisAssTable->setRowHeight(i, row_height);
     }
 
     old_make_idx = 0;
