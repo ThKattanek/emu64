@@ -64,7 +64,7 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
 
     QFontDatabase fontDB;
     fontDB.addApplicationFont(":/fonts/lucon.ttf");
-    QFont font1("Lucida Console",8);
+    QFont font1("Lucida Console",10);
 
     ui->MCodeHelp->setFont(font1);
 
