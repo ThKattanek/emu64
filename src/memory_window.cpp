@@ -28,13 +28,15 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
 {
     c64 = 0;
 
+    memory_rows = 17;
+
     ui->setupUi(this);
 
     // Center Window
     setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
     ui->MemoryTable->setColumnCount(1);
-    ui->MemoryTable->setRowCount(MemZeilenAnz);
+    ui->MemoryTable->setRowCount(memory_rows);
 
     MemScrDest << "RAM" << "KERNAL" << "BASIC" << "VIC" << "FARBRAM" << "SID" << "CIA1" << "CIA2" << "IO1" << "IO2" << "CHARROM" << "ROM-LO" << "ROM-HI" << "ROM-HI" << "ADR.OPEN";
     FloppyMemScrDest << "RAM" << "VIA1" << "VIA2" << "ROM" << "OPEN";
@@ -62,11 +64,16 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
         MapWriteDestination[i+0xC0] = FMV_OPEN;
     }
 
+    for(int i=0; i<MAX_MEMORY_ROW; i++)
+    {
+        memory_row[i] = nullptr;
+    }
+
     QFontDatabase fontDB;
     fontDB.addApplicationFont(":/fonts/lucon.ttf");
-    QFont font1("Lucida Console",9);
+    QFont font1("Lucida Console",10);
 
-    for(int i=0;i<MemZeilenAnz;i++)
+    for(int i=0;i<memory_rows;i++)
     {
         WidgetMemoryZeile *w = new WidgetMemoryZeile(&font1, this);
         ui->MemoryTable->setCellWidget(i,0,w);
@@ -77,11 +84,11 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
     }
 
     WidgetMemoryZeile *w = (WidgetMemoryZeile*)ui->MemoryTable->cellWidget(0,0);
-    w->setEnabled(true);
+    w->setEnabled(false);
 
     ui->MemoryTable->setMinimumWidth(w->width());
     ui->MemoryTable->setMaximumWidth(w->width());
-    ui->MemoryTable->setMinimumHeight((w->height()+1)*17);
+    ui->MemoryTable->setMinimumHeight((w->height()+1) * memory_rows);
 }
 
 MemoryWindow::~MemoryWindow()
@@ -152,7 +159,7 @@ void MemoryWindow::UpdateMemoryList(void)
     unsigned char puffer[16];
     unsigned char* ram_puffer;
 
-    for(int i=0;i<MemZeilenAnz-1;i++)
+    for(int i=0;i<memory_rows-1;i++)
     {
         if(AktSource > 0)
         {

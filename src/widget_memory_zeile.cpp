@@ -14,6 +14,7 @@
 //////////////////////////////////////////////////
 
 #include <cstdio>
+#include <QDebug>
 
 #include "./widget_memory_zeile.h"
 #include "./ui_widget_memory_zeile.h"
@@ -43,6 +44,56 @@ WidgetMemoryZeile::WidgetMemoryZeile(QFont *font1, QWidget *parent) :
     ui->EditValue_15->setFont(*font1);
     ui->ReadOut->setFont(*font1);
     ui->WriteOut->setFont(*font1);
+
+    int font_height = ui->AdresseOut->fontMetrics().height();
+    int font_weigth = ui->AdresseOut->fontMetrics().averageCharWidth();
+
+    this->setFixedHeight(font_height + 8);
+
+    ui->AdresseOut->setMinimumWidth(5 * font_weigth + 4);
+    ui->EditValue_0->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_1->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_2->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_3->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_4->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_5->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_6->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_7->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_8->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_9->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_10->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_11->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_12->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_13->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_14->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_15->setMinimumWidth(2 * font_weigth + 4);
+    ui->ReadOut->setMinimumWidth(10 * font_weigth + 4);
+    ui->WriteOut->setMinimumWidth(10 * font_weigth + 4);
+
+    ui->AdresseOut->setMaximumWidth(5 * font_weigth + 4);
+    ui->EditValue_0->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_1->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_2->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_3->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_4->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_5->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_6->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_7->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_8->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_9->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_10->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_11->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_12->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_13->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_14->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_15->setMaximumWidth(2 * font_weigth + 4);
+    ui->ReadOut->setMaximumWidth(9 * font_weigth + 4);
+    ui->WriteOut->setMaximumWidth(9 * font_weigth + 4);
+
+    int w = (5 * font_weigth + 4) + (16*(2 * font_weigth + 4)) + (2*(10 * font_weigth + 4));
+
+    this->setFixedWidth(w);
+
 }
 
 WidgetMemoryZeile::~WidgetMemoryZeile()

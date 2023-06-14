@@ -17,10 +17,12 @@
 #define MEMORY_WINDOW_H
 
 #include <QDialog>
+#include <QTableWidgetItem>
+
 #include "c64_class.h"
 #include "widget_memory_zeile.h"
 
-#define MemZeilenAnz 17
+#define MAX_MEMORY_ROW 255
 
 namespace Ui {
     class MemoryWindow;
@@ -62,6 +64,9 @@ private:
 
     QStringList MemScrDest;
     QStringList FloppyMemScrDest;
+
+    int16_t memory_rows;
+    QTableWidgetItem *memory_row[MAX_MEMORY_ROW];
 };
 
 #endif // MEMORY_WINDOW_H
