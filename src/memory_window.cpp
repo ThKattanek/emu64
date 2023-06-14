@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 28.09.2019                //
+// Letzte Änderung am 14.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,6 +17,7 @@
 #include <QStyle>
 
 #include "memory_window.h"
+#include "qdebug.h"
 #include "ui_memory_window.h"
 
 MemoryWindow::MemoryWindow(QWidget *parent) :
@@ -69,14 +70,18 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
     {
         WidgetMemoryZeile *w = new WidgetMemoryZeile(&font1, this);
         ui->MemoryTable->setCellWidget(i,0,w);
-        ui->MemoryTable->setRowHeight(i,w->height());
+        ui->MemoryTable->setRowHeight(i,w->height()+1);
         ui->MemoryTable->setColumnWidth(0,w->width());
         connect(w,SIGNAL(ChangeValue(unsigned short,unsigned char)),this,SLOT(onChangeValue(unsigned short,unsigned char)));
         connect(this,SIGNAL(NoFocus()),w,SLOT(onNoFocus()));
     }
 
     WidgetMemoryZeile *w = (WidgetMemoryZeile*)ui->MemoryTable->cellWidget(0,0);
-    w->setEnabled(false);
+    w->setEnabled(true);
+
+    ui->MemoryTable->setMinimumWidth(w->width());
+    ui->MemoryTable->setMaximumWidth(w->width());
+    ui->MemoryTable->setMinimumHeight((w->height()+1)*17);
 }
 
 MemoryWindow::~MemoryWindow()
@@ -200,16 +205,6 @@ void MemoryWindow::on_MemoryScroll_sliderPressed()
 void MemoryWindow::on_MemoryScroll_sliderReleased()
 {
     NoFocusRun = true;
-}
-
-void MemoryWindow::on_BitAnzeige_clicked(bool checked)
-{
-    WidgetMemoryZeile *w;
-    for(int i=0;i<MemZeilenAnz-1;i++)
-    {
-        w = (WidgetMemoryZeile*)ui->MemoryTable->cellWidget(i+1,0);
-        w->EndableBitLeiste(checked);
-    }
 }
 
 void MemoryWindow::on_OnlyRam_clicked(bool)

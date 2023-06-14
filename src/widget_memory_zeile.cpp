@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.08.2019                //
+// Letzte Änderung am 14.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -92,23 +92,6 @@ void WidgetMemoryZeile::Fill(unsigned short adr, unsigned char *byte_puffer,QStr
 
     ui->ReadOut->setText(ReadSource);
     ui->WriteOut->setText(WriteDestination);
-
-    ui->BitLeiste_0->SetValue(byte_puffer[0]);
-    ui->BitLeiste_1->SetValue(byte_puffer[1]);
-    ui->BitLeiste_2->SetValue(byte_puffer[2]);
-    ui->BitLeiste_3->SetValue(byte_puffer[3]);
-    ui->BitLeiste_4->SetValue(byte_puffer[4]);
-    ui->BitLeiste_5->SetValue(byte_puffer[5]);
-    ui->BitLeiste_6->SetValue(byte_puffer[6]);
-    ui->BitLeiste_7->SetValue(byte_puffer[7]);
-    ui->BitLeiste_8->SetValue(byte_puffer[8]);
-    ui->BitLeiste_9->SetValue(byte_puffer[9]);
-    ui->BitLeiste_10->SetValue(byte_puffer[10]);
-    ui->BitLeiste_11->SetValue(byte_puffer[11]);
-    ui->BitLeiste_12->SetValue(byte_puffer[12]);
-    ui->BitLeiste_13->SetValue(byte_puffer[13]);
-    ui->BitLeiste_14->SetValue(byte_puffer[14]);
-    ui->BitLeiste_15->SetValue(byte_puffer[15]);
 }
 
 bool WidgetMemoryZeile::ConvHex(QString str, unsigned char *value)
@@ -224,24 +207,4 @@ void WidgetMemoryZeile::on_EditValue_15_editingFinished()
 void WidgetMemoryZeile::onNoFocus(void)
 {
     if(!ui->AdresseOut->hasFocus()) ui->AdresseOut->setFocus();
-}
-
-void WidgetMemoryZeile::EndableBitLeiste(bool status)
-{
-    ui->BitLeiste_0->EnableBitLeiste(status);
-    ui->BitLeiste_1->EnableBitLeiste(status);
-    ui->BitLeiste_2->EnableBitLeiste(status);
-    ui->BitLeiste_3->EnableBitLeiste(status);
-    ui->BitLeiste_4->EnableBitLeiste(status);
-    ui->BitLeiste_5->EnableBitLeiste(status);
-    ui->BitLeiste_6->EnableBitLeiste(status);
-    ui->BitLeiste_7->EnableBitLeiste(status);
-    ui->BitLeiste_8->EnableBitLeiste(status);
-    ui->BitLeiste_9->EnableBitLeiste(status);
-    ui->BitLeiste_10->EnableBitLeiste(status);
-    ui->BitLeiste_11->EnableBitLeiste(status);
-    ui->BitLeiste_12->EnableBitLeiste(status);
-    ui->BitLeiste_13->EnableBitLeiste(status);
-    ui->BitLeiste_14->EnableBitLeiste(status);
-    ui->BitLeiste_15->EnableBitLeiste(status);
 }
