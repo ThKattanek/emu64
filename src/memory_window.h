@@ -22,7 +22,7 @@
 #include "c64_class.h"
 #include "widget_memory_zeile.h"
 
-#define MAX_MEMORY_ROW 255
+#define MAX_MEMORY_ROW 256
 
 namespace Ui {
     class MemoryWindow;
@@ -66,7 +66,7 @@ private:
     QStringList FloppyMemScrDest;
 
     int16_t memory_rows;
-    QTableWidgetItem *memory_row[MAX_MEMORY_ROW];
+    WidgetMemoryZeile *memory_row[MAX_MEMORY_ROW];
 };
 
 #endif // MEMORY_WINDOW_H

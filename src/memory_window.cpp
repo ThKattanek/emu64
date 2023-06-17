@@ -75,12 +75,12 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
 
     for(int i=0;i<memory_rows;i++)
     {
-        WidgetMemoryZeile *w = new WidgetMemoryZeile(&font1, this);
-        ui->MemoryTable->setCellWidget(i,0,w);
-        ui->MemoryTable->setRowHeight(i,w->height()+1);
-        ui->MemoryTable->setColumnWidth(0,w->width());
-        connect(w,SIGNAL(ChangeValue(unsigned short,unsigned char)),this,SLOT(onChangeValue(unsigned short,unsigned char)));
-        connect(this,SIGNAL(NoFocus()),w,SLOT(onNoFocus()));
+        memory_row[i] = new WidgetMemoryZeile(&font1, this);
+        ui->MemoryTable->setCellWidget(i,0,memory_row[i]);
+        ui->MemoryTable->setRowHeight(i,memory_row[i]->height()+1);
+        ui->MemoryTable->setColumnWidth(0,memory_row[i]->width());
+        connect(memory_row[i],SIGNAL(ChangeValue(unsigned short,unsigned char)),this,SLOT(onChangeValue(unsigned short,unsigned char)));
+        connect(this,SIGNAL(NoFocus()),memory_row[i],SLOT(onNoFocus()));
     }
 
     WidgetMemoryZeile *w = (WidgetMemoryZeile*)ui->MemoryTable->cellWidget(0,0);
@@ -89,6 +89,7 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
     ui->MemoryTable->setMinimumWidth(w->width());
     ui->MemoryTable->setMaximumWidth(w->width());
     ui->MemoryTable->setMinimumHeight((w->height()+1) * memory_rows);
+    ui->MemoryTable->setMaximumHeight((w->height()+1) * memory_rows);
 }
 
 MemoryWindow::~MemoryWindow()
