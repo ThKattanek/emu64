@@ -3459,9 +3459,12 @@ bool C64Class::ExportASM(const char *filename, uint16_t start_adresse, uint16_t 
     fprintf(file,"\n");
 
     uint16_t pc = start_adresse;
-L10:
-    pc = DisAss(file,pc,true,source);
-    if(pc < end_adresse) goto L10;
+
+    do
+    {
+        pc = DisAss(file, pc, true, source);
+    }
+    while(pc < end_adresse + 1);
 
     fclose(file);
 
