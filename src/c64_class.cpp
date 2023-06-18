@@ -32,6 +32,43 @@ int SDLThreadWarp(void *userdat);
 
 const char* C64Class::screenshot_format_name[] = {"BMP","PNG"};
 
+static const uint8_t CPU_OPC_INFO[256]={\
+0*16+6+0,7*16+5+0,0*16+0+8,7*16+7+8,3*16+2+8,3*16+2+0,3*16+4+0,3*16+4+8,0*16+2+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+3+8,2*16+3+0,2*16+5+0,2*16+5+8\
+,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8\
+,2*16+5+0,7*16+5+0,0*16+0+8,7*16+7+8,3*16+2+0,3*16+2+0,3*16+4+0,3*16+4+8,0*16+3+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+3+0,2*16+3+0,2*16+5+0,2*16+5+8\
+,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8\
+,0*16+5+0,7*16+5+0,0*16+0+8,7*16+7+8,3*16+2+8,3*16+2+0,3*16+4+0,3*16+4+8,0*16+2+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+2+0,2*16+4+0,2*16+5+0,2*16+5+8\
+,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8\
+,0*16+5+0,7*16+5+0,0*16+0+8,7*16+7+8,3*16+2+8,3*16+2+0,3*16+4+0,3*16+4+8,0*16+2+0,1*16+1+0,0*16+1+0,1*16+1+8,10*16+4+0,2*16+3+0,2*16+5+0,2*16+5+8\
+,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8\
+,1*16+1+8,7*16+5+0,0*16+1+8,7*16+5+8,3*16+2+0,3*16+2+0,3*16+2+0,3*16+2+8,0*16+1+0,1*16+1+8,0*16+1+0,1*16+1+8,2*16+3+0,2*16+3+0,2*16+3+0,2*16+3+8\
+,9*16+1+0,8*16+5+0,0*16+0+8,4*16+5+8,6*16+1+0,6*16+3+0,11*16+3+0,11*16+3+8,0*16+1+0,5*16+1+0,0*16+1+0,5*16+4+8,5*16+4+8,4*16+4+0,4*16+4+8,5*16+4+8\
+,1*16+1+0,7*16+5+0,1*16+1+0,7*16+5+8,3*16+2+0,3*16+2+0,3*16+2+0,3*16+2+8,0*16+1+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+3+0,2*16+3+0,2*16+3+0,2*16+3+8\
+,9*16+1+0,8*16+4+0,0*16+0+8,8*16+4+8,6*16+1+0,6*16+3+0,11*16+3+0,11*16+3+8,0*16+1+0,5*16+3+0,0*16+1+0,5*16+3+8,4*16+3+0,4*16+3+0,5*16+3+0,5*16+3+8\
+,1*16+1+0,7*16+5+0,1*16+1+8,7*16+7+8,3*16+2+0,3*16+2+0,3*16+4+0,3*16+4+8,0*16+1+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+3+0,2*16+3+0,2*16+5+0,2*16+5+8\
+,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8\
+,1*16+1+0,7*16+5+0,1*16+1+8,7*16+7+8,3*16+2+0,3*16+2+0,3*16+4+0,3*16+4+8,0*16+1+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+3+0,2*16+3+0,2*16+5+0,2*16+5+8\
+,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8};
+
+static const char* CPU_OPC = {"\
+BRKORAJAMSLONOPORAASLSLOPHPORAASLANCNOPORAASLSLO\
+BPLORAJAMSLONOPORAASLSLOCLCORANOPSLONOPORAASLSLO\
+JSRANDJAMRLABITANDROLRLAPLPANDROLANCBITANDROLRLA\
+BMIANDJAMRLANOPANDROLRLASECANDNOPRLANOPANDROLRLA\
+RTIEORJAMSRENOPEORLSRSREPHAEORLSRASRJMPEORLSRSRE\
+BVCEORJAMSRENOPEORLSRSRECLIEORNOPSRENOPEORLSRSRE\
+RTSADCJAMRRANOPADCRORRRAPLAADCRORARRJMPADCRORRRA\
+BVSADCJAMRRANOPADCRORRRASEIADCNOPARRNOPADCRORRRA\
+NOPSTANOPSAXSTYSTASTXSAXDEYNOPTXAANESTYSTASTXSAX\
+BCCSTAJAMSHASTYSTASTXSAXTYASTATXSSHSSHYSTASHXSHA\
+LDYLDALDXLAXLDYLDALDXLAXTAYLDATAXLXALDYLDALDXLAX\
+BCSLDAJAMLAXLDYLDALDXLAXCLVLDATSXLAELDYLDALDXLAX\
+CPYCMPNOPDCPCPYCMPDECDCPINYCMPDEXSBXCPYCMPDECDCP\
+BNECMPJAMDCPNOPCMPDECDCPCLDCMPNOPDCPNOPCMPDECDCP\
+CPXSBCNOPISBCPXSBCINCISBINXSBCNOPSBCCPXSBCINCISB\
+BEQSBCJAMISBNOPSBCINCISBSEDSBCNOPISBNOPSBCINCISB\
+RSTIRQNMI"};
+
 C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(char*)> log_function, const char *data_path):
     mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
 {
@@ -396,6 +433,7 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
 	limit_cycles_counter = 0;
 	hold_next_system_cycle = false;
     debug_animation = false;
+    debug_logging = false;
     animation_speed_add = audio_spec_have.samples/audio_frequency;
     animation_speed_counter = 0;
 
@@ -600,6 +638,8 @@ void C64Class::StartEmulation()
 
 void C64Class::EndEmulation()
 {
+    StopDebugLogging();
+
     EnableWarpMode(false);
 
 	if(enable_exit_screenshot)
@@ -1009,6 +1049,9 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
             NextSystemCycle();
 
+            if(cpu_states[0] && debug_logging)
+                DebugLogging();
+
             if((break_status != 0) || (floppy_found_breakpoint == true )) if(CheckBreakpoints()) break;
 
 
@@ -1194,6 +1237,9 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 {
                     NextSystemCycle();
 
+                    if(cpu_states[0] && debug_logging)
+                        DebugLogging();
+
                     if((break_status != 0) || (floppy_found_breakpoint == true )) if(CheckBreakpoints()) break;
 
                     if(iec_is_dumped)
@@ -1217,6 +1263,9 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 one_cycle = false;
 
                 NextSystemCycle();
+
+                if(cpu_states[0] && debug_logging)
+                    DebugLogging();
 
                 if((break_status != 0) || (floppy_found_breakpoint == true )) CheckBreakpoints();
 
@@ -1242,6 +1291,9 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     NextSystemCycle();
                 }
                 while (!cpu_states[one_opcode_source]);
+
+                if(debug_logging)
+                    DebugLogging();
 
                 if((break_status != 0) || (floppy_found_breakpoint == true )) CheckBreakpoints();
 
@@ -3179,6 +3231,149 @@ void C64Class::GetIECStatus(IEC_STRUCT *iec)
     iec->DATA_IN = !!(floppy_iec_wire & 128);
 }
 
+bool C64Class::StartDebugLogging(const char *filename)
+{
+    debug_logging_file = fopen (filename, "w");
+    if (debug_logging_file == nullptr)
+    {
+        return false;
+    }
+
+    debug_logging = true;
+
+    return true;
+}
+
+void C64Class::StopDebugLogging()
+{
+    if(debug_logging)
+    {
+        debug_logging = false;
+        fclose(debug_logging_file);
+    }
+}
+
+int C64Class::Disassemble(FILE* file, uint16_t pc, bool line_draw)
+{
+    static char output[50]; output[0] = 0;
+    static char address[7]; address[0] = 0;
+    static char memory[16]; memory[0] = 0;
+    static char opcode[5]; opcode[0] = 0;
+    static char addressing[8]; addressing[0] = 0;
+
+    uint16_t TMP;
+    uint16_t OPC;
+
+    uint16_t word;
+    uint16_t a;
+    char b;
+
+    sprintf(address, "$%4.4X ", pc);			// Adresse Ausgeben
+
+    OPC = ReadC64Byte(pc) * 3;					//** Opcodes Ausgeben **//
+    sprintf(opcode, "%c%c%c ", CPU_OPC[OPC + 0], CPU_OPC[OPC + 1], CPU_OPC[OPC + 2]);
+
+    TMP = CPU_OPC_INFO[ReadC64Byte(pc)];		//** Memory und Adressierung Ausgeben **//
+    TMP = TMP >> 4;
+    TMP = TMP & 15;
+
+    switch(TMP)
+    {
+    case 0:     //** Implizit **//
+        sprintf(memory, "$%2.2X          ", ReadC64Byte(pc));
+        sprintf(addressing, "");
+        pc++;
+        break;
+
+    case 1:		//** Unmittelbar **//
+        sprintf(memory, "$%2.2X $%2.2X      ", ReadC64Byte(pc), ReadC64Byte(pc + 1));
+        sprintf(addressing, "#$%2.2X", ReadC64Byte(pc + 1));
+        pc += 2;
+        break;
+
+    case 2:		//** Absolut **//
+        sprintf(memory, "$%2.2X $%2.2X $%2.2X  ", ReadC64Byte(pc), ReadC64Byte(pc + 1), ReadC64Byte(pc + 2));
+        word = ReadC64Byte(pc + 1);
+        word|=ReadC64Byte(pc + 2)<<8;
+        sprintf(addressing, "$%4.4X", word);
+        pc += 3;
+        break;
+
+    case 3:		//** Zerropage **//
+        sprintf(memory, "$%2.2X $%2.2X      ", ReadC64Byte(pc), ReadC64Byte(pc + 1));
+        sprintf(addressing, "$%2.2X", ReadC64Byte(pc + 1));
+        pc += 2;
+        break;
+
+    case 4:		//** Absolut X Indexziert **//
+        sprintf(memory, "$%2.2X $%2.2X $%2.2X  ", ReadC64Byte(pc), ReadC64Byte(pc + 1), ReadC64Byte(pc + 2));
+        word=ReadC64Byte(pc + 1);
+        word|=ReadC64Byte(pc + 2)<<8;
+        sprintf(addressing, "$%4.4X,X", word);
+        pc += 3;
+        break;
+
+    case 5:		//** Absolut Y Indexziert **//
+        sprintf(memory, "$%2.2X $%2.2X $%2.2X  ", ReadC64Byte(pc), ReadC64Byte(pc + 1), ReadC64Byte(pc + 2));
+        word=ReadC64Byte(pc + 1);
+        word|=ReadC64Byte(pc + 2)<<8;
+        sprintf(addressing, "$%4.4X,Y", word);
+        pc += 3;
+        break;
+
+    case 6:		//** Zerropage X Indexziert **//
+        sprintf(memory, "$%2.2X $%2.2X      ", ReadC64Byte(pc), ReadC64Byte(pc + 1));
+        sprintf(addressing, "$%2.2X,X", ReadC64Byte(pc + 1));
+        pc += 2;
+        break;
+
+    case 7:		//** Indirekt X Indiziert **//
+        sprintf(memory, "$%2.2X $%2.2X      ", ReadC64Byte(pc), ReadC64Byte(pc + 1));
+        sprintf(addressing, "($%2.2X,X)", ReadC64Byte(pc + 1));
+        pc += 2;
+        break;
+
+    case 8:		//** Indirekt Y Indiziert **//
+        sprintf(memory, "$%2.2X $%2.2X      ", ReadC64Byte(pc), ReadC64Byte(pc + 1));
+        sprintf(addressing, "($%2.2X),Y", ReadC64Byte(pc + 1));
+        pc += 2;
+        break;
+
+    case 9:
+        sprintf(memory, "$%2.2X $%2.2X      ", ReadC64Byte(pc), ReadC64Byte(pc + 1));
+        b = ReadC64Byte(pc + 1);
+        a = (pc + 2) + b;
+        sprintf(addressing, "$%4.4X", a);
+        pc += 2;
+        break;
+
+    case 10:	//** Indirekt **//
+        sprintf(memory, "$%2.2X $%2.2X $%2.2X  ", ReadC64Byte(pc), ReadC64Byte(pc + 1), ReadC64Byte(pc + 2));
+        word = ReadC64Byte(pc + 1);
+        word |= ReadC64Byte(pc + 2) << 8;
+        sprintf(addressing, "($%4.4X)", word);
+        pc += 3;
+        break;
+
+    case 11:									//** Zerropage Y Indexziert **//
+        sprintf(memory, "$%2.2X $%2.2X      ", ReadC64Byte(pc), ReadC64Byte(pc + 1));
+        sprintf(addressing, "$%2.2X,Y", ReadC64Byte(pc + 1));
+        pc += 2;
+        break;
+    }
+
+    sprintf(output, "%s%s%s%s", address, memory, opcode, addressing);
+    fprintf(file, "%s\n", output);
+
+    OPC /= 3;
+    if(((OPC == 0x40) || (OPC == 0x60) || (OPC == 0x4C)) && (line_draw == true))
+    {
+        fprintf(file, "------------------------------\n");
+    }
+
+    return pc;
+}
+
 int C64Class::AddBreakGroup()
 {
     if(breakgroup_count == MAX_BREAK_GROUP_NUM) return -1;
@@ -4367,4 +4562,22 @@ void C64Class::SwapRBSurface(SDL_Surface *surface)
         }
     }
     SDL_UnlockSurface(surface);
+}
+
+void C64Class::DebugLogging()
+{
+    static REG_STRUCT  cpuReg;
+    cpuReg.reg_mask = REG_MASK_ALL;
+
+    cpu->GetRegister(&cpuReg);
+
+    fprintf(debug_logging_file, "\nPC   AC XR YR SP SR NV/BDIZC IRQ  NMI\n");
+    fprintf(debug_logging_file, "%4.4X %2.2X %2.2X %2.2X %2.2X %2.2X ", cpuReg.pc, cpuReg.ac, cpuReg.xr, cpuReg.yr, cpuReg.sp, cpuReg.sr);
+
+    for(int i=7;i>=0;--i)
+        fprintf(debug_logging_file, "%d",((cpuReg.sr >> i)&1));
+
+    fprintf(debug_logging_file, " %4.4X %4.4X\n", cpuReg._0314, cpuReg._0318);
+    fprintf(debug_logging_file, "--------------------------------------\n");
+    Disassemble(debug_logging_file, cpuReg.pc, false);
 }

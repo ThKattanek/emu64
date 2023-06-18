@@ -157,6 +157,9 @@ public:
     void GetC64CpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg);
     void GetVicReg(VIC_STRUCT *vic_reg);
     void GetIECStatus(IEC_STRUCT *iec);
+    bool StartDebugLogging(const char *filename);
+    void StopDebugLogging();
+    int Disassemble(FILE* file, uint16_t pc, bool line_draw);
 
     int AddBreakGroup();
     void DelBreakGroup(int index);
@@ -418,6 +421,7 @@ private:
     int InitVideoCaptureSystem();
     void CloseVideoCaptureSystem();
     void SwapRBSurface(SDL_Surface *surface); // swaps the color red with blue in sdl surface
+    void DebugLogging();
 
     std::function<uint8_t(uint16_t)> *ReadProcTbl;
     std::function<void(uint16_t, uint8_t)> *WriteProcTbl;
@@ -526,6 +530,9 @@ private:
     bool        one_opcode;
     int         one_opcode_source;
     bool        cpu_states[5];              // true = Feetch / false = no Feetch ::: Index 0=C64 Cpu, 1-4 Floppy 1-4
+
+    FILE*       debug_logging_file;
+    bool        debug_logging;
 
     bool        warp_mode;
 

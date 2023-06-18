@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.04.2023                //
+// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -140,6 +140,10 @@ private slots:
     void OnChangeFloppyImage(int floppynr);
     void OnResetScreenshotCounter(void);
     void OnSetupFished(int result);
+
+    void on_actionCPU_Logging_Start_triggered();
+
+    void on_actionCPU_Logging_Stop_triggered();
 
 private:
     /// Funktionen ///

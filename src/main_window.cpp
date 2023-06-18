@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.04.2023                //
+// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1487,3 +1487,35 @@ void MainWindow::on_actionAudio_Oszilloskop_triggered()
 {
     oscilloscope_window->show();
 }
+
+void MainWindow::on_actionCPU_Logging_Start_triggered()
+{
+    if(QMessageBox::Yes == QMessageBox::question(this, tr("Achtung!"), tr("Bitte beachte, dass das Mitloggen der CPU eine sehr große Textdatei erzeugt. Es entstehen ca. 30MB/s an Daten. Außerdem könnte die Emulation verlangsamt werden, je nach Systemausstattung.\n\nMöchtest du fortfahren?")))
+    {
+        QString filename;
+        QString fileext;
+
+        QStringList filters;
+        filters << tr("Debug Logging (*.txt)")
+                << tr("Alle Dateien (*.*)");
+
+        if(!CustomSaveFileDialog::GetSaveFileName(this,tr("Export..."), filters, &filename, &fileext))
+        {
+            return;
+        }
+
+        fileext = fileext.toUpper();
+        if(fileext == "TXT")
+        {
+            if(!c64->StartDebugLogging(filename.toLatin1().constData()))
+                QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der Debug Logging Datei."));
+        }
+    }
+}
+
+
+void MainWindow::on_actionCPU_Logging_Stop_triggered()
+{
+    c64->StopDebugLogging();
+}
+
