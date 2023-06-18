@@ -3389,8 +3389,9 @@ bool C64Class::ExportPRG(const char *filename, uint16_t start_adresse, uint16_t 
     {
         return false;
     }
+
     fwrite(&start_adresse,sizeof(start_adresse),1,file);
-    for(int i=start_adresse;i<end_adresse;i++) fwrite(&RAM[i],1,1,file);
+    for(int i = start_adresse; i<end_adresse + 1; i++) fwrite(&RAM[i], 1, 1, file);
     fclose(file);
 
     return true;
@@ -3414,7 +3415,7 @@ bool C64Class::ExportRAW(const char *filename, uint16_t start_adresse, uint16_t 
     {
         return false;
     }
-    for(int i=start_adresse; i<end_adresse + 1; i++) fwrite(&RAM[i], 1, 1, file);
+    for(int i=start_adresse; i < end_adresse + 1; i++) fwrite(&RAM[i], 1, 1, file);
     fclose(file);
 
     return true;
