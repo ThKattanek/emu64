@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.03.2022                //
+// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -167,7 +167,7 @@ public:
     int LoadBreakGroups(const char *filename);
     bool SaveBreakGroups(const char *filename);
     bool ExportPRG(const char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
-    bool ExportRAW(char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
+    bool ExportRAW(const char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
     bool ExportASM(const char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
     void JoystickNewScan();
     void StartRecJoystickMapping(int slot_nr);

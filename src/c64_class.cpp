@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2022                //
+// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -3396,7 +3396,7 @@ bool C64Class::ExportPRG(const char *filename, uint16_t start_adresse, uint16_t 
     return true;
 }
 
-bool C64Class::ExportRAW(char *filename, uint16_t start_adresse, uint16_t end_adresse, int source)
+bool C64Class::ExportRAW(const char *filename, uint16_t start_adresse, uint16_t end_adresse, int source)
 {
     FILE *file;
     uint8_t *RAM;
@@ -3414,7 +3414,7 @@ bool C64Class::ExportRAW(char *filename, uint16_t start_adresse, uint16_t end_ad
     {
         return false;
     }
-    for(int i=start_adresse;i<end_adresse;i++) fwrite(&RAM[i],1,1,file);
+    for(int i=start_adresse; i<end_adresse + 1; i++) fwrite(&RAM[i], 1, 1, file);
     fclose(file);
 
     return true;

@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 30.05.2023                //
+// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -1990,6 +1990,7 @@ void DebuggerWindow::on_ExportDisAss_clicked()
     QStringList filters;
     filters << tr("Disassembler Listing (*.txt)")
             << tr("C64 Programm Datei (*.prg)")
+            << tr("RAW Datei (*.raw)")
             << tr("Alle Dateien (*.*)");
 
     if(!CustomSaveFileDialog::GetSaveFileName(this,tr("Export..."), filters, &filename, &fileext))
@@ -2013,6 +2014,12 @@ void DebuggerWindow::on_ExportDisAss_clicked()
         }
         if(!c64->ExportPRG(filename.toLocal8Bit(),start,end,current_source))
             QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der Programm Datei."));
+    }
+
+    if(fileext == "RAW")
+    {
+        if(!c64->ExportRAW(filename.toLocal8Bit(),start,end,current_source))
+            QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der RAW Datei."));
     }
 }
 
