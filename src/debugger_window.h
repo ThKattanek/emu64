@@ -139,6 +139,8 @@ private slots:
     void onResizeHistoryList(int weidth, int height);
     void onResizeDisassList(int weidth, int height);
 
+    void on_HistoryList_doubleClicked(const QModelIndex &index);
+
 private:
 
     void UpdateRegister(void);

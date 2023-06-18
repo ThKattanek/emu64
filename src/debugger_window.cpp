@@ -2290,3 +2290,16 @@ void DebuggerWindow::on_nmi_led_clicked(bool checked)
         else ui->nmi_led->setIcon(*icon_off);
     }
 }
+
+void DebuggerWindow::on_HistoryList_doubleClicked(const QModelIndex &index)
+{
+    bool is_ok = false;
+    int16_t address = index.data().toString().right(4).toInt(&is_ok, 16);
+
+    if(is_ok)
+    {
+        FillDisassemblyList(address, true);
+    }
+
+}
+
