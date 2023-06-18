@@ -857,6 +857,8 @@ void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
             break;
         }
     }
+
+    ui->DisAssScroll->setValue(address);
 }
 
 void DebuggerWindow::FillHistoryList(uint8_t index)
@@ -2300,6 +2302,5 @@ void DebuggerWindow::on_HistoryList_doubleClicked(const QModelIndex &index)
     {
         FillDisassemblyList(address, true);
     }
-
 }
 
