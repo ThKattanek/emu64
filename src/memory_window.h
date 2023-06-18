@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 14.06.2023                //
+// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -46,6 +46,8 @@ private slots:
     void on_MemoryScroll_sliderPressed();
     void on_MemoryScroll_sliderReleased();
     void on_OnlyRam_clicked(bool checked);
+
+    void on_jump_address_returnPressed();
 
 signals:
     void NoFocus(void);

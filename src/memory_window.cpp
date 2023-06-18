@@ -8,12 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 14.06.2023                //
+// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include <QScreen>
+#include <QMessageBox>
 #include <QStyle>
 
 #include "memory_window.h"
@@ -219,3 +220,31 @@ void MemoryWindow::on_OnlyRam_clicked(bool)
 {
     UpdateMemoryList();
 }
+
+void MemoryWindow::on_jump_address_returnPressed()
+{
+    bool ok;
+    QString in_str;
+    int value;
+
+    in_str = ui->jump_address->text();
+
+    if(in_str.left(1) == "$") in_str.replace(0,1,"0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
+    value = in_str.toInt(&ok,0);
+    if(!ok)
+    {
+        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gültiges Zahlenformat benutzt !"));
+            return;
+    }
+
+    if(value < 0 || value > 0xffff)
+            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Die Zieladresse muss zwischen $0000 (0) und $FFFF (65535) liegen"));
+
+    ui->MemoryScroll->setValue(value);
+
+    if(value < 0xff10)
+        memory_row[1]->SelectColumb(value % 16);
+    else
+        memory_row[16 - ((0xffff - value) / 16)]->SelectColumb(value % 16);
+}
+

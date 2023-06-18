@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 14.06.2023                //
+// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -143,6 +143,77 @@ void WidgetMemoryZeile::Fill(unsigned short adr, unsigned char *byte_puffer,QStr
 
     ui->ReadOut->setText(ReadSource);
     ui->WriteOut->setText(WriteDestination);
+}
+
+void WidgetMemoryZeile::SelectColumb(uint8_t columb)
+{
+    switch(columb)
+    {
+    case 0:
+        ui->EditValue_0->selectAll();
+        ui->EditValue_0->setFocus();
+        break;
+    case 1:
+        ui->EditValue_1->selectAll();
+        ui->EditValue_1->setFocus();
+        break;
+    case 2:
+        ui->EditValue_2->selectAll();
+        ui->EditValue_2->setFocus();
+        break;
+    case 3:
+        ui->EditValue_3->selectAll();
+        ui->EditValue_3->setFocus();
+        break;
+    case 4:
+        ui->EditValue_4->selectAll();
+        ui->EditValue_4->setFocus();
+        break;
+    case 5:
+        ui->EditValue_5->selectAll();
+        ui->EditValue_5->setFocus();
+        break;
+    case 6:
+        ui->EditValue_6->selectAll();
+        ui->EditValue_6->setFocus();
+        break;
+    case 7:
+        ui->EditValue_7->selectAll();
+        ui->EditValue_7->setFocus();
+        break;
+    case 8:
+        ui->EditValue_8->selectAll();
+        ui->EditValue_8->setFocus();
+        break;
+    case 9:
+        ui->EditValue_9->selectAll();
+        ui->EditValue_9->setFocus();
+        break;
+    case 10:
+        ui->EditValue_10->selectAll();
+        ui->EditValue_10->setFocus();
+        break;
+    case 11:
+        ui->EditValue_11->selectAll();
+        ui->EditValue_11->setFocus();
+        break;
+    case 12:
+        ui->EditValue_12->selectAll();
+        ui->EditValue_12->setFocus();
+        break;
+    case 13:
+        ui->EditValue_13->selectAll();
+        ui->EditValue_13->setFocus();
+        break;
+    case 14:
+        ui->EditValue_14->selectAll();
+        ui->EditValue_14->setFocus();
+        break;
+    case 15:
+        ui->EditValue_15->selectAll();
+        ui->EditValue_15->setFocus();
+        break;
+    }
 }
 
 bool WidgetMemoryZeile::ConvHex(QString str, unsigned char *value)
