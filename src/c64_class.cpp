@@ -3654,12 +3654,14 @@ bool C64Class::ExportASM(const char *filename, uint16_t start_adresse, uint16_t 
     fprintf(file,"\n");
 
     uint16_t pc = start_adresse;
+    uint16_t pc_old;
 
     do
     {
+        pc_old = pc;
         pc = DisAss(file, pc, true, source);
     }
-    while(pc < end_adresse + 1);
+    while((pc <= end_adresse + 1) && (pc_old < pc));
 
     fclose(file);
 
