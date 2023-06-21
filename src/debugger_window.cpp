@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.06.2023                //
+// Letzte Änderung am 20.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -74,10 +74,12 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
 
     int font1_width = ui->DisAssTable->fontMetrics().averageCharWidth() + 3;
 
-    ui->DisAssTable->setColumnWidth(0, 5 * font1_width);
-    ui->DisAssTable->setColumnWidth(1, 8 * font1_width);
-    ui->DisAssTable->setColumnWidth(2, 3 * font1_width);
-    ui->DisAssTable->setColumnWidth(3, 7 * font1_width);
+    ui->DisAssTable->setColumnWidth(0, 5 * font1_width + 2);
+    ui->DisAssTable->setColumnWidth(1, 8 * font1_width + 2);
+    ui->DisAssTable->setColumnWidth(2, 3 * font1_width + 2);
+    ui->DisAssTable->setColumnWidth(3, 7 * font1_width + 2);
+
+    ui->DisAssTable->setMinimumWidth(23 * font1_width + 8);
 
     disass_rows = 1;
     ui->DisAssTable->setRowCount(disass_rows);
@@ -86,9 +88,11 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     ui->AssMnemonicIn->setFont(font1);
     ui->AssAdressierungIn->setFont(font1);
 
+    ui->BreakpointTree->setFont(font1);
     ui->BreakpointTree->setColumnCount(2);
-    ui->BreakpointTree->setColumnWidth(0, 175);
-    ui->BreakpointTree->setColumnWidth(1, 50);
+    ui->BreakpointTree->setColumnWidth(0, (22 * font1_width) + 10);
+    ui->BreakpointTree->setColumnWidth(1, 5 * font1_width);
+    ui->BreakpointTree->setMinimumWidth(35 * font1_width);
     new_breakpoint_found = false;
 
     ui->HistoryList->setFont(font1);
@@ -1434,27 +1438,30 @@ void DebuggerWindow::AddBreakpointTreeRoot(QString name,BREAK_GROUP *bg)
     ui->BreakpointTree->addTopLevelItem(item);
 
     break_point_update_enable = false;
-    AddBreakpointTreeChild(item,bg->iPC,bg->bPC,tr("Wenn der Wert gleich dem Programm Counter (PC) ist."));
-    AddBreakpointTreeChild(item,bg->iAC,bg->bAC,tr("Wenn der Wert gleich dem Accu Register (AC) ist."));
-    AddBreakpointTreeChild(item,bg->iXR,bg->bXR,tr("Wenn der Wert gleich dem X Register (XR) ist."));
-    AddBreakpointTreeChild(item,bg->iYR,bg->bYR,tr("Wenn der Wert gleich dem Y Register (YR) ist."));
-    AddBreakpointTreeChild(item,bg->iRAdresse,bg->bRAdresse,tr("Wenn ein Lesezugriff an dieser Adresse statt findet."));
-    AddBreakpointTreeChild(item,bg->iWAdresse,bg->bWAdresse,tr("Wenn ein Schreibzugriff an dieser Adresse statt findet."));
-    AddBreakpointTreeChild(item,bg->iRWert,bg->bRWert,tr("Wenn aus einer Adresse dieser Wert ausgelesen wird."));
-    AddBreakpointTreeChild(item,bg->iWWert,bg->bWWert,tr("Wenn in einer Adresse dieser Wert geschrieben wird."));
+    AddBreakpointTreeChild(item,bg->iPC,bg->iPC,bg->bPC,tr("Wenn der Wert gleich dem Programm Counter (PC) ist."));
+    AddBreakpointTreeChild(item,bg->iAC,bg->iAC,bg->bAC,tr("Wenn der Wert gleich dem Accu Register (AC) ist."));
+    AddBreakpointTreeChild(item,bg->iXR,bg->iXR,bg->bXR,tr("Wenn der Wert gleich dem X Register (XR) ist."));
+    AddBreakpointTreeChild(item,bg->iYR,bg->iYR,bg->bYR,tr("Wenn der Wert gleich dem Y Register (YR) ist."));
+    AddBreakpointTreeChild(item,bg->iRAddress,bg->iRAddress + bg->iRAddressCount - 1,bg->bRAddress,tr("Wenn ein Lesezugriff an dieser Adresse statt findet."));
+    AddBreakpointTreeChild(item,bg->iWAddress,bg->iWAddress + bg->iWAddressCount - 1,bg->bWAddress,tr("Wenn ein Schreibzugriff an dieser Adresse statt findet."));
+    AddBreakpointTreeChild(item,bg->iRWert,bg->iRWert,bg->bRWert,tr("Wenn aus einer Adresse dieser Wert ausgelesen wird."));
+    AddBreakpointTreeChild(item,bg->iWWert,bg->iWWert,bg->bWWert,tr("Wenn in einer Adresse dieser Wert geschrieben wird."));
     if(current_source == 0)
     {
-        AddBreakpointTreeChild(item,bg->iRZ,bg->bRZ,tr("Wenn der Wert gleich der Aktuellen Rasterzeile ist."));
-        AddBreakpointTreeChild(item,bg->iRZZyklus,bg->bRZZyklus,tr("Wenn der Wert gleich dem Aktuellen Zyklus in einer Rasterzeile ist."));
+        AddBreakpointTreeChild(item,bg->iRZ,bg->iRZ,bg->bRZ,tr("Wenn der Wert gleich der Aktuellen Rasterzeile ist."));
+        AddBreakpointTreeChild(item,bg->iRZZyklus,bg->iRZZyklus,bg->bRZZyklus,tr("Wenn der Wert gleich dem Aktuellen Zyklus in einer Rasterzeile ist."));
     }
     break_point_update_enable = true;
     c64->UpdateBreakGroup();
 }
 
-void DebuggerWindow::AddBreakpointTreeChild(QTreeWidgetItem *parent, uint16_t value, uint8_t checked, QString tooltip)
+void DebuggerWindow::AddBreakpointTreeChild(QTreeWidgetItem *parent, uint16_t value1, uint16_t value2, uint8_t checked, QString tooltip)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(parent);
-    item->setText(1,QVariant(value).toString());
+    if(value1 == value2)
+        item->setText(1,QVariant(value1).toString());
+    else
+        item->setText(1,QVariant(value1).toString() + " - " + QVariant(value2).toString());
     item->setForeground(0,QBrush(QColor(0,0,0)));
     item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEditable);
     if(checked) item->setCheckState(0,Qt::Checked);
@@ -1505,8 +1512,8 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
         {
             QString tmp_str = item->text(1);
             bool ok;
-            uint16_t integer;
-            char str_00[10];
+            uint16_t integer, integer2;
+            char str_00[20];
 
             switch(child_index)
             {
@@ -1534,8 +1541,8 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 }
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bPC = item->checkState(0);
-
                 break;
+
             case 1:
                 item->setText(0,"AC:");
 
@@ -1570,6 +1577,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bAC = item->checkState(0);
                 break;
+
             case 2:
                 item->setText(0,"XR:");
 
@@ -1604,6 +1612,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bXR = item->checkState(0);
                 break;
+
             case 3:
                 item->setText(0,"YR:");
 
@@ -1638,56 +1647,129 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bYR = item->checkState(0);
                 break;
+
             case 4:
                 item->setText(0,tr("Lesen von Adresse:"));
 
                 if(tmp_str != "")
                 {
-                    if(tmp_str.left(1) == "$") tmp_str.replace(0,1,"0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
-                    integer = tmp_str.toUShort(&ok,0);
-                    if(ok)
+                    bool is_ok = true;
+
+                    integer = integer2 = 0;
+
+                    tmp_str = tmp_str.simplified();
+                    tmp_str.replace(" ", "");
+                    QStringList str_list = tmp_str.split('-');
+
+                    if(str_list.count() == 0 || str_list.count() > 2)
+                        is_ok = false;
+
+                    if(str_list.count() > 0)
                     {
-                        bg->iRAdresse = integer;
-                        sprintf(str_00,"$%4.4X",integer);
-                        item->setText(1,QString(str_00));
-                        item->setBackground(1,QColor(200,200,255));
-                        item->setForeground(1,QColor(200,0,0));
+                        if(str_list[0].left(1) == "$") str_list[0].replace(0, 1, "0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
+                        integer = str_list[0].toUShort(&ok, 0);
+
+                        if(!ok)
+                            is_ok = false;
+                        else
+                            integer2 = integer;
+                    }
+
+                    if(str_list.count() > 1)
+                    {
+                        if(str_list[1].left(1) == "$") str_list[1].replace(0, 1, "0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
+                        integer2 = str_list[1].toUShort(&ok, 0);
+
+                        if(!ok)
+                            is_ok = false;
+                    }
+
+                    if(integer > integer2)
+                        is_ok = false;
+
+                    if(is_ok)
+                    {
+                        bg->iRAddress = integer;
+                        bg->iRAddressCount = (integer2 - integer) + 1;
+                        sprintf(str_00, "$%4.4X - $%4.4X", integer, integer2);
+                        item->setText(1, QString(str_00));
+                        item->setBackground(1, QColor(200, 200, 255));
+                        item->setForeground(1, QColor(200, 0, 0));
                     }
                     else
                     {
-                        item->setCheckState(0,Qt::Unchecked);
-                        item->setBackground(1,QColor(200,0,0));
-                        item->setForeground(1,QColor(200,200,200));
+                        item->setCheckState(0, Qt::Unchecked);
+                        item->setBackground(1, QColor(200, 0, 0));
+                        item->setForeground(1, QColor(200, 200, 200));
                     }
                 }
-                else item->setCheckState(0,Qt::Unchecked);
-                bg->bRAdresse = item->checkState(0);
+                else
+                    item->setCheckState(0, Qt::Unchecked);
+
+                bg->bRAddress = item->checkState(0);
                 break;
+
             case 5:
                 item->setText(0,tr("Schreiben in Adresse:"));
 
                 if(tmp_str != "")
                 {
-                    if(tmp_str.left(1) == "$") tmp_str.replace(0,1,"0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
-                    integer = tmp_str.toUShort(&ok,0);
-                    if(ok)
+                    bool is_ok = true;
+
+                    integer = integer2 = 0;
+
+                    tmp_str = tmp_str.simplified();
+                    tmp_str.replace(" ", "");
+                    QStringList str_list = tmp_str.split('-');
+
+                    if(str_list.count() == 0 || str_list.count() > 2)
+                        is_ok = false;
+
+                    if(str_list.count() > 0)
                     {
-                        bg->iWAdresse = integer;
-                        sprintf(str_00,"$%4.4X",integer);
-                        item->setText(1,QString(str_00));
-                        item->setBackground(1,QColor(200,200,255));
-                        item->setForeground(1,QColor(200,0,0));
+                        if(str_list[0].left(1) == "$") str_list[0].replace(0, 1, "0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
+                        integer = str_list[0].toUShort(&ok, 0);
+
+                        if(!ok)
+                            is_ok = false;
+                        else
+                            integer2 = integer;
+                    }
+
+                    if(str_list.count() > 1)
+                    {
+                        if(str_list[1].left(1) == "$") str_list[1].replace(0, 1, "0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
+                        integer2 = str_list[1].toUShort(&ok, 0);
+
+                        if(!ok)
+                            is_ok = false;
+                    }
+
+                    if(integer > integer2)
+                        is_ok = false;
+
+                    if(is_ok)
+                    {
+                        bg->iWAddress = integer;
+                        bg->iWAddressCount = (integer2 - integer) + 1;
+                        sprintf(str_00, "$%4.4X - $%4.4X", integer, integer2);
+                        item->setText(1, QString(str_00));
+                        item->setBackground(1, QColor(200, 200, 255));
+                        item->setForeground(1, QColor(200, 0, 0));
                     }
                     else
                     {
-                        item->setCheckState(0,Qt::Unchecked);
-                        item->setBackground(1,QColor(200,0,0));
-                        item->setForeground(1,QColor(200,200,200));
+                        item->setCheckState(0, Qt::Unchecked);
+                        item->setBackground(1, QColor(200, 0, 0));
+                        item->setForeground(1, QColor(200, 200, 200));
                     }
                 }
-                else item->setCheckState(0,Qt::Unchecked);
-                bg->bWAdresse = item->checkState(0);
+                else
+                    item->setCheckState(0, Qt::Unchecked);
+
+                bg->bWAddress = item->checkState(0);
                 break;
+
             case 6:
                 item->setText(0,tr("Lesen von Wert:"));
 
@@ -1722,6 +1804,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bRWert = item->checkState(0);
                 break;
+
             case 7:
                 item->setText(0,tr("Schreiben von Wert:"));
 
@@ -1756,6 +1839,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bWWert = item->checkState(0);
                 break;
+
             case 8:
                 item->setText(0,tr("Rasterzeile:"));
 
@@ -1790,6 +1874,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bRZ = item->checkState(0);
                 break;
+
             case 9:
                 item->setText(0,tr("Zyklus:"));
 
@@ -1824,6 +1909,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bRZZyklus = item->checkState(0);
                 break;
+
             default:
                 item->setText(0,"???");
                 break;

@@ -1122,8 +1122,8 @@ void Floppy1541::UpdateBreakGroup()
             if(bg->bAC) Breakpoints[bg->iAC] |= 2;
             if(bg->bXR) Breakpoints[bg->iXR] |= 4;
             if(bg->bYR) Breakpoints[bg->iYR] |= 8;
-            if(bg->bRAdresse) Breakpoints[bg->iRAdresse] |= 16;
-            if(bg->bWAdresse) Breakpoints[bg->iWAdresse] |= 32;
+            if(bg->bRAddress) Breakpoints[bg->iRAddress] |= 16;
+            if(bg->bWAddress) Breakpoints[bg->iWAddress] |= 32;
             if(bg->bRWert) Breakpoints[bg->iRWert] |= 64;
             if(bg->bWWert) Breakpoints[bg->iWWert] |= 128;
             if(bg->bRZ) Breakpoints[bg->iRZ] |= 256;
@@ -1198,10 +1198,10 @@ int Floppy1541::LoadBreakGroups(const char *filename)
         reading_elements = fread(&BreakGroup[i]->iXR,sizeof(BreakGroup[i]->iXR),1,file);
         reading_elements = fread(&BreakGroup[i]->bYR,sizeof(BreakGroup[i]->bYR),1,file);
         reading_elements = fread(&BreakGroup[i]->iYR,sizeof(BreakGroup[i]->iYR),1,file);
-        reading_elements = fread(&BreakGroup[i]->bRAdresse,sizeof(BreakGroup[i]->bRAdresse),1,file);
-        reading_elements = fread(&BreakGroup[i]->iRAdresse,sizeof(BreakGroup[i]->iRAdresse),1,file);
-        reading_elements = fread(&BreakGroup[i]->bWAdresse,sizeof(BreakGroup[i]->bWAdresse),1,file);
-        reading_elements = fread(&BreakGroup[i]->iWAdresse,sizeof(BreakGroup[i]->iWAdresse),1,file);
+        reading_elements = fread(&BreakGroup[i]->bRAddress,sizeof(BreakGroup[i]->bRAddress),1,file);
+        reading_elements = fread(&BreakGroup[i]->iRAddress,sizeof(BreakGroup[i]->iRAddress),1,file);
+        reading_elements = fread(&BreakGroup[i]->bWAddress,sizeof(BreakGroup[i]->bWAddress),1,file);
+        reading_elements = fread(&BreakGroup[i]->iWAddress,sizeof(BreakGroup[i]->iWAddress),1,file);
         reading_elements = fread(&BreakGroup[i]->bRWert,sizeof(BreakGroup[i]->bRWert),1,file);
         reading_elements = fread(&BreakGroup[i]->iRWert,sizeof(BreakGroup[i]->iRWert),1,file);
         reading_elements = fread(&BreakGroup[i]->bWWert,sizeof(BreakGroup[i]->bWWert),1,file);
@@ -1248,10 +1248,10 @@ bool Floppy1541::SaveBreakGroups(const char *filename)
         fwrite(&BreakGroup[i]->iXR,sizeof(BreakGroup[i]->iXR),1,file);
         fwrite(&BreakGroup[i]->bYR,sizeof(BreakGroup[i]->bYR),1,file);
         fwrite(&BreakGroup[i]->iYR,sizeof(BreakGroup[i]->iYR),1,file);
-        fwrite(&BreakGroup[i]->bRAdresse,sizeof(BreakGroup[i]->bRAdresse),1,file);
-        fwrite(&BreakGroup[i]->iRAdresse,sizeof(BreakGroup[i]->iRAdresse),1,file);
-        fwrite(&BreakGroup[i]->bWAdresse,sizeof(BreakGroup[i]->bWAdresse),1,file);
-        fwrite(&BreakGroup[i]->iWAdresse,sizeof(BreakGroup[i]->iWAdresse),1,file);
+        fwrite(&BreakGroup[i]->bRAddress,sizeof(BreakGroup[i]->bRAddress),1,file);
+        fwrite(&BreakGroup[i]->iRAddress,sizeof(BreakGroup[i]->iRAddress),1,file);
+        fwrite(&BreakGroup[i]->bWAddress,sizeof(BreakGroup[i]->bWAddress),1,file);
+        fwrite(&BreakGroup[i]->iWAddress,sizeof(BreakGroup[i]->iWAddress),1,file);
         fwrite(&BreakGroup[i]->bRWert,sizeof(BreakGroup[i]->bRWert),1,file);
         fwrite(&BreakGroup[i]->iRWert,sizeof(BreakGroup[i]->iRWert),1,file);
         fwrite(&BreakGroup[i]->bWWert,sizeof(BreakGroup[i]->bWWert),1,file);
@@ -1298,15 +1298,15 @@ bool Floppy1541::CheckBreakpoints()
                 count1++;
                 if((BreakStatus&8) && (BreakWerte[3] == bg->iYR)) count2++;
             }
-            if(bg->bRAdresse)
+            if(bg->bRAddress)
             {
                 count1++;
-                if((BreakStatus&16) && (BreakWerte[4] == bg->iRAdresse)) count2++;
+                if((BreakStatus&16) && (BreakWerte[4] == bg->iRAddress)) count2++;
             }
-            if(bg->bWAdresse)
+            if(bg->bWAddress)
             {
                 count1++;
-                if((BreakStatus&32) && (BreakWerte[5] == bg->iWAdresse)) count2++;
+                if((BreakStatus&32) && (BreakWerte[5] == bg->iWAddress)) count2++;
             }
             if(bg->bRWert)
             {

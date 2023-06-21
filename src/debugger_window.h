@@ -150,7 +150,7 @@ private:
     bool FindAddressing(QString address_string, uint8_t* address_type, uint16_t* address_value);
     bool Assemble(QString address, QString mnemonic, QString addressing, uint16_t* ass_address, uint16_t* new_adress);
     void AddBreakpointTreeRoot(QString name, BREAK_GROUP* bg);
-    void AddBreakpointTreeChild(QTreeWidgetItem* parent, uint16_t value, uint8_t checked, QString tooltip);
+    void AddBreakpointTreeChild(QTreeWidgetItem* parent, uint16_t value1, uint16_t value2, uint8_t checked, QString tooltip);
     void ClearAllBreakpointBackcolors();
     void RefreshGUI();
 

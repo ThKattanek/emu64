@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.04.2023                //
+// Letzte Änderung am 20.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -183,25 +183,27 @@ struct BREAK_GROUP
     char            Name[128];
     boolean         Enable;
     boolean         bPC;
-    unsigned short  iPC;
+    uint16_t        iPC;
     boolean         bAC;
-    unsigned short  iAC;
+    uint16_t        iAC;
     boolean         bXR;
-    unsigned short  iXR;
+    uint16_t        iXR;
     boolean         bYR;
-    unsigned short  iYR;
-    boolean         bRAdresse;
-    unsigned short  iRAdresse;
-    boolean         bWAdresse;
-    unsigned short  iWAdresse;
+    uint16_t        iYR;
+    boolean         bRAddress;
+    uint16_t        iRAddress;
+    uint16_t        iRAddressCount;
+    boolean         bWAddress;
+    uint16_t        iWAddress;
+    uint16_t        iWAddressCount;
     boolean         bRWert;
-    unsigned short  iRWert;
+    uint16_t        iRWert;
     boolean         bWWert;
-    unsigned short  iWWert;
+    uint16_t        iWWert;
     boolean         bRZ;
-    unsigned short  iRZ;
+    uint16_t        iRZ;
     boolean         bRZZyklus;
-    unsigned short  iRZZyklus;
+    uint16_t        iRZZyklus;
     boolean         bTrue;
 };
 
