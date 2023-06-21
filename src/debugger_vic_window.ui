@@ -6,98 +6,94 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>226</width>
-    <height>156</height>
+    <width>88</width>
+    <height>88</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>VIC</string>
   </property>
-  <widget class="TreeWidgetMod" name="OutputList">
-   <property name="geometry">
-    <rect>
-     <x>5</x>
-     <y>5</y>
-     <width>216</width>
-     <height>146</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="horizontalScrollBarPolicy">
-    <enum>Qt::ScrollBarAlwaysOff</enum>
-   </property>
-   <property name="autoScroll">
-    <bool>true</bool>
-   </property>
-   <property name="selectionMode">
-    <enum>QAbstractItemView::NoSelection</enum>
-   </property>
-   <property name="rootIsDecorated">
-    <bool>false</bool>
-   </property>
-   <attribute name="headerVisible">
-    <bool>true</bool>
-   </attribute>
-   <column>
-    <property name="text">
-     <string>Bezeichnung</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Inhalt</string>
-    </property>
-   </column>
-   <item>
-    <property name="text">
-     <string>Aktuelle Rasterzeile</string>
-    </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="TreeWidgetMod" name="OutputList">
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="autoScroll">
+      <bool>true</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
+     <property name="rootIsDecorated">
+      <bool>false</bool>
+     </property>
+     <attribute name="headerVisible">
+      <bool>true</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Bezeichnung</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Inhalt</string>
+      </property>
+     </column>
+     <item>
+      <property name="text">
+       <string>Aktuelle Rasterzeile</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Raster Latch</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Aktueller Zyklus</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Display Status</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Grafik Modus</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Bank</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Matrix Base</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Char Base</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>IRQ Leitung</string>
+      </property>
+     </item>
+    </widget>
    </item>
-   <item>
-    <property name="text">
-     <string>Raster Latch</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Aktueller Zyklus</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Display Status</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Grafik Modus</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Bank</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Matrix Base</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Char Base</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>IRQ Leitung</string>
-    </property>
-   </item>
-  </widget>
+  </layout>
  </widget>
  <customwidgets>
   <customwidget>

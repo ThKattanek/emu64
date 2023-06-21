@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.06.2023                //
+// Letzte Änderung am 21.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -64,6 +64,7 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
 
     QFontDatabase fontDB;
     fontDB.addApplicationFont(":/fonts/lucon.ttf");
+
     QFont font1("Lucida Console",10);
 
     ui->MCodeHelp->setFont(font1);
