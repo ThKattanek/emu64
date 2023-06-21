@@ -6,224 +6,296 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>371</width>
-    <height>524</height>
+    <width>365</width>
+    <height>520</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Emu64 Information</string>
   </property>
-  <widget class="QWidget" name="widget_2" native="true">
-   <property name="geometry">
-    <rect>
-     <x>5</x>
-     <y>305</y>
-     <width>361</width>
-     <height>200</height>
-    </rect>
+  <layout class="QHBoxLayout" name="horizontalLayout_6">
+   <property name="spacing">
+    <number>2</number>
    </property>
-   <property name="styleSheet">
-    <string notr="true">border-image: url(:/grafik/qt_sdl_ffmpeg_logo_300x200.png);</string>
+   <property name="leftMargin">
+    <number>0</number>
    </property>
-  </widget>
-  <widget class="QLabel" name="moreinfosOut">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>505</y>
-     <width>351</width>
-     <height>17</height>
-    </rect>
+   <property name="topMargin">
+    <number>0</number>
    </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
+   <property name="rightMargin">
+    <number>0</number>
    </property>
-   <property name="text">
-    <string>INFO</string>
+   <property name="bottomMargin">
+    <number>0</number>
    </property>
-  </widget>
-  <widget class="QLabel" name="Emu64Version">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>4</y>
-     <width>221</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color: rgb(0, 0,100);</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>132</x>
-     <y>24</y>
-     <width>216</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>von Thorsten Kattanek</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="openExternalLinks">
-    <bool>false</bool>
-   </property>
-   <property name="textInteractionFlags">
-    <set>Qt::LinksAccessibleByMouse</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>35</y>
-     <width>221</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forum: &lt;a href=&quot;http://www.emu64-projekt.de&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;www.emu64-projekt.de&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="openExternalLinks">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QWidget" name="widget_3" native="true">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>120</width>
-     <height>120</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">border-image: url(:/grafik/emu64_logo_120_120.png);</string>
-   </property>
-  </widget>
-  <widget class="QWidget" name="widget_4" native="true">
-   <property name="geometry">
-    <rect>
-     <x>7</x>
-     <y>249</y>
-     <width>108</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">border-image: url(:/grafik/style64.png);</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_4">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>285</y>
-     <width>91</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.style64.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;www.style64.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="openExternalLinks">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_5">
-   <property name="geometry">
-    <rect>
-     <x>125</x>
-     <y>270</y>
-     <width>236</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Emu64 benutzt C64-Pro-Style TTF von Style64</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_6">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>50</y>
-     <width>221</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;GitHub: &lt;a href=&quot;https://github.com/ThKattanek/emu64&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;www.github.com/ThKattanek/emu64&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="openExternalLinks">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QWidget" name="widget" native="true">
-   <property name="geometry">
-    <rect>
-     <x>140</x>
-     <y>70</y>
-     <width>198</width>
-     <height>190</height>
-    </rect>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">border-image: url(:/grafik/thorsten.png);</string>
-   </property>
-  </widget>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>2</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="Emu64Version">
+           <property name="font">
+            <font>
+             <pointsize>18</pointsize>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(0, 0,100);</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>von Thorsten Kattanek</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="openExternalLinks">
+            <bool>false</bool>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::LinksAccessibleByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Website: &lt;a href=&quot;https://www.thorsten-kattanek.de&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;www.thorsten-kattanek.de&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;GitHub: &lt;a href=&quot;https://github.com/ThKattanek/emu64&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;www.github.com/ThKattanek/emu64&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item>
+            <widget class="QWidget" name="widget_3" native="true">
+             <property name="minimumSize">
+              <size>
+               <width>120</width>
+               <height>120</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>120</width>
+               <height>120</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">border-image: url(:/grafik/emu64_logo_120_120.png);</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <property name="spacing">
+        <number>2</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <item>
+            <widget class="QWidget" name="widget_4" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>108</width>
+               <height>51</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>108</width>
+               <height>51</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">border-image: url(:/grafik/style64.png);</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Emu64 benutzt C64-Pro-Style TTF von Style64</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.style64.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;www.style64.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <property name="spacing">
+        <number>2</number>
+       </property>
+       <item>
+        <widget class="QWidget" name="widget_2" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>361</width>
+           <height>200</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>361</width>
+           <height>200</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border-image: url(:/grafik/qt_sdl_ffmpeg_logo_300x200.png);</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QLabel" name="moreinfosOut">
+         <property name="font">
+          <font>
+           <pointsize>6</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>INFO</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>
