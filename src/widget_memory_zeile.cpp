@@ -8,12 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.08.2019                //
+// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include <cstdio>
+#include <QDebug>
 
 #include "./widget_memory_zeile.h"
 #include "./ui_widget_memory_zeile.h"
@@ -43,6 +44,56 @@ WidgetMemoryZeile::WidgetMemoryZeile(QFont *font1, QWidget *parent) :
     ui->EditValue_15->setFont(*font1);
     ui->ReadOut->setFont(*font1);
     ui->WriteOut->setFont(*font1);
+
+    int font_height = ui->AdresseOut->fontMetrics().height();
+    int font_weigth = ui->AdresseOut->fontMetrics().averageCharWidth();
+
+    this->setFixedHeight(font_height + 8);
+
+    ui->AdresseOut->setMinimumWidth(5 * font_weigth + 4);
+    ui->EditValue_0->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_1->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_2->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_3->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_4->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_5->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_6->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_7->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_8->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_9->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_10->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_11->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_12->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_13->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_14->setMinimumWidth(2 * font_weigth + 4);
+    ui->EditValue_15->setMinimumWidth(2 * font_weigth + 4);
+    ui->ReadOut->setMinimumWidth(10 * font_weigth + 4);
+    ui->WriteOut->setMinimumWidth(10 * font_weigth + 4);
+
+    ui->AdresseOut->setMaximumWidth(5 * font_weigth + 4);
+    ui->EditValue_0->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_1->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_2->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_3->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_4->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_5->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_6->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_7->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_8->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_9->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_10->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_11->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_12->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_13->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_14->setMaximumWidth(2 * font_weigth + 4);
+    ui->EditValue_15->setMaximumWidth(2 * font_weigth + 4);
+    ui->ReadOut->setMaximumWidth(9 * font_weigth + 4);
+    ui->WriteOut->setMaximumWidth(9 * font_weigth + 4);
+
+    int w = (5 * font_weigth + 4) + (16*(2 * font_weigth + 4)) + (2*(10 * font_weigth + 4));
+
+    this->setFixedWidth(w);
+
 }
 
 WidgetMemoryZeile::~WidgetMemoryZeile()
@@ -92,23 +143,77 @@ void WidgetMemoryZeile::Fill(unsigned short adr, unsigned char *byte_puffer,QStr
 
     ui->ReadOut->setText(ReadSource);
     ui->WriteOut->setText(WriteDestination);
+}
 
-    ui->BitLeiste_0->SetValue(byte_puffer[0]);
-    ui->BitLeiste_1->SetValue(byte_puffer[1]);
-    ui->BitLeiste_2->SetValue(byte_puffer[2]);
-    ui->BitLeiste_3->SetValue(byte_puffer[3]);
-    ui->BitLeiste_4->SetValue(byte_puffer[4]);
-    ui->BitLeiste_5->SetValue(byte_puffer[5]);
-    ui->BitLeiste_6->SetValue(byte_puffer[6]);
-    ui->BitLeiste_7->SetValue(byte_puffer[7]);
-    ui->BitLeiste_8->SetValue(byte_puffer[8]);
-    ui->BitLeiste_9->SetValue(byte_puffer[9]);
-    ui->BitLeiste_10->SetValue(byte_puffer[10]);
-    ui->BitLeiste_11->SetValue(byte_puffer[11]);
-    ui->BitLeiste_12->SetValue(byte_puffer[12]);
-    ui->BitLeiste_13->SetValue(byte_puffer[13]);
-    ui->BitLeiste_14->SetValue(byte_puffer[14]);
-    ui->BitLeiste_15->SetValue(byte_puffer[15]);
+void WidgetMemoryZeile::SelectColumb(uint8_t columb)
+{
+    switch(columb)
+    {
+    case 0:
+        ui->EditValue_0->selectAll();
+        ui->EditValue_0->setFocus();
+        break;
+    case 1:
+        ui->EditValue_1->selectAll();
+        ui->EditValue_1->setFocus();
+        break;
+    case 2:
+        ui->EditValue_2->selectAll();
+        ui->EditValue_2->setFocus();
+        break;
+    case 3:
+        ui->EditValue_3->selectAll();
+        ui->EditValue_3->setFocus();
+        break;
+    case 4:
+        ui->EditValue_4->selectAll();
+        ui->EditValue_4->setFocus();
+        break;
+    case 5:
+        ui->EditValue_5->selectAll();
+        ui->EditValue_5->setFocus();
+        break;
+    case 6:
+        ui->EditValue_6->selectAll();
+        ui->EditValue_6->setFocus();
+        break;
+    case 7:
+        ui->EditValue_7->selectAll();
+        ui->EditValue_7->setFocus();
+        break;
+    case 8:
+        ui->EditValue_8->selectAll();
+        ui->EditValue_8->setFocus();
+        break;
+    case 9:
+        ui->EditValue_9->selectAll();
+        ui->EditValue_9->setFocus();
+        break;
+    case 10:
+        ui->EditValue_10->selectAll();
+        ui->EditValue_10->setFocus();
+        break;
+    case 11:
+        ui->EditValue_11->selectAll();
+        ui->EditValue_11->setFocus();
+        break;
+    case 12:
+        ui->EditValue_12->selectAll();
+        ui->EditValue_12->setFocus();
+        break;
+    case 13:
+        ui->EditValue_13->selectAll();
+        ui->EditValue_13->setFocus();
+        break;
+    case 14:
+        ui->EditValue_14->selectAll();
+        ui->EditValue_14->setFocus();
+        break;
+    case 15:
+        ui->EditValue_15->selectAll();
+        ui->EditValue_15->setFocus();
+        break;
+    }
 }
 
 bool WidgetMemoryZeile::ConvHex(QString str, unsigned char *value)
@@ -224,24 +329,4 @@ void WidgetMemoryZeile::on_EditValue_15_editingFinished()
 void WidgetMemoryZeile::onNoFocus(void)
 {
     if(!ui->AdresseOut->hasFocus()) ui->AdresseOut->setFocus();
-}
-
-void WidgetMemoryZeile::EndableBitLeiste(bool status)
-{
-    ui->BitLeiste_0->EnableBitLeiste(status);
-    ui->BitLeiste_1->EnableBitLeiste(status);
-    ui->BitLeiste_2->EnableBitLeiste(status);
-    ui->BitLeiste_3->EnableBitLeiste(status);
-    ui->BitLeiste_4->EnableBitLeiste(status);
-    ui->BitLeiste_5->EnableBitLeiste(status);
-    ui->BitLeiste_6->EnableBitLeiste(status);
-    ui->BitLeiste_7->EnableBitLeiste(status);
-    ui->BitLeiste_8->EnableBitLeiste(status);
-    ui->BitLeiste_9->EnableBitLeiste(status);
-    ui->BitLeiste_10->EnableBitLeiste(status);
-    ui->BitLeiste_11->EnableBitLeiste(status);
-    ui->BitLeiste_12->EnableBitLeiste(status);
-    ui->BitLeiste_13->EnableBitLeiste(status);
-    ui->BitLeiste_14->EnableBitLeiste(status);
-    ui->BitLeiste_15->EnableBitLeiste(status);
 }

@@ -107,7 +107,10 @@ void WidgetFloppyStatus::onTimer()
 
     if(old_Spur != (info.Spur))
     {
-        snprintf(str,MAX_STRLEN,"%02d",static_cast<unsigned int>(info.Spur+1));
+        int spur = info.Spur+1;
+        if(spur > 99)
+            spur = 99;
+        snprintf(str,MAX_STRLEN,"%02d",static_cast<unsigned int>(spur));
         ui->TrackOut->setText(str);
         old_Spur = info.Spur;
     }

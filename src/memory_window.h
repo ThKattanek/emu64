@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.05.2014                //
+// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,10 +17,12 @@
 #define MEMORY_WINDOW_H
 
 #include <QDialog>
+#include <QTableWidgetItem>
+
 #include "c64_class.h"
 #include "widget_memory_zeile.h"
 
-#define MemZeilenAnz 17
+#define MAX_MEMORY_ROW 256
 
 namespace Ui {
     class MemoryWindow;
@@ -43,8 +45,9 @@ private slots:
     void on_MemoryScroll_valueChanged(int value);
     void on_MemoryScroll_sliderPressed();
     void on_MemoryScroll_sliderReleased();
-    void on_BitAnzeige_clicked(bool checked);
     void on_OnlyRam_clicked(bool checked);
+
+    void on_jump_address_returnPressed();
 
 signals:
     void NoFocus(void);
@@ -63,6 +66,9 @@ private:
 
     QStringList MemScrDest;
     QStringList FloppyMemScrDest;
+
+    int16_t memory_rows;
+    WidgetMemoryZeile *memory_row[MAX_MEMORY_ROW];
 };
 
 #endif // MEMORY_WINDOW_H

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>605</width>
-    <height>26</height>
+    <width>518</width>
+    <height>28</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,307 +19,341 @@
   <property name="windowTitle">
    <string notr="true"/>
   </property>
-  <widget class="QPushButton" name="InstertImage">
-   <property name="enabled">
-    <bool>true</bool>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>4</number>
    </property>
-   <property name="geometry">
-    <rect>
-     <x>50</x>
-     <y>1</y>
-     <width>22</width>
-     <height>22</height>
-    </rect>
+   <property name="leftMargin">
+    <number>0</number>
    </property>
-   <property name="statusTip">
-    <string>Ein Diskimage auswählen.</string>
+   <property name="topMargin">
+    <number>2</number>
    </property>
-   <property name="text">
-    <string/>
+   <property name="rightMargin">
+    <number>0</number>
    </property>
-   <property name="icon">
-    <iconset resource="emu64.qrc">
-     <normaloff>:/grafik/disk.png</normaloff>:/grafik/disk.png</iconset>
+   <property name="bottomMargin">
+    <number>0</number>
    </property>
-   <property name="iconSize">
-    <size>
-     <width>18</width>
-     <height>18</height>
-    </size>
-   </property>
-   <property name="flat">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="PowerLED">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>1</y>
-     <width>24</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="statusTip">
-    <string>Floppylaufwerk Ein-/Ausschalten</string>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string notr="true"/>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>14</width>
-     <height>14</height>
-    </size>
-   </property>
-   <property name="flat">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="GeraeteIDOut">
-   <property name="geometry">
-    <rect>
-     <x>25</x>
-     <y>4</y>
-     <width>21</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>12</pointsize>
-    </font>
-   </property>
-   <property name="statusTip">
-    <string>Floppy Geräteadresse</string>
-   </property>
-   <property name="text">
-    <string notr="true"/>
-   </property>
-  </widget>
-  <widget class="QLabel" name="TrackOut">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>115</x>
-     <y>3</y>
-     <width>21</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>12</pointsize>
-    </font>
-   </property>
-   <property name="statusTip">
-    <string>Aktuelle Spur.</string>
-   </property>
-   <property name="text">
-    <string notr="true">01</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="SekcorOut">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>143</x>
-     <y>3</y>
-     <width>21</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>12</pointsize>
-    </font>
-   </property>
-   <property name="statusTip">
-    <string>Aktueller Sektor.</string>
-   </property>
-   <property name="text">
-    <string notr="true">00</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="Label1">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>135</x>
-     <y>3</y>
-     <width>16</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>12</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string notr="true">-</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="DisknameOut">
-   <property name="geometry">
-    <rect>
-     <x>170</x>
-     <y>2</y>
-     <width>196</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string notr="true"/>
-   </property>
-   <property name="statusTip">
-    <string>Diskname der eingelegten Diskette.</string>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(60,60, 180);
+   <item>
+    <widget class="QPushButton" name="PowerLED">
+     <property name="statusTip">
+      <string>Floppylaufwerk Ein-/Ausschalten</string>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string notr="true"/>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>14</width>
+       <height>14</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="GeraeteIDOut">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="statusTip">
+      <string>Floppy Geräteadresse</string>
+     </property>
+     <property name="text">
+      <string notr="true"/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="InstertImage">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="statusTip">
+      <string>Ein Diskimage auswählen.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="emu64.qrc">
+       <normaloff>:/grafik/disk.png</normaloff>:/grafik/disk.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>18</width>
+       <height>18</height>
+      </size>
+     </property>
+     <property name="default">
+      <bool>false</bool>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="EjectImage">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="sizeIncrement">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="statusTip">
+      <string>Diskimage auswerfen.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="emu64.qrc">
+       <normaloff>:/grafik/eject1.png</normaloff>:/grafik/eject1.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>18</width>
+       <height>18</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="WidgetLED" name="motor_led" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>20</width>
+         <height>8</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>8</height>
+        </size>
+       </property>
+       <property name="statusTip">
+        <string>Anzeige für den Status des Diskmotors.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="WidgetLED" name="rw_led" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>20</width>
+         <height>8</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>8</height>
+        </size>
+       </property>
+       <property name="statusTip">
+        <string>Anzeige für den Schreib-/Lesezugriff.</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="TrackOut">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="statusTip">
+      <string>Aktuelle Spur.</string>
+     </property>
+     <property name="text">
+      <string notr="true">01</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="Label1">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string notr="true">-</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="SekcorOut">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="statusTip">
+      <string>Aktueller Sektor.</string>
+     </property>
+     <property name="text">
+      <string notr="true">00</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="DisknameOut">
+     <property name="minimumSize">
+      <size>
+       <width>200</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string notr="true"/>
+     </property>
+     <property name="statusTip">
+      <string>Diskname der eingelegten Diskette.</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(60,60, 180);
 color: rgb(150, 150, 255);
 border: 1px solid;
 border-top-color: rgb(200, 200, 200);
 border-left-color: rgb(200, 200, 200);
 border-bottom-color: rgb(50, 50,50);
 border-right-color: rgb(50, 50, 50);</string>
-   </property>
-   <property name="text">
-    <string notr="true"/>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::PlainText</enum>
-   </property>
-   <property name="scaledContents">
-    <bool>false</bool>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="EjectImage">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>70</x>
-     <y>1</y>
-     <width>22</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="statusTip">
-    <string>Diskimage auswerfen.</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="icon">
-    <iconset resource="emu64.qrc">
-     <normaloff>:/grafik/eject1.png</normaloff>:/grafik/eject1.png</iconset>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>19</width>
-     <height>19</height>
-    </size>
-   </property>
-   <property name="flat">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="Volume">
-   <property name="geometry">
-    <rect>
-     <x>370</x>
-     <y>0</y>
-     <width>20</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="statusTip">
-    <string>Lautstärke der Floppygeräusche.</string>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string notr="true"/>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>16</width>
-     <height>16</height>
-    </size>
-   </property>
-   <property name="flat">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="WidgetLED" name="motor_led" native="true">
-   <property name="geometry">
-    <rect>
-     <x>93</x>
-     <y>3</y>
-     <width>18</width>
-     <height>7</height>
-    </rect>
-   </property>
-   <property name="statusTip">
-    <string>Anzeige für den Status des Diskmotors.</string>
-   </property>
-  </widget>
-  <widget class="WidgetLED" name="rw_led" native="true">
-   <property name="geometry">
-    <rect>
-     <x>93</x>
-     <y>13</y>
-     <width>18</width>
-     <height>7</height>
-    </rect>
-   </property>
-   <property name="statusTip">
-    <string>Anzeige für den Schreib-/Lesezugriff.</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="Error">
-   <property name="geometry">
-    <rect>
-     <x>390</x>
-     <y>0</y>
-     <width>20</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="statusTip">
-    <string>Lautstärke der Floppygeräusche.</string>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string notr="true"/>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>16</width>
-     <height>16</height>
-    </size>
-   </property>
-   <property name="flat">
-    <bool>true</bool>
-   </property>
-  </widget>
+     </property>
+     <property name="text">
+      <string notr="true"/>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="Volume">
+     <property name="statusTip">
+      <string>Lautstärke der Floppygeräusche.</string>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string notr="true"/>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="Error">
+     <property name="statusTip">
+      <string>Lautstärke der Floppygeräusche.</string>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string notr="true"/>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
  </widget>
  <customwidgets>
   <customwidget>

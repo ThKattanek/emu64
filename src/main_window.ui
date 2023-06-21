@@ -149,7 +149,7 @@ background-position: center
      <x>0</x>
      <y>0</y>
      <width>538</width>
-     <height>27</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -228,11 +228,24 @@ background-position: center
      <addaction name="actionGEO_speichern"/>
      <addaction name="actionGEO_loeschen"/>
     </widget>
+    <widget class="QMenu" name="menuDebuger">
+     <property name="title">
+      <string>Debuger</string>
+     </property>
+     <addaction name="actionDebugger_Disassembler"/>
+     <addaction name="actionCPU_Logging_Start"/>
+     <addaction name="actionCPU_Logging_Stop"/>
+    </widget>
+    <widget class="QMenu" name="menuSID_Player">
+     <property name="title">
+      <string>SID Player</string>
+     </property>
+    </widget>
     <addaction name="actionQuick_C64_Snapshot"/>
     <addaction name="actionScreenshot"/>
     <addaction name="actionSID_Dump"/>
-    <addaction name="actionSID_Player"/>
-    <addaction name="actionDebugger_Disassembler"/>
+    <addaction name="menuSID_Player"/>
+    <addaction name="menuDebuger"/>
     <addaction name="actionC64_Geschwindigkeit"/>
     <addaction name="actionCross_Assembler"/>
     <addaction name="actionLan64"/>
@@ -529,20 +542,6 @@ background-position: center
    </property>
    <property name="statusTip">
     <string>Zeichnen Sie alle SID (Sound Interface Device) Signale auf um sie später mit dem  mitgelieferten SID Player abzuspielen.</string>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionSID_Player">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>SID Player</string>
-   </property>
-   <property name="statusTip">
-    <string>Schaltet in den SID Player Modus. Damit wird der Emu64 zu einem vollwertigen SID Player.</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
@@ -856,6 +855,16 @@ background-position: center
   <action name="actionAudio_Oszilloskop">
    <property name="text">
     <string>Audio Oszilloskop</string>
+   </property>
+  </action>
+  <action name="actionCPU_Logging_Start">
+   <property name="text">
+    <string>CPU Logging Start</string>
+   </property>
+  </action>
+  <action name="actionCPU_Logging_Stop">
+   <property name="text">
+    <string>CPU Logging Stop</string>
    </property>
   </action>
  </widget>

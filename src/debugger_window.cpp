@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.04.2020                //
+// Letzte Änderung am 21.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -20,13 +20,15 @@
 #include "./ui_debugger_window.h"
 #include "./micro_code_tbl_6510.h"
 #include "./micro_code_string_tbl_6510.h"
+#include "qdebug.h"
 
 DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     QDialog(parent),
     ui(new Ui::DebuggerWindow),
     memory_window(nullptr),
     vic_window(nullptr),
-    iec_window(nullptr)
+    iec_window(nullptr),
+    input_window(nullptr)
 {    
     this->ini = ini;
     c64 = nullptr;
@@ -44,6 +46,8 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     // Center Window
     setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
+    input_window = new InputBoxWindow(this);
+
     memory_window = new MemoryWindow(this);
     memory_window->ChangeSource(0);
 
@@ -57,56 +61,48 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
 
     icon_off = new QIcon(":/grafik/blue_led_off.png");
     icon_on = new QIcon(":/grafik/blue_led_on.png");
-    ui->EingabeFeld->hide();
 
     QFontDatabase fontDB;
     fontDB.addApplicationFont(":/fonts/lucon.ttf");
-    QFont font1("Lucida Console",8);
+
+    QFont font1("Lucida Console",10);
 
     ui->MCodeHelp->setFont(font1);
 
     ui->DisAssTable->setColumnCount(4);
-    ui->DisAssTable->setColumnWidth(0, 44);
-    ui->DisAssTable->setColumnWidth(1, 70);
-    ui->DisAssTable->setColumnWidth(2, 30);
-    ui->DisAssTable->setColumnWidth(3, 57);
 
     ui->DisAssTable->setFont(font1);
-    ui->DisAssTable->setRowCount(DISASS_ROW);
+
+    int font1_width = ui->DisAssTable->fontMetrics().averageCharWidth() + 3;
+
+    ui->DisAssTable->setColumnWidth(0, 5 * font1_width + 2);
+    ui->DisAssTable->setColumnWidth(1, 8 * font1_width + 2);
+    ui->DisAssTable->setColumnWidth(2, 3 * font1_width + 2);
+    ui->DisAssTable->setColumnWidth(3, 7 * font1_width + 2);
+
+    ui->DisAssTable->setMinimumWidth(23 * font1_width + 8);
+
+    disass_rows = 1;
+    ui->DisAssTable->setRowCount(disass_rows);
 
     ui->AssAdresseIn->setFont(font1);
     ui->AssMnemonicIn->setFont(font1);
     ui->AssAdressierungIn->setFont(font1);
 
+    ui->BreakpointTree->setFont(font1);
     ui->BreakpointTree->setColumnCount(2);
-    ui->BreakpointTree->setColumnWidth(0, 175);
-    ui->BreakpointTree->setColumnWidth(1, 50);
+    ui->BreakpointTree->setColumnWidth(0, (22 * font1_width) + 10);
+    ui->BreakpointTree->setColumnWidth(1, 5 * font1_width);
+    ui->BreakpointTree->setMinimumWidth(35 * font1_width);
     new_breakpoint_found = false;
 
     ui->HistoryList->setFont(font1);
-    for(int i=0; i<HISTORY_ROW; i++)
-    {
-        QListWidgetItem *item = new QListWidgetItem(ui->HistoryList);
-        item->setText(QVariant(i).toString());
-        ui->HistoryList->addItem(item);
-    }
 
-    for(int i=0; i<DISASS_ROW; i++)
-    {
-        view_code_address[i] = 0;
-        disass_pc[i] = new QTableWidgetItem();
-        disass_pc[i]->setBackground(table_back_color);
-        ui->DisAssTable->setItem(i, 0, disass_pc[i]);
-        disass_memory[i] = new QTableWidgetItem();
-        disass_memory[i]->setBackground(table_back_color);
-        ui->DisAssTable->setItem(i, 1, disass_memory[i]);
-        disass_mnemonic[i] = new QTableWidgetItem();
-        disass_mnemonic[i]->setBackground(table_back_color);
-        ui->DisAssTable->setItem(i, 2, disass_mnemonic[i]);
-        disass_addressing[i] = new QTableWidgetItem();
-        disass_addressing[i]->setBackground(table_back_color);
-        ui->DisAssTable->setItem(i, 3, disass_addressing[i]);
-    }
+    history_rows = 0;
+    connect(ui->HistoryList, SIGNAL(resize(int,int)),this,SLOT(onResizeHistoryList(int,int)));
+
+    disass_rows = 0;
+    connect(ui->DisAssTable, SIGNAL(resize(int,int)), this,SLOT(onResizeDisassList(int,int)));
 
     connect(ui->sr_widget, SIGNAL(ChangeValue(uint8_t)), this, SLOT(onSr_widget_ValueChange(uint8_t)));
     connect(ui->pc_out, SIGNAL(clicked(LabelWidgetMod*)), this, SLOT(onReg_label_clicked(LabelWidgetMod*)));
@@ -232,6 +228,63 @@ void DebuggerWindow::onTimerAnimationRefresh()
         }
         show();
     }
+}
+
+void DebuggerWindow::onResizeHistoryList(int weidth, int height)
+{
+    ui->HistoryList->clear();
+
+    QListWidgetItem *item = new QListWidgetItem(ui->HistoryList);
+    ui->HistoryList->addItem(item);
+
+    QRect rect = ui->HistoryList->visualItemRect(ui->HistoryList->item(0));
+
+    history_rows = height / rect.height();
+
+    for(int i=1; i<history_rows; i++)
+    {
+        QListWidgetItem *item = new QListWidgetItem(ui->HistoryList);
+        item->setText(QVariant(i).toString());
+        ui->HistoryList->addItem(item);
+    }
+
+    FillHistoryList(static_cast<uint8_t>(ui->HistoryScroll->value()));
+}
+
+void DebuggerWindow::onResizeDisassList(int weidth, int height)
+{
+    ui->DisAssTable->clear();
+
+    int row_height = ui->DisAssTable->fontInfo().pixelSize();
+
+    disass_rows = height / row_height;
+
+    if(disass_rows > MAX_DISASS_ROW)
+        disass_rows = MAX_DISASS_ROW;
+
+    ui->DisAssTable->setRowCount(disass_rows);
+
+    for(int i=0; i<disass_rows; i++)
+    {
+        view_code_address[i] = 0;
+        disass_pc[i] = new QTableWidgetItem();
+        disass_pc[i]->setBackground(table_back_color);
+        ui->DisAssTable->setItem(i, 0, disass_pc[i]);
+        disass_memory[i] = new QTableWidgetItem();
+        disass_memory[i]->setBackground(table_back_color);
+        ui->DisAssTable->setItem(i, 1, disass_memory[i]);
+        disass_mnemonic[i] = new QTableWidgetItem();
+        disass_mnemonic[i]->setBackground(table_back_color);
+        ui->DisAssTable->setItem(i, 2, disass_mnemonic[i]);
+        disass_addressing[i] = new QTableWidgetItem();
+        disass_addressing[i]->setBackground(table_back_color);
+        ui->DisAssTable->setItem(i, 3, disass_addressing[i]);
+        ui->DisAssTable->setRowHeight(i, row_height);
+    }
+
+    old_make_idx = 0;
+
+    FillDisassemblyList(ui->DisAssScroll->value(), false);
 }
 
 void DebuggerWindow::RetranslateUi()
@@ -441,8 +494,6 @@ void DebuggerWindow::onSr_widget_ValueChange(uint8_t value)
 {
     on_AnimationStop_clicked();
 
-    ui->EingabeFeld->hide();
-
     REG_STRUCT cpu_reg;
     cpu_reg.reg_mask = REG_MASK_SR;
     cpu_reg.sr = value;
@@ -455,8 +506,13 @@ void DebuggerWindow::onSr_widget_ValueChange(uint8_t value)
     if(current_source > 0)
     {
         c64->floppy[currnet_floppy_nr]->SetCpuReg(&cpu_reg);
+        c64->floppy[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr], &floppy_cpu_ireg[currnet_floppy_nr]);
     }
-    else c64->cpu->SetRegister(&cpu_reg);
+    else
+    {
+        c64->cpu->SetRegister(&cpu_reg);
+        c64->cpu->GetRegister(&c64_cpu_reg);
+    }
 }
 
 void DebuggerWindow::onReg_label_clicked(LabelWidgetMod* label)
@@ -472,118 +528,114 @@ void DebuggerWindow::onReg_label_clicked(LabelWidgetMod* label)
     if(label->objectName() == "yr_out") current_edit_reg = 4;
     if(label->objectName() == "sr_out") current_edit_reg = 5;
 
-    ui->EingabeFeld->setGeometry(label->geometry());
-
-    ui->EingabeFeld->setText(label->text());
-    ui->EingabeFeld->selectAll();
-    ui->EingabeFeld->show();
-    ui->EingabeFeld->setFocus();
-}
-
-void DebuggerWindow::on_EingabeFeld_returnPressed()
-{
-    if(current_edit_reg == -1)
-    {
-        ui->EingabeFeld->hide();
-        return;
-    }
-
-    bool ok;
-    QString in_str = ui->EingabeFeld->text();
-    uint16_t value;
-
-    if(in_str.left(1) == "$") in_str.replace(0, 1, "0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
-
-    value = in_str.toUShort(&ok, 0);
-
-    if(!ok)
-    {
-        QMessageBox::warning(this, tr("Eingabefehler..."), tr("Es wurde kein gültiges Zahlenformat benutzt !"));
-        return;
-    }
-
-    REG_STRUCT cpu_reg;
-
     switch(current_edit_reg)
     {
     case 0:
-        cpu_reg.reg_mask = REG_MASK_PC;
-        cpu_reg.pc = value;
+        input_window->setWindowTitle(tr("Program Counter (PC)"));
+        input_window->setRange_max(0xffff);
+        if(current_source > 0)
+            input_window->setValue(floppy_cpu_reg[currnet_floppy_nr].pc);
+        else
+            input_window->setValue(c64_cpu_reg.pc);
         break;
     case 1:
-        if(value > 0x100) value -= 0x100;
-        if(value > 0xFF)
-        {
-            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Der Wert muss zwischen 0 und 511 liegen !"));
-            return;
-        }
-        cpu_reg.reg_mask = REG_MASK_SP;
-        cpu_reg.sp = static_cast<uint8_t>(value);
+        input_window->setWindowTitle(tr("Stack Pointer (SP)"));
+        input_window->setRange_max(0xff);
+        if(current_source > 0)
+            input_window->setValue(floppy_cpu_reg[currnet_floppy_nr].sp);
+        else
+            input_window->setValue(c64_cpu_reg.sp);
         break;
     case 2:
-        if(value > 0xFF)
-        {
-            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Der Wert muss zwischen 0 und 255 liegen !"));
-            return;
-        }
-        cpu_reg.reg_mask = REG_MASK_AC;
-        cpu_reg.ac = static_cast<uint8_t>(value);
+        input_window->setWindowTitle(tr("Accumulator (AC)"));
+        input_window->setRange_max(0xff);
+        if(current_source > 0)
+            input_window->setValue(floppy_cpu_reg[currnet_floppy_nr].ac);
+        else
+            input_window->setValue(c64_cpu_reg.ac);
         break;
     case 3:
-        if(value > 0xFF)
-        {
-            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Der Wert muss zwischen 0 und 255 liegen !"));
-            return;
-        }
-        cpu_reg.reg_mask = REG_MASK_XR;
-        cpu_reg.xr = static_cast<uint8_t>(value);
+        input_window->setWindowTitle(tr("X Register (XR)"));
+        input_window->setRange_max(0xff);
+        if(current_source > 0)
+            input_window->setValue(floppy_cpu_reg[currnet_floppy_nr].xr);
+        else
+            input_window->setValue(c64_cpu_reg.xr);
         break;
     case 4:
-        if(value > 0xFF)
-        {
-            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Der Wert muss zwischen 0 und 255 liegen !"));
-            return;
-        }
-        cpu_reg.reg_mask = REG_MASK_YR;
-        cpu_reg.yr = static_cast<uint8_t>(value);
+        input_window->setWindowTitle(tr("Y Register (YR)"));
+        input_window->setRange_max(0xff);
+        if(current_source > 0)
+            input_window->setValue(floppy_cpu_reg[currnet_floppy_nr].yr);
+        else
+            input_window->setValue(c64_cpu_reg.yr);
         break;
     case 5:
-        if(value > 0xFF)
-        {
-            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Der Wert muss zwischen 0 und 255 liegen !"));
-            return;
-        }
-        cpu_reg.reg_mask = REG_MASK_SR;
-        cpu_reg.sr = static_cast<uint8_t>(value);
+        input_window->setWindowTitle(tr("Status Register (SR)"));
+        input_window->setRange_max(0xff);
+        if(current_source > 0)
+            input_window->setValue(floppy_cpu_reg[currnet_floppy_nr].sr);
+        else
+            input_window->setValue(c64_cpu_reg.sr);
         break;
     }
 
-    if(current_source > 0)
+    if(input_window->exec())
     {
-        c64->floppy[currnet_floppy_nr]->SetCpuReg(&cpu_reg);
-        c64->floppy[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr], &floppy_cpu_ireg[currnet_floppy_nr]);
-    }
-    else
-    {
-        c64->cpu->SetRegister(&cpu_reg);
-        c64->cpu->GetRegister(&c64_cpu_reg);
-    }
+        uint64_t value = input_window->getValue();
+        REG_STRUCT cpu_reg;
 
-    current_edit_reg = -1;
-    ui->EingabeFeld->hide();
-    UpdateRegister();
+        switch(current_edit_reg)
+        {
+        case 0:
+            cpu_reg.reg_mask = REG_MASK_PC;
+            cpu_reg.pc = value;
+            break;
+        case 1:
+            cpu_reg.reg_mask = REG_MASK_SP;
+            cpu_reg.sp = static_cast<uint8_t>(value);
+            break;
+        case 2:
+            cpu_reg.reg_mask = REG_MASK_AC;
+            cpu_reg.ac = static_cast<uint8_t>(value);
+            break;
+        case 3:
+            cpu_reg.reg_mask = REG_MASK_XR;
+            cpu_reg.xr = static_cast<uint8_t>(value);
+            break;
+        case 4:
+            cpu_reg.reg_mask = REG_MASK_YR;
+            cpu_reg.yr = static_cast<uint8_t>(value);
+            break;
+        case 5:
+            cpu_reg.reg_mask = REG_MASK_SR;
+            cpu_reg.sr = static_cast<uint8_t>(value);
+            break;
+        }
+
+        if(current_source > 0)
+        {
+            c64->floppy[currnet_floppy_nr]->SetCpuReg(&cpu_reg);
+            c64->floppy[currnet_floppy_nr]->GetCpuReg(&floppy_cpu_reg[currnet_floppy_nr], &floppy_cpu_ireg[currnet_floppy_nr]);
+        }
+        else
+        {
+            c64->cpu->SetRegister(&cpu_reg);
+            c64->cpu->GetRegister(&c64_cpu_reg);
+        }
+
+        UpdateRegister();
+    }
 }
 
 void DebuggerWindow::on_OneZyklus_clicked()
 {
-    ui->EingabeFeld->hide();
     ClearAllBreakpointBackcolors();
     c64->OneCycle();
 }
 
 void DebuggerWindow::on_OneOpcode_clicked()
 {
-    ui->EingabeFeld->hide();
     ClearAllBreakpointBackcolors();
     c64->OneOpcode(current_source);
 }
@@ -603,6 +655,9 @@ void DebuggerWindow::on_CycleCounterReset_clicked()
 
 void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
 {
+    if(disass_rows == 0)
+        return;
+
     uint16_t pc = address;
     char str00[50];
     uint16_t tmp;
@@ -618,7 +673,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
 
     if(!new_refresh)
     {
-        for(int i=0;i<DISASS_ROW;i++)
+        for(int i=0;i<disass_rows;i++)
         {
             if(view_code_address[i] == address)
             {
@@ -663,7 +718,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
     uint8_t ram1;
     uint8_t ram2;
 
-    for(int i=0; i<DISASS_ROW; i++)
+    for(int i=0; i<disass_rows; i++)
     {
         view_code_address[i] = pc;
         sprintf(str00, "$%4.4X", pc);
@@ -807,6 +862,8 @@ void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
             break;
         }
     }
+
+    ui->DisAssScroll->setValue(address);
 }
 
 void DebuggerWindow::FillHistoryList(uint8_t index)
@@ -814,11 +871,14 @@ void DebuggerWindow::FillHistoryList(uint8_t index)
     char str00[10];
     uint8_t hp;
 
+   // int row_count = ui->HistoryList->height() / rect.height();
+
     if(current_source > 0)
     {
         if(!c64->floppy[currnet_floppy_nr]->GetEnableFloppy()) return;
         hp = c64->floppy[currnet_floppy_nr]->HistoryPointer;
-        for(int i=0; i<HISTORY_ROW; i++)
+        //for(int i=0; i<HISTORY_ROW; i++)
+        for(int i=0; i<history_rows; i++)
         {
             sprintf(str00, "$%4.4X", c64->floppy[currnet_floppy_nr]->History[hp--]);
             ui->HistoryList->item(i)->setText(QString(str00));
@@ -827,7 +887,8 @@ void DebuggerWindow::FillHistoryList(uint8_t index)
     else
     {
         hp = c64->cpu_pc_history_pos - index;
-        for(int i=0; i<HISTORY_ROW; i++)
+        //for(int i=0; i<HISTORY_ROW; i++)
+        for(int i=0; i<history_rows; i++)
         {
             sprintf(str00, "$%4.4X", c64->cpu_pc_history[hp--]);
             ui->HistoryList->item(i)->setText(QString(str00));
@@ -1274,7 +1335,6 @@ void DebuggerWindow::on_AnimationStart_clicked()
     ui->AssAdresseIn->setEnabled(false);
     ui->AssMnemonicIn->setEnabled(false);
     ui->AssAdressierungIn->setEnabled(false);
-    ui->EingabeFeld->setVisible(false);
 
     c64->SetDebugAnimation(true);
 }
@@ -1379,27 +1439,30 @@ void DebuggerWindow::AddBreakpointTreeRoot(QString name,BREAK_GROUP *bg)
     ui->BreakpointTree->addTopLevelItem(item);
 
     break_point_update_enable = false;
-    AddBreakpointTreeChild(item,bg->iPC,bg->bPC,tr("Wenn der Wert gleich dem Programm Counter (PC) ist."));
-    AddBreakpointTreeChild(item,bg->iAC,bg->bAC,tr("Wenn der Wert gleich dem Accu Register (AC) ist."));
-    AddBreakpointTreeChild(item,bg->iXR,bg->bXR,tr("Wenn der Wert gleich dem X Register (XR) ist."));
-    AddBreakpointTreeChild(item,bg->iYR,bg->bYR,tr("Wenn der Wert gleich dem Y Register (YR) ist."));
-    AddBreakpointTreeChild(item,bg->iRAdresse,bg->bRAdresse,tr("Wenn ein Lesezugriff an dieser Adresse statt findet."));
-    AddBreakpointTreeChild(item,bg->iWAdresse,bg->bWAdresse,tr("Wenn ein Schreibzugriff an dieser Adresse statt findet."));
-    AddBreakpointTreeChild(item,bg->iRWert,bg->bRWert,tr("Wenn aus einer Adresse dieser Wert ausgelesen wird."));
-    AddBreakpointTreeChild(item,bg->iWWert,bg->bWWert,tr("Wenn in einer Adresse dieser Wert geschrieben wird."));
+    AddBreakpointTreeChild(item,bg->iPC,bg->iPC,bg->bPC,tr("Wenn der Wert gleich dem Programm Counter (PC) ist."));
+    AddBreakpointTreeChild(item,bg->iAC,bg->iAC,bg->bAC,tr("Wenn der Wert gleich dem Accu Register (AC) ist."));
+    AddBreakpointTreeChild(item,bg->iXR,bg->iXR,bg->bXR,tr("Wenn der Wert gleich dem X Register (XR) ist."));
+    AddBreakpointTreeChild(item,bg->iYR,bg->iYR,bg->bYR,tr("Wenn der Wert gleich dem Y Register (YR) ist."));
+    AddBreakpointTreeChild(item,bg->iRAddress,bg->iRAddress + bg->iRAddressCount - 1,bg->bRAddress,tr("Wenn ein Lesezugriff an dieser Adresse statt findet."));
+    AddBreakpointTreeChild(item,bg->iWAddress,bg->iWAddress + bg->iWAddressCount - 1,bg->bWAddress,tr("Wenn ein Schreibzugriff an dieser Adresse statt findet."));
+    AddBreakpointTreeChild(item,bg->iRWert,bg->iRWert,bg->bRWert,tr("Wenn aus einer Adresse dieser Wert ausgelesen wird."));
+    AddBreakpointTreeChild(item,bg->iWWert,bg->iWWert,bg->bWWert,tr("Wenn in einer Adresse dieser Wert geschrieben wird."));
     if(current_source == 0)
     {
-        AddBreakpointTreeChild(item,bg->iRZ,bg->bRZ,tr("Wenn der Wert gleich der Aktuellen Rasterzeile ist."));
-        AddBreakpointTreeChild(item,bg->iRZZyklus,bg->bRZZyklus,tr("Wenn der Wert gleich dem Aktuellen Zyklus in einer Rasterzeile ist."));
+        AddBreakpointTreeChild(item,bg->iRZ,bg->iRZ,bg->bRZ,tr("Wenn der Wert gleich der Aktuellen Rasterzeile ist."));
+        AddBreakpointTreeChild(item,bg->iRZZyklus,bg->iRZZyklus,bg->bRZZyklus,tr("Wenn der Wert gleich dem Aktuellen Zyklus in einer Rasterzeile ist."));
     }
     break_point_update_enable = true;
     c64->UpdateBreakGroup();
 }
 
-void DebuggerWindow::AddBreakpointTreeChild(QTreeWidgetItem *parent, uint16_t value, uint8_t checked, QString tooltip)
+void DebuggerWindow::AddBreakpointTreeChild(QTreeWidgetItem *parent, uint16_t value1, uint16_t value2, uint8_t checked, QString tooltip)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem(parent);
-    item->setText(1,QVariant(value).toString());
+    if(value1 == value2)
+        item->setText(1,QVariant(value1).toString());
+    else
+        item->setText(1,QVariant(value1).toString() + " - " + QVariant(value2).toString());
     item->setForeground(0,QBrush(QColor(0,0,0)));
     item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEditable);
     if(checked) item->setCheckState(0,Qt::Checked);
@@ -1450,8 +1513,8 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
         {
             QString tmp_str = item->text(1);
             bool ok;
-            uint16_t integer;
-            char str_00[10];
+            uint16_t integer, integer2;
+            char str_00[20];
 
             switch(child_index)
             {
@@ -1479,8 +1542,8 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 }
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bPC = item->checkState(0);
-
                 break;
+
             case 1:
                 item->setText(0,"AC:");
 
@@ -1515,6 +1578,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bAC = item->checkState(0);
                 break;
+
             case 2:
                 item->setText(0,"XR:");
 
@@ -1549,6 +1613,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bXR = item->checkState(0);
                 break;
+
             case 3:
                 item->setText(0,"YR:");
 
@@ -1583,56 +1648,129 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bYR = item->checkState(0);
                 break;
+
             case 4:
                 item->setText(0,tr("Lesen von Adresse:"));
 
                 if(tmp_str != "")
                 {
-                    if(tmp_str.left(1) == "$") tmp_str.replace(0,1,"0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
-                    integer = tmp_str.toUShort(&ok,0);
-                    if(ok)
+                    bool is_ok = true;
+
+                    integer = integer2 = 0;
+
+                    tmp_str = tmp_str.simplified();
+                    tmp_str.replace(" ", "");
+                    QStringList str_list = tmp_str.split('-');
+
+                    if(str_list.count() == 0 || str_list.count() > 2)
+                        is_ok = false;
+
+                    if(str_list.count() > 0)
                     {
-                        bg->iRAdresse = integer;
-                        sprintf(str_00,"$%4.4X",integer);
-                        item->setText(1,QString(str_00));
-                        item->setBackground(1,QColor(200,200,255));
-                        item->setForeground(1,QColor(200,0,0));
+                        if(str_list[0].left(1) == "$") str_list[0].replace(0, 1, "0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
+                        integer = str_list[0].toUShort(&ok, 0);
+
+                        if(!ok)
+                            is_ok = false;
+                        else
+                            integer2 = integer;
+                    }
+
+                    if(str_list.count() > 1)
+                    {
+                        if(str_list[1].left(1) == "$") str_list[1].replace(0, 1, "0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
+                        integer2 = str_list[1].toUShort(&ok, 0);
+
+                        if(!ok)
+                            is_ok = false;
+                    }
+
+                    if(integer > integer2)
+                        is_ok = false;
+
+                    if(is_ok)
+                    {
+                        bg->iRAddress = integer;
+                        bg->iRAddressCount = (integer2 - integer) + 1;
+                        sprintf(str_00, "$%4.4X - $%4.4X", integer, integer2);
+                        item->setText(1, QString(str_00));
+                        item->setBackground(1, QColor(200, 200, 255));
+                        item->setForeground(1, QColor(200, 0, 0));
                     }
                     else
                     {
-                        item->setCheckState(0,Qt::Unchecked);
-                        item->setBackground(1,QColor(200,0,0));
-                        item->setForeground(1,QColor(200,200,200));
+                        item->setCheckState(0, Qt::Unchecked);
+                        item->setBackground(1, QColor(200, 0, 0));
+                        item->setForeground(1, QColor(200, 200, 200));
                     }
                 }
-                else item->setCheckState(0,Qt::Unchecked);
-                bg->bRAdresse = item->checkState(0);
+                else
+                    item->setCheckState(0, Qt::Unchecked);
+
+                bg->bRAddress = item->checkState(0);
                 break;
+
             case 5:
                 item->setText(0,tr("Schreiben in Adresse:"));
 
                 if(tmp_str != "")
                 {
-                    if(tmp_str.left(1) == "$") tmp_str.replace(0,1,"0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
-                    integer = tmp_str.toUShort(&ok,0);
-                    if(ok)
+                    bool is_ok = true;
+
+                    integer = integer2 = 0;
+
+                    tmp_str = tmp_str.simplified();
+                    tmp_str.replace(" ", "");
+                    QStringList str_list = tmp_str.split('-');
+
+                    if(str_list.count() == 0 || str_list.count() > 2)
+                        is_ok = false;
+
+                    if(str_list.count() > 0)
                     {
-                        bg->iWAdresse = integer;
-                        sprintf(str_00,"$%4.4X",integer);
-                        item->setText(1,QString(str_00));
-                        item->setBackground(1,QColor(200,200,255));
-                        item->setForeground(1,QColor(200,0,0));
+                        if(str_list[0].left(1) == "$") str_list[0].replace(0, 1, "0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
+                        integer = str_list[0].toUShort(&ok, 0);
+
+                        if(!ok)
+                            is_ok = false;
+                        else
+                            integer2 = integer;
+                    }
+
+                    if(str_list.count() > 1)
+                    {
+                        if(str_list[1].left(1) == "$") str_list[1].replace(0, 1, "0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
+                        integer2 = str_list[1].toUShort(&ok, 0);
+
+                        if(!ok)
+                            is_ok = false;
+                    }
+
+                    if(integer > integer2)
+                        is_ok = false;
+
+                    if(is_ok)
+                    {
+                        bg->iWAddress = integer;
+                        bg->iWAddressCount = (integer2 - integer) + 1;
+                        sprintf(str_00, "$%4.4X - $%4.4X", integer, integer2);
+                        item->setText(1, QString(str_00));
+                        item->setBackground(1, QColor(200, 200, 255));
+                        item->setForeground(1, QColor(200, 0, 0));
                     }
                     else
                     {
-                        item->setCheckState(0,Qt::Unchecked);
-                        item->setBackground(1,QColor(200,0,0));
-                        item->setForeground(1,QColor(200,200,200));
+                        item->setCheckState(0, Qt::Unchecked);
+                        item->setBackground(1, QColor(200, 0, 0));
+                        item->setForeground(1, QColor(200, 200, 200));
                     }
                 }
-                else item->setCheckState(0,Qt::Unchecked);
-                bg->bWAdresse = item->checkState(0);
+                else
+                    item->setCheckState(0, Qt::Unchecked);
+
+                bg->bWAddress = item->checkState(0);
                 break;
+
             case 6:
                 item->setText(0,tr("Lesen von Wert:"));
 
@@ -1667,6 +1805,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bRWert = item->checkState(0);
                 break;
+
             case 7:
                 item->setText(0,tr("Schreiben von Wert:"));
 
@@ -1701,6 +1840,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bWWert = item->checkState(0);
                 break;
+
             case 8:
                 item->setText(0,tr("Rasterzeile:"));
 
@@ -1735,6 +1875,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bRZ = item->checkState(0);
                 break;
+
             case 9:
                 item->setText(0,tr("Zyklus:"));
 
@@ -1769,6 +1910,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
                 else item->setCheckState(0,Qt::Unchecked);
                 bg->bRZZyklus = item->checkState(0);
                 break;
+
             default:
                 item->setText(0,"???");
                 break;
@@ -1937,6 +2079,7 @@ void DebuggerWindow::on_ExportDisAss_clicked()
     QStringList filters;
     filters << tr("Disassembler Listing (*.txt)")
             << tr("C64 Programm Datei (*.prg)")
+            << tr("RAW Datei (*.raw)")
             << tr("Alle Dateien (*.*)");
 
     if(!CustomSaveFileDialog::GetSaveFileName(this,tr("Export..."), filters, &filename, &fileext))
@@ -1960,6 +2103,12 @@ void DebuggerWindow::on_ExportDisAss_clicked()
         }
         if(!c64->ExportPRG(filename.toLocal8Bit(),start,end,current_source))
             QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der Programm Datei."));
+    }
+
+    if(fileext == "RAW")
+    {
+        if(!c64->ExportRAW(filename.toLocal8Bit(),start,end,current_source))
+            QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der RAW Datei."));
     }
 }
 
@@ -2066,10 +2215,10 @@ void DebuggerWindow::RefreshGUI(void)
             ui->CycleCounter_Out->setText("");
 
             ui->VerlaufGroup->setEnabled(false);
-            for(int i=0;i<HISTORY_ROW;i++) ui->HistoryList->item(i)->setText("");
+            for(int i=0;i<history_rows;i++) ui->HistoryList->item(i)->setText("");
 
             ui->DisassGroup->setEnabled(false);
-            for(int i=0;i<DISASS_ROW;i++)
+            for(int i=0;i<disass_rows;i++)
             {
                 disass_pc[i]->setText("");
                 disass_pc[i]->setBackground(table_back_color);
@@ -2134,7 +2283,6 @@ void DebuggerWindow::RefreshGUI(void)
         FillDisassemblyList(c64_cpu_ireg.current_opcode_pc,false);
     }
 
-    ui->EingabeFeld->hide();
     UpdateRegister();
     FillHistoryList(static_cast<uint8_t>(ui->HistoryScroll->value()));
     memory_window->UpdateMemoryList();
@@ -2231,3 +2379,15 @@ void DebuggerWindow::on_nmi_led_clicked(bool checked)
         else ui->nmi_led->setIcon(*icon_off);
     }
 }
+
+void DebuggerWindow::on_HistoryList_doubleClicked(const QModelIndex &index)
+{
+    bool is_ok = false;
+    int16_t address = index.data().toString().right(4).toInt(&is_ok, 16);
+
+    if(is_ok)
+    {
+        FillDisassemblyList(address, true);
+    }
+}
+

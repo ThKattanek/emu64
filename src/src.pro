@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 13.03.2023                //
+# // Letzte Änderung am 23.04.2023                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -131,6 +131,7 @@ SOURCES += \
     floppy_window.cpp \
     georam_class.cpp \
     info_window.cpp \
+    input_box_window.cpp \
     label_widget_mod.cpp \
     main.cpp \
     main_window.cpp \
@@ -166,7 +167,7 @@ SOURCES += \
     widget_bit_leiste.cpp \
     widget_file_browse.cpp \
     widget_floppy_status.cpp \
-     widget_led.cpp \
+    widget_led.cpp \
     widget_memory_zeile.cpp \
     widget_sr_edit.cpp \
     widget_tape_counter.cpp
@@ -191,12 +192,14 @@ HEADERS += \
     debugger_iec_window.h \
     debugger_vic_window.h \
     debugger_window.h \
+    dos_error_messages.h \
     emu64_commands.h \
     floppy1541_class.h \
     floppy_new_d64_window.h \
     floppy_window.h \
     georam_class.h \
     info_window.h \
+    input_box_window.h \
     label_widget_mod.h \
     main_window.h \
     memory_window.h \
@@ -264,6 +267,7 @@ FORMS += \
     tape_window.ui \
     user_palette_window.ui \
     video_crt_setup_window.ui \
+    input_box_window.ui \
     video_capture_window.ui \
     widget_bit_leiste.ui \
     widget_file_browse.ui \
@@ -362,6 +366,3 @@ DISTFILES += \
     ../create_linux_appimage.sh \
     ../crossbuild-win-releases.sh \
     AppRun
-
-HEADERS += \
-	dos_error_messages.h

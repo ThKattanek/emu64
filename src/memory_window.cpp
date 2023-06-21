@@ -8,15 +8,17 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 28.09.2019                //
+// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include <QScreen>
+#include <QMessageBox>
 #include <QStyle>
 
 #include "memory_window.h"
+#include "qdebug.h"
 #include "ui_memory_window.h"
 
 MemoryWindow::MemoryWindow(QWidget *parent) :
@@ -27,13 +29,15 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
 {
     c64 = 0;
 
+    memory_rows = 17;
+
     ui->setupUi(this);
 
     // Center Window
     setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
     ui->MemoryTable->setColumnCount(1);
-    ui->MemoryTable->setRowCount(MemZeilenAnz);
+    ui->MemoryTable->setRowCount(memory_rows);
 
     MemScrDest << "RAM" << "KERNAL" << "BASIC" << "VIC" << "FARBRAM" << "SID" << "CIA1" << "CIA2" << "IO1" << "IO2" << "CHARROM" << "ROM-LO" << "ROM-HI" << "ROM-HI" << "ADR.OPEN";
     FloppyMemScrDest << "RAM" << "VIA1" << "VIA2" << "ROM" << "OPEN";
@@ -61,22 +65,32 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
         MapWriteDestination[i+0xC0] = FMV_OPEN;
     }
 
+    for(int i=0; i<MAX_MEMORY_ROW; i++)
+    {
+        memory_row[i] = nullptr;
+    }
+
     QFontDatabase fontDB;
     fontDB.addApplicationFont(":/fonts/lucon.ttf");
-    QFont font1("Lucida Console",9);
+    QFont font1("Lucida Console",10);
 
-    for(int i=0;i<MemZeilenAnz;i++)
+    for(int i=0;i<memory_rows;i++)
     {
-        WidgetMemoryZeile *w = new WidgetMemoryZeile(&font1, this);
-        ui->MemoryTable->setCellWidget(i,0,w);
-        ui->MemoryTable->setRowHeight(i,w->height());
-        ui->MemoryTable->setColumnWidth(0,w->width());
-        connect(w,SIGNAL(ChangeValue(unsigned short,unsigned char)),this,SLOT(onChangeValue(unsigned short,unsigned char)));
-        connect(this,SIGNAL(NoFocus()),w,SLOT(onNoFocus()));
+        memory_row[i] = new WidgetMemoryZeile(&font1, this);
+        ui->MemoryTable->setCellWidget(i,0,memory_row[i]);
+        ui->MemoryTable->setRowHeight(i,memory_row[i]->height()+1);
+        ui->MemoryTable->setColumnWidth(0,memory_row[i]->width());
+        connect(memory_row[i],SIGNAL(ChangeValue(unsigned short,unsigned char)),this,SLOT(onChangeValue(unsigned short,unsigned char)));
+        connect(this,SIGNAL(NoFocus()),memory_row[i],SLOT(onNoFocus()));
     }
 
     WidgetMemoryZeile *w = (WidgetMemoryZeile*)ui->MemoryTable->cellWidget(0,0);
     w->setEnabled(false);
+
+    ui->MemoryTable->setMinimumWidth(w->width());
+    ui->MemoryTable->setMaximumWidth(w->width());
+    ui->MemoryTable->setMinimumHeight((w->height()+1) * memory_rows);
+    ui->MemoryTable->setMaximumHeight((w->height()+1) * memory_rows);
 }
 
 MemoryWindow::~MemoryWindow()
@@ -147,7 +161,7 @@ void MemoryWindow::UpdateMemoryList(void)
     unsigned char puffer[16];
     unsigned char* ram_puffer;
 
-    for(int i=0;i<MemZeilenAnz-1;i++)
+    for(int i=0;i<memory_rows-1;i++)
     {
         if(AktSource > 0)
         {
@@ -202,17 +216,35 @@ void MemoryWindow::on_MemoryScroll_sliderReleased()
     NoFocusRun = true;
 }
 
-void MemoryWindow::on_BitAnzeige_clicked(bool checked)
-{
-    WidgetMemoryZeile *w;
-    for(int i=0;i<MemZeilenAnz-1;i++)
-    {
-        w = (WidgetMemoryZeile*)ui->MemoryTable->cellWidget(i+1,0);
-        w->EndableBitLeiste(checked);
-    }
-}
-
 void MemoryWindow::on_OnlyRam_clicked(bool)
 {
     UpdateMemoryList();
 }
+
+void MemoryWindow::on_jump_address_returnPressed()
+{
+    bool ok;
+    QString in_str;
+    int value;
+
+    in_str = ui->jump_address->text();
+
+    if(in_str.left(1) == "$") in_str.replace(0,1,"0x"); // Steht am Anfang ein '$' wird dieses in '0X' gewandelt
+    value = in_str.toInt(&ok,0);
+    if(!ok)
+    {
+        QMessageBox::warning(this,tr("Eingabefehler..."),tr("Es wurde kein gültiges Zahlenformat benutzt !"));
+            return;
+    }
+
+    if(value < 0 || value > 0xffff)
+            QMessageBox::warning(this, tr("Eingabefehler..."), tr("Die Zieladresse muss zwischen $0000 (0) und $FFFF (65535) liegen"));
+
+    ui->MemoryScroll->setValue(value);
+
+    if(value < 0xff10)
+        memory_row[1]->SelectColumb(value % 16);
+    else
+        memory_row[16 - ((0xffff - value) / 16)]->SelectColumb(value % 16);
+}
+

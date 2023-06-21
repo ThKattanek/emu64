@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.08.2019                //
+// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -31,7 +31,7 @@ public:
     explicit WidgetMemoryZeile(QFont *font1, QWidget *parent = nullptr);
     ~WidgetMemoryZeile();
     void Fill(unsigned short adr, unsigned char* byte_puffer,QString ReadSource,QString WriteDestination);
-    void EndableBitLeiste(bool status);
+    void SelectColumb(uint8_t columb);
 
 private slots:
     void on_EditValue_0_editingFinished();

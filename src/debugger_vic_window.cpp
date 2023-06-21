@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.04.2020                //
+// Letzte Änderung am 21.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -29,8 +29,16 @@ DebuggerVicWindow::DebuggerVicWindow(QWidget *parent) :
     // Center Window
     setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
-    ui->OutputList->setColumnWidth(0,110);
-    ui->OutputList->setColumnWidth(1,90);
+    QFont font1("Lucida Console", 9);
+    ui->OutputList->setFont(font1);
+
+    int font1_width = ui->OutputList->fontMetrics().averageCharWidth() + 1;
+    int font1_height = ui->OutputList->fontMetrics().height() + 4;
+
+    ui->OutputList->setColumnWidth(0, 20 * font1_width + 2);
+    ui->OutputList->setColumnWidth(1, 20 * font1_width + 2);
+    ui->OutputList->setMinimumWidth( 40 * font1_width + 4);
+    ui->OutputList->setMinimumHeight(ui->OutputList->topLevelItemCount() * font1_height);
 
     graphic_modi = QStringList() << "Standard Text" << "Multicolor Text" << "Standard Bitmap" << "Multicolor Bitmap" << "ECM Text" << "Ungültiger Textmodus" << "Ungültiger Bitmapmodus 1" << "Ungültiger Bitmapmodus 2";
 }
