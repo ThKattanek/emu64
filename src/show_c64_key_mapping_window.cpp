@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 28.09.2019                //
+// Letzte Änderung am 21.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -34,6 +34,12 @@ ShowC64KeyMappingWindow::ShowC64KeyMappingWindow(QWidget *parent, C64Class *c64)
     QFont font1("Lucida Console",10);
 
     ui->text_out->setFont(font1);
+
+    int font1_width = ui->text_out->fontMetrics().averageCharWidth() + 1;
+    int font1_height = ui->text_out->fontMetrics().height();
+
+    ui->text_out->setMinimumWidth( 31 * font1_width + 4);
+    ui->text_out->setMinimumHeight(30 * font1_height);
 
     UpdateText();
 }
