@@ -1037,6 +1037,11 @@ void SetupWindow::on_default_50hz_clicked()
     ui->cycles_per_second->setValue(982800);
 }
 
+void SetupWindow::on_default_60hz_clicked()
+{
+    ui->cycles_per_second->setValue(1179360);
+}
+
 void SetupWindow::on_cycles_per_second_valueChanged(int arg1)
 {
     c64->SetC64Frequency(arg1);
@@ -1148,3 +1153,6 @@ void SetupWindow::OnChangeUserColor(int color_number, QColor color)
 {
 	video_crt_output->SetUserPaletteColor(color_number, color.red(), color.green(), color.blue());
 }
+
+
+

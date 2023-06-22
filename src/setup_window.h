@@ -98,6 +98,8 @@ private slots:
 	void OnChangeUserColor(int color_number, QColor color);
 
 
+    void on_default_60hz_clicked();
+
 private:
     void UpdateToolTips();
     void FillRomSetCombo();

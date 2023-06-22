@@ -23,7 +23,7 @@
       <bool>true</bool>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -306,6 +306,13 @@
                <widget class="QPushButton" name="default_pal_c64">
                 <property name="text">
                  <string>50,125 FPS</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="default_60hz">
+                <property name="text">
+                 <string>60 FPS</string>
                 </property>
                </widget>
               </item>
