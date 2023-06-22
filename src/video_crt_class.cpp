@@ -322,6 +322,12 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
     float _uf1,_uf2,_uf3;
     float _vf1,_vf2,_vf3;
 
+    float _div2 = 1.0f / 2.0f;
+    float _div3 = 1.0f / 3.0f;
+    float _div4 = 1.0f / 4.0f;
+    float _div5 = 1.0f / 5.0f;
+    float _div7 = 1.0f / 7.0f;
+
     video_source = VICOutPuffer;
     video_source += VICOutPufferOffset;
 
@@ -338,14 +344,14 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
                 _u0 = _u1 = _u2 = _u3 = c64_yuv_colors_0[video_source[0] & 0x0f].u;
                 _v0 = _v1 = _v2 = _v3 = c64_yuv_colors_0[video_source[0] & 0x0f].v;
 
-                for(int x=0;x<(OutXW);x++)
+                for(int x=0; x<(OutXW); x++)
 				{
 					// from yuv to rgb
 					// R = Y + 1.140V
 					// G = Y - 0.395U - 0.581V
 					// B = Y + 2.032U
 
-                    int _x = x/2;
+                    int _x = x >> 1;
 
 					// Pixel
                     if(y & 1)
@@ -384,16 +390,16 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
                         _y = _y0;
                         break;
                     case 2:
-                        _y = (_y0 + _y1) / 2;
+                        _y = (_y0 + _y1) * _div2;
                         _y1 = _y;
                         break;
                     case 3:
-                        _y = (_y0 + _y1 + _y2) / 3;
+                        _y = (_y0 + _y1 + _y2) * _div3;
                         _y2 = _y1;
                         _y1 = _y;
                         break;
                     case 4:
-                        _y = (_y0 + _y1 + _y2 + _y3) / 4;
+                        _y = (_y0 + _y1 + _y2 + _y3) * _div4;
                         _y3 = _y2;
                         _y2 = _y1;
                         _y1 = _y;
@@ -411,25 +417,25 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
                         _v = _v0;
                         break;
                     case 2:
-                        _u = (_u0 + _u1 + _uf1) / 3;
+                        _u = (_u0 + _u1 + _uf1) * _div3;
                         _u1 = _u;
-                        _v = (_v0 + _v1 + _vf1) / 3;
+                        _v = (_v0 + _v1 + _vf1) * _div3;
                         _v1 = _v;
                         break;
                     case 3:
-                        _u = (_u0 + _u1 + _u2 + _uf1 + _uf2) / 5;
+                        _u = (_u0 + _u1 + _u2 + _uf1 + _uf2) * _div5;
                         _u2 = _u1;
                         _u1 = _u;
-                        _v = (_v0 + _v1 + _v2 + _vf1 + _vf2) / 5;
+                        _v = (_v0 + _v1 + _v2 + _vf1 + _vf2) * _div5;
                         _v2 = _v1;
                         _v1 = _v;
                         break;
                     case 4:
-                        _u = (_u0 + _u1 + _u2 + _u3 + _uf1 + _uf2 + _uf3) / 7;
+                        _u = (_u0 + _u1 + _u2 + _u3 + _uf1 + _uf2 + _uf3) * _div7;
                         _u3 = _u2;
                         _u2 = _u1;
                         _u1 = _u;
-                        _v = (_v0 + _v1 + _v2 + _v3 + _vf1 + _vf2 + _vf3) / 7;
+                        _v = (_v0 + _v1 + _v2 + _v3 + _vf1 + _vf2 + _vf3) * _div7;
                         _v3 = _v2;
                         _v2 = _v1;
                         _v1 = _v;
@@ -445,17 +451,17 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
                     {
                         if(!pal_delay_line_u_only)
                         {
-                            _ut = (_u + _uo[x]) / 2.0f;
+                            _ut = (_u + _uo[x]) * _div2;
                             _uo[x] = _u;
                             _u = _ut;
 
-                            _vt = (_v + _vo[x]) / 2.0f;
+                            _vt = (_v + _vo[x]) * _div2;
                             _vo[x] = _v;
                             _v = _vt;
                         }
                         else
                         {
-                            _ut = (_u + _uo[x]) / 2.0f;
+                            _ut = (_u + _uo[x]) * _div2;
                             _uo[x] = _u;
                             _u = _ut;
                         }
@@ -473,7 +479,7 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
 
 					r = _y + 1.140f * _v;
 					g = _y - 0.395f * _u - 0.581f * _v;
-					b = _y + 2.032f * _u;
+                    b = _y + 2.032f * _u;
 
                     r = std::max(r, 0.0f);
                     g = std::max(g, 0.0f);
@@ -572,16 +578,16 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
                         _y = _y0;
                         break;
                     case 2:
-                        _y = (_y0 + _y1) / 2;
+                        _y = (_y0 + _y1) * _div2;
                         _y1 = _y;
                         break;
                     case 3:
-                        _y = (_y0 + _y1 + _y2) / 3;
+                        _y = (_y0 + _y1 + _y2) * _div3;
                         _y2 = _y1;
                         _y1 = _y;
                         break;
                     case 4:
-                        _y = (_y0 + _y1 + _y2 + _y3) / 4;
+                        _y = (_y0 + _y1 + _y2 + _y3) * _div4;
                         _y3 = _y2;
                         _y2 = _y1;
                         _y1 = _y;
@@ -599,25 +605,25 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
                         _v = _v0;
                         break;
                     case 2:
-                        _u = (_u0 + _u1 + _uf1) / 3;
+                        _u = (_u0 + _u1 + _uf1) * _div3;
                         _u1 = _u;
-                        _v = (_v0 + _v1 + _vf1) / 3;
+                        _v = (_v0 + _v1 + _vf1) * _div3;
                         _v1 = _v;
                         break;
                     case 3:
-                        _u = (_u0 + _u1 + _u2 + _uf1 + _uf2) / 5;
+                        _u = (_u0 + _u1 + _u2 + _uf1 + _uf2) * _div5;
                         _u2 = _u1;
                         _u1 = _u;
-                        _v = (_v0 + _v1 + _v2 + _vf1 + _vf2) / 5;
+                        _v = (_v0 + _v1 + _v2 + _vf1 + _vf2) * _div5;
                         _v2 = _v1;
                         _v1 = _v;
                         break;
                     case 4:
-                        _u = (_u0 + _u1 + _u2 + _u3 + _uf1 + _uf2 + _uf3) / 7;
+                        _u = (_u0 + _u1 + _u2 + _u3 + _uf1 + _uf2 + _uf3) * _div7;
                         _u3 = _u2;
                         _u2 = _u1;
                         _u1 = _u;
-                        _v = (_v0 + _v1 + _v2 + _v3 + _vf1 + _vf2 + _vf3) / 7;
+                        _v = (_v0 + _v1 + _v2 + _v3 + _vf1 + _vf2 + _vf3) * _div7;
                         _v3 = _v2;
                         _v2 = _v1;
                         _v1 = _v;
@@ -633,17 +639,17 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
 					{
                         if(!pal_delay_line_u_only)
                         {
-                            _ut = (_u + _uo[x]) / 2.0f;
+                            _ut = (_u + _uo[x]) * _div2;
                             _uo[x] = _u;
                             _u = _ut;
 
-                            _vt = (_v + _vo[x]) / 2.0f;
+                            _vt = (_v + _vo[x]) * _div2;
                             _vo[x] = _v;
                             _v = _vt;
                         }
                         else
                         {
-                            _ut = (_u + _uo[x]) / 2.0f;
+                            _ut = (_u + _uo[x]) * _div2;
                             _uo[x] = _u;
                             _u = _ut;
                         }

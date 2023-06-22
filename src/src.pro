@@ -73,6 +73,9 @@ win32 {
 
 # Abhängigkeiten
 
+QMAKE_CXXFLAGS += -fopenmp
+LIBS += -fopenmp
+
 CONFIG += link_pkgconfig
 PKGCONFIG += sdl2 SDL2_image libpng glu libavutil libavformat libavcodec libswresample libswscale gl
 
