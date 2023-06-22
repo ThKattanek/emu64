@@ -16,6 +16,7 @@
 #include "video_crt_class.h"
 #include "c64_colors.h"
 #include <math.h>
+#include <algorithm>
 
 #include <iostream>
 
@@ -474,14 +475,13 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
 					g = _y - 0.395f * _u - 0.581f * _v;
 					b = _y + 2.032f * _u;
 
-					r = r * !(r<0);
-					g = g * !(g<0);
-					b = b * !(b<0);
+                    r = std::max(r, 0.0f);
+                    g = std::max(g, 0.0f);
+                    b = std::max(b, 0.0f);
 
-					r = r * (!(r>255)) + 255 * (r>255);
-					g = g * (!(g>255)) + 255 * (g>255);
-					b = b * (!(b>255)) + 255 * (b>255);
-
+                    r = std::min(r, 255.0f);
+                    g = std::min(g, 255.0f);
+                    b = std::min(b, 255.0f);
 
 					rgb =  static_cast<uint32_t>(r);       // Rot
 					rgb |= static_cast<uint32_t>(g)<<8;    // Grün
@@ -499,13 +499,13 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
 					g = _y - 0.395f * _u - 0.581f * _v;
 					b = _y + 2.032f * _u;
 
-					r = r * !(r<0);
-					g = g * !(g<0);
-					b = b * !(b<0);
+                    r = std::max(r, 0.0f);
+                    g = std::max(g, 0.0f);
+                    b = std::max(b, 0.0f);
 
-					r = r * (!(r>255)) + 255 * (r>255);
-					g = g * (!(g>255)) + 255 * (g>255);
-					b = b * (!(b>255)) + 255 * (b>255);
+                    r = std::min(r, 255.0f);
+                    g = std::min(g, 255.0f);
+                    b = std::min(b, 255.0f);
 
 					rgb =  static_cast<uint32_t>(r);       // Rot
 					rgb |= static_cast<uint32_t>(g)<<8;    // Grün
@@ -663,13 +663,13 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
 					g = _y - 0.395f * _u - 0.581f * _v;
 					b = _y + 2.032f * _u;
 
-					r = r * !(r<0);
-					g = g * !(g<0);
-					b = b * !(b<0);
+                    r = std::max(r, 0.0f);
+                    g = std::max(g, 0.0f);
+                    b = std::max(b, 0.0f);
 
-					r = r * (!(r>255)) + 255 * (r>255);
-					g = g * (!(g>255)) + 255 * (g>255);
-					b = b * (!(b>255)) + 255 * (b>255);
+                    r = std::min(r, 255.0f);
+                    g = std::min(g, 255.0f);
+                    b = std::min(b, 255.0f);
 
 					rgb =  static_cast<uint32_t>(r);       // Rot
 					rgb |= static_cast<uint32_t>(g)<<8;    // Grün
