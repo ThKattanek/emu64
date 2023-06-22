@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.06.2021                //
+// Letzte Änderung am 22.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -222,7 +222,7 @@ bool TAPE1530::LoadTapeImage(FILE *file, int typ)
 		TapePosIsEnd = false;
 
 		WaveCounter = 0.0f;
-		AddWaveWert = (double)WAVESampleRate / cycles_per_second;
+        AddWaveWert = WAVESampleRate / cycles_per_second;
 
 		return true;
 		break;
@@ -634,9 +634,9 @@ void TAPE1530::OneCycle()
 
     ZyklenCounter++;
     FreqConvCounter+=FreqConvAddWert;
-    if(FreqConvCounter>=(double)1.0)
+    if(FreqConvCounter>=1.0f)
     {
-        FreqConvCounter-=(double)1.0;
+        FreqConvCounter-=1.0f;
         ZyklenCounter=0;
 
         if(IsTapeInsert || IsRecTapeInsert)

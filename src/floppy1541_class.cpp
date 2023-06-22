@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.06.2023	       		//
+// Letzte Änderung am 22.06.2023	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -124,8 +124,8 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
     FloppySoundsLoaded = false;
     FloppySoundEnabled = false;
 
-    Samplerate = (double)samplerate;
-    FreqConvAddWert = ((double)1.0)/((double)985248.0/Samplerate);
+    Samplerate = samplerate;
+    FreqConvAddWert = 1.0f/(985248.0f/Samplerate);
     FreqConvCounter = 0.0;
     SoundBufferPos = 0;
     SoundBufferSize = buffersize;
@@ -760,9 +760,9 @@ bool Floppy1541::OneCycle()
         }
 
         FreqConvCounter+=FreqConvAddWert;
-        if(FreqConvCounter>=(double)1.0)
+        if(FreqConvCounter>=1.0f)
         {
-            FreqConvCounter-=(double)1.0;
+            FreqConvCounter-=1.0f;
 
             if(FloppySoundsLoaded && FloppyEnabled)
                 RenderFloppySound();

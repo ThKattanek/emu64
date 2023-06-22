@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.08.2019                //
+// Letzte Änderung am 22.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -30,9 +30,9 @@ MOS6581_8085::MOS6581_8085(int nummer,int samplerate,int puffersize,int *error)
     
     SidNummer = nummer;
     this->FilterFrequenz=0;
-    Samplerate=(double)samplerate;
+    Samplerate=samplerate;
     C64ZyklenSek = 985248;
-    FreqConvAddWert=((double)1.0)/((double)C64ZyklenSek/Samplerate);
+    FreqConvAddWert=1.0f/(C64ZyklenSek/Samplerate);
     FreqConvCounter=0.0;
 
     IODelayEnable = false;
@@ -108,8 +108,8 @@ void MOS6581_8085::ChangeSampleRate(int samplerate,int puffersize)
     delete SoundBufferV1;
     delete SoundBufferV2;
 
-    Samplerate=(double)samplerate;
-    FreqConvAddWert=((double)1.0)/((double)C64ZyklenSek/Samplerate);
+    Samplerate=samplerate;
+    FreqConvAddWert=1.0f/(C64ZyklenSek/Samplerate);
     FreqConvCounter=0.0;
 
     SoundBufferPos = 0;
@@ -169,7 +169,7 @@ void MOS6581_8085::SetChipType(int type)
 void MOS6581_8085::SetC64Zyklen(float C64ZyklenSek)
 {
     this->C64ZyklenSek = C64ZyklenSek;
-    FreqConvAddWert=((double)1.0)/((double)C64ZyklenSek/Samplerate);
+    FreqConvAddWert=1.0f/(C64ZyklenSek/Samplerate);
 }
 
 void MOS6581_8085::SetVoiceEnable(int nr, bool status)
@@ -210,9 +210,9 @@ bool MOS6581_8085::OneZyklus(void)
     
     Zyklencounter++;
     FreqConvCounter+=FreqConvAddWert;
-    if(FreqConvCounter>=(double)1.0)
+    if(FreqConvCounter>=1.0f)
     {
-    	FreqConvCounter-=(double)1.0;
+        FreqConvCounter-=1.0f;
     	if(!CycleExact)
     	{
             OscZyklus(Zyklencounter);
@@ -1225,7 +1225,7 @@ inline void MOS6581_8085::FilterReset(void)
 
 inline void MOS6581_8085::SetW0(void)
 {
-    const double pi = 3.1415926535897932385;
+    const float pi = 3.1415926535897932385;
     w0=(int)(2*pi*f0[FilterFrequenz]*1.048576);
     const int w0_max_1 = static_cast<int>(2*pi*16000*1.048576);
     w0_ceil_1 = w0 <= w0_max_1 ? w0 : w0_max_1;

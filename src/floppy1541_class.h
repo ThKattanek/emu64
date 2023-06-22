@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.03.2022	       		//
+// Letzte Änderung am 22.06.2023	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -176,13 +176,13 @@ private:
 
     /// Für Floppy Sound ///
 
-    double              Volume;
+    float               Volume;
     bool                StepperIncWait;
     bool                FloppySoundsLoaded;	// zeigt an ob alle Floppy Sound geladen sind
     bool                FloppySoundEnabled;
-    double              Samplerate;
-    double              FreqConvCounter;
-    double              FreqConvAddWert;
+    float               Samplerate;
+    float               FreqConvCounter;
+    float               FreqConvAddWert;
     int                 SoundBufferPos;
     int                 SoundBufferSize;
     short               *SoundBuffer;

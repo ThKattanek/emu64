@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.08.2019                //
+// Letzte Änderung am 22.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -84,7 +84,7 @@ class MOS6581_8085
     int                 Zyklencounter;
     bool                ret;
 
-    double              Samplerate;
+    float              Samplerate;
     VOICEClass          *Voice[3];
     unsigned char       IO[32];
 
@@ -104,8 +104,8 @@ class MOS6581_8085
     int SidModel;
 
     int                 C64ZyklenSek;
-    double              FreqConvCounter;	// interner Counter für Fast Fast Fast Resampling ;-)
-    double              FreqConvAddWert;
+    float              FreqConvCounter;	// interner Counter für Fast Fast Fast Resampling ;-)
+    float              FreqConvAddWert;
 
     unsigned char   PotX;
     unsigned char   PotY;
