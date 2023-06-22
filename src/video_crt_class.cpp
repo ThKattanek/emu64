@@ -311,8 +311,8 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
 {
 	// Outbuffer -> uint32 (ABGR)
 
-	float _y,_u,_v;
-	float r,g,b;
+    float _y,_u,_v;
+    float r,g,b;
 	uint32_t rgb;
 
     float _y0,_y1,_y2,_y3;
@@ -469,12 +469,9 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
 
                     if(!enable_user_palette_crt_mode)
                     {
-                        _y += brightness;
-                        _u *= saturation;
-                        _v *= saturation;
-                        _y *= contrast;
-                        _u *= contrast;
-                        _v *= contrast;
+                        _y = (_y + brightness) * contrast;
+                        _u *= saturation * contrast;
+                        _v *= saturation * contrast;
                     }
 
 					r = _y + 1.140f * _v;
@@ -657,12 +654,9 @@ void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOu
 
                     if(!enable_user_palette_crt_mode)
                     {
-                        _y += brightness;
-                        _u *= saturation;
-                        _v *= saturation;
-                        _y *= contrast;
-                        _u *= contrast;
-                        _v *= contrast;
+                        _y = (_y + brightness) * contrast;
+                        _u *= saturation * contrast;
+                        _v *= saturation * contrast;
                     }
 
 					r = _y + 1.140f * _v;
