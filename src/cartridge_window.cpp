@@ -85,17 +85,11 @@ CartridgeWindow::CartridgeWindow(QWidget *parent, QSettings *_ini, C64Class *c64
         ui->CRTInfo->addTopLevelItem(item);
     }
 
-    int totalHeight = 0;
     for (int i = 0; i < ui->CRTInfo->columnCount(); i++)
     {
         ui->CRTInfo->header()->setSectionResizeMode(i, QHeaderView::Stretch);
         ui->CRTInfo->header()->setSectionResizeMode(i, QHeaderView::ResizeToContents);
-        totalHeight += ui->CRTInfo->sizeHintForRow(i);
     }
-
-    totalHeight += 20;
-
-    qDebug() << totalHeight;
 
     ui->CRTInfo->setMinimumHeight(170);
     ui->CRTInfo->setMaximumHeight(170);
