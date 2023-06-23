@@ -13,7 +13,6 @@
   <property name="font">
    <font>
     <family>Arial</family>
-    <weight>50</weight>
     <bold>false</bold>
    </font>
   </property>
@@ -68,7 +67,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <property name="spacing">
-      <number>0</number>
+      <number>4</number>
      </property>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -167,7 +166,6 @@
            <property name="font">
             <font>
              <family>Noto Sans</family>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
