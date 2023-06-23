@@ -167,113 +167,112 @@
         <translation>Cartridges</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="403"/>
+        <location filename="cartridge_window.ui" line="409"/>
         <source>Modul aktivieren</source>
         <translation>Activate Cartridge</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="422"/>
+        <location filename="cartridge_window.ui" line="428"/>
         <source>Modul deaktivieren</source>
         <translation>Deactivate Cartridge</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="507"/>
+        <location filename="cartridge_window.cpp" line="76"/>
         <source>Variable</source>
         <translation>Variable</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="519"/>
+        <location filename="cartridge_window.cpp" line="76"/>
         <source>Inhalt</source>
         <translation>Content</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="531"/>
+        <location filename="cartridge_window.cpp" line="79"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="539"/>
+        <location filename="cartridge_window.cpp" line="79"/>
         <source>Version</source>
         <translation>Version</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="547"/>
+        <location filename="cartridge_window.cpp" line="79"/>
         <source>Hardware Typ</source>
         <translation>Hardware Type</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="555"/>
         <source>EXPROM Leitung</source>
-        <translation>EXPROM Circuit</translation>
+        <translation type="vanished">EXPROM Circuit</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="563"/>
+        <location filename="cartridge_window.cpp" line="79"/>
         <source>GAME Leitung</source>
         <translation>GAME Circuit</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="568"/>
+        <location filename="cartridge_window.cpp" line="79"/>
         <source>Chip Anzahl</source>
         <translation>Chip Count</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="601"/>
+        <location filename="cartridge_window.cpp" line="60"/>
         <source>Nr.</source>
         <translation>No.</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="613"/>
+        <location filename="cartridge_window.cpp" line="60"/>
         <source>Chip Typ</source>
         <translation>Chip Type</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="625"/>
+        <location filename="cartridge_window.cpp" line="60"/>
         <source>Bank</source>
         <translation>Bank</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="637"/>
+        <location filename="cartridge_window.cpp" line="60"/>
         <source>Adresse</source>
         <translation>Address</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="649"/>
+        <location filename="cartridge_window.cpp" line="60"/>
         <source>Größe</source>
         <translation>Size</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="106"/>
+        <location filename="cartridge_window.ui" line="109"/>
         <source>Boot Schalter</source>
         <translation>Boot switch</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="121"/>
+        <location filename="cartridge_window.ui" line="124"/>
         <source>Modul starten</source>
         <translation>Start Cartridge</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="140"/>
+        <location filename="cartridge_window.ui" line="143"/>
         <source>C64 Normal starten</source>
         <translation>Start C64 normally</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="151"/>
+        <location filename="cartridge_window.ui" line="154"/>
         <source>Flashspeicher Anzeigen</source>
         <translation>Flash memory display</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="161"/>
+        <location filename="cartridge_window.ui" line="164"/>
         <source>EasyFlash CRT speichern</source>
         <translation>Save EasyFlash CRT</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="168"/>
-        <location filename="cartridge_window.ui" line="247"/>
+        <location filename="cartridge_window.ui" line="171"/>
+        <location filename="cartridge_window.ui" line="253"/>
         <source>Weitere Infos</source>
         <translation>More info</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="186"/>
+        <location filename="cartridge_window.ui" line="189"/>
         <source>&lt;html&gt; &lt;a style = &apos;text-decoration:none&apos;href =&apos;http://www.c64-wiki.de/index.php/EasyFlash&apos;&gt;Artikel im C64 Wiki&lt;/a&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;a style = &apos;text-decoration:none&apos;href =&apos;http://www.c64-wiki.com/index.php/EasyFlash&apos;&gt;C64 Wiki&lt;/a&gt;&lt;/html&gt;</translation>
     </message>
@@ -283,52 +282,57 @@
         <translation>Status LED</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="220"/>
-        <location filename="cartridge_window.ui" line="306"/>
+        <location filename="cartridge_window.ui" line="223"/>
+        <location filename="cartridge_window.ui" line="312"/>
         <source>FREEZE</source>
         <translation>FREEZE</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="265"/>
+        <location filename="cartridge_window.ui" line="271"/>
         <source>&lt;html&gt; &lt;a style = &apos;text-decoration:none&apos;href =&apos;http://www.c64-wiki.de/index.php/Final_Cartridge_III&apos;&gt;Artikel im C64 Wiki&lt;/a&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;a style = &apos;text-decoration:none&apos;href =&apos;http://www.c64-wiki.com/index.php/Final_Cartridge_3&apos;&gt;C64 Wiki&lt;/a&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="cartridge_window.ui" line="367"/>
+        <location filename="cartridge_window.ui" line="373"/>
         <source>Leeres EasyFlash erstellen</source>
         <translation>Create empty Easy Flash</translation>
     </message>
     <message>
-        <location filename="cartridge_window.cpp" line="388"/>
-        <location filename="cartridge_window.cpp" line="403"/>
+        <location filename="cartridge_window.cpp" line="79"/>
+        <source>EXROM Leitung</source>
+        <translation>EXROM Circuit</translation>
+    </message>
+    <message>
+        <location filename="cartridge_window.cpp" line="426"/>
+        <location filename="cartridge_window.cpp" line="441"/>
         <source>Fehler!</source>
         <translation>Error!</translation>
     </message>
     <message>
-        <location filename="cartridge_window.cpp" line="388"/>
-        <location filename="cartridge_window.cpp" line="403"/>
+        <location filename="cartridge_window.cpp" line="426"/>
+        <location filename="cartridge_window.cpp" line="441"/>
         <source>Es konnte kein neues EasyFlash Image erstellt werden.</source>
         <translation>It could not create a new EasyFlash image.</translation>
     </message>
     <message>
-        <location filename="cartridge_window.cpp" line="398"/>
+        <location filename="cartridge_window.cpp" line="436"/>
         <source>Achtung!</source>
         <translation>Attention!</translation>
     </message>
     <message>
-        <location filename="cartridge_window.cpp" line="398"/>
+        <location filename="cartridge_window.cpp" line="436"/>
         <source>Eine Datei mit diesen Namen existiert schon!
 Soll diese überschrieben werden?</source>
         <translation>A file with that name allready exists!
 Do you want it to overwrite?</translation>
     </message>
     <message>
-        <location filename="cartridge_window.cpp" line="443"/>
+        <location filename="cartridge_window.cpp" line="481"/>
         <source>CRT Fehler</source>
         <translation>CRT error</translation>
     </message>
     <message>
-        <location filename="cartridge_window.cpp" line="443"/>
+        <location filename="cartridge_window.cpp" line="481"/>
         <source>Fehler beim Laden des ausgewählten CRT Files</source>
         <translation>Error while loading the selected CRT file</translation>
     </message>
