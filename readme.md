@@ -34,7 +34,7 @@ Emu64 auf Facebook: [https://www.facebook.com/Emu64-103321833093172](https://www
 ```bash
 git clone https://github.com/ThKattanek/emu64.git
 cd emu64
-git checkout 5.0.19
+git checkout 5.1.0
 mkdir build
 cd build
 qmake .. PREFIX="/usr/local"
