@@ -1,3 +1,49 @@
+5.1.0
+------
+
+- [#210] Fixed: F1 und F5 wurden falsch beim Mappen gesetzt. ( F1 und F5 muessen ggf neu gemappt werden!)
+- [#216] Fixed: Wenn in Dateinamen mehrere "." vorkommen wurde die Endung falsch ausgewertet
+- [#217] Fixed: Floppy1541: LoadDiskImage -> UnLoadDiskImage nur wenn auch ein bekannter Typ (D64, G64) übergegen wurde.
+- NEW! Bei einem Fehler der Floppy 1541, wird das jetzt im Statusfenster durch ein Ausrufezeichen neben der Floppy Lautstärke angezeigt. Durch einen klick darauf wird der aktuelle Fehler im Fehlerkanal angezeigt.
+- NEW! [#219] Neuer Komandozeilenparameter "--video-filter-off" hinzugefügt. Damit wird beim Sarten der Video CRT Modus abeschaltet, egal was in der emu64.ini steht. Die emu64.ini bleibt aber davon unberührt.
+- NEW! [#219] Neuer Komandozeilenparameter "-double-texture-off" hinzugefügt. Die Video Ausgabe Texture wird temporär nicht verdoppelt.
+- NEW! [#219] Neue Komandozeilenparameter "--enable-reu" und "--enable-georam" Aktiviert beim Start die REU oder die GeoRam.
+- NEW! [#219] Neuer Komandozeilenparameter "--set-sidtype" Der SID Typ kann nun per Kommandozeile gesetzt werden. Momentag aber nur der 1. SID
+- [#219] Fixed: "--exitscreenshot" Screenshots beim verlassen des Emulators sollten jetzt richtig dargestellt werden.
+- NEW! [#291] Neuen Komandozeilenparameter "--set-palette" hinzugefügt. Setzt temporär eine C64 Farbpalette beim Start. emu64.ini bleibt auch hier unberührt.
+- [#221] Fixed: "make install" rief "strip" bei allen files auf, soll aber nur bei binarys geschehen
+- crossbuild-win-releases.sh angepasst um besser zu konfigurieren ob komprimiert werden soll und welche architecturen erstellt werden sollen. x32 und x64
+- [#106] Fixed: "--nogui" zeigt jetzt wirklich keinerlei Fenster mehr an. Wenn --nogui angegeben wird braucht es kein --nosplash
+- [#226] Fixed: Die Disk ID aus der BAM (18/0) wird beim mounten eines D64 Image in allen Sektoren übernommen. Vorher wurde immer 0 geschrieben.
+- [#182] Fixed: Illegal opcodes SHA, SHS, SHX, SHY / Der Trap17 Test lief schief weil die Microcodes 134,135,136 und 137 eine Falsche Adresse, für die Berechnung des neuen Wertes der in den Speicher geschrieben, wird falsch war.
+- [#227] + [#228] GeoRam und Reu werden jetzt erkannt. Problem war das --autostart als erstes ein CRT entfernt. Damit flog auch die gerade gesetzte GeoRam oder REU raus.
+- Fixed: RAM Init Pattern angepasst. darkstarbbstest.prg und typicaltest.prg laufen nun auch.
+- [#230] Fixed: Wenn Emu64 mit Angestelltem Warp Modus beendet wird stürzt er nicht mehr ab.
+- [#223] Lock- und Unlock-Mutex aus EnableWarpMode entfernt
+- [#231] SHX & SHY Teilweise Implementierung der "unstable" Verhalten.
+- Fixed: BreakGroups -> OpenFileDialog Start Verzeichnis von Home auf das letzte umgestellt.
+- NEW! Neues Skript "create_linux_appimage.sh" hinzugefügt um ein Appimage für Linux zu erstellen
+- NEW! [#237] Neue Video CRT Emulation implementiert. Es wird nun auch eine PAL Delyline emuliert um besseres Farbmischen zu simulieren. Auch ist der Y-Blur etwas schöner wie vorher.
+       Das ganze ist aber momentan noch etwas langsamer als die alte Version.
+- [#236] Fixed: Es gab im Debugger mehrere Anzeigprobleme unter Windows 11. Diese sollten nun behoben sein.
+- NEW! [#236] Es wurde das Debug Logging wieder implementiert. 
+- NEW! [#236] In einer BreakGroup kann nun für das Lesen aus und in einer Adresse ein Bereich angegeben werden.
+- NEW! [#236] New Dokumentation für die "*.bpt" Files in doc hinzugefügt.
+- NEW! [#236] Bei einem Doppelklick in die History Liste im Debugger wird automatisch das Disassembler Listing an dieser Stelle angezeigt.
+- NEW! [#236] Beim ändern eines Registers im Debugger geht nun ein seperaten Fenster auf wo man den Wert ändern kann.
+- NEW! [#236] Im Debugger Memory Fenster kann nun direkt an einer Stelle gesprungen werden ohne zu Scrollen. Die Bit ANzeige wurde entfernt.
+- NEW! [#236] Im Debugger kann der Speicher wieder als RAW Datei exportiert werden.
+- Fixed: Das Floppy Status Feld im Emu64 Hauptfenster wurde angepasst und wird nun unter Windows 11 richtig dargestellt
+- Fixed: PRG Export im Debugger
+- Fixed: Viele Fenster wurden neu überarbeitet um unter Windows 11 vernünfigt dargestellt zu werden.
+- NEW! Einen 60Hz Button in Einstellungen/Emulation hinzugefügt.
+
+From Felix Palmen (Zirias)
+--------------------------
+
+- [#235] Fixed: Build with ffmpeg 6. This doesn't attempt to replace deprecated functions, it only replaces functions that are gone (avcodec_encode_[audio|video]2) with straight-forward replacement code.
+         It fixes the build with the latest 6.0 release and still builds fine with ffmpeg 4.4
+         
 5.0.19
 ------
 
