@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 25.06.2021                //
+// Letzte Änderung am 23.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -20,6 +20,7 @@
 #include "./cartridge_window.h"
 #include "./ui_cartridge_window.h"
 #include "./utils.h"
+#include "qdebug.h"
 
 CartridgeWindow::CartridgeWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QString tmp_path) :
     QDialog(parent),
@@ -48,7 +49,56 @@ CartridgeWindow::CartridgeWindow(QWidget *parent, QSettings *_ini, C64Class *c64
 
     QFontDatabase fontDB;
     fontDB.addApplicationFont(":/fonts/lucon.ttf");
-    QFont font("Lucida Console",8);
+    QFont font1("Lucida Console",9);
+
+    ui->ChipData->setFont(font1);
+    ui->ChipList->setFont(font1);
+    ui->CRTInfo->setFont(font1);
+
+    /// ChipList
+    ui->ChipList->setColumnCount(5);
+    ui->ChipList->setHeaderLabels(QStringList() << tr("Nr.") << tr("Chip Typ") << tr("Bank") << tr("Adresse") << tr("Größe"));
+
+    int totalWidth = 0;
+    for (int i = 0; i < ui->ChipList->columnCount(); i++)
+    {
+        //ui->ChipList->headerItem()->setTextAlignment(i, Qt::AlignCenter);
+        ui->ChipList->header()->setSectionResizeMode(i, QHeaderView::Stretch);
+        ui->ChipList->header()->setSectionResizeMode(i, QHeaderView::ResizeToContents);
+        totalWidth += ui->ChipList->columnWidth(i);
+    }
+
+    ui->ChipList->setMinimumWidth(totalWidth);
+    ui->CRTInfo->setMinimumWidth(totalWidth);
+
+    /// CRTInfo
+    ui->CRTInfo->setColumnCount(2);
+    ui->CRTInfo->setHeaderLabels(QStringList() << tr("Variable") << tr("Inhalt"));
+
+    QStringList crt_info_vnames;
+    crt_info_vnames << tr("Name") << tr("Version") << tr("Hardware Typ") << tr("EXROM Leitung") << tr("GAME Leitung") << tr("Chip Anzahl");
+
+    for(int i=0; i < crt_info_vnames.count(); i++)
+    {
+        QTreeWidgetItem *item = new QTreeWidgetItem(ui->CRTInfo);
+        item->setText(0, crt_info_vnames[i]);
+        ui->CRTInfo->addTopLevelItem(item);
+    }
+
+    int totalHeight = 0;
+    for (int i = 0; i < ui->CRTInfo->columnCount(); i++)
+    {
+        ui->CRTInfo->header()->setSectionResizeMode(i, QHeaderView::Stretch);
+        ui->CRTInfo->header()->setSectionResizeMode(i, QHeaderView::ResizeToContents);
+        totalHeight += ui->CRTInfo->sizeHintForRow(i);
+    }
+
+    totalHeight += 20;
+
+    qDebug() << totalHeight;
+
+    ui->CRTInfo->setMinimumHeight(170);
+    ui->CRTInfo->setMaximumHeight(170);
 
     connect(ui->FileBrowser,SIGNAL(SelectFile(QString)),this,SLOT(onSelectFile(QString)));
     connect(ui->ChipList->selectionModel(),SIGNAL(currentChanged(QModelIndex,QModelIndex)),this,SLOT(onChipList_currentChanged(QModelIndex,QModelIndex)));
@@ -63,12 +113,6 @@ CartridgeWindow::CartridgeWindow(QWidget *parent, QSettings *_ini, C64Class *c64
     insterted_hwtyp = 0;
 
     ui->CRTInfo->setColumnWidth(0,80);
-
-    ui->ChipList->setColumnWidth(0,25);
-    ui->ChipList->setColumnWidth(1,50);
-    ui->ChipList->setColumnWidth(2,35);
-    ui->ChipList->setColumnWidth(3,50);
-    ui->ChipList->setColumnWidth(4,50);
 
     ui->ChipData->setColumnCount(17);
     ui->ChipData->setHeaderLabels(QStringList() << "ADR"<<"0"<<"1"<<"2"<<"3"<<"4"<<"5"<<"6"<<"7"<<"8"<<"9"<<"A"<<"B"<<"C"<<"D"<<"E"<<"F");
@@ -224,7 +268,7 @@ void CartridgeWindow::onSelectFile(QString filename)
 			for(int i=0;i<crt_info.ChipCount;i++)
 			{
 				QTreeWidgetItem *item = new QTreeWidgetItem(ui->ChipList);
-				sprintf(str00,"%2.2d",i);
+                sprintf(str00,"%3.3d",i);
 				item->setText(0,str00);
 				item->setTextAlignment(0,Qt::AlignHCenter);
 
@@ -265,38 +309,38 @@ void CartridgeWindow::onSelectFile(QString filename)
 			case 1: // Action Replay
 				if(!win_exp)
 				{
-					this->resize(this->width()+200,this->height());
-					this->setMinimumWidth(this->minimumWidth()+200);
+                    this->resize(this->width()+250,this->height());
+                    this->setMinimumWidth(this->minimumWidth()+250);
 				}
-				ui->MoreCRTPage->setMinimumWidth(200);
+                ui->MoreCRTPage->setMinimumWidth(250);
 				ui->MoreCRTPage->setCurrentIndex(2);
 				win_exp = true;
 				break;
 			case 3: // FC_III
 				if(!win_exp)
 				{
-					this->resize(this->width()+200,this->height());
-					this->setMinimumWidth(this->minimumWidth()+200);
+                    this->resize(this->width()+250,this->height());
+                    this->setMinimumWidth(this->minimumWidth()+250);
 				}
-				ui->MoreCRTPage->setMinimumWidth(200);
+                ui->MoreCRTPage->setMinimumWidth(250);
 				ui->MoreCRTPage->setCurrentIndex(1);
 				win_exp = true;
 				break;
 			case 32: // EasyFlash
 				if(!win_exp)
 				{
-					this->resize(this->width()+200,this->height());
-					this->setMinimumWidth(this->minimumWidth()+200);
+                    this->resize(this->width()+250,this->height());
+                    this->setMinimumWidth(this->minimumWidth()+250);
 				}
-				ui->MoreCRTPage->setMinimumWidth(200);
+                ui->MoreCRTPage->setMinimumWidth(250);
 				ui->MoreCRTPage->setCurrentIndex(0);
 				win_exp = true;
 				break;
 			default:
 				if(win_exp)
 				{
-					this->setMinimumWidth(this->minimumWidth()-200);
-					this->resize(this->width()-200,this->height());
+                    this->setMinimumWidth(this->minimumWidth()-250);
+                    this->resize(this->width()-250,this->height());
 				}
 				ui->MoreCRTPage->setMinimumWidth(0);
 				win_exp = false;

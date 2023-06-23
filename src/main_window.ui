@@ -230,7 +230,7 @@ background-position: center
     </widget>
     <widget class="QMenu" name="menuDebuger">
      <property name="title">
-      <string>Debuger</string>
+      <string>Debugger</string>
      </property>
      <addaction name="actionDebugger_Disassembler"/>
      <addaction name="actionCPU_Logging_Start"/>
