@@ -66,8 +66,8 @@ ARCH=$ARCH VERSION=$VERSION ./linuxdeploy-x86_64.AppImage --appdir ./AppDir --pl
 
 rm -rf AppDir
 
-tar -cvzf emu64_"$VERSION"_linux_"$ARCH".tar.gz Emu64-"$VERSION"-"$ARCH".AppImage
+tar -cvzf emu64_"$VERSION"_linux_appimage_"$ARCH".tar.gz Emu64-"$VERSION"-"$ARCH".AppImage
 rm Emu64-"$VERSION"-"$ARCH".AppImage
 
 # SHA512 Hashwert erzeugen
-sha512sum -b emu64_"$VERSION"_linux_"$ARCH".tar.gz >> emu64_"$VERSION"_linux_"$ARCH".tar.gz.sha512
+sha512sum -b emu64_"$VERSION"_linux_appimage_"$ARCH".tar.gz >> emu64_"$VERSION"_linux_appimage_"$ARCH".tar.gz.sha512
