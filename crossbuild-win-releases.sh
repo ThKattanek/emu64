@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 20.03.2022                //
+# // Letzte Änderung am 24.06.2023                //
 # // www.emu64-projekt.de                         //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -57,7 +57,9 @@ cd public_release
 
 # check of qmake for static i686 and x86_64
 declare i686_qmake=$mxe_path/usr/i686-w64-mingw32.static/qt5/bin/qmake
+declare i686_libpath=$mxe_path/usr/i686-w64-mingw32.static/lib
 declare x86_64_qmake=$mxe_path/usr/x86_64-w64-mingw32.static/qt5/bin/qmake
+declare x86_64_libpath=$mxe_path/usr/x86_64-w64-mingw32.static/lib
 
 if [ ! -e $i686_cmake ]; then
     echo "qmake for static i686 is not exist!"
@@ -100,7 +102,7 @@ if [ $i686_ok ] && [ $x32 = true ]; then
     
     # execute qmake
     cd $build_i686_dir
-    $i686_qmake PREFIX=$install_i686_dir ../..
+    $i686_qmake PREFIX=$install_i686_dir QMAKE_LIBDIR=$i686_libpath ../.. 
     make -j24 install
     cd ..
     
@@ -157,7 +159,7 @@ if [ $x86_64_ok ] && [ $x64 = true ]; then
 
     # execute qmake
     cd $build_x86_64_dir
-    $x86_64_qmake PREFIX=$install_x86_64_dir ../..
+    $x86_64_qmake PREFIX=$install_x86_64_dir QMAKE_LIBDIR=$x86_64_libpath ../..
     make -j24 install
     cd ..
 
