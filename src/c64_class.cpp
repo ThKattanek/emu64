@@ -69,7 +69,7 @@ CPXSBCNOPISBCPXSBCINCISBINXSBCNOPSBCCPXSBCINCISB\
 BEQSBCJAMISBNOPSBCINCISBSEDSBCNOPISBNOPSBCINCISB\
 RSTIRQNMI"};
 
-C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(char*)> log_function, const char *data_path):
+C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(const char*)> log_function, const char *data_path):
     mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
 {
     *ret_error = 0;
@@ -113,10 +113,10 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     sprintf(gfx_path,"%s%s",data_path,"/gfx/");
     sprintf(rom_path,"%s%s",data_path,"/roms/");
 
-    LogText(const_cast<char*>(">> C64 Klasse wurde gestartet...\n"));
-    LogText(const_cast<char*>(">> GfxPath = "));
-    LogText(const_cast<char*>(gfx_path));
-    LogText(const_cast<char*>("\n"));
+    LogText(">> C64 Klasse wurde gestartet...\n");
+    LogText(">> GfxPath = ");
+    LogText(gfx_path);
+    LogText("\n");
 
     this->video_crt_output = video_crt_output;
     breakgroup_count = 0;
@@ -131,10 +131,10 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     mutex1 = SDL_CreateMutex();
     if(!mutex1)
     {
-        LogText(const_cast<char*>("<< ERROR: Fehler beim erstellen eines SDL_Mutex.\n"));
-        LogText(const_cast<char*>("<< SDL_Error: "));
-        LogText(const_cast<char*>(SDL_GetError()));
-        LogText(const_cast<char*>("\n"));
+        LogText("<< ERROR: Fehler beim erstellen eines SDL_Mutex.\n");
+        LogText("<< SDL_Error: ");
+        LogText(SDL_GetError());
+        LogText("\n");
         *ret_error = -1;
         return;
     }
@@ -165,87 +165,87 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     SDL_ClearError();
 	if(SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
     {
-         LogText(const_cast<char*>("<< ERROR: Fehler beim installieren von SDL2\n"));
-         LogText(const_cast<char*>("<< SDL_Error: "));
-         LogText(const_cast<char*>(SDL_GetError()));
-         LogText(const_cast<char*>("\n"));
+         LogText("<< ERROR: Fehler beim installieren von SDL2\n");
+         LogText("<< SDL_Error: ");
+         LogText(SDL_GetError());
+         LogText("\n");
          *ret_error = -2;
          return;
     }
     else
-        LogText(const_cast<char*>(">> SDL2 wurde installiert\n"));
+        LogText(">> SDL2 wurde installiert\n");
 
     char filename[FILENAME_MAX];
     sprintf(filename,"%spfeil0.png",gfx_path);
     img_joy_arrow0 = IMG_Load(filename);
     if(!img_joy_arrow0)
     {
-        LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
+        LogText("<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
         LogText(filename);
-        LogText(const_cast<char*>("\n"));
+        LogText("\n");
     }
     else
     {
-        LogText(const_cast<char*>(">> Folgendes Bild wurde erfolgreich geladen --- "));
+        LogText(">> Folgendes Bild wurde erfolgreich geladen --- ");
         LogText(filename);
-        LogText(const_cast<char*>("\n"));
+        LogText("\n");
 
-        if ( (img_joy_arrow0->w & (img_joy_arrow0->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
-        if ( (img_joy_arrow0->h & (img_joy_arrow0->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n"));
+        if ( (img_joy_arrow0->w & (img_joy_arrow0->w - 1)) != 0 ) LogText("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
+        if ( (img_joy_arrow0->h & (img_joy_arrow0->h - 1)) != 0 ) LogText("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
     }
 
     sprintf(filename,"%spfeil1.png",gfx_path);
     img_joy_arrow1 = IMG_Load(filename);
     if(!img_joy_arrow1)
     {
-        LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
+        LogText("<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
         LogText(filename);
-        LogText(const_cast<char*>("\n"));
+        LogText("\n");
     }
     else
     {
-        LogText(const_cast<char*>(">> Folgendes Bild wurde erfolgreich geladen --- "));
+        LogText(">> Folgendes Bild wurde erfolgreich geladen --- ");
         LogText(filename);
-        LogText(const_cast<char*>("\n"));
+        LogText("\n");
 
-        if ( (img_joy_arrow1->w & (img_joy_arrow1->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
-        if ( (img_joy_arrow1->h & (img_joy_arrow1->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n"));
+        if ( (img_joy_arrow1->w & (img_joy_arrow1->w - 1)) != 0 ) LogText("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
+        if ( (img_joy_arrow1->h & (img_joy_arrow1->h - 1)) != 0 ) LogText("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
     }
 
     sprintf(filename,"%skreis0.png",gfx_path);
     img_joy_button0 = IMG_Load(filename);
     if(!img_joy_button0)
     {
-        LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
+        LogText("<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
         LogText(filename);
-        LogText(const_cast<char*>("\n"));
+        LogText("\n");
     }
     else
     {
-        LogText(const_cast<char*>(">> Folgendes Bild wurde erfolgreich geladen --- "));
+        LogText(">> Folgendes Bild wurde erfolgreich geladen --- ");
         LogText(filename);
-        LogText(const_cast<char*>("\n"));
+        LogText("\n");
 
-        if ( (img_joy_button0->w & (img_joy_button0->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
-        if ( (img_joy_button0->h & (img_joy_button0->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n"));
+        if ( (img_joy_button0->w & (img_joy_button0->w - 1)) != 0 ) LogText("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
+        if ( (img_joy_button0->h & (img_joy_button0->h - 1)) != 0 ) LogText("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
     }
 
     sprintf(filename,"%skreis1.png",gfx_path);
     img_joy_button1 = IMG_Load(filename);
     if(!img_joy_button1)
     {
-        LogText(const_cast<char*>("<< ERROR: Folgendes Bild konnte nicht geladen werden --- "));
+        LogText("<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
         LogText(filename);
-        LogText(const_cast<char*>("\n"));
+        LogText("\n");
     }
     else
     {
-        LogText(const_cast<char*>(">> Folgendes Bild wurde erfolgreich geladen --- "));
+        LogText(">> Folgendes Bild wurde erfolgreich geladen --- ");
         LogText(filename);
-        LogText(const_cast<char*>("\n"));
+        LogText("\n");
 
-        if ( (img_joy_button1->w & (img_joy_button1->w - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n"));
-        if ( (img_joy_button1->h & (img_joy_button1->h - 1)) != 0 ) LogText(const_cast<char*>("<< WARNUNG: Die Hoehe ist keine Potenz von 2^n\n"));
+        if ( (img_joy_button1->w & (img_joy_button1->w - 1)) != 0 ) LogText("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
+        if ( (img_joy_button1->h & (img_joy_button1->h - 1)) != 0 ) LogText("<< WARNUNG: Die Hoehe ist keine Potenz von 2^n\n");
     }
 
     /// VideoCaptuer installieren ///
@@ -301,10 +301,10 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     audio_dev =  SDL_OpenAudioDevice(NULL, 0, &audio_spec_want, &audio_spec_have, SDL_AUDIO_ALLOW_ANY_CHANGE);
     if( audio_dev == 0 )
     {
-        LogText(const_cast<char*>("<< ERROR: Fehler beim installieren von SDL_Audio\n"));
-        LogText(const_cast<char*>("<< SDL_Error: "));
-        LogText(const_cast<char*>(SDL_GetError()));
-        LogText(const_cast<char*>("\n"));
+        LogText("<< ERROR: Fehler beim installieren von SDL_Audio\n");
+        LogText("<< SDL_Error: ");
+        LogText(SDL_GetError());
+        LogText("\n");
         sprintf(out_text, "\t -Audio Buffersize: %d\n" ,audio_spec_have.samples);
         LogText(out_text);
         *ret_error = -3;
@@ -348,17 +348,17 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
         SDL_ClearError();
         if(0 != SDL_SetColorKey(sdl_window_icon,SDL_TRUE,SDL_MapRGB(sdl_window_icon->format,0,0,0)))
         {
-            LogText(const_cast<char*>("<< ERROR: Fehler beim festlegen des ColorKey im Window Icon.\n"));
-            LogText(const_cast<char*>("<< SDL_Error: "));
-            LogText(const_cast<char*>(SDL_GetError()));
-            LogText(const_cast<char*>("\n"));
+            LogText("<< ERROR: Fehler beim festlegen des ColorKey im Window Icon.\n");
+            LogText("<< SDL_Error: ");
+            LogText(SDL_GetError());
+            LogText("\n");
             *ret_error = -4;
             return;
         }
 
     }
     else
-        LogText(const_cast<char*>("<< ERROR: Fehler beim laden des SLDFenster Icons\n"));
+        LogText("<< ERROR: Fehler beim laden des SLDFenster Icons\n");
 
     game_port1 = 0;
     game_port2 = 0;
@@ -622,16 +622,16 @@ void C64Class::StartEmulation()
     if(sdl_thread == nullptr)
     {
         LogText(const_cast<char*>("<< ERROR: SDL Thread (C64Thread) konnte nicht erstellt werden.\n"));
-        LogText(const_cast<char*>("<< SDL_Error: "));
-        LogText(const_cast<char*>(SDL_GetError()));
-        LogText(const_cast<char*>("\n"));
+        LogText("<< SDL_Error: ");
+        LogText(SDL_GetError());
+        LogText("\n");
     }
     else
     {
-        LogText(const_cast<char*>(">> C64Thread wurde gestartet.\n"));
+        LogText(">> C64Thread wurde gestartet.\n");
 
         SDL_PauseAudioDevice(audio_dev, 0);
-        LogText(const_cast<char*>(">> SDL Audiostream wurde getartet.\n"));
+        LogText(">> SDL Audiostream wurde getartet.\n");
     }
     return;
 }
@@ -844,9 +844,9 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
     if(SDL_LockSurface(c64_screen) != 0)
     {
         LogText(const_cast<char*>("<< ERROR: SDL Surface (VicRefresh) konnte nicht gelockt werden.\n"));
-        LogText(const_cast<char*>("<< SDL_Error: "));
-        LogText(const_cast<char*>(SDL_GetError()));
-        LogText(const_cast<char*>("\n"));
+        LogText("<< SDL_Error: ");
+        LogText(SDL_GetError());
+        LogText("\n");
         return;
     }
 
@@ -873,31 +873,31 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
             SDL_ClearError();
             if(0 != SDL_SaveBMP(c64_screen, screenshot_filename))
             {
-                LogText(const_cast<char*>("<< ERROR: Es konnte der Screenshot als BMP nicht gespeichert werden.\n"));
-                LogText(const_cast<char*>("<< SDL_Error: "));
-                LogText(const_cast<char*>(SDL_GetError()));
-                LogText(const_cast<char*>("\n"));
+                LogText("<< ERROR: Es konnte der Screenshot als BMP nicht gespeichert werden.\n");
+                LogText("<< SDL_Error: ");
+                LogText(SDL_GetError());
+                LogText("\n");
             }
             else
             {
-                LogText(const_cast<char*>(">> Screenshot wurde erfolgreich gespeichert ["));
+                LogText(">> Screenshot wurde erfolgreich gespeichert [");
                 LogText(screenshot_filename);
-                LogText(const_cast<char*>("\n"));
+                LogText("\n");
             }
             break;
         case SCREENSHOT_FORMAT_PNG:
             if(0 != SDL_SavePNG(c64_screen, screenshot_filename))
             {
-                LogText(const_cast<char*>("<< ERROR: Es konnte der Screenshot als PNG nicht gespeichert werden.\n"));
-                LogText(const_cast<char*>("<< SDL_Error: "));
-                LogText(const_cast<char*>(SDL_GetError()));
-                LogText(const_cast<char*>("\n"));
+                LogText("<< ERROR: Es konnte der Screenshot als PNG nicht gespeichert werden.\n");
+                LogText("<< SDL_Error: ");
+                LogText(SDL_GetError());
+                LogText("\n");
             }
             else
             {
-                LogText(const_cast<char*>(">> Screenshot wurde erfolgreich gespeichert ["));
+                LogText(">> Screenshot wurde erfolgreich gespeichert [");
                 LogText(screenshot_filename);
-                LogText(const_cast<char*>("\n"));
+                LogText("\n");
             }
             break;
         default:
@@ -950,9 +950,9 @@ void C64Class::WarpModeLoop()
                     if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
                     {
                         LogText(const_cast<char*>("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n"));
-                        LogText(const_cast<char*>("<< SDL_Error: "));
-                        LogText(const_cast<char*>(SDL_GetError()));
-                        LogText(const_cast<char*>("\n"));
+                        LogText("<< SDL_Error: ");
+                        LogText(SDL_GetError());
+                        LogText("\n");
                     }
                     wait_reset_ready = false;
                 }
@@ -965,9 +965,9 @@ void C64Class::WarpModeLoop()
                     if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
                     {
                         LogText(const_cast<char*>("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n"));
-                        LogText(const_cast<char*>("<< SDL_Error: "));
-                        LogText(const_cast<char*>(SDL_GetError()));
-                        LogText(const_cast<char*>("\n"));
+                        LogText("<< SDL_Error: ");
+                        LogText(SDL_GetError());
+                        LogText("\n");
                     }
                     wait_reset_ready = false;
                 }
@@ -1071,9 +1071,9 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                             if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
                             {
                                 LogText(const_cast<char*>("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n"));
-                                LogText(const_cast<char*>("<< SDL_Error: "));
-                                LogText(const_cast<char*>(SDL_GetError()));
-                                LogText(const_cast<char*>("\n"));
+                                LogText("<< SDL_Error: ");
+                                LogText(SDL_GetError());
+                                LogText("\n");
                             }
                             wait_reset_ready = false;
                         }
@@ -1086,9 +1086,9 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                             if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
                             {
                                 LogText(const_cast<char*>("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n"));
-                                LogText(const_cast<char*>("<< SDL_Error: "));
-                                LogText(const_cast<char*>(SDL_GetError()));
-                                LogText(const_cast<char*>("\n"));
+                                LogText("<< SDL_Error: ");
+                                LogText(SDL_GetError());
+                                LogText("\n");
                             }
                             wait_reset_ready = false;
                         }
@@ -1499,7 +1499,7 @@ void C64Class::SetGrafikModi(bool enable_screen_doublesize, bool enable_screen_c
     char str00[255];
     sprintf(str00,">>   Doublesize = %d\n>>   PAL = %d\n>>   Filter = %d\n>>   FullResXW = %d\n>>   FullResrYW = %d\n", enable_screen_doublesize, enable_screen_crt_output, enable_screen_filter, fullscreen_width, fullscreen_height);
 
-    LogText(const_cast<char*>(">> Grafikmodus wurde gesetzt:\n"));
+    LogText(">> Grafikmodus wurde gesetzt:\n");
     LogText(str00);
     */
 }
@@ -2869,16 +2869,16 @@ int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *retur
 
 	if(file == nullptr)
 	{
-		LogText(const_cast<char*>("<< ERROR: Datei konnte nicht geöffnet werden\n"));
+		LogText("<< ERROR: Datei konnte nicht geöffnet werden\n");
 		return 0x01;
 	}
 
 	switch(typ)
 	{
 	case PRG: case C64:
-		LogText(const_cast<char*>(">> PRG laden: "));
-		LogText(const_cast<char*>(filename));
-		LogText(const_cast<char*>("\n"));
+		LogText(">> PRG laden: ");
+		LogText(filename);
+		LogText("\n");
 
 		reading_bytes = fread (&temp,1,2,file);
 		start_address = static_cast<uint16_t>(temp[0]|(temp[1]<<8));
@@ -2909,9 +2909,9 @@ int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *retur
 
 		// T64
 	case T64:
-		LogText(const_cast<char*>(">> T64 laden: "));
-		LogText(const_cast<char*>(filename));
-		LogText(const_cast<char*>("\n"));
+		LogText(">> T64 laden: ");
+		LogText(filename);
+		LogText("\n");
 
 		reading_bytes = fread(signature,1,32,file);
 		if(reading_bytes != 32)
@@ -2981,9 +2981,9 @@ int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *retur
 		break;
 
 	case P00:
-		LogText(const_cast<char*>(">> P00 laden: "));
-		LogText(const_cast<char*>(filename));
-		LogText(const_cast<char*>("\n"));
+		LogText(">> P00 laden: ");
+		LogText(filename);
+		LogText("\n");
 
 		reading_bytes = fread(signature,1,7,file);
 		signature[7]=0;
@@ -4491,25 +4491,25 @@ void C64Class::OpenSDLJoystick()
 
         SDL_ClearError();
         SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-        LogText(const_cast<char*>(">> SDL Subsystem Joystick wurde geschlossen\n"));
-        LogText(const_cast<char*>("<< SDL_Error: "));
-        LogText(const_cast<char*>(SDL_GetError()));
-        LogText(const_cast<char*>("\n"));
+        LogText(">> SDL Subsystem Joystick wurde geschlossen\n");
+        LogText("<< SDL_Error: ");
+        LogText(SDL_GetError());
+        LogText("\n");
     }
 
     SDL_ClearError();
     if(SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
     {
         sdl_joystick_is_open = false;
-        LogText(const_cast<char*>("<< ERROR: SDL Subsystem Joystick konnte nicht geöffnet werden\n"));
-        LogText(const_cast<char*>("<< SDL_Error: "));
-        LogText(const_cast<char*>(SDL_GetError()));
-        LogText(const_cast<char*>("\n"));
+        LogText("<< ERROR: SDL Subsystem Joystick konnte nicht geöffnet werden\n");
+        LogText("<< SDL_Error: ");
+        LogText(SDL_GetError());
+        LogText("\n");
     }
     else
     {
         sdl_joystick_is_open = true;
-        LogText(const_cast<char*>(">> SDL Subsytem Joystick wurde erfolgreich geoeffnet\n"));
+        LogText(">> SDL Subsytem Joystick wurde erfolgreich geoeffnet\n");
         sdl_joystick_count = SDL_NumJoysticks();
         if(sdl_joystick_count > MAX_SDL_JOYSTICK_NUM) sdl_joystick_count = MAX_SDL_JOYSTICK_NUM;
 
@@ -4517,10 +4517,10 @@ void C64Class::OpenSDLJoystick()
         switch(sdl_joystick_count)
         {
         case 0:
-            LogText(const_cast<char*>("<< SDL konnte keinen Joystick/Gamepad erkennen\n"));
+            LogText("<< SDL konnte keinen Joystick/Gamepad erkennen\n");
             break;
         case 1:
-            LogText(const_cast<char*>(">> SDL konnte 1 Joystick/Gamepad erkennen\n"));
+            LogText(">> SDL konnte 1 Joystick/Gamepad erkennen\n");
             break;
         default:
             sprintf(str00,">> SDL konnte %d Joysticks/Gamepads erkennen\n",sdl_joystick_count);
@@ -4557,10 +4557,10 @@ void C64Class::CloseSDLJoystick()
         sdl_joystick_is_open = false;
         SDL_ClearError();
         SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
-        LogText(const_cast<char*>(">> SDL Subsystem Joystick wurde geschlossen\n"));
-        LogText(const_cast<char*>("<< SDL_Error: "));
-        LogText(const_cast<char*>(SDL_GetError()));
-        LogText(const_cast<char*>("\n"));
+        LogText(">> SDL Subsystem Joystick wurde geschlossen\n");
+        LogText("<< SDL_Error: ");
+        LogText(SDL_GetError());
+        LogText("\n");
     }
     sdl_joystick_stop_update = true;
 }
