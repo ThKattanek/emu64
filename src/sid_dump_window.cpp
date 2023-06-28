@@ -85,13 +85,13 @@ void SidDumpWindow::OnTimer1()
     int32_t time = c64->GetSidDumpFrames();
     int32_t  hour = time / (50 * 60 * 60);
     time %= (50 * 60 * 60);
-    int32_t  minutes = time / (50 * 60);
+    uint8_t  minutes = time / (50 * 60);
     time %= (50 * 60);
-    int32_t  seconds = time / 50;
-    int32_t  frames = time % 50;
+    uint8_t  seconds = time / 50;
+    uint8_t  frames = time % 50;
 
     char out_str[16];
 
-    sprintf(out_str,"%02d:%02d:%02d-%02d",hour,minutes,seconds,frames);
+    sprintf(out_str,"%02d:%02hhu:%02hhu-%02hhu",hour,minutes,seconds,frames);
     ui->TimeOutput->setText(out_str);
 }
