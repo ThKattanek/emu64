@@ -32,7 +32,7 @@ greaterThan(QT_MAJOR_VERSION, 5){
 TARGET = emu64
 TEMPLATE = app
 
-CONFIG += lrelease c++11
+CONFIG += lrelease c++14
 
 win32 {
     CONFIG += console
