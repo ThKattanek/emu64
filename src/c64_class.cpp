@@ -621,7 +621,7 @@ void C64Class::StartEmulation()
     sdl_thread = SDL_CreateThread(SDLThread, "C64Thread", this);
     if(sdl_thread == nullptr)
     {
-        LogText(const_cast<char*>("<< ERROR: SDL Thread (C64Thread) konnte nicht erstellt werden.\n"));
+        LogText("<< ERROR: SDL Thread (C64Thread) konnte nicht erstellt werden.\n");
         LogText("<< SDL_Error: ");
         LogText(SDL_GetError());
         LogText("\n");
@@ -843,7 +843,7 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
 
     if(SDL_LockSurface(c64_screen) != 0)
     {
-        LogText(const_cast<char*>("<< ERROR: SDL Surface (VicRefresh) konnte nicht gelockt werden.\n"));
+        LogText("<< ERROR: SDL Surface (VicRefresh) konnte nicht gelockt werden.\n");
         LogText("<< SDL_Error: ");
         LogText(SDL_GetError());
         LogText("\n");
@@ -949,7 +949,7 @@ void C64Class::WarpModeLoop()
                     SDL_ClearError();
                     if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
                     {
-                        LogText(const_cast<char*>("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n"));
+                        LogText("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n");
                         LogText("<< SDL_Error: ");
                         LogText(SDL_GetError());
                         LogText("\n");
@@ -964,7 +964,7 @@ void C64Class::WarpModeLoop()
                     SDL_ClearError();
                     if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
                     {
-                        LogText(const_cast<char*>("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n"));
+                        LogText("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n");
                         LogText("<< SDL_Error: ");
                         LogText(SDL_GetError());
                         LogText("\n");
@@ -1070,7 +1070,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                             SDL_ClearError();
                             if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
                             {
-                                LogText(const_cast<char*>("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n"));
+                                LogText("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n");
                                 LogText("<< SDL_Error: ");
                                 LogText(SDL_GetError());
                                 LogText("\n");
@@ -1085,7 +1085,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                             SDL_ClearError();
                             if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
                             {
-                                LogText(const_cast<char*>("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n"));
+                                LogText("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n");
                                 LogText("<< SDL_Error: ");
                                 LogText(SDL_GetError());
                                 LogText("\n");
@@ -3697,24 +3697,24 @@ bool C64Class::ExportASM(const char *filename, uint16_t start_adresse, uint16_t 
         return false;
     }
 
-    char *source_str = const_cast<char*>("");
+    const char *source_str = "";
 
     switch(source)
     {
     case 0:
-        source_str = const_cast<char*>("C64");
+        source_str = "C64";
         break;
     case 1:
-        source_str = const_cast<char*>("Floppy #08");
+        source_str = "Floppy #08";
         break;
     case 2:
-        source_str = const_cast<char*>("Floppy #09");
+        source_str = "Floppy #09";
         break;
     case 3:
-        source_str = const_cast<char*>("Floppy #10");
+        source_str = "Floppy #10";
         break;
     case 4:
-        source_str = const_cast<char*>("Floppy #11");
+        source_str = "Floppy #11";
         break;
     }
 
