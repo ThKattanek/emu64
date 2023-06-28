@@ -3281,7 +3281,7 @@ int C64Class::Disassemble(FILE* file, uint16_t pc, bool line_draw)
     {
     case 0:     //** Implizit **//
         sprintf(memory, "$%2.2X          ", ReadC64Byte(pc));
-        sprintf(addressing, "");
+        addressing[0] = 0;
         pc++;
         break;
 
