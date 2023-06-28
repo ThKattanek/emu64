@@ -581,7 +581,7 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     cpu->History = cpu_pc_history;
     cpu->HistoryPointer = &cpu_pc_history_pos;
 
-    for(i=0; i <= 0xffff; i++) breakpoints[i] = 0;
+    memset(breakpoints, 0, sizeof breakpoints);
 }
 
 C64Class::~C64Class()
