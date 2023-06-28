@@ -406,7 +406,7 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     sprintf(stepper_inc_filename,"%sstepper_inc.raw",floppy_sound_path);
     sprintf(stepper_dec_filename,"%sstepper_dec.raw",floppy_sound_path);
 
-    for(int i=0; i<MAX_FLOPPY_NUM; i++)
+    for(i=0; i<MAX_FLOPPY_NUM; i++)
     {
         floppy[i] = new Floppy1541(&reset_wire,audio_frequency,audio_spec_have.samples,&floppy_found_breakpoint);
         floppy[i]->SetResetReady(&floppy_reset_ready[i],0xEBFF);
@@ -437,7 +437,7 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     animation_speed_add = audio_spec_have.samples/audio_frequency;
     animation_speed_counter = 0;
 
-    for(int i=0;i<8;i++)
+    for(i=0;i<8;i++)
     {
         key_matrix_to_port_a_ext[i] = key_matrix_to_port_a[i] = 0;
         key_matrix_to_port_b_ext[i] = key_matrix_to_port_b[i] = 0;
@@ -581,7 +581,7 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     cpu->History = cpu_pc_history;
     cpu->HistoryPointer = &cpu_pc_history_pos;
 
-    for(int i=0; i <= 0xffff; i++) breakpoints[i] = 0;
+    for(i=0; i <= 0xffff; i++) breakpoints[i] = 0;
 }
 
 C64Class::~C64Class()
