@@ -25,10 +25,10 @@
 DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     QDialog(parent),
     ui(new Ui::DebuggerWindow),
+    input_window(nullptr),
     memory_window(nullptr),
     vic_window(nullptr),
-    iec_window(nullptr),
-    input_window(nullptr)
+    iec_window(nullptr)
 {    
     this->ini = ini;
     c64 = nullptr;
