@@ -243,7 +243,7 @@ void DebuggerWindow::onResizeHistoryList(int weidth, int height)
 
     for(int i=1; i<history_rows; i++)
     {
-        QListWidgetItem *item = new QListWidgetItem(ui->HistoryList);
+        item = new QListWidgetItem(ui->HistoryList);
         item->setText(QVariant(i).toString());
         ui->HistoryList->addItem(item);
     }
