@@ -53,6 +53,7 @@ protected:
 
     virtual void resizeEvent( QResizeEvent* e )
     {
+      (void)e;
       emit resize(this->width(), this->height());
     }
 };
@@ -74,6 +75,7 @@ protected:
 
     virtual void resizeEvent( QResizeEvent* e )
     {
+      (void)e;
       emit resize(this->width(), this->height());
     }
 };
