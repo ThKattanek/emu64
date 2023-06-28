@@ -61,11 +61,13 @@ OscilloscopeWindow::~OscilloscopeWindow()
 
 void OscilloscopeWindow::showEvent(QShowEvent *event)
 {
+    (void)event;
     is_hide = false;
 }
 
 void OscilloscopeWindow::hideEvent(QHideEvent *event)
 {
+    (void)event;
     is_hide = true;
 }
 
