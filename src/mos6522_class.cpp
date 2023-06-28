@@ -313,6 +313,7 @@ unsigned char MOS6522::ReadIO(unsigned short adresse)
                 {
                     IO[0x0D]&=253;
                 }
+		[[fallthrough]];
                 case 15:
                 {
                     return 0xFF;
@@ -377,6 +378,7 @@ unsigned char MOS6522::ReadIO(unsigned short adresse)
                         else return PB | 0x80 | WP;
                     }
                 }
+		[[fallthrough]];
                 case 0x01:
                 case 0x0F:
                 {
