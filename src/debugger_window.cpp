@@ -232,6 +232,8 @@ void DebuggerWindow::onTimerAnimationRefresh()
 
 void DebuggerWindow::onResizeHistoryList(int weidth, int height)
 {
+    (void)weidth;
+
     ui->HistoryList->clear();
 
     QListWidgetItem *item = new QListWidgetItem(ui->HistoryList);
@@ -253,6 +255,8 @@ void DebuggerWindow::onResizeHistoryList(int weidth, int height)
 
 void DebuggerWindow::onResizeDisassList(int weidth, int height)
 {
+    (void)weidth;
+
     ui->DisAssTable->clear();
 
     int row_height = ui->DisAssTable->fontInfo().pixelSize();
