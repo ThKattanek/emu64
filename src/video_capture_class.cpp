@@ -528,13 +528,12 @@ int VideoCaptureClass::WriteVideoFrame(AVFormatContext *oc, OutputStream *ost)
     AVCodecContext *c;
     AVFrame *frame;
     int got_packet = 0;
-    AVPacket pkt = {};
     c = ost->enc;
     frame = GetVideoFrame(ost);
-    av_init_packet(&pkt);
+    AVPacket *pkt = av_packet_alloc();
 
     /* encode the image */
-    ret = avcodec_receive_packet(c, &pkt);
+    ret = avcodec_receive_packet(c, pkt);
     if (ret == 0) got_packet = 1;
     if (ret == AVERROR(EAGAIN)) ret = 0;
     if (ret == 0) ret = avcodec_send_frame(c, frame);
@@ -546,7 +545,7 @@ int VideoCaptureClass::WriteVideoFrame(AVFormatContext *oc, OutputStream *ost)
 
     if (got_packet)
     {
-        ret = WriteFrame(oc, &c->time_base, ost->st, &pkt);
+        ret = WriteFrame(oc, &c->time_base, ost->st, pkt);
     } else
         ret = 0;
 
@@ -558,18 +557,17 @@ int VideoCaptureClass::WriteVideoFrame(AVFormatContext *oc, OutputStream *ost)
     else
         video_package_counter++;
 
+    av_packet_free(&pkt);
     return (frame || got_packet) ? 0 : 1;
 }
 
 int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
 {
     AVCodecContext *c;
-    AVPacket pkt = {}; // data and size must be 0;
     AVFrame *frame;
     int64_t ret;
     int got_packet = 0;
     int64_t dst_nb_samples;
-    av_init_packet(&pkt);
     c = ost->enc;
 
     frame = GetAudioFrame(ost);
@@ -600,7 +598,8 @@ int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
         frame->pts = av_rescale_q(ost->samples_count, AVRational{1, c->sample_rate}, c->time_base);
         ost->samples_count += dst_nb_samples;
     }
-    ret = avcodec_receive_packet(c, &pkt);
+    AVPacket *pkt = av_packet_alloc();
+    ret = avcodec_receive_packet(c, pkt);
     if (ret == 0) got_packet = 1;
     if (ret == AVERROR(EAGAIN)) ret = 0;
     if (ret == 0) ret = avcodec_send_frame(c, frame);
@@ -613,7 +612,7 @@ int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
 
     if (got_packet)
     {
-        ret = WriteFrame(oc, &c->time_base, ost->st, &pkt);
+        ret = WriteFrame(oc, &c->time_base, ost->st, pkt);
         if (ret < 0)
         {
             char err_msg[AV_ERROR_MAX_STRING_SIZE];
@@ -624,6 +623,7 @@ int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
             audio_package_counter++;
         }
     }
+    av_packet_free(&pkt);
     return (frame || got_packet) ? 0 : 1;
 }
 

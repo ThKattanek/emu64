@@ -21,6 +21,8 @@ ColorButton::ColorButton(QWidget *parent) :
 
 void ColorButton::paintEvent(QPaintEvent *event)
 {
+	(void)event;
+
 	QPainter p;
 	p.begin(this);
 

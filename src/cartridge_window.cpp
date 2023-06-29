@@ -420,8 +420,8 @@ void CartridgeWindow::on_NewEasyFlashCRT_clicked()
         QFile file(fullpath);
         if(!file.exists())
         {
-			FILE *file = qfopen(fullpath, "wb");
-			if(c64->CreateNewEasyFlashImage(file, cartridge_name.toLocal8Bit()))
+			FILE *fp = qfopen(fullpath, "wb");
+			if(c64->CreateNewEasyFlashImage(fp, cartridge_name.toLocal8Bit()))
             {
                 QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues EasyFlash Image erstellt werden."));
             }
@@ -435,8 +435,8 @@ void CartridgeWindow::on_NewEasyFlashCRT_clicked()
         {
             if(QMessageBox::Yes == QMessageBox::question(this,tr("Achtung!"),tr("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
             {
-				FILE *file = qfopen(fullpath, "wb");
-				if(c64->CreateNewEasyFlashImage(file, cartridge_name.toLocal8Bit()))
+				FILE *fp = qfopen(fullpath, "wb");
+				if(c64->CreateNewEasyFlashImage(fp, cartridge_name.toLocal8Bit()))
                 {
                     QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues EasyFlash Image erstellt werden."));
                 }

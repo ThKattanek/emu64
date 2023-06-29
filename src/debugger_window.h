@@ -53,6 +53,7 @@ protected:
 
     virtual void resizeEvent( QResizeEvent* e )
     {
+      (void)e;
       emit resize(this->width(), this->height());
     }
 };
@@ -74,6 +75,7 @@ protected:
 
     virtual void resizeEvent( QResizeEvent* e )
     {
+      (void)e;
       emit resize(this->width(), this->height());
     }
 };
@@ -136,8 +138,8 @@ private slots:
     void onReg_label_clicked(LabelWidgetMod* label);
     void onChangeFloppyStatus();
     void onTimerAnimationRefresh();
-    void onResizeHistoryList(int weidth, int height);
-    void onResizeDisassList(int weidth, int height);
+    void onResizeHistoryList(int width, int height);
+    void onResizeDisassList(int width, int height);
 
     void on_HistoryList_doubleClicked(const QModelIndex &index);
 

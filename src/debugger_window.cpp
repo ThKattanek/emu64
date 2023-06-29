@@ -25,10 +25,10 @@
 DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     QDialog(parent),
     ui(new Ui::DebuggerWindow),
+    input_window(nullptr),
     memory_window(nullptr),
     vic_window(nullptr),
-    iec_window(nullptr),
-    input_window(nullptr)
+    iec_window(nullptr)
 {    
     this->ini = ini;
     c64 = nullptr;
@@ -230,8 +230,10 @@ void DebuggerWindow::onTimerAnimationRefresh()
     }
 }
 
-void DebuggerWindow::onResizeHistoryList(int weidth, int height)
+void DebuggerWindow::onResizeHistoryList(int width, int height)
 {
+    (void)width;
+
     ui->HistoryList->clear();
 
     QListWidgetItem *item = new QListWidgetItem(ui->HistoryList);
@@ -243,7 +245,7 @@ void DebuggerWindow::onResizeHistoryList(int weidth, int height)
 
     for(int i=1; i<history_rows; i++)
     {
-        QListWidgetItem *item = new QListWidgetItem(ui->HistoryList);
+        item = new QListWidgetItem(ui->HistoryList);
         item->setText(QVariant(i).toString());
         ui->HistoryList->addItem(item);
     }
@@ -251,8 +253,10 @@ void DebuggerWindow::onResizeHistoryList(int weidth, int height)
     FillHistoryList(static_cast<uint8_t>(ui->HistoryScroll->value()));
 }
 
-void DebuggerWindow::onResizeDisassList(int weidth, int height)
+void DebuggerWindow::onResizeDisassList(int width, int height)
 {
+    (void)width;
+
     ui->DisAssTable->clear();
 
     int row_height = ui->DisAssTable->fontInfo().pixelSize();

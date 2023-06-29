@@ -695,10 +695,10 @@ void FloppyWindow::on_CreateNewD64_clicked()
         if(!file.exists())
         {
             D64Class d64;
-			FILE *file = qfopen(fullpath, "wb");
-			if(file != nullptr)
+			FILE *fp = qfopen(fullpath, "wb");
+			if(fp != nullptr)
 			{
-				if(!d64.CreateDiskImage(file, diskname.toLocal8Bit(), diskid.toLocal8Bit()))
+				if(!d64.CreateDiskImage(fp, diskname.toLocal8Bit(), diskid.toLocal8Bit()))
 				{
 					QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues Diskimage erstellt werden."));
 				}
@@ -715,10 +715,10 @@ void FloppyWindow::on_CreateNewD64_clicked()
             if(QMessageBox::Yes == QMessageBox::question(this,tr("Achtung!"),tr("Eine Datei mit diesen Namen existiert schon!\nSoll diese überschrieben werden?"),QMessageBox::Yes | QMessageBox::No))
             {
                 D64Class d64;
-				FILE *file = qfopen(fullpath, "wb");
-				if(file != nullptr)
+				FILE *fp = qfopen(fullpath, "wb");
+				if(fp != nullptr)
 				{
-					if(!d64.CreateDiskImage(file,diskname.toLocal8Bit(),diskid.toLocal8Bit()))
+					if(!d64.CreateDiskImage(fp,diskname.toLocal8Bit(),diskid.toLocal8Bit()))
 					{
 						QMessageBox::critical(this,tr("Fehler!"),tr("Es konnte kein neues Diskimage erstellt werden."));
 					}

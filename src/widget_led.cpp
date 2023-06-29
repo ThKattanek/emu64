@@ -51,6 +51,8 @@ void WidgetLED::SetBrightness(float brightness)
 
 void WidgetLED::paintEvent(QPaintEvent *event)
 {
+	(void)event;
+
 	int16_t new_r = color_off.red() + (color_on.red() - color_off.red()) * brightness * 0.6f;
 	int16_t new_g = color_off.green() + (color_on.green() - color_off.green()) * brightness * 0.6f;
 	int16_t new_b = color_off.blue() + (color_on.blue() - color_off.blue()) * brightness * 0.6f;

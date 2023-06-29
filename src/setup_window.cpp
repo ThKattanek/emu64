@@ -570,6 +570,8 @@ void SetupWindow::DisableTextureDouble()
 
 void SetupWindow::showEvent(QShowEvent *event)
 {
+	(void)event;
+
 	for(int i=0;i<MAX_VJOY_NUM;i++)
 	{
 		ui->VJoySlots->item(i,1)->setBackground(QBrush(QColor(255,255,255)));

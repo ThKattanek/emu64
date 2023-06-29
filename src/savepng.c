@@ -27,6 +27,7 @@
 /* libpng callbacks */ 
 static void png_error_SDL(png_structp png_ptr, png_const_charp str)
 {
+	(void)png_ptr;
 	SDL_SetError("libpng: %s\n", str);
 }
 

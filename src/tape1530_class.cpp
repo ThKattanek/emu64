@@ -55,7 +55,7 @@ TAPE1530::TAPE1530(int samplerate, int puffersize, float cycles_per_second)
     for(int i=0; i<(puffersize*2); i++)
         SoundBuffer[i] = 0;
 
-	image_file = nullptr;
+    image_file = nullptr;
 
     WaitCounter = 0;
 
@@ -84,8 +84,6 @@ void TAPE1530::SetC64Zyklen(float cycles_per_second)
 
 bool TAPE1530::LoadTapeImage(FILE *file, int typ)
 {
-    size_t reading_elements;
-
 	if(file == nullptr)
 		return false;
 
@@ -115,19 +113,14 @@ bool TAPE1530::LoadTapeImage(FILE *file, int typ)
 	switch(typ)
 	{
 	case TAP:
-		reading_elements = fread(Kennung,1,12,file);
+		if(!fread(Kennung,1,12,file)) goto loaderror;
 
 		Kennung[12]=0;
-		if(0!=strcmp("C64-TAPE-RAW",Kennung))
-		{
-			fclose(image_file);
-			image_file = nullptr;
-			return false;
-		}
+		if(0!=strcmp("C64-TAPE-RAW",Kennung)) goto loaderror;
 
-		reading_elements = fread(&TapeVersion,1,1,file);
+		if(!fread(&TapeVersion,1,1,file)) goto loaderror;
 		fseek(file,0x10,SEEK_SET);
-		reading_elements = fread(&TapeBufferSize,1,4,file);
+		if(!fread(&TapeBufferSize,1,4,file)) goto loaderror;
 
 		// Speicher für TapeBuffer reservieren vorher evtl. alten wieder freigeben
 		if(TapeBuffer != NULL)
@@ -141,7 +134,7 @@ bool TAPE1530::LoadTapeImage(FILE *file, int typ)
 		if(reading_bytes != TapeBufferSize)
 		{
 			std::cout << "Tapeimage ist defekt !" << std::endl << "Anzahl der Daten stimmt nicht mit der Anzahl im Tape Header überein." << std::endl;
-			return false;
+			goto loaderror;
 		}
 
 		WaitCounter = 0;
@@ -160,21 +153,15 @@ bool TAPE1530::LoadTapeImage(FILE *file, int typ)
 		image_file = nullptr;
 
 		return true;
-		break;
 
 	case WAV:
-		reading_elements = fread(Kennung,1,4,file);
+		if(!fread(Kennung,1,4,file)) goto loaderror;
 		Kennung[4]=0;
-		if(0!=strcmp("RIFF",Kennung))
-		{
-			fclose(image_file);
-			image_file = nullptr;
-			return false;
-		}
+		if(0!=strcmp("RIFF",Kennung)) goto loaderror;
 
 		fseek(file,4,SEEK_CUR);
 
-		reading_elements = fread(Kennung,1,4,file);
+		if(!fread(Kennung,1,4,file)) goto loaderror;
 		Kennung[4]=0;
 		if(0!=strcmp("WAVE",Kennung))
 		{
@@ -183,7 +170,7 @@ bool TAPE1530::LoadTapeImage(FILE *file, int typ)
 			return false;
 		}
 
-		reading_elements = fread(Kennung,1,4,file);
+		if(!fread(Kennung,1,4,file)) goto loaderror;
 		Kennung[4]=0;
 		if(0!=strcmp("fmt ",Kennung))
 		{
@@ -194,26 +181,21 @@ bool TAPE1530::LoadTapeImage(FILE *file, int typ)
 
 		fseek(file,4,SEEK_CUR);
 
-		reading_elements = fread(&WAVEFormatTag,1,2,file);
-		if(WAVEFormatTag != 1) return false;
+		if(!fread(&WAVEFormatTag,1,2,file)) goto loaderror;
+		if(WAVEFormatTag != 1) goto loaderror;
 
-		reading_elements = fread(&WAVEChannels,1,2,file);
+		if(!fread(&WAVEChannels,1,2,file)) goto loaderror;
 
-		reading_elements = fread(&WAVESampleRate,1,4,file);
-		reading_elements = fread(&WAVEBytePerSek,1,4,file);
-		reading_elements = fread(&WAVEBlockAlign,1,2,file);
-		reading_elements = fread(&WAVEBitPerSample,1,2,file);
+		if(!fread(&WAVESampleRate,1,4,file)) goto loaderror;
+		if(!fread(&WAVEBytePerSek,1,4,file)) goto loaderror;
+		if(!fread(&WAVEBlockAlign,1,2,file)) goto loaderror;
+		if(!fread(&WAVEBitPerSample,1,2,file)) goto loaderror;
 
-		reading_elements = fread(Kennung,1,4,file);
+		if(!fread(Kennung,1,4,file)) goto loaderror;
 		Kennung[4]=0;
-		if(0!=strcmp("data",Kennung))
-		{
-			fclose(image_file);
-			image_file = nullptr;
-			return false;
-		}
+		if(0!=strcmp("data",Kennung)) goto loaderror;
 
-		reading_elements = fread(&WAVEDataSize,1,4,file);
+		if(!fread(&WAVEDataSize,1,4,file)) goto loaderror;
 
 		TapeType = WAV;
 		IsTapeInsert = true;
@@ -222,10 +204,13 @@ bool TAPE1530::LoadTapeImage(FILE *file, int typ)
 		TapePosIsEnd = false;
 
 		WaveCounter = 0.0f;
-        AddWaveWert = WAVESampleRate / cycles_per_second;
+		AddWaveWert = WAVESampleRate / cycles_per_second;
 
 		return true;
-		break;
+
+	loaderror:
+		fclose(image_file);
+		image_file = nullptr;
 	}
     return false;
 }

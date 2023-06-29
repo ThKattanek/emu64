@@ -62,7 +62,7 @@ class C64Class
 {
 
 public:
-    C64Class(int *ret_error,int soundbuffer_size , VideoCrtClass *video_crt_output,bool start_minimized, std::function<void(char*)> log_function, const char *data_path);
+    C64Class(int *ret_error,int soundbuffer_size , VideoCrtClass *video_crt_output,bool start_minimized, std::function<void(const char*)> log_function, const char *data_path);
     ~C64Class();
     void StartEmulation();
     void EndEmulation();
@@ -375,7 +375,7 @@ public:
 
     std::function<void(void)> AnimationRefreshProc;
     std::function<void(void)> BreakpointProc;
-    std::function<void(char*)> LogText;
+    std::function<void(const char*)> LogText;
     std::function<void(void)> CloseEventC64Screen;
     std::function<void(void)> LimitCyclesEvent;
     std::function<void(uint8_t)> DebugCartEvent;
