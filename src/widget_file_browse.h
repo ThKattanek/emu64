@@ -22,7 +22,7 @@
 #include <QRegExp>
 
 #ifdef ZIP_SUPPORT
-#ifdef __WIN32      // MXE
+#if defined(__WIN32) || defined(__FreeBSD__)
         #include "quazip/quazip.h"
         #include "quazip/quazipfile.h"
 #else
