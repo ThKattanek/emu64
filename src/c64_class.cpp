@@ -2916,7 +2916,7 @@ int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *retur
 		reading_bytes = fread(signature,1,32,file);
 		if(reading_bytes != 32)
 		{
-            std::cout << "Error T64 0x02" << endl;
+            std::cout << "Error T64 0x02" << std::endl;
 			fclose(file);
 			file = nullptr;
 			return 0x02;
