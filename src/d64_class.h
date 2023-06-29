@@ -22,8 +22,6 @@
 
 #define D64_IMAGE_SIZE 174848
 
-using namespace std;
-
 #include "./structs.h"
 
 #define D64_NAME_LENGHT 24

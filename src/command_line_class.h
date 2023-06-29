@@ -23,8 +23,6 @@
 #define MAX_COMMAND_NUM 512
 #define CMD_ARG 0xFFFF
 
-using namespace std;
-
 struct CMD_STRUCT
 {
     const uint16_t cmd_command;     // CMD_COMMAND

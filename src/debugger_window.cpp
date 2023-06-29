@@ -310,8 +310,8 @@ void DebuggerWindow::SetC64Pointer(C64Class *c64)
     memory_window->SetC64Pointer(c64);
     vic_window->SetC64Pointer(c64);
     iec_window->SetC64Pointer(c64);
-    this->c64->AnimationRefreshProc = bind(&DebuggerWindow::AnimationRefreshProc, this);
-    this->c64->BreakpointProc = bind(&DebuggerWindow::BreakpointProc, this);
+    this->c64->AnimationRefreshProc = std::bind(&DebuggerWindow::AnimationRefreshProc, this);
+    this->c64->BreakpointProc = std::bind(&DebuggerWindow::BreakpointProc, this);
 }
 
 void DebuggerWindow::showEvent(QShowEvent*)

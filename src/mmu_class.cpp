@@ -15,7 +15,6 @@
 
 #include "mmu_class.h"
 #include <fstream>
-using namespace std;
 
 MMU::MMU(void)
 {
