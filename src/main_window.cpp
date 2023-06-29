@@ -504,17 +504,17 @@ int MainWindow::OnInit(bool nogui)
     LogText(tr(">> Alle Floppy Lauferke in Tabelle eingetragen\n").toUtf8());
 
     /// Close Evend von C64 Klasse hierher leiten
-    c64->CloseEventC64Screen = bind(&MainWindow::CloseC64Screeen,this);
+    c64->CloseEventC64Screen = std::bind(&MainWindow::CloseC64Screeen,this);
     LogText(tr(">> SDL Window Close Event mit MainWindow verknuepft\n").toUtf8());
 
     /// LimitCyclesEvent von C64 Klasse hierher leiten
     IsLimitCyclesEvent = false;
-    c64->LimitCyclesEvent = bind(&MainWindow::LimitCyclesEvent,this);
+    c64->LimitCyclesEvent = std::bind(&MainWindow::LimitCyclesEvent,this);
     LogText(tr(">> C64Class LimitCycelsEvent mit MainWindow verknuepft\n").toUtf8());
 
     /// DebugCartEvent von C64 Klasse hierher leiten
     IsDebugCartEvent = false;
-    c64->DebugCartEvent = bind(&MainWindow::DebugCartEvent,this,std::placeholders::_1);
+    c64->DebugCartEvent = std::bind(&MainWindow::DebugCartEvent,this,std::placeholders::_1);
     LogText(tr(">> C64Class DebugCartEvent mit MainWindow verknuepft\n").toUtf8());
 
     connect(floppy_window,SIGNAL(ChangeFloppyImage(int)),this,SLOT(OnChangeFloppyImage(int)));
@@ -858,8 +858,8 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
                     fi = new QFileInfo(filename);
                     if(fi->exists())
                     {
-                        cout << "Laufwerksnummer: " << lwnr << endl;
-                        cout << "Disk Image: " << fi->fileName().toLocal8Bit().data() << endl;
+                        std::cout << "Laufwerksnummer: " << lwnr << std::endl;
+                        std::cout << "Disk Image: " << fi->fileName().toLocal8Bit().data() << std::endl;
 
                         if(floppy_window->SetDiskImage(lwnr-8, fi->absoluteFilePath()))
                         {
@@ -868,7 +868,7 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
                         }
                     }
                     else
-                        cout << "Die angebene Datei existiert nicht." << endl;
+                        std::cout << "Die angebene Datei existiert nicht." << std::endl;
                 }
                 else
                     cmd_line->OutErrorMsg("Laufwerksnummer muss zwischen 8 und 11 liegen!","--help");
@@ -885,7 +885,7 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
                 }
             }
             else
-                cout << "Die angebene Datei existiert nicht." << endl;
+                std::cout << "Die angebene Datei existiert nicht." << std::endl;
 			delete fi;
             break;
         case CMD_UMOUNT_CRT:
@@ -974,7 +974,7 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             break;
 
         case CMD_VIDEOCAPTURE:
-            cout << "Video Record: " << cmd_line->GetArg(i+1) << endl;
+            std::cout << "Video Record: " << cmd_line->GetArg(i+1) << std::endl;
             c64->StartVideoRecord(cmd_line->GetArg(i+1));
             break;
         }
@@ -1030,7 +1030,7 @@ void MainWindow::AutoLoadAndRun(QString filename)
 
 	if(c64->LoadAutoRun(0, file, filename.toLocal8Bit(), typ) == 0)
 	{
-		cout << "AUTOLOAD: " << typ << ", FILE: " << file << endl;
+        std::cout << "AUTOLOAD: " << typ << ", FILE: " << file << std::endl;
 
 		// Prüfen welche
 		if(typ == D64)

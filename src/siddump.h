@@ -19,8 +19,6 @@
 #include <cstring>
 #include <stdio.h>
 
-using namespace std;
-
 class SIDDumpClass
 {
 ///// Funktionen /////

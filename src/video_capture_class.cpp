@@ -41,7 +41,7 @@ VideoCaptureClass::~VideoCaptureClass()
 {
     if(is_capture_cctive)
     {
-        cout << "VideoCaptureClass: " << "Stoppen erzwingen!" << endl;
+        std::cout << "VideoCaptureClass: " << "Stoppen erzwingen!" << std::endl;
         StopCapture();
 
         delete[] source_audio_data;
@@ -95,12 +95,12 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
     avformat_alloc_output_context2(&format_ctx, nullptr, nullptr, filename);
     if (!format_ctx)
     {
-        cerr << "Es konnte das Ausgabe Format nicht anhand des Dateinamens ermittelt werden. Es wird versucht MPEG zu benutzten." << endl;
+        std::cerr << "Es konnte das Ausgabe Format nicht anhand des Dateinamens ermittelt werden. Es wird versucht MPEG zu benutzten." << std::endl;
         avformat_alloc_output_context2(&format_ctx, nullptr, codec_name, filename);
     }
     if (!format_ctx)
     {
-        cerr << "Es konnte kein FormatContext erstellt werden." << endl;
+        std::cerr << "Es konnte kein FormatContext erstellt werden." << std::endl;
         mutex_01 = false;      // Mutex1 Unlocken (false)
         return false;
     }
@@ -139,7 +139,7 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
         if (ret < 0)
         {
             char err_msg[AV_ERROR_MAX_STRING_SIZE];
-            cerr << "Ausgabedatei kann nicht geöffnet werden: [" << filename << "[  -- " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
+            std::cerr << "Ausgabedatei kann nicht geöffnet werden: [" << filename << "[  -- " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
             mutex_01 = false;      // Mutex1 Unlocken (false)
             StopCapture();
             return false;
@@ -151,17 +151,17 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
     if (ret < 0)
     {
         char err_msg[AV_ERROR_MAX_STRING_SIZE];
-        cerr << "Beim öffnen der Ausgabedatei ist ein Fehler aufgetreten.  -- " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
+        std::cerr << "Beim öffnen der Ausgabedatei ist ein Fehler aufgetreten.  -- " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
         mutex_01 = false;      // Mutex1 Unlocken (false)
         StopCapture();
         return false;
     }
 
     // Ausgabe von aktuellen Aufnahme Parametern
-    cout << "Video Auflösung: " << video_xw << " x " << video_yw << endl;
-    cout << "VideoCodec: " << video_codec->name << endl;
-    cout << "AudioCodec: " << audio_codec->name << endl;
-    cout << "AudioFrameSize: " << audio_stream.enc->frame_size << endl;
+    std::cout << "Video Auflösung: " << video_xw << " x " << video_yw << std::endl;
+    std::cout << "VideoCodec: " << video_codec->name << std::endl;
+    std::cout << "AudioCodec: " << audio_codec->name << std::endl;
+    std::cout << "AudioFrameSize: " << audio_stream.enc->frame_size << std::endl;
 
     frame_audio_data_left = new int16_t[audio_stream.enc->frame_size];
     frame_audio_data_right = new int16_t[audio_stream.enc->frame_size];
@@ -176,7 +176,7 @@ void VideoCaptureClass::StopCapture()
 {
     if(!is_capture_cctive) return;
 
-    cout << "VideoCapture wird gestoppt" << endl;
+    std::cout << "VideoCapture wird gestoppt" << std::endl;
 
     is_capture_cctive = false;
 
@@ -216,9 +216,9 @@ void VideoCaptureClass::StopCapture()
 
     mutex_01 = false;      // Mutex1 Unlocken (false)
 
-    cout << "VideoCapture wurde gestoppt" << endl;
-    cout << "VideoFrames: " << video_package_counter << endl;
-    cout << "AudioPackages: " << audio_package_counter << endl;
+    std::cout << "VideoCapture wurde gestoppt" << std::endl;
+    std::cout << "VideoFrames: " << video_package_counter << std::endl;
+    std::cout << "AudioPackages: " << audio_package_counter << std::endl;
 }
 
 void VideoCaptureClass::SetCapturePause(bool cpt_pause)
@@ -242,7 +242,7 @@ void VideoCaptureClass::FillSourceAudioBuffer(int16_t *data, int len)
 
     if(len > SOURCE_SAMPLE_BUFFER_LEN)
     {
-        cerr << "Error: Sampledaten größer als Buffer !!" << endl;
+        std::cerr << "Error: Sampledaten größer als Buffer !!" << std::endl;
         return;
     }
 
@@ -377,7 +377,7 @@ bool VideoCaptureClass::OpenVideo(const AVCodec *codec, OutputStream *ost, AVDic
     if (ret < 0)
     {
         char err_msg[AV_ERROR_MAX_STRING_SIZE];
-        cerr << "Could not open video codec: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
+        std::cerr << "Could not open video codec: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
         return false;
     }
 
@@ -385,7 +385,7 @@ bool VideoCaptureClass::OpenVideo(const AVCodec *codec, OutputStream *ost, AVDic
     ost->frame = AllocPicture(c->pix_fmt, c->width, c->height);
     if (!ost->frame)
     {
-        cerr << "Could not allocate video frame." << endl;
+        std::cerr << "Could not allocate video frame." << std::endl;
         return false;
     }
     /* If the output format is not YUV420P, then a temporary YUV420P
@@ -397,7 +397,7 @@ bool VideoCaptureClass::OpenVideo(const AVCodec *codec, OutputStream *ost, AVDic
         ost->tmp_frame = AllocPicture(AV_PIX_FMT_YUV420P, c->width, c->height);
         if (!ost->tmp_frame)
         {
-            cerr << "Could not allocate temporary picture." << endl;
+            std::cerr << "Could not allocate temporary picture." << std::endl;
             return false;
         }
     }
@@ -406,7 +406,7 @@ bool VideoCaptureClass::OpenVideo(const AVCodec *codec, OutputStream *ost, AVDic
     ret = avcodec_parameters_from_context(ost->st->codecpar, c);
     if (ret < 0)
     {
-        cerr << "Could not copy the stream parameters." << endl;
+        std::cerr << "Could not copy the stream parameters." << std::endl;
         return false;
     }
 
@@ -427,7 +427,7 @@ AVFrame* VideoCaptureClass::AllocPicture(enum AVPixelFormat pix_fmt, int width, 
     ret = av_frame_get_buffer(picture, 32);
     if (ret < 0)
     {
-        cerr << "Could not allocate frame data." << endl;
+        std::cerr << "Could not allocate frame data." << std::endl;
         return nullptr;
     }
     return picture;
@@ -447,7 +447,7 @@ bool VideoCaptureClass::OpenAudio(const AVCodec *codec, OutputStream *ost, AVDic
     if (ret < 0)
     {
         char err_msg[AV_ERROR_MAX_STRING_SIZE];
-        cerr << "Could not open audio codec: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
+        std::cerr << "Could not open audio codec: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
         return false;
     }
 
@@ -467,7 +467,7 @@ bool VideoCaptureClass::OpenAudio(const AVCodec *codec, OutputStream *ost, AVDic
     ret = avcodec_parameters_from_context(ost->st->codecpar, c);
     if (ret < 0)
     {
-        cerr << "Could not copy the stream parameters." << endl;
+        std::cerr << "Could not copy the stream parameters." << std::endl;
         return false;
     }
 
@@ -475,7 +475,7 @@ bool VideoCaptureClass::OpenAudio(const AVCodec *codec, OutputStream *ost, AVDic
     ost->swr_ctx = swr_alloc();
     if (!ost->swr_ctx)
     {
-        cerr << "Could not allocate resampler context" << endl;
+        std::cerr << "Could not allocate resampler context" << std::endl;
         return false;
     }
 
@@ -489,7 +489,7 @@ bool VideoCaptureClass::OpenAudio(const AVCodec *codec, OutputStream *ost, AVDic
     /* initialize the resampling context */
     if ((ret = swr_init(ost->swr_ctx)) < 0)
     {
-        cerr << "Failed to initialize the resampling context" << endl;
+        std::cerr << "Failed to initialize the resampling context" << std::endl;
         return false;
     }
 
@@ -502,7 +502,7 @@ AVFrame* VideoCaptureClass::AllocAudioFrame(enum AVSampleFormat sample_fmt, uint
     int ret;
     if (!frame)
     {
-        cerr << "Error allocating an audio frame." << endl;
+        std::cerr << "Error allocating an audio frame." << std::endl;
         return nullptr;
     }
 
@@ -515,7 +515,7 @@ AVFrame* VideoCaptureClass::AllocAudioFrame(enum AVSampleFormat sample_fmt, uint
         ret = av_frame_get_buffer(frame, 0);
         if (ret < 0)
         {
-            cerr << "Error allocating an audio buffer." << endl;
+            std::cerr << "Error allocating an audio buffer." << std::endl;
             return nullptr;
         }
     }
@@ -540,7 +540,7 @@ int VideoCaptureClass::WriteVideoFrame(AVFormatContext *oc, OutputStream *ost)
     if (ret < 0)
     {
         char err_msg[AV_ERROR_MAX_STRING_SIZE];
-        cerr << "Error encoding video frame: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
+        std::cerr << "Error encoding video frame: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
     }
 
     if (got_packet)
@@ -552,7 +552,7 @@ int VideoCaptureClass::WriteVideoFrame(AVFormatContext *oc, OutputStream *ost)
     if (ret < 0)
     {
         char err_msg[AV_ERROR_MAX_STRING_SIZE];
-        cerr << "Error while writing video frame: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << endl;
+        std::cerr << "Error while writing video frame: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
     }
     else
         video_package_counter++;
@@ -607,7 +607,7 @@ int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
     if (ret < 0)
     {
         char err_msg[AV_ERROR_MAX_STRING_SIZE];
-        cerr << "Error encoding audio frame: " << av_make_error_string(err_msg, AV_ERROR_MAX_STRING_SIZE, static_cast<int>(ret)) << endl;
+        std::cerr << "Error encoding audio frame: " << av_make_error_string(err_msg, AV_ERROR_MAX_STRING_SIZE, static_cast<int>(ret)) << std::endl;
     }
 
     if (got_packet)
@@ -616,7 +616,7 @@ int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
         if (ret < 0)
         {
             char err_msg[AV_ERROR_MAX_STRING_SIZE];
-            cerr << "Error while writing audio frame: " << av_make_error_string(err_msg, AV_ERROR_MAX_STRING_SIZE, static_cast<int>(ret)) << endl;
+            std::cerr << "Error while writing audio frame: " << av_make_error_string(err_msg, AV_ERROR_MAX_STRING_SIZE, static_cast<int>(ret)) << std::endl;
         }
         else
         {

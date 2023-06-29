@@ -19,8 +19,6 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 
-using namespace std;
-
 #ifdef _WIN32
     #define PRId64 "I64d"
     #ifndef INT64_C

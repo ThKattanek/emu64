@@ -64,14 +64,14 @@ int main(int argc, char *argv[])
                 QFile *config_file = new QFile(config_dir.path() + "/emu64.ini");
                 if(!config_file->exists())
                 {
-					cout << "emu64.ini existiert nicht, muss deshalb nicht geloescht werden." << endl;
+                    std::cout << "emu64.ini existiert nicht, muss deshalb nicht geloescht werden." << std::endl;
                 }
                 else
                     if(config_file->remove())
-						cout << "emu64.ini wurde geloescht." << endl;
+                        std::cout << "emu64.ini wurde geloescht." << std::endl;
                     else
                     {
-						cout << "emu64.ini konnte nicht geloescht werden." << endl;
+                        std::cout << "emu64.ini konnte nicht geloescht werden." << std::endl;
                         return(-1);
                     }
             }
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
 
 	if(enable_georam == true && enable_reu == true)
 	{
-		cout << "Es können nicht '--enable-georam' und '--enable-reu' gleichzeitig gesetzt werden." << endl;
+        std::cout << "Es können nicht '--enable-georam' und '--enable-reu' gleichzeitig gesetzt werden." << std::endl;
 		return(-1);
 	}
 
@@ -229,6 +229,6 @@ int main(int argc, char *argv[])
     delete w;
     delete app;
 
-    cout << "ExitCode: 0x" << std::hex << ret << endl;
+    std::cout << "ExitCode: 0x" << std::hex << ret << std::endl;
     return ret;
 };
