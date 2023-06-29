@@ -230,9 +230,9 @@ void DebuggerWindow::onTimerAnimationRefresh()
     }
 }
 
-void DebuggerWindow::onResizeHistoryList(int weidth, int height)
+void DebuggerWindow::onResizeHistoryList(int width, int height)
 {
-    (void)weidth;
+    (void)width;
 
     ui->HistoryList->clear();
 
@@ -253,9 +253,9 @@ void DebuggerWindow::onResizeHistoryList(int weidth, int height)
     FillHistoryList(static_cast<uint8_t>(ui->HistoryScroll->value()));
 }
 
-void DebuggerWindow::onResizeDisassList(int weidth, int height)
+void DebuggerWindow::onResizeDisassList(int width, int height)
 {
-    (void)weidth;
+    (void)width;
 
     ui->DisAssTable->clear();
 
