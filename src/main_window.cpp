@@ -365,7 +365,7 @@ int MainWindow::OnInit(bool nogui)
 
     SplashMessage(tr("C64 Klasse wird initialisiert."),Qt::darkBlue);
     int ret_error;
-    c64 = new C64Class(&ret_error ,soundbuffer_size ,video_crt_output,start_minimized, bind(&MainWindow::LogText,this,std::placeholders::_1),QString(dataPath).toLocal8Bit());
+    c64 = new C64Class(&ret_error ,soundbuffer_size ,video_crt_output,start_minimized, std::bind(&MainWindow::LogText,this,std::placeholders::_1),QString(dataPath).toLocal8Bit());
     if(ret_error != 0)
     {
         LogText(tr("<< Fehler beim initiallisieren der C64 Klasse.\n").toUtf8());
@@ -462,7 +462,7 @@ int MainWindow::OnInit(bool nogui)
 
     /// CRT LED mit CRT_Window verbinden ///
     SplashMessage(tr("CRT LED mit CRT Window verbunden."),Qt::darkBlue);
-    c64->crt->ChangeLED = bind(&CartridgeWindow::ChangeLED,cartridge_window,std::placeholders::_1,std::placeholders::_2);
+    c64->crt->ChangeLED = std::bind(&CartridgeWindow::ChangeLED,cartridge_window,std::placeholders::_1,std::placeholders::_2);
     LogText(tr(">> CRT LED wurde mit CrtWindow verbunden\n").toUtf8());
 
     /// C64 Systemroms laden ///

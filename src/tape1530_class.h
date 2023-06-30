@@ -90,7 +90,6 @@ private:
 
     unsigned int	ZyklenCounter;
     unsigned int	WaitCounter;
-    unsigned int    WaitCounterHalf;
 
     float           Counter;
     float Time2CounterTbl[1800];    // Platz für 1800 sek (30min)
@@ -118,7 +117,6 @@ private:
     signed short	*SoundBuffer;
     unsigned int	SoundBufferPos;
     unsigned int	SoundBufferSize;
-    bool			SoundOutputEnable;
     float           Volume;
 
     float PlayFrequenzFaktor;

@@ -136,7 +136,7 @@ Floppy1541::~Floppy1541()
 
     FloppySoundEnabled = false;
     FloppyEnabled = false;
-    delete SoundBuffer;
+    delete[] SoundBuffer;
     delete cpu;
     delete via1;
     delete via2;

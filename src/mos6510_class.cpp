@@ -452,7 +452,7 @@ bool MOS6510::OneZyklus(void)
 
 			CHK_RDY
 
-			if((nmi_is_active == true)) // NMIStatePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der NMI schon angelegen haben also vor dem letzten Zyklus des vorigen Befehls
+			if(nmi_is_active == true) // NMIStatePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der NMI schon angelegen haben also vor dem letzten Zyklus des vorigen Befehls
 			{
 				nmi_is_active = false;
 				MCT = ((unsigned char*)MicroCodeTable6510 + (0x102*MCTItemSize));
