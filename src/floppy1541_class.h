@@ -136,8 +136,6 @@ private:
     int     DiskChangeSimState;         // 0 = momentan kein Diskwechsel
     int     DiskChangeSimCycleCounter;
 
-    REG_STRUCT rs;
-
     std::function<uint8_t(uint16_t)>  ReadProcTbl[256];
     std::function<void(uint16_t, uint8_t)> WriteProcTbl[256];
 
