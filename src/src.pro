@@ -90,10 +90,8 @@ equals(QT_MAJOR_VERSION, 5) {
 
     win32 {
         PKGCONFIG += quazip
-    } else:freebsd {
-        PKGCONFIG += quazip1-qt5
     } else {
-        LIBS += -lquazip5
+        PKGCONFIG += quazip1-qt5
     }
 
     message("QT5 is active")
