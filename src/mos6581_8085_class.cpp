@@ -89,10 +89,10 @@ MOS6581_8085::MOS6581_8085(int nummer,int samplerate,int puffersize,int *error)
 
 MOS6581_8085::~MOS6581_8085()
 {
-    delete SoundBuffer;
-    delete SoundBufferV0;
-    delete SoundBufferV1;
-    delete SoundBufferV2;
+    delete[] SoundBuffer;
+    delete[] SoundBufferV0;
+    delete[] SoundBufferV1;
+    delete[] SoundBufferV2;
 
     delete IoDump;
 
@@ -103,10 +103,10 @@ MOS6581_8085::~MOS6581_8085()
 
 void MOS6581_8085::ChangeSampleRate(int samplerate,int puffersize)
 {
-    delete SoundBuffer;
-    delete SoundBufferV0;
-    delete SoundBufferV1;
-    delete SoundBufferV2;
+    delete[] SoundBuffer;
+    delete[] SoundBufferV0;
+    delete[] SoundBufferV1;
+    delete[] SoundBufferV2;
 
     Samplerate=samplerate;
     FreqConvAddWert=1.0f/(C64ZyklenSek/Samplerate);
