@@ -189,9 +189,9 @@ void MMU::ChangeMemMap()
 			/// READ
 			for(int i=0;i<32;++i)
 			{
-                                CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadBasicRom,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0x80+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xA0+i] = std::bind(&MMU::ReadBasicRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xE0+i] = std::bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
                                 MapReadSource[0x80+i] = MV_RAM;
                                 MapReadSource[0xA0+i] = MV_BASIC_ROM;
                                 MapReadSource[0xE0+i] = MV_KERNAL_ROM;
@@ -200,7 +200,7 @@ void MMU::ChangeMemMap()
 			{
                                 CPUReadProcTbl[0xD0+i] = VicIOReadProc;
                                 CPUReadProcTbl[0xD4+i] = SidIOReadProc;
-                                CPUReadProcTbl[0xD8+i] = bind(&MMU::ReadFarbRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xD8+i] = std::bind(&MMU::ReadFarbRam,this,std::placeholders::_1);
                                 MapReadSource[0xD0+i] = MV_VIC;
                                 MapReadSource[0xD4+i] = MV_SID;
                                 MapReadSource[0xD8+i] = MV_FARB_RAM;
@@ -217,9 +217,9 @@ void MMU::ChangeMemMap()
 			/// WRITE
 			for(int i=0;i<32;++i)
 			{
-                                CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0x80+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xA0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xE0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0x80+i] = MV_RAM;
                                 MapWriteDestination[0xA0+i] = MV_RAM;
                                 MapWriteDestination[0xE0+i] = MV_RAM;
@@ -228,7 +228,7 @@ void MMU::ChangeMemMap()
 			{
                                 CPUWriteProcTbl[0xD0+i] = VicIOWriteProc;
                                 CPUWriteProcTbl[0xD4+i] = SidIOWriteProc;
-                                CPUWriteProcTbl[0xD8+i] = bind(&MMU::WriteFarbRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xD8+i] = std::bind(&MMU::WriteFarbRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0xD0+i] = MV_VIC;
                                 MapWriteDestination[0xD4+i] = MV_SID;
                                 MapWriteDestination[0xD8+i] = MV_FARB_RAM;
@@ -248,32 +248,32 @@ void MMU::ChangeMemMap()
 			/// READ
 			for(int i=0;i<32;++i)
 			{
-                                CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadBasicRom,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0x80+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xA0+i] = std::bind(&MMU::ReadBasicRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xE0+i] = std::bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
                                 MapReadSource[0x80+i] = MV_RAM;
                                 MapReadSource[0xA0+i] = MV_BASIC_ROM;
                                 MapReadSource[0xE0+i] = MV_KERNAL_ROM;
 			}
 			for(int i=0;i<16;++i)
 			{
-                                CPUReadProcTbl[0xD0+i] = bind(&MMU::ReadCharRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xD0+i] = std::bind(&MMU::ReadCharRom,this,std::placeholders::_1);
                                 MapReadSource[0xD0+i] = MV_CHAR_ROM;
 			}
 
 			/// WRITE
 			for(int i=0;i<32;++i)
 			{
-                                CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0x80+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xA0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xE0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0x80+i] = MV_RAM;
                                 MapWriteDestination[0xA0+i] = MV_RAM;
                                 MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
-                                CPUWriteProcTbl[0xD0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xD0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0xD0+i] = MV_RAM;
 			}
 		}break;
@@ -283,9 +283,9 @@ void MMU::ChangeMemMap()
 			/// READ
 			for(int i=0;i<32;++i)
 			{
-                                CPUReadProcTbl[0x80+i] = bind(&MMU::ReadCRT1,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadBasicRom,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0x80+i] = std::bind(&MMU::ReadCRT1,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xA0+i] = std::bind(&MMU::ReadBasicRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xE0+i] = std::bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
                                 MapReadSource[0x80+i] = MV_CRT_1;
                                 MapReadSource[0xA0+i] = MV_BASIC_ROM;
                                 MapReadSource[0xE0+i] = MV_KERNAL_ROM;
@@ -294,7 +294,7 @@ void MMU::ChangeMemMap()
 			{
                                 CPUReadProcTbl[0xD0+i] = VicIOReadProc;
                                 CPUReadProcTbl[0xD4+i] = SidIOReadProc;
-                                CPUReadProcTbl[0xD8+i] = bind(&MMU::ReadFarbRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xD8+i] = std::bind(&MMU::ReadFarbRam,this,std::placeholders::_1);
                                 MapReadSource[0xD0+i] = MV_VIC;
                                 MapReadSource[0xD4+i] = MV_SID;
                                 MapReadSource[0xD8+i] = MV_FARB_RAM;
@@ -311,9 +311,9 @@ void MMU::ChangeMemMap()
 			/// WRITE
 			for(int i=0;i<32;++i)
 			{
-                                CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteCRT1,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0x80+i] = std::bind(&MMU::WriteCRT1,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xA0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xE0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0x80+i] = MV_CRT_1;
                                 MapWriteDestination[0xA0+i] = MV_RAM;
                                 MapWriteDestination[0xE0+i] = MV_RAM;
@@ -322,7 +322,7 @@ void MMU::ChangeMemMap()
 			{
                                 CPUWriteProcTbl[0xD0+i] = VicIOWriteProc;
                                 CPUWriteProcTbl[0xD4+i] = SidIOWriteProc;
-                                CPUWriteProcTbl[0xD8+i] = bind(&MMU::WriteFarbRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xD8+i] = std::bind(&MMU::WriteFarbRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0xD0+i] = MV_VIC;
                                 MapWriteDestination[0xD4+i] = MV_SID;
                                 MapWriteDestination[0xD8+i] = MV_FARB_RAM;
@@ -342,32 +342,32 @@ void MMU::ChangeMemMap()
 			/// READ
 			for(int i=0;i<32;++i)
 			{
-                                CPUReadProcTbl[0x80+i] = bind(&MMU::ReadCRT1,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadBasicRom,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0x80+i] = std::bind(&MMU::ReadCRT1,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xA0+i] = std::bind(&MMU::ReadBasicRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xE0+i] = std::bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
                                 MapReadSource[0x80+i] = MV_CRT_1;
                                 MapReadSource[0xA0+i] = MV_BASIC_ROM;
                                 MapReadSource[0xE0+i] = MV_KERNAL_ROM;
 			}
 			for(int i=0;i<16;++i)
 			{
-                                CPUReadProcTbl[0xD0+i] = bind(&MMU::ReadCharRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xD0+i] = std::bind(&MMU::ReadCharRom,this,std::placeholders::_1);
                                 MapReadSource[0xD0+i] = MV_CHAR_ROM;
 			}
 
 			/// WRITE
 			for(int i=0;i<32;++i)
 			{
-                                CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteCRT1,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0x80+i] = std::bind(&MMU::WriteCRT1,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xA0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xE0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0x80+i] = MV_CRT_1;
                                 MapWriteDestination[0xA0+i] = MV_RAM;
                                 MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
-                                CPUWriteProcTbl[0xD0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xD0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0xD0+i] = MV_RAM;
 			}
 		}break;
@@ -377,9 +377,9 @@ void MMU::ChangeMemMap()
 			/// READ
 			for(int i=0;i<32;++i)
 			{
-                                CPUReadProcTbl[0x80+i] = bind(&MMU::ReadCRT1,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadCRT2,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0x80+i] = std::bind(&MMU::ReadCRT1,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xA0+i] = std::bind(&MMU::ReadCRT2,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xE0+i] = std::bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
                                 MapReadSource[0x80+i] = MV_CRT_1;
                                 MapReadSource[0xA0+i] = MV_CRT_2;
                                 MapReadSource[0xE0+i] = MV_KERNAL_ROM;
@@ -388,7 +388,7 @@ void MMU::ChangeMemMap()
 			{
                                 CPUReadProcTbl[0xD0+i] = VicIOReadProc;
                                 CPUReadProcTbl[0xD4+i] = SidIOReadProc;
-                                CPUReadProcTbl[0xD8+i] = bind(&MMU::ReadFarbRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xD8+i] = std::bind(&MMU::ReadFarbRam,this,std::placeholders::_1);
                                 MapReadSource[0xD0+i] = MV_VIC;
                                 MapReadSource[0xD4+i] = MV_SID;
                                 MapReadSource[0xD8+i] = MV_FARB_RAM;
@@ -405,9 +405,9 @@ void MMU::ChangeMemMap()
 			/// WRITE
 			for(int i=0;i<32;++i)
 			{
-                                CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteCRT1,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteCRT2,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0x80+i] = std::bind(&MMU::WriteCRT1,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xA0+i] = std::bind(&MMU::WriteCRT2,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xE0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0x80+i] = MV_CRT_1;
                                 MapWriteDestination[0xA0+i] = MV_CRT_2;
                                 MapWriteDestination[0xE0+i] = MV_RAM;
@@ -416,7 +416,7 @@ void MMU::ChangeMemMap()
 			{
                                 CPUWriteProcTbl[0xD0+i] = VicIOWriteProc;
                                 CPUWriteProcTbl[0xD4+i] = SidIOWriteProc;
-                                CPUWriteProcTbl[0xD8+i] = bind(&MMU::WriteFarbRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xD8+i] = std::bind(&MMU::WriteFarbRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0xD0+i] = MV_VIC;
                                 MapWriteDestination[0xD4+i] = MV_SID;
                                 MapWriteDestination[0xD8+i] = MV_FARB_RAM;
@@ -436,32 +436,32 @@ void MMU::ChangeMemMap()
 			/// READ
 			for(int i=0;i<32;++i)
 			{
-                                CPUReadProcTbl[0x80+i] = bind(&MMU::ReadCRT1,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadCRT2,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0x80+i] = std::bind(&MMU::ReadCRT1,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xA0+i] = std::bind(&MMU::ReadCRT2,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xE0+i] = std::bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
                                 MapReadSource[0x80+i] = MV_CRT_1;
                                 MapReadSource[0xA0+i] = MV_CRT_2;
                                 MapReadSource[0xE0+i] = MV_KERNAL_ROM;
 			}
 			for(int i=0;i<16;++i)
 			{
-                                CPUReadProcTbl[0xD0+i] = bind(&MMU::ReadCharRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xD0+i] = std::bind(&MMU::ReadCharRom,this,std::placeholders::_1);
                                 MapReadSource[0xD0+i] = MV_CHAR_ROM;
 			}
 
 			/// WRITE
 			for(int i=0;i<32;++i)
 			{
-                                CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteCRT1,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteCRT2,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0x80+i] = std::bind(&MMU::WriteCRT1,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xA0+i] = std::bind(&MMU::WriteCRT2,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xE0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0x80+i] = MV_CRT_1;
                                 MapWriteDestination[0xA0+i] = MV_CRT_2;
                                 MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
-                                CPUWriteProcTbl[0xD0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xD0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0xD0+i] = MV_RAM;
 			}
 		}break;
@@ -471,9 +471,9 @@ void MMU::ChangeMemMap()
 			/// READ
 			for(int i=0;i<32;++i)
 			{
-                                CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadCRT2,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0x80+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xA0+i] = std::bind(&MMU::ReadCRT2,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xE0+i] = std::bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
                                 MapReadSource[0x80+i] = MV_RAM;
                                 MapReadSource[0xA0+i] = MV_CRT_2;
                                 MapReadSource[0xE0+i] = MV_KERNAL_ROM;
@@ -482,7 +482,7 @@ void MMU::ChangeMemMap()
 			{
                                 CPUReadProcTbl[0xD0+i] = VicIOReadProc;
                                 CPUReadProcTbl[0xD4+i] = SidIOReadProc;
-                                CPUReadProcTbl[0xD8+i] = bind(&MMU::ReadFarbRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xD8+i] = std::bind(&MMU::ReadFarbRam,this,std::placeholders::_1);
                                 MapReadSource[0xD0+i] = MV_VIC;
                                 MapReadSource[0xD4+i] = MV_SID;
                                 MapReadSource[0xD8+i] = MV_FARB_RAM;
@@ -499,9 +499,9 @@ void MMU::ChangeMemMap()
 			/// WRITE
 			for(int i=0;i<32;++i)
 			{
-                                CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteCRT2,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0x80+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xA0+i] = std::bind(&MMU::WriteCRT2,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xE0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0x80+i] = MV_RAM;
                                 MapWriteDestination[0xA0+i] = MV_CRT_2;
                                 MapWriteDestination[0xE0+i] = MV_RAM;
@@ -510,7 +510,7 @@ void MMU::ChangeMemMap()
 			{
                                 CPUWriteProcTbl[0xD0+i] = VicIOWriteProc;
                                 CPUWriteProcTbl[0xD4+i] = SidIOWriteProc;
-                                CPUWriteProcTbl[0xD8+i] = bind(&MMU::WriteFarbRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xD8+i] = std::bind(&MMU::WriteFarbRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0xD0+i] = MV_VIC;
                                 MapWriteDestination[0xD4+i] = MV_SID;
                                 MapWriteDestination[0xD8+i] = MV_FARB_RAM;
@@ -530,16 +530,16 @@ void MMU::ChangeMemMap()
 			/// READ
 			for(int i=0;i<32;++i)
 			{
-                                CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadCRT2,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0x80+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xA0+i] = std::bind(&MMU::ReadCRT2,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xE0+i] = std::bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
                                 MapReadSource[0x80+i] = MV_RAM;
                                 MapReadSource[0xA0+i] = MV_CRT_2;
                                 MapReadSource[0xE0+i] = MV_KERNAL_ROM;
 			}
 			for(int i=0;i<16;++i)
 			{
-                                CPUReadProcTbl[0xD0+i] = bind(&MMU::ReadCharRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xD0+i] = std::bind(&MMU::ReadCharRom,this,std::placeholders::_1);
                                 MapReadSource[0xD0+i] = MV_CHAR_ROM;
 			}
 
@@ -547,16 +547,16 @@ void MMU::ChangeMemMap()
 
 			for(int i=0;i<32;++i)
 			{
-                                CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteCRT2,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0x80+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xA0+i] = std::bind(&MMU::WriteCRT2,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xE0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0x80+i] = MV_RAM;
                                 MapWriteDestination[0xA0+i] = MV_CRT_2;
                                 MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
-                                CPUWriteProcTbl[0xD0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xD0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0xD0+i] = MV_RAM;
 			}
 		}break;
@@ -566,9 +566,9 @@ void MMU::ChangeMemMap()
 			/// READ
 			for(int i=0;i<32;++i)
 			{
-                                CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0x80+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xA0+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xE0+i] = std::bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
                                 MapReadSource[0x80+i] = MV_RAM;
                                 MapReadSource[0xA0+i] = MV_RAM;
                                 MapReadSource[0xE0+i] = MV_KERNAL_ROM;
@@ -577,7 +577,7 @@ void MMU::ChangeMemMap()
 			{
                                 CPUReadProcTbl[0xD0+i] = VicIOReadProc;
                                 CPUReadProcTbl[0xD4+i] = SidIOReadProc;
-                                CPUReadProcTbl[0xD8+i] = bind(&MMU::ReadFarbRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xD8+i] = std::bind(&MMU::ReadFarbRam,this,std::placeholders::_1);
                                 MapReadSource[0xD0+i] = MV_VIC;
                                 MapReadSource[0xD4+i] = MV_SID;
                                 MapReadSource[0xD8+i] = MV_FARB_RAM;
@@ -594,9 +594,9 @@ void MMU::ChangeMemMap()
 			/// WRITE
 			for(int i=0;i<32;++i)
 			{
-                                CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0x80+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xA0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xE0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0x80+i] = MV_RAM;
                                 MapWriteDestination[0xA0+i] = MV_RAM;
                                 MapWriteDestination[0xE0+i] = MV_RAM;
@@ -605,7 +605,7 @@ void MMU::ChangeMemMap()
 			{
                                 CPUWriteProcTbl[0xD0+i] = VicIOWriteProc;
                                 CPUWriteProcTbl[0xD4+i] = SidIOWriteProc;
-                                CPUWriteProcTbl[0xD8+i] = bind(&MMU::WriteFarbRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xD8+i] = std::bind(&MMU::WriteFarbRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0xD0+i] = MV_VIC;
                                 MapWriteDestination[0xD4+i] = MV_SID;
                                 MapWriteDestination[0xD8+i] = MV_FARB_RAM;
@@ -625,32 +625,32 @@ void MMU::ChangeMemMap()
 			/// READ
 			for(int i=0;i<32;++i)
 			{
-                                CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0x80+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xA0+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xE0+i] = std::bind(&MMU::ReadKernalRom,this,std::placeholders::_1);
                                 MapReadSource[0x80+i] = MV_RAM;
                                 MapReadSource[0xA0+i] = MV_RAM;
                                 MapReadSource[0xE0+i] = MV_KERNAL_ROM;
 			}
 			for(int i=0;i<16;++i)
 			{
-                                CPUReadProcTbl[0xD0+i] = bind(&MMU::ReadCharRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xD0+i] = std::bind(&MMU::ReadCharRom,this,std::placeholders::_1);
                                 MapReadSource[0xD0+i] = MV_CHAR_ROM;
 			}
 
 			/// WRITE
 			for(int i=0;i<32;++i)
 			{
-                                CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0x80+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xA0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xE0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0x80+i] = MV_RAM;
                                 MapWriteDestination[0xA0+i] = MV_RAM;
                                 MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
-                                CPUWriteProcTbl[0xD0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xD0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0xD0+i] = MV_RAM;
 			}
 		}break;
@@ -660,9 +660,9 @@ void MMU::ChangeMemMap()
 			/// READ
 			for(int i=0;i<32;++i)
 			{
-                                CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0x80+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xA0+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xE0+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
                                 MapReadSource[0x80+i] = MV_RAM;
                                 MapReadSource[0xA0+i] = MV_RAM;
                                 MapReadSource[0xE0+i] = MV_RAM;
@@ -671,7 +671,7 @@ void MMU::ChangeMemMap()
 			{
                                 CPUReadProcTbl[0xD0+i] = VicIOReadProc;
                                 CPUReadProcTbl[0xD4+i] = SidIOReadProc;
-                                CPUReadProcTbl[0xD8+i] = bind(&MMU::ReadFarbRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xD8+i] = std::bind(&MMU::ReadFarbRam,this,std::placeholders::_1);
                                 MapReadSource[0xD0+i] = MV_VIC;
                                 MapReadSource[0xD4+i] = MV_SID;
                                 MapReadSource[0xD8+i] = MV_FARB_RAM;
@@ -687,9 +687,9 @@ void MMU::ChangeMemMap()
 
 			for(int i=0;i<32;++i)
 			{
-                                CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0x80+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xA0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xE0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0x80+i] = MV_RAM;
                                 MapWriteDestination[0xA0+i] = MV_RAM;
                                 MapWriteDestination[0xE0+i] = MV_RAM;
@@ -698,7 +698,7 @@ void MMU::ChangeMemMap()
 			{
                                 CPUWriteProcTbl[0xD0+i] = VicIOWriteProc;
                                 CPUWriteProcTbl[0xD4+i] = SidIOWriteProc;
-                                CPUWriteProcTbl[0xD8+i] = bind(&MMU::WriteFarbRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xD8+i] = std::bind(&MMU::WriteFarbRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0xD0+i] = MV_VIC;
                                 MapWriteDestination[0xD4+i] = MV_SID;
                                 MapWriteDestination[0xD8+i] = MV_FARB_RAM;
@@ -718,32 +718,32 @@ void MMU::ChangeMemMap()
 			/// READ
 			for(int i=0;i<32;++i)
 			{
-                                CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0x80+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xA0+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xE0+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
                                 MapReadSource[0x80+i] = MV_RAM;
                                 MapReadSource[0xA0+i] = MV_RAM;
                                 MapReadSource[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
-                                CPUReadProcTbl[0xD0+i] = bind(&MMU::ReadCharRom,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xD0+i] = std::bind(&MMU::ReadCharRom,this,std::placeholders::_1);
                                 MapReadSource[0xD0+i] = MV_CHAR_ROM;
 			}
 
 			/// WRITE
 			for(int i=0;i<32;++i)
 			{
-                                CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0x80+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xA0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xE0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0x80+i] = MV_RAM;
                                 MapWriteDestination[0xA0+i] = MV_RAM;
                                 MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
-                                CPUWriteProcTbl[0xD0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xD0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0xD0+i] = MV_RAM;
 			}
 		}break;
@@ -753,32 +753,32 @@ void MMU::ChangeMemMap()
 			/// READ
 			for(int i=0;i<32;++i)
 			{
-                                CPUReadProcTbl[0x80+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0x80+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xA0+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xE0+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
                                 MapReadSource[0x80+i] = MV_RAM;
                                 MapReadSource[0xA0+i] = MV_RAM;
                                 MapReadSource[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
-                                CPUReadProcTbl[0xD0+i] = bind(&MMU::ReadRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xD0+i] = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
                                 MapReadSource[0xD0+i] = MV_RAM;
 			}
 
 			/// WRITE
 			for(int i=0;i<32;++i)
 			{
-                                CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0x80+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xA0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xE0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0x80+i] = MV_RAM;
                                 MapWriteDestination[0xA0+i] = MV_RAM;
                                 MapWriteDestination[0xE0+i] = MV_RAM;
 			}
 			for(int i=0;i<16;++i)
 			{
-                                CPUWriteProcTbl[0xD0+i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xD0+i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0xD0+i] = MV_RAM;
 			}
 		}break;
@@ -789,19 +789,19 @@ void MMU::ChangeMemMap()
 			/// READ
                         for(int i=0;i<112;i++)
                         {
-                            CPUReadProcTbl[0x10+i] = bind(&MMU::ReadOpenAdress,this,std::placeholders::_1);
+                            CPUReadProcTbl[0x10+i] = std::bind(&MMU::ReadOpenAdress,this,std::placeholders::_1);
                             MapReadSource[0x10+i] = MV_OPEN;
                         }
                         for(int i=0;i<16;i++)
                         {
-                            CPUReadProcTbl[0xC0+i] = bind(&MMU::ReadOpenAdress,this,std::placeholders::_1);
+                            CPUReadProcTbl[0xC0+i] = std::bind(&MMU::ReadOpenAdress,this,std::placeholders::_1);
                             MapReadSource[0xC0+i] = MV_OPEN;
                         }
 			for(int i=0;i<32;++i)
 			{
-                                CPUReadProcTbl[0x80+i] = bind(&MMU::ReadCRT1,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xA0+i] = bind(&MMU::ReadOpenAdress,this,std::placeholders::_1);
-                                CPUReadProcTbl[0xE0+i] = bind(&MMU::ReadCRT3,this,std::placeholders::_1);
+                                CPUReadProcTbl[0x80+i] = std::bind(&MMU::ReadCRT1,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xA0+i] = std::bind(&MMU::ReadOpenAdress,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xE0+i] = std::bind(&MMU::ReadCRT3,this,std::placeholders::_1);
                                 MapReadSource[0x80+i] = MV_CRT_1;
                                 MapReadSource[0xA0+i] = MV_OPEN;
                                 MapReadSource[0xE0+i] = MV_CRT_3;
@@ -810,7 +810,7 @@ void MMU::ChangeMemMap()
 			{
                                 CPUReadProcTbl[0xD0+i] = VicIOReadProc;
                                 CPUReadProcTbl[0xD4+i] = SidIOReadProc;
-                                CPUReadProcTbl[0xD8+i] = bind(&MMU::ReadFarbRam,this,std::placeholders::_1);
+                                CPUReadProcTbl[0xD8+i] = std::bind(&MMU::ReadFarbRam,this,std::placeholders::_1);
                                 MapReadSource[0xD0+i] = MV_VIC;
                                 MapReadSource[0xD4+i] = MV_SID;
                                 MapReadSource[0xD8+i] = MV_FARB_RAM;
@@ -827,19 +827,19 @@ void MMU::ChangeMemMap()
 			/// WRITE
 			for(int i=0;i<112;i++)
 			{
-                                CPUWriteProcTbl[0x10+i] = bind(&MMU::WriteOpenAdress,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0x10+i] = std::bind(&MMU::WriteOpenAdress,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0x10+i] = MV_OPEN;
 			}
 			for(int i=0;i<16;i++)
 			{
-                                CPUWriteProcTbl[0xC0+i] = bind(&MMU::WriteOpenAdress,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xC0+i] = std::bind(&MMU::WriteOpenAdress,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0xC0+i] = MV_OPEN;
 			}
 			for(int i=0;i<32;++i)
 			{
-                                CPUWriteProcTbl[0x80+i] = bind(&MMU::WriteCRT1,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xA0+i] = bind(&MMU::WriteOpenAdress,this,std::placeholders::_1,std::placeholders::_2);
-                                CPUWriteProcTbl[0xE0+i] = bind(&MMU::WriteCRT3,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0x80+i] = std::bind(&MMU::WriteCRT1,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xA0+i] = std::bind(&MMU::WriteOpenAdress,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xE0+i] = std::bind(&MMU::WriteCRT3,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0x80+i] = MV_CRT_1;
                                 MapWriteDestination[0xA0+i] = MV_OPEN;
                                 MapWriteDestination[0xE0+i] = MV_CRT_3;
@@ -848,7 +848,7 @@ void MMU::ChangeMemMap()
 			{
                                 CPUWriteProcTbl[0xD0+i] = VicIOWriteProc;
                                 CPUWriteProcTbl[0xD4+i] = SidIOWriteProc;
-                                CPUWriteProcTbl[0xD8+i] = bind(&MMU::WriteFarbRam,this,std::placeholders::_1,std::placeholders::_2);
+                                CPUWriteProcTbl[0xD8+i] = std::bind(&MMU::WriteFarbRam,this,std::placeholders::_1,std::placeholders::_2);
                                 MapWriteDestination[0xD0+i] = MV_VIC;
                                 MapWriteDestination[0xD4+i] = MV_SID;
                                 MapWriteDestination[0xD8+i] = MV_FARB_RAM;
@@ -870,21 +870,21 @@ inline void MMU::InitProcTables(void)
 {
 	for(int i=0;i<256;++i)
 	{
-                CPUReadProcTbl[i] =  bind(&MMU::ReadRam,this,std::placeholders::_1);
-                CPUWriteProcTbl[i] = bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
-                VICReadProcTbl[i] = bind(&MMU::ReadVicRam,this,std::placeholders::_1);
+                CPUReadProcTbl[i] =  std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+                CPUWriteProcTbl[i] = std::bind(&MMU::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+                VICReadProcTbl[i] = std::bind(&MMU::ReadVicRam,this,std::placeholders::_1);
                 MapReadSource[i] = MV_RAM;
                 MapWriteDestination[i] = MV_RAM;
 	}
 
 	for(int i=0;i<16;++i)
 	{
-                VICReadProcTbl[0x10+i] = bind(&MMU::ReadVicCharRomBank0,this,std::placeholders::_1);
-                VICReadProcTbl[0x90+i] = bind(&MMU::ReadVicCharRomBank2,this,std::placeholders::_1);
+                VICReadProcTbl[0x10+i] = std::bind(&MMU::ReadVicCharRomBank0,this,std::placeholders::_1);
+                VICReadProcTbl[0x90+i] = std::bind(&MMU::ReadVicCharRomBank2,this,std::placeholders::_1);
 	}
 
-        CPUReadProcTbl[0] = bind(&MMU::ReadZeroPage,this,std::placeholders::_1);
-        CPUWriteProcTbl[0] = bind(&MMU::WriteZeroPage,this,std::placeholders::_1,std::placeholders::_2);
+        CPUReadProcTbl[0] = std::bind(&MMU::ReadZeroPage,this,std::placeholders::_1);
+        CPUWriteProcTbl[0] = std::bind(&MMU::WriteZeroPage,this,std::placeholders::_1,std::placeholders::_2);
 }
 
 unsigned char MMU::ReadZeroPage(unsigned short adresse)
