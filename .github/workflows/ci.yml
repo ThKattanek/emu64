@@ -10,12 +10,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      CI_CXXFLAGS: -O2 -Wall -Wextra -Wshadow=local -Werror -pedantic
+      CI_CXXFLAGS: -O2 -Wall -Wextra -Werror -pedantic
+      WSHADOW_GCC: -Wshadow=local
+      WSHADOW_CLANG: -Wshadow-uncaptured-local
     steps:
     - uses: actions/checkout@v3
     - uses: awalsh128/cache-apt-pkgs-action@latest
       with:
         packages: |
+          clang
           libavcodec-dev
           libavformat-dev
           libavutil-dev
@@ -28,9 +31,17 @@ jobs:
           qtbase5-dev
           qttools5-dev-tools
         version: 1.0
-    - name: make
+    - name: build-gcc
       run: |
-        mkdir build
-        cd build
-        qmake .. PREFIX="/usr/local" QMAKE_CXXFLAGS="${CI_CXXFLAGS}"
+        mkdir build-gcc
+        cd build-gcc
+        qmake .. PREFIX=/usr/local QMAKE_CXX=g++ \
+                 QMAKE_CXXFLAGS="${CI_CXXFLAGS} ${WSHADOW_GCC}"
+        make -j4
+    - name: build-clang
+      run: |
+        mkdir build-clang
+        cd build-clang
+        qmake .. PREFIX=/usr/local QMAKE_CXX=clang++ \
+                 QMAKE_CXXFLAGS="${CI_CXXFLAGS} ${WSHADOW_CLANG}"
         make -j4
