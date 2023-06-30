@@ -1489,7 +1489,6 @@ void C64Class::SetGrafikModi(bool enable_screen_doublesize, bool enable_screen_c
     this->enable_screen_doublesize = enable_screen_doublesize;
     this->enable_screen_crt_output =  enable_screen_crt_output;
     this->enable_screen_filter = enable_screen_filter;
-    this->start_minimized = start_minimized;
     this->fullscreen_width = fullscreen_width;
     this->fullscreen_height = fullscreen_height;
 
