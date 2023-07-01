@@ -88,12 +88,17 @@ equals(QT_MAJOR_VERSION, 5) {
 
     DEFINES += ZIP_SUPPORT
 
-    win32 {
-        PKGCONFIG += quazip
-    } else:freebsd {
+    system(pkg-config --exists quazip1-qt5) {
         PKGCONFIG += quazip1-qt5
+    } else:system(pkg-config --exists quazip) {
+        message("Old Quazip found, appending include path")
+        PKGCONFIG += quazip
+        QUAZIPINC = $$system(pkg-config --variable=includedir quazip)
+        INCLUDEPATH += $${QUAZIPINC}/quazip5 $${QUAZIPINC}/quazip
     } else {
+        message("Quazip not found, trying to guess")
         LIBS += -lquazip5
+        INCLUDEPATH += /usr/include/quazip5 /usr/include/quazip
     }
 
     message("QT5 is active")

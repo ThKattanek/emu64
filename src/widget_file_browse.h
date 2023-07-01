@@ -22,13 +22,8 @@
 #include <QRegExp>
 
 #ifdef ZIP_SUPPORT
-#if defined(__WIN32) || defined(__FreeBSD__)
-        #include "quazip/quazip.h"
-        #include "quazip/quazipfile.h"
-#else
-        #include "quazip5/quazip.h"
-        #include "quazip5/quazipfile.h"
-#endif
+#include <quazip.h>
+#include <quazipfile.h>
 #endif
 
 namespace Ui {
