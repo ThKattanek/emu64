@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -3119,12 +3118,12 @@ void C64Class::RemoveGEORAM()
 
 int C64Class::LoadGEORAMImage(const char *filename)
 {
-    return geo->LoadRAM(filename);
+    return geo->LoadImage(filename);
 }
 
 int C64Class::SaveGEORAMImage(const char *filename)
 {
-    return geo->SaveRAM(filename);
+    return geo->SaveImage(filename);
 }
 
 void C64Class::ClearGEORAMRam()
