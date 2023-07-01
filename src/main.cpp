@@ -197,11 +197,18 @@ int main(int argc, char *argv[])
     QObject::connect(app,SIGNAL(messageAvailable(QStringList)),w,SLOT(OnMessage(QStringList)));
 
     w->SetCustomDataPath("");
+
+    // Der erste Parameter "--data-path" ist der prioresierte alle nachfolgenden zuweisungen werden ignoriert
+    // Kommt in der regel nicht vor, wird aber für das linux appimage benötigt, da dort im .AppRun
+    // --data-path zwingend übergeben werden muss.
+
+    bool data_path_found = false;
     for(int i=0; i<cmd_line->GetCommandCount(); i++)
     {
-        if(cmd_line->GetCommand(i) == CMD_DATA_PATH)
+        if((cmd_line->GetCommand(i) == CMD_DATA_PATH) && (!data_path_found))
         {
             w->SetCustomDataPath(QString(cmd_line->GetArg(i+1)));
+            data_path_found = true;
         }
     }
 
