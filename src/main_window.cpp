@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -892,7 +891,7 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             cartridge_window->DisconnectCrt();
             break;
 		case CMD_ENABLE_GEORAM:
-			c64->InsertGEORAM();
+            c64->InsertGeoRam();
 			break;
 		case CMD_ENABLE_REU:
 			c64->InsertREU();
@@ -1412,13 +1411,13 @@ void MainWindow::on_actionREU_loeschen_triggered()
 
 void MainWindow::on_actionGEO_einstecken_triggered()
 {
-    c64->InsertGEORAM();
+    c64->InsertGeoRam();
     c64->SetFocusToC64Window();
 }
 
 void MainWindow::on_actionGEO_entfernen_triggered()
 {
-    c64->RemoveGEORAM();
+    c64->RemoveGeoRam();
     c64->SetFocusToC64Window();
 }
 
@@ -1427,7 +1426,7 @@ void MainWindow::on_actionGEO_laden_triggered()
     QString filename = QFileDialog::getOpenFileName(this,tr("GEORAM Inhalt laden"),QDir::homePath(),tr("GEORAM Image Dateien") + "(*.img);;" + tr("Alle Dateien") + "(*.*)",nullptr,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
-        if(c64->LoadGEORAMImage(filename.toLocal8Bit()) != 0)
+        if(c64->LoadGeoRamImage(filename.toLocal8Bit()) != 0)
             QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des GEORAM Images trat ein Fehler auf!"));
     }
 }
@@ -1444,7 +1443,7 @@ void MainWindow::on_actionGEO_speichern_triggered()
     if(!CustomSaveFileDialog::GetSaveFileName(this,tr("GEORAM Inhalt speichern"), filters, &filename, &fileext))
         return;
 
-    if(c64->SaveGEORAMImage(filename.toLocal8Bit()) != 0)
+    if(c64->SaveGeoRamImage(filename.toLocal8Bit()) != 0)
         QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des GEORAM Images trat ein Fehler auf!"));
 }
 
@@ -1452,7 +1451,7 @@ void MainWindow::on_actionGEO_loeschen_triggered()
 {
     if(QMessageBox::Yes == QMessageBox::question(this,tr("GEORAM Speicher löschen ..."),tr("Möchten Sie den Inhalt des GEORAM Speichers wirklich löschen?"),QMessageBox::Yes | QMessageBox::No))
     {
-        c64->ClearGEORAMRam();
+        c64->ClearGeoRam();
     }
 }
 
