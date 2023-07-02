@@ -39,7 +39,7 @@ void GEORAMClass::Remove(void)
 
 int GEORAMClass::LoadImage(const char *filename)
 {
-    /// GEORAM Inhalt laden ...
+    /// load georam image ...
     FILE* file;
     file = fopen(filename, "rb");
     if (file == NULL)
@@ -47,12 +47,45 @@ int GEORAMClass::LoadImage(const char *filename)
         return 1;
     }
 
-    size_t reading_bytes = fread(ram, 1, MAX_GEORAM_SIZE, file);
+    /// Get file size
+    if(fseek(file, 0, SEEK_END) != 0)
+    {
+        fclose(file);
+        return 1;
+    }
 
+    size_t file_size = ftell(file);
+    if(fseek(file, 0, SEEK_SET) != 0)
+    {
+        fclose(file);
+        return 1;
+    }
+
+    switch(file_size)
+    {
+    case 524288:
+        geo_ram_mode = _512KiB;
+        break;
+    case 1048576:
+        geo_ram_mode = _1024KiB;
+        break;
+    case 2097152:
+        geo_ram_mode = _2048KiB;
+        break;
+    case 4194304:
+        geo_ram_mode = _4096KiB;
+        break;
+    default:
+        fclose(file);
+        return 2;
+        break;
+    }
+
+    size_t reading_bytes = fread(ram, 1, geo_ram_size_tbl[geo_ram_mode & 0x03], file);
     if(reading_bytes != geo_ram_size_tbl[geo_ram_mode & 0x03])
     {
-        // GeoRam Image entspricht nicht der aktuell eingestellten GeoRAM Größe.
-        return 2;
+        fclose(file);
+        return 3;
     }
 
     fclose(file);
@@ -61,14 +94,19 @@ int GEORAMClass::LoadImage(const char *filename)
 
 int GEORAMClass::SaveImage(const char *filename)
 {
-    /// GEORAM Inhalt speichern ...
+    /// save georam image ...
     FILE* file;
     file = fopen(filename, "wb");
     if (file == NULL)
-    {
         return 1;
+
+    size_t written_bytes = fwrite(ram, 1, geo_ram_size_tbl[geo_ram_mode & 0x03], file);
+    if(written_bytes != geo_ram_size_tbl[geo_ram_mode & 0x03])
+    {
+        fclose(file);
+        return 2;
     }
-    fwrite(ram, 1, geo_ram_size_tbl[geo_ram_mode & 0x03], file);
+
     fclose(file);
     return 0;
 }
@@ -94,6 +132,11 @@ void GEORAMClass::SetGeoRamType(uint8_t type)
         reg_start_address = 0xdf80;
         break;
         }
+}
+
+uint8_t GEORAMClass::GetGeoRamMode()
+{
+        return geo_ram_mode;
 }
 
 void GEORAMClass::SetGeoRamMode(uint8_t mode)
