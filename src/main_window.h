@@ -144,6 +144,14 @@ private slots:
 
     void on_actionCPU_Logging_Stop_triggered();
 
+    void on_actionGEO_512KiB_triggered();
+
+    void on_actionGEO_1024KiB_triggered();
+
+    void on_actionGEO_2048KiB_triggered();
+
+    void on_actionGEO_4096KiB_triggered();
+
 private:
     /// Funktionen ///
     void changeEvent(QEvent *event);  

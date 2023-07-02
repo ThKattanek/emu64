@@ -1423,11 +1423,42 @@ void MainWindow::on_actionGEO_entfernen_triggered()
 
 void MainWindow::on_actionGEO_laden_triggered()
 {
+    uint8_t georam_mode = c64->GetGeoRamMode();
+
     QString filename = QFileDialog::getOpenFileName(this,tr("GEORAM Inhalt laden"),QDir::homePath(),tr("GEORAM Image Dateien") + "(*.img);;" + tr("Alle Dateien") + "(*.*)",nullptr,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
         if(c64->LoadGeoRamImage(filename.toLocal8Bit()) != 0)
             QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des GEORAM Images trat ein Fehler auf!"));
+        else if(georam_mode != c64->GetGeoRamMode())
+        {
+            QString GeoRamSizeStr;
+
+            switch (c64->GetGeoRamMode())
+            {
+            case _512KiB:
+                GeoRamSizeStr = "512KiB";
+                on_actionGEO_512KiB_triggered();
+                break;
+            case _1024KiB:
+                GeoRamSizeStr = "1024KiB";
+                on_actionGEO_1024KiB_triggered();
+                break;
+            case _2048KiB:
+                GeoRamSizeStr = "2048KiB";
+                on_actionGEO_2048KiB_triggered();
+                break;
+            case _4096KiB:
+                GeoRamSizeStr = "4096KiB";
+                on_actionGEO_4096KiB_triggered();
+                break;
+            default:
+                GeoRamSizeStr = "512KiB";
+                on_actionGEO_512KiB_triggered();
+                break;
+            }
+            QMessageBox::information(this,tr("Emu64 Info ..."),tr("Es wurde die Speichergröße der GEORAM auf ") + GeoRamSizeStr + tr(" geändert."));
+        }
     }
 }
 
@@ -1516,5 +1547,49 @@ void MainWindow::on_actionCPU_Logging_Start_triggered()
 void MainWindow::on_actionCPU_Logging_Stop_triggered()
 {
     c64->StopDebugLogging();
+}
+
+
+void MainWindow::on_actionGEO_512KiB_triggered()
+{
+    ui->actionGEO_512KiB->setChecked(true);
+    ui->actionGEO_1024KiB->setChecked(false);
+    ui->actionGEO_2048KiB->setChecked(false);
+    ui->actionGEO_4096KiB->setChecked(false);
+
+    c64->SetGeoRamMode(_512KiB);
+}
+
+
+void MainWindow::on_actionGEO_1024KiB_triggered()
+{
+    ui->actionGEO_512KiB->setChecked(false);
+    ui->actionGEO_1024KiB->setChecked(true);
+    ui->actionGEO_2048KiB->setChecked(false);
+    ui->actionGEO_4096KiB->setChecked(false);
+
+    c64->SetGeoRamMode(_1024KiB);
+}
+
+
+void MainWindow::on_actionGEO_2048KiB_triggered()
+{
+    ui->actionGEO_512KiB->setChecked(false);
+    ui->actionGEO_1024KiB->setChecked(false);
+    ui->actionGEO_2048KiB->setChecked(true);
+    ui->actionGEO_4096KiB->setChecked(false);
+
+    c64->SetGeoRamMode(_2048KiB);
+}
+
+
+void MainWindow::on_actionGEO_4096KiB_triggered()
+{
+    ui->actionGEO_512KiB->setChecked(false);
+    ui->actionGEO_1024KiB->setChecked(false);
+    ui->actionGEO_2048KiB->setChecked(false);
+    ui->actionGEO_4096KiB->setChecked(true);
+
+    c64->SetGeoRamMode(_4096KiB);
 }
 
