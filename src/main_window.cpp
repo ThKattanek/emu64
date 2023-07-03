@@ -134,6 +134,10 @@ MainWindow::~MainWindow()
         ini->beginGroup("Sound");
         ini->setValue("SoundBufferSize",soundbuffer_size);
         ini->endGroup();
+
+        ini->beginGroup("GeoRAM");
+        ini->setValue("GeoRamMode", c64->GetGeoRamMode());
+        ini->endGroup();
     }
     /////////////////////////////////////
 
@@ -581,7 +585,6 @@ int MainWindow::OnInit(bool nogui)
         int c64_key_table_size = c64->GetC64KeyTableSize();
 
         ini->beginGroup("C64KeyMapping");
-
         for(int i=0; i<c64_key_table_size; i++)
         {
             QString name = "C64_KEY_" + QVariant(i).toString();
@@ -594,7 +597,27 @@ int MainWindow::OnInit(bool nogui)
         }
 
         LogText(tr(">> C64 Tastatur Mapping aus INI geladen\n").toUtf8());
+        ini->endGroup();
 
+        ini->beginGroup("GeoRAM");
+        uint8_t geo_ram_mode = ini->value("GeoRamMode", 0).toUInt();
+        switch (geo_ram_mode)
+        {
+        case _512KiB:
+            on_actionGEO_512KiB_triggered();
+            break;
+        case _1024KiB:
+            on_actionGEO_1024KiB_triggered();
+            break;
+        case _2048KiB:
+            on_actionGEO_2048KiB_triggered();
+            break;
+        case _4096KiB:
+            on_actionGEO_4096KiB_triggered();
+            break;
+        default:
+            break;
+        }
         ini->endGroup();
     }
 
@@ -1425,9 +1448,18 @@ void MainWindow::on_actionGEO_laden_triggered()
 {
     uint8_t georam_mode = c64->GetGeoRamMode();
 
-    QString filename = QFileDialog::getOpenFileName(this,tr("GEORAM Inhalt laden"),QDir::homePath(),tr("GEORAM Image Dateien") + "(*.img);;" + tr("Alle Dateien") + "(*.*)",nullptr,QFileDialog::DontUseNativeDialog);
+    ini->beginGroup("GeoRAM");
+    QString geo_ram_image_path = ini->value("GeoRamLastImageDir", QDir::homePath()).toString();
+    ini->endGroup();
+
+    QString filename = QFileDialog::getOpenFileName(this,tr("GEORAM Inhalt laden"), geo_ram_image_path, tr("GEORAM Image Dateien") + "(*.img);;" + tr("Alle Dateien") + "(*.*)",nullptr,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
+        ini->beginGroup("GeoRAM");
+        QFileInfo file_info(filename);
+        ini->setValue("GeoRamLastImageDir", file_info.absolutePath());
+        ini->endGroup();
+
         if(c64->LoadGeoRamImage(filename.toLocal8Bit()) != 0)
             QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des GEORAM Images trat ein Fehler auf!"));
         else if(georam_mode != c64->GetGeoRamMode())
