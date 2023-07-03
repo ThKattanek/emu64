@@ -72,6 +72,9 @@ emu64 [PARAMETER]
 
 --enable-georam
     Aktiviert die GEORAM.
+    
+--set-georam-size      
+    Setzt die Größe des GEORAM Speichers in KiB (512, 1024, 2048, 4096).
 
 --enable-reu
     Aktiviert die REU.
@@ -103,4 +106,4 @@ emu64 [PARAMETER]
 
 
 
-by Th.Kattanek (C)2022
+by Th.Kattanek (C)2023

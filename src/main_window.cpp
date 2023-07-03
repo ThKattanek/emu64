@@ -915,7 +915,30 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             break;
 		case CMD_ENABLE_GEORAM:
             c64->InsertGeoRam();
-			break;
+            break;
+        case CMD_SET_GEORAM_SIZE:
+            val = cmd_line->GetArgInt(i+1, &error);
+            if(error) break;
+
+            switch(val)
+            {
+            case 512:
+                on_actionGEO_512KiB_triggered();
+                break;
+            case 1024:
+                on_actionGEO_1024KiB_triggered();
+                break;
+            case 2048:
+                on_actionGEO_2048KiB_triggered();
+                break;
+            case 4096:
+                on_actionGEO_4096KiB_triggered();
+                break;
+            default:
+                std::cout << "Ungültige GeoRAM Speichergröße. (512, 1024, 2048, 4096)" << std::endl;
+                break;
+            }
+            break;
 		case CMD_ENABLE_REU:
 			c64->InsertREU();
 			break;
