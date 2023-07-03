@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -3094,7 +3093,7 @@ void C64Class::ClearREURam()
     reu->ClearRAM();
 }
 
-void C64Class::InsertGEORAM()
+void C64Class::InsertGeoRam()
 {
     io_source = 3;
 
@@ -3108,7 +3107,7 @@ void C64Class::InsertGEORAM()
     HardReset();
 }
 
-void C64Class::RemoveGEORAM()
+void C64Class::RemoveGeoRam()
 {
     geo->Remove();
     io_source = 0;
@@ -3117,19 +3116,29 @@ void C64Class::RemoveGEORAM()
     HardReset();
 }
 
-int C64Class::LoadGEORAMImage(const char *filename)
+int C64Class::LoadGeoRamImage(const char *filename)
 {
-    return geo->LoadRAM(filename);
+    return geo->LoadImage(filename);
 }
 
-int C64Class::SaveGEORAMImage(const char *filename)
+int C64Class::SaveGeoRamImage(const char *filename)
 {
-    return geo->SaveRAM(filename);
+    return geo->SaveImage(filename);
 }
 
-void C64Class::ClearGEORAMRam()
+void C64Class::ClearGeoRam()
 {
     geo->ClearRAM();
+}
+
+uint8_t C64Class::GetGeoRamMode()
+{
+    return geo->GetGeoRamMode();
+}
+
+void C64Class::SetGeoRamMode(uint8_t mode)
+{
+    geo->SetGeoRamMode(mode);
 }
 
 void C64Class::SetMouse1351Port(uint8_t port)

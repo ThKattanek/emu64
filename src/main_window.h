@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -144,6 +143,14 @@ private slots:
     void on_actionCPU_Logging_Start_triggered();
 
     void on_actionCPU_Logging_Stop_triggered();
+
+    void on_actionGEO_512KiB_triggered();
+
+    void on_actionGEO_1024KiB_triggered();
+
+    void on_actionGEO_2048KiB_triggered();
+
+    void on_actionGEO_4096KiB_triggered();
 
 private:
     /// Funktionen ///

@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -134,6 +133,10 @@ MainWindow::~MainWindow()
 
         ini->beginGroup("Sound");
         ini->setValue("SoundBufferSize",soundbuffer_size);
+        ini->endGroup();
+
+        ini->beginGroup("GeoRAM");
+        ini->setValue("GeoRamMode", c64->GetGeoRamMode());
         ini->endGroup();
     }
     /////////////////////////////////////
@@ -582,7 +585,6 @@ int MainWindow::OnInit(bool nogui)
         int c64_key_table_size = c64->GetC64KeyTableSize();
 
         ini->beginGroup("C64KeyMapping");
-
         for(int i=0; i<c64_key_table_size; i++)
         {
             QString name = "C64_KEY_" + QVariant(i).toString();
@@ -595,7 +597,27 @@ int MainWindow::OnInit(bool nogui)
         }
 
         LogText(tr(">> C64 Tastatur Mapping aus INI geladen\n").toUtf8());
+        ini->endGroup();
 
+        ini->beginGroup("GeoRAM");
+        uint8_t geo_ram_mode = ini->value("GeoRamMode", 0).toUInt();
+        switch (geo_ram_mode)
+        {
+        case _512KiB:
+            on_actionGEO_512KiB_triggered();
+            break;
+        case _1024KiB:
+            on_actionGEO_1024KiB_triggered();
+            break;
+        case _2048KiB:
+            on_actionGEO_2048KiB_triggered();
+            break;
+        case _4096KiB:
+            on_actionGEO_4096KiB_triggered();
+            break;
+        default:
+            break;
+        }
         ini->endGroup();
     }
 
@@ -892,8 +914,31 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             cartridge_window->DisconnectCrt();
             break;
 		case CMD_ENABLE_GEORAM:
-			c64->InsertGEORAM();
-			break;
+            c64->InsertGeoRam();
+            break;
+        case CMD_SET_GEORAM_SIZE:
+            val = cmd_line->GetArgInt(i+1, &error);
+            if(error) break;
+
+            switch(val)
+            {
+            case 512:
+                on_actionGEO_512KiB_triggered();
+                break;
+            case 1024:
+                on_actionGEO_1024KiB_triggered();
+                break;
+            case 2048:
+                on_actionGEO_2048KiB_triggered();
+                break;
+            case 4096:
+                on_actionGEO_4096KiB_triggered();
+                break;
+            default:
+                std::cout << "Ungültige GeoRAM Speichergröße. (512, 1024, 2048, 4096)" << std::endl;
+                break;
+            }
+            break;
 		case CMD_ENABLE_REU:
 			c64->InsertREU();
 			break;
@@ -1412,23 +1457,63 @@ void MainWindow::on_actionREU_loeschen_triggered()
 
 void MainWindow::on_actionGEO_einstecken_triggered()
 {
-    c64->InsertGEORAM();
+    c64->InsertGeoRam();
     c64->SetFocusToC64Window();
 }
 
 void MainWindow::on_actionGEO_entfernen_triggered()
 {
-    c64->RemoveGEORAM();
+    c64->RemoveGeoRam();
     c64->SetFocusToC64Window();
 }
 
 void MainWindow::on_actionGEO_laden_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this,tr("GEORAM Inhalt laden"),QDir::homePath(),tr("GEORAM Image Dateien") + "(*.img);;" + tr("Alle Dateien") + "(*.*)",nullptr,QFileDialog::DontUseNativeDialog);
+    uint8_t georam_mode = c64->GetGeoRamMode();
+
+    ini->beginGroup("GeoRAM");
+    QString geo_ram_image_path = ini->value("GeoRamLastImageDir", QDir::homePath()).toString();
+    ini->endGroup();
+
+    QString filename = QFileDialog::getOpenFileName(this,tr("GEORAM Inhalt laden"), geo_ram_image_path, tr("GEORAM Image Dateien") + "(*.img);;" + tr("Alle Dateien") + "(*.*)",nullptr,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
-        if(c64->LoadGEORAMImage(filename.toLocal8Bit()) != 0)
+        ini->beginGroup("GeoRAM");
+        QFileInfo file_info(filename);
+        ini->setValue("GeoRamLastImageDir", file_info.absolutePath());
+        ini->endGroup();
+
+        if(c64->LoadGeoRamImage(filename.toLocal8Bit()) != 0)
             QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des GEORAM Images trat ein Fehler auf!"));
+        else if(georam_mode != c64->GetGeoRamMode())
+        {
+            QString GeoRamSizeStr;
+
+            switch (c64->GetGeoRamMode())
+            {
+            case _512KiB:
+                GeoRamSizeStr = "512KiB";
+                on_actionGEO_512KiB_triggered();
+                break;
+            case _1024KiB:
+                GeoRamSizeStr = "1024KiB";
+                on_actionGEO_1024KiB_triggered();
+                break;
+            case _2048KiB:
+                GeoRamSizeStr = "2048KiB";
+                on_actionGEO_2048KiB_triggered();
+                break;
+            case _4096KiB:
+                GeoRamSizeStr = "4096KiB";
+                on_actionGEO_4096KiB_triggered();
+                break;
+            default:
+                GeoRamSizeStr = "512KiB";
+                on_actionGEO_512KiB_triggered();
+                break;
+            }
+            QMessageBox::information(this,tr("Emu64 Info ..."),tr("Es wurde die Speichergröße der GEORAM auf ") + GeoRamSizeStr + tr(" geändert."));
+        }
     }
 }
 
@@ -1444,7 +1529,7 @@ void MainWindow::on_actionGEO_speichern_triggered()
     if(!CustomSaveFileDialog::GetSaveFileName(this,tr("GEORAM Inhalt speichern"), filters, &filename, &fileext))
         return;
 
-    if(c64->SaveGEORAMImage(filename.toLocal8Bit()) != 0)
+    if(c64->SaveGeoRamImage(filename.toLocal8Bit()) != 0)
         QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des GEORAM Images trat ein Fehler auf!"));
 }
 
@@ -1452,7 +1537,7 @@ void MainWindow::on_actionGEO_loeschen_triggered()
 {
     if(QMessageBox::Yes == QMessageBox::question(this,tr("GEORAM Speicher löschen ..."),tr("Möchten Sie den Inhalt des GEORAM Speichers wirklich löschen?"),QMessageBox::Yes | QMessageBox::No))
     {
-        c64->ClearGEORAMRam();
+        c64->ClearGeoRam();
     }
 }
 
@@ -1517,5 +1602,49 @@ void MainWindow::on_actionCPU_Logging_Start_triggered()
 void MainWindow::on_actionCPU_Logging_Stop_triggered()
 {
     c64->StopDebugLogging();
+}
+
+
+void MainWindow::on_actionGEO_512KiB_triggered()
+{
+    ui->actionGEO_512KiB->setChecked(true);
+    ui->actionGEO_1024KiB->setChecked(false);
+    ui->actionGEO_2048KiB->setChecked(false);
+    ui->actionGEO_4096KiB->setChecked(false);
+
+    c64->SetGeoRamMode(_512KiB);
+}
+
+
+void MainWindow::on_actionGEO_1024KiB_triggered()
+{
+    ui->actionGEO_512KiB->setChecked(false);
+    ui->actionGEO_1024KiB->setChecked(true);
+    ui->actionGEO_2048KiB->setChecked(false);
+    ui->actionGEO_4096KiB->setChecked(false);
+
+    c64->SetGeoRamMode(_1024KiB);
+}
+
+
+void MainWindow::on_actionGEO_2048KiB_triggered()
+{
+    ui->actionGEO_512KiB->setChecked(false);
+    ui->actionGEO_1024KiB->setChecked(false);
+    ui->actionGEO_2048KiB->setChecked(true);
+    ui->actionGEO_4096KiB->setChecked(false);
+
+    c64->SetGeoRamMode(_2048KiB);
+}
+
+
+void MainWindow::on_actionGEO_4096KiB_triggered()
+{
+    ui->actionGEO_512KiB->setChecked(false);
+    ui->actionGEO_1024KiB->setChecked(false);
+    ui->actionGEO_2048KiB->setChecked(false);
+    ui->actionGEO_4096KiB->setChecked(true);
+
+    c64->SetGeoRamMode(_4096KiB);
 }
 

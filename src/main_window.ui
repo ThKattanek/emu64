@@ -219,10 +219,21 @@ background-position: center
       <string>Emuliert eine komplette GEO- bzw NEO-RAM mit 2 MB</string>
      </property>
      <property name="title">
-      <string>GEO- / NEO-RAM (2MB)</string>
+      <string>GEO- / NEO-RAM</string>
      </property>
+     <widget class="QMenu" name="menuSpeichergr_e">
+      <property name="title">
+       <string>Speichergröße</string>
+      </property>
+      <addaction name="actionGEO_512KiB"/>
+      <addaction name="actionGEO_1024KiB"/>
+      <addaction name="actionGEO_2048KiB"/>
+      <addaction name="actionGEO_4096KiB"/>
+     </widget>
      <addaction name="actionGEO_einstecken"/>
      <addaction name="actionGEO_entfernen"/>
+     <addaction name="separator"/>
+     <addaction name="menuSpeichergr_e"/>
      <addaction name="separator"/>
      <addaction name="actionGEO_laden"/>
      <addaction name="actionGEO_speichern"/>
@@ -865,6 +876,41 @@ background-position: center
   <action name="actionCPU_Logging_Stop">
    <property name="text">
     <string>CPU Logging Stop</string>
+   </property>
+  </action>
+  <action name="actionGEO_512KiB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>512KiB</string>
+   </property>
+  </action>
+  <action name="actionGEO_1024KiB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>1024KiB</string>
+   </property>
+  </action>
+  <action name="actionGEO_2048KiB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>2048KiB</string>
+   </property>
+  </action>
+  <action name="actionGEO_4096KiB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>4096KiB</string>
    </property>
   </action>
  </widget>

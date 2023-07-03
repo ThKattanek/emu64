@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -138,11 +137,13 @@ public:
     int SaveREUImage(const char *filename);
     void ClearREURam();
 
-    void InsertGEORAM();
-    void RemoveGEORAM();
-    int LoadGEORAMImage(const char *filename);
-    int SaveGEORAMImage(const char *filename);
-    void ClearGEORAMRam();
+    void InsertGeoRam();
+    void RemoveGeoRam();
+    int LoadGeoRamImage(const char *filename);
+    int SaveGeoRamImage(const char *filename);
+    void ClearGeoRam();
+    uint8_t GetGeoRamMode();
+    void SetGeoRamMode(uint8_t mode);
 
     void SetMouse1351Port(uint8_t port);
 
