@@ -3118,12 +3118,12 @@ void C64Class::RemoveGeoRam()
 
 int C64Class::LoadGeoRamImage(const char *filename)
 {
-    return geo->LoadImage(filename);
+    return geo->LoadRamImage(filename);
 }
 
 int C64Class::SaveGeoRamImage(const char *filename)
 {
-    return geo->SaveImage(filename);
+    return geo->SaveRamImage(filename);
 }
 
 void C64Class::ClearGeoRam()

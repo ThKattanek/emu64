@@ -37,7 +37,7 @@ void GEORAMClass::Remove(void)
     geo_ram_insert = false;
 }
 
-int GEORAMClass::LoadImage(const char *filename)
+int GEORAMClass::LoadRamImage(const char *filename)
 {
     /// load georam image ...
     FILE* file;
@@ -92,7 +92,7 @@ int GEORAMClass::LoadImage(const char *filename)
     return 0;
 }
 
-int GEORAMClass::SaveImage(const char *filename)
+int GEORAMClass::SaveRamImage(const char *filename)
 {
     /// save georam image ...
     FILE* file;

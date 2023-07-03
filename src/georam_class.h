@@ -40,8 +40,8 @@ class GEORAMClass
 
     void Remove(void);
     void Insert(void);
-    int LoadImage(const char *filename);
-    int SaveImage(const char *filename);
+    int LoadRamImage(const char *filename);
+    int SaveRamImage(const char *filename);
     void ClearRAM(void);
     void SetGeoRamType(uint8_t type);   // _GEORAM or _NEORAM
     uint8_t GetGeoRamMode();            // return _512, _1024, _2048, 4096
