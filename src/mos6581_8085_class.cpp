@@ -63,7 +63,6 @@ MOS6581_8085::MOS6581_8085(int nummer,int samplerate,int puffersize,int *error)
     interpolate(f0_points_8580, f0_points_8580+ sizeof(f0_points_8580)/sizeof(*f0_points_8580) - 1,PointPlotter<int>(f0_8580), 1.0);
 	
     SoundOutputEnable=false;
-    SetChipType(0);
 
     this->CycleExact=false;
 
@@ -83,7 +82,11 @@ MOS6581_8085::MOS6581_8085(int nummer,int samplerate,int puffersize,int *error)
     Recording = false;
     RecSampleCounter = 0;
 
+    FilterResonanz = 0;
+
+    SetChipType(0);
     Reset();
+
     *error = 0;
 }
 
