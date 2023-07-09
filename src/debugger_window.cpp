@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 21.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,9 +17,7 @@
 
 #include "./debugger_window.h"
 #include "./ui_debugger_window.h"
-#include "./micro_code_tbl_6510.h"
 #include "./micro_code_string_tbl_6510.h"
-#include "qdebug.h"
 
 DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     QDialog(parent),
@@ -40,6 +37,17 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
 
     old_adresse = 0;
     old_make_idx = 0;
+
+    c64_cpu_reg = {0,0,0,0,0,0,0,0,0,0,0};
+    c64_cpu_ireg = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+    c64_cpu_ireg.current_opcode = 0;
+
+    for(int i=0; i<MAX_FLOPPY_NUM; i++)
+    {
+        floppy_cpu_reg[i] = {0,0,0,0,0,0,0,0,0,0,0};
+        floppy_cpu_ireg[i] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    }
 
     ui->setupUi(this);
 

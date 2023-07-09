@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek       	//
 //                                              //
-// Letzte Änderung am 18.08.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -75,6 +74,8 @@ C64KeyboardWindow::C64KeyboardWindow(QWidget *parent, QSettings *ini, C64Class *
     rec_key_press = false;
     rec_key_curr_x = 0xFF;
     rec_key_curr_y = 0xFF;
+
+    rec_time_out = 0;
 
     key_matrix_to_port_a = nullptr;
     key_matrix_to_port_b = nullptr;

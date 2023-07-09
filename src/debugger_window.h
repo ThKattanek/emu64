@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 18.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -27,7 +26,6 @@
 #include "./c64_class.h"
 #include "./custom_save_file_dialog.h"
 #include "./label_widget_mod.h"
-#include "./cpu_info.h"
 #include "./memory_window.h"
 #include "./debugger_vic_window.h"
 #include "./debugger_iec_window.h"
