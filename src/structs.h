@@ -8,8 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.06.2023                //
-// www.emu64.de                                 //
+// https://github.com/ThKattanek/emu64          //
 //                                              //
 //////////////////////////////////////////////////
 
@@ -107,37 +106,37 @@ typedef enum KeyStatus
 
 struct REG_STRUCT
 {
-    uint8_t     reg_mask;
-    uint16_t    pc;
-    uint8_t     ac;
-    uint8_t     xr;
-    uint8_t     yr;
-    uint8_t     sp;
-    uint8_t     sr;
-    uint16_t    irq;
-    uint16_t    nmi;
-    uint16_t    _0314;
-    uint16_t    _0318;
+    uint8_t     reg_mask = 0;
+    uint16_t    pc = 0;
+    uint8_t     ac = 0;
+    uint8_t     xr = 0;
+    uint8_t     yr = 0;
+    uint8_t     sp = 0;
+    uint8_t     sr = 0;
+    uint16_t    irq = 0;
+    uint16_t    nmi = 0;
+    uint16_t    _0314 = 0;
+    uint16_t    _0318 = 0;
 };
 
 struct IREG_STRUCT
 {
-    uint8_t   pointer;
-    uint16_t  address;
-    uint16_t  branch_address;
-    uint16_t  current_opcode_pc;
-    uint16_t  current_opcode;
-    uint8_t   current_micro_code;
-    uint8_t   tmp_byte;
-    bool      irq;
-    bool      nmi;
-    bool      rdy;
-    bool      reset;
-    bool      cpu_wait;
-    bool      jam_flag;
-    uint32_t  cycle_counter;
-    bool      exrom;
-    bool      game;
+    uint8_t   pointer = 0;
+    uint16_t  address = 0;
+    uint16_t  branch_address = 0;
+    uint16_t  current_opcode_pc = 0;
+    uint16_t  current_opcode = 0;
+    uint8_t   current_micro_code = 0;
+    uint8_t   tmp_byte = 0;
+    bool      irq = false;
+    bool      nmi = false;
+    bool      rdy = false;
+    bool      reset = false;
+    bool      cpu_wait = false;
+    bool      jam_flag = false;
+    uint32_t  cycle_counter = 0;
+    bool      exrom = false;
+    bool      game = false;
 };
 
 struct VIC_STRUCT

@@ -8,8 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.03.2022                //
-// www.emu64.de                                 //
+// https://github.com/ThKattanek/emu64          //
 //                                              //
 //////////////////////////////////////////////////
 
@@ -83,8 +82,8 @@ private:
     bool MotorLED;
     bool RWLED;
 
-    unsigned char old_Sektor;
-    unsigned char old_Spur;
+    uint8_t old_Sektor;
+    uint8_t old_Spur;
 
     QString AktFileName;
 };

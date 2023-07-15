@@ -8,7 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// www.emu64.de                                 //
+// https://github.com/ThKattanek/emu64          //
 //                                              //
 //////////////////////////////////////////////////
 
@@ -355,7 +355,7 @@ void DebuggerWindow::UpdateRegister()
 {
     if(c64 == nullptr) return;
 
-    char str00[1024];
+    char str00[1024] = "";
 
     if(current_source > 0)
     {
