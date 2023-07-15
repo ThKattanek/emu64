@@ -8,8 +8,7 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 12.03.2022                //
-// www.emu64.de                                 //
+// https://github.com/ThKattanek/emu64          //
 //                                              //
 //////////////////////////////////////////////////
 
@@ -30,6 +29,10 @@ WidgetFloppyStatus::WidgetFloppyStatus(QWidget *parent, int floppy_nr, Floppy154
 {
     FloppyNr = floppy_nr;
     floppy = _floppy;
+
+    old_Sektor = 255;
+    old_Spur = 255;
+
     ui->setupUi(this);
 
     QFontDatabase fontDB;

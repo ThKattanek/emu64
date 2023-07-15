@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -28,6 +27,8 @@ MMU::MMU(void)
     SidIOReadProc = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
     Cia1IOReadProc = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
     Cia2IOReadProc = std::bind(&MMU::ReadRam,this,std::placeholders::_1);
+
+    MEMORY_MAP = MEMORY_MAP_OLD = 0;
 
     InitProcTables();
 

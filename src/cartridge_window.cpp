@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 23.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -20,7 +19,6 @@
 #include "./cartridge_window.h"
 #include "./ui_cartridge_window.h"
 #include "./utils.h"
-#include "qdebug.h"
 
 CartridgeWindow::CartridgeWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QString tmp_path) :
     QDialog(parent),
@@ -40,6 +38,9 @@ CartridgeWindow::CartridgeWindow(QWidget *parent, QSettings *_ini, C64Class *c64
     LedRedOn = new QIcon(":/grafik/red_led_on.png");
     ui->FC3_LED->setIcon(*LedRedOff);
     ui->EF_LED->setIcon(*LedRedOff);
+
+    for(int i=0; i<LED_NUM; i++)
+        LedStatus[i] = LedStatusOld[i] = false;
 
     ui->PageEasyFlash->setEnabled(false);
     ui->PageFC->setEnabled(false);

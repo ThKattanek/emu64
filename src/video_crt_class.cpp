@@ -60,6 +60,8 @@ VideoCrtClass::VideoCrtClass()
     origin = sector/2.0f;
     radian = static_cast<float>(MATH_PI)/180.0f;
 
+    phase_alternating_line = 0;
+
     enable_pal_delay_line = false;
     pal_delay_line_u_only = false;
 

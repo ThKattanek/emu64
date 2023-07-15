@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.06.2023	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -128,6 +127,8 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
     SoundBufferSize = buffersize;
     SoundBuffer = new short[SoundBufferSize*2];
     for(int i=0;i<SoundBufferSize*2;i++) SoundBuffer[i] = 0;
+
+    memset(Breakpoints, 0, sizeof Breakpoints);
 }
 
 Floppy1541::~Floppy1541()
