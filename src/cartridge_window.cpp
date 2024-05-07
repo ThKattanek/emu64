@@ -32,6 +32,7 @@ CartridgeWindow::CartridgeWindow(QWidget *parent, QSettings *_ini, C64Class *c64
 
     ui->setupUi(this);
 
+    ui->ExportChip->setDisabled(true);
     ui->FileBrowser->SetTempDir(tmp_path);
 
     LedRedOff = new QIcon(":/grafik/red_led_off.png");
@@ -250,6 +251,8 @@ void CartridgeWindow::onSelectFile(QString filename)
 		{
 		case 0:
 			CRTIsSelected = true;
+            ui->ExportChip->setDisabled(false);
+
 			SelCRTFileName = filename;
 
 			ui->CRTInfo->topLevelItem(0)->setText(1,crt_info.Name);
@@ -345,14 +348,17 @@ void CartridgeWindow::onSelectFile(QString filename)
 			break;
 		case 1:
 			CRTIsSelected = false;
+            ui->ExportChip->setDisabled(true);
 			/* Fehler beim öffnene */
 			break;
 		case 2:
 			CRTIsSelected = false;
-			/* Unbekanntes Format */
+            ui->ExportChip->setDisabled(true);
+            /* Unbekanntes Format */
 			break;
 		case 3:
 			CRTIsSelected = false;
+            ui->ExportChip->setDisabled(true);
 			/* Kein ROM Image */
 			break;
 		}
@@ -517,3 +523,31 @@ void CartridgeWindow::on_FreezButtonAR_clicked()
 {
     crt->Freeze();
 }
+
+void CartridgeWindow::on_ExportChip_clicked()
+{
+    QString filename;
+    QString fileext;
+
+    QStringList filters;
+    filters << tr("ChipRom Datei (*.bin)")
+            << tr("Alle Dateien (*.*)");
+
+    if(!CustomSaveFileDialog::GetSaveFileName(this, tr("ChipRom speichern"), filters, &filename, &fileext))
+    {
+        return;
+    }
+
+    int chip_nr = ui->ChipList->currentIndex().row();
+
+    uint8_t *ChipRom = crt_info.ChipInfo[chip_nr].BufferPointer;
+    int ChipSize = crt_info.ChipInfo[chip_nr].ChipSize;
+
+    FILE *file = qfopen(filename, "wb");
+    if(file != nullptr)
+    {
+        fwrite(ChipRom, ChipSize, 1, file);
+        fclose(file);
+    }
+}
+

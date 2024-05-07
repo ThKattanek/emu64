@@ -63,7 +63,7 @@
         <height>0</height>
        </size>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -207,7 +207,7 @@
         <height>0</height>
        </size>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -296,7 +296,7 @@
       <property name="enabled">
        <bool>true</bool>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -461,6 +461,13 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QPushButton" name="ExportChip">
+       <property name="text">
+        <string>Export Chip</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item row="0" column="0" rowspan="2" colspan="3">
@@ -505,6 +512,11 @@
      <property name="itemsExpandable">
       <bool>true</bool>
      </property>
+     <column>
+      <property name="text">
+       <string notr="true">1</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item row="1" column="3">
@@ -530,6 +542,11 @@
      <property name="indentation">
       <number>0</number>
      </property>
+     <column>
+      <property name="text">
+       <string notr="true">1</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item row="3" column="0" colspan="5">
