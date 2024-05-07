@@ -21,6 +21,7 @@
 #include <QTimer>
 
 #include "./cartridge_class.h"
+#include "./custom_save_file_dialog.h"
 #include "./c64_class.h"
 #include "./structs.h"
 
@@ -60,6 +61,8 @@ private slots:
     void onSelectFile(QString filename);
     void onChipList_currentChanged(const QModelIndex &current, const QModelIndex &previous);
     void onTimer1();
+
+    void on_ExportChip_clicked();
 
 private:
     Ui::CartridgeWindow *ui;
