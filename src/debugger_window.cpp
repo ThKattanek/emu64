@@ -846,7 +846,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
             break;
         case 9:
             tmp1 = ram1;
-            word = (pc+2)+tmp1;
+            word = (pc+2)+(char)tmp1;
             sprintf(str00,"$%4.4X",word);
             disass_addressing[i]->setText(str00);
 
