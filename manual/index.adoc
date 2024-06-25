@@ -1,8 +1,8 @@
 = Emu64 Handbuch
 include::settings.adoc[]
+:toc:
 :title-logo-image: image:emu64_logo.png[align=right, pdfwidth=8cm]
 Author Thorsten Kattanek
-v1.0, 2024-06-25
+v-.-, 2024-06-25
 
-:toc:
 include::einfuehrung.adoc[]
