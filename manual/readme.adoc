@@ -3,6 +3,6 @@
 :imagesdir: images
 
 == Test1
-image:emu64_logo_120_120.png
+image:emu64_logo_120_120.png[]
 
 == Test2
