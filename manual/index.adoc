@@ -1,19 +1,8 @@
-= Emu64 Anleitung!
+= Emu64 Handbuch
+include::settings.adoc[]
+:title-logo-image: image:emu64_logo.png[align=right, pdfwidth=8cm]
+Author Thorsten Kattanek
+v1.0, 2024-06-25
 
-This is an interactive editor.
-Use it to try https://github.com/ThKattanek/emu64[Emu64 Github].
-
-== Section Title
-
-* A list item
-* Another list item
-
-[,c++]
-----
-int main()
-{
-    return 0;
-}
-----
-
-image::images/emu64_logo_120_120.png[]
+:toc:
+include::einfuehrung.adoc[]

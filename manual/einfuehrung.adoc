@@ -1,0 +1,19 @@
+== Einführung
+=== Vorwort
+Emu64 ist ein reines Hobby Projekt und wird von mir ständig weiterentwickelt. Der Emu64 erblickte 1994 das erste Mal das Licht der Welt. Damals wurde der Emu64 100% in Assembler für DOS programmiert. Nachdem Windows95 auf dem Markt kam, wurde aus Assembler ... C++. Damit wird auch heute noch der Emu64 programmiert. Neben der Kompatibilität ist das größte Ziel die Benutzerfreundlichkeit dieses C64 Emulators.
+
+=== Willkommen bei Emu64
+
+ Das ist ei Zitat
+ sdkaölsdk
+
+Hier ist alles wieder Normal. Du wichser :-)
+
+=== Etwas Code
+[, c++]
+----
+void main()
+{
+    cout << "Hello, World!" << endl;
+}
+----

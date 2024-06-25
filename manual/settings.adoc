@@ -1,0 +1,5 @@
+:lang: de
+ifdef::lang[include::locale/attributes-{lang}.adoc[]]
+:doctype: book
+:source-highlighter: rouge
+:imagesdir: images
