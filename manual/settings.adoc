@@ -1,5 +1,10 @@
 :lang: de
 ifdef::lang[include::locale/attributes-{lang}.adoc[]]
+// Ausgabe in Buchformat
 :doctype: book
+// Aktiviert die Kapitel Numerierung
+:sectnums:
+// ruby-rouge Syntaxhighlighter aktivieren
 :source-highlighter: rouge
+// Image Verzeichnis setzen
 :imagesdir: images
