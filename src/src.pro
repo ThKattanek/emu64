@@ -310,6 +310,7 @@ win32 {
     gfx.path = $$PREFIX/gfx
     txt.path = $$PREFIX
     languages.path = $$PREFIX/languages
+    manual.path = $$PREFIX/manual
 } else {
     target.path = $$PREFIX/bin
     roms.path = $$PREFIX/share/$$TARGET/roms
@@ -317,6 +318,7 @@ win32 {
     gfx.path = $$PREFIX/share/$$TARGET/gfx
     txt.path = $$PREFIX/share/doc/$$TARGET
     languages.path = $$PREFIX/share/$$TARGET/languages
+    manual.path = $$PREFIX/share/$$TARGET/manual
     desktop.path = $$PREFIX/share/applications
     icons.path = $$PREFIX/share/icons/hicolor/64x64/apps
 }
@@ -349,6 +351,11 @@ languages.CONFIG += nostrip
 languages.files += ../grafik/flaggen/emu64_de.png
 languages.files += ../grafik/flaggen/emu64_en.png
 
+# Manual
+manual.CONFIG += nostrip
+manual.files += ../manual/index.html
+manual.files += ../manual/images
+
 # Linux Install Startmenü Eintrag
 ## /usr/local/share/icons/hicolor/64x64/apps/
 linux
@@ -369,7 +376,7 @@ win32 {
     languages.extra += $(INSTALL_FILE) .qm/emu64_en.qm $(INSTALL_ROOT)$$languages.path;
 }
 
-INSTALLS += target roms floppy_sounds gfx txt languages icons desktop
+INSTALLS += target roms floppy_sounds gfx txt languages icons desktop manual
 }
 
 DISTFILES += \

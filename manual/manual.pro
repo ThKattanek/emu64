@@ -3,7 +3,7 @@
 # // Emu64                                        //
 # // von Thorsten Kattanek                        //
 # //                                              //
-# // #file: emu64.pro	                          //
+# // #file: manual.pro                            //
 # //                                              //
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
@@ -13,21 +13,9 @@
 # //                                              //
 # //////////////////////////////////////////////////
 
-TEMPLATE = subdirs
+DISTFILES += \
+	images/* \
+	locale/attributes-de.adoc \
+	*.adoc
 
-  SUBDIRS = emu64\
-	    manual
-
-  emu64.subdir = src
-  manual.subdir = manual
-
-  CONFIG += ordered
-
-# Example for more subdirs
-# SUBDIRS = src1\
-#            src2
-#
-# src1.subdir = src1
-# src2.subdir = src2
-#
-# app.depends = src1 src2
+system(asciidoctor index.adoc)
