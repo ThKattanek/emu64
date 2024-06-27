@@ -294,9 +294,8 @@ RC_FILE += emu64.rc
 
 DISTFILES += ../manual/*.adoc
 
-# Manual Rendern als HTML mit AsciiDoc
-
-system(asciidoctor ../manual/index.adoc)
+# Manual Rendern als HTML mit AsciiDoctor-PDF
+system(asciidoctor-pdf ../manual/index.adoc -o ../manual/emu64_manual_de.pdf)
 
 # Installation
 
@@ -358,8 +357,7 @@ languages.files += ../grafik/flaggen/emu64_en.png
 
 # Manual
 manual.CONFIG += nostrip
-manual.files += ../manual/index.html
-manual.files += ../manual/images
+manual.files += ../manual/emu64_manual_de.pdf
 
 # Linux Install Startmenü Eintrag
 ## /usr/local/share/icons/hicolor/64x64/apps/

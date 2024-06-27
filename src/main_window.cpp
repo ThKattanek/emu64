@@ -1661,8 +1661,6 @@ void MainWindow::on_actionGEO_4096KiB_triggered()
 
 void MainWindow::on_actionHandbuch_triggered()
 {
-    qDebug() << QString(manualPath + "/manual/index.html");
-
-    QDesktopServices::openUrl(QUrl(manualPath + "/manual/index.html"));
+    QDesktopServices::openUrl(QUrl(manualPath + "/manual/emu64_manual_de.pdf"));
 }
 
