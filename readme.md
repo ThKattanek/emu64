@@ -16,6 +16,7 @@ Emu64 auf Facebook: [https://www.facebook.com/Emu64-103321833093172](https://www
 
 ### Wichtige Vorraussetzung
 - qttools5-dev
+- asciidoctor
 
 ### Benötigte Libs 
 - qt5
