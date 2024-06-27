@@ -15,11 +15,9 @@
 
 TEMPLATE = subdirs
 
-  SUBDIRS = emu64\
-	    manual
+  SUBDIRS = emu64
 
   emu64.subdir = src
-  manual.subdir = manual
 
   CONFIG += ordered
 

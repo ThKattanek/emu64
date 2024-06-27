@@ -292,6 +292,12 @@ TRANSLATIONS += emu64_en.ts \
 RESOURCES += emu64.qrc
 RC_FILE += emu64.rc
 
+DISTFILES += ../manual/*.adoc
+
+# Manual Rendern als HTML mit AsciiDoc
+
+system(asciidoctor ../manual/index.adoc)
+
 # Installation
 
 message(Installpath: $$PREFIX)
