@@ -199,17 +199,26 @@ int MainWindow::OnInit(bool nogui)
 
 #ifdef _WIN32
     if(custom_dataPath == "")
-        dataPath = QApplication::applicationDirPath();
+        dataPath = manualPath = QApplication::applicationDirPath();
+
     else
-        dataPath = custom_dataPath;
+        dataPath = manualPath = custom_dataPath;
 #else
     if(custom_dataPath == "")
     {
         dataPath = DATA_PATH;
         dataPath += "/share/emu64";
+
+        manualPath = DATA_PATH;
+        manualPath += "/share/doc/emu64";
     }
     else
+    {
         dataPath = custom_dataPath;
+
+        manualPath = custom_dataPath;
+        manualPath += "/../doc/emu64";
+    }
 #endif
     LogText((QString(">> Data Path = ") + dataPath + QString("\n")).toUtf8());
 
@@ -1652,8 +1661,8 @@ void MainWindow::on_actionGEO_4096KiB_triggered()
 
 void MainWindow::on_actionHandbuch_triggered()
 {
-    qDebug() << QString(dataPath + "/manual/index.html");
+    qDebug() << QString(manualPath + "/manual/index.html");
 
-    QDesktopServices::openUrl(QUrl(dataPath + "/manual/index.html"));
+    QDesktopServices::openUrl(QUrl(manualPath + "/manual/index.html"));
 }
 

@@ -8,7 +8,6 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 24.06.2023                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -318,7 +317,7 @@ win32 {
     gfx.path = $$PREFIX/share/$$TARGET/gfx
     txt.path = $$PREFIX/share/doc/$$TARGET
     languages.path = $$PREFIX/share/$$TARGET/languages
-    manual.path = $$PREFIX/share/$$TARGET/manual
+    manual.path = $$PREFIX/share/doc/$$TARGET/manual
     desktop.path = $$PREFIX/share/applications
     icons.path = $$PREFIX/share/icons/hicolor/64x64/apps
 }
