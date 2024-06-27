@@ -742,7 +742,7 @@ background-position: center
   </action>
   <action name="actionHandbuch">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="icon">
     <iconset resource="emu64.qrc">

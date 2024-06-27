@@ -152,6 +152,8 @@ private slots:
 
     void on_actionGEO_4096KiB_triggered();
 
+    void on_actionHandbuch_triggered();
+
 private:
     /// Funktionen ///
     void changeEvent(QEvent *event);  

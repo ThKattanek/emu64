@@ -14,6 +14,7 @@
 
 #include <QScreen>
 #include <QStyle>
+#include <QDesktopServices>
 
 #include "./main_window.h"
 #include "./ui_main_window.h"
@@ -1646,5 +1647,13 @@ void MainWindow::on_actionGEO_4096KiB_triggered()
     ui->actionGEO_4096KiB->setChecked(true);
 
     c64->SetGeoRamMode(_4096KiB);
+}
+
+
+void MainWindow::on_actionHandbuch_triggered()
+{
+    qDebug() << QString(dataPath + "/manual/index.html");
+
+    QDesktopServices::openUrl(QUrl(dataPath + "/manual/index.html"));
 }
 
