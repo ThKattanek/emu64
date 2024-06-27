@@ -21,8 +21,8 @@
 #include <QTimer>
 
 #include "./cartridge_class.h"
-#include "./custom_save_file_dialog.h"
 #include "./c64_class.h"
+#include "./custom_save_file_dialog.h"
 #include "./structs.h"
 
 #include "./cartridge_new_easyflash_window.h"
