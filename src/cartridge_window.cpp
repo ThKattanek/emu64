@@ -537,6 +537,7 @@ void CartridgeWindow::on_ExportChip_clicked()
     {
         return;
     }
+    return;
 
     int chip_nr = ui->ChipList->currentIndex().row();
 
