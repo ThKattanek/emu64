@@ -8,3 +8,5 @@ public_release
 appimage
 *.autosave
 CMakeLists.txt.user.*
+manual/index.html
+manual/index.pdf
