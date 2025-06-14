@@ -62,7 +62,7 @@ uint8_t AM29F040Class::Read(uint32_t address)
         case STATUS_SECTOR_ERASE:
             /* TODO return write operation status. Until alarms are introduced, just reset the state and fall through */
             status = STATUS_READ;
-
+            break;
         [[clang::fallthrough]]; default:
             /* The state doesn't reset if a read occurs during a command sequence */
             /* fall through */
