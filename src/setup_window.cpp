@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -264,6 +263,10 @@ void SetupWindow::LoadINI(C64Class *c64)
         ui->SIDVolume->setValue(value);
         c64->SetSIDVolume(value / 100.0);
 
+        value =ini->value("SoundBufferSize",512).toInt();
+        ui->SoundBufferSizeValue->setValue(value);
+        //c64->SetSoundBufferSize(value);
+
         ini->endGroup();
 
         ini->beginGroup("SID");
@@ -444,6 +447,7 @@ void SetupWindow::SaveINI()
 
         ini->beginGroup("Sound");
         ini->setValue("SIDVolume",ui->SIDVolume->value());
+        ini->setValue("SoundBufferSize",ui->SoundBufferSizeValue->value());
         ini->endGroup();
 
         ini->beginGroup("SID");
@@ -1156,5 +1160,8 @@ void SetupWindow::OnChangeUserColor(int color_number, QColor color)
 	video_crt_output->SetUserPaletteColor(color_number, color.red(), color.green(), color.blue());
 }
 
-
+void SetupWindow::on_SounbufferChange_clicked()
+{
+    QMessageBox::information(this,tr("Soundbuffer Größe"),tr("Die Soundbuffer Größe kann nur beim Starten des C64 emulators geändert werden.\n\nBitte starten Sie den C64 Emulator neu, damit die Änderung wirksam wird."));
+}
 
