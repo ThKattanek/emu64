@@ -23,7 +23,7 @@
       <bool>true</bool>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -53,7 +53,7 @@
             <x>0</x>
             <y>0</y>
             <width>509</width>
-            <height>671</height>
+            <height>672</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -377,7 +377,7 @@
             <x>0</x>
             <y>0</y>
             <width>509</width>
-            <height>671</height>
+            <height>672</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -445,6 +445,45 @@
             </widget>
            </item>
            <item>
+            <widget class="QGroupBox" name="groupBox_5">
+             <property name="title">
+              <string>Soundpuffer Größe</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <widget class="QSpinBox" name="SoundBufferSizeValue">
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>4096</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="SounbufferChange">
+                <property name="text">
+                 <string>Übernehmen</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_9">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <spacer name="verticalSpacer_2">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -482,7 +521,7 @@
             <x>0</x>
             <y>0</y>
             <width>509</width>
-            <height>671</height>
+            <height>672</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_7">
@@ -783,7 +822,7 @@
             <x>0</x>
             <y>0</y>
             <width>509</width>
-            <height>671</height>
+            <height>672</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_13">

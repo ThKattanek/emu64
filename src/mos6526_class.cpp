@@ -270,7 +270,7 @@ inline void MOS6526::TimerCount()
 	{
         case WAIT_THEN_COUNT:
             timer_a_status = COUNT;
-        [[clang::fallthrough]]; case STOP:
+        [[fallthrough]]; case STOP:
             goto TimerA_Idle;
 		case LOAD_THEN_STOP:
             timer_a_status = STOP;
@@ -372,7 +372,7 @@ TimerA_Idle:
 	{
         case WAIT_THEN_COUNT:
             timer_b_status = COUNT;
-        [[clang::fallthrough]]; case STOP:
+        [[fallthrough]]; case STOP:
             goto TimerB_Idle;
 		case LOAD_THEN_STOP:
             timer_b_status = STOP;
