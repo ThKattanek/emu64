@@ -80,12 +80,15 @@ private:
     bool OpenVideo(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
     AVFrame* AllocPicture(enum AVPixelFormat pix_fmt, int width, int height);
     bool OpenAudio(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
+
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+    AVFrame* AllocAudioFrame(enum AVSampleFormat sample_fmt, const AVChannelLayout *ch_layout, int sample_rate, int nb_samples);
+#else
     AVFrame* AllocAudioFrame(enum AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
+#endif
+
     int WriteFrame(AVFormatContext *fmt_ctx, const AVRational *time_base, AVStream *st, AVPacket *pkt);
-
     int WriteAudioFrame(AVFormatContext *oc, OutputStream *ost);
-
-    // void LogPacket(const AVFormatContext *fmt_ctx, const AVPacket *pkt);
 
     AVFrame* GetVideoFrame(OutputStream *ost);
     void FillyuvImage(AVFrame *pict, int width, int height);

@@ -308,8 +308,32 @@ void VideoCaptureClass::AddStream(OutputStream *ost, AVFormatContext *oc, const 
                     c->sample_rate = 44100;
             }
         }
+
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+        AVChannelLayout layout;
+
+        // Layout aus String ("stereo") erzeugen
+        if (av_channel_layout_from_string(&layout, "stereo") < 0) {
+            // Fehlerbehandlung
+        }
+
+        // Layout dem Kontext zuweisen (Beispiel für AVCodecContext c)
+        av_channel_layout_copy(&c->ch_layout, &layout);
+
+        // Falls du aus codec->channel_layouts übernehmen willst:
+        if ((*codec)->ch_layouts) {
+            av_channel_layout_copy(&c->ch_layout, &(*codec)->ch_layouts[0]);
+            for (i = 0; (*codec)->ch_layouts[i].nb_channels; i++) {
+                if (av_channel_layout_compare(&(*codec)->ch_layouts[i], &layout) == 0) {
+                    av_channel_layout_copy(&c->ch_layout, &layout);
+                }
+            }
+        }
+#else
+        // Older FFMPEG versions use AVChannelLayout differently
         c->channels        = av_get_channel_layout_nb_channels(c->channel_layout);
         c->channel_layout = AV_CH_LAYOUT_STEREO;
+
         if ((*codec)->channel_layouts) {
             c->channel_layout = (*codec)->channel_layouts[0];
             for (i = 0; (*codec)->channel_layouts[i]; i++) {
@@ -318,6 +342,7 @@ void VideoCaptureClass::AddStream(OutputStream *ost, AVFormatContext *oc, const 
             }
         }
         c->channels        = av_get_channel_layout_nb_channels(c->channel_layout);
+#endif
         ost->st->time_base = AVRational{ 1, c->sample_rate };
         break;
 
@@ -434,7 +459,7 @@ AVFrame* VideoCaptureClass::AllocPicture(enum AVPixelFormat pix_fmt, int width, 
 }
 
 bool VideoCaptureClass::OpenAudio(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg)
-{
+{  
     AVCodecContext *c;
     int nb_samples;
     int ret;
@@ -460,8 +485,13 @@ bool VideoCaptureClass::OpenAudio(const AVCodec *codec, OutputStream *ost, AVDic
         nb_samples = c->frame_size;
     }
 
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+    ost->frame     = AllocAudioFrame(c->sample_fmt, &c->ch_layout, c->sample_rate, nb_samples);
+    ost->tmp_frame = AllocAudioFrame(AV_SAMPLE_FMT_S16, &c->ch_layout, c->sample_rate, nb_samples);
+#else
     ost->frame     = AllocAudioFrame(c->sample_fmt, c->channel_layout, c->sample_rate, nb_samples);
     ost->tmp_frame = AllocAudioFrame(AV_SAMPLE_FMT_S16, c->channel_layout, c->sample_rate, nb_samples);
+#endif
 
     /* copy the stream parameters to the muxer */
     ret = avcodec_parameters_from_context(ost->st->codecpar, c);
@@ -480,12 +510,17 @@ bool VideoCaptureClass::OpenAudio(const AVCodec *codec, OutputStream *ost, AVDic
     }
 
     /* set options */
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+    av_opt_set_int       (ost->swr_ctx, "in_channel_count",   c->ch_layout.nb_channels, 0);
+    av_opt_set_int       (ost->swr_ctx, "out_channel_count",  c->ch_layout.nb_channels, 0);
+#else
     av_opt_set_int       (ost->swr_ctx, "in_channel_count",   c->channels,       0);
-    av_opt_set_int       (ost->swr_ctx, "in_sample_rate",     c->sample_rate,    0);
-    av_opt_set_sample_fmt(ost->swr_ctx, "in_sample_fmt",      AV_SAMPLE_FMT_S16, 0);
     av_opt_set_int       (ost->swr_ctx, "out_channel_count",  c->channels,       0);
-    av_opt_set_int       (ost->swr_ctx, "out_sample_rate",    c->sample_rate,    0);
-    av_opt_set_sample_fmt(ost->swr_ctx, "out_sample_fmt",     c->sample_fmt,     0);
+#endif
+    av_opt_set_int       (ost->swr_ctx, "in_sample_rate",     c->sample_rate,           0);
+    av_opt_set_sample_fmt(ost->swr_ctx, "in_sample_fmt",      AV_SAMPLE_FMT_S16,        0);
+    av_opt_set_int       (ost->swr_ctx, "out_sample_rate",    c->sample_rate,           0);
+    av_opt_set_sample_fmt(ost->swr_ctx, "out_sample_fmt",     c->sample_fmt,            0);
     /* initialize the resampling context */
     if ((ret = swr_init(ost->swr_ctx)) < 0)
     {
@@ -496,7 +531,11 @@ bool VideoCaptureClass::OpenAudio(const AVCodec *codec, OutputStream *ost, AVDic
     return true;
 }
 
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+AVFrame* VideoCaptureClass::AllocAudioFrame(enum AVSampleFormat sample_fmt, const AVChannelLayout *ch_layout, int sample_rate, int nb_samples)
+#else
 AVFrame* VideoCaptureClass::AllocAudioFrame(enum AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples)
+#endif
 {
     AVFrame *frame = av_frame_alloc();
     int ret;
@@ -506,8 +545,16 @@ AVFrame* VideoCaptureClass::AllocAudioFrame(enum AVSampleFormat sample_fmt, uint
         return nullptr;
     }
 
-    frame->format = sample_fmt;
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+    if (av_channel_layout_copy(&frame->ch_layout, ch_layout) < 0) {
+        av_frame_free(&frame);
+        return NULL;
+    }
+#else
     frame->channel_layout = channel_layout;
+#endif
+
+    frame->format = sample_fmt;
     frame->sample_rate = sample_rate;
     frame->nb_samples = nb_samples;
     if (nb_samples)

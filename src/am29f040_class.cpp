@@ -63,7 +63,7 @@ uint8_t AM29F040Class::Read(uint32_t address)
             /* TODO return write operation status. Until alarms are introduced, just reset the state and fall through */
             status = STATUS_READ;
 
-        [[clang::fallthrough]]; default:
+            [[fallthrough]]; default:
             /* The state doesn't reset if a read occurs during a command sequence */
             /* fall through */
         case STATUS_READ:

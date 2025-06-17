@@ -363,8 +363,8 @@ int MainWindow::OnInit(bool nogui)
     soundbuffer_size = ini->value("SoundBufferSize",512).toInt();
     ini->endGroup();
 
-    if(soundbuffer_size < 64)
-        soundbuffer_size = 64;
+    if(soundbuffer_size < 1)
+        soundbuffer_size = 1;
 
     SplashMessage(tr("C64 Klasse wird initialisiert."),Qt::darkBlue);
     int ret_error;

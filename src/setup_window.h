@@ -96,9 +96,9 @@ private slots:
 	void on_SettingUserPalette_clicked();
 	void on_EnableUserPalette_clicked(bool checked);
 	void OnChangeUserColor(int color_number, QColor color);
-
-
     void on_default_60hz_clicked();
+
+    void on_SounbufferChange_clicked();
 
 private:
     void UpdateToolTips();
