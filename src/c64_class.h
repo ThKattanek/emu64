@@ -55,6 +55,8 @@
 
 #define MAX_VIDEO_DISPLAYS 8				  // Anzahl der Maximal unterstützen Video Displays
 
+#define DEBUG_CART_ADRESS 0xD7FF
+
 enum SCREENSHOT_FORMATS {SCREENSHOT_FORMAT_BMP, SCREENSHOT_FORMAT_PNG, SCREENSHOT_FORMATS_COUNT};
 
 class C64Class
@@ -543,6 +545,10 @@ private:
 
     bool        key_map_is_rec;
     uint8_t     rec_matrix_code;
+
+    bool            enable_debug_cart;      // Wird auf true gesetzt wenn der Debug Cart aktiviert ist
+    bool            is_wtite_to_debug_cart; // Wird auf true gesetzt wenn in den Debug Cart geschrieben wird
+    unsigned char   debug_cart_value;       // Wert der im Debug Cart steht
 };
 
 #endif // C64CLASS_H
