@@ -53,9 +53,6 @@ MOS6510::MOS6510(void)
 	nmi_fall_edge = false;
 	nmi_is_active = false;
 
-	EnableDebugCart = false;
-	WRITE_DEBUG_CART = false;
-
 	shxy_dma = false;
 }
 
@@ -248,17 +245,6 @@ void MOS6510::GetInterneRegister(IREG_STRUCT* ireg)
 	ireg->reset = *RESET;
 }
 
-void MOS6510::SetEnableDebugCart(bool enabled)
-{
-	EnableDebugCart = enabled;
-	WRITE_DEBUG_CART = false;
-}
-
-unsigned char MOS6510::GetDebugCartValue()
-{
-	return DebugCartValue;
-}
-
 /*
 bool MOS6510::SaveFreez(FILE *File)
 {
@@ -374,12 +360,6 @@ inline unsigned char MOS6510::Read(unsigned short adresse)
 
 inline void MOS6510::Write(unsigned short adresse, unsigned char wert)
 {
-	if((EnableDebugCart == true) && (adresse == DEBUG_CART_ADRESS))
-	{
-		DebugCartValue = wert;
-		WRITE_DEBUG_CART = true;
-	}
-
 	if(adresse == 0xFF00) WRITE_FF00 = true;
 	if(Breakpoints[adresse] & 32)
 	{

@@ -95,6 +95,9 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
 
     warp_mode = false;
 
+    enable_debug_cart = false;
+    is_wtite_to_debug_cart = false;
+
     LogText = log_function;
 
     enable_mouse_1351 = false;
@@ -673,7 +676,7 @@ void C64Class::SetLimitCycles(int nCycles)
 
 void C64Class::SetEnableDebugCart(bool enable)
 {
-    cpu->SetEnableDebugCart(enable);
+    enable_debug_cart = enable;
 }
 
 void AudioMix(void *not_used, Uint8 *stream, int laenge)
@@ -924,11 +927,11 @@ void C64Class::WarpModeLoop()
         }
     }
 
-    if(cpu->WRITE_DEBUG_CART)
+    if(is_wtite_to_debug_cart)
     {
         // Event auslösen
-        cpu->WRITE_DEBUG_CART = false;
-        if(DebugCartEvent != nullptr) DebugCartEvent(cpu->GetDebugCartValue());
+        is_wtite_to_debug_cart = false;
+        if(DebugCartEvent != nullptr) DebugCartEvent(debug_cart_value);
     }
 
     NextSystemCycle();
@@ -1039,11 +1042,11 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 }
             }
 
-            if(cpu->WRITE_DEBUG_CART)
+            if(is_wtite_to_debug_cart)
             {
                 // Event auslösen
-                cpu->WRITE_DEBUG_CART = false;
-                if(DebugCartEvent != nullptr) DebugCartEvent(cpu->GetDebugCartValue());
+                is_wtite_to_debug_cart = false;
+                if(DebugCartEvent != nullptr) DebugCartEvent(debug_cart_value);
             }
 
             NextSystemCycle();
@@ -4276,6 +4279,12 @@ bool C64Class::CheckBreakpoints()
 
 void C64Class::WriteSidIO(uint16_t address, uint8_t value)
 {
+    if((enable_debug_cart == true) && (address == DEBUG_CART_ADRESS))
+    {
+        debug_cart_value = value;
+        is_wtite_to_debug_cart = true;
+    }
+
     if(enable_stereo_sid)
     {
         if((address & 0xFFE0) == 0xD400) sid1->WriteIO(address,value);
