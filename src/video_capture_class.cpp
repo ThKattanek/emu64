@@ -43,9 +43,9 @@ VideoCaptureClass::~VideoCaptureClass()
     {
         std::cout << "VideoCaptureClass: " << "Stoppen erzwingen!" << std::endl;
         StopCapture();
-
-        delete[] source_audio_data;
     }
+
+    delete[] source_audio_data;
 }
 
 const char* VideoCaptureClass::GetAVVersion()
