@@ -609,11 +609,26 @@ C64Class::~C64Class()
     if(crt != nullptr) delete crt;
     if(reu != nullptr) delete reu;
     if(geo != nullptr) delete geo;
+    if(tape != nullptr) delete tape;
 
     if(video_capture != nullptr) delete video_capture;
 
     if(audio_16bit_buffer != nullptr)
         delete [] audio_16bit_buffer;
+
+    SDL_FreeSurface(img_joy_arrow0);
+    SDL_FreeSurface(img_joy_arrow1);
+    SDL_FreeSurface(img_joy_button0);
+    SDL_FreeSurface(img_joy_button1);
+    SDL_FreeSurface(sdl_window_icon);
+
+    if(screenshot_dir != nullptr) delete[] screenshot_dir;
+
+    if(mutex1 != nullptr)
+    {
+        SDL_DestroyMutex(mutex1);
+        mutex1 = nullptr;
+    }
 }
 
 void C64Class::StartEmulation()
@@ -661,6 +676,8 @@ void C64Class::EndEmulation()
         SDL_Delay(1);
         time_out--;
     }
+
+    SDL_DetachThread(sdl_thread);
 
 	SDL_PauseAudioDevice(audio_dev, 1);
     if(audio_dev > 0) SDL_CloseAudioDevice(audio_dev);

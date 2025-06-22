@@ -85,6 +85,14 @@ WidgetFloppyStatus::~WidgetFloppyStatus()
 {
     delete timer;
     delete ui;
+
+    if(iGreenLedOff != nullptr) delete iGreenLedOff;
+    if(iGreenLedOn != nullptr) delete iGreenLedOn;
+    if(iVol_mute != nullptr) delete iVol_mute;
+    if(iVol_low != nullptr) delete iVol_low;
+    if(iVol_medium != nullptr) delete iVol_medium;
+    if(iVol_high != nullptr) delete iVol_high;
+    if(iError != nullptr) delete iError;
 }
 
 void WidgetFloppyStatus::RetranslateUi()

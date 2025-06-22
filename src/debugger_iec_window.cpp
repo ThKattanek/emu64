@@ -40,6 +40,9 @@ DebuggerIECWindow::DebuggerIECWindow(QWidget *parent) :
 DebuggerIECWindow::~DebuggerIECWindow()
 {
     delete ui;
+
+    if(icon_off != nullptr) delete icon_off;
+    if(icon_on != nullptr) delete icon_on;
 }
 
 void DebuggerIECWindow::RetranslateUi()

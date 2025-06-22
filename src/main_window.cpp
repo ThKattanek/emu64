@@ -162,6 +162,7 @@ MainWindow::~MainWindow()
 
     delete ui;
     delete ini;
+
     LogText(tr(">> Es wurden alle Klassen wieder entfernt\n").toUtf8());
 
     LogText(tr("\n>> Emu64 wurde sauber beendet...").toUtf8());
@@ -1029,6 +1030,17 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
         // i korregieren (abhängig von der Anzahl der Argumente)
         if(akt_command != CMD_ARG)
             i += cmd_line->GetCommandArgCount(akt_command);
+    }
+
+    if(cmd_line != nullptr) delete cmd_line;
+
+    if(arg != nullptr)
+    {
+        for(int i=0; i<argc; i++)
+        {
+            delete[] arg[i];
+        }
+        delete[] arg;
     }
 }
 

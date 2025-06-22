@@ -272,6 +272,7 @@ bool CommandLineClass::CheckLongCommands(const char *long_command)
             char *str = new char[255];
             sprintf(str,"--%s", long_command);
             AddCommand(all_commands_list[i].cmd_command, str);
+            delete[] str;
             found = true;
         }
     }

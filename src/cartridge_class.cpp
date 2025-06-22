@@ -45,6 +45,17 @@ CartridgeClass::CartridgeClass()
 
 CartridgeClass::~CartridgeClass()
 {
+    if(am29f040Lo != nullptr)
+    {
+        delete am29f040Lo;
+        am29f040Lo = nullptr;
+    }
+
+    if(am29f040Hi != nullptr)
+    {
+        delete am29f040Hi;
+        am29f040Hi = nullptr;
+    }
 }
 
 void CartridgeClass::ResetAllLEDS(void)
