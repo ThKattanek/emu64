@@ -333,6 +333,7 @@ public:
 
     SDL_Thread      *warp_thread;
     bool            warp_thread_end;
+    bool            warp_thread_is_end;
 
     uint8_t         *vic_buffer;
     VideoCrtClass   *video_crt_output;

@@ -235,6 +235,7 @@ int main(int argc, char *argv[])
 
     delete w;
     delete app;
+    delete cmd_line;
 
     std::cout << "ExitCode: 0x" << std::hex << ret << std::endl;
     return ret;

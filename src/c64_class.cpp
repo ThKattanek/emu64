@@ -75,6 +75,8 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
 
     this->start_minimized = start_minimized;
 
+    DebugCartEvent = nullptr;
+
     changed_graphic_modi = false;
     changed_window_pos = false;
     changed_window_size = false;
@@ -609,11 +611,26 @@ C64Class::~C64Class()
     if(crt != nullptr) delete crt;
     if(reu != nullptr) delete reu;
     if(geo != nullptr) delete geo;
+    if(tape != nullptr) delete tape;
 
     if(video_capture != nullptr) delete video_capture;
 
     if(audio_16bit_buffer != nullptr)
         delete [] audio_16bit_buffer;
+
+    SDL_FreeSurface(img_joy_arrow0);
+    SDL_FreeSurface(img_joy_arrow1);
+    SDL_FreeSurface(img_joy_button0);
+    SDL_FreeSurface(img_joy_button1);
+    SDL_FreeSurface(sdl_window_icon);
+
+    if(screenshot_dir != nullptr) delete[] screenshot_dir;
+
+    if(mutex1 != nullptr)
+    {
+        SDL_DestroyMutex(mutex1);
+        mutex1 = nullptr;
+    }
 }
 
 void C64Class::StartEmulation()
@@ -662,6 +679,8 @@ void C64Class::EndEmulation()
         time_out--;
     }
 
+    SDL_DetachThread(sdl_thread);
+
 	SDL_PauseAudioDevice(audio_dev, 1);
     if(audio_dev > 0) SDL_CloseAudioDevice(audio_dev);
 
@@ -696,11 +715,14 @@ void AudioMix(void *not_used, Uint8 *stream, int laenge)
 int SDLThreadWarp(void *userdat)
 {
     C64Class *c64 = static_cast<C64Class*>(userdat);
+    c64->warp_thread_is_end = false;
 
     while(!c64->warp_thread_end)
     {
-        c64->WarpModeLoop();
+       c64->WarpModeLoop();
     }
+
+    c64->warp_thread_is_end = true;
     return 0;
 }
 
@@ -937,7 +959,6 @@ void C64Class::WarpModeLoop()
     NextSystemCycle();
 
     ////////////////////////// Testweise //////////////////////////
-
     static int zyklen_counter = 0;
     if(++zyklen_counter == 19656)
     {
@@ -2713,12 +2734,21 @@ void C64Class::EnableWarpMode(bool enabled)
         SDL_PauseAudioDevice(audio_dev, 1);     // Audiostream pausieren
         warp_thread_end = false;
         warp_thread = SDL_CreateThread(SDLThreadWarp,"WarpThread",this);
+        LogText("WarpMode aktiviert\n");
     }
     else
     {
         // WarpMode deaktivieren
 		warp_thread_end = true;
+        SDL_DetachThread(warp_thread);
+
+        while(!warp_thread_is_end)
+        {
+            SDL_Delay(1);
+        }
+
         SDL_PauseAudioDevice(audio_dev, 0);     // Audiostream wieder starten
+        LogText("WarpMode deaktiviert\n");
 	}
 }
 

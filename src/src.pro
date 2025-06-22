@@ -76,6 +76,10 @@ win32 {
 QMAKE_CXXFLAGS += -fopenmp
 LIBS += -fopenmp
 
+# Für AddressSanitize -> im Projekt kann als Compiler-Option LIBS="-lasan" angegen werden das Flag -fsanitize=address wird dann wohl automatisch gesetzt
+#QMAKE_CXXFLAGS += -fsanitize=address
+#LIBS += -lasan
+
 CONFIG += link_pkgconfig
 PKGCONFIG += sdl2 SDL2_image libpng glu libavutil libavformat libavcodec libswresample libswscale gl
 

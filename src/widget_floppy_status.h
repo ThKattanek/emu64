@@ -65,8 +65,6 @@ private:
 
     QIcon *iGreenLedOff;
     QIcon *iGreenLedOn;
-    QIcon *iYellowLedOff;
-    QIcon *iYellowLedOn;
 
     QIcon *iVol_mute;
     QIcon *iVol_low;

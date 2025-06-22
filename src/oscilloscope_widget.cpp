@@ -41,6 +41,8 @@ OscilloscopeWidget::~OscilloscopeWidget()
 {
     timer1->stop();
     delete ui;
+
+    if(output_line_pen != nullptr) delete output_line_pen;
 }
 
 void OscilloscopeWidget::paintEvent(QPaintEvent *)
