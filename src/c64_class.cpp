@@ -75,6 +75,8 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
 
     this->start_minimized = start_minimized;
 
+    DebugCartEvent = nullptr;
+
     changed_graphic_modi = false;
     changed_window_pos = false;
     changed_window_size = false;
@@ -713,11 +715,14 @@ void AudioMix(void *not_used, Uint8 *stream, int laenge)
 int SDLThreadWarp(void *userdat)
 {
     C64Class *c64 = static_cast<C64Class*>(userdat);
+    c64->warp_thread_is_end = false;
 
     while(!c64->warp_thread_end)
     {
-        c64->WarpModeLoop();
+       c64->WarpModeLoop();
     }
+
+    c64->warp_thread_is_end = true;
     return 0;
 }
 
@@ -954,7 +959,6 @@ void C64Class::WarpModeLoop()
     NextSystemCycle();
 
     ////////////////////////// Testweise //////////////////////////
-
     static int zyklen_counter = 0;
     if(++zyklen_counter == 19656)
     {
@@ -2730,12 +2734,21 @@ void C64Class::EnableWarpMode(bool enabled)
         SDL_PauseAudioDevice(audio_dev, 1);     // Audiostream pausieren
         warp_thread_end = false;
         warp_thread = SDL_CreateThread(SDLThreadWarp,"WarpThread",this);
+        LogText("WarpMode aktiviert\n");
     }
     else
     {
         // WarpMode deaktivieren
 		warp_thread_end = true;
+        SDL_DetachThread(warp_thread);
+
+        while(!warp_thread_is_end)
+        {
+            SDL_Delay(1);
+        }
+
         SDL_PauseAudioDevice(audio_dev, 0);     // Audiostream wieder starten
+        LogText("WarpMode deaktiviert\n");
 	}
 }
 

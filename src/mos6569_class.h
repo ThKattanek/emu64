@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -25,7 +24,7 @@
 
 #define MAX_XW 504
 #define MAX_YW MAX_RASTERLINES
-#define VIDEO_BUFFER_SIZE MAX_XW*MAX_YW*4
+#define VIDEO_BUFFER_SIZE MAX_XW * MAX_YW // 504*312 = 157248 Bytes (War fürher MAX_XW * MAX_YW * 4)
 
 enum
 {
