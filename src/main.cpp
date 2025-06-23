@@ -47,6 +47,9 @@ int main(int argc, char *argv[])
 
     CommandLineClass *cmd_line = new CommandLineClass(argc, argv, "emu64",command_list, command_list_count);
 
+    CustomSplashScreen *splash = nullptr;
+    QPixmap *splash_image = nullptr;
+
     // Prüfen ob ein Fehler bei der Kommandozeilenauswertung auftrat
     // Wenn ja emu64 beenden. (Fehlerausgabe kommt von CommandLineClass)
     if(cmd_line->GetCommandCount() < 0)
@@ -173,9 +176,9 @@ int main(int argc, char *argv[])
 
 	if(!cmd_line->FoundCommand(CMD_NOSPLASH) && !cmd_line->FoundCommand(CMD_NOGUI))
     {
-        QPixmap image(":/splash");
-        CustomSplashScreen *splash = new CustomSplashScreen(image);
-        splash->setMask(image.mask());
+        splash_image = new QPixmap(":/splash");
+        splash = new CustomSplashScreen(*splash_image);
+        splash->setMask(splash_image->mask());
         splash->setWindowFlag(Qt :: WindowStaysOnTopHint);
         splash->show();
 
@@ -236,6 +239,8 @@ int main(int argc, char *argv[])
     delete w;
     delete app;
     delete cmd_line;
+    delete splash;
+    delete splash_image;
 
     std::cout << "ExitCode: 0x" << std::hex << ret << std::endl;
     return ret;
