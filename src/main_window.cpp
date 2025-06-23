@@ -713,6 +713,7 @@ void MainWindow::DebugCartEvent(unsigned char value)
     DebugCartValue = value;
     IsDebugCartEvent = true;
     on_actionBeenden_triggered();
+    LogText("DebugCartEvent");
 }
 
 void MainWindow::SetCustomDataPath(QString path)

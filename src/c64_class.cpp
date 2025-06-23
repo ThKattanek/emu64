@@ -949,11 +949,12 @@ void C64Class::WarpModeLoop()
         }
     }
 
-    if(is_wtite_to_debug_cart)
+    // DebugCartEvent soll nur maximal einmal aufgerufen werden
+    if(is_wtite_to_debug_cart && (DebugCartEvent != nullptr))
     {
-        // Event auslösen
         is_wtite_to_debug_cart = false;
-        if(DebugCartEvent != nullptr) DebugCartEvent(debug_cart_value);
+        DebugCartEvent(debug_cart_value);
+        DebugCartEvent = nullptr; // Nur einmal aufrufen
     }
 
     NextSystemCycle();
@@ -1063,11 +1064,13 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 }
             }
 
-            if(is_wtite_to_debug_cart)
+
+            // DebugCartEvent soll nur maximal einmal aufgerufen werden
+            if(is_wtite_to_debug_cart && (DebugCartEvent != nullptr))
             {
-                // Event auslösen
                 is_wtite_to_debug_cart = false;
-                if(DebugCartEvent != nullptr) DebugCartEvent(debug_cart_value);
+                DebugCartEvent(debug_cart_value);
+                DebugCartEvent = nullptr; // Nur einmal aufrufen
             }
 
             NextSystemCycle();
