@@ -157,10 +157,6 @@ void SetupWindow::LoadINI(C64Class *c64)
             connect(button,SIGNAL(Clicked(int,int)),this,SLOT(onClickButton(int,int)));
             ui->VJoySlots->setCellWidget(i,4,button);
 
-
-            // Behebe folgende fehler: Using QByteRef with an index pointing outside the valid range of a QByteArray.
-
-
             QByteArray default_array(5,0);
             QByteArray array = ini->value("Type", default_array).toByteArray();
             if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].Type[j] = array.at(j);
