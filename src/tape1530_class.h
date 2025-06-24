@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,8 +16,7 @@
 #define TAPE1530_H
 
 #include <cstring>
-#include <fstream>
-#include <iostream>
+#include <cstdio>
 #include <math.h>
 
 #ifndef M_PI

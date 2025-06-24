@@ -13,7 +13,8 @@
 //////////////////////////////////////////////////
 
 #include "mmu_class.h"
-#include <fstream>
+#include <cstdio>
+#include <ctime>
 
 MMU::MMU(void)
 {

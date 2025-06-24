@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.06.2023	       		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,7 +17,7 @@
 
 #include <math.h>
 #include <cstring>
-#include <fstream>
+#include <cstdio>
 #include <functional>
 
 #include "./mos6502_class.h"

@@ -15,8 +15,8 @@
 #ifndef GEORAM_CLASS_H
 #define GEORAM_CLASS_H
 
-#include <inttypes.h>
-#include <fstream>
+#include <cstdint>
+#include <cstdio>
 
 // 512KiB, 1MiB, 2MiB, 4MiB
 
