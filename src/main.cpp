@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
 
     CustomSplashScreen *splash = nullptr;
     QPixmap *splash_image = nullptr;
+    QFile *config_file = nullptr;
 
     // Prüfen ob ein Fehler bei der Kommandozeilenauswertung auftrat
     // Wenn ja emu64 beenden. (Fehlerausgabe kommt von CommandLineClass)
@@ -64,7 +65,7 @@ int main(int argc, char *argv[])
         {
             if(cmd_line->GetCommand(i) == CMD_RESET_INI)
             {
-                QFile *config_file = new QFile(config_dir.path() + "/emu64.ini");
+                config_file = new QFile(config_dir.path() + "/emu64.ini");
                 if(!config_file->exists())
                 {
                     std::cout << "emu64.ini existiert nicht, muss deshalb nicht geloescht werden." << std::endl;
@@ -236,11 +237,12 @@ int main(int argc, char *argv[])
     if(w->IsLimitCyclesEvent) ret = 1;
     if(w->IsDebugCartEvent) ret = w->DebugCartValue;
 
-    delete w;
-    delete app;
-    delete cmd_line;
-    delete splash;
-    delete splash_image;
+    if(w != nullptr) delete w;
+    if(app != nullptr) delete app;
+    if(cmd_line != nullptr) delete cmd_line;
+    if(splash != nullptr) delete splash;
+    if(splash_image != nullptr) delete splash_image;
+    if(config_file != nullptr) delete config_file;
 
     std::cout << "ExitCode: 0x" << std::hex << ret << std::endl;
     return ret;

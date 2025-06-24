@@ -75,6 +75,7 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
 
     this->start_minimized = start_minimized;
 
+    LimitCyclesEvent = nullptr;
     DebugCartEvent = nullptr;
 
     changed_graphic_modi = false;
@@ -4039,7 +4040,7 @@ void C64Class::NextSystemCycle()
 {
     CheckKeys();
 
-	if(hold_next_system_cycle)
+    if(hold_next_system_cycle)
 		return;
 
     cycle_counter++;
