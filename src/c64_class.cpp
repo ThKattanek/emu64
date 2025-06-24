@@ -75,6 +75,7 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
 
     this->start_minimized = start_minimized;
 
+    LimitCyclesEvent = nullptr;
     DebugCartEvent = nullptr;
 
     changed_graphic_modi = false;
@@ -945,6 +946,7 @@ void C64Class::WarpModeLoop()
 		if(limit_cycles_counter == 0)
         {
             // Event auslösen
+            hold_next_system_cycle = true;  // Nächsten Systemzyklus anhalten
             if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
         }
     }
@@ -1060,6 +1062,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 				if(limit_cycles_counter == 0)
                 {
                     // Event auslösen
+                    hold_next_system_cycle = true;  // Nächsten Systemzyklus anhalten
                     if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
                 }
             }
@@ -4039,7 +4042,7 @@ void C64Class::NextSystemCycle()
 {
     CheckKeys();
 
-	if(hold_next_system_cycle)
+    if(hold_next_system_cycle)
 		return;
 
     cycle_counter++;

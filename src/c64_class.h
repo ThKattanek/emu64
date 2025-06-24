@@ -523,8 +523,12 @@ private:
     bool        c64_command_line_count_s;
 
     uint32_t    cycle_counter;
-	int         limit_cycles_counter;        // Dieser Counter wird wenn er > 0 ist bei jeden Zyklus um 1 runtergezählt
-	bool		hold_next_system_cycle;		 // Wird dieses Flag gesetzt wird verhindert das ein C64 Cylce ausgeführt wird
+    int         limit_cycles_counter;           // Dieser Counter wird wenn er > 0 ist bei jeden Zyklus um 1 runtergezählt
+    bool		hold_next_system_cycle;         // Wird dieses Flag gesetzt wird verhindert das ein C64 Cylce ausgeführt wird
+
+    bool        enable_debug_cart;          // Wird auf true gesetzt wenn der Debug Cart aktiviert ist
+    bool        is_wtite_to_debug_cart;     // Wird auf true gesetzt wenn in den Debug Cart geschrieben wird
+    unsigned char   debug_cart_value;           // Wert der im Debug Cart steht
 
 	bool        debug_mode;
     bool        debug_animation;
@@ -546,10 +550,6 @@ private:
 
     bool        key_map_is_rec;
     uint8_t     rec_matrix_code;
-
-    bool            enable_debug_cart;      // Wird auf true gesetzt wenn der Debug Cart aktiviert ist
-    bool            is_wtite_to_debug_cart; // Wird auf true gesetzt wenn in den Debug Cart geschrieben wird
-    unsigned char   debug_cart_value;       // Wert der im Debug Cart steht
 };
 
 #endif // C64CLASS_H
