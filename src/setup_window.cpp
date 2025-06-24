@@ -157,32 +157,37 @@ void SetupWindow::LoadINI(C64Class *c64)
             connect(button,SIGNAL(Clicked(int,int)),this,SLOT(onClickButton(int,int)));
             ui->VJoySlots->setCellWidget(i,4,button);
 
-            QByteArray array = ini->value("Type",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].Type[j] = array[j];
 
-            array = ini->value("JoyIndex",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].JoyIndex[j] = array[j];
+            // Behebe folgende fehler: Using QByteRef with an index pointing outside the valid range of a QByteArray.
 
-            array = ini->value("KeyDown",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].KeyDown[j] = array[j];
 
-            array = ini->value("KeyUp",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].KeyUp[j] = array[j];
+            QByteArray default_array(5,0);
+            QByteArray array = ini->value("Type", default_array).toByteArray();
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].Type[j] = array.at(j);
 
-            array = ini->value("ButtonNr",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].ButtonNr[j] = array[j];
+            array = ini->value("JoyIndex", default_array).toByteArray();
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].JoyIndex[j] = array.at(j);
 
-            array = ini->value("HatNr",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].HatNr[j] = array[j];
+            array = ini->value("KeyDown", default_array).toByteArray();
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].KeyDown[j] = array.at(j);
 
-            array = ini->value("HatValue",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].HatValue[j] = array[j];
+            array = ini->value("KeyUp", default_array).toByteArray();
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].KeyUp[j] = array.at(j);
 
-            array = ini->value("AxisNr",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].AxisNr[j] = array[j];
+            array = ini->value("ButtonNr", default_array).toByteArray();
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].ButtonNr[j] = array.at(j);
 
-            array = ini->value("AxisValue",0).toByteArray();
-            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].AxisValue[j] = array[j];
+            array = ini->value("HatNr", default_array).toByteArray();
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].HatNr[j] = array.at(j);
+
+            array = ini->value("HatValue", default_array).toByteArray();
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].HatValue[j] = array.at(j);
+
+            array = ini->value("AxisNr", default_array).toByteArray();
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].AxisNr[j] = array.at(j);
+
+            array = ini->value("AxisValue", default_array).toByteArray();
+            if (!array.isEmpty()) for(int j=0;j<5;j++) c64->virtual_joys[i].AxisValue[j] = array.at(j);
 
             ini->endGroup();
         }
