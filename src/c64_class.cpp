@@ -946,7 +946,6 @@ void C64Class::WarpModeLoop()
 		if(limit_cycles_counter == 0)
         {
             // Event auslösen
-            hold_next_system_cycle = true;  // Nächsten Systemzyklus anhalten
             if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
         }
     }
@@ -1062,7 +1061,6 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 				if(limit_cycles_counter == 0)
                 {
                     // Event auslösen
-                    hold_next_system_cycle = true;  // Nächsten Systemzyklus anhalten
                     if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
                 }
             }
