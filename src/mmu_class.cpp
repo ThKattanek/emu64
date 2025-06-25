@@ -14,6 +14,7 @@
 
 #include "mmu_class.h"
 #include <cstdio>
+#include <cstdlib>
 #include <ctime>
 
 MMU::MMU(void)
