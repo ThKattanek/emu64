@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,7 +15,7 @@
 #ifndef REU_CLASS_H
 #define REU_CLASS_H
 
-#include <fstream>
+#include <cstdio>
 #include <functional>
 
 #include "./structs.h"

@@ -8,13 +8,14 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "./tape1530_class.h"
 #include "./c64_file_types.h"
+
+#include <iostream>
 
 TAPE1530::TAPE1530(int samplerate, int puffersize, float cycles_per_second)
 {

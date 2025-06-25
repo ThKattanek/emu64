@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.06.2021         		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,8 +16,7 @@
 #define D64_CLASS_H
 
 #include <cstring>
-#include <fstream>
-#include <iostream>
+#include <cstdio>
 
 #define D64_IMAGE_SIZE 174848
 
