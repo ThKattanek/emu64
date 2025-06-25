@@ -847,13 +847,15 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
 	CommandLineClass *cmd_line = new CommandLineClass(argc, arg, "emu64",command_list, command_list_count);
 
     bool error;
-    int lwnr,adr,val;
+    int lwnr,adr,val,limit_cycles;;
 	QString filename;
     QFileInfo *fi;
 
     bool loop_break = false;
 
 	if(cmd_line == nullptr) return;
+
+    bool isLimitCyclesCommand = false;
 
     for(int i=0; i<cmd_line->GetCommandCount() && !loop_break; i++)
     {
@@ -988,7 +990,8 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
                 cmd_line->OutErrorMsg("Die Anzahl der Zyklen müssen groeßer als 0 sein.","--help");
                 break;
             }
-            c64->SetLimitCycles(val);
+            limit_cycles = val;
+            isLimitCyclesCommand = true;
             break;
 		case CMD_DOUBLE_TEXTURE_OFF:
 			isCommandDoubleTextureOff = true;
@@ -1032,6 +1035,9 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
         if(akt_command != CMD_ARG)
             i += cmd_line->GetCommandArgCount(akt_command);
     }
+
+    if(isLimitCyclesCommand)
+        c64->SetLimitCycles(val);
 
     if(cmd_line != nullptr) delete cmd_line;
 
