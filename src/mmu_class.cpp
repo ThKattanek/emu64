@@ -14,7 +14,7 @@
 
 #include "mmu_class.h"
 #include <cstdio>
-#include "time.h"
+#include <ctime>
 
 MMU::MMU(void)
 {
@@ -33,7 +33,7 @@ MMU::MMU(void)
 
     InitProcTables();
 
-	srand (time(NULL));
+    std::srand (std::time(NULL));
 }
 
 MMU::~MMU(void)
