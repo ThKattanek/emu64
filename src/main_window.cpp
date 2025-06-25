@@ -847,7 +847,7 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
 	CommandLineClass *cmd_line = new CommandLineClass(argc, arg, "emu64",command_list, command_list_count);
 
     bool error;
-    int lwnr,adr,val,limit_cycles;;
+    int lwnr,adr,val,limit_cycles;
 	QString filename;
     QFileInfo *fi;
 
@@ -1037,7 +1037,7 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
     }
 
     if(isLimitCyclesCommand)
-        c64->SetLimitCycles(val);
+        c64->SetLimitCycles(limit_cycles);
 
     if(cmd_line != nullptr) delete cmd_line;
 
