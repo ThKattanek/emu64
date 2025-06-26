@@ -116,11 +116,12 @@ bool D64Class::ExportPrg(int file_number, const char *filename)
     uint8_t current_track = d64_files[file_number].Track;
     uint8_t current_sector = d64_files[file_number].Sektor;
 
-    while(current_track != 0)
+    while(current_track != 0 && block_count > 0)
     {
         ReadBlock(current_track, current_sector, block);
         current_track = block[0];
         current_sector = block[1];
+        block_count--;
         if(current_track == 0) fwrite(block+2, 1, current_sector - 1, file);
         else fwrite(block+2, 1, 254, file);
     }
