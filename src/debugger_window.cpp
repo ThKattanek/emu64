@@ -888,11 +888,11 @@ void DebuggerWindow::FillHistoryList(uint8_t index)
     if(current_source > 0)
     {
         if(!c64->floppy[currnet_floppy_nr]->GetEnableFloppy()) return;
-        hp = c64->floppy[currnet_floppy_nr]->HistoryPointer;
+        hp = c64->floppy[currnet_floppy_nr]->GetCpuPCHistoryPosition();
         //for(int i=0; i<HISTORY_ROW; i++)
         for(int i=0; i<history_rows; i++)
         {
-            sprintf(str00, "$%4.4X", c64->floppy[currnet_floppy_nr]->History[hp--]);
+            sprintf(str00, "$%4.4X", c64->floppy[currnet_floppy_nr]->GetCpuPCHistory(hp--));
             ui->HistoryList->item(i)->setText(QString(str00));
         }
     }

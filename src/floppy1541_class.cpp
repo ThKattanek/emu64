@@ -196,3 +196,15 @@ void Floppy1541::ResetCycleCounter()
 {
 
 }
+
+uint16_t Floppy1541::GetCpuPCHistory(uint8_t pos)
+{
+    return cpu_pc_history[pos];
+}
+
+uint8_t Floppy1541::GetCpuPCHistoryPosition()
+{
+    return cpu_pc_history_position;
+}
+
+

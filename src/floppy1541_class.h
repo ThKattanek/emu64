@@ -58,7 +58,7 @@ public:
     void* GetSoundBuffer();
     void ZeroSoundBufferPos();
 
-    // Debugging
+    // Floppy 1541 Debugging
     void GetFloppyInfo(FLOPPY_INFO *fi);
     void UpdateBreakGroup();
     int GetBreakGroupCount();
@@ -75,14 +75,16 @@ public:
     void SetCpuReg(REG_STRUCT *reg);
     void GetCpuReg(REG_STRUCT *reg, IREG_STRUCT *ireg);
     void ResetCycleCounter();
+    uint16_t GetCpuPCHistory(uint8_t pos);
+    uint8_t GetCpuPCHistoryPosition();
 
     uint8_t FloppyIECLocal = 0; // Local IEC Port;
 
-    uint16_t History[256];
-    uint8_t HistoryPointer = 0; // History Pointer
-
 private:
 
+    // Floppy 1541 Debugging
+    uint16_t cpu_pc_history[256];
+    uint8_t cpu_pc_history_position = 0; // History Pointer
 };
 
 #endif // FLOPPY1541_CLASS_H
