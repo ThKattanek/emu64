@@ -4052,7 +4052,7 @@ void C64Class::NextSystemCycle()
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
         cpu_states[i+1] = floppy[i]->OneCycle();
-        floppy_iec_wire |= ~floppy[i]->FloppyIECLocal;
+        floppy_iec_wire |= ~floppy[i]->GetFloppyIEC();
     }
     floppy_iec_wire = ~floppy_iec_wire;
 
