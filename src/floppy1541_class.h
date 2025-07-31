@@ -84,6 +84,9 @@ public:
 private:
 
     bool *reset_line = nullptr;
+    bool via1_irq_line = false;
+    bool via2_irq_line = false;
+
     uint8_t floppy_iec = 0;
 
     bool enable_floppy = false;
@@ -101,6 +104,12 @@ private:
     void WriteRam(uint16_t address, uint8_t value);
     uint8_t ReadRam(uint16_t address);
     uint8_t ReadRom(uint16_t address);
+
+    // VIA Read/Write I/O
+    uint8_t ReadVia1(uint16_t address);
+    void WriteVia1(uint16_t address, uint8_t value);
+    uint8_t ReadVia2(uint16_t address);
+    void WriteVia2(uint16_t address, uint8_t value);
 
     uint8_t ram[0x800];     // 2K RAM
     uint8_t rom[0x4000];    // 16K ROM

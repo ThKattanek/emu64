@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,69 +15,35 @@
 #ifndef MOS6522_CLASS_H
 #define MOS6522_CLASS_H
 
-#include <functional>
-
-#include "./structs.h"
+#include <cstdint>
 
 class MOS6522
 {
 public:
 
-    /// Funktionen ///
-
-    MOS6522(unsigned char via_nr);
+    MOS6522(bool *reset_line, bool *irq_line = nullptr);
     ~MOS6522();
 
-    void Reset(void);
-    unsigned char GetIO_Zero(void);
-	float GetIOPB3_RMS(void);
+    void Reset();
     void OneZyklus(void);
-    void WriteIO(unsigned short adresse, unsigned char);
-    unsigned char ReadIO(unsigned short adresse);
-
-    std::function<bool(void)> SyncFound;
-    std::function<unsigned char(void)> ReadGCRByte;
-    std::function<void(unsigned char)> WriteGCRByte;
-    std::function<void(void)> SpurInc;
-    std::function<void(void)> SpurDec;
-    std::function<void(int)> TriggerInterrupt;
-    std::function<void(int)> ClearInterrupt;
-
-    /// Variablen ///
-
-    bool            *RESET;
-    bool            *WriteProtect;
-    bool            *DiskMotorOn;
-    unsigned char   *FloppyIEC;
-    unsigned char   *C64IEC;
-    unsigned char   *Jumper;
+    void WriteIO(uint16_t address, uint8_t value);
+    uint8_t ReadIO(unsigned short address);
+    uint8_t GetIOZero(void);
 
 private:
 
-    /// Variablen ///
+    bool *reset_line = nullptr;
+    bool *irq_line = nullptr;
 
-    unsigned char   VIANummer;
-    unsigned char   IO[16];
-    unsigned char   PA;
-    unsigned char   PB;
-    unsigned char   DDRA;
-    unsigned char   DDRB;
-    unsigned short  TimerA;
-    unsigned short  TimerALatch;
-    unsigned short  TimerB;
-    unsigned short  TimerBLatch;
-    bool            ATNState;
-    bool            IECInterrupt;
-    unsigned char   OldIECLines;
-    bool            OldATNState;
-    unsigned char   TmpByte;
-
-	/// Spezial ///
-	/// Annahme das PB3 ein PWM Signal ausgibt bei VIA2 [LED RW]
-
-	uint32_t counter_sample_pb3;
-	uint32_t addition_sample_pb3;
-	float rms_pb3;
+    uint8_t   io[16];
+    uint8_t   pa;
+    uint8_t   pb;
+    uint8_t   ddra;
+    uint8_t   ddrb;
+    uint16_t  timera;
+    uint16_t  timera_latch;
+    uint16_t  timerb;
+    uint16_t  timerb_latch;
 };
 
 #endif // MOS6522_CLASS_H

@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -36,7 +35,6 @@ MOS6502::MOS6502(void)
     SP = 0;
     SR = 32;
 
-    irq_state = 0;              // if Größer 0 ist die Leitung low
     irq_is_low_pegel = false;
     irq_is_active = false;
 
@@ -63,30 +61,9 @@ void MOS6502::Reset(void)
     PC++;
 }
 
-void MOS6502::TriggerInterrupt(int typ)
+void MOS6502::SetInterrupt(bool state)
 {
-    switch (typ)
-    {
-    case VIA1_IRQ:
-        irq_state |= 0x01;
-        break;
-    case VIA2_IRQ:
-        irq_state |= 0x02;
-        break;
-    }
-}
-
-void MOS6502::ClearInterrupt(int typ)
-{
-    switch (typ)
-    {
-    case VIA1_IRQ:
-        irq_state &= ~0x01;
-        break;
-    case VIA2_IRQ:
-        irq_state &= ~0x02;
-        break;
-    }
+    irq_is_low_pegel = state;
 }
 
 void MOS6502::ClearJAMFlag(void)
@@ -161,7 +138,7 @@ void MOS6502::GetInterneRegister(IREG_STRUCT* ireg)
     ireg->address = Adresse;
     ireg->branch_address = BranchAdresse;
     ireg->tmp_byte = TMPByte;
-    ireg->irq = irq_state;
+    ireg->irq = irq_is_low_pegel;
     ireg->reset = *RESET;
 }
 
@@ -256,12 +233,6 @@ bool MOS6502::OneZyklus(void)
         MCT = ((unsigned char*)MicroCodeTable6502 + (0x100*MCTItemSize));
         AktOpcode = 0x100;
     }
-
-    // IRQ auf low Pegel prüfen
-    if(irq_state > 0)
-        irq_is_low_pegel = true;
-    else
-        irq_is_low_pegel = false;
 
     switch(*MCT)
     {

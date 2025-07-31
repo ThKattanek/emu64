@@ -8,21 +8,16 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "mos6522_class.h"
 
-MOS6522::MOS6522(unsigned char via_nr):
-    DiskMotorOn(0),
-    FloppyIEC(0),
-    C64IEC(0),
-    Jumper(0)
+MOS6522::MOS6522(bool *reset_line, bool *irq_line)
 {
-    VIANummer = via_nr;
-    Reset();
+    this->reset_line = reset_line;
+    this->irq_line = irq_line;
 }
 
 MOS6522::~MOS6522()
@@ -31,397 +26,184 @@ MOS6522::~MOS6522()
 
 void MOS6522::Reset()
 {
-    for(int i=0;i<16;i++) IO[i] = 0x00;
+    for(int i=0; i<16; i++) io[i] = 0x00;
 
-    IO[0]=0xFF;
-    IO[1]=0xFF;
-    IO[2]=0xFF;
-    IO[3]=0xFF;
+    io[0]=0xff;
+    io[1]=0xff;
+    io[2]=0xff;
+    io[3]=0xff;
 
-    PA = 0xFF;
-    PB = 0xFF;
-    DDRA = 0xFF;
-    DDRB = 0xFF;
-
-    if(DiskMotorOn) *DiskMotorOn = true;
-
-    ATNState = false;
-    IECInterrupt = false;
-
-	counter_sample_pb3 = 0;
-	addition_sample_pb3 = 0;
-	rms_pb3 = 0.0f;
+    pa = 0xff;
+    pb = 0xff;
+    ddra = 0xff;
+    ddrb = 0xff;
 }
 
 void MOS6522::OneZyklus()
 {
-    if(!*RESET) Reset();
+    if(!*reset_line) Reset();
 
-    TimerA--;
-    TimerB--;
+    timera--;
+    timerb--;
 
-    if(TimerA == 0)
+    if(timerb == 0)
     {
-        IO[0x0D] |= 0x40;
-        TimerA = TimerALatch;
+        io[0x0d] |= 0x40;
+        timera = timera_latch;
     }
 
-    if(TimerB == 0)
+    if(timerb == 0)
     {
-        IO[0x0D] |= 0x20;
-        TimerB = TimerBLatch;
+        io[0x0d] |= 0x20;
+        timerb = timerb_latch;
     }
 
-    if(VIANummer == 0)
+    if (((io[0x0d] & 127) & (io[0x0e] & 127)) != 0)
     {
-        if (((*C64IEC) ^ OldIECLines) & 0x10)
-        {
-            ATNState = true;
-            if (OldIECLines & 0x10) // ATN 1->0
-            IECInterrupt = true;
-        }
-        OldIECLines = *C64IEC;
+        if(irq_line)
+            *irq_line = true;
 
-        OldATNState = ATNState;
-        ATNState = false;
-
-        if(OldATNState)
-        {
-            TmpByte = ~PB & DDRB;
-            *FloppyIEC = ((TmpByte << 6) & ((~TmpByte ^ *C64IEC) << 3) & 0x80) |    // DATA (incl. ATN acknowledge)
-                         ((TmpByte << 3) & 0x40);                                   // CLK
-
-        }
-
-        if(IECInterrupt)
-        {
-            IECInterrupt = false;
-            IO[0x0D]|=0x02;
-        }
-    }
-
-    if (((IO[0x0D]&127)&(IO[0x0E]&127))!=0)
-    {
-        if(VIANummer == 0)TriggerInterrupt(VIA1_IRQ);
-        else TriggerInterrupt(VIA2_IRQ);
-        IO[0x0D]|=0x80;
+        io[0x0d] |= 0x80;
     }
     else
     {
-        if(VIANummer == 0)ClearInterrupt(VIA1_IRQ);
-        else ClearInterrupt(VIA2_IRQ);
+        if(irq_line)
+            *irq_line = false;
     }
-
-	if(VIANummer == 1)
-	{
-
-		/// Mittelwertbildung PB3 ///
-
-		counter_sample_pb3++;
-		addition_sample_pb3 += (IO[0] >> 3) & 1;
-		if(counter_sample_pb3 == 50000)
-		{
-			rms_pb3 = addition_sample_pb3 / 50000.0f;
-			counter_sample_pb3 = 0;
-			addition_sample_pb3 = 0;
-			if(rms_pb3 > 1.0f) rms_pb3 = 1.0f;
-		}
-	}
 }
 
-unsigned char MOS6522::GetIO_Zero(void)
+uint8_t MOS6522::GetIOZero(void)
 {
-	return IO[0];
+    return io[0];
 }
 
-float MOS6522::GetIOPB3_RMS()
+void MOS6522::WriteIO(uint16_t address, uint8_t value)
 {
-	return rms_pb3;
-}
+    io[address & 0x0f] = value;
 
-void MOS6522::WriteIO(unsigned short adresse, unsigned char wert)
-{
-    IO[adresse & 0xF] = wert;
-
-    switch(VIANummer)
+    switch (address & 0x0f)
     {
-    case 0: // VIA 1 // Komunitkation via IEC BUS
-    {
-        switch (adresse & 0xF)
+        case 0x00:
         {
-            case 0x00:
-            {
-                PB = wert;
-                wert = ~PB & DDRB;
-                *FloppyIEC = ((wert << 6) & ((~wert ^ *C64IEC) << 3) & 0x80) | ((wert << 3) & 0x40);
-                break;
-            }
-            case 0x01:
-            case 0x0F:
-            {
-                PA = wert;
-                break;
-            }
-            case 0x02:
-            {
-                DDRB = wert;
-                wert = ~PB & DDRB;
-                *FloppyIEC = ((wert << 6) & ((~wert ^ *C64IEC) << 3) & 0x80) | ((wert << 3) & 0x40);
-                break;
-            }
-            case 0x03:
-            {
-                DDRA = wert;
-                break;
-            }
-            case 0x04:
-            {
-                TimerALatch = (TimerALatch & 0xFF00) | wert;
-                break;
-            }
-            case 0x05:
-            {
-                TimerALatch = (TimerALatch & 0x00FF) | (wert << 8);
-                IO[0x0D] &=0xBF;
-                TimerA = TimerALatch;
-                break;
-            }
-            case 0x06:
-            {
-                TimerALatch = (TimerALatch & 0xFF00) | wert;
-                break;
-            }
-            case 0x07:
-            {
-                TimerALatch = (TimerALatch & 0x00FF) | (wert << 8);
-                break;
-            }
-            case 0x08:
-            {
-                TimerBLatch = (TimerBLatch & 0xFF00) | wert;
-                break;
-            }
-            case 0x09:
-            {
-                TimerBLatch = (TimerBLatch & 0x00FF) | (wert << 8);
-                IO[0x0D] &=0xDF;
-                TimerB = TimerBLatch;
-                break;
-            }
-            case 0x0D:
-            {
-                IO[0x0D]&= ~wert;
-                break;
-            }
-        }
-        break;
-    }
-    case 1: // VIA 2 // Schreib/Lese Einheit FloppyDisk
-    {
-        switch (adresse & 0xF)
-        {
-            case 0x00:
-            {
-                if ((PB ^ wert) & 3)	// Bits 0/1: Stepper motor
-                {
-                    if ((PB & 3) == ((wert+1) & 3))
-                    {
-                        SpurDec();
-                    }
-                    else if ((PB & 3) == ((wert-1) & 3))
-                    {
-                        SpurInc();
-                    }
-                }
-                PB = wert & 0xEF;
-                *DiskMotorOn = !!(wert&4);
-                break;
-            }
-            case 0x01:
-            case 0x0F:
-            {
-                PA=wert;
-                WriteGCRByte(PA);
-                break;
-            }
-            case 0x04:
-            {
-                TimerALatch = (TimerALatch & 0xFF00) | wert;
-                break;
-            }
-            case 0x05:
-            {
-                TimerALatch = (TimerALatch & 0x00FF) | (wert << 8);
-                IO[0x0D] &=0xBF;
-                TimerA = TimerALatch;
-                break;
-            }
-            case 0x06:
-            {
-                TimerALatch = (TimerALatch & 0xFF00) | wert;
-                break;
-            }
-            case 0x07:
-            {
-                TimerALatch = (TimerALatch & 0x00FF) | (wert << 8);
-                break;
-            }
-            case 0x08:
-            {
-                TimerBLatch = (TimerBLatch & 0xFF00) |wert;
-                break;
-            }
-            case 0x09:
-            {
-                TimerBLatch = (TimerBLatch & 0x00FF) | (wert << 8);
-                IO[0x0D] &=0xDF;
-                TimerB = TimerBLatch;
-                break;
-            }
-            case 0x0D:
-            {
-                IO[0x0D]&= ~wert;
-                break;
-            }
-        }
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-unsigned char MOS6522::ReadIO(unsigned short adresse)
-{
-    switch(VIANummer)
-    {
-        case 0: // VIA 1 // Komunitkation via IEC BUS
-        {
-            switch (adresse & 0xF)
-            {
-                case 0x00:
-                {
-                return (((PB & 0x1A)
-                    | ((*FloppyIEC & *C64IEC) >> 7)             // DATA
-                    | (((*FloppyIEC & *C64IEC) >> 4) & 0x04)	// CLK
-                    | ((*C64IEC << 3) & 0x80)) ^ 0x85)          // ATN
-                    | ((*Jumper<<5)&64)                         // Schalter S1 für Geräte Adresse
-                    | ((*Jumper<<5)&32);                        // Schalter S2
-                    break;
-                }
-                case 0x01:
-                {
-                    IO[0x0D]&=253;
-                }
-		[[fallthrough]];
-                case 15:
-                {
-                    return 0xFF;
-                }
-
-                case 0x02:
-                {
-                    return DDRB;
-                }
-                case 0x03:
-                {
-                    return DDRA;
-                }
-                case 0x04:
-                {
-                    IO[0x0D] &= 0xBF;
-                    return (unsigned char)TimerA;
-                }
-                case 0x05:
-                {
-                    return TimerA>>8;
-                }
-                case 0x06:
-                {
-                    return (unsigned char)TimerALatch;
-                }
-                case 0x07:
-                {
-                    return TimerALatch>>8;
-                }
-                case 0x08:
-                {
-                    IO[0x0D] &= 0xDF;
-                    return (unsigned char)TimerB;
-                }
-                case 0x09:
-                {
-                    return TimerB>>8;
-                }
-                case 0x0D:
-                {
-                    return IO[0x0D] | (IO[0x0D] & IO[0x0E] ? 0x80 : 0);
-                }
-            }
-            return IO[adresse & 0xF];
+            pa = value;
             break;
         }
-
-        case 1: // VIA 2 // Schreib/Lese Einheit FloppyDisk
+        case 0x01:
+    [[fallthrough]];
+        case 0x0f:
         {
-            switch (adresse & 0xF)
-            {
-                case 0x00:
-                {
-                    static unsigned char WP;
-                    if (*WriteProtect) WP = 0;
-                    else WP = 0x10;
-
-                    if (SyncFound != 0)
-                    {
-                        if (SyncFound()) return (PB & 0x7F) | WP;
-                        else return PB | 0x80 | WP;
-                    }
-                }
-		[[fallthrough]];
-                case 0x01:
-                case 0x0F:
-                {
-                    return ReadGCRByte();
-                }
-                case 0x04:
-                {
-                    IO[0x0D] &= 0xBF;
-                    return (unsigned char)TimerA;
-                }
-                case 0x05:
-                {
-                    return TimerA>>8;
-                }
-                case 0x06:
-                {
-                    return (unsigned char)TimerALatch;
-                }
-                case 0x07:
-                {
-                    return TimerALatch>>8;
-                }
-                case 0x08:
-                {
-                    IO[0x0D] &= 0xDF;
-                    return (unsigned char)TimerB;
-                }
-                case 0x09:
-                {
-                    return TimerB>>8;
-                }
-                case 0x0D:
-                {
-                    return IO[0x0D] | (IO[0x0D] & IO[0x0E] ? 0x80 : 0);
-                }
-                default:
-                    return IO[adresse & 0xF];
-                break;
-            }
+            pa = value;
             break;
         }
-        default:
-            return 0;
+        case 0x02:
+        {
+            ddrb = value;
             break;
+        }
+        case 0x03:
+        {
+            ddra = value;
+            break;
+        }
+        case 0x04:
+        {
+            timera_latch = (timera_latch & 0xff00) | value;
+            break;
+        }
+        case 0x05:
+        {
+            timera_latch = (timera_latch & 0x00ff) | (value << 8);
+            io[0x0d] &=0xbf;
+            timera = timera_latch;
+            break;
+        }
+        case 0x06:
+        {
+            timera_latch = (timera_latch & 0xff00) | value;
+            break;
+        }
+        case 0x07:
+        {
+            timera_latch = (timera_latch & 0x00ff) | (value << 8);
+            break;
+        }
+        case 0x08:
+        {
+            timerb_latch = (timerb_latch & 0xFF00) | value;
+            break;
+        }
+        case 0x09:
+        {
+            timerb_latch = (timerb_latch & 0x00FF) | (value << 8);
+            io[0x0D] &=0xDF;
+            timerb = timerb_latch;
+            break;
+        }
+        case 0x0D:
+        {
+            io[0x0d] &= ~value;
+            break;
+        }
     }
+}
+
+uint8_t MOS6522::ReadIO(unsigned short address)
+{
+    switch (address & 0x0f)
+    {
+        case 0x00:
+        {
+            return pa | (ddra & 0x80 ? 0 : 0xff);
+            break;
+        }
+        case 0x01:
+        {
+            io[0x0D] &= 253;
+        }
+    [[fallthrough]];
+        case 0x0f:
+        {
+            return 0xff;
+        }
+
+        case 0x02:
+        {
+            return ddrb;
+        }
+        case 0x03:
+        {
+            return ddra;
+        }
+        case 0x04:
+        {
+            io[0x0d] &= 0xbf;
+            return (unsigned char)timera;
+        }
+        case 0x05:
+        {
+            return timera >> 8;
+        }
+        case 0x06:
+        {
+            return (unsigned char)timera_latch;
+        }
+        case 0x07:
+        {
+            return timera_latch >> 8;
+        }
+        case 0x08:
+        {
+            io[0x0D] &= 0xDF;
+            return (unsigned char)timerb;
+        }
+        case 0x09:
+        {
+            return timerb>>8;
+        }
+        case 0x0D:
+        {
+            return io[0x0d] | (io[0x0d] & io[0x0e] ? 0x80 : 0);
+        }
+    }
+    return io[address & 0x0f];
 }

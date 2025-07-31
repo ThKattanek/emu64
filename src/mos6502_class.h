@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,7 +16,6 @@
 #define MOS6502_CLASS_H
 
 #include <functional>
-
 #include "./structs.h"
 
 class MOS6502
@@ -37,9 +35,7 @@ public:
     void SetRegister(REG_STRUCT *reg);
     void GetInterneRegister(IREG_STRUCT *ireg);
     void SET_SR_BIT6(void);
-
-    void TriggerInterrupt(int typ);
-    void ClearInterrupt(int typ);
+    void SetInterrupt(bool state);
 
     std::function<unsigned char(unsigned short)> *ReadProcTbl;
     std::function<void(unsigned short,unsigned char)> *WriteProcTbl;
@@ -90,7 +86,6 @@ private:
     unsigned char   SP;
     unsigned char   SR;
 
-    unsigned char   irq_state;          // if Größer 0 ist die Leitung low
     bool            irq_is_low_pegel;
     bool            irq_is_active;
 

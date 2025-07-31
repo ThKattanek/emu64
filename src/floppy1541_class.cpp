@@ -40,26 +40,30 @@ Floppy1541::Floppy1541(bool *reset_line, int samplerate, int buffersize, bool *f
 
     for(int i=0;i<256;i++)
     {
-        ReadProcTbl[i] = std::bind(&Floppy1541::ReadNoMem,this,std::placeholders::_1);
-        WriteProcTbl[i] = std::bind(&Floppy1541::WriteNoMem,this,std::placeholders::_1,std::placeholders::_2);
+        ReadProcTbl[i] = std::bind(&Floppy1541::ReadNoMem, this, std::placeholders::_1);
+        WriteProcTbl[i] = std::bind(&Floppy1541::WriteNoMem, this, std::placeholders::_1, std::placeholders::_2);
     }
 
     for(int i=0;i<8;i++)
     {
-        ReadProcTbl[i] = std::bind(&Floppy1541::ReadRam,this,std::placeholders::_1);
-        WriteProcTbl[i] = std::bind(&Floppy1541::WriteRam,this,std::placeholders::_1,std::placeholders::_2);
+        ReadProcTbl[i] = std::bind(&Floppy1541::ReadRam, this, std::placeholders::_1);
+        WriteProcTbl[i] = std::bind(&Floppy1541::WriteRam, this,std::placeholders::_1, std::placeholders::_2);
     }
 
     for(int i=0;i<64;i++)
     {
-        ReadProcTbl[i+0xC0] = std::bind(&Floppy1541::ReadRom,this,std::placeholders::_1);
+        ReadProcTbl[i+0xC0] = std::bind(&Floppy1541::ReadRom, this, std::placeholders::_1);
     }
 
-    //ReadProcTbl[0x18] = std::bind(&MOS6522::ReadIO,via1,std::placeholders::_1);
-    //WriteProcTbl[0x18] = std::bind(&MOS6522::WriteIO,via1,std::placeholders::_1,std::placeholders::_2);
+    // initialize MOS6522
+    via1 = new MOS6522(reset_line, &via1_irq_line);
+    via2 = new MOS6522(reset_line, &via2_irq_line);
 
-    //ReadProcTbl[0x1C] = std::bind(&MOS6522::ReadIO,via2,std::placeholders::_1);
-    //WriteProcTbl[0x1C] = std::bind(&MOS6522::WriteIO,via2,std::placeholders::_1,std::placeholders::_2);
+    ReadProcTbl[0x18] = std::bind(&Floppy1541::ReadVia1, this, std::placeholders::_1);
+    WriteProcTbl[0x18] = std::bind(&Floppy1541::WriteVia1, this, std::placeholders::_1, std::placeholders::_2);
+
+    ReadProcTbl[0x1C] = std::bind(&Floppy1541::ReadVia2, this,std::placeholders::_1);
+    WriteProcTbl[0x1C] = std::bind(&Floppy1541::WriteVia2, this,std::placeholders::_1, std::placeholders::_2);
 
     memset(cpu_pc_history, 0, sizeof(cpu_pc_history));
     memset(breakpoints, 0, sizeof(breakpoints));
@@ -69,6 +73,8 @@ Floppy1541::Floppy1541(bool *reset_line, int samplerate, int buffersize, bool *f
 Floppy1541::~Floppy1541()
 {
     if(cpu != nullptr) delete cpu;
+    if(via1 != nullptr) delete via1;
+    if(via2 != nullptr) delete via2;
 }
 
 void Floppy1541::SetEnableFloppy(bool state)
@@ -81,8 +87,8 @@ void Floppy1541::SetEnableFloppy(bool state)
         cycle_counter = 0;
 
         cpu->Reset();
-        //via1->Reset();
-        //via2->Reset();
+        via1->Reset();
+        via2->Reset();
 
         //StepperIncWait = true;
 
@@ -249,15 +255,21 @@ bool Floppy1541::OneCycle()
     cycle_counter++;
 
     // PHI1
-    /*
     via1->OneZyklus();
     via2->OneZyklus();
 
-    if(via2->GetIO_Zero()&4) cpu->SET_SR_BIT6();
+    if(via2->GetIOZero() & 0x04) cpu->SET_SR_BIT6();
 
-    if((VIA1_IRQ == true) || (VIA2_IRQ == true)) IRQ = true;
-    else IRQ = false;
-    */
+    if(via1_irq_line || via2_irq_line)
+    {
+        // If IRQ Line is active, set the IRQ line of the CPU
+        cpu->SetInterrupt(true);
+    }
+    else
+    {
+        // If IRQ Line is inactive, clear the IRQ line of the CPU
+        cpu->SetInterrupt(false);
+    }
 
     cpu->Phi1();
 
@@ -405,7 +417,7 @@ int Floppy1541::LoadBreakGroups(const char *filename)
     }
 
     /// Kennung ///
-    reading_elements = fread(id, sizeof(id), 1, file);
+    fread(id, sizeof(id), 1, file);
     if(0 != strcmp("EMU64_BPT", id))
     {
         /// Kein Emu64 Format ///
@@ -414,7 +426,7 @@ int Floppy1541::LoadBreakGroups(const char *filename)
     }
 
     /// Version ///
-    reading_elements = fread(&version, sizeof(version), 1, file);
+    fread(&version, sizeof(version), 1, file);
 
     switch(version)
     {
@@ -718,4 +730,24 @@ uint8_t Floppy1541::ReadRam(uint16_t address)
 uint8_t Floppy1541::ReadRom(uint16_t address)
 {
     return rom[(address - 0xc000) & 0x3fff]; // Read from ROM, address must be in range 0xc000-0xffff];
+}
+
+uint8_t Floppy1541::ReadVia1(uint16_t address)
+{
+    return via1->ReadIO(address);
+}
+
+void Floppy1541::WriteVia1(uint16_t address, uint8_t value)
+{
+    via1->WriteIO(address, value);
+}
+
+uint8_t Floppy1541::ReadVia2(uint16_t address)
+{
+    return via2->ReadIO(address);
+}
+
+void Floppy1541::WriteVia2(uint16_t address, uint8_t value)
+{
+    via2->WriteIO(address, value);
 }
