@@ -552,7 +552,20 @@ void Floppy1541::SetWriteProtect(bool status)
     WriteProtect = WriteProtectAkt = status;
 }
 
+void Floppy1541::GetFloppyInfo(FLOPPY_INFO *fi)
+{
+    fi->Sektor = RAM[0x19];
+    fi->Spur = (AktHalbSpur+1)>>1;
 
+    uint8_t tmp = via2->GetIO_Zero();
+    fi->Motor = !!(tmp&4);
+    fi->Data = !!(tmp&8);
+    fi->Data_RMS = via2->GetIOPB3_RMS();
+
+    fi->ErrorFlag = RAM[0x26D];
+    for(int i=0; i<36; i++)
+        fi->ErrorMsg[i] = RAM[0x2D5 + i];
+}
 
 bool Floppy1541::LoadDosRom(const char *filename)
 {

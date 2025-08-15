@@ -95,6 +95,11 @@ private:
     MOS6522 *via1 = nullptr;
     MOS6522 *via2 = nullptr;
 
+
+    bool old_motor_state = false;   // Previous disk motor state for sound handling
+    bool motor_state = false;       // Current disk motor state
+
+
     // Memory Handling
     std::function<uint8_t(uint16_t)>  ReadProcTbl[256];
     std::function<void(uint16_t, uint8_t)> WriteProcTbl[256];
@@ -105,11 +110,12 @@ private:
     uint8_t ReadRam(uint16_t address);
     uint8_t ReadRom(uint16_t address);
 
-    // VIA Read/Write I/O
-    uint8_t ReadVia1(uint16_t address);
-    void WriteVia1(uint16_t address, uint8_t value);
-    uint8_t ReadVia2(uint16_t address);
-    void WriteVia2(uint16_t address, uint8_t value);
+    // VIA Ports
+    void WritePortVia1(MOS6522::PORTS port, MOS6522 *via1);
+    uint8_t ReadPortVia1(MOS6522::PORTS port, MOS6522 *via1);
+
+    void WritePortVia2(MOS6522::PORTS port, MOS6522 *via2);
+    uint8_t ReadPortVia2(MOS6522::PORTS port, MOS6522 *via2);
 
     uint8_t ram[0x800];     // 2K RAM
     uint8_t rom[0x4000];    // 16K ROM

@@ -14,6 +14,8 @@
 
 #include "mos6522_class.h"
 
+
+
 MOS6522::MOS6522(bool *reset_line, bool *irq_line)
 {
     this->reset_line = reset_line;
@@ -26,23 +28,20 @@ MOS6522::~MOS6522()
 
 void MOS6522::Reset()
 {
-    for(int i=0; i<16; i++) io[i] = 0x00;
+    ora = orb = 0x00;
+    ddra = ddrb = 0x00;
+    ioa = iob = 0xff;
+    ioa_old = iob_old = 0xff;
+    latcha = latchb = 0x00;
 
-    io[0]=0xff;
-    io[1]=0xff;
-    io[2]=0xff;
-    io[3]=0xff;
-
-    pa = 0xff;
-    pb = 0xff;
-    ddra = 0xff;
-    ddrb = 0xff;
+    pcr = acr = 0;
 }
 
 void MOS6522::OneZyklus()
 {
     if(!*reset_line) Reset();
 
+    /*
     timera--;
     timerb--;
 
@@ -70,140 +69,59 @@ void MOS6522::OneZyklus()
         if(irq_line)
             *irq_line = false;
     }
-}
-
-uint8_t MOS6522::GetIOZero(void)
-{
-    return io[0];
+    */
 }
 
 void MOS6522::WriteIO(uint16_t address, uint8_t value)
 {
-    io[address & 0x0f] = value;
+    address &= 0x0f; // Ensure address is within range
 
-    switch (address & 0x0f)
+    io[address] = value;
+
+    switch (address)
     {
-        case 0x00:
-        {
-            pa = value;
-            break;
-        }
-        case 0x01:
-    [[fallthrough]];
-        case 0x0f:
-        {
-            pa = value;
-            break;
-        }
-        case 0x02:
-        {
-            ddrb = value;
-            break;
-        }
-        case 0x03:
-        {
-            ddra = value;
-            break;
-        }
-        case 0x04:
-        {
-            timera_latch = (timera_latch & 0xff00) | value;
-            break;
-        }
-        case 0x05:
-        {
-            timera_latch = (timera_latch & 0x00ff) | (value << 8);
-            io[0x0d] &=0xbf;
-            timera = timera_latch;
-            break;
-        }
-        case 0x06:
-        {
-            timera_latch = (timera_latch & 0xff00) | value;
-            break;
-        }
-        case 0x07:
-        {
-            timera_latch = (timera_latch & 0x00ff) | (value << 8);
-            break;
-        }
-        case 0x08:
-        {
-            timerb_latch = (timerb_latch & 0xFF00) | value;
-            break;
-        }
-        case 0x09:
-        {
-            timerb_latch = (timerb_latch & 0x00FF) | (value << 8);
-            io[0x0D] &=0xDF;
-            timerb = timerb_latch;
-            break;
-        }
-        case 0x0D:
-        {
-            io[0x0d] &= ~value;
-            break;
-        }
+    case VIA_PRA:
+        [[fallthrough]];
+    case VIA_PRA_NHS:
+    case VIA_DDRA:
+        break;
+    case VIA_PRB:
+        [[fallthrough]];
+    case VIA_DDRB:
+        if(address == VIA_PRB)
+            orb = value; // Update Output Port B
+        else
+            ddrb = value; // Update Data Direction Register B
+
+        uint8_t iob = orb | ~ddrb;
+        this->iob = iob;
+
+        WritePort(PORTS::B, this);
+
+        iob_old = iob;
+        break;
     }
 }
 
 uint8_t MOS6522::ReadIO(unsigned short address)
 {
-    switch (address & 0x0f)
-    {
-        case 0x00:
-        {
-            return pa | (ddra & 0x80 ? 0 : 0xff);
-            break;
-        }
-        case 0x01:
-        {
-            io[0x0D] &= 253;
-        }
-    [[fallthrough]];
-        case 0x0f:
-        {
-            return 0xff;
-        }
+    address &= 0x0f; // Ensure address is within range
+    uint8_t value = 0xff;
 
-        case 0x02:
-        {
-            return ddrb;
-        }
-        case 0x03:
-        {
-            return ddra;
-        }
-        case 0x04:
-        {
-            io[0x0d] &= 0xbf;
-            return (unsigned char)timera;
-        }
-        case 0x05:
-        {
-            return timera >> 8;
-        }
-        case 0x06:
-        {
-            return (unsigned char)timera_latch;
-        }
-        case 0x07:
-        {
-            return timera_latch >> 8;
-        }
-        case 0x08:
-        {
-            io[0x0D] &= 0xDF;
-            return (unsigned char)timerb;
-        }
-        case 0x09:
-        {
-            return timerb>>8;
-        }
-        case 0x0D:
-        {
-            return io[0x0d] | (io[0x0d] & io[0x0e] ? 0x80 : 0);
-        }
+    switch (address)
+    {
+    case VIA_PRB: {
+        uint8_t out;
+        if ( acr & 2 )
+            out = latchb;
+        else
+            out =  ReadPort( PORTS::B, this );
+
+        return out;
     }
-    return io[address & 0x0f];
+    default:
+        break;
+    }
+
+    return io[address];
 }

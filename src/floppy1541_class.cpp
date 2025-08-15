@@ -59,15 +59,21 @@ Floppy1541::Floppy1541(bool *reset_line, int samplerate, int buffersize, bool *f
     via1 = new MOS6522(reset_line, &via1_irq_line);
     via2 = new MOS6522(reset_line, &via2_irq_line);
 
-    ReadProcTbl[0x18] = std::bind(&Floppy1541::ReadVia1, this, std::placeholders::_1);
-    WriteProcTbl[0x18] = std::bind(&Floppy1541::WriteVia1, this, std::placeholders::_1, std::placeholders::_2);
+    ReadProcTbl[0x18] = std::bind(&MOS6522::ReadIO, via1, std::placeholders::_1);
+    WriteProcTbl[0x18] = std::bind(&MOS6522::WriteIO, via1, std::placeholders::_1, std::placeholders::_2);
 
-    ReadProcTbl[0x1C] = std::bind(&Floppy1541::ReadVia2, this,std::placeholders::_1);
-    WriteProcTbl[0x1C] = std::bind(&Floppy1541::WriteVia2, this,std::placeholders::_1, std::placeholders::_2);
+    ReadProcTbl[0x1C] = std::bind(&MOS6522::ReadIO, via2,std::placeholders::_1);
+    WriteProcTbl[0x1C] = std::bind(&MOS6522::WriteIO, via2,std::placeholders::_1, std::placeholders::_2);
 
     memset(cpu_pc_history, 0, sizeof(cpu_pc_history));
     memset(breakpoints, 0, sizeof(breakpoints));
     memset(breakvalues, 0, sizeof(breakvalues));
+
+    // VIA Ports
+    via1->ReadPort = std::bind(&Floppy1541::ReadPortVia1, this, std::placeholders::_1, std::placeholders::_2);
+    via1->WritePort = std::bind(&Floppy1541::WritePortVia1, this, std::placeholders::_1, std::placeholders::_2);
+    via2->ReadPort = std::bind(&Floppy1541::ReadPortVia2, this, std::placeholders::_1, std::placeholders::_2);
+    via2->WritePort = std::bind(&Floppy1541::WritePortVia2, this, std::placeholders::_1, std::placeholders::_2);
 }
 
 Floppy1541::~Floppy1541()
@@ -258,7 +264,7 @@ bool Floppy1541::OneCycle()
     via1->OneZyklus();
     via2->OneZyklus();
 
-    if(via2->GetIOZero() & 0x04) cpu->SET_SR_BIT6();
+    //if(via2->GetIOZero() & 0x04) cpu->SET_SR_BIT6();
 
     if(via1_irq_line || via2_irq_line)
     {
@@ -283,6 +289,7 @@ bool Floppy1541::OneCycle()
 
     // PHI2
     bool ret = cpu->OneZyklus();
+
     if(breakstate != 0) *found_breakpoint = true;
     return ret;
 }
@@ -319,7 +326,20 @@ void Floppy1541::ZeroSoundBufferPos()
 
 void Floppy1541::GetFloppyInfo(FLOPPY_INFO *fi)
 {
+    fi->Sektor = 0;
+    fi->Spur = 0;
 
+    //fi->Sektor = RAM[0x19];
+    //fi->Spur = (AktHalbSpur+1)>>1;
+
+    //uint8_t tmp = via2->GetIO_Zero();
+    fi->Motor = motor_state;
+    fi->Data = !!(via2->GetOutputPB() & 0x08);
+    //fi->Data_RMS = via2->GetIOPB3_RMS();
+
+    //fi->ErrorFlag = RAM[0x26D];
+    //for(int i=0; i<36; i++)
+        //fi->ErrorMsg[i] = RAM[0x2D5 + i];
 }
 
 void Floppy1541::UpdateBreakGroup()
@@ -732,22 +752,30 @@ uint8_t Floppy1541::ReadRom(uint16_t address)
     return rom[(address - 0xc000) & 0x3fff]; // Read from ROM, address must be in range 0xc000-0xffff];
 }
 
-uint8_t Floppy1541::ReadVia1(uint16_t address)
+void Floppy1541::WritePortVia1(MOS6522::PORTS port, MOS6522 *via1)
 {
-    return via1->ReadIO(address);
+    // IEC Communication
 }
 
-void Floppy1541::WriteVia1(uint16_t address, uint8_t value)
+uint8_t Floppy1541::ReadPortVia1(MOS6522::PORTS port, MOS6522 *via1)
 {
-    via1->WriteIO(address, value);
+    // IEC Communication
 }
 
-uint8_t Floppy1541::ReadVia2(uint16_t address)
+void Floppy1541::WritePortVia2(MOS6522::PORTS port, MOS6522 *via2)
 {
-    return via2->ReadIO(address);
+    // Discontroller
+    if(port == MOS6522::PORTS::B)
+    {
+        if(via2->iob & 0x04)
+            motor_state = true; // Set motor state
+        else
+            motor_state = false; // Clear motor state
+    }
+
 }
 
-void Floppy1541::WriteVia2(uint16_t address, uint8_t value)
+uint8_t Floppy1541::ReadPortVia2(MOS6522::PORTS port, MOS6522 *via2)
 {
-    via2->WriteIO(address, value);
+    // Discontroller
 }
