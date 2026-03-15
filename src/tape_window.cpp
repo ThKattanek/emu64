@@ -84,9 +84,18 @@ TapeWindow::~TapeWindow()
     }
     ////////////////////////////////////
 
-    delete refresh_timer;
+    if(refresh_timer != nullptr) delete refresh_timer;
 
     delete ui;
+
+    if(VolMute != nullptr) delete VolMute;
+    if(VolLow != nullptr) delete VolLow;
+    if(VolMedium != nullptr) delete VolMedium;
+    if(VolHigh != nullptr) delete VolHigh;
+    if(GreenLEDOff != nullptr) delete GreenLEDOff;
+    if(GreenLEDOn != nullptr) delete GreenLEDOn;
+    if(RedLEDOff != nullptr) delete RedLEDOff;
+    if(RedLEDOn != nullptr) delete RedLEDOn;
 }
 
 void TapeWindow::RetranslateUi()

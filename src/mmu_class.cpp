@@ -13,7 +13,9 @@
 //////////////////////////////////////////////////
 
 #include "mmu_class.h"
-#include <fstream>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 
 MMU::MMU(void)
 {
@@ -32,7 +34,7 @@ MMU::MMU(void)
 
     InitProcTables();
 
-	srand (time(NULL));
+    std::srand (std::time(NULL));
 }
 
 MMU::~MMU(void)

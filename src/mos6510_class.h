@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 15.09.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,8 +17,6 @@
 
 #include "./structs.h"
 #include <functional>
-
-#define DEBUG_CART_ADRESS 0xD7FF
 
 class MOS6510
 {
@@ -35,8 +32,6 @@ public:
     void SetRegister(REG_STRUCT *reg);
     bool GetInterrupts(int typ);
     void GetInterneRegister(IREG_STRUCT *ireg);
-    void SetEnableDebugCart(bool enabled);
-    unsigned char GetDebugCartValue();
     //bool SaveFreez(FILE *File);
     //bool LoadFreez(FILE *File,unsigned short Version);
 
@@ -52,7 +47,6 @@ public:
     bool *RDY;
     bool *RESET;
     bool WRITE_FF00;
-    bool WRITE_DEBUG_CART;
 
     bool EnableExtInterrupts;
 
@@ -109,10 +103,7 @@ private:
     bool            nmi_fall_edge;
     bool            nmi_is_active;
 
-    bool            EnableDebugCart;
-    unsigned char   DebugCartValue;
-
-	bool			shxy_dma;
+    bool             shxy_dma;
 	uint8_t			axa_byte;
 };
 

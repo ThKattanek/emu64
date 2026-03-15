@@ -29,6 +29,9 @@ WidgetTapeCounter::WidgetTapeCounter(QWidget *parent) :
 WidgetTapeCounter::~WidgetTapeCounter()
 {
     delete ui;
+
+    delete pix1;
+    delete pix3;
 }
 
 void WidgetTapeCounter::SetCounter(unsigned int count)

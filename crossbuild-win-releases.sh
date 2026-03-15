@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 24.06.2023                //
+# // Letzte Änderung am 15.03.2026                //
 # // www.emu64-projekt.de                         //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -100,6 +100,12 @@ if [ $i686_ok ] && [ $x32 = true ]; then
     # compile ts files
     lrelease ../src/src.pro
     
+    # Alle PKG_CONFIG Pfade auf MXE umbiegen (hier für i686)
+    export PKG_CONFIG="$mxe_path/usr/bin/i686-w64-mingw32.static-pkg-config"
+    export PKG_CONFIG_LIBDIR="$mxe_path/usr/i686-w64-mingw32.static/lib/pkgconfig:$mxe_path/usr/i686-w64-mingw32.static/share/pkgconfig"
+    export PKG_CONFIG_PATH="$PKG_CONFIG_LIBDIR"
+    export PKG_CONFIG_SYSROOT_DIR="$mxe_path/usr/i686-w64-mingw32.static"
+
     # execute qmake
     cd $build_i686_dir
     $i686_qmake PREFIX=$install_i686_dir QMAKE_LIBDIR=$i686_libpath ../.. 
@@ -156,6 +162,12 @@ if [ $x86_64_ok ] && [ $x64 = true ]; then
     
     # compile ts files
     lrelease ../src/src.pro
+
+    # Alle PKG_CONFIG Pfade auf MXE umbiegen (hier für i686)
+    export PKG_CONFIG="$mxe_path/usr/bin/x86_64-w64-mingw32.static-pkg-config"
+    export PKG_CONFIG_LIBDIR="$mxe_path/usr/x86_64-w64-mingw32.static/lib/pkgconfig:$mxe_path/usr/x86_64-w64-mingw32.static/share/pkgconfig"
+    export PKG_CONFIG_PATH="$PKG_CONFIG_LIBDIR"
+    export PKG_CONFIG_SYSROOT_DIR="$mxe_path/usr/x86_64-w64-mingw32.static"
 
     # execute qmake
     cd $build_x86_64_dir

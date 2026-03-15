@@ -55,6 +55,8 @@
 
 #define MAX_VIDEO_DISPLAYS 8				  // Anzahl der Maximal unterstützen Video Displays
 
+#define DEBUG_CART_ADRESS 0xD7FF
+
 enum SCREENSHOT_FORMATS {SCREENSHOT_FORMAT_BMP, SCREENSHOT_FORMAT_PNG, SCREENSHOT_FORMATS_COUNT};
 
 class C64Class
@@ -331,6 +333,7 @@ public:
 
     SDL_Thread      *warp_thread;
     bool            warp_thread_end;
+    bool            warp_thread_is_end;
 
     uint8_t         *vic_buffer;
     VideoCrtClass   *video_crt_output;
@@ -520,8 +523,12 @@ private:
     bool        c64_command_line_count_s;
 
     uint32_t    cycle_counter;
-	int         limit_cycles_counter;        // Dieser Counter wird wenn er > 0 ist bei jeden Zyklus um 1 runtergezählt
-	bool		hold_next_system_cycle;		 // Wird dieses Flag gesetzt wird verhindert das ein C64 Cylce ausgeführt wird
+    int         limit_cycles_counter;           // Dieser Counter wird wenn er > 0 ist bei jeden Zyklus um 1 runtergezählt
+    bool		hold_next_system_cycle;         // Wird dieses Flag gesetzt wird verhindert das ein C64 Cylce ausgeführt wird
+
+    bool        enable_debug_cart;          // Wird auf true gesetzt wenn der Debug Cart aktiviert ist
+    bool        is_wtite_to_debug_cart;     // Wird auf true gesetzt wenn in den Debug Cart geschrieben wird
+    unsigned char   debug_cart_value;           // Wert der im Debug Cart steht
 
 	bool        debug_mode;
     bool        debug_animation;

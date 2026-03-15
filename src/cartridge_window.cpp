@@ -145,6 +145,9 @@ CartridgeWindow::~CartridgeWindow()
     ////////////////////////////////////
 
     delete ui;
+
+    if(LedRedOff != nullptr) delete LedRedOff;
+    if(LedRedOn != nullptr) delete LedRedOn;
 }
 
 void CartridgeWindow::LoadIni(void)

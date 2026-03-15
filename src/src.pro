@@ -8,7 +8,7 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 24.06.2023                //
+# // Letzte Änderung am 15.03.2026                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -76,6 +76,10 @@ win32 {
 QMAKE_CXXFLAGS += -fopenmp
 LIBS += -fopenmp
 
+# Für AddressSanitize -> im Projekt kann als Compiler-Option LIBS="-lasan" angegen werden das Flag -fsanitize=address wird dann wohl automatisch gesetzt
+#QMAKE_CXXFLAGS += -fsanitize=address
+#LIBS += -lasan
+
 CONFIG += link_pkgconfig
 PKGCONFIG += sdl2 SDL2_image libpng glu libavutil libavformat libavcodec libswresample libswscale gl
 
@@ -88,12 +92,18 @@ equals(QT_MAJOR_VERSION, 5) {
 
     DEFINES += ZIP_SUPPORT
 
-    system(pkg-config --exists quazip1-qt5) {
+    # Use PKG_CONFIG from environment for cross builds, fallback to pkg-config
+    PKG_CONFIG_BIN = $$(PKG_CONFIG)
+    isEmpty(PKG_CONFIG_BIN) {
+        PKG_CONFIG_BIN = pkg-config
+    }
+
+    system($$PKG_CONFIG_BIN --exists quazip1-qt5) {
         PKGCONFIG += quazip1-qt5
-    } else:system(pkg-config --exists quazip) {
-        message("Old Quazip found, appending include path")
+    } else:system($$PKG_CONFIG_BIN --exists quazip) {
+        message("Quazip (pkg-config name: quazip) found")
         PKGCONFIG += quazip
-        QUAZIPINC = $$system(pkg-config --variable=includedir quazip)
+        QUAZIPINC = $$system($$PKG_CONFIG_BIN --variable=includedir quazip)
         INCLUDEPATH += $${QUAZIPINC}/quazip5 $${QUAZIPINC}/quazip
     } else {
         message("Quazip not found, trying to guess")

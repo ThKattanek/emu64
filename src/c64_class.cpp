@@ -75,6 +75,9 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
 
     this->start_minimized = start_minimized;
 
+    LimitCyclesEvent = nullptr;
+    DebugCartEvent = nullptr;
+
     changed_graphic_modi = false;
     changed_window_pos = false;
     changed_window_size = false;
@@ -94,6 +97,9 @@ C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_cr
     virtual_port2 = 1;
 
     warp_mode = false;
+
+    enable_debug_cart = false;
+    is_wtite_to_debug_cart = false;
 
     LogText = log_function;
 
@@ -606,11 +612,26 @@ C64Class::~C64Class()
     if(crt != nullptr) delete crt;
     if(reu != nullptr) delete reu;
     if(geo != nullptr) delete geo;
+    if(tape != nullptr) delete tape;
 
     if(video_capture != nullptr) delete video_capture;
 
     if(audio_16bit_buffer != nullptr)
         delete [] audio_16bit_buffer;
+
+    SDL_FreeSurface(img_joy_arrow0);
+    SDL_FreeSurface(img_joy_arrow1);
+    SDL_FreeSurface(img_joy_button0);
+    SDL_FreeSurface(img_joy_button1);
+    SDL_FreeSurface(sdl_window_icon);
+
+    if(screenshot_dir != nullptr) delete[] screenshot_dir;
+
+    if(mutex1 != nullptr)
+    {
+        SDL_DestroyMutex(mutex1);
+        mutex1 = nullptr;
+    }
 }
 
 void C64Class::StartEmulation()
@@ -659,6 +680,8 @@ void C64Class::EndEmulation()
         time_out--;
     }
 
+    SDL_DetachThread(sdl_thread);
+
 	SDL_PauseAudioDevice(audio_dev, 1);
     if(audio_dev > 0) SDL_CloseAudioDevice(audio_dev);
 
@@ -673,7 +696,7 @@ void C64Class::SetLimitCycles(int nCycles)
 
 void C64Class::SetEnableDebugCart(bool enable)
 {
-    cpu->SetEnableDebugCart(enable);
+    enable_debug_cart = enable;
 }
 
 void AudioMix(void *not_used, Uint8 *stream, int laenge)
@@ -693,11 +716,14 @@ void AudioMix(void *not_used, Uint8 *stream, int laenge)
 int SDLThreadWarp(void *userdat)
 {
     C64Class *c64 = static_cast<C64Class*>(userdat);
+    c64->warp_thread_is_end = false;
 
     while(!c64->warp_thread_end)
     {
-        c64->WarpModeLoop();
+       c64->WarpModeLoop();
     }
+
+    c64->warp_thread_is_end = true;
     return 0;
 }
 
@@ -924,17 +950,17 @@ void C64Class::WarpModeLoop()
         }
     }
 
-    if(cpu->WRITE_DEBUG_CART)
+    // DebugCartEvent soll nur maximal einmal aufgerufen werden
+    if(is_wtite_to_debug_cart && (DebugCartEvent != nullptr))
     {
-        // Event auslösen
-        cpu->WRITE_DEBUG_CART = false;
-        if(DebugCartEvent != nullptr) DebugCartEvent(cpu->GetDebugCartValue());
+        is_wtite_to_debug_cart = false;
+        DebugCartEvent(debug_cart_value);
+        DebugCartEvent = nullptr; // Nur einmal aufrufen
     }
 
     NextSystemCycle();
 
     ////////////////////////// Testweise //////////////////////////
-
     static int zyklen_counter = 0;
     if(++zyklen_counter == 19656)
     {
@@ -1039,11 +1065,13 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 }
             }
 
-            if(cpu->WRITE_DEBUG_CART)
+
+            // DebugCartEvent soll nur maximal einmal aufgerufen werden
+            if(is_wtite_to_debug_cart && (DebugCartEvent != nullptr))
             {
-                // Event auslösen
-                cpu->WRITE_DEBUG_CART = false;
-                if(DebugCartEvent != nullptr) DebugCartEvent(cpu->GetDebugCartValue());
+                is_wtite_to_debug_cart = false;
+                DebugCartEvent(debug_cart_value);
+                DebugCartEvent = nullptr; // Nur einmal aufrufen
             }
 
             NextSystemCycle();
@@ -2710,12 +2738,21 @@ void C64Class::EnableWarpMode(bool enabled)
         SDL_PauseAudioDevice(audio_dev, 1);     // Audiostream pausieren
         warp_thread_end = false;
         warp_thread = SDL_CreateThread(SDLThreadWarp,"WarpThread",this);
+        LogText("WarpMode aktiviert\n");
     }
     else
     {
         // WarpMode deaktivieren
 		warp_thread_end = true;
+        SDL_DetachThread(warp_thread);
+
+        while(!warp_thread_is_end)
+        {
+            SDL_Delay(1);
+        }
+
         SDL_PauseAudioDevice(audio_dev, 0);     // Audiostream wieder starten
+        LogText("WarpMode deaktiviert\n");
 	}
 }
 
@@ -4003,7 +4040,7 @@ void C64Class::NextSystemCycle()
 {
     CheckKeys();
 
-	if(hold_next_system_cycle)
+    if(hold_next_system_cycle)
 		return;
 
     cycle_counter++;
@@ -4276,6 +4313,12 @@ bool C64Class::CheckBreakpoints()
 
 void C64Class::WriteSidIO(uint16_t address, uint8_t value)
 {
+    if((enable_debug_cart == true) && (address == DEBUG_CART_ADRESS))
+    {
+        debug_cart_value = value;
+        is_wtite_to_debug_cart = true;
+    }
+
     if(enable_stereo_sid)
     {
         if((address & 0xFFE0) == 0xD400) sid1->WriteIO(address,value);
