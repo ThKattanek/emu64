@@ -361,7 +361,7 @@ int MainWindow::OnInit(bool nogui)
 
     /// C64 Klasse Installieren ... Das HERZ ///
     ini->beginGroup("Sound");
-    soundbuffer_size = ini->value("SoundBufferSize",512).toInt();
+    soundbuffer_size = ini->value("SoundBufferSize",64).toInt();    // Es muss auch in der SetupWindow Klasse die gleiche Defaultgröße angegeben werden, da die C64 Klasse schon vor der SetupWindow Klasse erstellt wird und somit die Soundbuffergröße aus der INI geladen werden muss, bevor die SetupWindow Klasse erstellt wird.
     ini->endGroup();
 
     if(soundbuffer_size < 1)
