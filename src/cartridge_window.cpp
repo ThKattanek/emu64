@@ -49,9 +49,16 @@ CartridgeWindow::CartridgeWindow(QWidget *parent, QSettings *_ini, C64Class *c64
 
     ui->MoreCRTPage->setMinimumWidth(0);
 
-    QFontDatabase fontDB;
-    fontDB.addApplicationFont(":/fonts/lucon.ttf");
-    QFont font1("Lucida Console",9);
+    int id = QFontDatabase::addApplicationFont(":/fonts/lucon.ttf");
+
+    QString family = "Lucida Console"; // Fallback
+    if (id != -1) {
+        const QStringList families = QFontDatabase::applicationFontFamilies(id);
+        if (!families.isEmpty())
+            family = families.first(); // echte Familie aus der TTF
+    }
+
+    QFont font1(family, 9);
 
     ui->ChipData->setFont(font1);
     ui->ChipList->setFont(font1);

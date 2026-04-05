@@ -70,10 +70,16 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     icon_off = new QIcon(":/grafik/blue_led_off.png");
     icon_on = new QIcon(":/grafik/blue_led_on.png");
 
-    QFontDatabase fontDB;
-    fontDB.addApplicationFont(":/fonts/lucon.ttf");
+    int id = QFontDatabase::addApplicationFont(":/fonts/lucon.ttf");
 
-    QFont font1("Lucida Console",10);
+    QString family = "Lucida Console"; // Fallback
+    if (id != -1) {
+        const QStringList families = QFontDatabase::applicationFontFamilies(id);
+        if (!families.isEmpty())
+            family = families.first(); // echte Familie aus der TTF
+    }
+
+    QFont font1(family, 10);
 
     ui->MCodeHelp->setFont(font1);
 

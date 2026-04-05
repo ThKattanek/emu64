@@ -35,16 +35,23 @@ WidgetFloppyStatus::WidgetFloppyStatus(QWidget *parent, int floppy_nr, Floppy154
 
     ui->setupUi(this);
 
-    QFontDatabase fontDB;
+    int id = QFontDatabase::addApplicationFont(":/fonts/C64_Pro-STYLE.ttf");
 
-    fontDB.addApplicationFont(":/fonts/C64_Pro-STYLE.ttf");
-    QFont font("C64 Pro");
-    font.setPixelSize(8);
-    font.setStyleStrategy(QFont::PreferAntialias);
-    font.setBold(false);
-    font.setKerning(true);
+    QString family = "C64 Pro"; // Fallback
+    if (id != -1) {
+        const QStringList families = QFontDatabase::applicationFontFamilies(id);
+        if (!families.isEmpty())
+            family = families.first(); // echte Familie aus der TTF
+    }
 
-    ui->DisknameOut->setFont(font);
+    QFont font1(family, 8);
+
+    font1.setPixelSize(8);
+    font1.setStyleStrategy(QFont::PreferAntialias);
+    font1.setBold(false);
+    font1.setKerning(true);
+
+    ui->DisknameOut->setFont(font1);
 
     iGreenLedOff = new QIcon(":/grafik/green_off_32.png");
     iGreenLedOn = new QIcon(":/grafik/green_on_32.png");

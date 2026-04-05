@@ -29,9 +29,16 @@ ShowC64KeyMappingWindow::ShowC64KeyMappingWindow(QWidget *parent, C64Class *c64)
     // Center Window
     setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
-    QFontDatabase fontDB;
-    fontDB.addApplicationFont(":/fonts/lucon.ttf");
-    QFont font1("Lucida Console",10);
+    int id = QFontDatabase::addApplicationFont(":/fonts/lucon.ttf");
+
+    QString family = "Lucida Console"; // Fallback
+    if (id != -1) {
+        const QStringList families = QFontDatabase::applicationFontFamilies(id);
+        if (!families.isEmpty())
+            family = families.first(); // echte Familie aus der TTF
+    }
+
+    QFont font1(family, 10);
 
     ui->text_out->setFont(font1);
 
