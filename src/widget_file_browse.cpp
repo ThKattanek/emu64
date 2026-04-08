@@ -28,8 +28,6 @@ WidgetFileBrowse::WidgetFileBrowse(QWidget *parent) :
 
     ui->delete_file->setDisabled(true);
 
-    connect(ui->listView_filebrowser,SIGNAL(activated(QModelIndex)),this,SLOT(on_listView_filebrowser_clicked(QModelIndex)));
-
     ui->listWidget_zip->setMinimumHeight(0);
     ui->listWidget_zip->setMaximumHeight(0);
 
@@ -39,9 +37,25 @@ WidgetFileBrowse::WidgetFileBrowse(QWidget *parent) :
     dirmodel = new QFileSystemModel(this);
     dirmodel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files | QDir::AllEntries);
     dirmodel->setRootPath(QDir::rootPath());
+    ui->listView_filebrowser->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->listView_filebrowser->setModel(dirmodel);
     akt_fullpath = dirmodel->rootPath();
     ui->AktPath->setText(akt_fullpath);
+
+    // Signal für Mausklick auf Listenelemente verbinden
+    connect(ui->listView_filebrowser,SIGNAL(activated(QModelIndex)),this,SLOT(on_listView_filebrowser_clicked(QModelIndex)));
+
+    // Möglichkeit hinzugefügt, dass auch mit den Cursortasten durch die Liste navigiert werden kann und dabei die Datei ausgewählt wird
+    connect(ui->listView_filebrowser->selectionModel(),
+            &QItemSelectionModel::currentRowChanged,
+            this,
+            [this](const QModelIndex &current, const QModelIndex)
+            {
+                if (!current.isValid())
+                    return;
+
+                on_listView_filebrowser_clicked(current);
+            });
 
     // Laufwerke in Liste eintragen
     QFileInfoList file_info_list = QDir::drives();
@@ -215,6 +229,12 @@ void WidgetFileBrowse::on_to_parent_clicked()
     ui->AktPath->setText(akt_fullpath);
 }
 
+void WidgetFileBrowse::on_listView_filebrowser_activated(const QModelIndex &index)
+{
+    qDebug() << "Activated: " << dirmodel->filePath(index);
+}
+
+
 void WidgetFileBrowse::on_listView_filebrowser_clicked(const QModelIndex &index)
 {
     if(!dirmodel->fileInfo(index).isDir())
@@ -362,3 +382,10 @@ void WidgetFileBrowse::on_drive_list_currentIndexChanged(const QString &arg1)
 {
     SetAktDir(arg1);
 }
+
+
+void WidgetFileBrowse::on_listView_filebrowser_entered(const QModelIndex &index)
+{
+
+}
+
