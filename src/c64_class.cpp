@@ -17,6 +17,7 @@
 #include "./c64_file_types.h"
 
 #include <QDebug>
+#include <iostream>
 
 void AudioMix(void *not_used, Uint8 *stream, int laenge);
 int SDLThread(void *userdat);

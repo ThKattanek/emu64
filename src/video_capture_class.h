@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.03.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,7 +15,6 @@
 #ifndef VIDEO_CAPTURE_CLASS_H
 #define VIDEO_CAPTURE_CLASS_H
 
-#include <iostream>
 #include <SDL2/SDL.h>
 
 extern "C"

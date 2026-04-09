@@ -14,6 +14,7 @@
 
 #include <QScreen>
 #include <QStyle>
+#include <iostream>
 
 #include "./main_window.h"
 #include "./ui_main_window.h"
