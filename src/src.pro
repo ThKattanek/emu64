@@ -74,6 +74,10 @@ win32 {
 # Abhängigkeiten
 
 QMAKE_CXXFLAGS += -fopenmp
+
+# add compile flags for pedantic mode
+# QMAKE_CXXFLAGS += -O2 -Wall -Wextra -Werror -pedantic
+
 LIBS += -fopenmp
 
 # Für AddressSanitize -> im Projekt kann als Compiler-Option LIBS="-lasan" angegen werden das Flag -fsanitize=address wird dann wohl automatisch gesetzt

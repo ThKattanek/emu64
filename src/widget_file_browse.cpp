@@ -383,9 +383,3 @@ void WidgetFileBrowse::on_drive_list_currentIndexChanged(const QString &arg1)
     SetAktDir(arg1);
 }
 
-
-void WidgetFileBrowse::on_listView_filebrowser_entered(const QModelIndex &index)
-{
-
-}
-
