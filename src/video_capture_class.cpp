@@ -67,10 +67,9 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
 {
     if(is_capture_cctive) return false;
 
-    while(mutex_01){
+    while(mutex_01.exchange(true)){
         SDL_Delay(1);
-    }   // Warten bis Mutex1 Unlocked (false)
-    mutex_01 = true;      // Mutex1 Locken (true)
+    }   // Warten bis Mutex1 Unlocked (false) und dann Locken (true)
 
     video_xw = xw;
     video_yw = yw;
@@ -191,10 +190,9 @@ void VideoCaptureClass::StopCapture()
 
     is_capture_cctive = false;
 
-    while(mutex_01){
+    while(mutex_01.exchange(true)){
         SDL_Delay(1);
-    }   // Warten bis Mutex1 Unlocked (false)
-    mutex_01 = true;      // Mutex1 Locken (true)
+    }   // Warten bis Mutex1 Unlocked (false) und dann Locken (true)
 
 
     // Trailer schreiben
@@ -249,10 +247,9 @@ void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
         return;
     }
 
-    while(mutex_01){
+    while(mutex_01.exchange(true)){
         SDL_Delay(1);
-    }   // Warten bis Mutex1 Unlocked (false)
-    mutex_01 = true;      // Mutex1 Locken (true)
+    }   // Warten bis Mutex1 Unlocked (false) und dann Locken (true)
 
     if(!is_capture_cctive || is_capture_pause)
     {

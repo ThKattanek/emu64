@@ -16,6 +16,7 @@
 #define VIDEO_CAPTURE_CLASS_H
 
 #include <SDL2/SDL.h>
+#include <atomic>
 
 extern "C"
 {
@@ -70,7 +71,7 @@ public:
     AVFormatContext *format_ctx;
     OutputStream video_stream;
 
-    bool mutex_01;
+    std::atomic<bool> mutex_01;
 
 private:
     void AddStream(OutputStream *ost, AVFormatContext *oc, const AVCodec **codec, enum AVCodecID codec_id);
