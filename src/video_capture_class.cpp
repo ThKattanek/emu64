@@ -415,6 +415,7 @@ bool VideoCaptureClass::OpenVideo(const AVCodec *codec, OutputStream *ost, AVDic
     {
         char err_msg[AV_ERROR_MAX_STRING_SIZE];
         std::cerr << "Could not open video codec: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
+
         return false;
     }
 
@@ -443,7 +444,9 @@ bool VideoCaptureClass::OpenVideo(const AVCodec *codec, OutputStream *ost, AVDic
     ret = avcodec_parameters_from_context(ost->st->codecpar, c);
     if (ret < 0)
     {
-        std::cerr << "Could not copy the stream parameters." << std::endl;
+        char err_msg[AV_ERROR_MAX_STRING_SIZE];
+        std::cerr << "Could not copy the stream parameters: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
+
         return false;
     }
 
@@ -485,6 +488,7 @@ bool VideoCaptureClass::OpenAudio(const AVCodec *codec, OutputStream *ost, AVDic
     {
         char err_msg[AV_ERROR_MAX_STRING_SIZE];
         std::cerr << "Could not open audio codec: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
+
         return false;
     }
 
@@ -509,14 +513,16 @@ bool VideoCaptureClass::OpenAudio(const AVCodec *codec, OutputStream *ost, AVDic
     ret = avcodec_parameters_from_context(ost->st->codecpar, c);
     if (ret < 0)
     {
-        std::cerr << "Could not copy the stream parameters." << std::endl;
+        char err_msg[AV_ERROR_MAX_STRING_SIZE];
+        std::cerr << "Could not copy the stream parameters: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
+
         return false;
     }
 
     /* create resampler context */
     ost->swr_ctx = swr_alloc();
     if (!ost->swr_ctx)
-    {
+    {   
         std::cerr << "Could not allocate resampler context" << std::endl;
         return false;
     }
@@ -534,9 +540,12 @@ bool VideoCaptureClass::OpenAudio(const AVCodec *codec, OutputStream *ost, AVDic
     av_opt_set_int       (ost->swr_ctx, "out_sample_rate",    c->sample_rate,           0);
     av_opt_set_sample_fmt(ost->swr_ctx, "out_sample_fmt",     c->sample_fmt,            0);
     /* initialize the resampling context */
-    if ((ret = swr_init(ost->swr_ctx)) < 0)
+    ret = swr_init(ost->swr_ctx);
+    if (ret < 0)
     {
-        std::cerr << "Failed to initialize the resampling context" << std::endl;
+        char err_msg[AV_ERROR_MAX_STRING_SIZE];
+        std::cerr << "Failed to initialize the resampling context: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
+
         return false;
     }
 
@@ -553,7 +562,9 @@ AVFrame* VideoCaptureClass::AllocAudioFrame(enum AVSampleFormat sample_fmt, uint
     int ret;
     if (!frame)
     {
-        std::cerr << "Error allocating an audio frame." << std::endl;
+        char err_msg[AV_ERROR_MAX_STRING_SIZE];
+        std::cerr << "Error allocating an audio frame: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
+
         return nullptr;
     }
 
@@ -574,7 +585,9 @@ AVFrame* VideoCaptureClass::AllocAudioFrame(enum AVSampleFormat sample_fmt, uint
         ret = av_frame_get_buffer(frame, 0);
         if (ret < 0)
         {
-            std::cerr << "Error allocating an audio buffer." << std::endl;
+            char err_msg[AV_ERROR_MAX_STRING_SIZE];
+            std::cerr << "Error allocating an audio buffer: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
+
             return nullptr;
         }
     }
