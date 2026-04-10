@@ -562,8 +562,7 @@ AVFrame* VideoCaptureClass::AllocAudioFrame(enum AVSampleFormat sample_fmt, uint
     int ret;
     if (!frame)
     {
-        char err_msg[AV_ERROR_MAX_STRING_SIZE];
-        std::cerr << "Error allocating an audio frame: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
+        std::cerr << "Error allocating an audio frame." << std::endl;
 
         return nullptr;
     }
