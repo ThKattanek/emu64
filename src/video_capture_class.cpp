@@ -13,7 +13,6 @@
 //////////////////////////////////////////////////
 
 #include "video_capture_class.h"
-#include "video_capture_class.h"
 
 #include <iostream>
 
@@ -529,11 +528,19 @@ bool VideoCaptureClass::OpenAudio(const AVCodec *codec, OutputStream *ost, AVDic
 
     /* set options */
 #if LIBAVCODEC_VERSION_MAJOR >= 60
+    av_opt_set_chlayout  (ost->swr_ctx, "in_chlayout",        &c->ch_layout,            0);
+    av_opt_set_chlayout  (ost->swr_ctx, "out_chlayout",       &c->ch_layout,            0);
     av_opt_set_int       (ost->swr_ctx, "in_channel_count",   c->ch_layout.nb_channels, 0);
     av_opt_set_int       (ost->swr_ctx, "out_channel_count",  c->ch_layout.nb_channels, 0);
 #else
-    av_opt_set_int       (ost->swr_ctx, "in_channel_count",   c->channels,       0);
-    av_opt_set_int       (ost->swr_ctx, "out_channel_count",  c->channels,       0);
+    {
+        uint64_t ch_layout = c->channel_layout ? c->channel_layout : AV_CH_LAYOUT_STEREO;
+        int      ch_count  = c->channels       ? c->channels       : av_get_channel_layout_nb_channels(ch_layout);
+        av_opt_set_int       (ost->swr_ctx, "in_channel_layout",  (int64_t)ch_layout,    0);
+        av_opt_set_int       (ost->swr_ctx, "out_channel_layout", (int64_t)ch_layout,    0);
+        av_opt_set_int       (ost->swr_ctx, "in_channel_count",   ch_count,              0);
+        av_opt_set_int       (ost->swr_ctx, "out_channel_count",  ch_count,              0);
+    }
 #endif
     av_opt_set_int       (ost->swr_ctx, "in_sample_rate",     c->sample_rate,           0);
     av_opt_set_sample_fmt(ost->swr_ctx, "in_sample_fmt",      AV_SAMPLE_FMT_S16,        0);
