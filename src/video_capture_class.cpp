@@ -241,10 +241,31 @@ void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
 {
     if(!is_capture_cctive || is_capture_pause) return;
 
+    if(data == nullptr || linesize <= 0) return;
+
+    if(linesize < video_xw * 4)
+    {
+        std::cerr << "AddFrame: linesize (" << linesize << ") < video_xw*4 (" << video_xw*4 << "), frame skipped" << std::endl;
+        return;
+    }
+
+    while(mutex_01){
+        SDL_Delay(1);
+    }   // Warten bis Mutex1 Unlocked (false)
+    mutex_01 = true;      // Mutex1 Locken (true)
+
+    if(!is_capture_cctive || is_capture_pause)
+    {
+        mutex_01 = false;
+        return;
+    }
+
     source_video_data = data;
     source_video_line_size = linesize;
 
     WriteVideoFrame(format_ctx, &video_stream);
+
+    mutex_01 = false;     // Mutex1 Unlocken (false)
 }
 
 void VideoCaptureClass::FillSourceAudioBuffer(int16_t *data, int len)
@@ -779,6 +800,8 @@ AVFrame* VideoCaptureClass::GetVideoFrame(OutputStream *ost)
 
 void VideoCaptureClass::FillyuvImage(AVFrame *pict, int width, int height)
 {
+    if(pict == nullptr || pict->data[0] == nullptr || pict->linesize[0] <= 0) return;
+
     uint8_t *src_pixels;
     uint8_t Y;
     uint8_t Cb,Cr;
