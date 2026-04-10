@@ -127,9 +127,20 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
     /* Now that all the parameters are set, we can open the audio and
      * video codecs and allocate the necessary encode buffers. */
     if (have_video)
-        OpenVideo(video_codec, &video_stream, options);
+        if(!OpenVideo(video_codec, &video_stream, options))
+        {
+            mutex_01 = false;      // Mutex1 Unlocken (false)
+            StopCapture();
+            return false;
+        }
+
     if (have_audio)
-        OpenAudio(audio_codec, &audio_stream, options);
+        if(!OpenAudio(audio_codec, &audio_stream, options))
+        {
+            mutex_01 = false;      // Mutex1 Unlocken (false)
+            StopCapture();
+            return false;
+        }
 
     av_dump_format(format_ctx, 0, filename, 1);
 
