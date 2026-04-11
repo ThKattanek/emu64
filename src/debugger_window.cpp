@@ -21,17 +21,26 @@
 
 DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     QDialog(parent),
+    c64(nullptr),
     ui(new Ui::DebuggerWindow),
     input_window(nullptr),
     memory_window(nullptr),
     vic_window(nullptr),
-    iec_window(nullptr)
-{    
-    this->ini = ini;
-    c64 = nullptr;
-
-    current_source = 0;
-
+    iec_window(nullptr),
+    ini(ini),
+    is_one_showed(false),
+    icon_off(nullptr),
+    icon_on(nullptr),
+    context_diss_assList(nullptr),
+    timer1(nullptr),
+    new_refresh(false),
+    break_point_update_enable(false),
+    new_breakpoint_found(false),
+    current_source(0),
+    currnet_floppy_nr(0),
+    history_rows(0),
+    disass_rows(0)
+{
     table_back_color = QColor(255,255,255);
     table_position_color = QColor(255,200,200);
 
@@ -96,8 +105,7 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
 
     ui->DisAssTable->setMinimumWidth(23 * font1_width + 8);
 
-    disass_rows = 1;
-    ui->DisAssTable->setRowCount(disass_rows);
+    ui->DisAssTable->setRowCount(1);
 
     ui->AssAdresseIn->setFont(font1);
     ui->AssMnemonicIn->setFont(font1);
@@ -108,14 +116,11 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     ui->BreakpointTree->setColumnWidth(0, (22 * font1_width) + 10);
     ui->BreakpointTree->setColumnWidth(1, 5 * font1_width);
     ui->BreakpointTree->setMinimumWidth(35 * font1_width);
-    new_breakpoint_found = false;
 
     ui->HistoryList->setFont(font1);
 
-    history_rows = 0;
     connect(ui->HistoryList, SIGNAL(resize(int,int)),this,SLOT(onResizeHistoryList(int,int)));
 
-    disass_rows = 0;
     connect(ui->DisAssTable, SIGNAL(resize(int,int)), this,SLOT(onResizeDisassList(int,int)));
 
     connect(ui->sr_widget, SIGNAL(ChangeValue(uint8_t)), this, SLOT(onSr_widget_ValueChange(uint8_t)));
@@ -360,6 +365,7 @@ void DebuggerWindow::hideEvent(QHideEvent*)
 void DebuggerWindow::UpdateRegister()
 {
     if(c64 == nullptr) return;
+    if(icon_on == nullptr || icon_off == nullptr) return;
 
     char str00[1024] = "";
 
@@ -2138,6 +2144,7 @@ void DebuggerWindow::onChangeFloppyStatus(void)
 void DebuggerWindow::RefreshGUI(void)
 {
     if(c64 == nullptr) return;
+    if(icon_on == nullptr || icon_off == nullptr) return;
 
     c64_cpu_reg.reg_mask = REG_MASK_ALL;
     c64->GetC64CpuReg(&c64_cpu_reg,&c64_cpu_ireg);
