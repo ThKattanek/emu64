@@ -1253,7 +1253,13 @@ void MainWindow::on_menu_main_info_triggered()
     QString emu64_version = QString("Emu64 V") + QString(VERSION_STRING);
 
     info_window->SetEmu64VersionText(emu64_version);
-    info_window->SetMoreInfoText("Qt Version: " + QString(qVersion()) + " / SDL Version: " + sdl_version + " / FFMpeg Version: " + QString(c64->GetAVVersion()));
+    QString out = "Qt Version: " + QString(qVersion()) + " / SDL Version: " + sdl_version + " / FFMpeg Version: " + QString(c64->GetAVVersion());
+#ifdef ZIP_SUPPORT
+    out += tr(" / ZIP Support: Ja");
+#else
+    out += tr(" / ZIP Support: Nein");
+#endif
+    info_window->SetMoreInfoText(out);
 
     info_window->show();
 }
