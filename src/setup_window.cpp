@@ -14,6 +14,7 @@
 
 #include <QScreen>
 #include <QStyle>
+#include <QComboBox>
 
 #include "setup_window.h"
 #include "ui_setup_window.h"
@@ -39,6 +40,11 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoCrtClass *vid
     this->dataPath = dataPath;
 
     ui->setupUi(this);
+
+    connect(ui->SelectRomSet,
+            QOverload<const QString &>::of(&QComboBox::currentIndexChanged),
+            this,
+            &SetupWindow::SelectRomSetCurrentIndexChanged);
 
     // Center Window
     setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
@@ -872,7 +878,7 @@ void SetupWindow::on_Sid6ChannelMode_toggled(bool checked)
     }
 }
 
-void SetupWindow::on_SelectRomSet_currentIndexChanged(const QString &arg1)
+void SetupWindow::SelectRomSetCurrentIndexChanged(const QString &arg1)
 {
     QString kernal_rom, basic_rom, char_rom, dos1541_rom;
 
