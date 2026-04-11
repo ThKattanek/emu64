@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -21,6 +20,8 @@
 
 #include "./command_line_class.h"   // Klasse zur Auswertung der KomandLine
 #include "./emu64_commands.h"       // Struktur mit allen verfügbaren Kommandos
+
+#include <iostream>
 
 #if (!defined(SINGLE_THREADED_PLAYBACK) and defined(Q_WS_X11))
 #include <X11/Xlib.h>

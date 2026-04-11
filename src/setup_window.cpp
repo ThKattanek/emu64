@@ -264,7 +264,7 @@ void SetupWindow::LoadINI(C64Class *c64)
         ui->SIDVolume->setValue(value);
         c64->SetSIDVolume(value / 100.0);
 
-        value =ini->value("SoundBufferSize",512).toInt();
+        value =ini->value("SoundBufferSize",64).toInt();
         ui->SoundBufferSizeValue->setValue(value);
         //c64->SetSoundBufferSize(value);
 

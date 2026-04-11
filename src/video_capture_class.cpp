@@ -8,13 +8,13 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.03.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
 #include "video_capture_class.h"
-#include "video_capture_class.h"
+
+#include <iostream>
 
 VideoCaptureClass::VideoCaptureClass()
 {
@@ -67,10 +67,9 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
 {
     if(is_capture_cctive) return false;
 
-    while(mutex_01){
+    while(mutex_01.exchange(true)){
         SDL_Delay(1);
-    }   // Warten bis Mutex1 Unlocked (false)
-    mutex_01 = true;      // Mutex1 Locken (true)
+    }   // Warten bis Mutex1 Unlocked (false) und dann Locken (true)
 
     video_xw = xw;
     video_yw = yw;
@@ -126,9 +125,20 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
     /* Now that all the parameters are set, we can open the audio and
      * video codecs and allocate the necessary encode buffers. */
     if (have_video)
-        OpenVideo(video_codec, &video_stream, options);
+        if(!OpenVideo(video_codec, &video_stream, options))
+        {
+            mutex_01 = false;      // Mutex1 Unlocken (false)
+            StopCapture();
+            return false;
+        }
+
     if (have_audio)
-        OpenAudio(audio_codec, &audio_stream, options);
+        if(!OpenAudio(audio_codec, &audio_stream, options))
+        {
+            mutex_01 = false;      // Mutex1 Unlocken (false)
+            StopCapture();
+            return false;
+        }
 
     av_dump_format(format_ctx, 0, filename, 1);
 
@@ -180,10 +190,9 @@ void VideoCaptureClass::StopCapture()
 
     is_capture_cctive = false;
 
-    while(mutex_01){
+    while(mutex_01.exchange(true)){
         SDL_Delay(1);
-    }   // Warten bis Mutex1 Unlocked (false)
-    mutex_01 = true;      // Mutex1 Locken (true)
+    }   // Warten bis Mutex1 Unlocked (false) und dann Locken (true)
 
 
     // Trailer schreiben
@@ -230,10 +239,30 @@ void VideoCaptureClass::AddFrame(uint8_t *data, int linesize)
 {
     if(!is_capture_cctive || is_capture_pause) return;
 
+    if(data == nullptr || linesize <= 0) return;
+
+    if(linesize < video_xw * 4)
+    {
+        std::cerr << "AddFrame: linesize (" << linesize << ") < video_xw*4 (" << video_xw*4 << "), frame skipped" << std::endl;
+        return;
+    }
+
+    while(mutex_01.exchange(true)){
+        SDL_Delay(1);
+    }   // Warten bis Mutex1 Unlocked (false) und dann Locken (true)
+
+    if(!is_capture_cctive || is_capture_pause)
+    {
+        mutex_01 = false;
+        return;
+    }
+
     source_video_data = data;
     source_video_line_size = linesize;
 
     WriteVideoFrame(format_ctx, &video_stream);
+
+    mutex_01 = false;     // Mutex1 Unlocken (false)
 }
 
 void VideoCaptureClass::FillSourceAudioBuffer(int16_t *data, int len)
@@ -403,6 +432,7 @@ bool VideoCaptureClass::OpenVideo(const AVCodec *codec, OutputStream *ost, AVDic
     {
         char err_msg[AV_ERROR_MAX_STRING_SIZE];
         std::cerr << "Could not open video codec: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
+
         return false;
     }
 
@@ -431,7 +461,9 @@ bool VideoCaptureClass::OpenVideo(const AVCodec *codec, OutputStream *ost, AVDic
     ret = avcodec_parameters_from_context(ost->st->codecpar, c);
     if (ret < 0)
     {
-        std::cerr << "Could not copy the stream parameters." << std::endl;
+        char err_msg[AV_ERROR_MAX_STRING_SIZE];
+        std::cerr << "Could not copy the stream parameters: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
+
         return false;
     }
 
@@ -473,6 +505,7 @@ bool VideoCaptureClass::OpenAudio(const AVCodec *codec, OutputStream *ost, AVDic
     {
         char err_msg[AV_ERROR_MAX_STRING_SIZE];
         std::cerr << "Could not open audio codec: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
+
         return false;
     }
 
@@ -497,34 +530,47 @@ bool VideoCaptureClass::OpenAudio(const AVCodec *codec, OutputStream *ost, AVDic
     ret = avcodec_parameters_from_context(ost->st->codecpar, c);
     if (ret < 0)
     {
-        std::cerr << "Could not copy the stream parameters." << std::endl;
+        char err_msg[AV_ERROR_MAX_STRING_SIZE];
+        std::cerr << "Could not copy the stream parameters: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
+
         return false;
     }
 
     /* create resampler context */
     ost->swr_ctx = swr_alloc();
     if (!ost->swr_ctx)
-    {
+    {   
         std::cerr << "Could not allocate resampler context" << std::endl;
         return false;
     }
 
     /* set options */
 #if LIBAVCODEC_VERSION_MAJOR >= 60
+    av_opt_set_chlayout  (ost->swr_ctx, "in_chlayout",        &c->ch_layout,            0);
+    av_opt_set_chlayout  (ost->swr_ctx, "out_chlayout",       &c->ch_layout,            0);
     av_opt_set_int       (ost->swr_ctx, "in_channel_count",   c->ch_layout.nb_channels, 0);
     av_opt_set_int       (ost->swr_ctx, "out_channel_count",  c->ch_layout.nb_channels, 0);
 #else
-    av_opt_set_int       (ost->swr_ctx, "in_channel_count",   c->channels,       0);
-    av_opt_set_int       (ost->swr_ctx, "out_channel_count",  c->channels,       0);
+    {
+        uint64_t ch_layout = c->channel_layout ? c->channel_layout : AV_CH_LAYOUT_STEREO;
+        int      ch_count  = c->channels       ? c->channels       : av_get_channel_layout_nb_channels(ch_layout);
+        av_opt_set_int       (ost->swr_ctx, "in_channel_layout",  (int64_t)ch_layout,    0);
+        av_opt_set_int       (ost->swr_ctx, "out_channel_layout", (int64_t)ch_layout,    0);
+        av_opt_set_int       (ost->swr_ctx, "in_channel_count",   ch_count,              0);
+        av_opt_set_int       (ost->swr_ctx, "out_channel_count",  ch_count,              0);
+    }
 #endif
     av_opt_set_int       (ost->swr_ctx, "in_sample_rate",     c->sample_rate,           0);
     av_opt_set_sample_fmt(ost->swr_ctx, "in_sample_fmt",      AV_SAMPLE_FMT_S16,        0);
     av_opt_set_int       (ost->swr_ctx, "out_sample_rate",    c->sample_rate,           0);
     av_opt_set_sample_fmt(ost->swr_ctx, "out_sample_fmt",     c->sample_fmt,            0);
     /* initialize the resampling context */
-    if ((ret = swr_init(ost->swr_ctx)) < 0)
+    ret = swr_init(ost->swr_ctx);
+    if (ret < 0)
     {
-        std::cerr << "Failed to initialize the resampling context" << std::endl;
+        char err_msg[AV_ERROR_MAX_STRING_SIZE];
+        std::cerr << "Failed to initialize the resampling context: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
+
         return false;
     }
 
@@ -542,6 +588,7 @@ AVFrame* VideoCaptureClass::AllocAudioFrame(enum AVSampleFormat sample_fmt, uint
     if (!frame)
     {
         std::cerr << "Error allocating an audio frame." << std::endl;
+
         return nullptr;
     }
 
@@ -562,7 +609,9 @@ AVFrame* VideoCaptureClass::AllocAudioFrame(enum AVSampleFormat sample_fmt, uint
         ret = av_frame_get_buffer(frame, 0);
         if (ret < 0)
         {
-            std::cerr << "Error allocating an audio buffer." << std::endl;
+            char err_msg[AV_ERROR_MAX_STRING_SIZE];
+            std::cerr << "Error allocating an audio buffer: " << av_make_error_string(err_msg,AV_ERROR_MAX_STRING_SIZE,ret) << std::endl;
+
             return nullptr;
         }
     }
@@ -748,6 +797,8 @@ AVFrame* VideoCaptureClass::GetVideoFrame(OutputStream *ost)
 
 void VideoCaptureClass::FillyuvImage(AVFrame *pict, int width, int height)
 {
+    if(pict == nullptr || pict->data[0] == nullptr || pict->linesize[0] <= 0) return;
+
     uint8_t *src_pixels;
     uint8_t Y;
     uint8_t Cb,Cr;

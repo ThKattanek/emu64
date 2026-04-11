@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 20.03.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,8 +15,8 @@
 #ifndef VIDEO_CAPTURE_CLASS_H
 #define VIDEO_CAPTURE_CLASS_H
 
-#include <iostream>
 #include <SDL2/SDL.h>
+#include <atomic>
 
 extern "C"
 {
@@ -72,7 +71,7 @@ public:
     AVFormatContext *format_ctx;
     OutputStream video_stream;
 
-    bool mutex_01;
+    std::atomic<bool> mutex_01;
 
 private:
     void AddStream(OutputStream *ost, AVFormatContext *oc, const AVCodec **codec, enum AVCodecID codec_id);

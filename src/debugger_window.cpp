@@ -21,11 +21,15 @@
 
 DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     QDialog(parent),
+    c64(nullptr),
     ui(new Ui::DebuggerWindow),
     input_window(nullptr),
     memory_window(nullptr),
     vic_window(nullptr),
-    iec_window(nullptr)
+    iec_window(nullptr),
+    ini(nullptr),
+    icon_off(nullptr),
+    icon_on(nullptr)
 {    
     this->ini = ini;
     c64 = nullptr;
@@ -70,10 +74,16 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     icon_off = new QIcon(":/grafik/blue_led_off.png");
     icon_on = new QIcon(":/grafik/blue_led_on.png");
 
-    QFontDatabase fontDB;
-    fontDB.addApplicationFont(":/fonts/lucon.ttf");
+    int id = QFontDatabase::addApplicationFont(":/fonts/lucon.ttf");
 
-    QFont font1("Lucida Console",10);
+    QString family = "Lucida Console"; // Fallback
+    if (id != -1) {
+        const QStringList families = QFontDatabase::applicationFontFamilies(id);
+        if (!families.isEmpty())
+            family = families.first(); // echte Familie aus der TTF
+    }
+
+    QFont font1(family, 10);
 
     ui->MCodeHelp->setFont(font1);
 
@@ -354,6 +364,7 @@ void DebuggerWindow::hideEvent(QHideEvent*)
 void DebuggerWindow::UpdateRegister()
 {
     if(c64 == nullptr) return;
+    if(icon_on == nullptr || icon_off == nullptr) return;
 
     char str00[1024] = "";
 
