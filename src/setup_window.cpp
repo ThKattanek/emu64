@@ -42,7 +42,7 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoCrtClass *vid
     ui->setupUi(this);
 
     connect(ui->SelectRomSet,
-            QOverload<const QString &>::of(&QComboBox::currentIndexChanged),
+            QOverload<int>::of(&QComboBox::currentIndexChanged),
             this,
             &SetupWindow::SelectRomSetCurrentIndexChanged);
 
@@ -878,8 +878,9 @@ void SetupWindow::on_Sid6ChannelMode_toggled(bool checked)
     }
 }
 
-void SetupWindow::SelectRomSetCurrentIndexChanged(const QString &arg1)
+void SetupWindow::SelectRomSetCurrentIndexChanged(int index)
 {
+    const QString arg1 = ui->SelectRomSet->itemText(index);
     QString kernal_rom, basic_rom, char_rom, dos1541_rom;
 
     if(arg1 == DEFAULT_ROMSET_NAME)

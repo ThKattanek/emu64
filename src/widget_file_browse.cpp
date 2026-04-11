@@ -26,7 +26,7 @@ WidgetFileBrowse::WidgetFileBrowse(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->drive_list,
-            QOverload<const QString &>::of(&QComboBox::currentIndexChanged),
+            QOverload<int>::of(&QComboBox::currentIndexChanged),
             this,
             &WidgetFileBrowse::DriveListCurrentIndexChanged);
 
@@ -384,8 +384,8 @@ QString WidgetFileBrowse::rootPathName(const QString &aPath)
     return strRootPathName;
 }
 
-void WidgetFileBrowse::DriveListCurrentIndexChanged(const QString &arg1)
+void WidgetFileBrowse::DriveListCurrentIndexChanged(int index)
 {
-    SetAktDir(arg1);
+    SetAktDir(ui->drive_list->itemText(index));
 }
 
