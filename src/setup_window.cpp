@@ -14,6 +14,7 @@
 
 #include <QScreen>
 #include <QStyle>
+#include <QComboBox>
 
 #include "setup_window.h"
 #include "ui_setup_window.h"
@@ -872,8 +873,9 @@ void SetupWindow::on_Sid6ChannelMode_toggled(bool checked)
     }
 }
 
-void SetupWindow::on_SelectRomSet_currentIndexChanged(const QString &arg1)
+void SetupWindow::on_SelectRomSetCurrentIndexChanged(int index)
 {
+    const QString arg1 = ui->SelectRomSet->itemText(index);
     QString kernal_rom, basic_rom, char_rom, dos1541_rom;
 
     if(arg1 == DEFAULT_ROMSET_NAME)

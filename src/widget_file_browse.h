@@ -64,7 +64,7 @@ private slots:
     void on_view_refresh_clicked();
     void on_delete_file_clicked();
     void on_to_home_clicked();
-	void on_drive_list_currentIndexChanged(const QString &arg1);
+    void on_DriveListCurrentIndexChanged(int index);
     void on_listView_filebrowser_activated(const QModelIndex &index);
 
 private:
