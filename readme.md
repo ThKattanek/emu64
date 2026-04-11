@@ -41,6 +41,13 @@ qmake .. PREFIX="/usr/local"
 make -j8
 sudo make install
 ```
+
+### Übersetzung aktuallisieren
+Um die Übersetzung auf andere Sprachen zu aktuallisieren ist es Nötig die *.ts Files zu aktuallisieren.
+Das passiert mit lupdate emu64.pro oder lupdate src/src.pro
+Danach kann mit dem QLinguist Tool das jeweilige ts file geladen werden und neue Wörter überstetzt werden.
+Dann wieder speichern. Die qm Files werden automatisch beim compilieren erzeugt.
+
 ### Wenn folgender Fehler bei "make install" kommt:
 ```code
 Aufruf von stat für '.qm/emu64_de.qm' nicht möglich: Datei oder Verzeichnis nicht gefunden
