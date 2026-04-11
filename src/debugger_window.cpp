@@ -21,11 +21,15 @@
 
 DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     QDialog(parent),
+    c64(nullptr),
     ui(new Ui::DebuggerWindow),
     input_window(nullptr),
     memory_window(nullptr),
     vic_window(nullptr),
-    iec_window(nullptr)
+    iec_window(nullptr),
+    ini(nullptr),
+    icon_off(nullptr),
+    icon_on(nullptr)
 {    
     this->ini = ini;
     c64 = nullptr;
@@ -360,6 +364,7 @@ void DebuggerWindow::hideEvent(QHideEvent*)
 void DebuggerWindow::UpdateRegister()
 {
     if(c64 == nullptr) return;
+    if(icon_on == nullptr || icon_off == nullptr) return;
 
     char str00[1024] = "";
 
