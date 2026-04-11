@@ -12,6 +12,7 @@
 //                                              //
 //////////////////////////////////////////////////
 
+#include <QCoreApplication>
 #include <QScreen>
 #include <QStyle>
 #include <iostream>
@@ -1268,8 +1269,14 @@ void MainWindow::on_actionBeenden_triggered()
 {
     if(!debugger_window->isHidden()) debugger_window->hide();
 	if(!nogui)
+	{
 		showNormal();
-    close();
+		close();
+	}
+	else
+	{
+		QCoreApplication::quit();
+	}
 }
 
 void MainWindow::on_actionSoftreset_triggered()
