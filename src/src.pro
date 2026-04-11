@@ -8,7 +8,6 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 15.03.2026                //
 # // www.emu64.de                                 //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -94,7 +93,7 @@ message("Zip: $$ZIP")
 
 equals(QT_MAJOR_VERSION, 5) {
 
-    DEFINES += ZIP_SUPPORT
+    message("QT5 is active")
 
     # Use PKG_CONFIG from environment for cross builds, fallback to pkg-config
     PKG_CONFIG_BIN = $$(PKG_CONFIG)
@@ -104,33 +103,55 @@ equals(QT_MAJOR_VERSION, 5) {
 
     system($$PKG_CONFIG_BIN --exists quazip1-qt5) {
         PKGCONFIG += quazip1-qt5
+        DEFINES += ZIP_SUPPORT
     } else:system($$PKG_CONFIG_BIN --exists quazip) {
         message("Quazip (pkg-config name: quazip) found")
         PKGCONFIG += quazip
+        DEFINES += ZIP_SUPPORT
         QUAZIPINC = $$system($$PKG_CONFIG_BIN --variable=includedir quazip)
         INCLUDEPATH += $${QUAZIPINC}/quazip5 $${QUAZIPINC}/quazip
     } else {
-        message("Quazip not found, trying to guess")
-        LIBS += -lquazip5
-        INCLUDEPATH += /usr/include/quazip5 /usr/include/quazip
+        "Quazip not found! No ZIP support will be available."
     }
-
-    message("QT5 is active")
 }
 
 equals(QT_MAJOR_VERSION, 6) {
 
-    #DEFINES += ZIP_SUPPORT
-
-    #win32 {
-    #    PKGCONFIG += quazip
-    #} else {
-    #    LIBS += -lquazip6
-    #}
-
     message("QT6 is active")
-}
 
+    # Use PKG_CONFIG from environment for cross builds, fallback to pkg-config
+    PKG_CONFIG_BIN = $$(PKG_CONFIG)
+    isEmpty(PKG_CONFIG_BIN) {
+        PKG_CONFIG_BIN = pkg-config
+    }
+
+    system($$PKG_CONFIG_BIN --exists quazip1-qt6) {
+        PKGCONFIG += quazip1-qt6
+        DEFINES += ZIP_SUPPORT
+    } else:system($$PKG_CONFIG_BIN --exists quazip) {
+
+        # Achtung: Wenn quazip1-qt5 installiert ist und quazip1-qt6 nicht, dann wird hier trotzdem quazip gefunden als Version5 und eingebunden.
+        # Unter Kubuntu 25.10
+        # pkg-config quazip1-qt5 --libs  --> -lquazip1-qt5 -lz -lQt5Core
+        # pkg-config quazip --libs  --> -lquazip5 -lQt5Core
+
+        # wenn beides installiert ist, quazip1-qt5 und quazip1-qt6
+        # Unter Kubuntu 25.10
+        # pkg-config quazip1-qt5 --libs  --> -lquazip1-qt5 -lz -lQt5Core
+        # pkg-config quazip --libs  --> -lquazip5 -lQt5Core
+        # pkg-config quazip1-qt6 --libs  --> -lquazip1-qt6 -lz -lQt6Core
+
+        # Also nach quazip zu suchen für qt6 ist nicht optimal, da es wahrscheinlich eher die qt5 Version findet, wenn nur qt5 oder beide installiert sind.
+
+        #message("Quazip (pkg-config name: quazip) found")
+        #PKGCONFIG += quazip
+        #DEFINES += ZIP_SUPPORT
+        #QUAZIPINC = $$system($$PKG_CONFIG_BIN --variable=includedir quazip)
+        #INCLUDEPATH += $${QUAZIPINC}/quazip5 $${QUAZIPINC}/quazip
+    } else {
+        message("Quazip not found! No ZIP support will be available.")
+    }
+}
 
 # Quelltexte
 
