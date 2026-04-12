@@ -732,7 +732,7 @@ void MainWindow::changeEvent(QEvent *event)
 
         bool ret;
 
-        qtTranslator.load("qt_" + locale, langPath);
+        ret = qtTranslator.load("qt_" + locale, langPath);
         if(!ret) LogText(QString("Failed to load qt translation for locale: " + locale).toUtf8());
 
         ret = appTranslator.load("emu64_" + locale, langPath);

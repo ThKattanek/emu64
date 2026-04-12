@@ -22,15 +22,13 @@
 
 #include "./cartridge_class.h"
 #include "./c64_class.h"
-#include "./custom_save_file_dialog.h"
-#include "./structs.h"
 
-#include "./cartridge_new_easyflash_window.h"
+#include "./structs.h"
 
 #define LED_NUM 2
 
 namespace Ui {
-    class CartridgeWindow;
+class CartridgeWindow;
 }
 
 class CartridgeWindow : public QDialog
