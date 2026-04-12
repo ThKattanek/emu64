@@ -20,15 +20,15 @@
 
 extern "C"
 {
-    #include <libavcodec/avcodec.h>
-    #include <libavutil/avassert.h>
-    #include <libavutil/channel_layout.h>
-    #include <libavutil/opt.h>
-    #include <libavutil/mathematics.h>
-    #include <libavutil/timestamp.h>
-    #include <libavformat/avformat.h>
-    #include <libswscale/swscale.h>
-    #include <libswresample/swresample.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/avassert.h>
+#include <libavutil/channel_layout.h>
+#include <libavutil/opt.h>
+#include <libavutil/mathematics.h>
+#include <libavutil/timestamp.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+#include <libswresample/swresample.h>
 }
 
 #define STREAM_DURATION   10.0
@@ -80,7 +80,7 @@ private:
     AVFrame* AllocPicture(enum AVPixelFormat pix_fmt, int width, int height);
     bool OpenAudio(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
 
-#if LIBAVCODEC_VERSION_MAJOR >= 60
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(59, 37, 100)
     AVFrame* AllocAudioFrame(enum AVSampleFormat sample_fmt, const AVChannelLayout *ch_layout, int sample_rate, int nb_samples);
 #else
     AVFrame* AllocAudioFrame(enum AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
