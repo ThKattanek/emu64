@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *l
     this->log = log;
 
     isFirstPaintEvent = false;
-	isCommandDoubleTextureOff = false;
+    isCommandDoubleTextureOff = false;
 
     this->setGeometry(0,0,0,0);
 
@@ -83,7 +83,7 @@ MainWindow::~MainWindow()
     if(ini != nullptr && no_write_ini_exit == false)
     {
         ini->beginGroup("MainWindow");
-		ini->setValue("Geometry",saveGeometry());
+        ini->setValue("Geometry",saveGeometry());
         ini->setValue("State",saveState());
         ini->setValue("ScreenshotCounter",c64->GetScreenshotNumber());
         ini->setValue("LastAutoloadDir",lastAutoloadPath);
@@ -114,11 +114,11 @@ MainWindow::~MainWindow()
         ini->beginGroup("C64Screen");
         ini->setValue("PosX",x);
         ini->setValue("PosY",y);
-		if(!isCommandDoubleTextureOff)
-		{
-			ini->setValue("SizeW",w);
-			ini->setValue("SizeH",h);
-		}
+        if(!isCommandDoubleTextureOff)
+        {
+            ini->setValue("SizeW",w);
+            ini->setValue("SizeH",h);
+        }
         ini->endGroup();
 
         C64_KEYS* c64_key_table = c64->GetC64KeyTable();
@@ -194,7 +194,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
 int MainWindow::OnInit(bool nogui)
 {
-	this->nogui = nogui;
+    this->nogui = nogui;
 
     // Alle Pfade setzen //
     configPath = QDir::homePath() + "/.config/emu64";
@@ -379,7 +379,7 @@ int MainWindow::OnInit(bool nogui)
         return -1;
     }
 
-	c64->start_hidden_window = nogui;
+    c64->start_hidden_window = nogui;
 
     SetC64ScreenTitle();
     c64->EnableScreenshots(ScreenshotsEnable);
@@ -498,7 +498,7 @@ int MainWindow::OnInit(bool nogui)
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
         SplashMessage(tr("Floppy: ") + QVariant(i).toString() + "wird in Tabelle eingefuegt",Qt::darkBlue);
-		ui->FloppyTabel->setRowHeight(i,24);
+        ui->FloppyTabel->setRowHeight(i,24);
         WidgetFloppyStatus *w = new WidgetFloppyStatus(this,i,c64->floppy[i]);
         w->SetGeraeteID(i+8);
         ui->FloppyTabel->setCellWidget(i,0,w);
@@ -551,17 +551,17 @@ int MainWindow::OnInit(bool nogui)
 
             w->SetAktFilename(floppy_window->GetAktFilename(i),floppy_window->GetAktD64Name(i));
 
-			QFileInfo file_info(floppy_window->GetAktFilename(i));
+            QFileInfo file_info(floppy_window->GetAktFilename(i));
 
-			int typ = NO_C64_FILE;
-			if(file_info.suffix().toUpper() == "D64")
-				typ = D64;
+            int typ = NO_C64_FILE;
+            if(file_info.suffix().toUpper() == "D64")
+                typ = D64;
 
-			if(file_info.suffix().toUpper() == "G64")
-				typ = G64;
+            if(file_info.suffix().toUpper() == "G64")
+                typ = G64;
 
-			FILE *file = qfopen(floppy_window->GetAktFilename(i), "r+b");
-			c64->LoadDiskImage(i,file, typ);
+            FILE *file = qfopen(floppy_window->GetAktFilename(i), "r+b");
+            c64->LoadDiskImage(i,file, typ);
 
             w->SetEnableFloppy(ini->value("Enabled",false).toBool());
             w->SetFloppyVolume(ini->value("VolumeMode",2).toInt());
@@ -655,8 +655,8 @@ int MainWindow::OnInit(bool nogui)
     if(splash != nullptr) splash->close();
     LogText(tr(">> Splashsreen wurde geschlossen.\n").toUtf8());
 
-	if(!nogui)
-		this->show();
+    if(!nogui)
+        this->show();
 
     FixedVersionSettings();
 
@@ -685,7 +685,7 @@ int MainWindow::OnInit(bool nogui)
 void MainWindow::OnMessage(QStringList msg)
 {
     if(c64 != nullptr)
-		ExecuteCommandLine(msg);
+        ExecuteCommandLine(msg);
 }
 
 void MainWindow::LogText(const char *log_text)
@@ -727,17 +727,22 @@ void MainWindow::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::LocaleChange)
     {
-      QString locale = QLocale::system().name();
-      locale.truncate(locale.lastIndexOf('_'));
+        QString locale = QLocale::system().name();
+        locale.truncate(locale.lastIndexOf('_'));
 
-      qtTranslator.load("qt_" + locale, langPath);
-      appTranslator.load("emu64_" + locale, langPath);
-      RetranslateUi();
+        bool ret;
+
+        qtTranslator.load("qt_" + locale, langPath);
+        if(!ret) LogText(QString("Failed to load qt translation for locale: " + locale).toUtf8());
+
+        ret = appTranslator.load("emu64_" + locale, langPath);
+        if(!ret) LogText(QString("Failed to load app translation for locale: " + locale).toUtf8());
+
+        RetranslateUi();
     }
 
     if (event->type() == QEvent::Show)
     {
-        qDebug("Show Event");
         c64->SetFocusToC64Window();
     }
 
@@ -746,61 +751,72 @@ void MainWindow::changeEvent(QEvent *event)
 
 void MainWindow::CreateLanguageMenu(QString defaultLocale)
 {
-   QActionGroup* langGroup = new QActionGroup(ui->menuSprache);
-   langGroup->setExclusive(true);
+    QActionGroup* langGroup = new QActionGroup(ui->menuSprache);
+    langGroup->setExclusive(true);
 
-   connect(langGroup, SIGNAL(triggered(QAction *)),this, SLOT(slotLanguageChanged(QAction *)));
+    connect(langGroup, SIGNAL(triggered(QAction *)),this, SLOT(slotLanguageChanged(QAction *)));
 
     QDir dir(langPath);
     QStringList fileNames;
 
     fileNames = dir.entryList(QStringList("emu64_*.qm"));
 
-   for (int i = 0; i < fileNames.size(); ++i)
-   {
-      // get locale extracted by filename
-      QString locale;
-      locale = fileNames[i];                      // "emu64_de.qm"
-      locale.truncate(locale.lastIndexOf('.'));   // "emu64_de"
-      locale.remove(0, locale.indexOf('_') + 1);  // "de"
+    for (int i = 0; i < fileNames.size(); ++i)
+    {
+        // get locale extracted by filename
+        QString locale;
+        locale = fileNames[i];                      // "emu64_de.qm"
+        locale.truncate(locale.lastIndexOf('.'));   // "emu64_de"
+        locale.remove(0, locale.indexOf('_') + 1);  // "de"
 
-      QString lang = QLocale::languageToString(QLocale(locale).language());
+        QString lang = QLocale::languageToString(QLocale(locale).language());
 
-      if(lang == "German") lang = "Deutsch";
+        if(lang == "German") lang = "Deutsch";
 
-      QAction *action = new QAction(lang, this);
-      action->setCheckable(true);
-      action->setData(locale);
+        QAction *action = new QAction(lang, this);
+        action->setCheckable(true);
+        action->setData(locale);
 
-      QString iconfile = fileNames[i];
-      iconfile.truncate(iconfile.lastIndexOf('.'));
-      iconfile = dir.filePath(iconfile + ".png");
-      action->setIcon(QIcon(iconfile));
-      action->setIconVisibleInMenu(true);
-      action->setStatusTip(tr("Wechseln zur Sprache: ") + lang);
+        QString iconfile = fileNames[i];
+        iconfile.truncate(iconfile.lastIndexOf('.'));
+        iconfile = dir.filePath(iconfile + ".png");
+        action->setIcon(QIcon(iconfile));
+        action->setIconVisibleInMenu(true);
+        action->setStatusTip(tr("Wechseln zur Sprache: ") + lang);
 
-      ui->menuSprache->addAction(action);
-      langGroup->addAction(action);
+        ui->menuSprache->addAction(action);
+        langGroup->addAction(action);
 
-      // set default translators and language checked
-      if (defaultLocale == locale)
-      {
-         appTranslator.load("emu64_" + action->data().toString(), langPath);
-         qtTranslator.load("qt_" + action->data().toString(), langPath);
-         action->setChecked(true);
-         ui->retranslateUi(this);
-      }
+        // set default translators and language checked
+        if (defaultLocale == locale)
+        {
+            bool ret;
+            ret = appTranslator.load("emu64_" + action->data().toString(), langPath);
+            if(!ret) LogText(QString("Failed to load app translation for default locale: " + defaultLocale).toUtf8());
+
+            ret = qtTranslator.load("qt_" + action->data().toString(), langPath);
+            if(!ret) LogText(QString("Failed to load qt translation for default locale: " + defaultLocale).toUtf8());
+
+            action->setChecked(true);
+            ui->retranslateUi(this);
+        }
     }
 }
 
 void MainWindow::slotLanguageChanged(QAction* action)
 {
-   appTranslator.load("emu64_" + action->data().toString(), langPath);
-   qtTranslator.load("qt_" + action->data().toString(), langPath);
-   ini->beginGroup("MainWindow");
-   ini->setValue("lang",action->data().toString());
-   ini->endGroup();
-   RetranslateUi();
+    bool ret;
+
+    ret = appTranslator.load("emu64_" + action->data().toString(), langPath);
+    if(!ret) LogText(QString("Failed to load app translation for locale: " + action->data().toString()).toUtf8());
+
+    ret = qtTranslator.load("qt_" + action->data().toString(), langPath);
+    if(!ret) LogText(QString("Failed to load qt translation for locale: " + action->data().toString()).toUtf8());
+
+    ini->beginGroup("MainWindow");
+    ini->setValue("lang",action->data().toString());
+    ini->endGroup();
+    RetranslateUi();
 }
 
 void MainWindow::RetranslateUi()
@@ -835,27 +851,27 @@ void MainWindow::SetC64ScreenTitle()
 
 void MainWindow::ExecuteCommandLine(QStringList string_list)
 {
-	char** arg;
-	int argc = string_list.length();
+    char** arg;
+    int argc = string_list.length();
 
-	arg = new char*[string_list.length()];
+    arg = new char*[string_list.length()];
 
-	for(int i=0; i<argc; i++)
-	{
-		arg[i] = new char[string_list.at(i).size()+1];
-		strcpy(arg[i],string_list.at(i).toLatin1().data());
-	}
+    for(int i=0; i<argc; i++)
+    {
+        arg[i] = new char[string_list.at(i).size()+1];
+        strcpy(arg[i],string_list.at(i).toLatin1().data());
+    }
 
-	CommandLineClass *cmd_line = new CommandLineClass(argc, arg, "emu64",command_list, command_list_count);
+    CommandLineClass *cmd_line = new CommandLineClass(argc, arg, "emu64",command_list, command_list_count);
 
     bool error;
     int lwnr,adr,val,limit_cycles;
-	QString filename;
+    QString filename;
     QFileInfo *fi;
 
     bool loop_break = false;
 
-	if(cmd_line == nullptr) return;
+    if(cmd_line == nullptr) return;
 
     bool isLimitCyclesCommand = false;
 
@@ -867,7 +883,7 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
         case CMD_ARG:
             break;
         case CMD_AUTOSTART:
-			AutoLoadAndRun(string_list[i+2]);
+            AutoLoadAndRun(string_list[i+2]);
             break;
         case CMD_HARDRESET:
             c64->HardReset();
@@ -877,7 +893,7 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             break;
         case CMD_MOUNT_DISK:
             lwnr = cmd_line->GetArgInt(i+1, &error);
-			filename = string_list[i+3];
+            filename = string_list[i+3];
 
             if(!error)
             {
@@ -903,7 +919,7 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             }
             break;
         case CMD_MOUNT_CRT:
-			filename = string_list[i+2];
+            filename = string_list[i+2];
             fi = new QFileInfo(filename);
             if(fi->exists())
             {
@@ -914,12 +930,12 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             }
             else
                 std::cout << "Die angebene Datei existiert nicht." << std::endl;
-			delete fi;
+            delete fi;
             break;
         case CMD_UMOUNT_CRT:
             cartridge_window->DisconnectCrt();
             break;
-		case CMD_ENABLE_GEORAM:
+        case CMD_ENABLE_GEORAM:
             c64->InsertGeoRam();
             break;
         case CMD_SET_GEORAM_SIZE:
@@ -945,20 +961,20 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
                 break;
             }
             break;
-		case CMD_ENABLE_REU:
-			c64->InsertREU();
-			break;
-		case CMD_SET_SIDTYPE:
-			val = cmd_line->GetArgInt(i+1, &error);
-			if(error) break;
+        case CMD_ENABLE_REU:
+            c64->InsertREU();
+            break;
+        case CMD_SET_SIDTYPE:
+            val = cmd_line->GetArgInt(i+1, &error);
+            if(error) break;
 
-			if(val < 0 || val > 1)
-			{
-				cmd_line->OutErrorMsg("Der Sidtype muss zwischen 0 und 1 sein.","--help");
-				break;
-			}
-			c64->SetFirstSidTyp(val);
-			break;
+            if(val < 0 || val > 1)
+            {
+                cmd_line->OutErrorMsg("Der Sidtype muss zwischen 0 und 1 sein.","--help");
+                break;
+            }
+            c64->SetFirstSidTyp(val);
+            break;
         case CMD_WARP_MODE:
             c64->EnableWarpMode(true);
             break;
@@ -995,28 +1011,28 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             limit_cycles = val;
             isLimitCyclesCommand = true;
             break;
-		case CMD_DOUBLE_TEXTURE_OFF:
-			isCommandDoubleTextureOff = true;
-			c64->enable_screen_doublesize = false;
-			c64->SetGrafikModi(c64->enable_screen_doublesize,c64->enable_screen_crt_output,c64->enable_screen_filter,0,0);
-			setup_window->DisableTextureDouble();
-			break;
-		case CMD_VIDEO_FILTER_OFF:
-			c64->enable_screen_crt_output = false;
-			c64->video_crt_output->EnableCrtOutput(false);
-			setup_window->DisableVideoCRT();
-			break;
-		case CMD_SET_PALETTE:
-			val = cmd_line->GetArgInt(i+1, &error);
-			if(error) break;
+        case CMD_DOUBLE_TEXTURE_OFF:
+            isCommandDoubleTextureOff = true;
+            c64->enable_screen_doublesize = false;
+            c64->SetGrafikModi(c64->enable_screen_doublesize,c64->enable_screen_crt_output,c64->enable_screen_filter,0,0);
+            setup_window->DisableTextureDouble();
+            break;
+        case CMD_VIDEO_FILTER_OFF:
+            c64->enable_screen_crt_output = false;
+            c64->video_crt_output->EnableCrtOutput(false);
+            setup_window->DisableVideoCRT();
+            break;
+        case CMD_SET_PALETTE:
+            val = cmd_line->GetArgInt(i+1, &error);
+            if(error) break;
 
-			if(val < 0 || val > 9)
-			{
-				cmd_line->OutErrorMsg("Die Palettennummer muss zwischen 0 und 9 sein.","--help");
-				break;
-			}
-			video_crt_output->SetC64Palette(val);
-			break;
+            if(val < 0 || val > 9)
+            {
+                cmd_line->OutErrorMsg("Die Palettennummer muss zwischen 0 und 9 sein.","--help");
+                break;
+            }
+            video_crt_output->SetC64Palette(val);
+            break;
         case CMD_EXIT_SCREENSHOT:
             c64->SetExitScreenshot(cmd_line->GetArg(i+1));
             break;
@@ -1055,55 +1071,55 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
 
 void MainWindow::SplashMessage(const QString &message, const QColor &color)
 {
-	if(splash != nullptr) splash->ShowStatusMessage(message,color);
+    if(splash != nullptr) splash->ShowStatusMessage(message,color);
 }
 
 void MainWindow::AutoLoadAndRun(QString filename)
 {
-	// akutelles Autostart Verzeichnis abspeichern
-	QFileInfo file_info(filename);
-	lastAutoloadPath = file_info.absolutePath();
+    // akutelles Autostart Verzeichnis abspeichern
+    QFileInfo file_info(filename);
+    lastAutoloadPath = file_info.absolutePath();
 
-	int typ = NO_C64_FILE;
+    int typ = NO_C64_FILE;
 
-	if(file_info.suffix().toUpper() == "PRG")
-		typ = PRG;
+    if(file_info.suffix().toUpper() == "PRG")
+        typ = PRG;
 
-	if(file_info.suffix().toUpper() == "C64")
-		typ = C64;
+    if(file_info.suffix().toUpper() == "C64")
+        typ = C64;
 
-	if(file_info.suffix().toUpper() == "T64")
-		typ = T64;
+    if(file_info.suffix().toUpper() == "T64")
+        typ = T64;
 
-	if(file_info.suffix().toUpper() == "P00")
-		typ = P00;
+    if(file_info.suffix().toUpper() == "P00")
+        typ = P00;
 
-	if(file_info.suffix().toUpper() == "D64")
-		typ = D64;
+    if(file_info.suffix().toUpper() == "D64")
+        typ = D64;
 
-	if(file_info.suffix().toUpper() == "G64")
-		typ = G64;
+    if(file_info.suffix().toUpper() == "G64")
+        typ = G64;
 
-	if(file_info.suffix().toUpper() == "CRT")
-		typ = CRT;
+    if(file_info.suffix().toUpper() == "CRT")
+        typ = CRT;
 
-	if(file_info.suffix().toUpper() == "FRZ")
-		typ = FRZ;
+    if(file_info.suffix().toUpper() == "FRZ")
+        typ = FRZ;
 
-	// QMessageBox::information(this,"Test",filename);
+    // QMessageBox::information(this,"Test",filename);
 
-	FILE *file = qfopen(filename, "rb");
+    FILE *file = qfopen(filename, "rb");
 
-	if(c64->LoadAutoRun(0, file, filename.toLocal8Bit(), typ) == 0)
-	{
+    if(c64->LoadAutoRun(0, file, filename.toLocal8Bit(), typ) == 0)
+    {
         std::cout << "AUTOLOAD: " << typ << ", FILE: " << file << std::endl;
 
-		// Prüfen welche
-		if(typ == D64)
-		{
-			WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(0,0);
-			w->SetEnableFloppy(true);
-			floppy_window->SetDiskImage(0,filename);
+        // Prüfen welche
+        if(typ == D64)
+        {
+            WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(0,0);
+            w->SetEnableFloppy(true);
+            floppy_window->SetDiskImage(0,filename);
         }
     }
 }
@@ -1268,15 +1284,15 @@ void MainWindow::on_menu_main_info_triggered()
 void MainWindow::on_actionBeenden_triggered()
 {
     if(!debugger_window->isHidden()) debugger_window->hide();
-	if(!nogui)
-	{
-		showNormal();
-		close();
-	}
-	else
-	{
-		QCoreApplication::quit();
-	}
+    if(!nogui)
+    {
+        showNormal();
+        close();
+    }
+    else
+    {
+        QCoreApplication::quit();
+    }
 }
 
 void MainWindow::on_actionSoftreset_triggered()
@@ -1299,10 +1315,10 @@ void MainWindow::on_actionAutostart_triggered()
         lastAutoloadPath = QDir::homePath();
     }
 
-	QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),lastAutoloadPath,tr("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.d64 *.g64 *.crt *.frz);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
+    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),lastAutoloadPath,tr("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.d64 *.g64 *.crt *.frz);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
-		AutoLoadAndRun(filename);
+        AutoLoadAndRun(filename);
         c64->SetFocusToC64Window();
     }
 }
@@ -1312,24 +1328,24 @@ void MainWindow::on_actionC64_Programme_direkt_laden_triggered()
     QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),"",tr("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.frz);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
-		QFileInfo file_info(filename);
+        QFileInfo file_info(filename);
 
-		int typ = NO_C64_FILE;
-		if(file_info.suffix().toUpper() == "PRG")
-			typ = PRG;
+        int typ = NO_C64_FILE;
+        if(file_info.suffix().toUpper() == "PRG")
+            typ = PRG;
 
-		if(file_info.suffix().toUpper() == "C64")
-			typ = C64;
+        if(file_info.suffix().toUpper() == "C64")
+            typ = C64;
 
-		if(file_info.suffix().toUpper() == "T64")
-			typ = T64;
+        if(file_info.suffix().toUpper() == "T64")
+            typ = T64;
 
-		if(file_info.suffix().toUpper() == "P00")
-			typ = P00;
+        if(file_info.suffix().toUpper() == "P00")
+            typ = P00;
 
-		FILE *file = qfopen(filename, "rb");
+        FILE *file = qfopen(filename, "rb");
 
-		c64->LoadPRG(file, filename.toLocal8Bit(), typ, nullptr);
+        c64->LoadPRG(file, filename.toLocal8Bit(), typ, nullptr);
     }
 }
 
@@ -1396,17 +1412,17 @@ void MainWindow::OnChangeFloppyImage(int floppynr)
     WidgetFloppyStatus *w = (WidgetFloppyStatus*)ui->FloppyTabel->cellWidget(floppynr,0);
     w->SetAktFilename(floppy_window->GetAktFilename(floppynr),floppy_window->GetAktD64Name(floppynr));
 
-	QFileInfo file_info(floppy_window->GetAktFilename(floppynr));
+    QFileInfo file_info(floppy_window->GetAktFilename(floppynr));
 
-	int typ = NO_C64_FILE;
-	if(file_info.suffix().toUpper() == "D64")
-		typ = D64;
+    int typ = NO_C64_FILE;
+    if(file_info.suffix().toUpper() == "D64")
+        typ = D64;
 
-	if(file_info.suffix().toUpper() == "G64")
-		typ = G64;
+    if(file_info.suffix().toUpper() == "G64")
+        typ = G64;
 
-	FILE *file = qfopen(floppy_window->GetAktFilename(floppynr), "r+b");
-	c64->LoadDiskImage(floppynr,file, typ);
+    FILE *file = qfopen(floppy_window->GetAktFilename(floppynr), "r+b");
+    c64->LoadDiskImage(floppynr,file, typ);
 }
 
 void MainWindow::OnResetScreenshotCounter()
