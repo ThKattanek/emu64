@@ -86,7 +86,7 @@ bool VideoCaptureClass::StartCapture(const char *filename, const char *codec_nam
 
     int ret;
 
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 9, 100)
+#if LIBAVFORMAT_VERSION_MAJOR < 59
     av_register_all();
 #endif
 
@@ -327,7 +327,7 @@ void VideoCaptureClass::AddStream(OutputStream *ost, AVFormatContext *oc, const 
     switch ((*codec)->type) {
     case AVMEDIA_TYPE_AUDIO:
         c->sample_fmt  = (*codec)->sample_fmts ?
-            (*codec)->sample_fmts[0] : AV_SAMPLE_FMT_FLTP;
+                            (*codec)->sample_fmts[0] : AV_SAMPLE_FMT_FLTP;
         c->bit_rate    = audio_bitrate;
         c->sample_rate = 44100;
         if ((*codec)->supported_samplerates) {
@@ -375,7 +375,7 @@ void VideoCaptureClass::AddStream(OutputStream *ost, AVFormatContext *oc, const 
         ost->st->time_base = AVRational{ 1, c->sample_rate };
         break;
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     case AVMEDIA_TYPE_VIDEO:
         c->codec_id = codec_id;
@@ -401,7 +401,7 @@ void VideoCaptureClass::AddStream(OutputStream *ost, AVFormatContext *oc, const 
              * the motion of the chroma plane does not match the luma plane. */
             c->mb_decision = 2;
         }
-    break;
+        break;
     default:
         break;
     }
@@ -673,9 +673,9 @@ int VideoCaptureClass::WriteAudioFrame(AVFormatContext *oc, OutputStream *ost)
     if (frame)
     {
         /* convert samples from native format to destination codec format, using the resampler */
-            /* compute destination number of samples */
-            dst_nb_samples = av_rescale_rnd(swr_get_delay(ost->swr_ctx, c->sample_rate) + frame->nb_samples, c->sample_rate, c->sample_rate, AV_ROUND_UP);
-            av_assert0(dst_nb_samples == frame->nb_samples);
+        /* compute destination number of samples */
+        dst_nb_samples = av_rescale_rnd(swr_get_delay(ost->swr_ctx, c->sample_rate) + frame->nb_samples, c->sample_rate, c->sample_rate, AV_ROUND_UP);
+        av_assert0(dst_nb_samples == frame->nb_samples);
         /* when we pass a frame to the encoder, it may keep a reference to it
          * internally;
          * make sure we do not overwrite it here
