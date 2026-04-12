@@ -80,7 +80,7 @@ private:
     AVFrame* AllocPicture(enum AVPixelFormat pix_fmt, int width, int height);
     bool OpenAudio(const AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg);
 
-#if LIBAVCODEC_VERSION_MAJOR >= 60
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(59, 37, 100)
     AVFrame* AllocAudioFrame(enum AVSampleFormat sample_fmt, const AVChannelLayout *ch_layout, int sample_rate, int nb_samples);
 #else
     AVFrame* AllocAudioFrame(enum AVSampleFormat sample_fmt, uint64_t channel_layout, int sample_rate, int nb_samples);
