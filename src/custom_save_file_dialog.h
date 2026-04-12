@@ -90,9 +90,7 @@ static bool GetSaveFileName(QWidget *parent, QString caption, QStringList filter
 
        int result = QMessageBox::question(parent, QObject::tr("Überschreiben?"),
           QObject::tr("Soll die Datei \"%1\" überschrieben werden?").arg(fileInfo.fileName()),
-          QMessageBox::Yes,
-          QMessageBox::No | QMessageBox::Default,
-          QMessageBox::Cancel | QMessageBox::Escape);
+          QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel));
        if (result == QMessageBox::Cancel)
           return false;
        else if (result == QMessageBox::No) {
