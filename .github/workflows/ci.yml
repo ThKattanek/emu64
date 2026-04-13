@@ -45,3 +45,25 @@ jobs:
         qmake .. PREFIX=/usr/local QMAKE_CXX=clang++ \
                  QMAKE_CXXFLAGS="${CI_CXXFLAGS} ${WSHADOW_CLANG}"
         make -j4
+
+  unit-tests:
+    name: Unit Tests (CPU / CIA / VIC)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install cmake
+      run: sudo apt-get install -y cmake
+
+    - name: Configure testbench
+      run: |
+        cmake -S testbench -B build-tests \
+              -DCMAKE_BUILD_TYPE=Debug
+
+    - name: Build testbench
+      run: cmake --build build-tests --parallel 4
+
+    - name: Run unit tests
+      run: ctest --test-dir build-tests --output-on-failure
