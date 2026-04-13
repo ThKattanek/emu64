@@ -484,7 +484,7 @@ bool MOS6510::OneZyklus(void)
             break;
         //W // SR -> Stack // SR|4 // SP--
         case 4:
-            Write(0x0100+(SP),SR);
+            Write(0x0100+(SP),SR | 1 << 4 | 1 << 5);    // Break Flag und Bit 5 immer auf 1 setzen, da laut diversen Quellen diese Bits so auf dem Stack liegen
             SR|=4;
             SP--;
             break;
@@ -1422,8 +1422,7 @@ bool MOS6510::OneZyklus(void)
             break;
         //W // SR nach 0x100+SP schreiben // SP-- // IFlag setzen // BFlag lÃ¶schen
         case 116:
-            SR&=239;
-            Write(0x0100+SP,SR);
+            Write(0x0100+SP,((SR & ~(1 << 4)) | 1 << 5));   // BFlag löschen, und Bit 5 auf 1
             SP--;
             SR|=4;
             break;
