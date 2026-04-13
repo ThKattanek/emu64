@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -373,23 +372,23 @@ bool MOS6502::OneZyklus(void)
         //SR = 0x04;
         //MCT = ((unsigned char*)MicroCodeTable6502 + (0x100*MCTItemSize));
         return 0;
-    break;
+        break;
     //R // TMPByte von Adresse holen
     case 13:
         TMPByte = Read(Adresse);
         break;
     //W // TMPByte nach Adresse schreiben // ASL MEMORY // ORA
     case 14:
-    Write(Adresse,TMPByte);
+        Write(Adresse,TMPByte);
 
-    SET_CARRY(TMPByte&0x80);	// ASL MEMORY
-    TMPByte <<= 1;
-    TMPByte &= 0xFF;
+        SET_CARRY(TMPByte&0x80);	// ASL MEMORY
+        TMPByte <<= 1;
+        TMPByte &= 0xFF;
 
-    AC|=TMPByte;                // ORA
-    SET_SR_NZ(AC);
+        AC|=TMPByte;                // ORA
+        SET_SR_NZ(AC);
 
-    break;
+        break;
     //W // TMPByte nach Adresse schreiben
     case 15:
         Write(Adresse,TMPByte);
@@ -985,7 +984,7 @@ bool MOS6502::OneZyklus(void)
     //R // PC LO von Adresse lesen // AdresseLo+1
     case 94:
         SetPCLo(Read(Adresse));
-        Adresse = (Adresse&0xFF00)|((Adresse+1)&0x00FF);
+        Adresse = (Adresse & 0xFF00) | ((Adresse + 1) & 0x00FF);    // mit JMP ($nnnn) Indirect Bug
         break;
     //R // PC HI von Adresse lesen
     case 95:
@@ -1272,7 +1271,7 @@ bool MOS6502::OneZyklus(void)
             SET_SR_NZ(tmp2 & 0xff);
             SET_CARRY(tmp2 < 0x100);
             SET_OVERFLOW(((AC ^ tmp2) & 0x80)
-                                             && ((AC ^ src) & 0x80));
+                         && ((AC ^ src) & 0x80));
             AC = (unsigned char) tmp2;
         }
         break;
@@ -1353,22 +1352,22 @@ bool MOS6502::OneZyklus(void)
         PC++;
         break;
     //W // Illegal [SHY]
-	case 134:
-		Write(Adresse, YR & ((Adresse >> 8) + 1));
-		break;
-	//W // Illegal [SHX]
-	case 135:
-		Write(Adresse, XR & ((Adresse >> 8) + 1));
-		break;
-	//W // Illegal [SHA]
-	case 136:
-		Write(Adresse, AC & XR & ((Adresse >> 8) + 1));
-		break;
-	//W // Illegal [SHS]
-	case 137:
-		SP = AC & XR;
-		Write(Adresse, AC & XR & ((Adresse >> 8) + 1));
-		break;
+    case 134:
+        Write(Adresse, YR & ((Adresse >> 8) + 1));
+        break;
+    //W // Illegal [SHX]
+    case 135:
+        Write(Adresse, XR & ((Adresse >> 8) + 1));
+        break;
+    //W // Illegal [SHA]
+    case 136:
+        Write(Adresse, AC & XR & ((Adresse >> 8) + 1));
+        break;
+    //W // Illegal [SHS]
+    case 137:
+        SP = AC & XR;
+        Write(Adresse, AC & XR & ((Adresse >> 8) + 1));
+        break;
     //R // Illegal [ANC]
     case 138:
         AC &= Read(PC);
@@ -1403,23 +1402,23 @@ bool MOS6502::OneZyklus(void)
         AktOpcodePC = PC;
         if(Breakpoints[PC] & 1)
         {
-                *BreakStatus |=1;
-                BreakWerte[0] = PC;
+            *BreakStatus |=1;
+            BreakWerte[0] = PC;
         }
         if(Breakpoints[AC] & 2)
         {
-                *BreakStatus |=2;
-                BreakWerte[1] = AC;
+            *BreakStatus |=2;
+            BreakWerte[1] = AC;
         }
         if(Breakpoints[XR] & 4)
         {
-                *BreakStatus |=4;
-                BreakWerte[2] = XR;
+            *BreakStatus |=4;
+            BreakWerte[2] = XR;
         }
         if(Breakpoints[YR] & 8)
         {
-                *BreakStatus |=8;
-                BreakWerte[3] = YR;
+            *BreakStatus |=8;
+            BreakWerte[3] = YR;
         }
 
         if(ResetReadyAdr == PC)

@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 17.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -50,7 +49,7 @@ public:
 
     bool *RESET;
     bool *ResetReady;               // Wird bei einem Reset False und beim erreichen einer
-                                    // Adresse wird es True
+    // Adresse wird es True
     unsigned short  ResetReadyAdr;
     unsigned short  *BreakStatus;
     unsigned short  *Breakpoints;
