@@ -16,7 +16,6 @@
 #define FLOPPY1541_CLASS_H
 
 #include <math.h>
-#include <cstring>
 #include <cstdio>
 #include <functional>
 
@@ -50,7 +49,7 @@ public:
     void* GetSoundBuffer();
     void ZeroSoundBufferPos();
     void SetFloppySoundVolume(float_t volume);
-	bool LoadDiskImage(FILE *file, int typ);		// 0=D64 , 1=G64
+    bool LoadDiskImage(FILE *file, int typ);		// 0=D64 , 1=G64
     void UnLoadDiskImage();
     void SetC64IEC(uint8_t* port);
     void SetDeviceNumber(uint8_t number);
@@ -112,15 +111,16 @@ private:
 
     void CheckImageWrite();
     void D64ImageToGCRImage();
-	void SectorToGCR(unsigned int spur, unsigned int sektor, uint16_t disk_id);
+    void SectorToGCR(unsigned int spur, unsigned int sektor, uint16_t disk_id);
     void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
     void GCRImageToD64Image();
     void GCRToSector(unsigned int spur, unsigned int sektor);
     void ConvertToD64(uint8_t *source_buffer, uint8_t *destination_buffer);
     void RenderFloppySound();
     void StartDiskChange();
+    void AnalyzeG64Image();
 
-	uint16_t GetDiskIDFromBAM();
+    uint16_t GetDiskIDFromBAM();
 
     /// Variablen ///
 
@@ -153,9 +153,9 @@ private:
 
     ////////// Fürs Disk Image //////////
 
-    #define             FileNameSize 1024
+#define             FileNameSize 1024
 
-	FILE *              image_file;
+    FILE *              image_file;
     int                 ImageTyp;
     uint8_t             AktGCRWert;
     static const int	NUM_TRACKS = 42;

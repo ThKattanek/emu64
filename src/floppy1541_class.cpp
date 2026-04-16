@@ -15,15 +15,13 @@
 #include "./floppy1541_class.h"
 #include "./c64_file_types.h"
 
-#include <iostream>
-
 #include <QDebug>
 
 const uint8_t Floppy1541::num_sectors[] = {21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,19,19,19,19,19,19,19,18,18,18,18,18,18,17,17,17,17,17,17,17,17,17,17,17,17};
 const uint8_t Floppy1541::d64_track_zone[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-                   1,1,1,1,1,1,1,
-                   2,2,2,2,2,2,
-                   3,3,3,3,3,3,3,3,3,3};
+                                              1,1,1,1,1,1,1,
+                                              2,2,2,2,2,2,
+                                              3,3,3,3,3,3,3,3,3,3};
 
 // Zeiger auf Track Anfang //	<------------------------- Track 1-17 ----------------------> <------ Track 18-24 ------> <---- Track 25-30 ----> <---- Track 31-36 ---->
 const uint16_t track_index[]={0,0,21,42,63,84,105,126,147,168,189,210,231,252,273,294,315,336,357,376,395,414,433,452,471,490,508,526,544,562,580,598,615,632,649,666,683};
@@ -39,7 +37,7 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
     RESET = reset;
     GCR_PTR = nullptr;
     breakgroup_count = 0;
-	image_file = nullptr;
+    image_file = nullptr;
 
     CycleCounter = 0;
 
@@ -74,7 +72,7 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
 
     for(int i=0;i<64;i++)
     {
-         ReadProcTbl[i+0xC0] = std::bind(&Floppy1541::ReadRom,this,std::placeholders::_1);
+        ReadProcTbl[i+0xC0] = std::bind(&Floppy1541::ReadRom,this,std::placeholders::_1);
     }
 
     ReadProcTbl[0x18] = std::bind(&MOS6522::ReadIO,via1,std::placeholders::_1);
@@ -219,138 +217,161 @@ void Floppy1541::SetFloppySoundVolume(float_t volume)
 
 bool Floppy1541::LoadDiskImage(FILE *file, int typ)
 {
-	size_t reading_elements;
+    size_t reading_elements;
 
-	if(typ != -1)
-		UnLoadDiskImage();
+    if(typ != -1)
+        UnLoadDiskImage();
 
-	image_file = file;
+    image_file = file;
 
-	switch(typ)
-	{
-	case D64:
-		// Diskwechsel simulieren
-		StartDiskChange();
+    switch(typ)
+    {
+    case D64:
+        // Diskwechsel simulieren
+        StartDiskChange();
 
-		if (file == nullptr)
-			return false;
+        if (file == nullptr)
+            return false;
 
-		for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i]=0x00;
+        for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i]=0x00;
 
-		reading_elements = fread (D64Image,1,D64_IMAGE_SIZE,file);
-		if(reading_elements != D64_IMAGE_SIZE)
-		{
-			//fclose(file);
-			return false;
-		}
+        reading_elements = fread (D64Image,1,D64_IMAGE_SIZE,file);
+        if(reading_elements != D64_IMAGE_SIZE)
+        {
+            return false;
+        }
 
-		//fclose(file);
-		D64ImageToGCRImage();
+        D64ImageToGCRImage();
 
-		GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
-		GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
+        GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
+        GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
 
-		ImageWriteStatus = false;
-		ImageDirectoryWriteStatus = false;
-		ImageTyp = D64;
+        ImageWriteStatus = false;
+        ImageDirectoryWriteStatus = false;
+        ImageTyp = D64;
 
-		SyncFoundCount = 0;
+        SyncFoundCount = 0;
 
-		return true;
-		break;
+        return true;
+        break;
 
-	case G64:
-		char  kennung[9];
-		char  version;
-		int8_t  trackanzahl;
-		unsigned short  tracksize;
-		uint32_t trackpos[84];
-		uint32_t trackspeed[84];
+    case G64:
+        char  kennung[9];
+        char  version;
+        int8_t  trackanzahl;
+        unsigned short  tracksize;
+        uint32_t trackpos[84];
+        uint32_t trackspeed[84];
 
-		// Diskwechsel simulieren
-		StartDiskChange();
+        // Diskwechsel simulieren
+        StartDiskChange();
 
-		if (file == nullptr)
-			return false;
+        if (file == nullptr)
+            return false;
 
-		for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i]=0x00;
+        for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i]=0x00;
 
-		reading_elements = fread (kennung,1,8,file);
-		kennung[8]=0;
+        reading_elements = fread (kennung,1,8,file);
+        if(reading_elements != 8)
+            return false;
 
-		if(0 != strcmp("GCR-1541",kennung))
-		{
-			//MessageBox(0,"Fehlerhaftes G64 Image","Error!",0);
-			return false;
-		}
+        kennung[8]=0;
 
-		reading_elements = fread (&version,1,1,file);
-		if(version != 0)
-		{
-			//MessageBox(0,"Dies Version unterstützt nur G64 Images Version 1","Error!",0);
-			return false;
-		}
+        if(0 != strcmp("GCR-1541",kennung))
+        {
+            //MessageBox(0,"Fehlerhaftes G64 Image","Error!",0);
+            return false;
+        }
 
-		reading_elements = fread (&trackanzahl,1,1,file);
-		if(trackanzahl > 84)
-		{
-			//MessageBox(0,"Das Image enthält zuviele Tracks!","Error!",0);
-		}
+        reading_elements = fread (&version,1,1,file);
+        if(reading_elements != 1)
+            return false;
 
-		reading_elements = fread (&tracksize,1,2,file);
-		if(tracksize != 7928)
-		{
-			//MessageBox(0,"Unbekannte Trackgröße","Error!",0);
-		}
+        if(version != 0)
+        {
+            //MessageBox(0,"Dies Version unterstützt nur G64 Images Version 1","Error!",0);
+            return false;
+        }
 
-		reading_elements = fread (&trackpos,4,84,file);
-		reading_elements = fread (&trackspeed,4,84,file);
+        reading_elements = fread (&trackanzahl,1,1,file);
+        if(reading_elements != 1)
+            return false;
 
-		for(int i=0;i<trackanzahl;i++)
-		{
-			if(trackpos[i] != 0)
-			{
-				fseek(file,trackpos[i],SEEK_SET);
-				reading_elements = fread(&TrackSize[i],1,2,file);
-				reading_elements = fread(GCRImage+(i*tracksize),1,tracksize-2,file);
-			}
-		}
+        if(trackanzahl > 84)
+        {
+            //MessageBox(0,"Das Image enthält zuviele Tracks!","Error!",0);
+        }
 
-		//fclose(file);
+        reading_elements = fread (&tracksize,1,2,file);
+        if(reading_elements != 2)
+            return false;
 
-		ImageWriteStatus = false;
-		ImageDirectoryWriteStatus = false;
-		ImageTyp = G64;
+        if(tracksize != 7928)
+        {
+            //MessageBox(0,"Unbekannte Trackgröße","Error!",0);
+        }
 
-		SyncFoundCount = 0;
+        reading_elements = fread (&trackpos,4,84,file);
+        if(reading_elements != 84)
+            return false;
 
-		return true;
-		break;
-	}
+        reading_elements = fread (&trackspeed,4,84,file);
+        if(reading_elements != 84)
+            return false;
+
+        for(int i=0;i<trackanzahl;i++)
+        {
+            if(trackpos[i] != 0)
+            {
+                fseek(file,trackpos[i],SEEK_SET);
+
+                reading_elements = fread(&TrackSize[i],1,2,file);
+                if(reading_elements != 2)
+                    return false;
+
+                reading_elements = fread(GCRImage+(i*tracksize),1,tracksize-2,file);
+                if(reading_elements != size_t(tracksize-2))
+                    return false;
+            }
+        }
+
+        //fclose(file);
+
+        ImageWriteStatus = false;
+        ImageDirectoryWriteStatus = false;
+        ImageTyp = G64;
+
+        SyncFoundCount = 0;
+
+
+
+        return true;
+        break;
+    }
     return false;
 }
 
 void Floppy1541::UnLoadDiskImage()
 {
-	if(image_file == nullptr)
-		return;
+    if(image_file == nullptr)
+        return;
 
     CheckImageWrite();
 
-	for(int i=0;i<D64_IMAGE_SIZE;i++)
-		D64Image[i] = 0;
-	for(int i=0;i<G64_IMAGE_SIZE;i++)
-		GCRImage[i] = 0;
+    for(int i=0;i<D64_IMAGE_SIZE;i++)
+        D64Image[i] = 0;
+    for(int i=0;i<G64_IMAGE_SIZE;i++)
+        GCRImage[i] = 0;
     WriteProtect = false;
 
-	fclose(image_file);
-	image_file = nullptr;
+    fclose(image_file);
+    image_file = nullptr;
 }
 
 inline void Floppy1541::CheckImageWrite()
 {
-	if(image_file == nullptr)
-		return;
+    if(image_file == nullptr)
+        return;
 
     if(ImageWriteStatus && !WriteProtectAkt)
     {
@@ -358,8 +379,8 @@ inline void Floppy1541::CheckImageWrite()
         {
         case D64:
             GCRImageToD64Image();
-			fseek(image_file, 0, SEEK_SET);
-			fwrite(D64Image,1,D64_IMAGE_SIZE, image_file);
+            fseek(image_file, 0, SEEK_SET);
+            fwrite(D64Image,1,D64_IMAGE_SIZE, image_file);
             break;
 
         case G64:
@@ -370,15 +391,15 @@ inline void Floppy1541::CheckImageWrite()
 
 inline void Floppy1541::D64ImageToGCRImage()
 {
-	uint16_t disk_id = GetDiskIDFromBAM();
+    uint16_t disk_id = GetDiskIDFromBAM();
 
-	for (int track=1; track<=35; track++)
+    for (int track=1; track<=35; track++)
     {
-		TrackSize[(track-1)*2] = GCR_SECTOR_SIZE*num_sectors[track-1];
-		TrackSize[((track-1)*2)+1] = GCR_SECTOR_SIZE*num_sectors[track-1];
-		for(int sector=0; sector<num_sectors[track-1];sector++)
+        TrackSize[(track-1)*2] = GCR_SECTOR_SIZE*num_sectors[track-1];
+        TrackSize[((track-1)*2)+1] = GCR_SECTOR_SIZE*num_sectors[track-1];
+        for(int sector=0; sector<num_sectors[track-1];sector++)
         {
-			SectorToGCR(track, sector, disk_id);
+            SectorToGCR(track, sector, disk_id);
         }
     }
     ImageWriteStatus=false;
@@ -387,14 +408,14 @@ inline void Floppy1541::D64ImageToGCRImage()
 
 inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor, uint16_t disk_id)
 {
-	uint8_t id1 = disk_id;
-	uint8_t id2 = disk_id >> 8;
+    uint8_t id1 = disk_id;
+    uint8_t id2 = disk_id >> 8;
     uint8_t block[256];
     uint8_t buffer[4];
     uint8_t *P = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCR_SECTOR_SIZE;
 
     int TEMP;
-	TEMP=track_index[spur]+(sektor);
+    TEMP=track_index[spur]+(sektor);
     TEMP*=256;
 
     for (int z=0;z<256;z++) block[z]=D64Image[TEMP+z];
@@ -491,7 +512,7 @@ inline void Floppy1541::GCRToSector(unsigned int spur, unsigned int sektor)
     uint8_t BUFFER[4];
 
     uint8_t *gcr = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCR_SECTOR_SIZE;
-	uint8_t *d64 = D64Image + ((track_index[spur]+sektor)*256);
+    uint8_t *d64 = D64Image + ((track_index[spur]+sektor)*256);
 
     gcr += 11;
 
@@ -575,11 +596,11 @@ void Floppy1541::GetFloppyInfo(FLOPPY_INFO *fi)
     uint8_t tmp = via2->GetIO_Zero();
     fi->Motor = !!(tmp&4);
     fi->Data = !!(tmp&8);
-	fi->Data_RMS = via2->GetIOPB3_RMS();
+    fi->Data_RMS = via2->GetIOPB3_RMS();
 
-	fi->ErrorFlag = RAM[0x26D];
-	for(int i=0; i<36; i++)
-		fi->ErrorMsg[i] = RAM[0x2D5 + i];
+    fi->ErrorFlag = RAM[0x26D];
+    for(int i=0; i<36; i++)
+        fi->ErrorMsg[i] = RAM[0x2D5 + i];
 }
 
 bool Floppy1541::LoadDosRom(const char *filename)
@@ -593,6 +614,7 @@ bool Floppy1541::LoadDosRom(const char *filename)
 
     if(0x4000 != fread (ROM,1,0x4000,file))
     {
+        fclose(file);
         return false;
     }
 
@@ -610,7 +632,7 @@ int Floppy1541::LoadFloppySounds(const char *motor_sound_filename, const char *m
     File = fopen(motor_on_sound_filename, "rb");
     if (File == NULL)
     {
-            return 0x01;
+        return 0x01;
     }
 
     fseek(File,0,SEEK_END);
@@ -622,13 +644,16 @@ int Floppy1541::LoadFloppySounds(const char *motor_sound_filename, const char *m
     fclose(File);
 
     if(reading_elements != (unsigned int)FloppySound00Size)
+    {
+        delete[] FloppySound00;
         return 0x01;
+    }
 
     File = fopen(motor_sound_filename, "rb");
     if (File == NULL)
     {
-            delete[] FloppySound00;
-            return 0x02;
+        delete[] FloppySound00;
+        return 0x02;
     }
 
     fseek(File,0,SEEK_END);
@@ -639,12 +664,19 @@ int Floppy1541::LoadFloppySounds(const char *motor_sound_filename, const char *m
     reading_elements = fread(FloppySound01,2,FloppySound01Size,File);
     fclose(File);
 
+    if(reading_elements != (unsigned int)FloppySound01Size)
+    {
+        delete[] FloppySound00;
+        delete[] FloppySound01;
+        return 0x02;
+    }
+
     File = fopen(motor_off_sound_filename, "rb");
     if (File == NULL)
     {
-            delete[] FloppySound00;
-            delete[] FloppySound01;
-            return 0x03;
+        delete[] FloppySound00;
+        delete[] FloppySound01;
+        return 0x03;
     }
 
     fseek(File,0,SEEK_END);
@@ -654,14 +686,21 @@ int Floppy1541::LoadFloppySounds(const char *motor_sound_filename, const char *m
     FloppySound02 = new unsigned short[FloppySound02Size];
     reading_elements = fread(FloppySound02,2,FloppySound02Size,File);
     fclose(File);
+    if(reading_elements != (unsigned int)FloppySound02Size)
+    {
+        delete[] FloppySound00;
+        delete[] FloppySound01;
+        delete[] FloppySound02;
+        return 0x03;
+    }
 
     File = fopen(Stepper_inc_sound_filename, "rb");
     if (File == NULL)
     {
-            delete[] FloppySound00;
-            delete[] FloppySound01;
-            delete[] FloppySound02;
-            return 0x04;
+        delete[] FloppySound00;
+        delete[] FloppySound01;
+        delete[] FloppySound02;
+        return 0x04;
     }
 
     fseek(File,0,SEEK_END);
@@ -671,15 +710,23 @@ int Floppy1541::LoadFloppySounds(const char *motor_sound_filename, const char *m
     FloppySound03 = new unsigned short[FloppySound03Size];
     reading_elements = fread(FloppySound03,2,FloppySound03Size,File);
     fclose(File);
+    if(reading_elements != (unsigned int)FloppySound03Size)
+    {
+        delete[] FloppySound00;
+        delete[] FloppySound01;
+        delete[] FloppySound02;
+        delete[] FloppySound03;
+        return 0x04;
+    }
 
     File = fopen(stepper_dec_sound_filename, "rb");
     if (File == NULL)
     {
-            delete[] FloppySound00;
-            delete[] FloppySound01;
-            delete[] FloppySound02;
-            delete[] FloppySound03;
-            return 0x05;
+        delete[] FloppySound00;
+        delete[] FloppySound01;
+        delete[] FloppySound02;
+        delete[] FloppySound03;
+        return 0x05;
     }
 
     fseek(File,0,SEEK_END);
@@ -689,16 +736,25 @@ int Floppy1541::LoadFloppySounds(const char *motor_sound_filename, const char *m
     FloppySound04 = new unsigned short[FloppySound04Size];
     reading_elements = fread(FloppySound04,2,FloppySound04Size,File);
     fclose(File);
+    if(reading_elements != (unsigned int)FloppySound04Size)
+    {
+        delete[] FloppySound00;
+        delete[] FloppySound01;
+        delete[] FloppySound02;
+        delete[] FloppySound03;
+        delete[] FloppySound04;
+        return 0x05;
+    }
 
     File = fopen(anschlag_sound_filename, "rb");
     if (File == NULL)
     {
-            delete[] FloppySound00;
-            delete[] FloppySound01;
-            delete[] FloppySound02;
-            delete[] FloppySound03;
-            delete[] FloppySound04;
-            return 0x06;
+        delete[] FloppySound00;
+        delete[] FloppySound01;
+        delete[] FloppySound02;
+        delete[] FloppySound03;
+        delete[] FloppySound04;
+        return 0x06;
     }
 
     fseek(File,0,SEEK_END);
@@ -708,6 +764,16 @@ int Floppy1541::LoadFloppySounds(const char *motor_sound_filename, const char *m
     FloppySound05 = new unsigned short[FloppySound05Size];
     reading_elements = fread(FloppySound05,2,FloppySound05Size,File);
     fclose(File);
+    if(reading_elements != (unsigned int)FloppySound05Size)
+    {
+        delete[] FloppySound00;
+        delete[] FloppySound01;
+        delete[] FloppySound02;
+        delete[] FloppySound03;
+        delete[] FloppySound04;
+        delete[] FloppySound05;
+        return 0x06;
+    }
 
     FloppySoundsLoaded = true;
     return 0;
@@ -911,7 +977,7 @@ bool Floppy1541::SyncFound()
 
     if(*GCR_PTR == 0xFF)
     {
-L1:
+    L1:
         GCR_PTR++;
         if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
         if(*GCR_PTR == 0xFF) goto L1;
@@ -1025,8 +1091,8 @@ void Floppy1541::RenderFloppySound()
     switch(StepperLoopStatus)
     {
     case 0:
-            SoundBuffer[SoundBufferPos] += 0;
-            break;
+        SoundBuffer[SoundBufferPos] += 0;
+        break;
     case 1:
         SoundBuffer[SoundBufferPos] += FloppySound03[FloppySound03Pos];
         FloppySound03Pos++;
@@ -1066,26 +1132,31 @@ void Floppy1541::StartDiskChange()
 {
     DiskChangeSimState = DISK_CHANGE_STATE_COUNTS;
     DiskChangeSimCycleCounter = DISK_CHANGE_STATE_CYCLES;
-	WriteProtect = !WriteProtect;
+    WriteProtect = !WriteProtect;
+}
+
+void Floppy1541::AnalyzeG64Image()
+{
+
 }
 
 uint16_t Floppy1541::GetDiskIDFromBAM()
 {
-	// position for BAM
-	uint8_t track = 18;
-	uint8_t sector = 0;
+    // position for BAM
+    uint8_t track = 18;
+    uint8_t sector = 0;
 
-	uint16_t disk_id;
+    uint16_t disk_id;
 
-	int index;
+    int index;
 
-	index = track_index[track] + sector;
-	index *= 256;
+    index = track_index[track] + sector;
+    index *= 256;
 
-	disk_id = D64Image[index + 162];
-	disk_id |= D64Image[index + 163] << 8;
+    disk_id = D64Image[index + 162];
+    disk_id |= D64Image[index + 163] << 8;
 
-	return disk_id;
+    return disk_id;
 }
 
 int16_t Floppy1541::AddBreakGroup()
@@ -1165,6 +1236,14 @@ int Floppy1541::GetBreakGroupCount()
     return breakgroup_count;
 }
 
+#define READ_OR_RETURN_ERROR(variable) \
+reading_elements = fread(&variable,sizeof(variable),1,file); \
+    if(reading_elements != 1) \
+{ \
+        fclose(file); \
+        return -3; \
+}
+
 int Floppy1541::LoadBreakGroups(const char *filename)
 {
     FILE *file;
@@ -1178,12 +1257,19 @@ int Floppy1541::LoadBreakGroups(const char *filename)
     file = fopen (filename, "rb");
     if (file == NULL)
     {
-            /// Datei konnte nicht geöffnet werden ///
-            return -1;
+        /// Datei konnte nicht geöffnet werden ///
+        return -1;
     }
 
     /// Kennung ///
     reading_elements = fread(Kennung,sizeof(Kennung),1,file);
+    if(reading_elements != 1)
+    {
+        /// Fehler beim Lesen der Kennung ///
+        fclose(file);
+        return -3;
+    }
+
     if(0 != strcmp("EMU64_BPT",Kennung))
     {
         /// Kein Emu64 Format ///
@@ -1193,6 +1279,12 @@ int Floppy1541::LoadBreakGroups(const char *filename)
 
     /// Version ///
     reading_elements = fread(&Version,sizeof(Version),1,file);
+    if(reading_elements != 1)
+    {
+        /// Fehler beim Lesen der Version ///
+        fclose(file);
+        return -6;
+    }
 
     switch(Version)
     {
@@ -1200,36 +1292,44 @@ int Floppy1541::LoadBreakGroups(const char *filename)
         /// Groupanzahl ///
         reading_elements = fread(&Groupanzahl,sizeof(Groupanzahl),1,file);
         if(reading_elements != 1)
+        {
+            fclose(file);
             return -5;
+        }
 
-        if(Groupanzahl == 0) return -4;
+        if(Groupanzahl == 0)
+        {
+            fclose(file);
+            return -4;
+        }
 
         /// Groups ///
         for(int ii=0;ii<Groupanzahl;ii++)
         {
             int i = AddBreakGroup();
-            reading_elements = fread(BreakGroup[i]->Name,sizeof(BreakGroup[i]->Name),1,file);
-            reading_elements = fread(&BreakGroup[i]->Enable,sizeof(BreakGroup[i]->Enable),1,file);
-            reading_elements = fread(&BreakGroup[i]->bPC,sizeof(BreakGroup[i]->bPC),1,file);
-            reading_elements = fread(&BreakGroup[i]->iPC,sizeof(BreakGroup[i]->iPC),1,file);
-            reading_elements = fread(&BreakGroup[i]->bAC,sizeof(BreakGroup[i]->bAC),1,file);
-            reading_elements = fread(&BreakGroup[i]->iAC,sizeof(BreakGroup[i]->iAC),1,file);
-            reading_elements = fread(&BreakGroup[i]->bXR,sizeof(BreakGroup[i]->bXR),1,file);
-            reading_elements = fread(&BreakGroup[i]->iXR,sizeof(BreakGroup[i]->iXR),1,file);
-            reading_elements = fread(&BreakGroup[i]->bYR,sizeof(BreakGroup[i]->bYR),1,file);
-            reading_elements = fread(&BreakGroup[i]->iYR,sizeof(BreakGroup[i]->iYR),1,file);
-            reading_elements = fread(&BreakGroup[i]->bRAddress,sizeof(BreakGroup[i]->bRAddress),1,file);
-            reading_elements = fread(&BreakGroup[i]->iRAddress,sizeof(BreakGroup[i]->iRAddress),1,file);
-            reading_elements = fread(&BreakGroup[i]->bWAddress,sizeof(BreakGroup[i]->bWAddress),1,file);
-            reading_elements = fread(&BreakGroup[i]->iWAddress,sizeof(BreakGroup[i]->iWAddress),1,file);
-            reading_elements = fread(&BreakGroup[i]->bRWert,sizeof(BreakGroup[i]->bRWert),1,file);
-            reading_elements = fread(&BreakGroup[i]->iRWert,sizeof(BreakGroup[i]->iRWert),1,file);
-            reading_elements = fread(&BreakGroup[i]->bWWert,sizeof(BreakGroup[i]->bWWert),1,file);
-            reading_elements = fread(&BreakGroup[i]->iWWert,sizeof(BreakGroup[i]->iWWert),1,file);
-            reading_elements = fread(&BreakGroup[i]->bRZ,sizeof(BreakGroup[i]->bRZ),1,file);
-            reading_elements = fread(&BreakGroup[i]->iRZ,sizeof(BreakGroup[i]->iRZ),1,file);
-            reading_elements = fread(&BreakGroup[i]->bRZZyklus,sizeof(BreakGroup[i]->bRZZyklus),1,file);
-            reading_elements = fread(&BreakGroup[i]->iRZZyklus,sizeof(BreakGroup[i]->iRZZyklus),1,file);
+
+            READ_OR_RETURN_ERROR(BreakGroup[i]->Name);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->Enable);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bPC);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iPC);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bAC);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iAC);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bXR);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iXR);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bYR);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iYR);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bRAddress);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iRAddress);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bWAddress);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iWAddress);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bRWert);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iRWert);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bWWert);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iWWert);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bRZ);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iRZ);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bRZZyklus);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iRZZyklus);
 
             // version 2 compatiblity
             BreakGroup[i]->iRAddressCount = 1;
@@ -1245,47 +1345,57 @@ int Floppy1541::LoadBreakGroups(const char *filename)
         /// Groupanzahl ///
         reading_elements = fread(&Groupanzahl,sizeof(Groupanzahl),1,file);
         if(reading_elements != 1)
+        {
+            /// Fehler beim Lesen der Groupanzahl ///
+            fclose(file);
             return -5;
+        }
 
-        if(Groupanzahl == 0) return -4;
+        if(Groupanzahl == 0)
+        {
+            fclose(file);
+            return -4;
+        }
 
         /// Groups ///
         for(int ii=0;ii<Groupanzahl;ii++)
         {
             int i = AddBreakGroup();
-            reading_elements = fread(BreakGroup[i]->Name,sizeof(BreakGroup[i]->Name),1,file);
-            reading_elements = fread(&BreakGroup[i]->Enable,sizeof(BreakGroup[i]->Enable),1,file);
-            reading_elements = fread(&BreakGroup[i]->bPC,sizeof(BreakGroup[i]->bPC),1,file);
-            reading_elements = fread(&BreakGroup[i]->iPC,sizeof(BreakGroup[i]->iPC),1,file);
-            reading_elements = fread(&BreakGroup[i]->bAC,sizeof(BreakGroup[i]->bAC),1,file);
-            reading_elements = fread(&BreakGroup[i]->iAC,sizeof(BreakGroup[i]->iAC),1,file);
-            reading_elements = fread(&BreakGroup[i]->bXR,sizeof(BreakGroup[i]->bXR),1,file);
-            reading_elements = fread(&BreakGroup[i]->iXR,sizeof(BreakGroup[i]->iXR),1,file);
-            reading_elements = fread(&BreakGroup[i]->bYR,sizeof(BreakGroup[i]->bYR),1,file);
-            reading_elements = fread(&BreakGroup[i]->iYR,sizeof(BreakGroup[i]->iYR),1,file);
-            reading_elements = fread(&BreakGroup[i]->bRAddress,sizeof(BreakGroup[i]->bRAddress),1,file);
-            reading_elements = fread(&BreakGroup[i]->iRAddress,sizeof(BreakGroup[i]->iRAddress),1,file);
-            reading_elements = fread(&BreakGroup[i]->iRAddressCount,sizeof(BreakGroup[i]->iRAddressCount),1,file);
-            reading_elements = fread(&BreakGroup[i]->bWAddress,sizeof(BreakGroup[i]->bWAddress),1,file);
-            reading_elements = fread(&BreakGroup[i]->iWAddress,sizeof(BreakGroup[i]->iWAddress),1,file);
-            reading_elements = fread(&BreakGroup[i]->iWAddressCount,sizeof(BreakGroup[i]->iWAddressCount),1,file);
-            reading_elements = fread(&BreakGroup[i]->bRWert,sizeof(BreakGroup[i]->bRWert),1,file);
-            reading_elements = fread(&BreakGroup[i]->iRWert,sizeof(BreakGroup[i]->iRWert),1,file);
-            reading_elements = fread(&BreakGroup[i]->bWWert,sizeof(BreakGroup[i]->bWWert),1,file);
-            reading_elements = fread(&BreakGroup[i]->iWWert,sizeof(BreakGroup[i]->iWWert),1,file);
-            reading_elements = fread(&BreakGroup[i]->bRZ,sizeof(BreakGroup[i]->bRZ),1,file);
-            reading_elements = fread(&BreakGroup[i]->iRZ,sizeof(BreakGroup[i]->iRZ),1,file);
-            reading_elements = fread(&BreakGroup[i]->bRZZyklus,sizeof(BreakGroup[i]->bRZZyklus),1,file);
-            reading_elements = fread(&BreakGroup[i]->iRZZyklus,sizeof(BreakGroup[i]->iRZZyklus),1,file);
+
+            READ_OR_RETURN_ERROR(BreakGroup[i]->Name);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->Enable);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bPC);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iPC);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bAC);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iAC);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bXR);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iXR);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bYR);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iYR);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bRAddress);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iRAddress);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iRAddressCount);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bWAddress);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iWAddress);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iWAddressCount);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bRWert);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iRWert);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bWWert);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iWWert);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bRZ);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iRZ);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->bRZZyklus);
+            READ_OR_RETURN_ERROR(BreakGroup[i]->iRZZyklus);
         }
         break;
 
     default:
+        /// Version nicht unterstützt ///
+        fclose(file);
         return -3;
     }
 
-
-
+    fclose(file);
     return 0;
 }
 
@@ -1298,7 +1408,7 @@ bool Floppy1541::SaveBreakGroups(const char *filename)
     file = fopen (filename, "wb");
     if (file == NULL)
     {
-            return false;
+        return false;
     }
 
     /// Kennung ///
