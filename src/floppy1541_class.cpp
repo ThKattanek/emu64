@@ -1307,6 +1307,12 @@ int Floppy1541::LoadBreakGroups(const char *filename)
         for(int ii=0;ii<Groupanzahl;ii++)
         {
             int i = AddBreakGroup();
+            if(i < 0)
+            {
+                /// Fehler beim Hinzufügen einer Breakgruppe ///
+                fclose(file);
+                return -7;
+            }
 
             READ_OR_RETURN_ERROR(BreakGroup[i]->Name);
             READ_OR_RETURN_ERROR(BreakGroup[i]->Enable);
@@ -1361,6 +1367,12 @@ int Floppy1541::LoadBreakGroups(const char *filename)
         for(int ii=0;ii<Groupanzahl;ii++)
         {
             int i = AddBreakGroup();
+            if(i < 0)
+            {
+                /// Fehler beim Hinzufügen einer Breakgruppe ///
+                fclose(file);
+                return -7;
+            }
 
             READ_OR_RETURN_ERROR(BreakGroup[i]->Name);
             READ_OR_RETURN_ERROR(BreakGroup[i]->Enable);
