@@ -51,7 +51,7 @@ public:
     bool EnableExtInterrupts;
 
     bool *ResetReady;	// Wird bei einem Reset False und beim erreichen einer
-						// Adresse wird es True
+    // Adresse wird es True
     unsigned short ResetReadyAdr;
     bool JAMFlag;
     unsigned short  *BreakStatus;
@@ -104,7 +104,7 @@ private:
     bool            nmi_is_active;
 
     bool             shxy_dma;
-	uint8_t			axa_byte;
+    uint8_t			axa_byte;
 };
 
 #define SetAdresseLo(wert) Adresse = ((Adresse&0xFF00)|wert)
