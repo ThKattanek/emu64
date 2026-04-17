@@ -118,7 +118,7 @@ private:
     void ConvertToD64(uint8_t *source_buffer, uint8_t *destination_buffer);
     void RenderFloppySound();
     void StartDiskChange();
-    void AnalyzeG64Image();
+    bool GetGCRBit(int pos);
 
     uint16_t GetDiskIDFromBAM();
 

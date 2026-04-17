@@ -950,30 +950,7 @@ uint8_t Floppy1541::ReadRom(uint16_t address)
 
 bool Floppy1541::SyncFound()
 {
-    // bool found = false;
-
     if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr)) return false;
-
-    // NEU TEST
-    /*
-    if(*GCR_PTR == 0xFF)
-    {
-        SyncFoundCount++;
-        if(SyncFoundCount == 5)
-        {
-            found = true;
-            GCR_PTR --;
-        }
-    }
-    else
-    {
-        SyncFoundCount = 0;
-        GCR_PTR ++;	// Rotate disk
-        if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
-    }
-
-    return found;
-    */
 
     if(*GCR_PTR == 0xFF)
     {
@@ -1024,6 +1001,11 @@ void Floppy1541::SpurInc()
     GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
     GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
 
+    qDebug() << "Spurgröße Track: " << AktHalbSpur << " = " << TrackSize[AktHalbSpur];
+    qDebug() << "GCRBits:";
+    for(int i=0; i<50; i++)
+        qDebug() << GetGCRBit(i);
+
     if(StepperIncWait)
         StepperIncWait = false;
     else StepperInc = true;
@@ -1037,6 +1019,8 @@ void Floppy1541::SpurDec()
     {
         GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
         GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
+
+        qDebug() << "Spurgröße Track: " << AktHalbSpur << " = " << TrackSize[AktHalbSpur];
 
         if(stepper_bump != 2)
             stepper_bump++;
@@ -1135,9 +1119,15 @@ void Floppy1541::StartDiskChange()
     WriteProtect = !WriteProtect;
 }
 
-void Floppy1541::AnalyzeG64Image()
+bool Floppy1541::GetGCRBit(int pos)
 {
+    if((TrackSize[AktHalbSpur] * 8) < pos)
+        return false;
 
+    int byte_pos = pos / 8;
+    int bit_pos = pos % 8;
+
+    return GCRSpurStart[byte_pos] & 1 << (7 - bit_pos);
 }
 
 uint16_t Floppy1541::GetDiskIDFromBAM()
