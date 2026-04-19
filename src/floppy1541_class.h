@@ -118,6 +118,7 @@ private:
     void ConvertToD64(uint8_t *source_buffer, uint8_t *destination_buffer);
     void RenderFloppySound();
     void StartDiskChange();
+    void UpdateGCRPointer();
     bool GetGCRBit(int pos);
 
     uint16_t GetDiskIDFromBAM();
@@ -170,6 +171,8 @@ private:
     uint8_t             D64Image[D64_IMAGE_SIZE];   // Aktuelles D64 Image
     uint8_t             GCRImage[G64_IMAGE_SIZE];   // Aktuelles GCR Image
     uint16_t            TrackSize[256];
+    uint32_t            GCRBitTrackSize;
+    uint32_t            GCRBitTrackPos;
 
     /// Für Floppy Sound ///
 

@@ -163,8 +163,7 @@ void Floppy1541::SetEnableFloppy(bool status)
         StepperIncWait = true;
 
         AktHalbSpur = -1; //1
-        GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
-        GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
+        UpdateGCRPointer();
     }
     else
     {
@@ -243,8 +242,7 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
 
         D64ImageToGCRImage();
 
-        GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
-        GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
+        UpdateGCRPointer();
 
         ImageWriteStatus = false;
         ImageDirectoryWriteStatus = false;
@@ -334,6 +332,12 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
                     return false;
             }
         }
+
+        // GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
+        // GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
+
+        GCRBitTrackSize = TrackSize[AktHalbSpur] * 8;
+        GCRBitTrackPos = 0;
 
         //fclose(file);
 
@@ -879,8 +883,7 @@ bool Floppy1541::OneCycle()
     {
         StepperIncWait = true;
         AktHalbSpur = -1; //1
-        GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
-        GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
+        UpdateGCRPointer();
     }
 
     // PHI2
@@ -950,6 +953,75 @@ uint8_t Floppy1541::ReadRom(uint16_t address)
 
 bool Floppy1541::SyncFound()
 {
+    // NEW
+    int sync_bit_count;
+
+    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr) || DiskMotorOn == false) return false;
+
+    if(GetGCRBit(GCRBitTrackPos++))
+    {
+        if(GCRBitTrackPos == GCRBitTrackSize)
+            GCRBitTrackPos = 0;
+
+        sync_bit_count = 1;
+
+        while(GetGCRBit(GCRBitTrackPos))
+        {
+            GCRBitTrackPos++;
+            if(GCRBitTrackPos == GCRBitTrackSize)
+                GCRBitTrackPos = 0;
+            sync_bit_count++;
+        }
+
+        // Letztes bit war eine Null, deshalb Zeiger um eins wieder zurück
+        if(sync_bit_count >= 10)
+        {
+            // 8Bit zurück, damit der Sync-Byte gelesen werden kann
+            if(GCRBitTrackPos < 8)
+                GCRBitTrackPos = GCRBitTrackSize - (8 - GCRBitTrackPos);
+            else
+                GCRBitTrackPos -= 8;
+
+            qDebug() << "SYNC Foud (" << sync_bit_count << " Bits)";
+           // for(int i=0; i<8; i++)
+           //     qDebug() << ReadGCRByte();
+            return true;
+        }
+        return false;
+    }
+    else
+    {
+        if(GCRBitTrackPos == GCRBitTrackSize)
+            GCRBitTrackPos = 0;
+        return false;
+    }
+
+    // NEW_OLD
+/*
+    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2))) return false;
+
+    if(ReadGCRByte() == 0xff)
+    {
+        while(ReadGCRByte() == 0xff);
+
+        //GCRBitTrackPos = GCRBitTrackPosOld;
+        // 16Bit zurück, damit der Sync-Byte gelesen werden kann
+        if(GCRBitTrackPos < 16)
+            GCRBitTrackPos = GCRBitTrackSize - (16 - GCRBitTrackPos);
+        else
+            GCRBitTrackPos -= 16;
+
+        qDebug() << "SYNC Foud -> Track: " << (AktHalbSpur >> 1);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+*/
+
+    // OLD
+/*
     if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr)) return false;
 
     if(*GCR_PTR == 0xFF)
@@ -960,6 +1032,7 @@ bool Floppy1541::SyncFound()
         if(*GCR_PTR == 0xFF) goto L1;
         GCR_PTR--;
         if(GCR_PTR < GCRSpurStart) GCR_PTR = GCRSpurEnde;
+        qDebug() << "SYNC Foud -> Track: " << (AktHalbSpur >> 1);
         return true;
     }
     else
@@ -968,13 +1041,46 @@ bool Floppy1541::SyncFound()
         if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
         return false;
     }
+*/
 }
 
 uint8_t Floppy1541::ReadGCRByte()
 {
+    // NEW
+/*
+    uint8_t gcr_byte = 0;
+    for(int i=0; i<8; i++)
+    {
+        if(GetGCRBit(GCRBitTrackPos++))
+        {
+            if(GCRBitTrackPos == GCRBitTrackSize)
+                GCRBitTrackPos = 0;
+            gcr_byte |= (0x80 >> i);
+        }
+    }
+    return gcr_byte;
+*/
+
+    // NEW_OLD
+    uint8_t gcr_byte = 0;
+    for(int i=0; i<8; i++)
+    {
+        if(GetGCRBit(GCRBitTrackPos++))
+        {
+            if(GCRBitTrackPos == GCRBitTrackSize)
+                GCRBitTrackPos = 0;
+            gcr_byte |= (0x80 >> i);
+        }
+    }
+    //AktGCRWert = gcr_byte;
+    return gcr_byte;
+
+    // OLD
+/*
     AktGCRWert = *GCR_PTR++;	// Rotate disk
     if (GCR_PTR >= GCRSpurEnde) GCR_PTR = GCRSpurStart;
     return	AktGCRWert;
+*/
 }
 
 void Floppy1541::WriteGCRByte(uint8_t value)
@@ -998,13 +1104,7 @@ void Floppy1541::SpurInc()
     if (AktHalbSpur == ((NUM_TRACKS-1) * 2)) return;
 
     AktHalbSpur++;
-    GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
-    GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
-
-    qDebug() << "Spurgröße Track: " << AktHalbSpur << " = " << TrackSize[AktHalbSpur];
-    qDebug() << "GCRBits:";
-    for(int i=0; i<50; i++)
-        qDebug() << GetGCRBit(i);
+    UpdateGCRPointer();
 
     if(StepperIncWait)
         StepperIncWait = false;
@@ -1017,10 +1117,7 @@ void Floppy1541::SpurDec()
 
     if (AktHalbSpur  == 0)
     {
-        GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
-        GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
-
-        qDebug() << "Spurgröße Track: " << AktHalbSpur << " = " << TrackSize[AktHalbSpur];
+        UpdateGCRPointer();
 
         if(stepper_bump != 2)
             stepper_bump++;
@@ -1034,9 +1131,7 @@ void Floppy1541::SpurDec()
     }
 
     AktHalbSpur--;
-
-    GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
-    GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
+    UpdateGCRPointer();
 
     StepperDec = true;
 }
@@ -1119,6 +1214,15 @@ void Floppy1541::StartDiskChange()
     WriteProtect = !WriteProtect;
 }
 
+void Floppy1541::UpdateGCRPointer()
+{
+    GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
+    GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
+
+    GCRBitTrackSize = TrackSize[AktHalbSpur] * 8;
+    GCRBitTrackPos = 0;
+}
+
 bool Floppy1541::GetGCRBit(int pos)
 {
     if((TrackSize[AktHalbSpur] * 8) < pos)
@@ -1127,7 +1231,7 @@ bool Floppy1541::GetGCRBit(int pos)
     int byte_pos = pos / 8;
     int bit_pos = pos % 8;
 
-    return GCRSpurStart[byte_pos] & 1 << (7 - bit_pos);
+    return GCRSpurStart[byte_pos] & (0X80 >> bit_pos);
 }
 
 uint16_t Floppy1541::GetDiskIDFromBAM()

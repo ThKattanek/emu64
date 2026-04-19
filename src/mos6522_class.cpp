@@ -14,6 +14,7 @@
 //////////////////////////////////////////////////
 
 #include "mos6522_class.h"
+#include "qdebug.h"
 
 MOS6522::MOS6522(unsigned char via_nr):
     DiskMotorOn(0),
@@ -382,7 +383,9 @@ unsigned char MOS6522::ReadIO(unsigned short adresse)
                 case 0x01:
                 case 0x0F:
                 {
-                    return ReadGCRByte();
+                    uint8_t value = ReadGCRByte();
+                    qDebug() << value;
+                    return value;
                 }
                 case 0x04:
                 {
