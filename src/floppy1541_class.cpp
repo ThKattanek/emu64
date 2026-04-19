@@ -953,10 +953,11 @@ uint8_t Floppy1541::ReadRom(uint16_t address)
 
 bool Floppy1541::SyncFound()
 {
-    // NEW
-    int sync_bit_count;
+    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr)) return false;
 
-    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr) || DiskMotorOn == false) return false;
+    // NEW
+/*
+    int sync_bit_count;
 
     if(GetGCRBit(GCRBitTrackPos++))
     {
@@ -995,35 +996,36 @@ bool Floppy1541::SyncFound()
             GCRBitTrackPos = 0;
         return false;
     }
+*/
 
     // NEW_OLD
-/*
-    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2))) return false;
 
-    if(ReadGCRByte() == 0xff)
+    uint32_t GCRBitTrackPosOld = GCRBitTrackPos;
+
+    for(int i = 0; i<8; i++)
     {
-        while(ReadGCRByte() == 0xff);
+    }
 
-        //GCRBitTrackPos = GCRBitTrackPosOld;
-        // 16Bit zurück, damit der Sync-Byte gelesen werden kann
-        if(GCRBitTrackPos < 16)
-            GCRBitTrackPos = GCRBitTrackSize - (16 - GCRBitTrackPos);
-        else
-            GCRBitTrackPos -= 16;
-
+    if(*GCR_PTR == 0xFF)
+    {
+    L1:
+        GCR_PTR++;
+        if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
+        if(*GCR_PTR == 0xFF) goto L1;
+        GCR_PTR--;
+        if(GCR_PTR < GCRSpurStart) GCR_PTR = GCRSpurEnde;
         qDebug() << "SYNC Foud -> Track: " << (AktHalbSpur >> 1);
         return true;
     }
     else
     {
+        GCR_PTR ++;	// Rotate disk
+        if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
         return false;
     }
-*/
 
     // OLD
 /*
-    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr)) return false;
-
     if(*GCR_PTR == 0xFF)
     {
     L1:
@@ -1062,18 +1064,10 @@ uint8_t Floppy1541::ReadGCRByte()
 */
 
     // NEW_OLD
-    uint8_t gcr_byte = 0;
-    for(int i=0; i<8; i++)
-    {
-        if(GetGCRBit(GCRBitTrackPos++))
-        {
-            if(GCRBitTrackPos == GCRBitTrackSize)
-                GCRBitTrackPos = 0;
-            gcr_byte |= (0x80 >> i);
-        }
-    }
-    //AktGCRWert = gcr_byte;
-    return gcr_byte;
+
+    AktGCRWert = *GCR_PTR++;	// Rotate disk
+    if (GCR_PTR >= GCRSpurEnde) GCR_PTR = GCRSpurStart;
+    return	AktGCRWert;
 
     // OLD
 /*
@@ -1232,6 +1226,11 @@ bool Floppy1541::GetGCRBit(int pos)
     int bit_pos = pos % 8;
 
     return GCRSpurStart[byte_pos] & (0X80 >> bit_pos);
+}
+
+uint8_t Floppy1541::GetGCRByte(int pos)
+{
+
 }
 
 uint16_t Floppy1541::GetDiskIDFromBAM()
