@@ -951,6 +951,8 @@ uint8_t Floppy1541::ReadRom(uint16_t address)
     return ROM[address-0xC000];
 }
 
+static int one_bit_counter = 0;
+
 bool Floppy1541::SyncFound()
 {
     if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr)) return false;
@@ -997,33 +999,130 @@ bool Floppy1541::SyncFound()
         return false;
     }
 */
+    // NEW_OLD_2
 
-    // NEW_OLD
+    uint8_t gcr_byte = 0;
+    uint32_t pos = GCRBitTrackPos;
 
-    uint32_t GCRBitTrackPosOld = GCRBitTrackPos;
-
-    for(int i = 0; i<8; i++)
+    for(int i=0; i<8; i++)
     {
+        if(GetGCRBit(pos++))
+        {
+            if(pos == GCRBitTrackSize)
+                pos = 0;
+            gcr_byte |= (0x80 >> i);
+        }
     }
 
-    if(*GCR_PTR == 0xFF)
+    if(gcr_byte == 0xff)
     {
     L1:
-        GCR_PTR++;
-        if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
-        if(*GCR_PTR == 0xFF) goto L1;
-        GCR_PTR--;
-        if(GCR_PTR < GCRSpurStart) GCR_PTR = GCRSpurEnde;
+        GCRBitTrackPos += 8;
+        if(GCRBitTrackPos >= GCRBitTrackSize)
+            GCRBitTrackPos -= GCRBitTrackSize;
+
+        gcr_byte = 0;
+        pos = GCRBitTrackPos;
+
+        for(int i=0; i<8; i++)
+        {
+            if(GetGCRBit(pos++))
+            {
+                if(pos == GCRBitTrackSize)
+                    pos = 0;
+                gcr_byte |= (0x80 >> i);
+            }
+        }
+
+        if(gcr_byte == 0xff) goto L1;
+
+        if((gcr_byte & 0x80) == 0x00)
+            GCRBitTrackPos -= 8;
+
+        if((gcr_byte & 0xC0) == 0x80)
+            GCRBitTrackPos -= 7;
+        if((gcr_byte & 0xE0) == 0xC0)
+            GCRBitTrackPos -= 6;
+        if((gcr_byte & 0xF0) == 0xE0)
+            GCRBitTrackPos -= 5;
+        if((gcr_byte & 0xF8) == 0xF0)
+            GCRBitTrackPos -= 4;
+        if((gcr_byte & 0xFC) == 0xF8)
+            GCRBitTrackPos -= 3;
+        if((gcr_byte & 0xFE) == 0xFC)
+            GCRBitTrackPos -= 2;
+        if((gcr_byte & 0xFF) == 0xFE)
+            GCRBitTrackPos -= 1;
+
+
+        if(GCRBitTrackPos >= GCRBitTrackSize)
+            GCRBitTrackPos -= GCRBitTrackSize;
+
         qDebug() << "SYNC Foud -> Track: " << (AktHalbSpur >> 1);
         return true;
     }
     else
     {
-        GCR_PTR ++;	// Rotate disk
-        if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
+        GCRBitTrackPos += 8;
+        if(GCRBitTrackPos >= GCRBitTrackSize)
+            GCRBitTrackPos -= GCRBitTrackSize;
+
         return false;
     }
 
+    // NEW_OLD_1
+/*
+    uint8_t gcr_byte = 0;
+    uint32_t pos = GCRBitTrackPos;
+
+    for(int i=0; i<8; i++)
+    {
+        if(GetGCRBit(pos++))
+        {
+            if(pos == GCRBitTrackSize)
+                pos = 0;
+            gcr_byte |= (0x80 >> i);
+        }
+    }
+
+    if(gcr_byte == 0xff)
+    {
+    L1:
+        GCRBitTrackPos += 8;
+        if(GCRBitTrackPos >= GCRBitTrackSize)
+            GCRBitTrackPos -= GCRBitTrackSize;
+
+        gcr_byte = 0;
+        pos = GCRBitTrackPos;
+
+        for(int i=0; i<8; i++)
+        {
+            if(GetGCRBit(pos++))
+            {
+                if(pos == GCRBitTrackSize)
+                    pos = 0;
+                gcr_byte |= (0x80 >> i);
+            }
+        }
+
+        if(gcr_byte == 0xff) goto L1;
+
+        GCRBitTrackPos -= 8;
+        if(GCRBitTrackPos >= GCRBitTrackSize)
+            GCRBitTrackPos -= GCRBitTrackSize;
+
+        qDebug() << "SYNC Foud -> Track: " << (AktHalbSpur >> 1);
+        return true;
+    }
+    else
+    {
+        GCRBitTrackPos += 8;
+        if(GCRBitTrackPos >= GCRBitTrackSize)
+            GCRBitTrackPos -= GCRBitTrackSize;
+
+        return false;
+    }
+*/
     // OLD
 /*
     if(*GCR_PTR == 0xFF)
@@ -1061,14 +1160,52 @@ uint8_t Floppy1541::ReadGCRByte()
         }
     }
     return gcr_byte;
+
 */
+    // NEW_OLD_2
 
-    // NEW_OLD
+    uint8_t gcr_byte = 0;
 
-    AktGCRWert = *GCR_PTR++;	// Rotate disk
-    if (GCR_PTR >= GCRSpurEnde) GCR_PTR = GCRSpurStart;
-    return	AktGCRWert;
+    uint32_t pos = GCRBitTrackPos;
 
+    for(int i=0; i<8; i++)
+    {
+        if(GetGCRBit(pos++))
+        {
+            if(pos == GCRBitTrackSize)
+                pos = 0;
+            gcr_byte |= (0x80 >> i);
+        }
+    }
+
+    GCRBitTrackPos += 8;
+    if(GCRBitTrackPos >= GCRBitTrackSize)
+        GCRBitTrackPos -= GCRBitTrackSize;
+
+    return gcr_byte;
+
+    // NEW_OLD_1
+/*
+    uint8_t gcr_byte = 0;
+
+    uint32_t pos = GCRBitTrackPos;
+
+    for(int i=0; i<8; i++)
+    {
+        if(GetGCRBit(pos++))
+        {
+            if(pos == GCRBitTrackSize)
+                pos = 0;
+            gcr_byte |= (0x80 >> i);
+        }
+    }
+
+    GCRBitTrackPos += 8;
+    if(GCRBitTrackPos >= GCRBitTrackSize)
+        GCRBitTrackPos -= GCRBitTrackSize;
+
+    return gcr_byte;
+*/
     // OLD
 /*
     AktGCRWert = *GCR_PTR++;	// Rotate disk
@@ -1226,11 +1363,6 @@ bool Floppy1541::GetGCRBit(int pos)
     int bit_pos = pos % 8;
 
     return GCRSpurStart[byte_pos] & (0X80 >> bit_pos);
-}
-
-uint8_t Floppy1541::GetGCRByte(int pos)
-{
-
 }
 
 uint16_t Floppy1541::GetDiskIDFromBAM()
