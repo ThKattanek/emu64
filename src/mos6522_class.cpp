@@ -8,13 +8,12 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
+#include "./structs.h"
 #include "mos6522_class.h"
-#include "qdebug.h"
 
 MOS6522::MOS6522(unsigned char via_nr):
     DiskMotorOn(0),
@@ -384,7 +383,6 @@ unsigned char MOS6522::ReadIO(unsigned short adresse)
                 case 0x0F:
                 {
                     uint8_t value = ReadGCRByte();
-                    qDebug() << value;
                     return value;
                 }
                 case 0x04:
