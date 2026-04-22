@@ -120,6 +120,7 @@ private:
     void StartDiskChange();
     void UpdateGCRPointer();
     bool GetGCRBit(int pos);
+    uint8_t PeekGCRByte(uint32_t pos);
 
     uint16_t GetDiskIDFromBAM();
 
@@ -158,7 +159,7 @@ private:
 
     FILE *              image_file;
     int                 ImageTyp;
-    uint8_t             AktGCRWert;
+    //uint8_t             AktGCRWert;
     static const int	NUM_TRACKS = 42;
     static const int	GCR_SECTOR_SIZE = 364;      // SYNC Header Gap SYNC Data Gap (should be 5 SYNC bytes each) ///  ALF Sector in Byte
     static const int	GCR_TRACK_SIZE = 7928;      // Each track in gcr_data has 21 sectors

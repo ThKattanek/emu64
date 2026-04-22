@@ -951,114 +951,39 @@ uint8_t Floppy1541::ReadRom(uint16_t address)
     return ROM[address-0xC000];
 }
 
-static int one_bit_counter = 0;
-
 bool Floppy1541::SyncFound()
 {
-    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr)) return false;
+    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr) || (DiskMotorOn == false)) return false;
 
-    // NEW
-/*
-    int sync_bit_count;
-
-    if(GetGCRBit(GCRBitTrackPos++))
-    {
-        if(GCRBitTrackPos == GCRBitTrackSize)
-            GCRBitTrackPos = 0;
-
-        sync_bit_count = 1;
-
-        while(GetGCRBit(GCRBitTrackPos))
-        {
-            GCRBitTrackPos++;
-            if(GCRBitTrackPos == GCRBitTrackSize)
-                GCRBitTrackPos = 0;
-            sync_bit_count++;
-        }
-
-        // Letztes bit war eine Null, deshalb Zeiger um eins wieder zurück
-        if(sync_bit_count >= 10)
-        {
-            // 8Bit zurück, damit der Sync-Byte gelesen werden kann
-            if(GCRBitTrackPos < 8)
-                GCRBitTrackPos = GCRBitTrackSize - (8 - GCRBitTrackPos);
-            else
-                GCRBitTrackPos -= 8;
-
-            qDebug() << "SYNC Foud (" << sync_bit_count << " Bits)";
-           // for(int i=0; i<8; i++)
-           //     qDebug() << ReadGCRByte();
-            return true;
-        }
-        return false;
-    }
-    else
-    {
-        if(GCRBitTrackPos == GCRBitTrackSize)
-            GCRBitTrackPos = 0;
-        return false;
-    }
-*/
-    // NEW_OLD_2
-
-    uint8_t gcr_byte = 0;
     uint32_t pos = GCRBitTrackPos;
-
-    for(int i=0; i<8; i++)
-    {
-        if(GetGCRBit(pos++))
-        {
-            if(pos == GCRBitTrackSize)
-                pos = 0;
-            gcr_byte |= (0x80 >> i);
-        }
-    }
+    uint8_t gcr_byte = PeekGCRByte(pos);
 
     if(gcr_byte == 0xff)
     {
-    L1:
-        GCRBitTrackPos += 8;
-        if(GCRBitTrackPos >= GCRBitTrackSize)
-            GCRBitTrackPos -= GCRBitTrackSize;
+        do{
+            GCRBitTrackPos += 8;
+            if(GCRBitTrackPos >= GCRBitTrackSize)
+                GCRBitTrackPos -= GCRBitTrackSize;
 
-        gcr_byte = 0;
-        pos = GCRBitTrackPos;
+            pos = GCRBitTrackPos;
 
-        for(int i=0; i<8; i++)
-        {
-            if(GetGCRBit(pos++))
-            {
-                if(pos == GCRBitTrackSize)
-                    pos = 0;
-                gcr_byte |= (0x80 >> i);
-            }
+
+            gcr_byte = PeekGCRByte(pos);
+        }while(gcr_byte == 0xff);
+
+        // Anzahl der 1er Bits zählen
+        unsigned n = 0;
+        while (n < 8 && (gcr_byte & 0x80)) { // höchstes Bit ist 1?
+            n++;
+            gcr_byte <<= 1;
         }
+        GCRBitTrackPos -= (8 - n);  // zurück zum Anfang der Sync-Sequenz
 
-        if(gcr_byte == 0xff) goto L1;
-
-        if((gcr_byte & 0x80) == 0x00)
-            GCRBitTrackPos -= 8;
-
-        if((gcr_byte & 0xC0) == 0x80)
-            GCRBitTrackPos -= 7;
-        if((gcr_byte & 0xE0) == 0xC0)
-            GCRBitTrackPos -= 6;
-        if((gcr_byte & 0xF0) == 0xE0)
-            GCRBitTrackPos -= 5;
-        if((gcr_byte & 0xF8) == 0xF0)
-            GCRBitTrackPos -= 4;
-        if((gcr_byte & 0xFC) == 0xF8)
-            GCRBitTrackPos -= 3;
-        if((gcr_byte & 0xFE) == 0xFC)
-            GCRBitTrackPos -= 2;
-        if((gcr_byte & 0xFF) == 0xFE)
-            GCRBitTrackPos -= 1;
-
-
+        // Sicherstellen, dass wir am Anfang der Sync-Sequenz stehen
         if(GCRBitTrackPos >= GCRBitTrackSize)
             GCRBitTrackPos -= GCRBitTrackSize;
 
-        qDebug() << "SYNC Foud -> Track: " << (AktHalbSpur >> 1);
+        // qDebug() << "SYNC Foud -> Track: " << (AktHalbSpur >> 1);
         return true;
     }
     else
@@ -1069,149 +994,18 @@ bool Floppy1541::SyncFound()
 
         return false;
     }
-
-    // NEW_OLD_1
-/*
-    uint8_t gcr_byte = 0;
-    uint32_t pos = GCRBitTrackPos;
-
-    for(int i=0; i<8; i++)
-    {
-        if(GetGCRBit(pos++))
-        {
-            if(pos == GCRBitTrackSize)
-                pos = 0;
-            gcr_byte |= (0x80 >> i);
-        }
-    }
-
-    if(gcr_byte == 0xff)
-    {
-    L1:
-        GCRBitTrackPos += 8;
-        if(GCRBitTrackPos >= GCRBitTrackSize)
-            GCRBitTrackPos -= GCRBitTrackSize;
-
-        gcr_byte = 0;
-        pos = GCRBitTrackPos;
-
-        for(int i=0; i<8; i++)
-        {
-            if(GetGCRBit(pos++))
-            {
-                if(pos == GCRBitTrackSize)
-                    pos = 0;
-                gcr_byte |= (0x80 >> i);
-            }
-        }
-
-        if(gcr_byte == 0xff) goto L1;
-
-        GCRBitTrackPos -= 8;
-        if(GCRBitTrackPos >= GCRBitTrackSize)
-            GCRBitTrackPos -= GCRBitTrackSize;
-
-        qDebug() << "SYNC Foud -> Track: " << (AktHalbSpur >> 1);
-        return true;
-    }
-    else
-    {
-        GCRBitTrackPos += 8;
-        if(GCRBitTrackPos >= GCRBitTrackSize)
-            GCRBitTrackPos -= GCRBitTrackSize;
-
-        return false;
-    }
-*/
-    // OLD
-/*
-    if(*GCR_PTR == 0xFF)
-    {
-    L1:
-        GCR_PTR++;
-        if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
-        if(*GCR_PTR == 0xFF) goto L1;
-        GCR_PTR--;
-        if(GCR_PTR < GCRSpurStart) GCR_PTR = GCRSpurEnde;
-        qDebug() << "SYNC Foud -> Track: " << (AktHalbSpur >> 1);
-        return true;
-    }
-    else
-    {
-        GCR_PTR ++;	// Rotate disk
-        if (GCR_PTR == GCRSpurEnde) GCR_PTR = GCRSpurStart;
-        return false;
-    }
-*/
 }
 
 uint8_t Floppy1541::ReadGCRByte()
 {
-    // NEW
-/*
-    uint8_t gcr_byte = 0;
-    for(int i=0; i<8; i++)
-    {
-        if(GetGCRBit(GCRBitTrackPos++))
-        {
-            if(GCRBitTrackPos == GCRBitTrackSize)
-                GCRBitTrackPos = 0;
-            gcr_byte |= (0x80 >> i);
-        }
-    }
-    return gcr_byte;
-
-*/
-    // NEW_OLD_2
-
-    uint8_t gcr_byte = 0;
-
     uint32_t pos = GCRBitTrackPos;
-
-    for(int i=0; i<8; i++)
-    {
-        if(GetGCRBit(pos++))
-        {
-            if(pos == GCRBitTrackSize)
-                pos = 0;
-            gcr_byte |= (0x80 >> i);
-        }
-    }
+    uint8_t gcr_byte = PeekGCRByte(pos);
 
     GCRBitTrackPos += 8;
     if(GCRBitTrackPos >= GCRBitTrackSize)
         GCRBitTrackPos -= GCRBitTrackSize;
 
     return gcr_byte;
-
-    // NEW_OLD_1
-/*
-    uint8_t gcr_byte = 0;
-
-    uint32_t pos = GCRBitTrackPos;
-
-    for(int i=0; i<8; i++)
-    {
-        if(GetGCRBit(pos++))
-        {
-            if(pos == GCRBitTrackSize)
-                pos = 0;
-            gcr_byte |= (0x80 >> i);
-        }
-    }
-
-    GCRBitTrackPos += 8;
-    if(GCRBitTrackPos >= GCRBitTrackSize)
-        GCRBitTrackPos -= GCRBitTrackSize;
-
-    return gcr_byte;
-*/
-    // OLD
-/*
-    AktGCRWert = *GCR_PTR++;	// Rotate disk
-    if (GCR_PTR >= GCRSpurEnde) GCR_PTR = GCRSpurStart;
-    return	AktGCRWert;
-*/
 }
 
 void Floppy1541::WriteGCRByte(uint8_t value)
@@ -1363,6 +1157,25 @@ bool Floppy1541::GetGCRBit(int pos)
     int bit_pos = pos % 8;
 
     return GCRSpurStart[byte_pos] & (0X80 >> bit_pos);
+}
+
+inline uint8_t Floppy1541::PeekGCRByte(uint32_t pos)
+{
+    if(pos >= GCRBitTrackSize)
+        return 0;
+
+    uint8_t gcr_byte = 0;
+
+    for(int i=0; i<8; i++)
+    {
+        if(GetGCRBit(pos++))
+        {
+            if(pos == GCRBitTrackSize)
+                pos = 0;
+            gcr_byte |= (0x80 >> i);
+        }
+    }
+    return gcr_byte;
 }
 
 uint16_t Floppy1541::GetDiskIDFromBAM()
