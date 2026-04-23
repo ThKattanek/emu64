@@ -248,8 +248,6 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
         ImageDirectoryWriteStatus = false;
         ImageTyp = D64;
 
-        SyncFoundCount = 0;
-
         return true;
         break;
 
@@ -341,13 +339,11 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
 
         //fclose(file);
 
+        UpdateGCRPointer();
+
         ImageWriteStatus = false;
         ImageDirectoryWriteStatus = false;
         ImageTyp = G64;
-
-        SyncFoundCount = 0;
-
-
 
         return true;
         break;
@@ -427,10 +423,10 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor, uint
     // Create GCR header (15 Bytes)
     // SYNC
     *P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
     buffer[0] = 0x08;							// Header mark
     buffer[1] = sektor ^ spur ^ id2 ^ id1;		// Checksum
     buffer[2] = sektor;
@@ -447,10 +443,10 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor, uint
     uint8_t SUM;
     // SYNC
     *P++ = 0xFF;                                // SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
+    *P++ = 0xFF;								// SYNC
     buffer[0] = 0x07;							// Data mark
     SUM = buffer[1] = block[0];
     SUM ^= buffer[2] = block[1];
@@ -951,8 +947,63 @@ uint8_t Floppy1541::ReadRom(uint16_t address)
     return ROM[address-0xC000];
 }
 
+#define NEW_SYNC_METHOD
 bool Floppy1541::SyncFound()
 {
+    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr) || (DiskMotorOn == false)) return false;
+
+#ifdef NEW_SYNC_METHOD
+
+#define SYNC_BIT_THRESHOLD 10
+
+    uint32_t pos = GCRBitTrackPos;
+    bool sync_found = false;
+    uint32_t sync_pos;
+
+    for(int i=0; i<8; i++)
+    {
+        if(PeekGCRBit(pos) == true)
+        {
+            SyncBitCounter++;
+
+            if(SyncBitCounter >= SYNC_BIT_THRESHOLD)
+            {
+                SyncBitsFound = true;
+            }
+        }
+        else
+        {
+            SyncBitCounter = 0;
+
+            if(SyncBitsFound)
+            {
+                SyncBitsFound = false;
+                sync_found = true;
+                sync_pos = pos - 8;
+                if(sync_pos >= GCRBitTrackSize)
+                    sync_pos -= GCRBitTrackSize;
+                SyncFoundCount++;
+            }
+        }
+
+        pos++;
+        if(pos >= GCRBitTrackSize)
+            pos -= GCRBitTrackSize;
+    }
+
+    if(sync_found)
+    {
+        GCRBitTrackPos = sync_pos;
+        // qDebug() << "SYNC Found -> Track: " << (AktHalbSpur >> 1) << ", Sync Count: " << SyncFoundCount;
+        return true;
+    }
+    else
+    {
+        GCRBitTrackPos = pos;
+        return false;
+    }
+
+#else
     if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr) || (DiskMotorOn == false)) return false;
 
     uint32_t pos = GCRBitTrackPos;
@@ -994,6 +1045,7 @@ bool Floppy1541::SyncFound()
 
         return false;
     }
+#endif
 }
 
 uint8_t Floppy1541::ReadGCRByte()
@@ -1146,9 +1198,12 @@ void Floppy1541::UpdateGCRPointer()
 
     GCRBitTrackSize = TrackSize[AktHalbSpur] * 8;
     GCRBitTrackPos = 0;
+    SyncBitCounter = 0;
+    SyncBitsFound = false;
+    SyncFoundCount = 0;
 }
 
-bool Floppy1541::GetGCRBit(int pos)
+inline bool Floppy1541::PeekGCRBit(int pos)
 {
     if((TrackSize[AktHalbSpur] * 8) < pos)
         return false;
@@ -1168,7 +1223,7 @@ inline uint8_t Floppy1541::PeekGCRByte(uint32_t pos)
 
     for(int i=0; i<8; i++)
     {
-        if(GetGCRBit(pos++))
+        if(PeekGCRBit(pos++))
         {
             if(pos == GCRBitTrackSize)
                 pos = 0;

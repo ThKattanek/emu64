@@ -119,7 +119,7 @@ private:
     void RenderFloppySound();
     void StartDiskChange();
     void UpdateGCRPointer();
-    bool GetGCRBit(int pos);
+    bool PeekGCRBit(int pos);
     uint8_t PeekGCRByte(uint32_t pos);
 
     uint16_t GetDiskIDFromBAM();
@@ -171,9 +171,11 @@ private:
     bool                ImageDirectoryWriteStatus;  // Sowie in das Image auf Spur 18 geschrieben wird wird es true
     uint8_t             D64Image[D64_IMAGE_SIZE];   // Aktuelles D64 Image
     uint8_t             GCRImage[G64_IMAGE_SIZE];   // Aktuelles GCR Image
-    uint16_t            TrackSize[256];
-    uint32_t            GCRBitTrackSize;
-    uint32_t            GCRBitTrackPos;
+    uint16_t            TrackSize[256];             // Größe der einzelnen Spuren in Byte
+    uint32_t            GCRBitTrackSize;            // Größe der einzelnen Spuren in Bit
+    uint32_t            GCRBitTrackPos;             // Aktuelle Position in der Spur in Bit
+    uint32_t            SyncBitCounter;             // Zählt die Anzahl der aufeinander folgenden 1er Bits, ohne Unterbrechung durch eine 0, um eine Sync Sequenz zu erkennen
+    bool                SyncBitsFound;              // Zeigt an, dass eine Sync Sequenz gefunden wurde, damit die nächsten Bytes als Header oder Daten interpretiert werden können
 
     /// Für Floppy Sound ///
 
