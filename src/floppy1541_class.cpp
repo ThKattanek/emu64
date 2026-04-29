@@ -109,7 +109,7 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
     D64ImageToGCRImage();
     UnLoadDiskImage();
 
-    AktHalbSpur = 1;
+    AktHalbSpur = 33;    // 1
 
     /// Für Floppysound ///
 
@@ -162,7 +162,7 @@ void Floppy1541::SetEnableFloppy(bool status)
 
         StepperIncWait = true;
 
-        AktHalbSpur = -1; //1
+        AktHalbSpur = 33; // -1
         UpdateGCRPointer();
     }
     else
@@ -878,7 +878,7 @@ bool Floppy1541::OneCycle()
     if(!*RESET)
     {
         StepperIncWait = true;
-        AktHalbSpur = -1; //1
+        AktHalbSpur = 33; //-1
         UpdateGCRPointer();
     }
 
