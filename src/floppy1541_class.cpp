@@ -1202,7 +1202,7 @@ void Floppy1541::UpdateGCRPointer()
 inline bool Floppy1541::PeekGCRBit(int pos)
 {
     if((TrackSize[AktHalbSpur] * 8) <= pos)
-        pos = pos % (TrackSize[AktHalbSpur] * 8);
+        if(TrackSize[AktHalbSpur] > 0) pos = pos % (TrackSize[AktHalbSpur] * 8);    // Sicherstellen, dass die Position innerhalb der Spur bleibt, wenn sie größer ist als die Spurgröße (Zusätzliches Prüfung auf Spurgröße > 0, um Division durch Null zu vermeiden)
 
     int byte_pos = pos / 8;
     int bit_pos = pos % 8;
