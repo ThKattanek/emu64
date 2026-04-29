@@ -28,6 +28,8 @@
 #define D64_IMAGE_SIZE 174848
 #define G64_IMAGE_SIZE 665952
 
+#define SYNC_BIT_THRESHOLD 10   // Minimale Anzahl der aufeinander folgenden 1er Bits die als SYNC Markierung gewertet wird
+
 #define DISK_CHANGE_STATE_COUNTS 4
 #define DISK_CHANGE_STATE_CYCLES 1000
 
@@ -103,8 +105,6 @@ public:
     uint16_t        History[256];
     uint8_t         HistoryPointer;
 
-    int SyncFoundCount;
-
 private:
 
     /// Funktionen ///
@@ -176,6 +176,10 @@ private:
     uint32_t            GCRBitTrackPos;             // Aktuelle Position in der Spur in Bit
     uint32_t            SyncBitCounter;             // Zählt die Anzahl der aufeinander folgenden 1er Bits, ohne Unterbrechung durch eine 0, um eine Sync Sequenz zu erkennen
     bool                SyncBitsFound;              // Zeigt an, dass eine Sync Sequenz gefunden wurde, damit die nächsten Bytes als Header oder Daten interpretiert werden können
+
+    /// Für Tests
+    uint8_t             gcr_buffer[5];
+    uint8_t             gcr_buffer_pos = 0;
 
     /// Für Floppy Sound ///
 

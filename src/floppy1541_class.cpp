@@ -868,7 +868,7 @@ bool Floppy1541::OneCycle()
     via1->OneZyklus();
     via2->OneZyklus();
 
-    if(via2->GetIO_Zero()&4) cpu->SET_SR_BIT6();
+    if(via2->GetIO_Zero() & 4) cpu->SET_SR_BIT6();
 
     if((VIA1_IRQ == true) || (VIA2_IRQ == true)) IRQ = true;
     else IRQ = false;
@@ -954,8 +954,6 @@ bool Floppy1541::SyncFound()
 
 #ifdef NEW_SYNC_METHOD
 
-#define SYNC_BIT_THRESHOLD 10
-
     uint32_t pos = GCRBitTrackPos;
     bool sync_found = false;
     uint32_t sync_pos;
@@ -968,6 +966,7 @@ bool Floppy1541::SyncFound()
 
             if(SyncBitCounter >= SYNC_BIT_THRESHOLD)
             {
+                gcr_buffer_pos = 0;
                 SyncBitsFound = true;
             }
         }
@@ -982,7 +981,6 @@ bool Floppy1541::SyncFound()
                 sync_pos = pos - 8;
                 if(sync_pos >= GCRBitTrackSize)
                     sync_pos -= GCRBitTrackSize;
-                SyncFoundCount++;
             }
         }
 
@@ -994,7 +992,7 @@ bool Floppy1541::SyncFound()
     if(sync_found)
     {
         GCRBitTrackPos = sync_pos;
-        // qDebug() << "SYNC Found -> Track: " << (AktHalbSpur >> 1) << ", Sync Count: " << SyncFoundCount;
+        qDebug() << "SYNC Found -> Track: " << (AktHalbSpur >> 1) + 1;
         return true;
     }
     else
@@ -1056,6 +1054,22 @@ uint8_t Floppy1541::ReadGCRByte()
     GCRBitTrackPos += 8;
     if(GCRBitTrackPos >= GCRBitTrackSize)
         GCRBitTrackPos -= GCRBitTrackSize;
+
+    if(gcr_byte != 0xff)
+    {
+        gcr_buffer[gcr_buffer_pos++] = gcr_byte;
+    }
+
+    if(gcr_buffer_pos == 5)
+    {
+        uint8_t buffer[4];
+        gcr_buffer_pos = 0;
+
+        ConvertToD64(gcr_buffer, buffer);
+
+        // Ausgabe als Hexadezimal
+        qDebug() << Qt::hex << buffer[0] << buffer[1] << buffer[2] << buffer[3];
+    }
 
     return gcr_byte;
 }
@@ -1179,8 +1193,6 @@ void Floppy1541::RenderFloppySound()
     SoundBuffer[SoundBufferPos+1] = SoundBuffer[SoundBufferPos];
     SoundBufferPos += 2;
 
-    //SoundBufferPos++;
-
     if(SoundBufferPos >= SoundBufferSize*2) SoundBufferPos = 0;
 }
 
@@ -1200,7 +1212,6 @@ void Floppy1541::UpdateGCRPointer()
     GCRBitTrackPos = 0;
     SyncBitCounter = 0;
     SyncBitsFound = false;
-    SyncFoundCount = 0;
 }
 
 inline bool Floppy1541::PeekGCRBit(int pos)
