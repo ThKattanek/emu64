@@ -177,10 +177,6 @@ private:
     uint32_t            SyncBitCounter;             // Zählt die Anzahl der aufeinander folgenden 1er Bits, ohne Unterbrechung durch eine 0, um eine Sync Sequenz zu erkennen
     bool                SyncBitsFound;              // Zeigt an, dass eine Sync Sequenz gefunden wurde, damit die nächsten Bytes als Header oder Daten interpretiert werden können
 
-    /// Für Tests
-    uint8_t             gcr_buffer[5];
-    uint8_t             gcr_buffer_pos = 0;
-
     /// Für Floppy Sound ///
 
     float               Volume;
