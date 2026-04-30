@@ -1066,11 +1066,11 @@ void Floppy1541::WriteGCRByte(uint8_t value)
         ImageDirectoryWriteStatus = true;
     }
 
+    PokeGCRByte(GCRBitTrackPos, value);
+
     GCRBitTrackPos += 8;
     if(GCRBitTrackPos >= GCRBitTrackSize)
         GCRBitTrackPos -= GCRBitTrackSize;
-
-    PokeGCRByte(GCRBitTrackPos, value);
 
     if(AktHalbSpur == (DIRECTORY_TRACK-1) * 2)
     {
