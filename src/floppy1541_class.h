@@ -120,7 +120,9 @@ private:
     void StartDiskChange();
     void UpdateGCRPointer();
     bool PeekGCRBit(int pos);
+    void PokeGCRBit(int pos, bool bit);
     uint8_t PeekGCRByte(uint32_t pos);
+    void PokeGCRByte(uint32_t pos, uint8_t value);
 
     uint16_t GetDiskIDFromBAM();
 
