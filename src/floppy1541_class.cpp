@@ -437,7 +437,7 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor, uint
     buffer[2] = 0x0F;
     buffer[3] = 0x0F;
     ConvertToGCR(buffer, P+5);
-    P += 9;
+    P += 10;
 
     // Create GCR data (338 Bytes)
     uint8_t SUM;
@@ -511,10 +511,19 @@ inline void Floppy1541::GCRToSector(unsigned int spur, unsigned int sektor)
 {
     uint8_t BUFFER[4];
 
-    uint8_t *gcr = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCR_SECTOR_SIZE;
+    uint8_t *sector_start = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCR_SECTOR_SIZE;
     uint8_t *d64 = D64Image + ((track_index[spur]+sektor)*256);
 
-    gcr += 11;
+    // Locate the data block by searching for the data SYNC after the header region.
+    // Valid GCR bytes are never 0xFF, so 0xFF unambiguously marks SYNC sequences.
+    // The header occupies at most 15 bytes (5 SYNC + 10 GCR), so start the search there.
+    int offset = 15;
+    while (offset < GCR_SECTOR_SIZE - 1 && sector_start[offset] != 0xFF)
+        offset++;
+    while (offset < GCR_SECTOR_SIZE - 1 && sector_start[offset] == 0xFF)
+        offset++;
+
+    uint8_t *gcr = sector_start + offset;
 
     ConvertToD64(gcr,BUFFER);
     *d64++ = BUFFER[1];
