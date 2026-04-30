@@ -1052,9 +1052,7 @@ uint8_t Floppy1541::ReadGCRByte()
 
     GCRBitTrackPos += 8;
     if(GCRBitTrackPos >= GCRBitTrackSize)
-    {
         GCRBitTrackPos -= GCRBitTrackSize;
-    }
 
     return gcr_byte;
 }
@@ -1068,11 +1066,23 @@ void Floppy1541::WriteGCRByte(uint8_t value)
         ImageDirectoryWriteStatus = true;
     }
 
+    GCRBitTrackPos += 8;
+    if(GCRBitTrackPos >= GCRBitTrackSize)
+        GCRBitTrackPos -= GCRBitTrackSize;
+
+    PokeGCRByte(GCRBitTrackPos, value);
+
+    if(AktHalbSpur == (DIRECTORY_TRACK-1) * 2)
+    {
+        qDebug() << "Write GCR Byte: " << (int)value << " to Track: " << (AktHalbSpur >> 1) + 1;
+    }
+
+    /*
     GCR_PTR++;	// Rotate disk
     *GCR_PTR = value;
 
-
     if (GCR_PTR >= GCRSpurEnde) GCR_PTR = GCRSpurStart;
+     */
 }
 
 void Floppy1541::SpurInc()
@@ -1210,6 +1220,20 @@ inline bool Floppy1541::PeekGCRBit(int pos)
     return GCRSpurStart[byte_pos] & (0X80 >> bit_pos);
 }
 
+inline void Floppy1541::PokeGCRBit(int pos, bool bit)
+{
+    if((TrackSize[AktHalbSpur] * 8) <= pos)
+        if(TrackSize[AktHalbSpur] > 0) pos = pos % (TrackSize[AktHalbSpur] * 8);    // Sicherstellen, dass die Position innerhalb der Spur bleibt, wenn sie größer ist als die Spurgröße (Zusätzliches Prüfung auf Spurgröße > 0, um Division durch Null zu vermeiden)
+
+    int byte_pos = pos / 8;
+    int bit_pos = pos % 8;
+
+    if(bit)
+        GCRSpurStart[byte_pos] |= (0X80 >> bit_pos);
+    else
+        GCRSpurStart[byte_pos] &= ~(0X80 >> bit_pos);
+}
+
 inline uint8_t Floppy1541::PeekGCRByte(uint32_t pos)
 {
     if(pos >= GCRBitTrackSize)
@@ -1227,6 +1251,17 @@ inline uint8_t Floppy1541::PeekGCRByte(uint32_t pos)
         }
     }
     return gcr_byte;
+}
+
+inline void Floppy1541::PokeGCRByte(uint32_t pos, uint8_t value)
+{
+    for(int i=0; i<8; i++)
+    {
+        bool bit = (value & (0x80 >> i)) != 0;
+        PokeGCRBit(pos++, bit);
+        if(pos == GCRBitTrackSize)
+            pos = 0;
+    }
 }
 
 uint16_t Floppy1541::GetDiskIDFromBAM()
