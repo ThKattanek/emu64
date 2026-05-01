@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,9 +15,8 @@
 #ifndef MOS6522_CLASS_H
 #define MOS6522_CLASS_H
 
+#include <cstdint>
 #include <functional>
-
-#include "./structs.h"
 
 class MOS6522
 {

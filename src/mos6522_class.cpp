@@ -8,11 +8,11 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 01.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
+#include "./structs.h"
 #include "mos6522_class.h"
 
 MOS6522::MOS6522(unsigned char via_nr):
@@ -372,7 +372,7 @@ unsigned char MOS6522::ReadIO(unsigned short adresse)
                     if (*WriteProtect) WP = 0;
                     else WP = 0x10;
 
-                    if (SyncFound != 0)
+                    if (SyncFound != nullptr)   // Check if function pointer is valid, otherwise return old value
                     {
                         if (SyncFound()) return (PB & 0x7F) | WP;
                         else return PB | 0x80 | WP;
@@ -382,7 +382,8 @@ unsigned char MOS6522::ReadIO(unsigned short adresse)
                 case 0x01:
                 case 0x0F:
                 {
-                    return ReadGCRByte();
+                    uint8_t value = ReadGCRByte();
+                    return value;
                 }
                 case 0x04:
                 {

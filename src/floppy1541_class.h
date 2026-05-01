@@ -16,7 +16,6 @@
 #define FLOPPY1541_CLASS_H
 
 #include <math.h>
-#include <cstring>
 #include <cstdio>
 #include <functional>
 
@@ -28,6 +27,8 @@
 
 #define D64_IMAGE_SIZE 174848
 #define G64_IMAGE_SIZE 665952
+
+#define SYNC_BIT_THRESHOLD 8   // Minimale Anzahl der aufeinander folgenden 1er Bits die als SYNC Markierung gewertet wird (Naormal ist 10)
 
 #define DISK_CHANGE_STATE_COUNTS 4
 #define DISK_CHANGE_STATE_CYCLES 1000
@@ -50,7 +51,7 @@ public:
     void* GetSoundBuffer();
     void ZeroSoundBufferPos();
     void SetFloppySoundVolume(float_t volume);
-	bool LoadDiskImage(FILE *file, int typ);		// 0=D64 , 1=G64
+    bool LoadDiskImage(FILE *file, int typ);		// 0=D64 , 1=G64
     void UnLoadDiskImage();
     void SetC64IEC(uint8_t* port);
     void SetDeviceNumber(uint8_t number);
@@ -104,23 +105,26 @@ public:
     uint16_t        History[256];
     uint8_t         HistoryPointer;
 
-    int SyncFoundCount;
-
 private:
 
     /// Funktionen ///
 
     void CheckImageWrite();
     void D64ImageToGCRImage();
-	void SectorToGCR(unsigned int spur, unsigned int sektor, uint16_t disk_id);
+    void SectorToGCR(unsigned int spur, unsigned int sektor, uint16_t disk_id);
     void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
     void GCRImageToD64Image();
     void GCRToSector(unsigned int spur, unsigned int sektor);
     void ConvertToD64(uint8_t *source_buffer, uint8_t *destination_buffer);
     void RenderFloppySound();
     void StartDiskChange();
+    void UpdateGCRPointer();
+    bool PeekGCRBit(int pos);
+    void PokeGCRBit(int pos, bool bit);
+    uint8_t PeekGCRByte(uint32_t pos);
+    void PokeGCRByte(uint32_t pos, uint8_t value);
 
-	uint16_t GetDiskIDFromBAM();
+    uint16_t GetDiskIDFromBAM();
 
     /// Variablen ///
 
@@ -153,11 +157,11 @@ private:
 
     ////////// Fürs Disk Image //////////
 
-    #define             FileNameSize 1024
+#define             FileNameSize 1024
 
-	FILE *              image_file;
+    FILE *              image_file;
     int                 ImageTyp;
-    uint8_t             AktGCRWert;
+    //uint8_t             AktGCRWert;
     static const int	NUM_TRACKS = 42;
     static const int	GCR_SECTOR_SIZE = 364;      // SYNC Header Gap SYNC Data Gap (should be 5 SYNC bytes each) ///  ALF Sector in Byte
     static const int	GCR_TRACK_SIZE = 7928;      // Each track in gcr_data has 21 sectors
@@ -169,7 +173,11 @@ private:
     bool                ImageDirectoryWriteStatus;  // Sowie in das Image auf Spur 18 geschrieben wird wird es true
     uint8_t             D64Image[D64_IMAGE_SIZE];   // Aktuelles D64 Image
     uint8_t             GCRImage[G64_IMAGE_SIZE];   // Aktuelles GCR Image
-    uint16_t            TrackSize[256];
+    uint16_t            TrackSize[256];             // Größe der einzelnen Spuren in Byte
+    uint32_t            GCRBitTrackSize;            // Größe der einzelnen Spuren in Bit
+    uint32_t            GCRBitTrackPos;             // Aktuelle Position in der Spur in Bit
+    uint32_t            SyncBitCounter;             // Zählt die Anzahl der aufeinander folgenden 1er Bits, ohne Unterbrechung durch eine 0, um eine Sync Sequenz zu erkennen
+    bool                SyncBitsFound;              // Zeigt an, dass eine Sync Sequenz gefunden wurde, damit die nächsten Bytes als Header oder Daten interpretiert werden können
 
     /// Für Floppy Sound ///
 
