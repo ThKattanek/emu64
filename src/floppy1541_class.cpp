@@ -15,7 +15,7 @@
 #include "./floppy1541_class.h"
 #include "./c64_file_types.h"
 
-#include <QDebug>
+#include <cstring>
 
 const uint8_t Floppy1541::num_sectors[] = {21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,19,19,19,19,19,19,19,18,18,18,18,18,18,17,17,17,17,17,17,17,17,17,17,17,17};
 const uint8_t Floppy1541::d64_track_zone[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -583,8 +583,6 @@ void Floppy1541::SetDeviceNumber(uint8_t number)
 
 void Floppy1541::SetWriteProtect(bool status)
 {
-    /* qDebug("Set WriteProtect [%d], Status: %d",Jumper, status); */
-
     WriteProtect = WriteProtectAkt = status;
 }
 
@@ -991,7 +989,6 @@ bool Floppy1541::SyncFound()
     if(sync_found)
     {
         GCRBitTrackPos = sync_pos;
-        // qDebug() << "SYNC Found -> Track: " << (AktHalbSpur >> 1) + 1;
         return true;
     }
     else
@@ -1031,7 +1028,6 @@ bool Floppy1541::SyncFound()
         if(GCRBitTrackPos >= GCRBitTrackSize)
             GCRBitTrackPos -= GCRBitTrackSize;
 
-        // qDebug() << "SYNC Foud -> Track: " << (AktHalbSpur >> 1);
         return true;
     }
     else
@@ -1071,18 +1067,6 @@ void Floppy1541::WriteGCRByte(uint8_t value)
         GCRBitTrackPos -= GCRBitTrackSize;
 
     PokeGCRByte(GCRBitTrackPos, value);
-
-    if(AktHalbSpur == (DIRECTORY_TRACK-1) * 2)
-    {
-        qDebug() << "Write GCR Byte: " << (int)value << " to Track: " << (AktHalbSpur >> 1) + 1;
-    }
-
-    /*
-    GCR_PTR++;	// Rotate disk
-    *GCR_PTR = value;
-
-    if (GCR_PTR >= GCRSpurEnde) GCR_PTR = GCRSpurStart;
-     */
 }
 
 void Floppy1541::SpurInc()
