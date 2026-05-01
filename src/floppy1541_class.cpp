@@ -422,10 +422,10 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor, uint
 
     // Create GCR header (15 Bytes)
     // SYNC
-    *P++ = 0xFF;								// SYNC
-    *P++ = 0xFF;								// SYNC
-    *P++ = 0xFF;								// SYNC
-    *P++ = 0xFF;								// SYNC
+    //*P++ = 0xFF;								// SYNC
+    //*P++ = 0xFF;								// SYNC
+    //*P++ = 0xFF;								// SYNC
+    //*P++ = 0xFF;								// SYNC
     *P++ = 0xFF;								// SYNC
     buffer[0] = 0x08;							// Header mark
     buffer[1] = sektor ^ spur ^ id2 ^ id1;		// Checksum
@@ -442,10 +442,10 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor, uint
     // Create GCR data (338 Bytes)
     uint8_t SUM;
     // SYNC
-    *P++ = 0xFF;                                // SYNC
-    *P++ = 0xFF;								// SYNC
-    *P++ = 0xFF;								// SYNC
-    *P++ = 0xFF;								// SYNC
+    //*P++ = 0xFF;                                // SYNC
+    //*P++ = 0xFF;								// SYNC
+    //*P++ = 0xFF;								// SYNC
+    //*P++ = 0xFF;								// SYNC
     *P++ = 0xFF;								// SYNC
     buffer[0] = 0x07;							// Data mark
     SUM = buffer[1] = block[0];
