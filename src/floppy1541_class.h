@@ -28,7 +28,7 @@
 #define D64_IMAGE_SIZE 174848
 #define G64_IMAGE_SIZE 665952
 
-#define SYNC_BIT_THRESHOLD 8   // Minimale Anzahl der aufeinander folgenden 1er Bits die als SYNC Markierung gewertet wird (Naormal ist 10)
+#define SYNC_BIT_THRESHOLD 10   // Minimale Anzahl der aufeinander folgenden 1er Bits die als SYNC Markierung gewertet wird (Naormal ist 10)
 
 #define DISK_CHANGE_STATE_COUNTS 4
 #define DISK_CHANGE_STATE_CYCLES 1000
