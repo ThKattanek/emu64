@@ -1473,8 +1473,21 @@ void MainWindow::on_actionREU_laden_triggered()
     QString filename = QFileDialog::getOpenFileName(this,tr("REU Inhalt laden"),QDir::homePath(),tr("REU Image Dateien") + "(*.reu);;" + tr("Alle Dateien") + "(*.*)",nullptr,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
-        if(c64->LoadREUImage(filename.toLocal8Bit()) != 0)
-            QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des REU Images trat ein Fehler auf!"));
+        int ret = c64->LoadREUImage(filename.toLocal8Bit());
+
+        switch (ret) {
+        case -1:
+            QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Das REU Image konnte nicht geöffnet werden!"));
+            break;
+        case -2:
+            QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Das REU Image ist zu groß für die aktuell eingestellte REU Größe!"));
+            break;
+        case -3:
+            QMessageBox::warning(this,tr("Emu64 Fehler ..."),tr("Das REU Image ist kleiner als die aktuell eingestellte REU Größe!\nDas Image wurde aber trotzdem geladen, der restliche REU Speicher ist mit 0x00 gefüllt."));
+            break;
+        default:
+            break;
+        }
     }
 }
 
@@ -1647,12 +1660,10 @@ void MainWindow::on_actionCPU_Logging_Start_triggered()
     }
 }
 
-
 void MainWindow::on_actionCPU_Logging_Stop_triggered()
 {
     c64->StopDebugLogging();
 }
-
 
 void MainWindow::on_actionGEO_512KiB_triggered()
 {
@@ -1664,7 +1675,6 @@ void MainWindow::on_actionGEO_512KiB_triggered()
     c64->SetGeoRamMode(_512KiB);
 }
 
-
 void MainWindow::on_actionGEO_1024KiB_triggered()
 {
     ui->actionGEO_512KiB->setChecked(false);
@@ -1675,7 +1685,6 @@ void MainWindow::on_actionGEO_1024KiB_triggered()
     c64->SetGeoRamMode(_1024KiB);
 }
 
-
 void MainWindow::on_actionGEO_2048KiB_triggered()
 {
     ui->actionGEO_512KiB->setChecked(false);
@@ -1685,7 +1694,6 @@ void MainWindow::on_actionGEO_2048KiB_triggered()
 
     c64->SetGeoRamMode(_2048KiB);
 }
-
 
 void MainWindow::on_actionGEO_4096KiB_triggered()
 {

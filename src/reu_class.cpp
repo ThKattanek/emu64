@@ -8,17 +8,18 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
-#include "reu_class.h"
+#include "./structs.h"
+#include "./reu_class.h"
 
 REUClass::REUClass()
 {
     REUInsert = false;
 
+    RamBankCount = 2;       // 128kB
     ClearRAM();
 
     DMAStatus = 0;
@@ -48,18 +49,33 @@ int REUClass::LoadRAM(const char *filename)
     file = fopen (filename,"rb");
     if (file == NULL)
     {
-        return 1;
+        // Datei konnte nicht geöffnet werden
+        return -1;
+    }
+
+    // File size ermitteln
+    fseek(file, 0, SEEK_END);   // Zeiger ans Ende setzen
+    long file_size = ftell(file);    // Position ist Größe
+    fseek(file, 0, SEEK_SET);   // Zeiger zurück zum Anfang setzen
+
+    if(file_size > RamBankCount * 0x10000)
+    {
+        // Datei ist zu groß für die Anzahl der verfügbaren RAM-Bänke
+        fclose(file);
+        return -2;
     }
 
     size_t reading_bytes;
 
-    for(int i=0;i<256;i++)
+    ClearRAM(); // Vor dem Laden den RAM löschen, um sicherzustellen, dass nicht geladene Bereiche auf 0 gesetzt sind
+    for(int i=0; i<RamBankCount; i++)
     {
         reading_bytes = fread(RamBaenke[i],1,0x10000,file);
         if(reading_bytes < 0x10000)
         {
-            printf("Fehler beim laden der %d. REU RamBank\n",i);
-            return 1;
+            // Die Datei enthält nicht genügend Daten, um die aktuelle RAM-Bank vollständig zu laden
+            fclose(file);
+            return -3;
         }
     }
 
@@ -288,11 +304,11 @@ inline void REUClass::Write(unsigned short adresse, unsigned char wert)
     WriteProcTbl[(adresse)>>8](adresse,wert);
 }
 
-void REUClass::WriteIO1(unsigned short /*adresse*/,unsigned char /*wert*/)
+void REUClass::WriteIO1(uint16_t /*adresse*/, uint8_t /*wert*/)
 {
 }
 
-void REUClass::WriteIO2(unsigned short adresse,unsigned char wert)
+void REUClass::WriteIO2(uint16_t adresse, uint8_t wert)
 {
     if(!REUInsert) return;
     switch(adresse)
@@ -367,12 +383,12 @@ void REUClass::WriteIO2(unsigned short adresse,unsigned char wert)
     }
 }
 
-unsigned char REUClass::ReadIO1(unsigned short /*adresse*/)
+uint8_t REUClass::ReadIO1(uint16_t /*adresse*/)
 {
     return 0;
 }
 
-unsigned char REUClass::ReadIO2(unsigned short adresse)
+uint8_t REUClass::ReadIO2(uint16_t adresse)
 {
     static unsigned char ret;
 

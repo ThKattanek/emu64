@@ -15,25 +15,27 @@
 #ifndef REU_CLASS_H
 #define REU_CLASS_H
 
+#include <cstdint>
 #include <cstdio>
 #include <functional>
 
-#include "./structs.h"
+#define MAX_BANK_COUNT 256
 
 class REUClass
 {
-    public:
+public:
     REUClass();
     ~REUClass();
 
     // Funktionen
-    void WriteIO1(unsigned short adresse,unsigned char wert);
-    void WriteIO2(unsigned short adresse,unsigned char wert);
-    unsigned char ReadIO1(unsigned short adresse);
-    unsigned char ReadIO2(unsigned short adresse);
+    void WriteIO1(uint16_t adresse, uint8_t wert);
+    void WriteIO2(uint16_t adresse, uint8_t wert);
+    uint8_t ReadIO1(uint16_t adresse);
+    uint8_t ReadIO2(uint16_t adresse);
 
     void Insert(void);
     void Remove(void);
+    void SetRamBankCount(uint16_t count) { RamBankCount = count; }
     int LoadRAM(const char *filename);
     int SaveRAM(const char *filename);
     void ClearRAM(void);
@@ -55,7 +57,7 @@ class REUClass
 
     unsigned char DMAStatus;	// 0=kein Transfer / 1=Lesen / 2=Schreiben / 3=Swap / 4=Verify
 
-    private:
+private:
     // Funktionen
     inline unsigned char Read(unsigned short adresse);
     inline void Write(unsigned short adresse, unsigned char wert);
@@ -64,21 +66,21 @@ class REUClass
 
     bool			BA_STATUS;
 
-    //unsigned char	RamBaenke[32][0x10000];	// 32 x 64KB = 2MB
-    unsigned char	RamBaenke[256][0x10000]; // 256 x 64KB = 16MB
+    uint16_t        RamBankCount;    // Anzahl der 64KB Bänke (1-256)
+    uint8_t     	RamBaenke[MAX_BANK_COUNT][0x10000]; // 256 x 64KB = 16MB
 
     bool			REUInsert;
     bool			REUWait_FF00;
 
     // IO
-    unsigned char	IO[0x0B];
-    unsigned char	CPUWaitCounter;
+    uint8_t     	IO[0x0B];
+    uint8_t     	CPUWaitCounter;
     bool			TransferStart;
-    unsigned short	AdresseC64;
-    unsigned short	AdresseREU;
-    unsigned short	Counter;
-    unsigned char	Bank;
-    unsigned char	TransferTyp;
+    uint16_t    	AdresseC64;
+    uint16_t    	AdresseREU;
+    uint16_t    	Counter;
+    uint8_t         Bank;
+    uint8_t     	TransferTyp;
 };
 
 #endif // REU_CLASS_H
