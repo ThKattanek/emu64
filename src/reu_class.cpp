@@ -144,7 +144,7 @@ int REUClass::SaveRAM(const char *filename)
     {
         return 1;
     }
-    for(int i=0; i<256; i++) fwrite(ram_baenke[i], 1, 0x10000, file);
+    for(int i=0; i<ram_bank_count; i++) fwrite(ram_baenke[i], 1, 0x10000, file);
     fclose(file);
     return 0;
 }
