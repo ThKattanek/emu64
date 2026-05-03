@@ -15,6 +15,8 @@
 #include "./c64_class.h"
 #include "./c64_keys.h"
 #include "./c64_file_types.h"
+#include "./cpu_info.h"
+#include "./savepng.h"
 
 #include <QDebug>
 #include <iostream>
@@ -33,561 +35,561 @@ int SDLThreadWarp(void *userdat);
 const char* C64Class::screenshot_format_name[] = {"BMP","PNG"};
 
 static const uint8_t CPU_OPC_INFO[256]={\
-0*16+6+0,7*16+5+0,0*16+0+8,7*16+7+8,3*16+2+8,3*16+2+0,3*16+4+0,3*16+4+8,0*16+2+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+3+8,2*16+3+0,2*16+5+0,2*16+5+8\
-,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8\
-,2*16+5+0,7*16+5+0,0*16+0+8,7*16+7+8,3*16+2+0,3*16+2+0,3*16+4+0,3*16+4+8,0*16+3+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+3+0,2*16+3+0,2*16+5+0,2*16+5+8\
-,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8\
-,0*16+5+0,7*16+5+0,0*16+0+8,7*16+7+8,3*16+2+8,3*16+2+0,3*16+4+0,3*16+4+8,0*16+2+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+2+0,2*16+4+0,2*16+5+0,2*16+5+8\
-,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8\
-,0*16+5+0,7*16+5+0,0*16+0+8,7*16+7+8,3*16+2+8,3*16+2+0,3*16+4+0,3*16+4+8,0*16+2+0,1*16+1+0,0*16+1+0,1*16+1+8,10*16+4+0,2*16+3+0,2*16+5+0,2*16+5+8\
-,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8\
-,1*16+1+8,7*16+5+0,0*16+1+8,7*16+5+8,3*16+2+0,3*16+2+0,3*16+2+0,3*16+2+8,0*16+1+0,1*16+1+8,0*16+1+0,1*16+1+8,2*16+3+0,2*16+3+0,2*16+3+0,2*16+3+8\
-,9*16+1+0,8*16+5+0,0*16+0+8,4*16+5+8,6*16+1+0,6*16+3+0,11*16+3+0,11*16+3+8,0*16+1+0,5*16+1+0,0*16+1+0,5*16+4+8,5*16+4+8,4*16+4+0,4*16+4+8,5*16+4+8\
-,1*16+1+0,7*16+5+0,1*16+1+0,7*16+5+8,3*16+2+0,3*16+2+0,3*16+2+0,3*16+2+8,0*16+1+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+3+0,2*16+3+0,2*16+3+0,2*16+3+8\
-,9*16+1+0,8*16+4+0,0*16+0+8,8*16+4+8,6*16+1+0,6*16+3+0,11*16+3+0,11*16+3+8,0*16+1+0,5*16+3+0,0*16+1+0,5*16+3+8,4*16+3+0,4*16+3+0,5*16+3+0,5*16+3+8\
-,1*16+1+0,7*16+5+0,1*16+1+8,7*16+7+8,3*16+2+0,3*16+2+0,3*16+4+0,3*16+4+8,0*16+1+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+3+0,2*16+3+0,2*16+5+0,2*16+5+8\
-,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8\
-,1*16+1+0,7*16+5+0,1*16+1+8,7*16+7+8,3*16+2+0,3*16+2+0,3*16+4+0,3*16+4+8,0*16+1+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+3+0,2*16+3+0,2*16+5+0,2*16+5+8\
-,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8};
+                                                  0*16+6+0,7*16+5+0,0*16+0+8,7*16+7+8,3*16+2+8,3*16+2+0,3*16+4+0,3*16+4+8,0*16+2+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+3+8,2*16+3+0,2*16+5+0,2*16+5+8\
+                                          ,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8\
+                                          ,2*16+5+0,7*16+5+0,0*16+0+8,7*16+7+8,3*16+2+0,3*16+2+0,3*16+4+0,3*16+4+8,0*16+3+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+3+0,2*16+3+0,2*16+5+0,2*16+5+8\
+                                          ,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8\
+                                          ,0*16+5+0,7*16+5+0,0*16+0+8,7*16+7+8,3*16+2+8,3*16+2+0,3*16+4+0,3*16+4+8,0*16+2+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+2+0,2*16+4+0,2*16+5+0,2*16+5+8\
+                                          ,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8\
+                                          ,0*16+5+0,7*16+5+0,0*16+0+8,7*16+7+8,3*16+2+8,3*16+2+0,3*16+4+0,3*16+4+8,0*16+2+0,1*16+1+0,0*16+1+0,1*16+1+8,10*16+4+0,2*16+3+0,2*16+5+0,2*16+5+8\
+                                          ,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8\
+                                          ,1*16+1+8,7*16+5+0,0*16+1+8,7*16+5+8,3*16+2+0,3*16+2+0,3*16+2+0,3*16+2+8,0*16+1+0,1*16+1+8,0*16+1+0,1*16+1+8,2*16+3+0,2*16+3+0,2*16+3+0,2*16+3+8\
+                                          ,9*16+1+0,8*16+5+0,0*16+0+8,4*16+5+8,6*16+1+0,6*16+3+0,11*16+3+0,11*16+3+8,0*16+1+0,5*16+1+0,0*16+1+0,5*16+4+8,5*16+4+8,4*16+4+0,4*16+4+8,5*16+4+8\
+                                          ,1*16+1+0,7*16+5+0,1*16+1+0,7*16+5+8,3*16+2+0,3*16+2+0,3*16+2+0,3*16+2+8,0*16+1+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+3+0,2*16+3+0,2*16+3+0,2*16+3+8\
+                                          ,9*16+1+0,8*16+4+0,0*16+0+8,8*16+4+8,6*16+1+0,6*16+3+0,11*16+3+0,11*16+3+8,0*16+1+0,5*16+3+0,0*16+1+0,5*16+3+8,4*16+3+0,4*16+3+0,5*16+3+0,5*16+3+8\
+                                          ,1*16+1+0,7*16+5+0,1*16+1+8,7*16+7+8,3*16+2+0,3*16+2+0,3*16+4+0,3*16+4+8,0*16+1+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+3+0,2*16+3+0,2*16+5+0,2*16+5+8\
+                                          ,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8\
+                                          ,1*16+1+0,7*16+5+0,1*16+1+8,7*16+7+8,3*16+2+0,3*16+2+0,3*16+4+0,3*16+4+8,0*16+1+0,1*16+1+0,0*16+1+0,1*16+1+8,2*16+3+0,2*16+3+0,2*16+5+0,2*16+5+8\
+                                          ,9*16+1+0,8*16+4+0,0*16+0+8,8*16+7+8,6*16+3+8,6*16+3+0,6*16+5+0,6*16+5+8,0*16+1+0,5*16+3+0,0*16+1+8,5*16+6+8,4*16+3+8,4*16+3+0,4*16+6+0,4*16+6+8};
 
 static const char* CPU_OPC = {"\
-BRKORAJAMSLONOPORAASLSLOPHPORAASLANCNOPORAASLSLO\
-BPLORAJAMSLONOPORAASLSLOCLCORANOPSLONOPORAASLSLO\
-JSRANDJAMRLABITANDROLRLAPLPANDROLANCBITANDROLRLA\
-BMIANDJAMRLANOPANDROLRLASECANDNOPRLANOPANDROLRLA\
-RTIEORJAMSRENOPEORLSRSREPHAEORLSRASRJMPEORLSRSRE\
-BVCEORJAMSRENOPEORLSRSRECLIEORNOPSRENOPEORLSRSRE\
-RTSADCJAMRRANOPADCRORRRAPLAADCRORARRJMPADCRORRRA\
-BVSADCJAMRRANOPADCRORRRASEIADCNOPARRNOPADCRORRRA\
-NOPSTANOPSAXSTYSTASTXSAXDEYNOPTXAANESTYSTASTXSAX\
-BCCSTAJAMSHASTYSTASTXSAXTYASTATXSSHSSHYSTASHXSHA\
-LDYLDALDXLAXLDYLDALDXLAXTAYLDATAXLXALDYLDALDXLAX\
-BCSLDAJAMLAXLDYLDALDXLAXCLVLDATSXLAELDYLDALDXLAX\
-CPYCMPNOPDCPCPYCMPDECDCPINYCMPDEXSBXCPYCMPDECDCP\
-BNECMPJAMDCPNOPCMPDECDCPCLDCMPNOPDCPNOPCMPDECDCP\
-CPXSBCNOPISBCPXSBCINCISBINXSBCNOPSBCCPXSBCINCISB\
-BEQSBCJAMISBNOPSBCINCISBSEDSBCNOPISBNOPSBCINCISB\
-RSTIRQNMI"};
+                              BRKORAJAMSLONOPORAASLSLOPHPORAASLANCNOPORAASLSLO\
+                              BPLORAJAMSLONOPORAASLSLOCLCORANOPSLONOPORAASLSLO\
+                              JSRANDJAMRLABITANDROLRLAPLPANDROLANCBITANDROLRLA\
+                              BMIANDJAMRLANOPANDROLRLASECANDNOPRLANOPANDROLRLA\
+                              RTIEORJAMSRENOPEORLSRSREPHAEORLSRASRJMPEORLSRSRE\
+                              BVCEORJAMSRENOPEORLSRSRECLIEORNOPSRENOPEORLSRSRE\
+                              RTSADCJAMRRANOPADCRORRRAPLAADCRORARRJMPADCRORRRA\
+                              BVSADCJAMRRANOPADCRORRRASEIADCNOPARRNOPADCRORRRA\
+                              NOPSTANOPSAXSTYSTASTXSAXDEYNOPTXAANESTYSTASTXSAX\
+                              BCCSTAJAMSHASTYSTASTXSAXTYASTATXSSHSSHYSTASHXSHA\
+                              LDYLDALDXLAXLDYLDALDXLAXTAYLDATAXLXALDYLDALDXLAX\
+                              BCSLDAJAMLAXLDYLDALDXLAXCLVLDATSXLAELDYLDALDXLAX\
+                              CPYCMPNOPDCPCPYCMPDECDCPINYCMPDEXSBXCPYCMPDECDCP\
+                              BNECMPJAMDCPNOPCMPDECDCPCLDCMPNOPDCPNOPCMPDECDCP\
+                              CPXSBCNOPISBCPXSBCINCISBINXSBCNOPSBCCPXSBCINCISB\
+                              BEQSBCJAMISBNOPSBCINCISBSEDSBCNOPISBNOPSBCINCISB\
+                              RSTIRQNMI"};
 
-C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(const char*)> log_function, const char *data_path):
-    mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
+                              C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(const char*)> log_function, const char *data_path):
+                                  mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
+                              {
+                                   *ret_error = 0;
+
+this->start_minimized = start_minimized;
+
+LimitCyclesEvent = nullptr;
+DebugCartEvent = nullptr;
+
+changed_graphic_modi = false;
+changed_window_pos = false;
+changed_window_size = false;
+
+sdl_joystick_update_is_stoped = true;
+rec_joy_mapping = false;
+sdl_joystick_stop_update = true;
+sdl_joystick_is_open = false;
+sdl_joystick_count = 0;
+
+return_key_is_down = false;
+
+key_map_is_rec = false;
+rec_matrix_code = false;
+
+virtual_port1 = 0;
+virtual_port2 = 1;
+
+warp_mode = false;
+
+enable_debug_cart = false;
+is_wtite_to_debug_cart = false;
+
+LogText = log_function;
+
+enable_mouse_1351 = false;
+mouse_1351_x_rel = mouse_1351_y_rel = 0;
+
+mouse_port = 0;  // Port1 = 0 ... Port2 = 1
+poti_ax = poti_ay = poti_bx = poti_by = 0xFF;    // HighZ zum Beginn (Keine Paddles / Maus angeschlossen)
+poti_x = poti_y = 0xFF;
+
+mouse_is_hidden = false;
+mouse_hide_counter = 0;
+mouse_hide_time = 3000;
+
+sprintf(floppy_sound_path,"%s%s",data_path,"/floppy_sounds/");
+sprintf(gfx_path,"%s%s",data_path,"/gfx/");
+sprintf(rom_path,"%s%s",data_path,"/roms/");
+
+LogText(">> C64 Klasse wurde gestartet...\n");
+LogText(">> GfxPath = ");
+LogText(gfx_path);
+LogText("\n");
+
+this->video_crt_output = video_crt_output;
+breakgroup_count = 0;
+floppy_found_breakpoint = false;
+enable_ext_wires = false;
+
+iec_is_dumped = false;
+
+current_c64_screen_width = current_window_width = current_c64_screen_height = current_window_height = 0;
+
+SDL_ClearError();
+mutex1 = SDL_CreateMutex();
+if(!mutex1)
 {
-    *ret_error = 0;
+    LogText("<< ERROR: Fehler beim erstellen eines SDL_Mutex.\n");
+    LogText("<< SDL_Error: ");
+    LogText(SDL_GetError());
+    LogText("\n");
+    *ret_error = -1;
+    return;
+}
 
-    this->start_minimized = start_minimized;
+sdl_window = nullptr;
+c64_screen = nullptr;
+c64_screen_texture = 0;
+screen_aspect_ratio = SCREEN_RATIO_4_3;
+enable_window_aspect_ratio = true;
+enable_fullscreen_aspect_ratio = true;
+c64_screen_is_obselete = false;
+start_screenshot = false;
+enable_exit_screenshot = false;
+frame_skip_counter = 1;
 
-    LimitCyclesEvent = nullptr;
-    DebugCartEvent = nullptr;
+enable_distortion = true;
+SetDistortion(-0.05f);
 
-    changed_graphic_modi = false;
-    changed_window_pos = false;
-    changed_window_size = false;
+is_screenshot_enable = false;
+screenshot_number = 0;
+screenshot_dir = nullptr;
+screenshot_format = 0;
 
-    sdl_joystick_update_is_stoped = true;
-    rec_joy_mapping = false;
-    sdl_joystick_stop_update = true;
-    sdl_joystick_is_open = false;
-    sdl_joystick_count = 0;
+video_capture = nullptr;
 
-    return_key_is_down = false;
+/// SDL Installieren ///
 
-    key_map_is_rec = false;
-    rec_matrix_code = false;
+SDL_ClearError();
+if(SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
+{
+    LogText("<< ERROR: Fehler beim installieren von SDL2\n");
+    LogText("<< SDL_Error: ");
+    LogText(SDL_GetError());
+    LogText("\n");
+    *ret_error = -2;
+    return;
+}
+else
+    LogText(">> SDL2 wurde installiert\n");
 
-    virtual_port1 = 0;
-    virtual_port2 = 1;
-
-    warp_mode = false;
-
-    enable_debug_cart = false;
-    is_wtite_to_debug_cart = false;
-
-    LogText = log_function;
-
-    enable_mouse_1351 = false;
-    mouse_1351_x_rel = mouse_1351_y_rel = 0;
-
-    mouse_port = 0;  // Port1 = 0 ... Port2 = 1
-    poti_ax = poti_ay = poti_bx = poti_by = 0xFF;    // HighZ zum Beginn (Keine Paddles / Maus angeschlossen)
-    poti_x = poti_y = 0xFF;
-
-    mouse_is_hidden = false;
-    mouse_hide_counter = 0;
-    mouse_hide_time = 3000;
-
-    sprintf(floppy_sound_path,"%s%s",data_path,"/floppy_sounds/");
-    sprintf(gfx_path,"%s%s",data_path,"/gfx/");
-    sprintf(rom_path,"%s%s",data_path,"/roms/");
-
-    LogText(">> C64 Klasse wurde gestartet...\n");
-    LogText(">> GfxPath = ");
-    LogText(gfx_path);
+char filename[FILENAME_MAX];
+sprintf(filename,"%spfeil0.png",gfx_path);
+img_joy_arrow0 = IMG_Load(filename);
+if(!img_joy_arrow0)
+{
+    LogText("<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
+    LogText(filename);
+    LogText("\n");
+}
+else
+{
+    LogText(">> Folgendes Bild wurde erfolgreich geladen --- ");
+    LogText(filename);
     LogText("\n");
 
-    this->video_crt_output = video_crt_output;
-    breakgroup_count = 0;
-    floppy_found_breakpoint = false;
-    enable_ext_wires = false;
+    if ( (img_joy_arrow0->w & (img_joy_arrow0->w - 1)) != 0 ) LogText("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
+    if ( (img_joy_arrow0->h & (img_joy_arrow0->h - 1)) != 0 ) LogText("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
+}
 
-    iec_is_dumped = false;
+sprintf(filename,"%spfeil1.png",gfx_path);
+img_joy_arrow1 = IMG_Load(filename);
+if(!img_joy_arrow1)
+{
+    LogText("<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
+    LogText(filename);
+    LogText("\n");
+}
+else
+{
+    LogText(">> Folgendes Bild wurde erfolgreich geladen --- ");
+    LogText(filename);
+    LogText("\n");
 
-    current_c64_screen_width = current_window_width = current_c64_screen_height = current_window_height = 0;
+    if ( (img_joy_arrow1->w & (img_joy_arrow1->w - 1)) != 0 ) LogText("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
+    if ( (img_joy_arrow1->h & (img_joy_arrow1->h - 1)) != 0 ) LogText("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
+}
 
-    SDL_ClearError();
-    mutex1 = SDL_CreateMutex();
-    if(!mutex1)
-    {
-        LogText("<< ERROR: Fehler beim erstellen eines SDL_Mutex.\n");
-        LogText("<< SDL_Error: ");
-        LogText(SDL_GetError());
-        LogText("\n");
-        *ret_error = -1;
-        return;
-    }
+sprintf(filename,"%skreis0.png",gfx_path);
+img_joy_button0 = IMG_Load(filename);
+if(!img_joy_button0)
+{
+    LogText("<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
+    LogText(filename);
+    LogText("\n");
+}
+else
+{
+    LogText(">> Folgendes Bild wurde erfolgreich geladen --- ");
+    LogText(filename);
+    LogText("\n");
 
-    sdl_window = nullptr;
-    c64_screen = nullptr;
-    c64_screen_texture = 0;
-    screen_aspect_ratio = SCREEN_RATIO_4_3;
-    enable_window_aspect_ratio = true;
-    enable_fullscreen_aspect_ratio = true;
-    c64_screen_is_obselete = false;
-    start_screenshot = false;
-    enable_exit_screenshot = false;
-    frame_skip_counter = 1;
+    if ( (img_joy_button0->w & (img_joy_button0->w - 1)) != 0 ) LogText("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
+    if ( (img_joy_button0->h & (img_joy_button0->h - 1)) != 0 ) LogText("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
+}
 
-    enable_distortion = true;
-    SetDistortion(-0.05f);
+sprintf(filename,"%skreis1.png",gfx_path);
+img_joy_button1 = IMG_Load(filename);
+if(!img_joy_button1)
+{
+    LogText("<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
+    LogText(filename);
+    LogText("\n");
+}
+else
+{
+    LogText(">> Folgendes Bild wurde erfolgreich geladen --- ");
+    LogText(filename);
+    LogText("\n");
 
-    is_screenshot_enable = false;
-    screenshot_number = 0;
-    screenshot_dir = nullptr;
-    screenshot_format = 0;
+    if ( (img_joy_button1->w & (img_joy_button1->w - 1)) != 0 ) LogText("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
+    if ( (img_joy_button1->h & (img_joy_button1->h - 1)) != 0 ) LogText("<< WARNUNG: Die Hoehe ist keine Potenz von 2^n\n");
+}
 
-    video_capture = nullptr;
+/// VideoCaptuer installieren ///
 
-    /// SDL Installieren ///
+video_capture = new VideoCaptureClass();
 
-    SDL_ClearError();
-	if(SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
-    {
-         LogText("<< ERROR: Fehler beim installieren von SDL2\n");
-         LogText("<< SDL_Error: ");
-         LogText(SDL_GetError());
-         LogText("\n");
-         *ret_error = -2;
-         return;
-    }
-    else
-        LogText(">> SDL2 wurde installiert\n");
-
-    char filename[FILENAME_MAX];
-    sprintf(filename,"%spfeil0.png",gfx_path);
-    img_joy_arrow0 = IMG_Load(filename);
-    if(!img_joy_arrow0)
-    {
-        LogText("<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
-        LogText(filename);
-        LogText("\n");
-    }
-    else
-    {
-        LogText(">> Folgendes Bild wurde erfolgreich geladen --- ");
-        LogText(filename);
-        LogText("\n");
-
-        if ( (img_joy_arrow0->w & (img_joy_arrow0->w - 1)) != 0 ) LogText("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-        if ( (img_joy_arrow0->h & (img_joy_arrow0->h - 1)) != 0 ) LogText("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
-    }
-
-    sprintf(filename,"%spfeil1.png",gfx_path);
-    img_joy_arrow1 = IMG_Load(filename);
-    if(!img_joy_arrow1)
-    {
-        LogText("<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
-        LogText(filename);
-        LogText("\n");
-    }
-    else
-    {
-        LogText(">> Folgendes Bild wurde erfolgreich geladen --- ");
-        LogText(filename);
-        LogText("\n");
-
-        if ( (img_joy_arrow1->w & (img_joy_arrow1->w - 1)) != 0 ) LogText("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-        if ( (img_joy_arrow1->h & (img_joy_arrow1->h - 1)) != 0 ) LogText("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
-    }
-
-    sprintf(filename,"%skreis0.png",gfx_path);
-    img_joy_button0 = IMG_Load(filename);
-    if(!img_joy_button0)
-    {
-        LogText("<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
-        LogText(filename);
-        LogText("\n");
-    }
-    else
-    {
-        LogText(">> Folgendes Bild wurde erfolgreich geladen --- ");
-        LogText(filename);
-        LogText("\n");
-
-        if ( (img_joy_button0->w & (img_joy_button0->w - 1)) != 0 ) LogText("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-        if ( (img_joy_button0->h & (img_joy_button0->h - 1)) != 0 ) LogText("<< WARNUNG: Die Höhe ist keine Potenz von 2^n\n");
-    }
-
-    sprintf(filename,"%skreis1.png",gfx_path);
-    img_joy_button1 = IMG_Load(filename);
-    if(!img_joy_button1)
-    {
-        LogText("<< ERROR: Folgendes Bild konnte nicht geladen werden --- ");
-        LogText(filename);
-        LogText("\n");
-    }
-    else
-    {
-        LogText(">> Folgendes Bild wurde erfolgreich geladen --- ");
-        LogText(filename);
-        LogText("\n");
-
-        if ( (img_joy_button1->w & (img_joy_button1->w - 1)) != 0 ) LogText("<< WARNUNG: Die Breite ist keine Potenz von 2^n\n");
-        if ( (img_joy_button1->h & (img_joy_button1->h - 1)) != 0 ) LogText("<< WARNUNG: Die Hoehe ist keine Potenz von 2^n\n");
-    }
-
-    /// VideoCaptuer installieren ///
-
-    video_capture = new VideoCaptureClass();
-
-    /// SLD Audio Installieren (C64 Emulation) ///
+/// SLD Audio Installieren (C64 Emulation) ///
 
 
-    char out_text[1024];
+char out_text[1024];
 
-    // Alle Audio Devices in Log auflisten
-    sprintf(out_text, ">> Alle Audio Devices:\n");
+// Alle Audio Devices in Log auflisten
+sprintf(out_text, ">> Alle Audio Devices:\n");
+LogText(out_text);
+
+int i, count = SDL_GetNumAudioDevices(0);
+for (i = 0; i < count; ++i)
+{
+    sprintf(out_text, "\t -Audio device %d: %s\n", i, SDL_GetAudioDeviceName(i, 0));
     LogText(out_text);
+}
 
-    int i, count = SDL_GetNumAudioDevices(0);
-    for (i = 0; i < count; ++i)
-    {
-        sprintf(out_text, "\t -Audio device %d: %s\n", i, SDL_GetAudioDeviceName(i, 0));
-        LogText(out_text);
-    }
+//  SDL Audio Format
+//  +----------------------sample is signed if set
+//  |
+//  |        +----------sample is bigendian if set
+//  |        |
+//  |        |           +--sample is float if set
+//  |        |           |
+//  |        |           |  +--sample bit size---+
+//  |        |           |  |                    |
+// 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
 
-    //  SDL Audio Format
-    //  +----------------------sample is signed if set
-    //  |
-    //  |        +----------sample is bigendian if set
-    //  |        |
-    //  |        |           +--sample is float if set
-    //  |        |           |
-    //  |        |           |  +--sample bit size---+
-    //  |        |           |  |                    |
-    // 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
+// Wunschformat
+// Muss aber nicht sein, das dieses auch verwendet wird
+// Wichtig ... Es muss alles aus audio_spec_have verwendetet werden
 
-    // Wunschformat
-    // Muss aber nicht sein, das dieses auch verwendet wird
-    // Wichtig ... Es muss alles aus audio_spec_have verwendetet werden
+SDL_memset(&audio_spec_want, 0, sizeof(audio_spec_want));
+audio_spec_want.freq = AudioSampleRate;
+audio_spec_want.format = AUDIO_S16SYS;
+audio_spec_want.channels = 2;
+audio_spec_want.samples = soundbuffer_size;
+audio_spec_want.callback = AudioMix;
+audio_spec_want.userdata = this;
 
-    SDL_memset(&audio_spec_want, 0, sizeof(audio_spec_want));
-    audio_spec_want.freq = AudioSampleRate;
-    audio_spec_want.format = AUDIO_S16SYS;
-    audio_spec_want.channels = 2;
-    audio_spec_want.samples = soundbuffer_size;
-    audio_spec_want.callback = AudioMix;
-    audio_spec_want.userdata = this;
+#ifdef _WIN32
+if(getenv("SDL_AUDIODRIVER") == NULL)
+    putenv("SDL_AUDIODRIVER=directsound");
 
-    #ifdef _WIN32
-        if(getenv("SDL_AUDIODRIVER") == NULL)
-            putenv("SDL_AUDIODRIVER=directsound");
+#endif
 
-    #endif
-
-    SDL_ClearError();
-    audio_dev =  SDL_OpenAudioDevice(NULL, 0, &audio_spec_want, &audio_spec_have, SDL_AUDIO_ALLOW_ANY_CHANGE);
-    if( audio_dev == 0 )
-    {
-        LogText("<< ERROR: Fehler beim installieren von SDL_Audio\n");
-        LogText("<< SDL_Error: ");
-        LogText(SDL_GetError());
-        LogText("\n");
-        sprintf(out_text, "\t -Audio Buffersize: %d\n" ,audio_spec_have.samples);
-        LogText(out_text);
-        *ret_error = -3;
-        return;
-    }
-
-    audio_frequency = audio_spec_have.freq;
-    audio_channels = audio_spec_have.channels;
-    audio_sample_bit_size = audio_spec_have.format & 0x00ff;
-    is_audio_sample_little_endian = audio_spec_have.format & 0x8000;
-    is_audio_sample_float = audio_spec_have.format & 0x0100;
-    is_audio_sample_signed = audio_spec_have.format & 0x1000;
-    audio_16bit_buffer_size = audio_spec_have.samples * 2;
-    audio_16bit_buffer = new int16_t[audio_16bit_buffer_size];
-
-    sprintf(out_text, "\t -Audio Driver: %s\n" , getenv("SDL_AUDIODRIVER"));
-    LogText(out_text);
-    sprintf(out_text, "\t -Audio Frequency: %d\n" , audio_frequency);
-    LogText(out_text);
-    sprintf(out_text, "\t -Audio Channels: %d\n" ,audio_channels);
-    LogText(out_text);
+SDL_ClearError();
+audio_dev =  SDL_OpenAudioDevice(NULL, 0, &audio_spec_want, &audio_spec_have, SDL_AUDIO_ALLOW_ANY_CHANGE);
+if( audio_dev == 0 )
+{
+    LogText("<< ERROR: Fehler beim installieren von SDL_Audio\n");
+    LogText("<< SDL_Error: ");
+    LogText(SDL_GetError());
+    LogText("\n");
     sprintf(out_text, "\t -Audio Buffersize: %d\n" ,audio_spec_have.samples);
     LogText(out_text);
-    sprintf(out_text, "\t -Audio Sample Bit Size: %d\n",audio_sample_bit_size);
-    LogText(out_text);
-    sprintf(out_text, "\t -Audio Sample Is Float: %d\n",is_audio_sample_float);
-    LogText(out_text);
-    sprintf(out_text, "\t -Audio Sample Is Signed: %d\n",is_audio_sample_signed);
-    LogText(out_text);
-    sprintf(out_text, "\t -Audio Sample Is Little Endian: %d\n",is_audio_sample_little_endian);
-    LogText(out_text);
+    *ret_error = -3;
+    return;
+}
 
-    OpenSDLJoystick();
+audio_frequency = audio_spec_have.freq;
+audio_channels = audio_spec_have.channels;
+audio_sample_bit_size = audio_spec_have.format & 0x00ff;
+is_audio_sample_little_endian = audio_spec_have.format & 0x8000;
+is_audio_sample_float = audio_spec_have.format & 0x0100;
+is_audio_sample_signed = audio_spec_have.format & 0x1000;
+audio_16bit_buffer_size = audio_spec_have.samples * 2;
+audio_16bit_buffer = new int16_t[audio_16bit_buffer_size];
 
-    SetGrafikModi(video_crt_output->start_c64_is_doublesize, video_crt_output->start_c64_is_palmode, false);
+sprintf(out_text, "\t -Audio Driver: %s\n" , getenv("SDL_AUDIODRIVER"));
+LogText(out_text);
+sprintf(out_text, "\t -Audio Frequency: %d\n" , audio_frequency);
+LogText(out_text);
+sprintf(out_text, "\t -Audio Channels: %d\n" ,audio_channels);
+LogText(out_text);
+sprintf(out_text, "\t -Audio Buffersize: %d\n" ,audio_spec_have.samples);
+LogText(out_text);
+sprintf(out_text, "\t -Audio Sample Bit Size: %d\n",audio_sample_bit_size);
+LogText(out_text);
+sprintf(out_text, "\t -Audio Sample Is Float: %d\n",is_audio_sample_float);
+LogText(out_text);
+sprintf(out_text, "\t -Audio Sample Is Signed: %d\n",is_audio_sample_signed);
+LogText(out_text);
+sprintf(out_text, "\t -Audio Sample Is Little Endian: %d\n",is_audio_sample_little_endian);
+LogText(out_text);
 
-    sprintf(filename,"%ssdl_icon.png",gfx_path);
-    sdl_window_icon = IMG_Load(filename);
-    if(sdl_window_icon != nullptr)
+OpenSDLJoystick();
+
+SetGrafikModi(video_crt_output->start_c64_is_doublesize, video_crt_output->start_c64_is_palmode, false);
+
+sprintf(filename,"%ssdl_icon.png",gfx_path);
+sdl_window_icon = IMG_Load(filename);
+if(sdl_window_icon != nullptr)
+{
+    SDL_ClearError();
+    if(0 != SDL_SetColorKey(sdl_window_icon,SDL_TRUE,SDL_MapRGB(sdl_window_icon->format,0,0,0)))
     {
-        SDL_ClearError();
-        if(0 != SDL_SetColorKey(sdl_window_icon,SDL_TRUE,SDL_MapRGB(sdl_window_icon->format,0,0,0)))
-        {
-            LogText("<< ERROR: Fehler beim festlegen des ColorKey im Window Icon.\n");
-            LogText("<< SDL_Error: ");
-            LogText(SDL_GetError());
-            LogText("\n");
-            *ret_error = -4;
-            return;
-        }
-
-    }
-    else
-        LogText("<< ERROR: Fehler beim laden des SLDFenster Icons\n");
-
-    game_port1 = 0;
-    game_port2 = 0;
-
-    /// Init Classes ///
-    mmu = new MMU();
-    cpu = new MOS6510();
-    vic = new VICII();
-    int sid_ret_error;
-    sid1 = new MOS6581_8085(0,audio_frequency,audio_spec_have.samples,&sid_ret_error);
-    sid2 = new MOS6581_8085(1,audio_frequency,audio_spec_have.samples,&sid_ret_error);
-    cia1 = new MOS6526(0);
-    cia2 = new MOS6526(1);
-    crt = new CartridgeClass();
-    reu = new REUClass();
-    geo = new GEORAMClass();
-    tape = new TAPE1530(audio_frequency,audio_spec_have.samples,C64Takt);
-
-    vic_buffer = vic->video_buffer;
-
-    cia2->floppy_iec_wire = &floppy_iec_wire;
-    cia2->c64_iec_wire = &c64_iec_wire;
-
-    iec_export_vdc.AddWire("c64_out_atn",false);
-    iec_export_vdc.AddWire("c64_out_clk",false);
-    iec_export_vdc.AddWire("c64_out_data",false);
-    iec_export_vdc.AddWire("floppy_out_clk",false);
-    iec_export_vdc.AddWire("floppy_out_data",false);
-
-    /// Floppy mit C64 verbinden ///
-
-    sprintf(filename,"%s1541.rom",rom_path);
-
-    char motor_filename[FILENAME_MAX];
-    char motor_on_filename[FILENAME_MAX];
-    char motor_off_filename[FILENAME_MAX];
-    char bumper_filename[FILENAME_MAX];
-    char stepper_inc_filename[FILENAME_MAX];
-    char stepper_dec_filename[FILENAME_MAX];
-
-    sprintf(motor_filename,"%smotor.raw",floppy_sound_path);
-    sprintf(motor_on_filename,"%smotor_on.raw",floppy_sound_path);
-    sprintf(motor_off_filename,"%smotor_off.raw",floppy_sound_path);
-    sprintf(bumper_filename,"%sanschlag.raw",floppy_sound_path);
-    sprintf(stepper_inc_filename,"%sstepper_inc.raw",floppy_sound_path);
-    sprintf(stepper_dec_filename,"%sstepper_dec.raw",floppy_sound_path);
-
-    for(i=0; i<MAX_FLOPPY_NUM; i++)
-    {
-        floppy[i] = new Floppy1541(&reset_wire,audio_frequency,audio_spec_have.samples,&floppy_found_breakpoint);
-        floppy[i]->SetResetReady(&floppy_reset_ready[i],0xEBFF);
-        floppy[i]->SetC64IEC(&c64_iec_wire);
-        floppy[i]->SetDeviceNumber(static_cast<uint8_t>(8+i));
-        floppy[i]->LoadDosRom(filename);
-        //floppy[i]->LoadFloppySounds((char*)"floppy_sounds/motor.raw",(char*)"floppy_sounds/motor_on.raw",(char*)"floppy_sounds/motor_off.raw",(char*)"floppy_sounds/anschlag.raw",(char*)"floppy_sounds/stepper_inc.raw",(char*)"floppy_sounds/stepper_dec.raw");
-        floppy[i]->LoadFloppySounds(motor_filename,motor_on_filename,motor_off_filename,bumper_filename,stepper_inc_filename,stepper_dec_filename);
-        floppy[i]->SetEnableFloppy(false);
-        floppy[i]->SetEnableFloppySound(true);
+        LogText("<< ERROR: Fehler beim festlegen des ColorKey im Window Icon.\n");
+        LogText("<< SDL_Error: ");
+        LogText(SDL_GetError());
+        LogText("\n");
+        *ret_error = -4;
+        return;
     }
 
-    /// Init Vars ///
-    c64_frequency = C64Takt;
-    c64_speed = 100;
-    cpu_pc_history_pos = 0;
-    io_source = 0;
-    c64_command_line_lenght = 0;
-    c64_command_line_current_pos = 0;
-    c64_command_line_status = false;
-    c64_command_line_count_s = false;
-    debug_mode = one_cycle = one_opcode = false;
-    cycle_counter = 0;
-	limit_cycles_counter = 0;
-	hold_next_system_cycle = false;
-    debug_animation = false;
-    debug_logging = false;
-    animation_speed_add = audio_spec_have.samples/audio_frequency;
-    animation_speed_counter = 0;
+}
+else
+    LogText("<< ERROR: Fehler beim laden des SLDFenster Icons\n");
 
-    for(i=0;i<8;i++)
-    {
-        key_matrix_to_port_a_ext[i] = key_matrix_to_port_a[i] = 0;
-        key_matrix_to_port_b_ext[i] = key_matrix_to_port_b[i] = 0;
-    }
+game_port1 = 0;
+game_port2 = 0;
 
-    /// Callbackroutinen setzen ///
-    ReadProcTbl = mmu->CPUReadProcTbl;
-    WriteProcTbl = mmu->CPUWriteProcTbl;
-    cpu->ReadProcTbl = mmu->CPUReadProcTbl;
-    cpu->WriteProcTbl = mmu->CPUWriteProcTbl;
-    vic->ReadProcTbl = mmu->VICReadProcTbl;
-    vic->RefreshProc = std::bind(&C64Class::VicRefresh,this,std::placeholders::_1);
-    reu->ReadProcTbl = mmu->CPUReadProcTbl;
-    reu->WriteProcTbl = mmu->CPUWriteProcTbl;
+/// Init Classes ///
+mmu = new MMU();
+cpu = new MOS6510();
+vic = new VICII();
+int sid_ret_error;
+sid1 = new MOS6581_8085(0,audio_frequency,audio_spec_have.samples,&sid_ret_error);
+sid2 = new MOS6581_8085(1,audio_frequency,audio_spec_have.samples,&sid_ret_error);
+cia1 = new MOS6526(0);
+cia2 = new MOS6526(1);
+crt = new CartridgeClass();
+reu = new REUClass();
+geo = new GEORAMClass();
+tape = new TAPE1530(audio_frequency,audio_spec_have.samples,C64Takt);
 
-    mmu->VicIOWriteProc = std::bind(&VICII::WriteIO,vic,std::placeholders::_1,std::placeholders::_2);
-    mmu->VicIOReadProc = std::bind(&VICII::ReadIO,vic,std::placeholders::_1);
-    mmu->SidIOWriteProc = std::bind(&C64Class::WriteSidIO,this,std::placeholders::_1,std::placeholders::_2);
-    mmu->SidIOReadProc = std::bind(&C64Class::ReadSidIO,this,std::placeholders::_1);
-    mmu->Cia1IOWriteProc = std::bind(&MOS6526::WriteIO,cia1,std::placeholders::_1,std::placeholders::_2);
-    mmu->Cia1IOReadProc = std::bind(&MOS6526::ReadIO,cia1,std::placeholders::_1);
-    mmu->Cia2IOWriteProc = std::bind(&MOS6526::WriteIO,cia2,std::placeholders::_1,std::placeholders::_2);
-    mmu->Cia2IOReadProc = std::bind(&MOS6526::ReadIO,cia2,std::placeholders::_1);
+vic_buffer = vic->video_buffer;
 
-    mmu->CRTRom1WriteProc = std::bind(&CartridgeClass::WriteRom1,crt,std::placeholders::_1,std::placeholders::_2);
-    mmu->CRTRom2WriteProc = std::bind(&CartridgeClass::WriteRom2,crt,std::placeholders::_1,std::placeholders::_2);
-    mmu->CRTRom3WriteProc = std::bind(&CartridgeClass::WriteRom3,crt,std::placeholders::_1,std::placeholders::_2);
-    mmu->CRTRom1ReadProc = std::bind(&CartridgeClass::ReadRom1,crt,std::placeholders::_1);
-    mmu->CRTRom2ReadProc = std::bind(&CartridgeClass::ReadRom2,crt,std::placeholders::_1);
-    mmu->CRTRom3ReadProc = std::bind(&CartridgeClass::ReadRom3,crt,std::placeholders::_1);
-    mmu->IO1ReadProc = std::bind(&C64Class::ReadIO1,this,std::placeholders::_1);
-    mmu->IO1WriteProc = std::bind(&C64Class::WriteIO1,this,std::placeholders::_1,std::placeholders::_2);
-    mmu->IO2ReadProc = std::bind(&C64Class::ReadIO2,this,std::placeholders::_1);
-    mmu->IO2WriteProc = std::bind(&C64Class::WriteIO2,this,std::placeholders::_1,std::placeholders::_2);
+cia2->floppy_iec_wire = &floppy_iec_wire;
+cia2->c64_iec_wire = &c64_iec_wire;
 
-    crt->ChangeMemMapProc = std::bind(&MMU::ChangeMemMap,mmu);
+iec_export_vdc.AddWire("c64_out_atn",false);
+iec_export_vdc.AddWire("c64_out_clk",false);
+iec_export_vdc.AddWire("c64_out_data",false);
+iec_export_vdc.AddWire("floppy_out_clk",false);
+iec_export_vdc.AddWire("floppy_out_data",false);
 
-    /// Module mit Virtuellen Leitungen verbinden
-    mmu->GAME = &game_wire;
-    mmu->EXROM = &exrom_wire;
-    mmu->RAM_H = &hi_ram_wire;
-    mmu->RAM_L = &lo_ram_wire;
-    mmu->CPU_PORT = &cpu_port;
-    crt->exrom = &exrom_wire;
-    crt->game = &game_wire;
-    crt->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
-    crt->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
-    cpu->RDY = &rdy_ba_wire;
-    cpu->RESET = &reset_wire;
-    cpu->ResetReady = &c64_reset_ready;
-    cpu->ResetReadyAdr = 0xE5CD;
-    cpu->EnableExtInterrupts = enable_ext_wires;
-    cia1->reset_wire = &reset_wire;
-    cia1->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
-    cia1->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
-    cia1->VicTriggerLP = std::bind(&VICII::TriggerLightpen,vic);
-    cia1->ChangePOTSwitch = std::bind(&C64Class::ChangePOTSwitch,this);
-    cia1->pa = &cia1_port_a;
-    cia1->pb = &cia1_port_b;
-    cia2->reset_wire = &reset_wire;
-    cia2->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
-    cia2->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
-    cia2->pa = &cia2_port_a;
-    cia2->pb = &cia2_port_b;
-    vic->ba = &rdy_ba_wire;
-    vic->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
-    vic->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
-    vic->color_ram = mmu->GetFarbramPointer();
-    vic->cia2_port_a = cia2_port_a.GetOutputBitsPointer();
-    sid1->RESET = &reset_wire;
-    sid2->RESET = &reset_wire;
-    reu->BA = &rdy_ba_wire;
-    reu->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
-    reu->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
-    reu->RESET = &reset_wire;
-    reu->WRITE_FF00 = &cpu->WRITE_FF00;
+/// Floppy mit C64 verbinden ///
 
-    reu_is_insert = false;
+sprintf(filename,"%s1541.rom",rom_path);
 
-    /// Tape mit C64 verbinden ///
-    tape->CPU_PORT = &cpu_port;
-    cia1->flag_pin = &tape->CassRead;
+char motor_filename[FILENAME_MAX];
+char motor_on_filename[FILENAME_MAX];
+char motor_off_filename[FILENAME_MAX];
+char bumper_filename[FILENAME_MAX];
+char stepper_inc_filename[FILENAME_MAX];
+char stepper_dec_filename[FILENAME_MAX];
 
-    /// CRT mit MMU verbinden ///
-    crt->c64_ram = mmu->GetRAMPointer();
-    mmu->EasyFlashDirty1 = crt->GetFlash040Dirty(0);
-    mmu->EasyFlashDirty2 = crt->GetFlash040Dirty(1);
-    mmu->EasyFlashByte1 = crt->GetFlash040Byte(0);
-    mmu->EasyFlashByte2 = crt->GetFlash040Byte(1);
+sprintf(motor_filename,"%smotor.raw",floppy_sound_path);
+sprintf(motor_on_filename,"%smotor_on.raw",floppy_sound_path);
+sprintf(motor_off_filename,"%smotor_off.raw",floppy_sound_path);
+sprintf(bumper_filename,"%sanschlag.raw",floppy_sound_path);
+sprintf(stepper_inc_filename,"%sstepper_inc.raw",floppy_sound_path);
+sprintf(stepper_dec_filename,"%sstepper_dec.raw",floppy_sound_path);
 
-    mmu->EasyFlashDirty1 = &easy_flash_dirty;
-    mmu->EasyFlashDirty2 = &easy_flash_dirty;
-    mmu->EasyFlashByte1 = &easy_flash_byte;
-    mmu->EasyFlashByte2 = &easy_flash_byte;
+for(i=0; i<MAX_FLOPPY_NUM; i++)
+{
+    floppy[i] = new Floppy1541(&reset_wire,audio_frequency,audio_spec_have.samples,&floppy_found_breakpoint);
+    floppy[i]->SetResetReady(&floppy_reset_ready[i],0xEBFF);
+    floppy[i]->SetC64IEC(&c64_iec_wire);
+    floppy[i]->SetDeviceNumber(static_cast<uint8_t>(8+i));
+    floppy[i]->LoadDosRom(filename);
+    //floppy[i]->LoadFloppySounds((char*)"floppy_sounds/motor.raw",(char*)"floppy_sounds/motor_on.raw",(char*)"floppy_sounds/motor_off.raw",(char*)"floppy_sounds/anschlag.raw",(char*)"floppy_sounds/stepper_inc.raw",(char*)"floppy_sounds/stepper_dec.raw");
+    floppy[i]->LoadFloppySounds(motor_filename,motor_on_filename,motor_off_filename,bumper_filename,stepper_inc_filename,stepper_dec_filename);
+    floppy[i]->SetEnableFloppy(false);
+    floppy[i]->SetEnableFloppySound(true);
+}
 
-    rdy_ba_wire = true;
-    game_wire = true;
-    exrom_wire = true;
+/// Init Vars ///
+c64_frequency = C64Takt;
+c64_speed = 100;
+cpu_pc_history_pos = 0;
+io_source = 0;
+c64_command_line_lenght = 0;
+c64_command_line_current_pos = 0;
+c64_command_line_status = false;
+c64_command_line_count_s = false;
+debug_mode = one_cycle = one_opcode = false;
+cycle_counter = 0;
+limit_cycles_counter = 0;
+hold_next_system_cycle = false;
+debug_animation = false;
+debug_logging = false;
+animation_speed_add = audio_spec_have.samples/audio_frequency;
+animation_speed_counter = 0;
 
-    wait_reset_ready = false;
+for(i=0;i<8;i++)
+{
+    key_matrix_to_port_a_ext[i] = key_matrix_to_port_a[i] = 0;
+    key_matrix_to_port_b_ext[i] = key_matrix_to_port_b[i] = 0;
+}
 
-    mmu->Reset();
-    cia1->Reset();
-    cia2->Reset();
+/// Callbackroutinen setzen ///
+ReadProcTbl = mmu->CPUReadProcTbl;
+WriteProcTbl = mmu->CPUWriteProcTbl;
+cpu->ReadProcTbl = mmu->CPUReadProcTbl;
+cpu->WriteProcTbl = mmu->CPUWriteProcTbl;
+vic->ReadProcTbl = mmu->VICReadProcTbl;
+vic->RefreshProc = std::bind(&C64Class::VicRefresh,this,std::placeholders::_1);
+reu->ReadProcTbl = mmu->CPUReadProcTbl;
+reu->WriteProcTbl = mmu->CPUWriteProcTbl;
 
-    sid_volume = 1.0f;
+mmu->VicIOWriteProc = std::bind(&VICII::WriteIO,vic,std::placeholders::_1,std::placeholders::_2);
+mmu->VicIOReadProc = std::bind(&VICII::ReadIO,vic,std::placeholders::_1);
+mmu->SidIOWriteProc = std::bind(&C64Class::WriteSidIO,this,std::placeholders::_1,std::placeholders::_2);
+mmu->SidIOReadProc = std::bind(&C64Class::ReadSidIO,this,std::placeholders::_1);
+mmu->Cia1IOWriteProc = std::bind(&MOS6526::WriteIO,cia1,std::placeholders::_1,std::placeholders::_2);
+mmu->Cia1IOReadProc = std::bind(&MOS6526::ReadIO,cia1,std::placeholders::_1);
+mmu->Cia2IOWriteProc = std::bind(&MOS6526::WriteIO,cia2,std::placeholders::_1,std::placeholders::_2);
+mmu->Cia2IOReadProc = std::bind(&MOS6526::ReadIO,cia2,std::placeholders::_1);
 
-    sid1->RESET = &reset_wire;
-    sid1->SetC64Zyklen(c64_frequency);     // PAL 63*312*50 = 982800
-    sid1->SetChipType(MOS_8580);
-    sid1->SoundOutputEnable = true;
-    sid1->CycleExact = true;
-    sid1->FilterOn = true;
-    sid1->Reset();
-    sid1->SetPotXY(poti_x, poti_y);
+mmu->CRTRom1WriteProc = std::bind(&CartridgeClass::WriteRom1,crt,std::placeholders::_1,std::placeholders::_2);
+mmu->CRTRom2WriteProc = std::bind(&CartridgeClass::WriteRom2,crt,std::placeholders::_1,std::placeholders::_2);
+mmu->CRTRom3WriteProc = std::bind(&CartridgeClass::WriteRom3,crt,std::placeholders::_1,std::placeholders::_2);
+mmu->CRTRom1ReadProc = std::bind(&CartridgeClass::ReadRom1,crt,std::placeholders::_1);
+mmu->CRTRom2ReadProc = std::bind(&CartridgeClass::ReadRom2,crt,std::placeholders::_1);
+mmu->CRTRom3ReadProc = std::bind(&CartridgeClass::ReadRom3,crt,std::placeholders::_1);
+mmu->IO1ReadProc = std::bind(&C64Class::ReadIO1,this,std::placeholders::_1);
+mmu->IO1WriteProc = std::bind(&C64Class::WriteIO1,this,std::placeholders::_1,std::placeholders::_2);
+mmu->IO2ReadProc = std::bind(&C64Class::ReadIO2,this,std::placeholders::_1);
+mmu->IO2WriteProc = std::bind(&C64Class::WriteIO2,this,std::placeholders::_1,std::placeholders::_2);
 
-    sid2->RESET = &reset_wire;
-    sid2->SetC64Zyklen(c64_frequency);     // PAL 63*312*50 = 982800
-    sid2->SetChipType(MOS_8580);
-    sid2->SoundOutputEnable = true;
-    sid2->CycleExact = true;
-    sid2->FilterOn = true;
-    sid2->Reset();
+crt->ChangeMemMapProc = std::bind(&MMU::ChangeMemMap,mmu);
 
-    enable_stereo_sid = false;
-    enable_stereo_sid_6channel_mode = false;
-    stereo_sid_address = 0xD420;
+/// Module mit Virtuellen Leitungen verbinden
+mmu->GAME = &game_wire;
+mmu->EXROM = &exrom_wire;
+mmu->RAM_H = &hi_ram_wire;
+mmu->RAM_L = &lo_ram_wire;
+mmu->CPU_PORT = &cpu_port;
+crt->exrom = &exrom_wire;
+crt->game = &game_wire;
+crt->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
+crt->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
+cpu->RDY = &rdy_ba_wire;
+cpu->RESET = &reset_wire;
+cpu->ResetReady = &c64_reset_ready;
+cpu->ResetReadyAdr = 0xE5CD;
+cpu->EnableExtInterrupts = enable_ext_wires;
+cia1->reset_wire = &reset_wire;
+cia1->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
+cia1->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
+cia1->VicTriggerLP = std::bind(&VICII::TriggerLightpen,vic);
+cia1->ChangePOTSwitch = std::bind(&C64Class::ChangePOTSwitch,this);
+cia1->pa = &cia1_port_a;
+cia1->pb = &cia1_port_b;
+cia2->reset_wire = &reset_wire;
+cia2->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
+cia2->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
+cia2->pa = &cia2_port_a;
+cia2->pb = &cia2_port_b;
+vic->ba = &rdy_ba_wire;
+vic->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
+vic->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
+vic->color_ram = mmu->GetFarbramPointer();
+vic->cia2_port_a = cia2_port_a.GetOutputBitsPointer();
+sid1->RESET = &reset_wire;
+sid2->RESET = &reset_wire;
+reu->BA = &rdy_ba_wire;
+reu->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
+reu->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
+reu->RESET = &reset_wire;
+reu->WRITE_FF00 = &cpu->WRITE_FF00;
 
-    vic->ba = &rdy_ba_wire;
-    vic->cia2_port_a = cia2->pa->GetOutputBitsPointer();
+reu_is_insert = false;
 
-    /// Breakpoints ///
-    cpu->BreakStatus = &break_status;
-    cpu->BreakWerte = break_values;
-    cpu->Breakpoints = breakpoints;
+/// Tape mit C64 verbinden ///
+tape->CPU_PORT = &cpu_port;
+cia1->flag_pin = &tape->CassRead;
 
-    vic->break_status = &break_status;
-    vic->break_values = break_values;
-    vic->breakpoints = breakpoints;
+/// CRT mit MMU verbinden ///
+crt->c64_ram = mmu->GetRAMPointer();
+mmu->EasyFlashDirty1 = crt->GetFlash040Dirty(0);
+mmu->EasyFlashDirty2 = crt->GetFlash040Dirty(1);
+mmu->EasyFlashByte1 = crt->GetFlash040Byte(0);
+mmu->EasyFlashByte2 = crt->GetFlash040Byte(1);
 
-    cpu->History = cpu_pc_history;
-    cpu->HistoryPointer = &cpu_pc_history_pos;
+mmu->EasyFlashDirty1 = &easy_flash_dirty;
+mmu->EasyFlashDirty2 = &easy_flash_dirty;
+mmu->EasyFlashByte1 = &easy_flash_byte;
+mmu->EasyFlashByte2 = &easy_flash_byte;
 
-    memset(breakpoints, 0, sizeof breakpoints);
+rdy_ba_wire = true;
+game_wire = true;
+exrom_wire = true;
+
+wait_reset_ready = false;
+
+mmu->Reset();
+cia1->Reset();
+cia2->Reset();
+
+sid_volume = 1.0f;
+
+sid1->RESET = &reset_wire;
+sid1->SetC64Zyklen(c64_frequency);     // PAL 63*312*50 = 982800
+sid1->SetChipType(MOS_8580);
+sid1->SoundOutputEnable = true;
+sid1->CycleExact = true;
+sid1->FilterOn = true;
+sid1->Reset();
+sid1->SetPotXY(poti_x, poti_y);
+
+sid2->RESET = &reset_wire;
+sid2->SetC64Zyklen(c64_frequency);     // PAL 63*312*50 = 982800
+sid2->SetChipType(MOS_8580);
+sid2->SoundOutputEnable = true;
+sid2->CycleExact = true;
+sid2->FilterOn = true;
+sid2->Reset();
+
+enable_stereo_sid = false;
+enable_stereo_sid_6channel_mode = false;
+stereo_sid_address = 0xD420;
+
+vic->ba = &rdy_ba_wire;
+vic->cia2_port_a = cia2->pa->GetOutputBitsPointer();
+
+/// Breakpoints ///
+cpu->BreakStatus = &break_status;
+cpu->BreakWerte = break_values;
+cpu->Breakpoints = breakpoints;
+
+vic->break_status = &break_status;
+vic->break_values = break_values;
+vic->breakpoints = breakpoints;
+
+cpu->History = cpu_pc_history;
+cpu->HistoryPointer = &cpu_pc_history_pos;
+
+memset(breakpoints, 0, sizeof breakpoints);
 }
 
 C64Class::~C64Class()
@@ -663,13 +665,13 @@ void C64Class::EndEmulation()
 
     EnableWarpMode(false);
 
-	if(enable_exit_screenshot)
-	{
-		hold_next_system_cycle = true;
-		SwapRBSurface(c64_screen);
-		SDL_SavePNG(c64_screen, exit_screenshot_filename);
-		hold_next_system_cycle = false;
-	}
+    if(enable_exit_screenshot)
+    {
+        hold_next_system_cycle = true;
+        SwapRBSurface(c64_screen);
+        SDL_SavePNG(c64_screen, exit_screenshot_filename);
+        hold_next_system_cycle = false;
+    }
 
     /// Loop Thread beenden ///
     loop_thread_end = true;
@@ -683,7 +685,7 @@ void C64Class::EndEmulation()
 
     SDL_DetachThread(sdl_thread);
 
-	SDL_PauseAudioDevice(audio_dev, 1);
+    SDL_PauseAudioDevice(audio_dev, 1);
     if(audio_dev > 0) SDL_CloseAudioDevice(audio_dev);
 
     CloseSDLJoystick();
@@ -692,7 +694,7 @@ void C64Class::EndEmulation()
 
 void C64Class::SetLimitCycles(int nCycles)
 {
-	limit_cycles_counter = nCycles;
+    limit_cycles_counter = nCycles;
 }
 
 void C64Class::SetEnableDebugCart(bool enable)
@@ -721,7 +723,7 @@ int SDLThreadWarp(void *userdat)
 
     while(!c64->warp_thread_end)
     {
-       c64->WarpModeLoop();
+        c64->WarpModeLoop();
     }
 
     c64->warp_thread_is_end = true;
@@ -941,10 +943,10 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
 
 void C64Class::WarpModeLoop()
 {
-	if(limit_cycles_counter > 0)
+    if(limit_cycles_counter > 0)
     {
-		limit_cycles_counter--;
-		if(limit_cycles_counter == 0)
+        limit_cycles_counter--;
+        if(limit_cycles_counter == 0)
         {
             // Event auslösen
             if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
@@ -1056,10 +1058,10 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
     {
         while((sid1->SoundBufferPos < sample_buffer_size_mono) && (debug_mode == false))
         {
-			if(limit_cycles_counter > 0)
+            if(limit_cycles_counter > 0)
             {
-				limit_cycles_counter--;
-				if(limit_cycles_counter == 0)
+                limit_cycles_counter--;
+                if(limit_cycles_counter == 0)
                 {
                     // Event auslösen
                     if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
@@ -1446,7 +1448,7 @@ bool C64Class::LoadDiskImage(uint8_t floppy_nr, FILE *file, int typ)
 {
     if(floppy_nr < MAX_FLOPPY_NUM)
     {
-		return floppy[floppy_nr]->LoadDiskImage(file, typ);
+        return floppy[floppy_nr]->LoadDiskImage(file, typ);
     }
     return false;
 }
@@ -1483,7 +1485,7 @@ void C64Class::SetFloppyWriteProtect(uint8_t floppy_nr, bool status)
 
 void C64Class::SetCommandLine(char *c64_command)
 {
-    strcpy(c64_command_line,c64_command);
+    strlcpy(c64_command_line, c64_command, sizeof(c64_command_line));
     c64_command_line_lenght = static_cast<uint16_t>(strlen(c64_command_line));
     c64_command_line_current_pos = 0;
     c64_command_line_status = true;
@@ -1533,41 +1535,41 @@ void C64Class::SetGrafikModi(bool enable_screen_doublesize, bool enable_screen_c
 
 void C64Class::SetSDLWindowName(const char *name)
 {
-    strcpy(sdl_window_name, name);
+    strlcpy(sdl_window_name, name, sizeof(sdl_window_name));
     SDL_SetWindowTitle(sdl_window, name);
 }
 
 void C64Class::SetFullscreen(bool is_fullscreen)
 {
     static int size_w, size_h, pos_x, pos_y;
-	static SDL_DisplayMode window_display_mode;
+    static SDL_DisplayMode window_display_mode;
 
-	if(is_fullscreen)
-	{
-		if(0 == SDL_GetCurrentDisplayMode(0, &window_display_mode))
-		{
-			enable_fullscreen = is_fullscreen;
-		}
-		else return;
-	}
+    if(is_fullscreen)
+    {
+        if(0 == SDL_GetCurrentDisplayMode(0, &window_display_mode))
+        {
+            enable_fullscreen = is_fullscreen;
+        }
+        else return;
+    }
 
     if(is_fullscreen)
     {
         SDL_GetWindowSize(sdl_window, &size_w, &size_h);
         SDL_GetWindowPosition(sdl_window, &pos_x, &pos_y);
-		SDL_ShowCursor(false);
+        SDL_ShowCursor(false);
 
-		int current_video_display = SDL_GetWindowDisplayIndex(sdl_window);
-		if(current_video_display >= MAX_VIDEO_DISPLAYS)
-			current_video_display = 0;
+        int current_video_display = SDL_GetWindowDisplayIndex(sdl_window);
+        if(current_video_display >= MAX_VIDEO_DISPLAYS)
+            current_video_display = 0;
 
-		SDL_SetWindowDisplayMode(sdl_window, &fullscreen_display_mode[current_video_display]);
-		SDL_SetWindowFullscreen(sdl_window,SDL_WINDOW_FULLSCREEN);
+        SDL_SetWindowDisplayMode(sdl_window, &fullscreen_display_mode[current_video_display]);
+        SDL_SetWindowFullscreen(sdl_window,SDL_WINDOW_FULLSCREEN);
     }
     else
     {
         SDL_ShowCursor(true);
-		SDL_SetWindowFullscreen(sdl_window,0);
+        SDL_SetWindowFullscreen(sdl_window,0);
 
         sdl_window_pos_x = pos_x;
         sdl_window_pos_y = pos_y;
@@ -1582,8 +1584,8 @@ void C64Class::SetFullscreen(bool is_fullscreen)
 
 void C64Class::ToggleScreenMode()
 {
-     enable_fullscreen = ! enable_fullscreen;
-     SetFullscreen(enable_fullscreen);
+    enable_fullscreen = ! enable_fullscreen;
+    SetFullscreen(enable_fullscreen);
 }
 
 void C64Class::InitGrafik()
@@ -1654,12 +1656,12 @@ void C64Class::InitGrafik()
         LogText("\tInitGrafik: SDL_Window noch nicht vorhanden.\n");
 
         // Wenn no-gui command
-		if(start_hidden_window)
-			sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_HIDDEN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
-		else
-			sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+        if(start_hidden_window)
+            sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_HIDDEN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+        else
+            sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
-		if(sdl_window == nullptr)
+        if(sdl_window == nullptr)
             LogText("\tInitGrafik: Fehler beim erstellen des SDL_Window.\n");
         else
         {
@@ -1680,7 +1682,7 @@ void C64Class::InitGrafik()
     }
 
     // Wenn Minimized Comandline
-	if(start_minimized && !start_hidden_window)
+    if(start_minimized && !start_hidden_window)
         SDL_MinimizeWindow(sdl_window);
 
     gl_context = SDL_GL_CreateContext(sdl_window);
@@ -1729,7 +1731,7 @@ void C64Class::InitGrafik()
 
     if(c64_screen != nullptr)
     {
-       SDL_FreeSurface(c64_screen);
+        SDL_FreeSurface(c64_screen);
         LogText("\tInitGrafik: SDL Surface C64Screen wurde wieder freigegeben.\n");
     }
 
@@ -1869,14 +1871,14 @@ void C64Class::ReleaseGrafik()
     int timeout = 1000;
     while(!vic_refresh_is_holded && timeout > 0)
     {
-          SDL_Delay(1);
-          timeout--;
+        SDL_Delay(1);
+        timeout--;
     }
 
     if(c64_screen != nullptr)
     {
-       SDL_FreeSurface(c64_screen);
-       c64_screen = nullptr;
+        SDL_FreeSurface(c64_screen);
+        c64_screen = nullptr;
     }
 
     if(sdl_window != nullptr)
@@ -2050,40 +2052,101 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
     SDL_Keymod keymod;
 
-	bool is_hotkey = false;
+    bool is_hotkey = false;
 
     switch (event->type)
     {
-        case SDL_WINDOWEVENT:
+    case SDL_WINDOWEVENT:
 
         switch (event->window.event)
         {
-            case SDL_WINDOWEVENT_SIZE_CHANGED:
-            case SDL_WINDOWEVENT_RESIZED:
-                current_window_width = static_cast<uint16_t>(event->window.data1);
-                current_window_height = static_cast<uint16_t>(event->window.data2);
+        case SDL_WINDOWEVENT_SIZE_CHANGED:
+        case SDL_WINDOWEVENT_RESIZED:
+            current_window_width = static_cast<uint16_t>(event->window.data1);
+            current_window_height = static_cast<uint16_t>(event->window.data2);
 
-                glViewport(0,0,current_window_width,current_window_height);
-                glMatrixMode(GL_PROJECTION);
-                glOrtho(0,current_window_width,current_window_height,0,-1,1);
-                glLoadIdentity();
-                break;
+            glViewport(0,0,current_window_width,current_window_height);
+            glMatrixMode(GL_PROJECTION);
+            glOrtho(0,current_window_width,current_window_height,0,-1,1);
+            glLoadIdentity();
+            break;
 
-            default:
-                break;
+        default:
+            break;
         }
         break;
 
-        case SDL_JOYBUTTONDOWN:
-        case SDL_JOYBUTTONUP:
+    case SDL_JOYBUTTONDOWN:
+    case SDL_JOYBUTTONUP:
+    {
+        if((rec_joy_mapping == true) && (event->jbutton.type == SDL_JOYBUTTONDOWN))
         {
-            if((rec_joy_mapping == true) && (event->jbutton.type == SDL_JOYBUTTONDOWN))
+            virtual_joys[rec_joy_slot_nr].Type[rec_joy_mapping_pos] = VJOY_TYPE_BUTTON;
+            virtual_joys[rec_joy_slot_nr].JoyIndex[rec_joy_mapping_pos] = static_cast<uint8_t>(event->jbutton.which);
+            virtual_joys[rec_joy_slot_nr].ButtonNr[rec_joy_mapping_pos] = event->jbutton.button;
+        }
+        else if((rec_joy_mapping == true) && (event->jbutton.type == SDL_JOYBUTTONUP) && (rec_polling_wait == false))
+        {
+            rec_joy_mapping_pos++;
+            if(rec_joy_mapping_pos == 5)
             {
-                virtual_joys[rec_joy_slot_nr].Type[rec_joy_mapping_pos] = VJOY_TYPE_BUTTON;
-                virtual_joys[rec_joy_slot_nr].JoyIndex[rec_joy_mapping_pos] = static_cast<uint8_t>(event->jbutton.which);
-                virtual_joys[rec_joy_slot_nr].ButtonNr[rec_joy_mapping_pos] = event->jbutton.button;
+                /// Rec Mapping ist fertig ///
+                rec_joy_mapping = false;
             }
-            else if((rec_joy_mapping == true) && (event->jbutton.type == SDL_JOYBUTTONUP) && (rec_polling_wait == false))
+            else
+            {
+                rec_polling_wait = true;
+                rec_polling_wait_counter = RecPollingWaitStart;
+            }
+        }
+        else
+        {
+            /// VJoyStick abfrage ///
+            /// Port1
+            if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOY_NUM))
+            {
+                for(int i=0;i<5;i++)
+                {
+                    if((virtual_joys[virtual_port1].ButtonNr[i] == event->jbutton.button) &&
+                        (virtual_joys[virtual_port1].Type[i] == VJOY_TYPE_BUTTON) &&
+                        (virtual_joys[virtual_port1].JoyIndex[i] == event->jbutton.which))
+                    {
+                        if(event->jbutton.state == 1) game_port1 |= 1<<i;
+                        else game_port1 &= ~(1<<i);
+                    }
+                }
+            }
+
+            /// Port2
+            if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOY_NUM))
+            {
+                for(int i=0;i<5;i++)
+                {
+                    if((virtual_joys[virtual_port2].ButtonNr[i] == event->jbutton.button) &&
+                        (virtual_joys[virtual_port2].Type[i] == VJOY_TYPE_BUTTON) &&
+                        (virtual_joys[virtual_port2].JoyIndex[i] == event->jbutton.which))
+                    {
+                        if(event->jbutton.state == 1) game_port2 |= 1<<i;
+                        else game_port2 &= ~(1<<i);
+                    }
+                }
+            }
+        }
+        break;
+    }
+
+    case SDL_JOYHATMOTION:
+    {
+        if((rec_joy_mapping == true) && (rec_polling_wait == false))
+        {
+            if(event->jhat.value > 0)
+            {
+                virtual_joys[rec_joy_slot_nr].Type[rec_joy_mapping_pos] = VJOY_TYPE_HAT;
+                virtual_joys[rec_joy_slot_nr].JoyIndex[rec_joy_mapping_pos] = static_cast<uint8_t>(event->jhat.which);
+                virtual_joys[rec_joy_slot_nr].HatNr[rec_joy_mapping_pos] = event->jhat.hat;
+                virtual_joys[rec_joy_slot_nr].HatValue[rec_joy_mapping_pos] = event->jhat.value;
+            }
+            else
             {
                 rec_joy_mapping_pos++;
                 if(rec_joy_mapping_pos == 5)
@@ -2097,343 +2160,58 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                     rec_polling_wait_counter = RecPollingWaitStart;
                 }
             }
-            else
-            {
-                /// VJoyStick abfrage ///
-                /// Port1
-                if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOY_NUM))
-                {
-                    for(int i=0;i<5;i++)
-                    {
-                        if((virtual_joys[virtual_port1].ButtonNr[i] == event->jbutton.button) &&
-                                (virtual_joys[virtual_port1].Type[i] == VJOY_TYPE_BUTTON) &&
-                                (virtual_joys[virtual_port1].JoyIndex[i] == event->jbutton.which))
-                        {
-                            if(event->jbutton.state == 1) game_port1 |= 1<<i;
-                            else game_port1 &= ~(1<<i);
-                        }
-                    }
-                }
-
-                /// Port2
-                if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOY_NUM))
-                {
-                    for(int i=0;i<5;i++)
-                    {
-                        if((virtual_joys[virtual_port2].ButtonNr[i] == event->jbutton.button) &&
-                                (virtual_joys[virtual_port2].Type[i] == VJOY_TYPE_BUTTON) &&
-                                (virtual_joys[virtual_port2].JoyIndex[i] == event->jbutton.which))
-                        {
-                            if(event->jbutton.state == 1) game_port2 |= 1<<i;
-                            else game_port2 &= ~(1<<i);
-                        }
-                    }
-                }
-            }
-            break;
         }
-
-        case SDL_JOYHATMOTION:
+        else
         {
-            if((rec_joy_mapping == true) && (rec_polling_wait == false))
-            {
-                if(event->jhat.value > 0)
-                {
-                    virtual_joys[rec_joy_slot_nr].Type[rec_joy_mapping_pos] = VJOY_TYPE_HAT;
-                    virtual_joys[rec_joy_slot_nr].JoyIndex[rec_joy_mapping_pos] = static_cast<uint8_t>(event->jhat.which);
-                    virtual_joys[rec_joy_slot_nr].HatNr[rec_joy_mapping_pos] = event->jhat.hat;
-                    virtual_joys[rec_joy_slot_nr].HatValue[rec_joy_mapping_pos] = event->jhat.value;
-                }
-                else
-                {
-                    rec_joy_mapping_pos++;
-                    if(rec_joy_mapping_pos == 5)
-                    {
-                        /// Rec Mapping ist fertig ///
-                        rec_joy_mapping = false;
-                    }
-                    else
-                    {
-                        rec_polling_wait = true;
-                        rec_polling_wait_counter = RecPollingWaitStart;
-                    }
-                }
-            }
-            else
-            {
-                /// VJoyStick abfrage ///
-                /// Port1
-                if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOY_NUM))
-                {
-                    for(int i=0;i<5;i++)
-                    {
-                        if((virtual_joys[virtual_port1].HatNr[i] == event->jhat.hat) &&
-                                (virtual_joys[virtual_port1].Type[i] == VJOY_TYPE_HAT) &&
-                                (virtual_joys[virtual_port1].JoyIndex[i] == event->jhat.which))
-                        {
-                            if((event->jhat.value & virtual_joys[virtual_port1].HatValue[i]) == virtual_joys[virtual_port1].HatValue[i]) game_port1 |= 1<<i;
-                            else game_port1 &= ~(1<<i);
-                        }
-                    }
-                }
-
-                /// VJoyStick abfrage ///
-                /// Port2
-                if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOY_NUM))
-                {
-                    for(int i=0;i<5;i++)
-                    {
-                        if((virtual_joys[virtual_port2].HatNr[i] == event->jhat.hat) &&
-                                (virtual_joys[virtual_port2].Type[i] == VJOY_TYPE_HAT) &&
-                                (virtual_joys[virtual_port2].JoyIndex[i] == event->jhat.which))
-                        {
-                            if((event->jhat.value & virtual_joys[virtual_port2].HatValue[i]) == virtual_joys[virtual_port2].HatValue[i]) game_port2 |= 1<<i;
-                            else game_port2 &= ~(1<<i);
-                        }
-                    }
-                }
-
-            }
-          break;
-        }
-
-        case SDL_JOYAXISMOTION:
-        {
-            if((rec_joy_mapping == true) && (rec_polling_wait == false))
-            {
-                if(((event->jaxis.value < -16000) || (event->jaxis.value > 16000)) && (joy_center_flag == true) && ((event->jaxis.axis & 1) == joy_axis_tbl[rec_joy_mapping_pos]))
-                {
-                    joy_center_flag = false;
-
-                    virtual_joys[rec_joy_slot_nr].Type[rec_joy_mapping_pos] = VJOY_TYPE_AXIS;
-                    virtual_joys[rec_joy_slot_nr].JoyIndex[rec_joy_mapping_pos] = static_cast<uint8_t>(event->jaxis.which);
-                    virtual_joys[rec_joy_slot_nr].AxisNr[rec_joy_mapping_pos] = event->jaxis.axis;
-                    if(event->jaxis.value > 0) virtual_joys[rec_joy_slot_nr].AxisValue[rec_joy_mapping_pos] = 0;
-                    else virtual_joys[rec_joy_slot_nr].AxisValue[rec_joy_mapping_pos] = 1;
-
-                    rec_joy_mapping_pos++;
-                    if(rec_joy_mapping_pos == 5)
-                    {
-                        /// Rec Mapping ist fertig ///
-                        rec_joy_mapping = false;
-                    }
-                    else
-                    {
-                        rec_polling_wait = true;
-                        rec_polling_wait_counter = RecPollingWaitStart;
-                    }
-                }
-
-                if((event->jaxis.value > -14000) && (event->jaxis.value < 14000))
-                {
-                    joy_center_flag = true;
-                }
-            }
-            else
-            {
-                /// VJoyStick abfrage ///
-                /// Port1
-                if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOY_NUM))
-                {
-                    for(int i=0;i<5;i++)
-                    {
-                        if((virtual_joys[virtual_port1].AxisNr[i] == event->jaxis.axis) &&
-                                (virtual_joys[virtual_port1].Type[i] == VJOY_TYPE_AXIS) &&
-                                (virtual_joys[virtual_port1].JoyIndex[i] == event->jaxis.which))
-                        {
-                            if(!((event->jaxis.value >= -14000) && (event->jaxis.value <= 14000)))
-                            {
-                                if(event->jaxis.value > 16000)
-                                {
-                                    if(virtual_joys[virtual_port1].AxisValue[i] == 0) game_port1 |= 1<<i;
-                                }
-                                else if(event->jaxis.value < -16000)
-                                {
-                                    if(virtual_joys[virtual_port1].AxisValue[i] == 1) game_port1 |= 1<<i;
-                                }
-                            }
-                            else game_port1 &= ~(1<<i);
-                        }
-                    }
-                }
-
-                /// VJoyStick abfrage ///
-                /// Port2
-                if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOY_NUM))
-                {
-                    for(int i=0;i<5;i++)
-                    {
-                        if((virtual_joys[virtual_port2].AxisNr[i] == event->jaxis.axis) &&
-                                (virtual_joys[virtual_port2].Type[i] == VJOY_TYPE_AXIS) &&
-                                (virtual_joys[virtual_port2].JoyIndex[i] == event->jaxis.which))
-                        {
-                            if(!((event->jaxis.value >= -14000) && (event->jaxis.value <= 14000)))
-                            {
-                                if(event->jaxis.value > 16000)
-                                {
-                                    if(virtual_joys[virtual_port2].AxisValue[i] == 0) game_port2 |= 1<<i;
-                                }
-                                else if(event->jaxis.value < -16000)
-                                {
-                                    if(virtual_joys[virtual_port2].AxisValue[i] == 1) game_port2 |= 1<<i;
-                                }
-                            }
-                            else game_port2 &= ~(1<<i);
-                        }
-                    }
-                }
-            }
-          break;
-        }
-
-        case SDL_KEYDOWN:
-        {
-            switch(event->key.keysym.sym)
-            {
-            case SDLK_F11:
-                SaveScreenshot();
-                break;
-
-            case SDLK_F12:
-                if(rec_joy_mapping)
-                {
-                    rec_joy_mapping = false;
-                }
-                else
-                {
-                    if((KMOD_LSHIFT == (event->key.keysym.mod & KMOD_LSHIFT)) || (KMOD_RSHIFT == (event->key.keysym.mod & KMOD_RSHIFT)))
-                    {
-                        HardReset();
-                        reset_wire = false;
-                    }
-                    else
-                    {
-                        wait_reset_ready = false;
-                        reset_wire = false;
-                    }
-                }
-
-                break;
-
-			case SDLK_RETURN:
-
-                keymod = SDL_GetModState();
-
-                if((KMOD_MODE == (keymod & KMOD_MODE) || KMOD_LALT == (keymod & KMOD_LALT) || KMOD_RALT == (keymod & KMOD_RALT)) && (return_key_is_down == false))
-                {
-                    ToggleScreenMode();     // switching between fullscreen an window mode
-                }
-
-                return_key_is_down = true;
-                break;
-
-			case SDLK_j:				// HotKey [ALT+J] swap joyports
-				// if ALT pressed down
-				if(KMOD_LALT == (SDL_GetModState() & KMOD_LALT))
-				{
-					is_hotkey = true;
-					SwapJoyPorts();
-				}
-				break;
-
-			case SDLK_w:				// HotKey [ALT+W] toggle warpmode
-				// if ALT pressed down
-				if(KMOD_LALT == (SDL_GetModState() & KMOD_LALT))
-				{
-					is_hotkey = true;
-					ToggleWarpMode();
-				}
-				break;
-
-            default:
-                break;
-            }
-
-            if(rec_joy_mapping == true)
-            {
-                virtual_joys[rec_joy_slot_nr].Type[rec_joy_mapping_pos] = VJOY_TYPE_KEY;
-                virtual_joys[rec_joy_slot_nr].KeyDown[rec_joy_mapping_pos] = static_cast<uint8_t>(event->key.keysym.scancode);
-            }
-            else
-            {
-                if(key_map_is_rec)
-                {
-                    // Mappen der gedrückten Taste
-                    for(int i=0;i<C64_KEY_COUNT;i++)
-                    {
-                        if(c64_key_table[i].SDLKeyCode == event->key.keysym.sym)
-                        {
-                            c64_key_table[i].SDLKeyCode = 0xFFFF;
-                        }
-                    }
-
-                    c64_key_table[((rec_matrix_code & 0xF0)>>1) + (rec_matrix_code & 0x07)].SDLKeyCode = event->key.keysym.sym;
-                    key_map_is_rec = false;
-                }
-				else if (!is_hotkey)	// nur wenn es kein HotKey war
-                {
-                    /// Auf RESTORE KEY TESTEN
-                    if(c64_key_table[64].SDLKeyCode == event->key.keysym.sym)
-                        cpu->TriggerInterrupt(RESTORE_NMI);
-                    else
-                    {
-                        for(int i=0;i<C64_KEY_COUNT;i++)
-                        {
-                            if(c64_key_table[i].SDLKeyCode == event->key.keysym.sym && (event->key.keysym.mod != KMOD_LALT) && (event->key.keysym.mod != KMOD_RALT))
-                            {
-                                KeyEvent(c64_key_table[i].MatrixCode,KEY_DOWN,c64_key_table[i].Shift);
-                            }
-                        }
-                    }
-                }
-            }
-
             /// VJoyStick abfrage ///
             /// Port1
             if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOY_NUM))
             {
                 for(int i=0;i<5;i++)
                 {
-                    if((virtual_joys[virtual_port1].KeyDown[i] == event->key.keysym.scancode) &&
-                            (virtual_joys[virtual_port1].Type[i] == VJOY_TYPE_KEY))
-                        game_port1 |= 1<<i;
+                    if((virtual_joys[virtual_port1].HatNr[i] == event->jhat.hat) &&
+                        (virtual_joys[virtual_port1].Type[i] == VJOY_TYPE_HAT) &&
+                        (virtual_joys[virtual_port1].JoyIndex[i] == event->jhat.which))
+                    {
+                        if((event->jhat.value & virtual_joys[virtual_port1].HatValue[i]) == virtual_joys[virtual_port1].HatValue[i]) game_port1 |= 1<<i;
+                        else game_port1 &= ~(1<<i);
+                    }
                 }
             }
 
+            /// VJoyStick abfrage ///
             /// Port2
             if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOY_NUM))
             {
                 for(int i=0;i<5;i++)
                 {
-                    if((virtual_joys[virtual_port2].KeyDown[i] == event->key.keysym.scancode) &&
-                            (virtual_joys[virtual_port2].Type[i] == VJOY_TYPE_KEY))
-                        game_port2 |= 1<<i;
+                    if((virtual_joys[virtual_port2].HatNr[i] == event->jhat.hat) &&
+                        (virtual_joys[virtual_port2].Type[i] == VJOY_TYPE_HAT) &&
+                        (virtual_joys[virtual_port2].JoyIndex[i] == event->jhat.which))
+                    {
+                        if((event->jhat.value & virtual_joys[virtual_port2].HatValue[i]) == virtual_joys[virtual_port2].HatValue[i]) game_port2 |= 1<<i;
+                        else game_port2 &= ~(1<<i);
+                    }
                 }
             }
-            break;
+
         }
+        break;
+    }
 
-        case SDL_KEYUP:
+    case SDL_JOYAXISMOTION:
+    {
+        if((rec_joy_mapping == true) && (rec_polling_wait == false))
         {
-            switch(event->key.keysym.sym)
+            if(((event->jaxis.value < -16000) || (event->jaxis.value > 16000)) && (joy_center_flag == true) && ((event->jaxis.axis & 1) == joy_axis_tbl[rec_joy_mapping_pos]))
             {
+                joy_center_flag = false;
 
-            case SDLK_RETURN:
-                return_key_is_down = false;
-                break;
-
-            case SDLK_F12:
-                reset_wire = true;
-                break;
-
-            default:
-                break;
-            }
-
-            if(rec_joy_mapping == true)
-            {
-                virtual_joys[rec_joy_slot_nr].Type[rec_joy_mapping_pos] = VJOY_TYPE_KEY;
-                virtual_joys[rec_joy_slot_nr].KeyUp[rec_joy_mapping_pos] = static_cast<uint8_t>(event->key.keysym.scancode);
+                virtual_joys[rec_joy_slot_nr].Type[rec_joy_mapping_pos] = VJOY_TYPE_AXIS;
+                virtual_joys[rec_joy_slot_nr].JoyIndex[rec_joy_mapping_pos] = static_cast<uint8_t>(event->jaxis.which);
+                virtual_joys[rec_joy_slot_nr].AxisNr[rec_joy_mapping_pos] = event->jaxis.axis;
+                if(event->jaxis.value > 0) virtual_joys[rec_joy_slot_nr].AxisValue[rec_joy_mapping_pos] = 0;
+                else virtual_joys[rec_joy_slot_nr].AxisValue[rec_joy_mapping_pos] = 1;
 
                 rec_joy_mapping_pos++;
                 if(rec_joy_mapping_pos == 5)
@@ -2441,86 +2219,310 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
                     /// Rec Mapping ist fertig ///
                     rec_joy_mapping = false;
                 }
-            }
-            else
-            {
-                /// Auf RESTORE KEY TESTEN
-                if(c64_key_table[64].SDLKeyCode == event->key.keysym.sym)
-                    cpu->ClearInterrupt(RESTORE_NMI);
                 else
                 {
-                    for(int i=0;i<C64_KEY_COUNT;i++)
-                    {
-                        if(c64_key_table[i].SDLKeyCode == event->key.keysym.sym)
-                        {
-                            KeyEvent(c64_key_table[i].MatrixCode,KEY_UP,c64_key_table[i].Shift);
-                        }
-                    }
+                    rec_polling_wait = true;
+                    rec_polling_wait_counter = RecPollingWaitStart;
                 }
             }
 
+            if((event->jaxis.value > -14000) && (event->jaxis.value < 14000))
+            {
+                joy_center_flag = true;
+            }
+        }
+        else
+        {
             /// VJoyStick abfrage ///
             /// Port1
             if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOY_NUM))
             {
                 for(int i=0;i<5;i++)
                 {
-                    if((virtual_joys[virtual_port1].KeyUp[i] == event->key.keysym.scancode) &&
-                            (virtual_joys[virtual_port1].Type[i] == VJOY_TYPE_KEY))
-                        game_port1 &= ~(1<<i);
+                    if((virtual_joys[virtual_port1].AxisNr[i] == event->jaxis.axis) &&
+                        (virtual_joys[virtual_port1].Type[i] == VJOY_TYPE_AXIS) &&
+                        (virtual_joys[virtual_port1].JoyIndex[i] == event->jaxis.which))
+                    {
+                        if(!((event->jaxis.value >= -14000) && (event->jaxis.value <= 14000)))
+                        {
+                            if(event->jaxis.value > 16000)
+                            {
+                                if(virtual_joys[virtual_port1].AxisValue[i] == 0) game_port1 |= 1<<i;
+                            }
+                            else if(event->jaxis.value < -16000)
+                            {
+                                if(virtual_joys[virtual_port1].AxisValue[i] == 1) game_port1 |= 1<<i;
+                            }
+                        }
+                        else game_port1 &= ~(1<<i);
+                    }
                 }
             }
 
+            /// VJoyStick abfrage ///
             /// Port2
             if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOY_NUM))
             {
                 for(int i=0;i<5;i++)
                 {
-                    if((virtual_joys[virtual_port2].KeyUp[i] == event->key.keysym.scancode) &&
-                            (virtual_joys[virtual_port2].Type[i] == VJOY_TYPE_KEY))
-                        game_port2 &= ~(1<<i);
+                    if((virtual_joys[virtual_port2].AxisNr[i] == event->jaxis.axis) &&
+                        (virtual_joys[virtual_port2].Type[i] == VJOY_TYPE_AXIS) &&
+                        (virtual_joys[virtual_port2].JoyIndex[i] == event->jaxis.which))
+                    {
+                        if(!((event->jaxis.value >= -14000) && (event->jaxis.value <= 14000)))
+                        {
+                            if(event->jaxis.value > 16000)
+                            {
+                                if(virtual_joys[virtual_port2].AxisValue[i] == 0) game_port2 |= 1<<i;
+                            }
+                            else if(event->jaxis.value < -16000)
+                            {
+                                if(virtual_joys[virtual_port2].AxisValue[i] == 1) game_port2 |= 1<<i;
+                            }
+                        }
+                        else game_port2 &= ~(1<<i);
+                    }
                 }
             }
+        }
+        break;
+    }
+
+    case SDL_KEYDOWN:
+    {
+        switch(event->key.keysym.sym)
+        {
+        case SDLK_F11:
+            SaveScreenshot();
+            break;
+
+        case SDLK_F12:
+            if(rec_joy_mapping)
+            {
+                rec_joy_mapping = false;
+            }
+            else
+            {
+                if((KMOD_LSHIFT == (event->key.keysym.mod & KMOD_LSHIFT)) || (KMOD_RSHIFT == (event->key.keysym.mod & KMOD_RSHIFT)))
+                {
+                    HardReset();
+                    reset_wire = false;
+                }
+                else
+                {
+                    wait_reset_ready = false;
+                    reset_wire = false;
+                }
+            }
+
+            break;
+
+        case SDLK_RETURN:
+
+            keymod = SDL_GetModState();
+
+            if((KMOD_MODE == (keymod & KMOD_MODE) || KMOD_LALT == (keymod & KMOD_LALT) || KMOD_RALT == (keymod & KMOD_RALT)) && (return_key_is_down == false))
+            {
+                ToggleScreenMode();     // switching between fullscreen an window mode
+            }
+
+            return_key_is_down = true;
+            break;
+
+        case SDLK_j:				// HotKey [ALT+J] swap joyports
+            // if ALT pressed down
+            if(KMOD_LALT == (SDL_GetModState() & KMOD_LALT))
+            {
+                is_hotkey = true;
+                SwapJoyPorts();
+            }
+            break;
+
+        case SDLK_w:				// HotKey [ALT+W] toggle warpmode
+            // if ALT pressed down
+            if(KMOD_LALT == (SDL_GetModState() & KMOD_LALT))
+            {
+                is_hotkey = true;
+                ToggleWarpMode();
+            }
+            break;
+
+        default:
             break;
         }
 
-        case SDL_MOUSEBUTTONDOWN:
-            switch(event->button.button)
+        if(rec_joy_mapping == true)
+        {
+            virtual_joys[rec_joy_slot_nr].Type[rec_joy_mapping_pos] = VJOY_TYPE_KEY;
+            virtual_joys[rec_joy_slot_nr].KeyDown[rec_joy_mapping_pos] = static_cast<uint8_t>(event->key.keysym.scancode);
+        }
+        else
+        {
+            if(key_map_is_rec)
             {
-            case SDL_BUTTON_LEFT:
-
-                // Wenn Linke STRG Taste gedrück dann Mouse 1351 umschalten
-				if(KMOD_LCTRL == (SDL_GetModState() & KMOD_LCTRL))
+                // Mappen der gedrückten Taste
+                for(int i=0;i<C64_KEY_COUNT;i++)
                 {
-                    enable_mouse_1351 = !enable_mouse_1351;
-                    SDL_SetRelativeMouseMode(SDL_bool(enable_mouse_1351));
-                    mouse_1351_x_rel = mouse_1351_y_rel = 0;
+                    if(c64_key_table[i].SDLKeyCode == event->key.keysym.sym)
+                    {
+                        c64_key_table[i].SDLKeyCode = 0xFFFF;
+                    }
                 }
 
-                if(enable_mouse_1351)
+                c64_key_table[((rec_matrix_code & 0xF0)>>1) + (rec_matrix_code & 0x07)].SDLKeyCode = event->key.keysym.sym;
+                key_map_is_rec = false;
+            }
+            else if (!is_hotkey)	// nur wenn es kein HotKey war
+            {
+                /// Auf RESTORE KEY TESTEN
+                if(c64_key_table[64].SDLKeyCode == event->key.keysym.sym)
+                    cpu->TriggerInterrupt(RESTORE_NMI);
+                else
                 {
-                    if(mouse_port == 0)
-                        game_port1 |= 0x10;
-                    else
-                        game_port2 |= 0x10;
+                    for(int i=0;i<C64_KEY_COUNT;i++)
+                    {
+                        if(c64_key_table[i].SDLKeyCode == event->key.keysym.sym && (event->key.keysym.mod != KMOD_LALT) && (event->key.keysym.mod != KMOD_RALT))
+                        {
+                            KeyEvent(c64_key_table[i].MatrixCode,KEY_DOWN,c64_key_table[i].Shift);
+                        }
+                    }
                 }
-                break;
+            }
+        }
 
-            case SDL_BUTTON_RIGHT:
+        /// VJoyStick abfrage ///
+        /// Port1
+        if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOY_NUM))
+        {
+            for(int i=0;i<5;i++)
+            {
+                if((virtual_joys[virtual_port1].KeyDown[i] == event->key.keysym.scancode) &&
+                    (virtual_joys[virtual_port1].Type[i] == VJOY_TYPE_KEY))
+                    game_port1 |= 1<<i;
+            }
+        }
 
-                if(enable_mouse_1351)
+        /// Port2
+        if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOY_NUM))
+        {
+            for(int i=0;i<5;i++)
+            {
+                if((virtual_joys[virtual_port2].KeyDown[i] == event->key.keysym.scancode) &&
+                    (virtual_joys[virtual_port2].Type[i] == VJOY_TYPE_KEY))
+                    game_port2 |= 1<<i;
+            }
+        }
+        break;
+    }
+
+    case SDL_KEYUP:
+    {
+        switch(event->key.keysym.sym)
+        {
+
+        case SDLK_RETURN:
+            return_key_is_down = false;
+            break;
+
+        case SDLK_F12:
+            reset_wire = true;
+            break;
+
+        default:
+            break;
+        }
+
+        if(rec_joy_mapping == true)
+        {
+            virtual_joys[rec_joy_slot_nr].Type[rec_joy_mapping_pos] = VJOY_TYPE_KEY;
+            virtual_joys[rec_joy_slot_nr].KeyUp[rec_joy_mapping_pos] = static_cast<uint8_t>(event->key.keysym.scancode);
+
+            rec_joy_mapping_pos++;
+            if(rec_joy_mapping_pos == 5)
+            {
+                /// Rec Mapping ist fertig ///
+                rec_joy_mapping = false;
+            }
+        }
+        else
+        {
+            /// Auf RESTORE KEY TESTEN
+            if(c64_key_table[64].SDLKeyCode == event->key.keysym.sym)
+                cpu->ClearInterrupt(RESTORE_NMI);
+            else
+            {
+                for(int i=0;i<C64_KEY_COUNT;i++)
                 {
-                    if(mouse_port == 0)
-                        game_port1 |= 0x01;
-                    else
-                        game_port2 |= 0x01;
+                    if(c64_key_table[i].SDLKeyCode == event->key.keysym.sym)
+                    {
+                        KeyEvent(c64_key_table[i].MatrixCode,KEY_UP,c64_key_table[i].Shift);
+                    }
                 }
-                break;
+            }
+        }
 
-            default:
-                break;
+        /// VJoyStick abfrage ///
+        /// Port1
+        if((virtual_port1 >= 0) && (virtual_port1 < MAX_VJOY_NUM))
+        {
+            for(int i=0;i<5;i++)
+            {
+                if((virtual_joys[virtual_port1].KeyUp[i] == event->key.keysym.scancode) &&
+                    (virtual_joys[virtual_port1].Type[i] == VJOY_TYPE_KEY))
+                    game_port1 &= ~(1<<i);
+            }
+        }
+
+        /// Port2
+        if((virtual_port2 >= 0) && (virtual_port2 < MAX_VJOY_NUM))
+        {
+            for(int i=0;i<5;i++)
+            {
+                if((virtual_joys[virtual_port2].KeyUp[i] == event->key.keysym.scancode) &&
+                    (virtual_joys[virtual_port2].Type[i] == VJOY_TYPE_KEY))
+                    game_port2 &= ~(1<<i);
+            }
+        }
+        break;
+    }
+
+    case SDL_MOUSEBUTTONDOWN:
+        switch(event->button.button)
+        {
+        case SDL_BUTTON_LEFT:
+
+            // Wenn Linke STRG Taste gedrück dann Mouse 1351 umschalten
+            if(KMOD_LCTRL == (SDL_GetModState() & KMOD_LCTRL))
+            {
+                enable_mouse_1351 = !enable_mouse_1351;
+                SDL_SetRelativeMouseMode(SDL_bool(enable_mouse_1351));
+                mouse_1351_x_rel = mouse_1351_y_rel = 0;
+            }
+
+            if(enable_mouse_1351)
+            {
+                if(mouse_port == 0)
+                    game_port1 |= 0x10;
+                else
+                    game_port2 |= 0x10;
             }
             break;
+
+        case SDL_BUTTON_RIGHT:
+
+            if(enable_mouse_1351)
+            {
+                if(mouse_port == 0)
+                    game_port1 |= 0x01;
+                else
+                    game_port2 |= 0x01;
+            }
+            break;
+
+        default:
+            break;
+        }
+        break;
 
     case SDL_MOUSEBUTTONUP:
         switch(event->button.button)
@@ -2550,7 +2552,7 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
         }
         break;
 
-        case SDL_MOUSEMOTION:
+    case SDL_MOUSEMOTION:
 
         if(!enable_fullscreen)
         {
@@ -2567,16 +2569,16 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
 
         break;
 
-        case SDL_QUIT:
-            if(CloseEventC64Screen != nullptr) CloseEventC64Screen();
+    case SDL_QUIT:
+        if(CloseEventC64Screen != nullptr) CloseEventC64Screen();
 
 #ifdef _WIN32
         //LoopThreadEnd = true;
 #endif
         break;
 
-        default:
-            break;
+    default:
+        break;
     }
 }
 
@@ -2612,68 +2614,68 @@ void C64Class::SetWindowSize(int w, int h)
 {
     sdl_window_size_width = w;
     sdl_window_size_height = h;
-	changed_window_size = true;
+    changed_window_size = true;
 }
 
 int C64Class::GetNumDisplays()
 {
-	return SDL_GetNumVideoDisplays();
+    return SDL_GetNumVideoDisplays();
 }
 
 const char *C64Class::GetDisplayName(int display_index)
 {
-	return SDL_GetDisplayName(display_index);
+    return SDL_GetDisplayName(display_index);
 }
 
 int C64Class::GetNumDisplayModes(int display_index)
 {
-	return SDL_GetNumDisplayModes(display_index);
+    return SDL_GetNumDisplayModes(display_index);
 }
 
 int C64Class::GetDisplayMode(int display_index, int mode_index, int &w, int &h, int &refresh_rate, uint32_t &format)
 {
-	SDL_DisplayMode display_mode = { SDL_PIXELFORMAT_UNKNOWN, 0, 0, 0, 0 };
+    SDL_DisplayMode display_mode = { SDL_PIXELFORMAT_UNKNOWN, 0, 0, 0, 0 };
 
-	if(0 == SDL_GetDisplayMode(display_index, mode_index, &display_mode))
-	{
-		w = display_mode.w;
-		h = display_mode.h;
-		refresh_rate = display_mode.refresh_rate;
-		format = display_mode.format;
-	}
-	else
-	{
-		w = 0;
-		h = 0;
-		refresh_rate = 0;
-		format = 0;
-	}
-	return 0;
+    if(0 == SDL_GetDisplayMode(display_index, mode_index, &display_mode))
+    {
+        w = display_mode.w;
+        h = display_mode.h;
+        refresh_rate = display_mode.refresh_rate;
+        format = display_mode.format;
+    }
+    else
+    {
+        w = 0;
+        h = 0;
+        refresh_rate = 0;
+        format = 0;
+    }
+    return 0;
 }
 
 void C64Class::SetFullscreenDisplayMode(int display_index, int mode_index)
 {
-	if(display_index >= MAX_VIDEO_DISPLAYS || mode_index < 0)
-		return;
+    if(display_index >= MAX_VIDEO_DISPLAYS || mode_index < 0)
+        return;
 
-	SDL_DisplayMode display_mode;
+    SDL_DisplayMode display_mode;
 
-	if(0 == SDL_GetDisplayMode(display_index, mode_index, &display_mode))
-	{
-		fullscreen_display_mode[display_index] = display_mode;
-	}
+    if(0 == SDL_GetDisplayMode(display_index, mode_index, &display_mode))
+    {
+        fullscreen_display_mode[display_index] = display_mode;
+    }
 
-	//cout << "SetDisplayMode: " << display_index << ";" << mode_index << endl;
+    //cout << "SetDisplayMode: " << display_index << ";" << mode_index << endl;
 }
 
 bool C64Class::LoadTapeImage(FILE *file, int typ)
 {
-	return tape->LoadTapeImage(file, typ);
+    return tape->LoadTapeImage(file, typ);
 }
 
 bool C64Class::RecordTapeImage(FILE *file)
 {
-	return tape->RecordTapeImage(file);
+    return tape->RecordTapeImage(file);
 }
 
 uint8_t C64Class::SetTapeKeys(uint8_t pressed_key)
@@ -2744,7 +2746,7 @@ void C64Class::EnableWarpMode(bool enabled)
     else
     {
         // WarpMode deaktivieren
-		warp_thread_end = true;
+        warp_thread_end = true;
         SDL_DetachThread(warp_thread);
 
         while(!warp_thread_is_end)
@@ -2754,20 +2756,20 @@ void C64Class::EnableWarpMode(bool enabled)
 
         SDL_PauseAudioDevice(audio_dev, 0);     // Audiostream wieder starten
         LogText("WarpMode deaktiviert\n");
-	}
+    }
 }
 
 void C64Class::ToggleWarpMode()
 {
-	if(warp_mode == true)
-		EnableWarpMode(false);
-	else
-		EnableWarpMode(true);
+    if(warp_mode == true)
+        EnableWarpMode(false);
+    else
+        EnableWarpMode(true);
 }
 
 bool C64Class::IsWarpMode()
 {
-	return warp_mode;
+    return warp_mode;
 }
 
 int SDLThreadLoad(void *userdat)
@@ -2781,17 +2783,23 @@ int SDLThreadLoad(void *userdat)
         c64->SetCommandLine(c64->auto_load_command_line);
         break;
     case 1:
-		c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse);
-        if(PRGStartAdresse <= 0x0801) sprintf(c64->auto_load_command_line,"RUN%c",13);
-        else sprintf(c64->auto_load_command_line,"SYS %d%c",PRGStartAdresse,13);
-        c64->SetCommandLine(c64->auto_load_command_line);
+        if(0 == c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse))
+        {
+            if(PRGStartAdresse <= 0x0801) sprintf(c64->auto_load_command_line,"RUN%c",13);
+            else sprintf(c64->auto_load_command_line,"SYS %d%c",PRGStartAdresse,13);
+            c64->SetCommandLine(c64->auto_load_command_line);
+        }
         break;
     case 2:
-		c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse);
-		//if(c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse) == 5) return 4; //Behandlung wenn mehr als 1 File in T64
-        if(PRGStartAdresse <= 0x0801) sprintf(c64->auto_load_command_line,"RUN%c",13);
-        else sprintf(c64->auto_load_command_line,"SYS %d%c",PRGStartAdresse,13);
-        c64->SetCommandLine(c64->auto_load_command_line);
+        if(0 == c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse))
+        {
+            //if(c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse) == 5) return 4; //Behandlung wenn mehr als 1 File in T64
+            if(PRGStartAdresse <= 0x0801) sprintf(c64->auto_load_command_line,"RUN%c",13);
+            else sprintf(c64->auto_load_command_line,"SYS %d%c",PRGStartAdresse,13);
+            c64->SetCommandLine(c64->auto_load_command_line);
+        }
+        break;
+    default:
         break;
     }
     return 0;
@@ -2800,93 +2808,93 @@ int SDLThreadLoad(void *userdat)
 // ret 0=OK 1=nicht unterstütztes Format 2=D64 n.IO 3=G64 n.IO 4=OK nur es war ein CRT
 int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, int typ)
 {
-	switch(typ)
-	{
-	case D64:
-		if(!LoadDiskImage(floppy_nr, file, typ)) return 2;
+    switch(typ)
+    {
+    case D64:
+        if(!LoadDiskImage(floppy_nr, file, typ)) return 2;
 
-		KillCommandLine();
-		auto_load_mode = 0;
-		sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
-		HardReset();
-		wait_reset_ready = true;
-		c64_reset_ready = false;
-		floppy_reset_ready[0] = false;
+        KillCommandLine();
+        auto_load_mode = 0;
+        sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
+        HardReset();
+        wait_reset_ready = true;
+        c64_reset_ready = false;
+        floppy_reset_ready[0] = false;
 
-		return 0;
-		break;
+        return 0;
+        break;
 
-	case G64:
-		if(!LoadDiskImage(floppy_nr, file, typ)) return 3;
+    case G64:
+        if(!LoadDiskImage(floppy_nr, file, typ)) return 3;
 
-		KillCommandLine();
-		auto_load_mode = 0;
-		sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
-		HardReset();
-		wait_reset_ready = true;
-		c64_reset_ready = false;
-		floppy_reset_ready[0] = false;
+        KillCommandLine();
+        auto_load_mode = 0;
+        sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
+        HardReset();
+        wait_reset_ready = true;
+        c64_reset_ready = false;
+        floppy_reset_ready[0] = false;
 
-		return 0;
-		break;
+        return 0;
+        break;
 
-	case PRG: case C64:
-		KillCommandLine();
-		auto_load_mode = 1;
+    case PRG: case C64:
+        KillCommandLine();
+        auto_load_mode = 1;
 
-		strcpy(auto_load_filename,filename);
-		auto_load_file = file;
-		auto_load_file_typ = typ;
+        strlcpy(auto_load_filename, filename, sizeof(auto_load_filename));
+        auto_load_file = file;
+        auto_load_file_typ = typ;
 
-		HardReset();
-		wait_reset_ready = true;
-		c64_reset_ready = false;
-		floppy_reset_ready[0] = false;
-		return 0;
-		break;
+        HardReset();
+        wait_reset_ready = true;
+        c64_reset_ready = false;
+        floppy_reset_ready[0] = false;
+        return 0;
+        break;
 
-	case T64:
-		KillCommandLine();
-		auto_load_mode = 2;
+    case T64:
+        KillCommandLine();
+        auto_load_mode = 2;
 
-		strcpy(auto_load_filename, filename);
-		auto_load_file = file;
-		auto_load_file_typ = typ;
+        strlcpy(auto_load_filename, filename, sizeof(auto_load_filename));
+        auto_load_file = file;
+        auto_load_file_typ = typ;
 
-		HardReset();
-		wait_reset_ready = true;
-		c64_reset_ready = false;
-		floppy_reset_ready[0] = false;
-		return 0;
-		break;
+        HardReset();
+        wait_reset_ready = true;
+        c64_reset_ready = false;
+        floppy_reset_ready[0] = false;
+        return 0;
+        break;
 
-	case P00:
-		KillCommandLine();
-		auto_load_mode = 1;
+    case P00:
+        KillCommandLine();
+        auto_load_mode = 1;
 
-		strcpy(auto_load_filename, filename);
-		auto_load_file = file;
-		auto_load_file_typ = typ;
+        strlcpy(auto_load_filename, filename, sizeof(auto_load_filename));
+        auto_load_file = file;
+        auto_load_file_typ = typ;
 
-		HardReset();
-		wait_reset_ready = true;
-		c64_reset_ready = false;
-		floppy_reset_ready[0] = false;
-		return 0;
-		break;
+        HardReset();
+        wait_reset_ready = true;
+        c64_reset_ready = false;
+        floppy_reset_ready[0] = false;
+        return 0;
+        break;
 
-	case FRZ:
-		//KillCommandLine();
-		//LoadFreez(filename,FreezReturn);
-		return 0;
-		break;
+    case FRZ:
+        //KillCommandLine();
+        //LoadFreez(filename,FreezReturn);
+        return 0;
+        break;
 
-	case CRT:
-		KillCommandLine();
-		LoadCRT(file);
-		return 4;
-		break;
-	}
+    case CRT:
+        KillCommandLine();
+        LoadCRT(file);
+        return 4;
+        break;
+    }
     return 1;
 }
 
@@ -2895,71 +2903,78 @@ int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *retur
     uint8_t *RAM = mmu->GetRAMPointer();
     char str00[256];
 
-	uint16_t start_address;
-	uint16_t end_address;
-	size_t reading_bytes;
-	uint8_t temp[2];
-	char signature[32];
-	uint16_t T64Entries;
-	int FileStartOffset;
+    uint16_t start_address;
+    uint16_t end_address;
+    size_t reading_bytes;
+    uint8_t temp[2];
+    char signature[32];
+    uint16_t T64Entries;
+    int FileStartOffset;
 
-	if(file == nullptr)
-	{
-		LogText("<< ERROR: Datei konnte nicht geöffnet werden\n");
-		return 0x01;
-	}
+    if(file == nullptr)
+    {
+        LogText("<< ERROR: Datei konnte nicht geöffnet werden\n");
+        return 0x01;
+    }
 
-	switch(typ)
-	{
-	case PRG: case C64:
-		LogText(">> PRG laden: ");
-		LogText(filename);
-		LogText("\n");
+    switch(typ)
+    {
+    case PRG: case C64:
+        LogText(">> PRG laden: ");
+        LogText(filename);
+        LogText("\n");
 
-		reading_bytes = fread (&temp,1,2,file);
-		start_address = static_cast<uint16_t>(temp[0]|(temp[1]<<8));
-		if(return_start_address != nullptr) *return_start_address = start_address;
+        reading_bytes = fread (&temp,1,2,file);
+        if(reading_bytes != 2)
+        {
+            std::cout << "Error PRG 0x02" << std::endl;
+            fclose(file);
+            file = nullptr;
+            return 0x02;
+        }
+        start_address = static_cast<uint16_t>(temp[0]|(temp[1]<<8));
+        if(return_start_address != nullptr) *return_start_address = start_address;
 
-		reading_bytes=fread (RAM+start_address,1,0xFFFF-start_address,file);
+        reading_bytes=fread (RAM+start_address,1,0xFFFF-start_address,file);
 
-		RAM[0x2B] = 0x01;
-		RAM[0x2C] = 0x08;
+        RAM[0x2B] = 0x01;
+        RAM[0x2C] = 0x08;
 
-		sprintf(str00,">>   SartAdresse: $%4.4X(%d)",start_address,start_address);
-		LogText(str00);
+        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",start_address,start_address);
+        LogText(str00);
 
-		start_address += static_cast<uint16_t>(reading_bytes);
-		RAM[0x2D] = static_cast<uint8_t>(start_address);
-		RAM[0x2E] = static_cast<uint8_t>(start_address>>8);
-		RAM[0xAE] = static_cast<uint8_t>(start_address);
-		RAM[0xAF] = static_cast<uint8_t>(start_address>>8);
+        start_address += static_cast<uint16_t>(reading_bytes);
+        RAM[0x2D] = static_cast<uint8_t>(start_address);
+        RAM[0x2E] = static_cast<uint8_t>(start_address>>8);
+        RAM[0xAE] = static_cast<uint8_t>(start_address);
+        RAM[0xAF] = static_cast<uint8_t>(start_address>>8);
 
-		fclose(file);
-		file = nullptr;
+        fclose(file);
+        file = nullptr;
 
-		sprintf(str00,"EndAdresse: $%4.4X(%d)\n", start_address, start_address);
-		LogText(str00);
+        sprintf(str00,"EndAdresse: $%4.4X(%d)\n", start_address, start_address);
+        LogText(str00);
 
-		return 0x00;
-		break;
+        return 0x00;
+        break;
 
-		// T64
-	case T64:
-		LogText(">> T64 laden: ");
-		LogText(filename);
-		LogText("\n");
+        // T64
+    case T64:
+        LogText(">> T64 laden: ");
+        LogText(filename);
+        LogText("\n");
 
-		reading_bytes = fread(signature,1,32,file);
-		if(reading_bytes != 32)
-		{
+        reading_bytes = fread(signature,1,32,file);
+        if(reading_bytes != 32)
+        {
             std::cout << "Error T64 0x02" << std::endl;
-			fclose(file);
-			file = nullptr;
-			return 0x02;
-		}
+            fclose(file);
+            file = nullptr;
+            return 0x02;
+        }
 
-		// Es gibt irgendwie zu viele verschiedene Kennungen :(
-		/*
+        // Es gibt irgendwie zu viele verschiedene Kennungen :(
+        /*
 		if((strcmp(Kennung, "C64 tape image file") != 0) && (strcmp(Kennung, "C64S tape image file") != 0))
 		{
 			cout << "Error T64 0x03" << endl;
@@ -2968,17 +2983,24 @@ int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *retur
 		}
 		*/
 
-		fseek(file,4,SEEK_CUR);
-		reading_bytes = fread(&T64Entries,1,2,file);
+        fseek(file,4,SEEK_CUR);
+        reading_bytes = fread(&T64Entries,1,2,file);
+        if(reading_bytes != 2)
+        {
+            std::cout << "Error T64 0x02" << std::endl;
+            fclose(file);
+            file = nullptr;
+            return 0x02;
+        }
 
-		if(T64Entries==0)
-		{
-			fclose(file);
-			file = nullptr;
-			return 0x04;
-		}
+        if(T64Entries==0)
+        {
+            fclose(file);
+            file = nullptr;
+            return 0x04;
+        }
 
-		/*
+        /*
 		if(T64Entries>1)
 		{
 			fclose(file);
@@ -2987,78 +3009,125 @@ int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *retur
 		}
 		*/
 
-		fseek(file,0x42,SEEK_SET);
-		reading_bytes = fread(&start_address,1,2,file);
-		if(return_start_address != nullptr) *return_start_address = start_address;
-		reading_bytes = fread(&end_address,1,2,file);
-		fseek(file,2,SEEK_CUR);
-		reading_bytes = fread(&FileStartOffset,1,4,file);
+        fseek(file,0x42,SEEK_SET);
+        reading_bytes = fread(&start_address,1,2,file);
+        if(reading_bytes != 2)
+        {
+            std::cout << "Error T64 0x02" << std::endl;
+            fclose(file);
+            file = nullptr;
+            return 0x02;
+        }
 
-		fseek(file,FileStartOffset,SEEK_SET);
-		reading_bytes = fread(RAM + start_address,1,end_address - start_address,file);
+        if(return_start_address != nullptr) *return_start_address = start_address;
 
-		fclose(file);
-		file = nullptr;
+        reading_bytes = fread(&end_address,1,2,file);
+        if(reading_bytes != 2)
+        {
+            std::cout << "Error T64 0x02" << std::endl;
+            fclose(file);
+            file = nullptr;
+            return 0x02;
+        }
 
-		RAM[0x2B] = 0x01;
-		RAM[0x2C] = 0x08;
+        fseek(file,2,SEEK_CUR);
+        reading_bytes = fread(&FileStartOffset,1,4,file);
+        if(reading_bytes != 4)
+        {
+            std::cout << "Error T64 0x02" << std::endl;
+            fclose(file);
+            file = nullptr;
+            return 0x02;
+        }
 
-		RAM[0x2D] = static_cast<uint8_t>(end_address);
-		RAM[0x2E] = static_cast<uint8_t>(end_address>>8);
-		RAM[0xAE] = static_cast<uint8_t>(end_address);
-		RAM[0xAF] = static_cast<uint8_t>(end_address>>8);
+        fseek(file,FileStartOffset,SEEK_SET);
+        reading_bytes = fread(RAM + start_address,1,end_address - start_address,file);
+        if(reading_bytes != (end_address - start_address))
+        {
+            std::cout << "Error T64 0x02" << std::endl;
+            fclose(file);
+            file = nullptr;
+            return 0x02;
+        }
 
-		sprintf(str00,">>   SartAdresse: $%4.4X(%d)", start_address, start_address);
-		LogText(str00);
-		sprintf(str00,"EndAdresse: $%4.4X(%d)\n", end_address, end_address);
-		LogText(str00);
+        fclose(file);
+        file = nullptr;
 
-		return 0x00;
-		break;
+        RAM[0x2B] = 0x01;
+        RAM[0x2C] = 0x08;
 
-	case P00:
-		LogText(">> P00 laden: ");
-		LogText(filename);
-		LogText("\n");
+        RAM[0x2D] = static_cast<uint8_t>(end_address);
+        RAM[0x2E] = static_cast<uint8_t>(end_address>>8);
+        RAM[0xAE] = static_cast<uint8_t>(end_address);
+        RAM[0xAF] = static_cast<uint8_t>(end_address>>8);
 
-		reading_bytes = fread(signature,1,7,file);
-		signature[7]=0;
-		if(0!=strcmp("C64File",signature))
-		{
-				fclose(file);
-				file = nullptr;
-				return 0x06;
-		}
+        sprintf(str00,">>   SartAdresse: $%4.4X(%d)", start_address, start_address);
+        LogText(str00);
+        sprintf(str00,"EndAdresse: $%4.4X(%d)\n", end_address, end_address);
+        LogText(str00);
 
-		fseek(file,0x1A,SEEK_SET);
+        return 0x00;
+        break;
 
-		reading_bytes = fread (&temp,1,2,file);
-		start_address = static_cast<uint16_t>(temp[0]|(temp[1]<<8));
-		if(return_start_address != nullptr) *return_start_address = start_address;
+    case P00:
+        LogText(">> P00 laden: ");
+        LogText(filename);
+        LogText("\n");
 
-		reading_bytes=fread (RAM+start_address,1,0xFFFF,file);
+        reading_bytes = fread(signature,1,7,file);
+        if(reading_bytes != 7)
+        {
+            std::cout << "Error P00 0x02" << std::endl;
+            fclose(file);
+            file = nullptr;
+            return 0x02;
+        }
 
-		RAM[0x2B] = 0x01;
-		RAM[0x2C] = 0x08;
+        signature[7]=0;
+        if(0!=strcmp("C64File",signature))
+        {
+            fclose(file);
+            file = nullptr;
+            return 0x06;
+        }
 
-		sprintf(str00,">>   SartAdresse: $%4.4X(%d)",start_address,start_address);
-		LogText(str00);
+        fseek(file,0x1A,SEEK_SET);
 
-		start_address += static_cast<uint16_t>(reading_bytes);
-		RAM[0x2D] = static_cast<uint8_t>(start_address);
-		RAM[0x2E] = static_cast<uint8_t>(start_address>>8);
-		RAM[0xAE] = static_cast<uint8_t>(start_address);
-		RAM[0xAF] = static_cast<uint8_t>(start_address>>8);
+        reading_bytes = fread (&temp,1,2,file);
+        if(reading_bytes != 2)
+        {
+            std::cout << "Error P00 0x02" << std::endl;
+            fclose(file);
+            file = nullptr;
+            return 0x02;
+        }
 
-		fclose(file);
-		file = nullptr;
+        start_address = static_cast<uint16_t>(temp[0]|(temp[1]<<8));
+        if(return_start_address != nullptr) *return_start_address = start_address;
 
-		sprintf(str00,"EndAdresse: $%4.4X(%d)\n",start_address,start_address);
-		LogText(str00);
+        reading_bytes=fread (RAM+start_address,1,0xFFFF,file);
 
-		return 0x00;
-		break;
-	}
+        RAM[0x2B] = 0x01;
+        RAM[0x2C] = 0x08;
+
+        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",start_address,start_address);
+        LogText(str00);
+
+        start_address += static_cast<uint16_t>(reading_bytes);
+        RAM[0x2D] = static_cast<uint8_t>(start_address);
+        RAM[0x2E] = static_cast<uint8_t>(start_address>>8);
+        RAM[0xAE] = static_cast<uint8_t>(start_address);
+        RAM[0xAF] = static_cast<uint8_t>(start_address>>8);
+
+        fclose(file);
+        file = nullptr;
+
+        sprintf(str00,"EndAdresse: $%4.4X(%d)\n",start_address,start_address);
+        LogText(str00);
+
+        return 0x00;
+        break;
+    }
     return 0x02;
 }
 
@@ -3067,7 +3136,7 @@ int C64Class::LoadCRT(FILE *file)
     reu->Remove();
     geo->Remove();
 
-	int ret = crt->LoadCartridgeImage(file);
+    int ret = crt->LoadCartridgeImage(file);
     if(ret == 0)
     {
         io_source = 1;
@@ -3088,7 +3157,7 @@ void C64Class::RemoveCRT()
 
 int C64Class::CreateNewEasyFlashImage(FILE *file, const char *crt_name)
 {
-	return crt->CreateNewEasyFlashImage(file, crt_name);
+    return crt->CreateNewEasyFlashImage(file, crt_name);
 }
 
 void C64Class::InsertREU()
@@ -3506,6 +3575,14 @@ int C64Class::GetBreakGroupCount()
     return breakgroup_count;
 }
 
+#define READ_OR_RETURN_ERROR(variable) \
+reading_elements = fread(&variable,sizeof(variable),1,file); \
+    if(reading_elements != 1) \
+{ \
+        fclose(file); \
+        return -3; \
+}
+
 int C64Class::LoadBreakGroups(const char *filename)
 {
     FILE *file;
@@ -3519,12 +3596,18 @@ int C64Class::LoadBreakGroups(const char *filename)
     file = fopen (filename, "rb");
     if (file == nullptr)
     {
-            /// Datei konnte nicht geöffnet werden ///
-            return -1;
+        /// Datei konnte nicht geöffnet werden ///
+        return -1;
     }
 
     /// Kennung ///
     reading_elements = fread(Kennung,sizeof(Kennung),1,file);
+    if(reading_elements != 1)
+    {
+        /// Fehler beim Lesen der Kennung ///
+        fclose(file);
+        return -6;
+    }
 
     if(0 != strcmp("EMU64_BPT",Kennung))
     {
@@ -3535,6 +3618,12 @@ int C64Class::LoadBreakGroups(const char *filename)
 
     /// Version ///
     reading_elements = fread(&Version,sizeof(Version),1,file);
+    if(reading_elements != 1)
+    {
+        /// Fehler beim Lesen der Version ///
+        fclose(file);
+        return -6;
+    }
 
     switch(Version)
     {
@@ -3542,36 +3631,50 @@ int C64Class::LoadBreakGroups(const char *filename)
         /// Groupanzahl ///
         reading_elements = fread(&Groupanzahl,sizeof(Groupanzahl),1,file);
         if(reading_elements != 1)
+        {
+            fclose(file);
             return -5;
+        }
 
-        if(Groupanzahl == 0) return -4;
+        if(Groupanzahl == 0)
+        {
+            fclose(file);
+            return -4;
+        }
 
         /// Groups ///
         for(int ii=0;ii<Groupanzahl;ii++)
         {
             int i = AddBreakGroup();
-            reading_elements = fread(breakgroup[i]->Name,sizeof(breakgroup[i]->Name),1,file);
-            reading_elements = fread(&breakgroup[i]->Enable,sizeof(breakgroup[i]->Enable),1,file);
-            reading_elements = fread(&breakgroup[i]->bPC,sizeof(breakgroup[i]->bPC),1,file);
-            reading_elements = fread(&breakgroup[i]->iPC,sizeof(breakgroup[i]->iPC),1,file);
-            reading_elements = fread(&breakgroup[i]->bAC,sizeof(breakgroup[i]->bAC),1,file);
-            reading_elements = fread(&breakgroup[i]->iAC,sizeof(breakgroup[i]->iAC),1,file);
-            reading_elements = fread(&breakgroup[i]->bXR,sizeof(breakgroup[i]->bXR),1,file);
-            reading_elements = fread(&breakgroup[i]->iXR,sizeof(breakgroup[i]->iXR),1,file);
-            reading_elements = fread(&breakgroup[i]->bYR,sizeof(breakgroup[i]->bYR),1,file);
-            reading_elements = fread(&breakgroup[i]->iYR,sizeof(breakgroup[i]->iYR),1,file);
-            reading_elements = fread(&breakgroup[i]->bRAddress,sizeof(breakgroup[i]->bRAddress),1,file);
-            reading_elements = fread(&breakgroup[i]->iRAddress,sizeof(breakgroup[i]->iRAddress),1,file);
-            reading_elements = fread(&breakgroup[i]->bWAddress,sizeof(breakgroup[i]->bWAddress),1,file);
-            reading_elements = fread(&breakgroup[i]->iWAddress,sizeof(breakgroup[i]->iWAddress),1,file);
-            reading_elements = fread(&breakgroup[i]->bRWert,sizeof(breakgroup[i]->bRWert),1,file);
-            reading_elements = fread(&breakgroup[i]->iRWert,sizeof(breakgroup[i]->iRWert),1,file);
-            reading_elements = fread(&breakgroup[i]->bWWert,sizeof(breakgroup[i]->bWWert),1,file);
-            reading_elements = fread(&breakgroup[i]->iWWert,sizeof(breakgroup[i]->iWWert),1,file);
-            reading_elements = fread(&breakgroup[i]->bRZ,sizeof(breakgroup[i]->bRZ),1,file);
-            reading_elements = fread(&breakgroup[i]->iRZ,sizeof(breakgroup[i]->iRZ),1,file);
-            reading_elements = fread(&breakgroup[i]->bRZZyklus,sizeof(breakgroup[i]->bRZZyklus),1,file);
-            reading_elements = fread(&breakgroup[i]->iRZZyklus,sizeof(breakgroup[i]->iRZZyklus),1,file);
+            if(i < 0)
+            {
+                /// Fehler beim Hinzufügen einer Breakgruppe ///
+                fclose(file);
+                return -7;
+            }
+
+            READ_OR_RETURN_ERROR(breakgroup[i]->Name);
+            READ_OR_RETURN_ERROR(breakgroup[i]->Enable);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bPC);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iPC);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bAC);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iAC);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bXR);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iXR);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bYR);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iYR);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bRAddress);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iRAddress);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bWAddress);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iWAddress);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bRWert);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iRWert);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bWWert);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iWWert);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bRZ);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iRZ);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bRZZyklus);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iRZZyklus);
 
             // version 2 compatiblity
             breakgroup[i]->iRAddressCount = 1;
@@ -3587,45 +3690,62 @@ int C64Class::LoadBreakGroups(const char *filename)
         /// Groupanzahl ///
         reading_elements = fread(&Groupanzahl,sizeof(Groupanzahl),1,file);
         if(reading_elements != 1)
+        {
+            fclose(file);
             return -5;
+        }
 
-        if(Groupanzahl == 0) return -4;
+        if(Groupanzahl == 0)
+        {
+            fclose(file);
+            return -4;
+        }
 
         /// Groups ///
         for(int ii=0;ii<Groupanzahl;ii++)
         {
             int i = AddBreakGroup();
-            reading_elements = fread(breakgroup[i]->Name,sizeof(breakgroup[i]->Name),1,file);
-            reading_elements = fread(&breakgroup[i]->Enable,sizeof(breakgroup[i]->Enable),1,file);
-            reading_elements = fread(&breakgroup[i]->bPC,sizeof(breakgroup[i]->bPC),1,file);
-            reading_elements = fread(&breakgroup[i]->iPC,sizeof(breakgroup[i]->iPC),1,file);
-            reading_elements = fread(&breakgroup[i]->bAC,sizeof(breakgroup[i]->bAC),1,file);
-            reading_elements = fread(&breakgroup[i]->iAC,sizeof(breakgroup[i]->iAC),1,file);
-            reading_elements = fread(&breakgroup[i]->bXR,sizeof(breakgroup[i]->bXR),1,file);
-            reading_elements = fread(&breakgroup[i]->iXR,sizeof(breakgroup[i]->iXR),1,file);
-            reading_elements = fread(&breakgroup[i]->bYR,sizeof(breakgroup[i]->bYR),1,file);
-            reading_elements = fread(&breakgroup[i]->iYR,sizeof(breakgroup[i]->iYR),1,file);
-            reading_elements = fread(&breakgroup[i]->bRAddress,sizeof(breakgroup[i]->bRAddress),1,file);
-            reading_elements = fread(&breakgroup[i]->iRAddress,sizeof(breakgroup[i]->iRAddress),1,file);
-            reading_elements = fread(&breakgroup[i]->iRAddressCount,sizeof(breakgroup[i]->iRAddressCount),1,file);
-            reading_elements = fread(&breakgroup[i]->bWAddress,sizeof(breakgroup[i]->bWAddress),1,file);
-            reading_elements = fread(&breakgroup[i]->iWAddress,sizeof(breakgroup[i]->iWAddress),1,file);
-            reading_elements = fread(&breakgroup[i]->iWAddressCount,sizeof(breakgroup[i]->iWAddressCount),1,file);
-            reading_elements = fread(&breakgroup[i]->bRWert,sizeof(breakgroup[i]->bRWert),1,file);
-            reading_elements = fread(&breakgroup[i]->iRWert,sizeof(breakgroup[i]->iRWert),1,file);
-            reading_elements = fread(&breakgroup[i]->bWWert,sizeof(breakgroup[i]->bWWert),1,file);
-            reading_elements = fread(&breakgroup[i]->iWWert,sizeof(breakgroup[i]->iWWert),1,file);
-            reading_elements = fread(&breakgroup[i]->bRZ,sizeof(breakgroup[i]->bRZ),1,file);
-            reading_elements = fread(&breakgroup[i]->iRZ,sizeof(breakgroup[i]->iRZ),1,file);
-            reading_elements = fread(&breakgroup[i]->bRZZyklus,sizeof(breakgroup[i]->bRZZyklus),1,file);
-            reading_elements = fread(&breakgroup[i]->iRZZyklus,sizeof(breakgroup[i]->iRZZyklus),1,file);
+            if(i < 0)
+            {
+                /// Fehler beim Hinzufügen einer Breakgruppe ///
+                fclose(file);
+                return -7;
+            }
+
+            READ_OR_RETURN_ERROR(breakgroup[i]->Name);
+            READ_OR_RETURN_ERROR(breakgroup[i]->Enable);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bPC);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iPC);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bAC);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iAC);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bXR);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iXR);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bYR);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iYR);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bRAddress);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iRAddress);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iRAddressCount);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bWAddress);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iWAddress);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iWAddressCount);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bRWert);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iRWert);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bWWert);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iWWert);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bRZ);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iRZ);
+            READ_OR_RETURN_ERROR(breakgroup[i]->bRZZyklus);
+            READ_OR_RETURN_ERROR(breakgroup[i]->iRZZyklus);
         }
         break;
 
     default:
+        /// Version nicht unterstützt ///
+        fclose(file);
         return -3;
     }
 
+    fclose(file);
     return 0;
 }
 
@@ -3638,7 +3758,7 @@ bool C64Class::SaveBreakGroups(const char *filename)
     file = fopen (filename, "wb");
     if (file == nullptr)
     {
-            return false;
+        return false;
     }
 
     /// Kennung ///
@@ -3823,7 +3943,7 @@ void C64Class::SetScreenshotDir(const char *screenshot_dir)
 #ifdef __STDC_LIB_EXT1__
     strcpy_s(this->screenshot_dir, static_cast<size_t>(strlen(screenshot_dir))+1, screenshot_dir);
 #else
-    strcpy(this->screenshot_dir, screenshot_dir);
+    strlcpy(this->screenshot_dir, screenshot_dir, sizeof(strlen(screenshot_dir)+1));
 #endif
 }
 
@@ -3864,7 +3984,7 @@ const char *C64Class::GetScreenshotFormatName(uint8_t format)
 
 void C64Class::SetExitScreenshot(const char *filename)
 {
-    strcpy(exit_screenshot_filename,filename);
+    strlcpy(exit_screenshot_filename, filename, sizeof(exit_screenshot_filename));
     enable_exit_screenshot = true;
 }
 
@@ -3877,9 +3997,9 @@ bool C64Class::StartVideoRecord(const char *filename, int audio_bitrate, int vid
 {
     if(video_capture != nullptr)
     {
-		c64_frequency_temp = c64_frequency;
-		c64_frequency = 982800;	// Auf genau 50 Hz stellen !!
-		SetC64Speed(c64_speed);
+        c64_frequency_temp = c64_frequency;
+        c64_frequency = 982800;	// Auf genau 50 Hz stellen !!
+        SetC64Speed(c64_speed);
 
         video_capture->SetAudioBitrate(audio_bitrate);
         video_capture->SetVideoBitrate(video_bitrate);
@@ -3900,8 +4020,8 @@ void C64Class::StopVideoRecord()
     {
         video_capture->StopCapture();
 
-		c64_frequency = c64_frequency_temp;
-		SetC64Speed(c64_speed);
+        c64_frequency = c64_frequency_temp;
+        SetC64Speed(c64_speed);
     }
 }
 
@@ -4042,7 +4162,7 @@ void C64Class::NextSystemCycle()
     CheckKeys();
 
     if(hold_next_system_cycle)
-		return;
+        return;
 
     cycle_counter++;
 
@@ -4091,7 +4211,7 @@ uint16_t C64Class::DisAss(FILE *file, uint16_t PC, bool line_draw, int source)
     uint8_t ram1;
     uint8_t ram2;
 
-    if(source > 0)
+    if(source > 0 && source <= MAX_FLOPPY_NUM)
     {
         ram0 = floppy[source-1]->ReadByte(PC+0);
         ram1 = floppy[source-1]->ReadByte(PC+1);
@@ -4459,7 +4579,7 @@ void C64Class::ClearJoystickMapping(int slot_nr)
 {
     char str00[32];
     sprintf(str00,"Slot %d",slot_nr+1);
-    strcpy(virtual_joys[slot_nr].Name, str00);
+    strlcpy(virtual_joys[slot_nr].Name, str00, sizeof(virtual_joys[slot_nr].Name));
 
     for(int i=0;i<5;i++)
     {
@@ -4472,15 +4592,15 @@ void C64Class::ClearJoystickMapping(int slot_nr)
         virtual_joys[slot_nr].HatValue[i] = 0;
         virtual_joys[slot_nr].AxisNr[i] = 0;
         virtual_joys[slot_nr].AxisValue[i] = 0;
-	}
+    }
 }
 
 void C64Class::SwapJoyPorts()
 {
-	int temp = virtual_port1;
-	virtual_port1 = virtual_port2;
-	virtual_port2 = temp;
-	LogText(">> JoyPorts vertauscht\n");
+    int temp = virtual_port1;
+    virtual_port1 = virtual_port2;
+    virtual_port2 = temp;
+    LogText(">> JoyPorts vertauscht\n");
 }
 
 void C64Class::IncMouseHiddenCounter()

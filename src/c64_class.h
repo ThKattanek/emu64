@@ -26,9 +26,7 @@
 #include "./georam_class.h"
 #include "./floppy1541_class.h"
 #include "./tape1530_class.h"
-#include "./cpu_info.h"
 #include "./vcd_class.h"
-#include "./savepng.h"
 #include "./video_capture_class.h"
 
 #include <GL/glu.h>
@@ -75,7 +73,7 @@ public:
     void KeyEvent(uint8_t  matrix_code, KeyStatus status, bool isAutoShift);
     bool LoadC64Roms(const char *kernalrom, const char *basicrom, const char *charrom);
     bool LoadFloppyRom(uint8_t floppy_nr, const char *dos1541rom);
-	bool LoadDiskImage(uint8_t floppy_nr, FILE *file, int typ);
+    bool LoadDiskImage(uint8_t floppy_nr, FILE *file, int typ);
     void LoadPRGFromD64(uint8_t floppy_nr, char *c64_filename, int command);
     void SetFloppyWriteProtect(uint8_t floppy_nr, bool status);
     void SetCommandLine(char *c64_command);
@@ -99,22 +97,22 @@ public:
     void SetC64Frequency(int c64_frequency);
     void SetC64Speed(int speed);
     void EnableWarpMode(bool enabled);
-	void ToggleWarpMode();
-	bool IsWarpMode();
+    void ToggleWarpMode();
+    bool IsWarpMode();
     void SetDistortion(float_t value);
     void SetMouseHiddenTime(int time);  // Time in ms // Bei 0 Wird der Cursor nicht mehr ausgeblendet
     void GetWindowPos(int *x, int *y);
     void SetWindowPos(int x, int y);
     void GetWindowSize(int *x, int *y);
     void SetWindowSize(int w, int h);
-	int GetNumDisplays();
-	const char* GetDisplayName(int display_index);
-	int GetNumDisplayModes(int display_index);
-	int GetDisplayMode(int display_index, int mode_index, int &w, int &h, int &refresh_rate, uint32_t &format);
-	void SetFullscreenDisplayMode(int display_index, int mode_index);
+    int GetNumDisplays();
+    const char* GetDisplayName(int display_index);
+    int GetNumDisplayModes(int display_index);
+    int GetDisplayMode(int display_index, int mode_index, int &w, int &h, int &refresh_rate, uint32_t &format);
+    void SetFullscreenDisplayMode(int display_index, int mode_index);
 
-	bool LoadTapeImage(FILE *file, int typ);
-	bool RecordTapeImage(FILE* file);
+    bool LoadTapeImage(FILE *file, int typ);
+    bool RecordTapeImage(FILE* file);
     uint8_t SetTapeKeys(uint8_t pressed_key);
     bool GetTapeMotorStatus();
     bool GetTapeRecordLedStatus();
@@ -126,12 +124,12 @@ public:
     void SoftReset();
     void HardReset();
     void SetReset(int status, int hard_reset);
-	int LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, int typ);
-	int LoadPRG(FILE *file, const char* filename, int typ, uint16_t *return_start_address);	// Filename ist nur für Logausgabe / Ausschlaggebend ist FILE*
+    int LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, int typ);
+    int LoadPRG(FILE *file, const char* filename, int typ, uint16_t *return_start_address);	// Filename ist nur für Logausgabe / Ausschlaggebend ist FILE*
 
-	int LoadCRT(FILE *file);
+    int LoadCRT(FILE *file);
     void RemoveCRT();
-	int CreateNewEasyFlashImage(FILE *file, const char *crt_name);
+    int CreateNewEasyFlashImage(FILE *file, const char *crt_name);
 
     void InsertREU();
     void RemoveREU();
@@ -179,7 +177,7 @@ public:
     void StartRecJoystickMapping(int slot_nr);
     void StopRecJoystickMapping();
     void ClearJoystickMapping(int slot_nr);
-	void SwapJoyPorts();
+    void SwapJoyPorts();
     void IncMouseHiddenCounter();
 
     void StartRecKeyMap(uint8_t keymatrix_code);
@@ -237,7 +235,7 @@ public:
     static const char* screenshot_format_name[SCREENSHOT_FORMATS_COUNT];
 
     bool            start_minimized;
-	bool			start_hidden_window;
+    bool			start_hidden_window;
 
     uint16_t        current_window_width;
     uint16_t        current_window_height;
@@ -266,7 +264,7 @@ public:
     SDL_Surface     *sdl_window_icon;
     SDL_GLContext   gl_context;
 
-	SDL_DisplayMode fullscreen_display_mode[MAX_VIDEO_DISPLAYS];
+    SDL_DisplayMode fullscreen_display_mode[MAX_VIDEO_DISPLAYS];
 
     int             sdl_window_pos_x;
     int             sdl_window_pos_y;
@@ -339,9 +337,9 @@ public:
     VideoCrtClass   *video_crt_output;
 
     int             c64_frequency;   // Normaler PAL Takt ist 985248 Hz (985248 / (312 Rz * 63 Cycles) = 50,124542 Hz)
-                                     // 50 Hz Syncroner Takt ist 982800 Hz
+    // 50 Hz Syncroner Takt ist 982800 Hz
 
-	int				c64_frequency_temp;	// Dient zum zwischenspeichern der C64 Frequenz beim Videorecord.
+    int				c64_frequency_temp;	// Dient zum zwischenspeichern der C64 Frequenz beim Videorecord.
 
     int             c64_speed;
 
@@ -371,8 +369,8 @@ public:
     uint8_t         auto_load_mode;
     char            auto_load_command_line[MAX_STRING_LENGTH];
     char            auto_load_filename[MAX_STRING_LENGTH];
-	FILE*			auto_load_file;
-	int				auto_load_file_typ;
+    FILE*			auto_load_file;
+    int				auto_load_file_typ;
 
     bool            loop_thread_end;
     bool            loop_thread_is_end;
@@ -530,7 +528,7 @@ private:
     bool        is_wtite_to_debug_cart;     // Wird auf true gesetzt wenn in den Debug Cart geschrieben wird
     unsigned char   debug_cart_value;           // Wert der im Debug Cart steht
 
-	bool        debug_mode;
+    bool        debug_mode;
     bool        debug_animation;
     float_t     animation_speed_add;
     float_t     animation_speed_counter;
