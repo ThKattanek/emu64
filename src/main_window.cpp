@@ -1758,7 +1758,6 @@ void MainWindow::on_actionGEO_4096KiB_triggered()
     c64->SetGeoRamMode(GEORAM_4096KiB);
 }
 
-
 void MainWindow::on_actionREU_128KiB_triggered()
 {
     ui->actionREU_128KiB->setChecked(true);
@@ -1772,7 +1771,6 @@ void MainWindow::on_actionREU_128KiB_triggered()
 
     c64->SetREUMode(REU_128KiB);
 }
-
 
 void MainWindow::on_actionREU_256KiB_triggered()
 {
@@ -1788,7 +1786,6 @@ void MainWindow::on_actionREU_256KiB_triggered()
     c64->SetREUMode(REU_256KiB);
 }
 
-
 void MainWindow::on_actionREU_512KiB_triggered()
 {
     ui->actionREU_128KiB->setChecked(false);
@@ -1802,7 +1799,6 @@ void MainWindow::on_actionREU_512KiB_triggered()
 
     c64->SetREUMode(REU_512KiB);
 }
-
 
 void MainWindow::on_actionREU_1MiB_triggered()
 {
@@ -1818,7 +1814,6 @@ void MainWindow::on_actionREU_1MiB_triggered()
     c64->SetREUMode(REU_1MiB);
 }
 
-
 void MainWindow::on_actionREU_2MiB_triggered()
 {
     ui->actionREU_128KiB->setChecked(false);
@@ -1832,7 +1827,6 @@ void MainWindow::on_actionREU_2MiB_triggered()
 
     c64->SetREUMode(REU_2MiB);
 }
-
 
 void MainWindow::on_actionREU_4MiB_triggered()
 {
@@ -1848,7 +1842,6 @@ void MainWindow::on_actionREU_4MiB_triggered()
     c64->SetREUMode(REU_4MiB);
 }
 
-
 void MainWindow::on_actionREU_8MiB_triggered()
 {
     ui->actionREU_128KiB->setChecked(false);
@@ -1862,7 +1855,6 @@ void MainWindow::on_actionREU_8MiB_triggered()
 
     c64->SetREUMode(REU_8MiB);
 }
-
 
 void MainWindow::on_actionREU_16MiB_triggered()
 {

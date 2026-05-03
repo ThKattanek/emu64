@@ -136,27 +136,19 @@ private slots:
     void on_actionGEO_1024KiB_triggered();
     void on_actionGEO_2048KiB_triggered();
     void on_actionGEO_4096KiB_triggered();
+    void on_actionREU_128KiB_triggered();
+    void on_actionREU_256KiB_triggered();
+    void on_actionREU_512KiB_triggered();
+    void on_actionREU_1MiB_triggered();
+    void on_actionREU_2MiB_triggered();
+    void on_actionREU_4MiB_triggered();
+    void on_actionREU_8MiB_triggered();
+    void on_actionREU_16MiB_triggered();
 
     void OnChangeGrafikModi(bool fullscreen, bool palmode, bool doublemode, bool filter);
     void OnChangeFloppyImage(int floppynr);
     void OnResetScreenshotCounter(void);
     void OnSetupFished(int result);
-
-    void on_actionREU_128KiB_triggered();
-
-    void on_actionREU_256KiB_triggered();
-
-    void on_actionREU_512KiB_triggered();
-
-    void on_actionREU_1MiB_triggered();
-
-    void on_actionREU_2MiB_triggered();
-
-    void on_actionREU_4MiB_triggered();
-
-    void on_actionREU_8MiB_triggered();
-
-    void on_actionREU_16MiB_triggered();
 
 private:
     /// Funktionen ///
