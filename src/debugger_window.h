@@ -24,7 +24,6 @@
 #include <QFontDatabase>
 
 #include "./c64_class.h"
-#include "./custom_save_file_dialog.h"
 #include "./label_widget_mod.h"
 #include "./memory_window.h"
 #include "./debugger_vic_window.h"
@@ -51,8 +50,8 @@ protected:
 
     virtual void resizeEvent( QResizeEvent* e )
     {
-      (void)e;
-      emit resize(this->width(), this->height());
+        (void)e;
+        emit resize(this->width(), this->height());
     }
 };
 
@@ -73,13 +72,13 @@ protected:
 
     virtual void resizeEvent( QResizeEvent* e )
     {
-      (void)e;
-      emit resize(this->width(), this->height());
+        (void)e;
+        emit resize(this->width(), this->height());
     }
 };
 
 namespace Ui {
-    class DebuggerWindow;
+class DebuggerWindow;
 }
 
 class DebuggerWindow : public QDialog

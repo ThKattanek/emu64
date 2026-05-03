@@ -22,6 +22,11 @@
 #include "./c64_file_types.h"
 #include "./utils.h"
 
+#include "./custom_save_file_dialog.h"
+#include "./command_line_class.h"
+#include "./emu64_commands.h"
+#include "./widget_floppy_status.h"
+
 static QMutex mutex_log_text;
 
 MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *log) :
@@ -57,7 +62,7 @@ MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *l
     ui->setupUi(this);
 
     // Center Window
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens().at(0)->availableGeometry()));
 
 #ifdef _WIN32
     setWindowTitle("Emu64 Version " + QString(VERSION_STRING) + " --- [Windows " + QString(ARCHITECTURE_STRING) + "]");
@@ -139,6 +144,10 @@ MainWindow::~MainWindow()
 
         ini->beginGroup("GeoRAM");
         ini->setValue("GeoRamMode", c64->GetGeoRamMode());
+        ini->endGroup();
+
+        ini->beginGroup("REU");
+        ini->setValue("ReuRamMode", c64->GetREUMode());
         ini->endGroup();
     }
     /////////////////////////////////////
@@ -602,23 +611,59 @@ int MainWindow::OnInit(bool nogui)
         LogText(tr(">> C64 Tastatur Mapping aus INI geladen\n").toUtf8());
         ini->endGroup();
 
+        // GeoRAM Mode aus INI laden und setzen //
         ini->beginGroup("GeoRAM");
-        uint8_t geo_ram_mode = ini->value("GeoRamMode", 0).toUInt();
+        uint8_t geo_ram_mode = ini->value("GeoRamMode", GEORAM_512KiB).toUInt();
         switch (geo_ram_mode)
         {
-        case _512KiB:
+        case GEORAM_512KiB:
             on_actionGEO_512KiB_triggered();
             break;
-        case _1024KiB:
+        case GEORAM_1024KiB:
             on_actionGEO_1024KiB_triggered();
             break;
-        case _2048KiB:
+        case GEORAM_2048KiB:
             on_actionGEO_2048KiB_triggered();
             break;
-        case _4096KiB:
+        case GEORAM_4096KiB:
             on_actionGEO_4096KiB_triggered();
             break;
         default:
+            break;
+        }
+        ini->endGroup();
+
+        // REU Einstellungen aus INI laden und setzen //
+        ini->beginGroup("REU");
+        uint16_t reu_ram_mode = ini->value("ReuRamMode", REU_512KiB).toUInt();
+        switch (reu_ram_mode)
+        {
+        case REU_128KiB:
+            on_actionREU_128KiB_triggered();
+            break;
+        case REU_256KiB:
+            on_actionREU_256KiB_triggered();
+            break;
+        case REU_512KiB:
+            on_actionREU_512KiB_triggered();
+            break;
+        case REU_1MiB:
+            on_actionREU_1MiB_triggered();
+            break;
+        case REU_2MiB:
+            on_actionREU_2MiB_triggered();
+            break;
+        case REU_4MiB:
+            on_actionREU_4MiB_triggered();
+            break;
+        case REU_8MiB:
+            on_actionREU_8MiB_triggered();
+            break;
+        case REU_16MiB:
+            on_actionREU_16MiB_triggered();
+            break;
+        default:
+            on_actionREU_256KiB_triggered();
             break;
         }
         ini->endGroup();
@@ -859,7 +904,7 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
     for(int i=0; i<argc; i++)
     {
         arg[i] = new char[string_list.at(i).size()+1];
-        strcpy(arg[i],string_list.at(i).toLatin1().data());
+        strlcpy(arg[i],string_list.at(i).toLatin1().data(), string_list.at(i).size()+1);
     }
 
     CommandLineClass *cmd_line = new CommandLineClass(argc, arg, "emu64",command_list, command_list_count);
@@ -963,6 +1008,41 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             break;
         case CMD_ENABLE_REU:
             c64->InsertREU();
+            break;
+        case CMD_SET_REU_SIZE:
+            val = cmd_line->GetArgInt(i+1, &error);
+            if(error) break;
+
+            switch(val)
+            {
+            case 128:
+                on_actionREU_128KiB_triggered();
+                break;
+            case 256:
+                on_actionREU_256KiB_triggered();
+                break;
+            case 512:
+                on_actionREU_512KiB_triggered();
+                break;
+            case 1024:
+                on_actionREU_1MiB_triggered();
+                break;
+            case 2048:
+                on_actionREU_2MiB_triggered();
+                break;
+            case 4096:
+                on_actionREU_4MiB_triggered();
+                break;
+            case 8192:
+                on_actionREU_8MiB_triggered();
+                break;
+            case 16384:
+                on_actionREU_16MiB_triggered();
+                break;
+            default:
+                std::cout << "Ungültige REU Speichergröße. (128, 256, 512, 1024, 2048, 4096, 8192, 16384)" << std::endl;
+                break;
+            }
             break;
         case CMD_SET_SIDTYPE:
             val = cmd_line->GetArgInt(i+1, &error);
@@ -1139,7 +1219,11 @@ bool MainWindow::ParseVersionNumber(QString version_string)
     {
         if(version_string[i] == '.')
         {
-            num = version_string.mid(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+            num = version_string.sliced(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+#else
+            num = version_string.midRef(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+#endif
             if(conv_to_int_is_ok)
             {
                 if(version_pos < 4)
@@ -1156,7 +1240,11 @@ bool MainWindow::ParseVersionNumber(QString version_string)
     {
         if(version_string[i] == '-')
         {
-            num = version_string.mid(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+            num = version_string.sliced(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+#else
+            num = version_string.midRef(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+#endif
             if(conv_to_int_is_ok)
             {
                 if(version_pos < 4)
@@ -1473,8 +1561,21 @@ void MainWindow::on_actionREU_laden_triggered()
     QString filename = QFileDialog::getOpenFileName(this,tr("REU Inhalt laden"),QDir::homePath(),tr("REU Image Dateien") + "(*.reu);;" + tr("Alle Dateien") + "(*.*)",nullptr,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
-        if(c64->LoadREUImage(filename.toLocal8Bit()) != 0)
-            QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des REU Images trat ein Fehler auf!"));
+        int ret = c64->LoadREUImage(filename.toLocal8Bit());
+
+        switch (ret) {
+        case -1:
+            QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Das REU Image konnte nicht geöffnet werden!"));
+            break;
+        case -2:
+            QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Das REU Image ist zu groß für die aktuell eingestellte REU Größe!"));
+            break;
+        case -3:
+            QMessageBox::warning(this,tr("Emu64 Fehler ..."),tr("Das REU Image ist kleiner als die aktuell eingestellte REU Größe!\nDas Image wurde aber trotzdem geladen, der restliche REU Speicher ist mit 0x00 gefüllt."));
+            break;
+        default:
+            break;
+        }
     }
 }
 
@@ -1540,19 +1641,19 @@ void MainWindow::on_actionGEO_laden_triggered()
 
             switch (c64->GetGeoRamMode())
             {
-            case _512KiB:
+            case GEORAM_512KiB:
                 GeoRamSizeStr = "512KiB";
                 on_actionGEO_512KiB_triggered();
                 break;
-            case _1024KiB:
+            case GEORAM_1024KiB:
                 GeoRamSizeStr = "1024KiB";
                 on_actionGEO_1024KiB_triggered();
                 break;
-            case _2048KiB:
+            case GEORAM_2048KiB:
                 GeoRamSizeStr = "2048KiB";
                 on_actionGEO_2048KiB_triggered();
                 break;
-            case _4096KiB:
+            case GEORAM_4096KiB:
                 GeoRamSizeStr = "4096KiB";
                 on_actionGEO_4096KiB_triggered();
                 break;
@@ -1647,12 +1748,10 @@ void MainWindow::on_actionCPU_Logging_Start_triggered()
     }
 }
 
-
 void MainWindow::on_actionCPU_Logging_Stop_triggered()
 {
     c64->StopDebugLogging();
 }
-
 
 void MainWindow::on_actionGEO_512KiB_triggered()
 {
@@ -1661,9 +1760,8 @@ void MainWindow::on_actionGEO_512KiB_triggered()
     ui->actionGEO_2048KiB->setChecked(false);
     ui->actionGEO_4096KiB->setChecked(false);
 
-    c64->SetGeoRamMode(_512KiB);
+    c64->SetGeoRamMode(GEORAM_512KiB);
 }
-
 
 void MainWindow::on_actionGEO_1024KiB_triggered()
 {
@@ -1672,9 +1770,8 @@ void MainWindow::on_actionGEO_1024KiB_triggered()
     ui->actionGEO_2048KiB->setChecked(false);
     ui->actionGEO_4096KiB->setChecked(false);
 
-    c64->SetGeoRamMode(_1024KiB);
+    c64->SetGeoRamMode(GEORAM_1024KiB);
 }
-
 
 void MainWindow::on_actionGEO_2048KiB_triggered()
 {
@@ -1683,9 +1780,8 @@ void MainWindow::on_actionGEO_2048KiB_triggered()
     ui->actionGEO_2048KiB->setChecked(true);
     ui->actionGEO_4096KiB->setChecked(false);
 
-    c64->SetGeoRamMode(_2048KiB);
+    c64->SetGeoRamMode(GEORAM_2048KiB);
 }
-
 
 void MainWindow::on_actionGEO_4096KiB_triggered()
 {
@@ -1694,6 +1790,118 @@ void MainWindow::on_actionGEO_4096KiB_triggered()
     ui->actionGEO_2048KiB->setChecked(false);
     ui->actionGEO_4096KiB->setChecked(true);
 
-    c64->SetGeoRamMode(_4096KiB);
+    c64->SetGeoRamMode(GEORAM_4096KiB);
+}
+
+void MainWindow::on_actionREU_128KiB_triggered()
+{
+    ui->actionREU_128KiB->setChecked(true);
+    ui->actionREU_256KiB->setChecked(false);
+    ui->actionREU_512KiB->setChecked(false);
+    ui->actionREU_1MiB->setChecked(false);
+    ui->actionREU_2MiB->setChecked(false);
+    ui->actionREU_4MiB->setChecked(false);
+    ui->actionREU_8MiB->setChecked(false);
+    ui->actionREU_16MiB->setChecked(false);
+
+    c64->SetREUMode(REU_128KiB);
+}
+
+void MainWindow::on_actionREU_256KiB_triggered()
+{
+    ui->actionREU_128KiB->setChecked(false);
+    ui->actionREU_256KiB->setChecked(true);
+    ui->actionREU_512KiB->setChecked(false);
+    ui->actionREU_1MiB->setChecked(false);
+    ui->actionREU_2MiB->setChecked(false);
+    ui->actionREU_4MiB->setChecked(false);
+    ui->actionREU_8MiB->setChecked(false);
+    ui->actionREU_16MiB->setChecked(false);
+
+    c64->SetREUMode(REU_256KiB);
+}
+
+void MainWindow::on_actionREU_512KiB_triggered()
+{
+    ui->actionREU_128KiB->setChecked(false);
+    ui->actionREU_256KiB->setChecked(false);
+    ui->actionREU_512KiB->setChecked(true);
+    ui->actionREU_1MiB->setChecked(false);
+    ui->actionREU_2MiB->setChecked(false);
+    ui->actionREU_4MiB->setChecked(false);
+    ui->actionREU_8MiB->setChecked(false);
+    ui->actionREU_16MiB->setChecked(false);
+
+    c64->SetREUMode(REU_512KiB);
+}
+
+void MainWindow::on_actionREU_1MiB_triggered()
+{
+    ui->actionREU_128KiB->setChecked(false);
+    ui->actionREU_256KiB->setChecked(false);
+    ui->actionREU_512KiB->setChecked(false);
+    ui->actionREU_1MiB->setChecked(true);
+    ui->actionREU_2MiB->setChecked(false);
+    ui->actionREU_4MiB->setChecked(false);
+    ui->actionREU_8MiB->setChecked(false);
+    ui->actionREU_16MiB->setChecked(false);
+
+    c64->SetREUMode(REU_1MiB);
+}
+
+void MainWindow::on_actionREU_2MiB_triggered()
+{
+    ui->actionREU_128KiB->setChecked(false);
+    ui->actionREU_256KiB->setChecked(false);
+    ui->actionREU_512KiB->setChecked(false);
+    ui->actionREU_1MiB->setChecked(false);
+    ui->actionREU_2MiB->setChecked(true);
+    ui->actionREU_4MiB->setChecked(false);
+    ui->actionREU_8MiB->setChecked(false);
+    ui->actionREU_16MiB->setChecked(false);
+
+    c64->SetREUMode(REU_2MiB);
+}
+
+void MainWindow::on_actionREU_4MiB_triggered()
+{
+    ui->actionREU_128KiB->setChecked(false);
+    ui->actionREU_256KiB->setChecked(false);
+    ui->actionREU_512KiB->setChecked(false);
+    ui->actionREU_1MiB->setChecked(false);
+    ui->actionREU_2MiB->setChecked(false);
+    ui->actionREU_4MiB->setChecked(true);
+    ui->actionREU_8MiB->setChecked(false);
+    ui->actionREU_16MiB->setChecked(false);
+
+    c64->SetREUMode(REU_4MiB);
+}
+
+void MainWindow::on_actionREU_8MiB_triggered()
+{
+    ui->actionREU_128KiB->setChecked(false);
+    ui->actionREU_256KiB->setChecked(false);
+    ui->actionREU_512KiB->setChecked(false);
+    ui->actionREU_1MiB->setChecked(false);
+    ui->actionREU_2MiB->setChecked(false);
+    ui->actionREU_4MiB->setChecked(false);
+    ui->actionREU_8MiB->setChecked(true);
+    ui->actionREU_16MiB->setChecked(false);
+
+    c64->SetREUMode(REU_8MiB);
+}
+
+void MainWindow::on_actionREU_16MiB_triggered()
+{
+    ui->actionREU_128KiB->setChecked(false);
+    ui->actionREU_256KiB->setChecked(false);
+    ui->actionREU_512KiB->setChecked(false);
+    ui->actionREU_1MiB->setChecked(false);
+    ui->actionREU_2MiB->setChecked(false);
+    ui->actionREU_4MiB->setChecked(false);
+    ui->actionREU_8MiB->setChecked(false);
+    ui->actionREU_16MiB->setChecked(true);
+
+    c64->SetREUMode(REU_16MiB);
 }
 

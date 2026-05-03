@@ -16,11 +16,10 @@
 #define GEORAM_CLASS_H
 
 #include <cstdint>
-#include <cstdio>
 
 // 512KiB, 1MiB, 2MiB, 4MiB
 
-enum GEO_RAM_MODES {_512KiB, _1024KiB, _2048KiB, _4096KiB};
+enum GEO_RAM_MODES {GEORAM_512KiB, GEORAM_1024KiB, GEORAM_2048KiB, GEORAM_4096KiB};
 enum GEO_RAM_TYPE {_GEORAM, _NEORAM};
 
 #define MAX_GEORAM_SIZE 4194304
@@ -45,7 +44,7 @@ class GEORAMClass
     int SaveRamImage(const char *filename);
     void ClearRAM(void);
     void SetGeoRamType(uint8_t type);   // _GEORAM or _NEORAM
-    uint8_t GetGeoRamMode();            // return _512, _1024, _2048, 4096
+    uint8_t GetGeoRamMode();            // return _512, _1024, _2048, _4096
     void SetGeoRamMode(uint8_t mode);   // _512, _1024, _2048, 4096
 
     private:

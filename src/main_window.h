@@ -30,7 +30,6 @@
 /// Windows ///
 #include "./structs.h"
 #include "./custom_splashscreen.h"
-#include "./widget_floppy_status.h"
 #include "./info_window.h"
 #include "./video_crt_setup_window.h"
 #include "./floppy_window.h"
@@ -44,16 +43,13 @@
 #include "./video_capture_window.h"
 #include "./sid_dump_window.h"
 #include "./oscilloscope_window.h"
-#include "./custom_save_file_dialog.h"
-#include "./command_line_class.h"
-#include "./emu64_commands.h"
 #include "c64_class.h"
 
 #define loging 'if(log!=0) *log'
 #define ErrorMsg(title, msg) QMessageBox::critical(this,title,msg,0,0);
 
 namespace Ui {
-    class MainWindow;
+class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -99,7 +95,7 @@ public:
 
 public slots:
     void OnMessage(QStringList msg);
-	int OnInit(bool nogui);
+    int OnInit(bool nogui);
 
 private slots:
     void on_menu_main_info_triggered();
@@ -134,23 +130,25 @@ private slots:
     void on_actionVideo_Capture_triggered();
     void on_actionSID_Dump_triggered();
     void on_actionAudio_Oszilloskop_triggered();
+    void on_actionCPU_Logging_Start_triggered();
+    void on_actionCPU_Logging_Stop_triggered();
+    void on_actionGEO_512KiB_triggered();
+    void on_actionGEO_1024KiB_triggered();
+    void on_actionGEO_2048KiB_triggered();
+    void on_actionGEO_4096KiB_triggered();
+    void on_actionREU_128KiB_triggered();
+    void on_actionREU_256KiB_triggered();
+    void on_actionREU_512KiB_triggered();
+    void on_actionREU_1MiB_triggered();
+    void on_actionREU_2MiB_triggered();
+    void on_actionREU_4MiB_triggered();
+    void on_actionREU_8MiB_triggered();
+    void on_actionREU_16MiB_triggered();
 
     void OnChangeGrafikModi(bool fullscreen, bool palmode, bool doublemode, bool filter);
     void OnChangeFloppyImage(int floppynr);
     void OnResetScreenshotCounter(void);
     void OnSetupFished(int result);
-
-    void on_actionCPU_Logging_Start_triggered();
-
-    void on_actionCPU_Logging_Stop_triggered();
-
-    void on_actionGEO_512KiB_triggered();
-
-    void on_actionGEO_1024KiB_triggered();
-
-    void on_actionGEO_2048KiB_triggered();
-
-    void on_actionGEO_4096KiB_triggered();
 
 private:
     /// Funktionen ///
@@ -158,9 +156,9 @@ private:
     void CreateLanguageMenu(QString defaultLocale);
     void RetranslateUi();
     void SetC64ScreenTitle(void);
-	void ExecuteCommandLine(QStringList string_list);
+    void ExecuteCommandLine(QStringList string_list);
     void SplashMessage(const QString &message, const QColor &color);
-	void AutoLoadAndRun(QString filename);
+    void AutoLoadAndRun(QString filename);
     bool ParseVersionNumber(QString version_string);
     int CompareVersionNumber(const VERSION_NUMBER *version1, const VERSION_NUMBER *version2); // compare result from version number in the ini file. INI Version: 0 = is equal, -1 is lesser, 1 = is greater
     void FixedVersionSettings();
@@ -176,7 +174,7 @@ private:
     QString dataPath;            // Pfad für alle Emu64 Daten
     QString custom_dataPath;     // Pfad für alle Emu64 Daten -> Wenn er per Komandozeile angegeben wurde (--data-path)
 
-	bool nogui;					 // Wenn die GUI nicht angezeigt wird
+    bool nogui;					 // Wenn die GUI nicht angezeigt wird
 
     //QString appPath;           // Pfad der emu64 Datei
     QString langPath;            // Pfad für alle Sprachfiles
@@ -213,7 +211,7 @@ private:
     //QStringList commandLine;                        // Enthält den an Emu64 übergebenen String
 
     bool isFirstPaintEvent;
-	bool isCommandDoubleTextureOff;
+    bool isCommandDoubleTextureOff;
 };
 
 #endif // MAINWINDOW_H
