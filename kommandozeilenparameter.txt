@@ -79,6 +79,9 @@ emu64 [PARAMETER]
 --enable-reu
     Aktiviert die REU.
 
+--set-reu-size
+    Setzt die Größe des REU Speichers in KiB (128, 256, 512, 1024, 2048, 4096, 8192, 16384).
+
 --set-sidtype
     Setzt den Typ des ersten SID's.
 
@@ -106,4 +109,4 @@ emu64 [PARAMETER]
 
 
 
-by Th.Kattanek (C)2023
+by Th.Kattanek (C)2026

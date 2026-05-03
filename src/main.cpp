@@ -39,6 +39,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("Emu64");
     QCoreApplication::setApplicationVersion(VERSION_STRING);
 
+    bool isFirstInstance = false;
+
     QTextStream *log = nullptr;
     QDir config_dir = QDir(QDir::homePath() + "/.config/emu64");
 
@@ -113,8 +115,6 @@ int main(int argc, char *argv[])
     SingleApplication *app;
     app = new SingleApplication (argc, argv);
 
-    bool isFirstInstance;
-
     if(!cmd_line->FoundCommand(CMD_MULTIPLE_INSTANCE))
     {
         if (app->alreadyExists())
@@ -122,7 +122,6 @@ int main(int argc, char *argv[])
 	    QStringList args;
             for(int i=0;i<argc;i++) args << argv[i];
 	    app->sendMessages(args);
-            isFirstInstance = false;
             return 0;
         }
         else
@@ -147,7 +146,12 @@ int main(int argc, char *argv[])
         if(!config_dir.exists())
         {
             qDebug("Fatal Error ... not created emu64 config directory !!!");
-            return app->exec();
+            int app_ret = app->exec();
+
+            if(app != nullptr)
+                delete app;
+
+            return app_ret;
         }
     }
     QFile LogFile(config_dir.path() + "/emu64.log");

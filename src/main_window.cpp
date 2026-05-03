@@ -1009,6 +1009,41 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
         case CMD_ENABLE_REU:
             c64->InsertREU();
             break;
+        case CMD_SET_REU_SIZE:
+            val = cmd_line->GetArgInt(i+1, &error);
+            if(error) break;
+
+            switch(val)
+            {
+            case 128:
+                on_actionREU_128KiB_triggered();
+                break;
+            case 256:
+                on_actionREU_256KiB_triggered();
+                break;
+            case 512:
+                on_actionREU_512KiB_triggered();
+                break;
+            case 1024:
+                on_actionREU_1MiB_triggered();
+                break;
+            case 2048:
+                on_actionREU_2MiB_triggered();
+                break;
+            case 4096:
+                on_actionREU_4MiB_triggered();
+                break;
+            case 8192:
+                on_actionREU_8MiB_triggered();
+                break;
+            case 16384:
+                on_actionREU_16MiB_triggered();
+                break;
+            default:
+                std::cout << "Ungültige REU Speichergröße. (128, 256, 512, 1024, 2048, 4096, 8192, 16384)" << std::endl;
+                break;
+            }
+            break;
         case CMD_SET_SIDTYPE:
             val = cmd_line->GetArgInt(i+1, &error);
             if(error) break;
