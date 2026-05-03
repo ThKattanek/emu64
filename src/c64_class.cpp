@@ -3042,7 +3042,8 @@ int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *retur
 
         fseek(file,FileStartOffset,SEEK_SET);
         reading_bytes = fread(RAM + start_address,1,end_address - start_address,file);
-        if(reading_bytes != (end_address - start_address))
+
+        if(reading_bytes != static_cast<size_t>(end_address - start_address))
         {
             std::cout << "Error T64 0x02" << std::endl;
             fclose(file);
