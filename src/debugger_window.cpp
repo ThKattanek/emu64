@@ -17,7 +17,9 @@
 
 #include "./debugger_window.h"
 #include "./ui_debugger_window.h"
+#include "./custom_save_file_dialog.h"
 #include "./micro_code_string_tbl_6510.h"
+#include "./cpu_info.h"
 
 DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     QDialog(parent),
@@ -56,7 +58,7 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     ui->setupUi(this);
 
     // Center Window
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens().at(0)->availableGeometry()));
 
     input_window = new InputBoxWindow(this);
 
@@ -733,7 +735,7 @@ void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
         disass_mnemonic[0]->setBackground(table_position_color);
         disass_addressing[0]->setBackground(table_position_color);
 
-        old_make_idx = akt_make_idx = 0;
+        old_make_idx = 0;
         pc = old_adresse = address;
     }
 
@@ -894,7 +896,7 @@ void DebuggerWindow::FillHistoryList(uint8_t index)
     char str00[10];
     uint8_t hp;
 
-   // int row_count = ui->HistoryList->height() / rect.height();
+    // int row_count = ui->HistoryList->height() / rect.height();
 
     if(current_source > 0)
     {
@@ -1386,9 +1388,9 @@ void DebuggerWindow::on_AnimationSpeed_valueChanged(int value)
 
 void DebuggerWindow::on_DisAssTable_doubleClicked(const QModelIndex &index)
 {
-   ui->AssAdresseIn->setText(ui->DisAssTable->item(index.row(),0)->text());
-   ui->AssMnemonicIn->setText(ui->DisAssTable->item(index.row(),2)->text());
-   ui->AssAdressierungIn->setText(ui->DisAssTable->item(index.row(),3)->text());
+    ui->AssAdresseIn->setText(ui->DisAssTable->item(index.row(),0)->text());
+    ui->AssMnemonicIn->setText(ui->DisAssTable->item(index.row(),2)->text());
+    ui->AssAdressierungIn->setText(ui->DisAssTable->item(index.row(),3)->text());
 }
 
 void DebuggerWindow::on_DisAssScroll_valueChanged(int value)
@@ -1414,7 +1416,7 @@ void DebuggerWindow::on_AddBreakpoint_clicked()
         else bg = c64->GetBreakGroup(index);
 
         QString Name = tr("Haltepunkt (") + QVariant(auto_num[current_source]++).toString() + ")";
-        strcpy(bg->Name,Name.toLocal8Bit().constData());
+        strlcpy(bg->Name,Name.toLocal8Bit().constData(), sizeof(bg->Name));
         bg->Enable = true;
 
         AddBreakpointTreeRoot(Name,bg);
@@ -1515,7 +1517,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
         }
         else bg = c64->GetBreakGroup(bg_index);
 
-        strcpy(bg->Name,item->text(0).toLocal8Bit().constData());
+        strlcpy(bg->Name,item->text(0).toLocal8Bit().constData(), sizeof(bg->Name));
         bg->Enable = item->checkState(0);
         c64->UpdateBreakGroup();
     }
@@ -1969,15 +1971,15 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
     if(current_source > 0) c64->floppy[currnet_floppy_nr]->DeleteAllBreakGroups();
     else c64->DeleteAllBreakGroups();
 
-	QString filename = QFileDialog::getOpenFileName(this, tr("Haltepunkte öffnen"), nullptr, tr("Emu64 Haltepunkt Datei ") + "(*.bpt)", nullptr, QFileDialog::DontUseNativeDialog);
+    QString filename = QFileDialog::getOpenFileName(this, tr("Haltepunkte öffnen"), nullptr, tr("Emu64 Haltepunkt Datei ") + "(*.bpt)", nullptr, QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
-       int ret;
-       if(current_source > 0) ret = c64->floppy[currnet_floppy_nr]->LoadBreakGroups(filename.toLocal8Bit());
-       else ret = c64->LoadBreakGroups(filename.toLocal8Bit());
+        int ret;
+        if(current_source > 0) ret = c64->floppy[currnet_floppy_nr]->LoadBreakGroups(filename.toLocal8Bit());
+        else ret = c64->LoadBreakGroups(filename.toLocal8Bit());
 
-       if(ret != 0)
-       {
+        if(ret != 0)
+        {
             switch(ret)
             {
             case -1:
@@ -1993,29 +1995,29 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
                 QMessageBox::warning(this,tr("Fehler..."),tr("Diese Datei enthält keine Haltepunkte."));
                 break;
             }
-       }
-       else
-       {
-           /// Alle Haltepunke ins TreeWidget einfügen ///
-           if(current_source > 0)
-           {
-               int count = c64->floppy[currnet_floppy_nr]->GetBreakGroupCount();
-               for(int i=0; i<count; i++)
-               {
-                   BREAK_GROUP *bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(i);
-                   AddBreakpointTreeRoot(bg->Name,bg);
-               }
-           }
-           else
-           {
-               int count = c64->GetBreakGroupCount();
-               for(int i=0; i<count; i++)
-               {
-                   BREAK_GROUP *bg = c64->GetBreakGroup(i);
-                   AddBreakpointTreeRoot(bg->Name,bg);
-               }
-           }
-       }
+        }
+        else
+        {
+            /// Alle Haltepunke ins TreeWidget einfügen ///
+            if(current_source > 0)
+            {
+                int count = c64->floppy[currnet_floppy_nr]->GetBreakGroupCount();
+                for(int i=0; i<count; i++)
+                {
+                    BREAK_GROUP *bg = c64->floppy[currnet_floppy_nr]->GetBreakGroup(i);
+                    AddBreakpointTreeRoot(bg->Name,bg);
+                }
+            }
+            else
+            {
+                int count = c64->GetBreakGroupCount();
+                for(int i=0; i<count; i++)
+                {
+                    BREAK_GROUP *bg = c64->GetBreakGroup(i);
+                    AddBreakpointTreeRoot(bg->Name,bg);
+                }
+            }
+        }
     }
 }
 
@@ -2043,7 +2045,7 @@ void DebuggerWindow::on_SaveBreakpoints_clicked()
     else
     {
         if(!c64->SaveBreakGroups(filename.toLocal8Bit()))
-          QMessageBox::warning(this,tr("Fehler..."),tr("Die Haltepunkte konnten nicht gespeichert werden."));
+            QMessageBox::warning(this,tr("Fehler..."),tr("Die Haltepunkte konnten nicht gespeichert werden."));
     }
 }
 
@@ -2406,7 +2408,12 @@ void DebuggerWindow::on_nmi_led_clicked(bool checked)
 void DebuggerWindow::on_HistoryList_doubleClicked(const QModelIndex &index)
 {
     bool is_ok = false;
-    int16_t address = index.data().toString().right(4).toInt(&is_ok, 16);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    int16_t address = index.data().toString().last(4).toInt(&is_ok, 16);
+#else
+    int16_t address = index.data().toString().rightRef(4).toInt(&is_ok, 16);
+#endif
 
     if(is_ok)
     {
