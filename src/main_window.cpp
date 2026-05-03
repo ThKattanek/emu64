@@ -22,6 +22,11 @@
 #include "./c64_file_types.h"
 #include "./utils.h"
 
+#include "./custom_save_file_dialog.h"
+#include "./command_line_class.h"
+#include "./emu64_commands.h"
+#include "./widget_floppy_status.h"
+
 static QMutex mutex_log_text;
 
 MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *log) :
@@ -57,7 +62,7 @@ MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *l
     ui->setupUi(this);
 
     // Center Window
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens().at(0)->availableGeometry()));
 
 #ifdef _WIN32
     setWindowTitle("Emu64 Version " + QString(VERSION_STRING) + " --- [Windows " + QString(ARCHITECTURE_STRING) + "]");
@@ -859,7 +864,7 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
     for(int i=0; i<argc; i++)
     {
         arg[i] = new char[string_list.at(i).size()+1];
-        strcpy(arg[i],string_list.at(i).toLatin1().data());
+        strlcpy(arg[i],string_list.at(i).toLatin1().data(), string_list.at(i).size()+1);
     }
 
     CommandLineClass *cmd_line = new CommandLineClass(argc, arg, "emu64",command_list, command_list_count);
@@ -1139,7 +1144,11 @@ bool MainWindow::ParseVersionNumber(QString version_string)
     {
         if(version_string[i] == '.')
         {
-            num = version_string.mid(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+            num = version_string.sliced(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+#else
+            num = version_string.midRef(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+#endif
             if(conv_to_int_is_ok)
             {
                 if(version_pos < 4)
@@ -1156,7 +1165,11 @@ bool MainWindow::ParseVersionNumber(QString version_string)
     {
         if(version_string[i] == '-')
         {
-            num = version_string.mid(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+            num = version_string.sliced(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+#else
+            num = version_string.midRef(substr_pos, i - substr_pos).toInt(&conv_to_int_is_ok, 10);
+#endif
             if(conv_to_int_is_ok)
             {
                 if(version_pos < 4)
