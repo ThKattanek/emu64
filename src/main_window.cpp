@@ -145,6 +145,10 @@ MainWindow::~MainWindow()
         ini->beginGroup("GeoRAM");
         ini->setValue("GeoRamMode", c64->GetGeoRamMode());
         ini->endGroup();
+
+        ini->beginGroup("REU");
+        ini->setValue("ReuRamMode", c64->GetREUMode());
+        ini->endGroup();
     }
     /////////////////////////////////////
 
@@ -607,8 +611,9 @@ int MainWindow::OnInit(bool nogui)
         LogText(tr(">> C64 Tastatur Mapping aus INI geladen\n").toUtf8());
         ini->endGroup();
 
+        // GeoRAM Mode aus INI laden und setzen //
         ini->beginGroup("GeoRAM");
-        uint8_t geo_ram_mode = ini->value("GeoRamMode", 0).toUInt();
+        uint8_t geo_ram_mode = ini->value("GeoRamMode", GEORAM_512KiB).toUInt();
         switch (geo_ram_mode)
         {
         case GEORAM_512KiB:
@@ -624,6 +629,41 @@ int MainWindow::OnInit(bool nogui)
             on_actionGEO_4096KiB_triggered();
             break;
         default:
+            break;
+        }
+        ini->endGroup();
+
+        // REU Einstellungen aus INI laden und setzen //
+        ini->beginGroup("REU");
+        uint16_t reu_ram_mode = ini->value("ReuRamMode", REU_512KiB).toUInt();
+        switch (reu_ram_mode)
+        {
+        case REU_128KiB:
+            on_actionREU_128KiB_triggered();
+            break;
+        case REU_256KiB:
+            on_actionREU_256KiB_triggered();
+            break;
+        case REU_512KiB:
+            on_actionREU_512KiB_triggered();
+            break;
+        case REU_1MiB:
+            on_actionREU_1MiB_triggered();
+            break;
+        case REU_2MiB:
+            on_actionREU_2MiB_triggered();
+            break;
+        case REU_4MiB:
+            on_actionREU_4MiB_triggered();
+            break;
+        case REU_8MiB:
+            on_actionREU_8MiB_triggered();
+            break;
+        case REU_16MiB:
+            on_actionREU_16MiB_triggered();
+            break;
+        default:
+            on_actionREU_256KiB_triggered();
             break;
         }
         ini->endGroup();
