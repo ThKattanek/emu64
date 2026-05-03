@@ -1559,6 +1559,8 @@ void MainWindow::on_actionREU_entfernen_triggered()
 void MainWindow::on_actionREU_laden_triggered()
 {
     QString filename = QFileDialog::getOpenFileName(this,tr("REU Inhalt laden"),QDir::homePath(),tr("REU Image Dateien") + "(*.reu);;" + tr("Alle Dateien") + "(*.*)",nullptr,QFileDialog::DontUseNativeDialog);
+    QFileInfo file_info(filename);
+
     if(filename != "")
     {
         int ret = c64->LoadREUImage(filename.toLocal8Bit());
@@ -1568,7 +1570,7 @@ void MainWindow::on_actionREU_laden_triggered()
             QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Das REU Image konnte nicht geöffnet werden!"));
             break;
         case -2:
-            QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Das REU Image ist zu groß für die aktuell eingestellte REU Größe!"));
+            QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Das REU Image ist zu groß für die aktuell eingestellte REU Größe!\nImage Größe: ") + QVariant(file_info.size() / 1024.0f).toString() + "KiB");
             break;
         case -3:
             QMessageBox::warning(this,tr("Emu64 Fehler ..."),tr("Das REU Image ist kleiner als die aktuell eingestellte REU Größe!\nDas Image wurde aber trotzdem geladen, der restliche REU Speicher ist mit 0x00 gefüllt."));
