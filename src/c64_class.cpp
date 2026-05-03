@@ -3200,6 +3200,16 @@ void C64Class::ClearREURam()
     reu->ClearRAM();
 }
 
+uint8_t C64Class::GetREUMode()
+{
+    return reu->GetReuRamMode();
+}
+
+void C64Class::SetREUMode(uint16_t mode)
+{
+    reu->SetReuRamMode(mode);
+}
+
 void C64Class::InsertGeoRam()
 {
     io_source = 3;

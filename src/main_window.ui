@@ -149,7 +149,7 @@ background-position: center
      <x>0</x>
      <y>0</y>
      <width>538</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -205,10 +205,25 @@ background-position: center
       <bool>false</bool>
      </property>
      <property name="title">
-      <string>REU 1764 (16MB)</string>
+      <string>RAM Expansion Unit (REU)</string>
      </property>
+     <widget class="QMenu" name="menuSpeichergr_e_2">
+      <property name="title">
+       <string>Speichergröße</string>
+      </property>
+      <addaction name="actionREU_128KiB"/>
+      <addaction name="actionREU_256KiB"/>
+      <addaction name="actionREU_512KiB"/>
+      <addaction name="actionREU_1MiB"/>
+      <addaction name="actionREU_2MiB"/>
+      <addaction name="actionREU_4MiB"/>
+      <addaction name="actionREU_8MiB"/>
+      <addaction name="actionREU_16MiB"/>
+     </widget>
      <addaction name="actionREU_einstecken"/>
      <addaction name="actionREU_entfernen"/>
+     <addaction name="separator"/>
+     <addaction name="menuSpeichergr_e_2"/>
      <addaction name="separator"/>
      <addaction name="actionREU_laden"/>
      <addaction name="actionREU_speichern"/>
@@ -911,6 +926,73 @@ background-position: center
    </property>
    <property name="text">
     <string>4096KiB</string>
+   </property>
+  </action>
+  <action name="actionREU_128KiB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>128KiB</string>
+   </property>
+  </action>
+  <action name="actionREU_256KiB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>256KiB</string>
+   </property>
+  </action>
+  <action name="actionREU_512KiB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>512KiB</string>
+   </property>
+  </action>
+  <action name="actionREU_1MiB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>1MiB</string>
+   </property>
+  </action>
+  <action name="actionREU_2MiB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>2MiB</string>
+   </property>
+  </action>
+  <action name="actionREU_4MiB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>4MiB</string>
+   </property>
+  </action>
+  <action name="actionREU_8MiB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>8MiB</string>
+   </property>
+  </action>
+  <action name="actionREU_16MiB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>16MiB</string>
    </property>
   </action>
  </widget>

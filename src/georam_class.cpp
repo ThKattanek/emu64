@@ -13,12 +13,13 @@
 //////////////////////////////////////////////////
 
 #include "georam_class.h"
+#include <cstdio>
 
 GEORAMClass::GEORAMClass() :
     geo_ram_insert(false),
     mem_frame(0),
     reg_start_address(0xdf80),  // original GeoRAM
-    geo_ram_mode(_512KiB)
+    geo_ram_mode(GEORAM_512KiB)
 {
 }
 
@@ -64,16 +65,16 @@ int GEORAMClass::LoadRamImage(const char *filename)
     switch(file_size)
     {
     case 524288:
-        geo_ram_mode = _512KiB;
+        geo_ram_mode = GEORAM_512KiB;
         break;
     case 1048576:
-        geo_ram_mode = _1024KiB;
+        geo_ram_mode = GEORAM_1024KiB;
         break;
     case 2097152:
-        geo_ram_mode = _2048KiB;
+        geo_ram_mode = GEORAM_2048KiB;
         break;
     case 4194304:
-        geo_ram_mode = _4096KiB;
+        geo_ram_mode = GEORAM_4096KiB;
         break;
     default:
         fclose(file);
@@ -168,16 +169,16 @@ void GEORAMClass::WriteIO2(uint16_t address, uint8_t value)
         // "Sector"
         switch(geo_ram_mode)
         {
-        case _512KiB:
+        case GEORAM_512KiB:
             _dfff = value & 0x1f;
             break;
-        case _1024KiB:
+        case GEORAM_1024KiB:
             _dfff = value & 0x3f;
             break;
-        case _2048KiB:
+        case GEORAM_2048KiB:
             _dfff = value & 0x7f;
             break;
-        case _4096KiB:
+        case GEORAM_4096KiB:
             _dfff = value;
             break;
         default:

@@ -21,6 +21,10 @@
 
 #define MAX_BANK_COUNT 256
 
+// 128KiB, 256KiB, 512KiB, 1MiB, 2MiB, 4MiB, 8MiB, 16MiB
+
+enum REU_RAM_MODES {REU_128KiB, REU_256KiB, REU_512KiB, REU_1MiB, REU_2MiB, REU_4MiB, REU_8MiB, REU_16MiB};
+
 class REUClass
 {
 public:
@@ -35,7 +39,9 @@ public:
 
     void Insert(void);
     void Remove(void);
-    void SetRamBankCount(uint16_t count) { RamBankCount = count; }
+    void SetReuRamMode(uint8_t mode);   // _128, _256, _512, _1024, _2048, _4096, _8192, _16384
+    uint8_t GetReuRamMode();            // return _128, _256, _512, _1024, _2048, _4096, _8192, _16384
+
     int LoadRAM(const char *filename);
     int SaveRAM(const char *filename);
     void ClearRAM(void);
@@ -66,21 +72,23 @@ private:
 
     bool			BA_STATUS;
 
-    uint16_t        RamBankCount;    // Anzahl der 64KB Bänke (1-256)
-    uint8_t     	RamBaenke[MAX_BANK_COUNT][0x10000]; // 256 x 64KB = 16MB
+    uint8_t         reu_ram_mode;       // 128kB, 256kB, 512kB, 1MB, 2MB, 4MB, 8MB, 16MB
+    uint16_t        ram_bank_count;     // Anzahl der 64KB Bänke (1-256)
+    uint8_t     	ram_baenke[MAX_BANK_COUNT][0x10000]; // 256 x 64KB = 16MB
+    uint8_t     	ram_bank_mask;      // Maske für die Banknummer (0-255)
 
-    bool			REUInsert;
-    bool			REUWait_FF00;
+    bool			is_reu_insert;
+    bool			reu_wait_ff00;
 
     // IO
-    uint8_t     	IO[0x0B];
-    uint8_t     	CPUWaitCounter;
-    bool			TransferStart;
-    uint16_t    	AdresseC64;
-    uint16_t    	AdresseREU;
-    uint16_t    	Counter;
-    uint8_t         Bank;
-    uint8_t     	TransferTyp;
+    uint8_t     	io[0x0B];
+    uint8_t     	cpu_wait_counter;
+    bool			tarnsfer_start;
+    uint16_t    	c64_address;
+    uint16_t    	reu_address;
+    uint16_t    	counter;
+    uint8_t         current_bank;
+    uint8_t     	transfer_typ;
 };
 
 #endif // REU_CLASS_H

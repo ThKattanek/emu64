@@ -136,6 +136,8 @@ public:
     int LoadREUImage(const char *filename);
     int SaveREUImage(const char *filename);
     void ClearREURam();
+    uint8_t GetREUMode();
+    void SetREUMode(uint16_t mode);
 
     void InsertGeoRam();
     void RemoveGeoRam();
