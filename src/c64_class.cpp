@@ -1485,7 +1485,7 @@ void C64Class::SetFloppyWriteProtect(uint8_t floppy_nr, bool status)
 
 void C64Class::SetCommandLine(char *c64_command)
 {
-    strlcpy(c64_command_line, c64_command, sizeof(c64_command_line));
+    snprintf(c64_command_line, sizeof(c64_command_line), "%s", c64_command);
     c64_command_line_lenght = static_cast<uint16_t>(strlen(c64_command_line));
     c64_command_line_current_pos = 0;
     c64_command_line_status = true;
@@ -1535,7 +1535,7 @@ void C64Class::SetGrafikModi(bool enable_screen_doublesize, bool enable_screen_c
 
 void C64Class::SetSDLWindowName(const char *name)
 {
-    strlcpy(sdl_window_name, name, sizeof(sdl_window_name));
+    snprintf(sdl_window_name, sizeof(sdl_window_name), "%s", name);
     SDL_SetWindowTitle(sdl_window, name);
 }
 
@@ -2815,7 +2815,8 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
 
         KillCommandLine();
         auto_load_mode = 0;
-        sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
+
+        snprintf(auto_load_command_line, sizeof(auto_load_command_line), "LOAD\"*\",%d,1%cRUN%c", floppy_nr + 8, 13, 13);
         HardReset();
         wait_reset_ready = true;
         c64_reset_ready = false;
@@ -2829,7 +2830,8 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
 
         KillCommandLine();
         auto_load_mode = 0;
-        sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
+
+        snprintf(auto_load_command_line, sizeof(auto_load_command_line) , "LOAD\"*\",%d,1%cRUN%c", floppy_nr + 8, 13, 13);
         HardReset();
         wait_reset_ready = true;
         c64_reset_ready = false;
@@ -2842,7 +2844,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
         KillCommandLine();
         auto_load_mode = 1;
 
-        strlcpy(auto_load_filename, filename, sizeof(auto_load_filename));
+        snprintf(auto_load_filename, sizeof(auto_load_filename), "%s", filename);
         auto_load_file = file;
         auto_load_file_typ = typ;
 
@@ -2857,7 +2859,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
         KillCommandLine();
         auto_load_mode = 2;
 
-        strlcpy(auto_load_filename, filename, sizeof(auto_load_filename));
+        snprintf(auto_load_filename, sizeof(auto_load_filename), "%s", filename);
         auto_load_file = file;
         auto_load_file_typ = typ;
 
@@ -2872,7 +2874,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
         KillCommandLine();
         auto_load_mode = 1;
 
-        strlcpy(auto_load_filename, filename, sizeof(auto_load_filename));
+        snprintf(auto_load_filename, sizeof(auto_load_filename), "%s", filename);
         auto_load_file = file;
         auto_load_file_typ = typ;
 
@@ -3954,7 +3956,7 @@ void C64Class::SetScreenshotDir(const char *screenshot_dir)
 #ifdef __STDC_LIB_EXT1__
     strcpy_s(this->screenshot_dir, static_cast<size_t>(strlen(screenshot_dir))+1, screenshot_dir);
 #else
-    strlcpy(this->screenshot_dir, screenshot_dir, sizeof(strlen(screenshot_dir)+1));
+    snprintf(this->screenshot_dir, sizeof(this->screenshot_dir), "%s", screenshot_dir);
 #endif
 }
 
@@ -3995,7 +3997,7 @@ const char *C64Class::GetScreenshotFormatName(uint8_t format)
 
 void C64Class::SetExitScreenshot(const char *filename)
 {
-    strlcpy(exit_screenshot_filename, filename, sizeof(exit_screenshot_filename));
+    snprintf(exit_screenshot_filename, sizeof(exit_screenshot_filename), "%s", filename);
     enable_exit_screenshot = true;
 }
 
@@ -4590,7 +4592,7 @@ void C64Class::ClearJoystickMapping(int slot_nr)
 {
     char str00[32];
     sprintf(str00,"Slot %d",slot_nr+1);
-    strlcpy(virtual_joys[slot_nr].Name, str00, sizeof(virtual_joys[slot_nr].Name));
+    snprintf(virtual_joys[slot_nr].Name, sizeof(virtual_joys[slot_nr].Name), "%s", str00);
 
     for(int i=0;i<5;i++)
     {

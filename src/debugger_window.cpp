@@ -1416,7 +1416,7 @@ void DebuggerWindow::on_AddBreakpoint_clicked()
         else bg = c64->GetBreakGroup(index);
 
         QString Name = tr("Haltepunkt (") + QVariant(auto_num[current_source]++).toString() + ")";
-        strlcpy(bg->Name,Name.toLocal8Bit().constData(), sizeof(bg->Name));
+        snprintf(bg->Name, sizeof(bg->Name), "%s", Name.toLocal8Bit().constData());
         bg->Enable = true;
 
         AddBreakpointTreeRoot(Name,bg);
@@ -1517,7 +1517,7 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
         }
         else bg = c64->GetBreakGroup(bg_index);
 
-        strlcpy(bg->Name,item->text(0).toLocal8Bit().constData(), sizeof(bg->Name));
+        snprintf(bg->Name, sizeof(bg->Name), "%s", item->text(0).toLocal8Bit().constData());
         bg->Enable = item->checkState(0);
         c64->UpdateBreakGroup();
     }

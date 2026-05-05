@@ -904,7 +904,7 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
     for(int i=0; i<argc; i++)
     {
         arg[i] = new char[string_list.at(i).size()+1];
-        strlcpy(arg[i],string_list.at(i).toLatin1().data(), string_list.at(i).size()+1);
+        strncpy(arg[i],string_list.at(i).toLatin1().data(), string_list.at(i).size()+1);
     }
 
     CommandLineClass *cmd_line = new CommandLineClass(argc, arg, "emu64",command_list, command_list_count);
