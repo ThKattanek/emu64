@@ -57,8 +57,10 @@ cd public_release
 
 # check of qmake for static i686 and x86_64
 declare i686_qmake=$mxe_path/usr/i686-w64-mingw32.static/qt5/bin/qmake
+# declare i686_qmake=$mxe_path/usr/i686-w64-mingw32.static/qt6/bin/qmake
 declare i686_libpath=$mxe_path/usr/i686-w64-mingw32.static/lib
 declare x86_64_qmake=$mxe_path/usr/x86_64-w64-mingw32.static/qt5/bin/qmake
+# declare x86_64_qmake=$mxe_path/usr/x86_64-w64-mingw32.static/qt6/bin/qmake
 declare x86_64_libpath=$mxe_path/usr/x86_64-w64-mingw32.static/lib
 
 if [ ! -e $i686_cmake ]; then
