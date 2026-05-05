@@ -288,6 +288,38 @@ HEADERS += \
     widget_sr_edit.h \
     widget_tape_counter.h
 
+# reSID
+SOURCES += \
+    resid/dac.cc \
+    resid/envelope.cc \
+    resid/extfilt.cc \
+    resid/filter8580new.cc \
+    resid/pot.cc \
+    resid/sid.cc \
+    resid/version.cc \
+    resid/voice.cc \
+    resid/wave.cc
+
+HEADERS += \
+    resid/dac.h \
+    resid/envelope.h \
+    resid/extfilt.h \
+    resid/filter8580new.h \
+    resid/pot.h \
+    resid/sid.h \
+    resid/siddefs.h \
+    resid/spline.h \
+    resid/voice.h \
+    resid/wave.h \
+    resid/wave6581_PST.h \
+    resid/wave6581_PS_.h \
+    resid/wave6581_P_T.h \
+    resid/wave6581__ST.h \
+    resid/wave8580_PST.h \
+    resid/wave8580_PS_.h \
+    resid/wave8580_P_T.h \
+    resid/wave8580__ST.h
+
 FORMS += \
     c64_keyboard_window.ui \
     c64_speed_window.ui \

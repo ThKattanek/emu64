@@ -20,6 +20,7 @@
 #include "./mos6510_class.h"
 #include "./mos6569_class.h"
 #include "./mos6581_8085_class.h"
+#include "./resid/sid.h"
 #include "./mos6526_class.h"
 #include "./cartridge_class.h"
 #include "./reu_class.h"
@@ -348,8 +349,15 @@ public:
     MMU             *mmu;
     MOS6510         *cpu;
     VICII           *vic;
+
+    // Emu64 OLD SID Emulation
     MOS6581_8085    *sid1;
     MOS6581_8085    *sid2;
+
+    // reSID Emulation
+    reSID::SID      *resid_sid1;
+    reSID::SID      *resid_sid2;
+
     MOS6526         *cia1;
     MOS6526         *cia2;
     CartridgeClass  *crt;

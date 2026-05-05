@@ -378,6 +378,10 @@ vic = new VICII();
 int sid_ret_error;
 sid1 = new MOS6581_8085(0,audio_frequency,audio_spec_have.samples,&sid_ret_error);
 sid2 = new MOS6581_8085(1,audio_frequency,audio_spec_have.samples,&sid_ret_error);
+
+resid_sid1 = new reSID::SID();
+resid_sid2 = new reSID::SID();
+
 cia1 = new MOS6526(0);
 cia2 = new MOS6526(1);
 crt = new CartridgeClass();
@@ -610,6 +614,10 @@ C64Class::~C64Class()
         delete sid1;
     }
     if(sid2 != nullptr) delete sid2;
+
+    if(resid_sid1 != nullptr) delete resid_sid1;
+    if(resid_sid2 != nullptr) delete resid_sid2;
+
     if(cia1 != nullptr) delete cia1;
     if(cia2 != nullptr) delete cia2;
     if(crt != nullptr) delete crt;
