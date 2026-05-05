@@ -3956,7 +3956,7 @@ void C64Class::SetScreenshotDir(const char *screenshot_dir)
 #ifdef __STDC_LIB_EXT1__
     strcpy_s(this->screenshot_dir, static_cast<size_t>(strlen(screenshot_dir))+1, screenshot_dir);
 #else
-    snprintf(this->screenshot_dir, sizeof(this->screenshot_dir), "%s", screenshot_dir);
+    snprintf(this->screenshot_dir, static_cast<size_t>(strlen(screenshot_dir))+1, "%s", screenshot_dir);
 #endif
 }
 
