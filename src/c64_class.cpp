@@ -72,7 +72,7 @@ static const char* CPU_OPC = {"\
                               RSTIRQNMI"};
 
                               C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(const char*)> log_function, const char *data_path):
-                                  mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
+                                  mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),resid1(nullptr),resid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
                               {
                                    *ret_error = 0;
 
@@ -376,11 +376,16 @@ mmu = new MMU();
 cpu = new MOS6510();
 vic = new VICII();
 int sid_ret_error;
+
+// Emu64 SID Emulation
 sid1 = new MOS6581_8085(0,audio_frequency,audio_spec_have.samples,&sid_ret_error);
 sid2 = new MOS6581_8085(1,audio_frequency,audio_spec_have.samples,&sid_ret_error);
 
-resid_sid1 = new reSID::SID();
-resid_sid2 = new reSID::SID();
+// Resid SID Emulation
+resid1 = new ReSIDWrapperClass(0,audio_frequency,audio_spec_have.samples,&sid_ret_error);
+resid2 = new ReSIDWrapperClass(0,audio_frequency,audio_spec_have.samples,&sid_ret_error);
+
+sid_emulation = SID_EMULATION::EMU64_SID;
 
 cia1 = new MOS6526(0);
 cia2 = new MOS6526(1);
@@ -521,6 +526,8 @@ vic->color_ram = mmu->GetFarbramPointer();
 vic->cia2_port_a = cia2_port_a.GetOutputBitsPointer();
 sid1->RESET = &reset_wire;
 sid2->RESET = &reset_wire;
+resid1->reset = &reset_wire;
+resid2->reset = &reset_wire;
 reu->BA = &rdy_ba_wire;
 reu->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
 reu->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
@@ -615,8 +622,12 @@ C64Class::~C64Class()
     }
     if(sid2 != nullptr) delete sid2;
 
-    if(resid_sid1 != nullptr) delete resid_sid1;
-    if(resid_sid2 != nullptr) delete resid_sid2;
+    if(resid1 != nullptr)
+    {
+        StopSidDump();
+        delete resid1;
+    }
+    if(resid2 != nullptr) delete resid2;
 
     if(cia1 != nullptr) delete cia1;
     if(cia2 != nullptr) delete cia2;
@@ -4127,7 +4138,9 @@ bool C64Class::StartSidDump(const char *filename)
 
 void C64Class::StopSidDump()
 {
-    sid1->IoDump->StopCapture();
+    if(sid1 != nullptr)
+        if(sid1->IoDump != nullptr)
+            sid1->IoDump->StopCapture();
 }
 
 int C64Class::GetSidDumpFrames()

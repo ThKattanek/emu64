@@ -20,7 +20,7 @@
 #include "./mos6510_class.h"
 #include "./mos6569_class.h"
 #include "./mos6581_8085_class.h"
-#include "./resid/sid.h"
+#include "./resid_wrapper.h"
 #include "./mos6526_class.h"
 #include "./cartridge_class.h"
 #include "./reu_class.h"
@@ -57,6 +57,7 @@
 #define DEBUG_CART_ADRESS 0xD7FF
 
 enum SCREENSHOT_FORMATS {SCREENSHOT_FORMAT_BMP, SCREENSHOT_FORMAT_PNG, SCREENSHOT_FORMATS_COUNT};
+enum SID_EMULATION {EMU64_SID, RESID_SID};
 
 class C64Class
 {
@@ -354,9 +355,8 @@ public:
     MOS6581_8085    *sid1;
     MOS6581_8085    *sid2;
 
-    // reSID Emulation
-    reSID::SID      *resid_sid1;
-    reSID::SID      *resid_sid2;
+    ReSIDWrapperClass *resid1;
+    ReSIDWrapperClass *resid2;
 
     MOS6526         *cia1;
     MOS6526         *cia2;
@@ -531,8 +531,8 @@ private:
     bool        c64_command_line_count_s;
 
     uint32_t    cycle_counter;
-    int         limit_cycles_counter;           // Dieser Counter wird wenn er > 0 ist bei jeden Zyklus um 1 runtergezählt
-    bool		hold_next_system_cycle;         // Wird dieses Flag gesetzt wird verhindert das ein C64 Cylce ausgeführt wird
+    int         limit_cycles_counter;       // Dieser Counter wird wenn er > 0 ist bei jeden Zyklus um 1 runtergezählt
+    bool		hold_next_system_cycle;     // Wird dieses Flag gesetzt wird verhindert das ein C64 Cylce ausgeführt wird
 
     bool        enable_debug_cart;          // Wird auf true gesetzt wenn der Debug Cart aktiviert ist
     bool        is_wtite_to_debug_cart;     // Wird auf true gesetzt wenn in den Debug Cart geschrieben wird
@@ -558,6 +558,8 @@ private:
 
     bool        key_map_is_rec;
     uint8_t     rec_matrix_code;
+
+    int         sid_emulation;
 };
 
 #endif // C64CLASS_H

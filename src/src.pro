@@ -192,6 +192,7 @@ SOURCES += \
     new_romset_window.cpp \
     oscilloscope_widget.cpp \
     oscilloscope_window.cpp \
+    resid_wrapper.cpp \
     reu_class.cpp \
     savepng.c \
     setup_window.cpp \
@@ -261,6 +262,7 @@ HEADERS += \
     new_romset_window.h \
     oscilloscope_widget.h \
     oscilloscope_window.h \
+    resid_wrapper.h \
     reu_class.h \
     savepng.h \
     setup_window.h \
