@@ -194,7 +194,8 @@ bool MOS6581_8085::OneZyklus(void)
 {
     ret = false;
     
-    if(!*RESET) Reset();
+    if(RESET != nullptr)
+        if(!*RESET) Reset();
 
     if(LastWriteCounter > 0)
     {

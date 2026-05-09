@@ -10,6 +10,15 @@ public:
     ReSIDWrapperClass(int number, int samplerate,int buffersize,int *error);
     ~ReSIDWrapperClass();
 
+    void SetClockFrequency(float clock_freq);
+    void SetChipModel(int model);
+    void Reset();
+    unsigned char ReadRegister(unsigned char offset);
+    void WriteRegister(unsigned char offset, unsigned char value);
+    bool OneCycle();
+
+    void SetSoundBufferPosToZero();
+
     short *sound_buffer;
     short *sound_buffer_v0;
     short *sound_buffer_v1;
@@ -33,7 +42,7 @@ private:
     reSID::SID *sid;
 
     int	sid_number;
-    int Sid_model;
+    int sid_model;
 
     float samplerate;
 
