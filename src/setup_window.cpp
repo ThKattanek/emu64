@@ -54,6 +54,9 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoCrtClass *vid
     ui->VicSprBgrCollisionEnable->setEnabled(true);
     ui->VicGreyDotsEnable->setEnabled(true);
 
+    // SID Emulation Emu64 oder reSID
+    ui->resid_sid->setChecked(true);
+
     // SID Typen zur ComboBox hinzufügen
     ui->FirstSidTyp->addItems(QStringList()<<"MOS-6581"<<"MOS-8580");
     ui->SecondSidTyp->addItems(QStringList()<<"MOS-6581"<<"MOS-8580");
@@ -263,7 +266,7 @@ void SetupWindow::LoadINI(C64Class *c64)
 
         value = ini->value("SIDVolume",100).toInt();
         ui->SIDVolume->setValue(value);
-        c64->SetSIDVolume(value / 100.0);
+        c64->SetSidVolume(value / 100.0);
 
         value =ini->value("SoundBufferSize",64).toInt();
         ui->SoundBufferSizeValue->setValue(value);
@@ -765,7 +768,7 @@ void SetupWindow::on_MausPort_currentIndexChanged(int index)
 void SetupWindow::on_SIDVolume_valueChanged(int value)
 {
    ui->SIDVolumeOut->setText(QVariant(value).toString() + "%");
-   c64->SetSIDVolume(value / 100.0);
+   c64->SetSidVolume(value / 100.0);
 }
 
 void SetupWindow::on_AutoMouseHide_clicked(bool checked)
@@ -787,6 +790,18 @@ void SetupWindow::on_AutoMouseHideTime_valueChanged(int arg1)
     if(ui->AutoMouseHide->isChecked()) c64->SetMouseHiddenTime(arg1 * 1000);
     else c64->SetMouseHiddenTime(0);
 }
+
+void SetupWindow::on_emu64_sid_clicked()
+{
+    c64->SetSidEmulation(SID_EMULATION::EMU64_SID);
+}
+
+
+void SetupWindow::on_resid_sid_clicked()
+{
+    c64->SetSidEmulation(SID_EMULATION::RESID_SID);
+}
+
 
 void SetupWindow::on_FirstSidTyp_currentIndexChanged(int index)
 {

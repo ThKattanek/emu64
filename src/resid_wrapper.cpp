@@ -71,6 +71,7 @@ ReSIDWrapperClass::~ReSIDWrapperClass()
 
 void ReSIDWrapperClass::SetClockFrequency(float clock_freq)
 {
+    c64_cycle_sek = clock_freq;
     sid->set_sampling_parameters(clock_freq, reSID::SAMPLE_INTERPOLATE, samplerate);
     freq_conv_add_value = 1.0f/(c64_cycle_sek/samplerate);
 }

@@ -363,7 +363,6 @@ if(sdl_window_icon != nullptr)
         *ret_error = -4;
         return;
     }
-
 }
 else
     LogText("<< ERROR: Fehler beim laden des SLDFenster Icons\n");
@@ -687,6 +686,7 @@ void C64Class::StartEmulation()
     {
         LogText(">> C64Thread wurde gestartet.\n");
 
+        is_process_fill_audio_buffer = false;
         SDL_PauseAudioDevice(audio_dev, 0);
         LogText(">> SDL Audiostream wurde getartet.\n");
     }
@@ -1080,7 +1080,6 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 {
     sid1->ZeroSoundBufferPos();
     sid2->ZeroSoundBufferPos();
-
     resid1->SetSoundBufferPosToZero();
     resid2->SetSoundBufferPosToZero();
 
@@ -1110,6 +1109,8 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
         while((*current_soundbuffer_pos < sample_buffer_size_mono) && (debug_mode == false))
         {
+            is_process_fill_audio_buffer = true;
+
             if(limit_cycles_counter > 0)
             {
                 limit_cycles_counter--;
@@ -1211,7 +1212,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 iec_export_vdc.SetWire(3,floppy_iec_wire & 64);
                 iec_export_vdc.SetWire(4,floppy_iec_wire & 128);
             }
-
+            is_process_fill_audio_buffer = false;
         }
 
         int sample_buffer_size = ((laenge / audio_channels) * 2) / (audio_sample_bit_size/8);
@@ -2819,6 +2820,7 @@ void C64Class::SetC64Frequency(int c64_frequency)
 void C64Class::SetC64Speed(int speed)
 {
     c64_speed = speed;
+
     sid1->SetC64Zyklen(c64_frequency*(speed/100.f));
     sid2->SetC64Zyklen(c64_frequency*(speed/100.f));
 
@@ -4170,7 +4172,37 @@ void C64Class::StopIECDump()
     iec_export_vdc.Close();
 }
 
-void C64Class::SetSIDVolume(float_t volume)
+void C64Class::SetSidEmulation(int sid_emulation)
+{
+    if(this->sid_emulation == sid_emulation)
+        return;
+
+    this->sid_emulation = sid_emulation;
+
+    while(is_process_fill_audio_buffer) {SDL_Delay(1);}
+    switch(sid_emulation)
+    {
+        case EMU64_SID:
+            sid1->ZeroSoundBufferPos();
+            sid2->ZeroSoundBufferPos();
+            sid1->SoundOutputEnable = !debug_mode;
+            sid2->SoundOutputEnable = !debug_mode;
+            resid1->sound_output_enable = false;
+            resid2->sound_output_enable = false;
+            break;
+
+        case RESID_SID:
+            resid1->SetSoundBufferPosToZero();
+            resid2->SetSoundBufferPosToZero();
+            sid1->SoundOutputEnable = false;
+            sid2->SoundOutputEnable = false;
+            resid1->sound_output_enable = !debug_mode;
+            resid2->sound_output_enable = !debug_mode;
+            break;
+    }
+}
+
+void C64Class::SetSidVolume(float_t volume)
 {
     sid_volume = volume;
 }

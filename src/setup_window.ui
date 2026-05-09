@@ -23,7 +23,7 @@
       <bool>true</bool>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -81,58 +81,65 @@
               <property name="horizontalSpacing">
                <number>6</number>
               </property>
-              <item row="3" column="0" colspan="2">
-               <widget class="QCheckBox" name="SidFilterEnable">
-                <property name="text">
-                 <string>Filter Emulation</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0" colspan="2">
-               <widget class="QCheckBox" name="SidCycleExactEnable">
-                <property name="text">
-                 <string>Zyklengenaue Emulation</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="2" colspan="2">
-               <widget class="QCheckBox" name="Sid6ChannelMode">
-                <property name="text">
-                 <string>6 Kanal Modus</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
+              <item row="2" column="1">
                <widget class="QCheckBox" name="SecondSidEnable">
                 <property name="text">
                  <string>2. SID</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QComboBox" name="FirstSidTyp"/>
-              </item>
-              <item row="0" column="3">
-               <widget class="QLabel" name="sid_io_label">
-                <property name="text">
-                 <string>IO Bereich</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="3">
-               <widget class="QComboBox" name="SecondSidAddress"/>
-              </item>
-              <item row="1" column="1" colspan="2">
-               <widget class="QComboBox" name="SecondSidTyp"/>
-              </item>
-              <item row="0" column="0">
+              <item row="2" column="0">
                <widget class="QLabel" name="sid1_label">
                 <property name="text">
                  <string>1. SID</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="4">
+              <item row="3" column="0">
+               <widget class="QComboBox" name="FirstSidTyp"/>
+              </item>
+              <item row="3" column="3">
+               <widget class="QComboBox" name="SecondSidAddress"/>
+              </item>
+              <item row="2" column="3">
+               <widget class="QLabel" name="sid_io_label">
+                <property name="text">
+                 <string>IO Bereich</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QRadioButton" name="emu64_sid">
+                <property name="text">
+                 <string>Emu64 SID</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0" colspan="2">
+               <widget class="QCheckBox" name="SidFilterEnable">
+                <property name="text">
+                 <string>Filter Emulation</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0" colspan="2">
+               <widget class="QCheckBox" name="SidCycleExactEnable">
+                <property name="text">
+                 <string>Zyklengenaue Emulation</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="2" colspan="2">
+               <widget class="QCheckBox" name="Sid6ChannelMode">
+                <property name="text">
+                 <string>6 Kanal Modus</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="4">
                <spacer name="horizontalSpacer_3">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -144,6 +151,23 @@
                  </size>
                 </property>
                </spacer>
+              </item>
+              <item row="0" column="1">
+               <widget class="QRadioButton" name="resid_sid">
+                <property name="text">
+                 <string>reSID</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1" colspan="2">
+               <widget class="QComboBox" name="SecondSidTyp"/>
+              </item>
+              <item row="1" column="0" colspan="5">
+               <widget class="Line" name="line_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>

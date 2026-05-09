@@ -57,7 +57,7 @@
 #define DEBUG_CART_ADRESS 0xD7FF
 
 enum SCREENSHOT_FORMATS {SCREENSHOT_FORMAT_BMP, SCREENSHOT_FORMAT_PNG, SCREENSHOT_FORMATS_COUNT};
-enum SID_EMULATION {EMU64_SID, RESID_SID};
+enum SID_EMULATION {EMU64_SID, RESID_SID, SID_EMULATION_COUNT};
 
 class C64Class
 {
@@ -212,7 +212,8 @@ public:
     bool StartIECDump(const char *filename);
     void StopIECDump();
 
-    void SetSIDVolume(float_t volume);  // Lautstärke der SID's (0.0f - 1.0f)
+    void SetSidEmulation(int sid_emulation);  // SID Emulation (EMU64_SID oder RESID_SID)
+    void SetSidVolume(float_t volume);  // Lautstärke der SID's (0.0f - 1.0f)
     void SetFirstSidTyp(int sid_typ);   // SID Typ des 1. SID (MOS_6581 oder MOS_8580)
     void SetSecondSidTyp(int sid_typ);  // SID Typ des 2. SID (MOS_6581 oder MOS_8580)
     void EnableStereoSid(bool enable);  // 2. SID aktivieren
@@ -560,6 +561,7 @@ private:
     uint8_t     rec_matrix_code;
 
     int         sid_emulation;
+    bool        is_process_fill_audio_buffer;
 };
 
 #endif // C64CLASS_H

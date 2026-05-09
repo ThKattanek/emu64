@@ -100,6 +100,10 @@ private slots:
 
     void on_SounbufferChange_clicked();
 
+    void on_emu64_sid_clicked();
+
+    void on_resid_sid_clicked();
+
 private:
     void UpdateToolTips();
     void FillRomSetCombo();
