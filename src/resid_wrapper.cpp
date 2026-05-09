@@ -12,6 +12,12 @@
 //                                              //
 //////////////////////////////////////////////////
 
+// reSID Wrapper für die ReSID Library von Dag Lem <
+// resid muss kommplett in /src/resid/ liegen, so wie auf github zu finden:
+// https://github.com/libsidplayfp/resid
+// oder als Mirror auf: https://github.com/ThKattanek/resid
+// Für Emu64 müssen an den Original Code von ReSID keine Anpassungen vorgenommen werden, dafür ist dieser Wrapper da, damit die ReSID Library in Emu64 eingebunden werden kann.
+
 #include "resid_wrapper.h"
 
 ReSIDWrapperClass::ReSIDWrapperClass(int number, int samplerate, int buffersize, int *error)
@@ -82,6 +88,11 @@ void ReSIDWrapperClass::SetChipModel(int model)
         sid->set_chip_model(reSID::MOS8580);
         break;
     }
+}
+
+void ReSIDWrapperClass::EnableFilter(bool enable)
+{
+    sid->enable_filter(enable);
 }
 
 void ReSIDWrapperClass::Reset()

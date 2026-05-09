@@ -583,7 +583,7 @@ resid1->SetClockFrequency(c64_frequency);
 resid1->SetChipModel(MOS_8580);
 resid1->sound_output_enable = true;
 resid1->cycle_exact = true;
-resid1->filter_on = true;
+resid1->EnableFilter(true);
 resid1->Reset();
 //resid1->SetPotXY(poti_x, poti_y);
 
@@ -591,7 +591,7 @@ resid2->SetClockFrequency(c64_frequency);
 resid2->SetChipModel(MOS_8580);
 resid2->sound_output_enable = true;
 resid2->cycle_exact = true;
-resid2->filter_on = true;
+resid2->EnableFilter(true);
 resid2->Reset();
 
 enable_stereo_sid = false;
@@ -4218,8 +4218,8 @@ void C64Class::SetSidFilter(bool enable)
 {
     sid1->FilterOn = enable;
     sid2->FilterOn = enable;
-    resid1->filter_on = enable;
-    resid2->filter_on = enable;
+    resid1->EnableFilter(enable);
+    resid2->EnableFilter(enable);
 }
 
 bool C64Class::StartSidDump(const char *filename)

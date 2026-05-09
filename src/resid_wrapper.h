@@ -12,6 +12,12 @@
 //                                              //
 //////////////////////////////////////////////////
 
+// reSID Wrapper für die ReSID Library von Dag Lem <
+// resid muss kommplett in /src/resid/ liegen, so wie auf github zu finden:
+// https://github.com/libsidplayfp/resid
+// oder als Mirror auf: https://github.com/ThKattanek/resid
+// Für Emu64 müssen an den Original Code von ReSID keine Anpassungen vorgenommen werden, dafür ist dieser Wrapper da, damit die ReSID Library in Emu64 eingebunden werden kann.
+
 #ifndef RESID_WRAPPER_H
 #define RESID_WRAPPER_H
 
@@ -26,6 +32,7 @@ public:
 
     void SetClockFrequency(float clock_freq);
     void SetChipModel(int model);
+    void EnableFilter(bool enable);
     void Reset();
     unsigned char ReadRegister(unsigned char offset);
     void WriteRegister(unsigned char offset, unsigned char value);
@@ -40,7 +47,6 @@ public:
     int sound_buffer_pos;
     int sound_buffer_size;
     bool cycle_exact;
-    bool filter_on;
     bool sound_output_enable;
     bool *reset;
 
