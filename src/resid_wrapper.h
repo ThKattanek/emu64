@@ -1,3 +1,17 @@
+//////////////////////////////////////////////////
+//                                              //
+// Emu64                                        //
+// von Thorsten Kattanek                        //
+//                                              //
+// #file: resid_wrapper.h                       //
+//                                              //
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// www.emu64.de                                 //
+//                                              //
+//////////////////////////////////////////////////
+
 #ifndef RESID_WRAPPER_H
 #define RESID_WRAPPER_H
 

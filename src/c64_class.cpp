@@ -632,6 +632,7 @@ C64Class::~C64Class()
     {
         StopSidDump();
         delete sid1;
+        sid1 = nullptr;
     }
     if(sid2 != nullptr) delete sid2;
 
@@ -639,6 +640,7 @@ C64Class::~C64Class()
     {
         StopSidDump();
         delete resid1;
+        resid1 = nullptr;
     }
     if(resid2 != nullptr) delete resid2;
 
@@ -1082,6 +1084,8 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
     resid1->SetSoundBufferPosToZero();
     resid2->SetSoundBufferPosToZero();
 
+    int *current_soundbuffer_pos;
+
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
         floppy[i]->ZeroSoundBufferPos();
 
@@ -1091,19 +1095,17 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
     if(!debug_mode)
     {
-        int *current_soundbuffer_pos;
-
         switch(sid_emulation)
         {
-            case EMU64_SID:
-                current_soundbuffer_pos = &sid1->SoundBufferPos;
-                break;
-            case RESID_SID:
-                current_soundbuffer_pos = &resid1->sound_buffer_pos;
-                break;
-            default:
-                current_soundbuffer_pos = nullptr;
-                break;
+        case EMU64_SID:
+            current_soundbuffer_pos = &sid1->SoundBufferPos;
+            break;
+        case RESID_SID:
+            current_soundbuffer_pos = &resid1->sound_buffer_pos;
+            break;
+        default:
+            current_soundbuffer_pos = nullptr;
+            break;
         }
 
         while((*current_soundbuffer_pos < sample_buffer_size_mono) && (debug_mode == false))
@@ -4316,8 +4318,8 @@ void C64Class::NextSystemCycle()
         break;
     case RESID_SID:
         resid1->OneCycle();
-         if(enable_stereo_sid) resid2->OneCycle();
-         break;
+        if(enable_stereo_sid) resid2->OneCycle();
+        break;
     default:
         break;
     }

@@ -1,3 +1,17 @@
+//////////////////////////////////////////////////
+//                                              //
+// Emu64                                        //
+// von Thorsten Kattanek                        //
+//                                              //
+// #file: resid_wrapper.cpp                     //
+//                                              //
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// www.emu64.de                                 //
+//                                              //
+//////////////////////////////////////////////////
+
 #include "resid_wrapper.h"
 
 ReSIDWrapperClass::ReSIDWrapperClass(int number, int samplerate, int buffersize, int *error)

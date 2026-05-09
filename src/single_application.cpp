@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.201A                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -42,11 +41,11 @@ SingleApplication::SingleApplication(int &argc, char *argv[]) : QApplication(arg
     DWORD usernameLen = UNLEN + 1;
     if (GetUserNameW(username, &usernameLen))
     {
-	appData.addData(QString::fromWCharArray(username).toUtf8());
+        appData.addData(QString::fromWCharArray(username).toUtf8());
     }
     else
     {
-	appData.addData(qgetenv("USERNAME"));
+        appData.addData(qgetenv("USERNAME"));
     }
 #else
     // add current user to identifier on POSIX
@@ -55,11 +54,11 @@ SingleApplication::SingleApplication(int &argc, char *argv[]) : QApplication(arg
     struct passwd *pw = getpwuid(uid);
     if (pw)
     {
-	username = pw->pw_name;
+        username = pw->pw_name;
     }
     if (username.isEmpty())
     {
-	username = qgetenv("USER");
+        username = qgetenv("USER");
     }
     appData.addData(username);
 #endif
@@ -75,13 +74,13 @@ SingleApplication::SingleApplication(int &argc, char *argv[]) : QApplication(arg
     // case of a crash.
     if (listening)
     {
-	CreateMutexW(0, true,
-		reinterpret_cast<LPCWSTR>(instanceServerName.utf16()));
-	if (GetLastError() == ERROR_ALREADY_EXISTS)
-	{
-	    instanceServer.close();
-	    listening = false;
-	}
+        CreateMutexW(0, true,
+                     reinterpret_cast<LPCWSTR>(instanceServerName.utf16()));
+        if (GetLastError() == ERROR_ALREADY_EXISTS)
+        {
+            instanceServer.close();
+            listening = false;
+        }
     }
 #else
     // on POSIX, only one server can listen on a local socket, but a crashing
@@ -89,18 +88,18 @@ SingleApplication::SingleApplication(int &argc, char *argv[]) : QApplication(arg
     // by connecting to it -- otherwise, remove stale socket
     if (!listening)
     {
-	QLocalSocket sock;
-	sock.connectToServer(instanceServerName, QIODevice::WriteOnly);
-	if (sock.state() != QLocalSocket::ConnectedState &&
-		!sock.waitForConnected(2000))
-	{
-	    QLocalServer::removeServer(instanceServerName);
-	    listening = instanceServer.listen(instanceServerName);
-	}
-	else
-	{
-	    sock.disconnectFromServer();
-	}
+        QLocalSocket sock;
+        sock.connectToServer(instanceServerName, QIODevice::WriteOnly);
+        if (sock.state() != QLocalSocket::ConnectedState &&
+            !sock.waitForConnected(2000))
+        {
+            QLocalServer::removeServer(instanceServerName);
+            listening = instanceServer.listen(instanceServerName);
+        }
+        else
+        {
+            sock.disconnectFromServer();
+        }
     }
 #endif
 
@@ -108,61 +107,61 @@ SingleApplication::SingleApplication(int &argc, char *argv[]) : QApplication(arg
 
     if (listening)
     {
-	// if we're listening on the local socket (first running instance),
-	// handle connections to it.
-	connect(&instanceServer, &QLocalServer::newConnection, this, [this](){
-		QLocalSocket *conn = instanceServer.nextPendingConnection();
-		connect(conn, &QIODevice::readyRead, this, [this](){
-			QLocalSocket *sock =
-				qobject_cast<QLocalSocket *>(sender());
-			if (sock)
-			{
-			    activeClients.insert(sock);
-			    QDataStream recvStream(sock);
-			    QStringList arguments;
-			    QString argument;
+        // if we're listening on the local socket (first running instance),
+        // handle connections to it.
+        connect(&instanceServer, &QLocalServer::newConnection, this, [this](){
+            QLocalSocket *conn = instanceServer.nextPendingConnection();
+            connect(conn, &QIODevice::readyRead, this, [this](){
+                QLocalSocket *sock =
+                    qobject_cast<QLocalSocket *>(sender());
+                if (sock)
+                {
+                    activeClients.insert(sock);
+                    QDataStream recvStream(sock);
+                    QStringList arguments;
+                    QString argument;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
-			    for (;;)
-			    {
-				recvStream.startTransaction();
+                    for (;;)
+                    {
+                        recvStream.startTransaction();
 #else
-			    while (!recvStream.atEnd())
-			    {
+                    while (!recvStream.atEnd())
+                    {
 #endif
-				recvStream >> argument;
+                        recvStream >> argument;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
-				if (!recvStream.commitTransaction()) break;
+                        if (!recvStream.commitTransaction()) break;
 #endif
-				arguments << argument;
-			    }
-			    activeClients.remove(sock);
-			    if (sock->state() != QLocalSocket::ConnectedState)
-			    {
-				emit remoteActivated();
-				sock->deleteLater();
-			    }
-			    if (arguments.size())
-			    {
-				emit messageAvailable( arguments );
-			    }
-			}
-		    });
-		connect(conn, &QLocalSocket::disconnected, this, [this](){
-			QLocalSocket *sock =
-				qobject_cast<QLocalSocket *>(sender());
-			if (sock)
-			{
-			    if (!activeClients.contains(sock))
-			    {
-				emit remoteActivated();
-				sock->deleteLater();
-			    }
-			}
-		    });
-		QDataStream sendStream(conn);
-		sendStream << applicationPid();
-		conn->flush();
-	    });
+                        arguments << argument;
+                    }
+                    activeClients.remove(sock);
+                    if (sock->state() != QLocalSocket::ConnectedState)
+                    {
+                        emit remoteActivated();
+                        sock->deleteLater();
+                    }
+                    if (arguments.size())
+                    {
+                        emit messageAvailable( arguments );
+                    }
+                }
+            });
+            connect(conn, &QLocalSocket::disconnected, this, [this](){
+                QLocalSocket *sock =
+                    qobject_cast<QLocalSocket *>(sender());
+                if (sock)
+                {
+                    if (!activeClients.contains(sock))
+                    {
+                        emit remoteActivated();
+                        sock->deleteLater();
+                    }
+                }
+            });
+            QDataStream sendStream(conn);
+            sendStream << applicationPid();
+            conn->flush();
+        });
     }
 }
 
@@ -177,40 +176,40 @@ bool SingleApplication::sendMessages(const QStringList &messages)
     QLocalSocket sock;
     sock.connectToServer(instanceServerName);
     if (sock.state() == QLocalSocket::ConnectedState
-	    || sock.waitForConnected(5000))
+        || sock.waitForConnected(5000))
     {
-	QDataStream stream(&sock);
-	if (sock.waitForReadyRead(5000))
-	{
-	    qint64 mainpid;
+        QDataStream stream(&sock);
+        if (sock.waitForReadyRead(5000))
+        {
+            qint64 mainpid;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
-	    stream.startTransaction();
+            stream.startTransaction();
 #endif
-	    stream >> mainpid;
+            stream >> mainpid;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
 #ifdef _WIN32
-	    if (stream.commitTransaction())
-	    {
-		AllowSetForegroundWindow(DWORD(mainpid));
-	    }
+            if (stream.commitTransaction())
+            {
+                AllowSetForegroundWindow(DWORD(mainpid));
+            }
 #else
-	    stream.commitTransaction();
+            stream.commitTransaction();
 #endif
 #else
 #ifdef _WIN32
-	    AllowSetForegroundWindow(DWORD(mainpid));
+            AllowSetForegroundWindow(DWORD(mainpid));
 #endif
 #endif
-	}
-	for (QStringList::const_iterator i = messages.constBegin();
-		i != messages.constEnd(); ++i)
-	{
-	    stream << *i;
-	}
-	sock.flush();
-	sock.disconnectFromServer();
-	sock.state() == QLocalSocket::UnconnectedState ||
-	    sock.waitForDisconnected(1000);
+        }
+        for (QStringList::const_iterator i = messages.constBegin();
+             i != messages.constEnd(); ++i)
+        {
+            stream << *i;
+        }
+        sock.flush();
+        sock.disconnectFromServer();
+        sock.state() == QLocalSocket::UnconnectedState ||
+            sock.waitForDisconnected(1000);
     }
 
     return true;

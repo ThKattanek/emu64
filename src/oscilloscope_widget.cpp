@@ -1,3 +1,17 @@
+//////////////////////////////////////////////////
+//                                              //
+// Emu64                                        //
+// von Thorsten Kattanek                        //
+//                                              //
+// #file: oscilloscope_widget.cpp               //
+//                                              //
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// www.emu64.de                                 //
+//                                              //
+//////////////////////////////////////////////////
+
 #include "oscilloscope_widget.h"
 #include "ui_oscilloscope_widget.h"
 
@@ -130,11 +144,11 @@ void OscilloscopeWidget::DrawData(QPainter &painter, int width)
 
     for(x2=1; x2<width; x2++)
     {
-         y2 = tmp_output[x2];
-         painter.drawLine(x1,y1,x2,y2);
+        y2 = tmp_output[x2];
+        painter.drawLine(x1,y1,x2,y2);
 
-         x1 = x2;
-         y1 = y2;
+        x1 = x2;
+        y1 = y2;
     }
 }
 
@@ -200,6 +214,9 @@ void OscilloscopeWidget::NextAudioData(float *data, int length)
 
 void OscilloscopeWidget::NextAudioData(uint8_t *data, int length)
 {
+    if(data == nullptr)
+        return;
+
     int16_t *buffer = reinterpret_cast<int16_t*>(data);
 
     float *new_data = new float[length];
