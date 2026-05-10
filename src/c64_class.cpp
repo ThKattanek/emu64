@@ -385,6 +385,7 @@ resid1 = new ReSIDWrapperClass(0,audio_frequency,audio_spec_have.samples,&sid_re
 resid2 = new ReSIDWrapperClass(0,audio_frequency,audio_spec_have.samples,&sid_ret_error);
 
 sid_emulation = SID_EMULATION::RESID_SID;
+write_in_all_emulation_sid_registers = true;
 
 cia1 = new MOS6526(0);
 cia2 = new MOS6526(1);
@@ -685,8 +686,6 @@ void C64Class::StartEmulation()
     else
     {
         LogText(">> C64Thread wurde gestartet.\n");
-
-        is_process_fill_audio_buffer = false;
         SDL_PauseAudioDevice(audio_dev, 0);
         LogText(">> SDL Audiostream wurde getartet.\n");
     }
@@ -1109,8 +1108,6 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
         while((*current_soundbuffer_pos < sample_buffer_size_mono) && (debug_mode == false))
         {
-            is_process_fill_audio_buffer = true;
-
             if(limit_cycles_counter > 0)
             {
                 limit_cycles_counter--;
@@ -1212,7 +1209,6 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 iec_export_vdc.SetWire(3,floppy_iec_wire & 64);
                 iec_export_vdc.SetWire(4,floppy_iec_wire & 128);
             }
-            is_process_fill_audio_buffer = false;
         }
 
         int sample_buffer_size = ((laenge / audio_channels) * 2) / (audio_sample_bit_size/8);
@@ -4177,29 +4173,32 @@ void C64Class::SetSidEmulation(int sid_emulation)
     if(this->sid_emulation == sid_emulation)
         return;
 
+    SDL_LockMutex(mutex1);           // ← ZUERST: Audio-Callback ausschließen
+
     this->sid_emulation = sid_emulation;
 
-    while(is_process_fill_audio_buffer) {SDL_Delay(1);}
     switch(sid_emulation)
     {
-        case EMU64_SID:
-            sid1->ZeroSoundBufferPos();
-            sid2->ZeroSoundBufferPos();
-            sid1->SoundOutputEnable = !debug_mode;
-            sid2->SoundOutputEnable = !debug_mode;
-            resid1->sound_output_enable = false;
-            resid2->sound_output_enable = false;
-            break;
+    case EMU64_SID:
+        sid1->ZeroSoundBufferPos();
+        sid2->ZeroSoundBufferPos();
+        sid1->SoundOutputEnable = !debug_mode;
+        sid2->SoundOutputEnable = !debug_mode;
+        resid1->sound_output_enable = false;
+        resid2->sound_output_enable = false;
+        break;
 
-        case RESID_SID:
-            resid1->SetSoundBufferPosToZero();
-            resid2->SetSoundBufferPosToZero();
-            sid1->SoundOutputEnable = false;
-            sid2->SoundOutputEnable = false;
-            resid1->sound_output_enable = !debug_mode;
-            resid2->sound_output_enable = !debug_mode;
-            break;
+    case RESID_SID:
+        resid1->SetSoundBufferPosToZero();
+        resid2->SetSoundBufferPosToZero();
+        sid1->SoundOutputEnable = false;
+        sid2->SoundOutputEnable = false;
+        resid1->sound_output_enable = !debug_mode;
+        resid2->sound_output_enable = !debug_mode;
+        break;
     }
+
+    SDL_UnlockMutex(mutex1);
 }
 
 void C64Class::SetSidVolume(float_t volume)
@@ -4612,32 +4611,50 @@ void C64Class::WriteSidIO(uint16_t address, uint8_t value)
 
     if(enable_stereo_sid)
     {
-        switch (sid_emulation)
+        if(!write_in_all_emulation_sid_registers)
         {
-        case EMU64_SID:
+            switch (sid_emulation)
+            {
+            case EMU64_SID:
+                if((address & 0xFFE0) == 0xD400) sid1->WriteIO(address,value);
+                if((address & 0xFFE0) == stereo_sid_address) sid2->WriteIO(address,value);
+                break;
+            case RESID_SID:
+                if((address & 0xFFE0) == 0xD400) resid1->WriteRegister(address,value);
+                if((address & 0xFFE0) == stereo_sid_address) resid2->WriteRegister(address,value);
+                break;
+            default:
+                break;
+            }
+        }
+        else
+        {
             if((address & 0xFFE0) == 0xD400) sid1->WriteIO(address,value);
             if((address & 0xFFE0) == stereo_sid_address) sid2->WriteIO(address,value);
-            break;
-        case RESID_SID:
             if((address & 0xFFE0) == 0xD400) resid1->WriteRegister(address,value);
             if((address & 0xFFE0) == stereo_sid_address) resid2->WriteRegister(address,value);
-            break;
-        default:
-            break;
         }
     }
     else
     {
-        switch(sid_emulation)
+        if(!write_in_all_emulation_sid_registers)
         {
-        case EMU64_SID:
+            switch(sid_emulation)
+            {
+            case EMU64_SID:
+                sid1->WriteIO(address,value);
+                break;
+            case RESID_SID:
+                resid1->WriteRegister(address,value);
+                break;
+            default:
+                break;
+            }
+        }
+        else
+        {
             sid1->WriteIO(address,value);
-            break;
-        case RESID_SID:
             resid1->WriteRegister(address,value);
-            break;
-        default:
-            break;
         }
     }
 }

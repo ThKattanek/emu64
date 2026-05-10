@@ -561,7 +561,7 @@ private:
     uint8_t     rec_matrix_code;
 
     int         sid_emulation;
-    bool        is_process_fill_audio_buffer;
+    bool        write_in_all_emulation_sid_registers;   // Beim Schreiben in einen SID werden je nach Einstellung alle SIDs beschrieben oder nur die aktive SID
 };
 
 #endif // C64CLASS_H
