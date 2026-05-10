@@ -5012,8 +5012,17 @@ void C64Class::ChangePOTSwitch()
         }
     }
 
-    sid1->SetPotXY(poti_x, poti_y);
-    //resid1->SetPotXY(poti_x, poti_y);
+    switch (sid_emulation)
+    {
+    case EMU64_SID:
+        sid1->SetPotXY(poti_x, poti_y);
+        break;
+    case RESID_SID:
+        resid1->SetPotXY(poti_x, poti_y);
+        break;
+    default:
+        break;
+    }
 }
 
 void C64Class::UpdateMouse(void)

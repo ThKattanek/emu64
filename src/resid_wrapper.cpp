@@ -103,12 +103,27 @@ void ReSIDWrapperClass::Reset()
 
 unsigned char ReSIDWrapperClass::ReadRegister(unsigned char offset)
 {
-    return sid->read(offset);
+    switch(offset & 0x1f)
+    {
+    case 0x19:
+        return pot_x;
+    case 0x1a:
+        return pot_y;
+    default:
+        return sid->read(offset);
+        break;
+    }
 }
 
 void ReSIDWrapperClass::WriteRegister(unsigned char offset, unsigned char value)
 {
     sid->write(offset, value);
+}
+
+void ReSIDWrapperClass::SetPotXY(unsigned char pot_x, unsigned char pot_y)
+{
+    this->pot_x = pot_x;
+    this->pot_y = pot_y;
 }
 
 bool ReSIDWrapperClass::OneCycle()

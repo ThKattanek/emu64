@@ -36,6 +36,7 @@ public:
     void Reset();
     unsigned char ReadRegister(unsigned char offset);
     void WriteRegister(unsigned char offset, unsigned char value);
+    void SetPotXY(unsigned char pot_x, unsigned char pot_y);
     bool OneCycle();
 
     void SetSoundBufferPosToZero();
