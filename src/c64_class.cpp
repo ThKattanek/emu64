@@ -382,10 +382,10 @@ sid2 = new MOS6581_8085(1,audio_frequency,audio_spec_have.samples,&sid_ret_error
 
 // Resid SID Emulation
 resid1 = new ReSIDWrapperClass(0,audio_frequency,audio_spec_have.samples,&sid_ret_error);
-resid2 = new ReSIDWrapperClass(0,audio_frequency,audio_spec_have.samples,&sid_ret_error);
+resid2 = new ReSIDWrapperClass(1,audio_frequency,audio_spec_have.samples,&sid_ret_error);
 
 sid_emulation = SID_EMULATION::RESID_SID;
-write_in_all_emulation_sid_registers = true;
+write_in_all_emulation_sid_registers = false;
 
 cia1 = new MOS6526(0);
 cia2 = new MOS6526(1);
@@ -585,7 +585,7 @@ resid1->sound_output_enable = true;
 resid1->cycle_exact = true;
 resid1->EnableFilter(true);
 resid1->Reset();
-//resid1->SetPotXY(poti_x, poti_y);
+resid1->SetPotXY(poti_x, poti_y);
 
 resid2->SetClockFrequency(c64_frequency);
 resid2->SetChipModel(MOS_8580);
