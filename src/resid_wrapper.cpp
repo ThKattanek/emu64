@@ -163,7 +163,7 @@ bool ReSIDWrapperClass::OneCycle()
                 SoundBufferV1[SoundBufferPos] = VoiceOutput(1);
                 SoundBufferV2[SoundBufferPos] = VoiceOutput(2);
                 */
-                sound_buffer[sound_buffer_pos++] = sid->output();
+                sound_buffer[sound_buffer_pos++] = sid->output() << 1;
             }
         }
         else
