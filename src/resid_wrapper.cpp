@@ -110,14 +110,14 @@ unsigned char ReSIDWrapperClass::ReadRegister(unsigned char offset)
     case 0x1a:
         return pot_y;
     default:
-        return sid->read(offset);
+        return sid->read(offset & 0x1f);
         break;
     }
 }
 
 void ReSIDWrapperClass::WriteRegister(unsigned char offset, unsigned char value)
 {
-    sid->write(offset, value);
+    sid->write(offset & 0x1f, value);
 }
 
 void ReSIDWrapperClass::SetPotXY(unsigned char pot_x, unsigned char pot_y)
