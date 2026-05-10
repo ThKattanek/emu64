@@ -96,10 +96,18 @@
                </widget>
               </item>
               <item row="3" column="0">
-               <widget class="QComboBox" name="FirstSidTyp"/>
+               <widget class="QComboBox" name="FirstSidTyp">
+                <property name="toolTip">
+                 <string>Auswahl des SID Typs für den Standard Steckplatz.</string>
+                </property>
+               </widget>
               </item>
               <item row="3" column="3">
-               <widget class="QComboBox" name="SecondSidAddress"/>
+               <widget class="QComboBox" name="SecondSidAddress">
+                <property name="toolTip">
+                 <string>IO Bereich für einen zweiten SID.</string>
+                </property>
+               </widget>
               </item>
               <item row="2" column="3">
                <widget class="QLabel" name="sid_io_label">
@@ -110,6 +118,9 @@
               </item>
               <item row="0" column="0">
                <widget class="QRadioButton" name="emu64_sid">
+                <property name="toolTip">
+                 <string>Hier arbeitet die alte gewohnte Emu64 SID Emulation.</string>
+                </property>
                 <property name="text">
                  <string>Emu64 SID</string>
                 </property>
@@ -154,18 +165,39 @@
               </item>
               <item row="0" column="1">
                <widget class="QRadioButton" name="resid_sid">
+                <property name="toolTip">
+                 <string>Hier arbeitet die reSID Emulation.
+reSID ist eine ursprünglich von Dag Lem in der Programmiersprache C++
+geschriebene Open Source-Bibliothek zur Emulation des Audio-Chips SID.</string>
+                </property>
                 <property name="text">
                  <string>reSID</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="1" colspan="2">
-               <widget class="QComboBox" name="SecondSidTyp"/>
+               <widget class="QComboBox" name="SecondSidTyp">
+                <property name="toolTip">
+                 <string>Auswahl des SID Typs für einen zweiten Steckplatz.</string>
+                </property>
+               </widget>
               </item>
               <item row="1" column="0" colspan="5">
                <widget class="Line" name="line_2">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QCheckBox" name="checkBox">
+                <property name="toolTip">
+                 <string>Wenn aktiviert. Wird auch auf die deaktivierte SID Emulation geschrieben)
+So kann man immer Nahtlos zwischen beide hin und her schalten.
+Kann im Norfall aber deaktiviert bleiben.</string>
+                </property>
+                <property name="text">
+                 <string>Immer in beide SID Register schreiben</string>
                 </property>
                </widget>
               </item>
