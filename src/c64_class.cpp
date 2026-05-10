@@ -4661,36 +4661,59 @@ void C64Class::WriteSidIO(uint16_t address, uint8_t value)
 
 uint8_t C64Class::ReadSidIO(uint16_t address)
 {
-    /*
-    if(StereoEnable)
+    if(enable_stereo_sid)
     {
-        if(Sid2Adresse == 0xD400)
+        if((address & 0xFFE0) == 0xD400)
         {
-            return sid1_ReadIO(adresse);
+            switch(sid_emulation)
+            {
+            case EMU64_SID:
+                return sid1->ReadIO(address);
+                break;
+            case RESID_SID:
+                return resid1->ReadRegister(address);
+                break;
+            default:
+                return 0x00;
+                break;
+            }
         }
         else
         {
-            if((adresse && 0x001F) == 0x00) return sid1_ReadIO(adresse);
-            else return sid2_ReadIO(adresse);
+            switch (sid_emulation)
+            {
+            case EMU64_SID:
+                if((address & 0xFFE0) == stereo_sid_address)
+                    return sid2->ReadIO(address);
+                else
+                    return 0x00;
+                break;
+            case RESID_SID:
+                if((address & 0xFFE0) == stereo_sid_address)
+                    return resid2->ReadRegister(address);
+                else
+                    return 0x00;
+                break;
+            default:
+                return 0x00;
+                break;
+            }
         }
     }
     else
     {
-        return sid1_ReadIO(adresse);
-    }
-    */
-
-    switch(sid_emulation)
-    {
-    case EMU64_SID:
-        return sid1->ReadIO(address);
-        break;
-    case RESID_SID:
-        return resid1->ReadRegister(address);
-        break;
-    default:
-        return 0x00;
-        break;
+        switch(sid_emulation)
+        {
+        case EMU64_SID:
+            return sid1->ReadIO(address);
+            break;
+        case RESID_SID:
+            return resid1->ReadRegister(address);
+            break;
+        default:
+            return 0x00;
+            break;
+        }
     }
 }
 
