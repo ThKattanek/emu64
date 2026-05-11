@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 19.03.2022                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -25,11 +24,8 @@
 #include <QMessageBox>
 #include <QDebug>
 
-#include "button_mod.h"
-#include "video_crt_class.h"
-#include "c64_class.h"
-#include "new_romset_window.h"
-#include "user_palette_window.h"
+#include "./video_crt_class.h"
+#include "./c64_class.h"
 
 namespace Ui {
     class SetupWindow;
@@ -97,12 +93,11 @@ private slots:
 	void on_EnableUserPalette_clicked(bool checked);
 	void OnChangeUserColor(int color_number, QColor color);
     void on_default_60hz_clicked();
-
     void on_SounbufferChange_clicked();
-
     void on_emu64_sid_clicked();
-
     void on_resid_sid_clicked();
+
+    void on_write_to_all_emulation_sids_clicked(bool checked);
 
 private:
     void UpdateToolTips();

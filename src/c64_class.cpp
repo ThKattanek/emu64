@@ -385,7 +385,7 @@ resid1 = new ReSIDWrapperClass(0,audio_frequency,audio_spec_have.samples,&sid_re
 resid2 = new ReSIDWrapperClass(1,audio_frequency,audio_spec_have.samples,&sid_ret_error);
 
 sid_emulation = SID_EMULATION::RESID_SID;
-write_in_all_emulation_sid_registers = false;
+write_to_all_emulation_sids = false;
 
 cia1 = new MOS6526(0);
 cia2 = new MOS6526(1);
@@ -4253,6 +4253,11 @@ void C64Class::SetSidFilter(bool enable)
     resid2->EnableFilter(enable);
 }
 
+void C64Class::EnableWriteToAllEmulationSids(bool enable)
+{
+    write_to_all_emulation_sids = enable;
+}
+
 bool C64Class::StartSidDump(const char *filename)
 {
     return sid1->IoDump->StartCapture(filename);
@@ -4611,7 +4616,7 @@ void C64Class::WriteSidIO(uint16_t address, uint8_t value)
 
     if(enable_stereo_sid)
     {
-        if(!write_in_all_emulation_sid_registers)
+        if(!write_to_all_emulation_sids)
         {
             switch (sid_emulation)
             {
@@ -4637,7 +4642,7 @@ void C64Class::WriteSidIO(uint16_t address, uint8_t value)
     }
     else
     {
-        if(!write_in_all_emulation_sid_registers)
+        if(!write_to_all_emulation_sids)
         {
             switch(sid_emulation)
             {

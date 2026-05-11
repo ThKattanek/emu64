@@ -190,7 +190,7 @@ geschriebene Open Source-Bibliothek zur Emulation des Audio-Chips SID.</string>
                </widget>
               </item>
               <item row="0" column="3">
-               <widget class="QCheckBox" name="checkBox">
+               <widget class="QCheckBox" name="write_to_all_emulation_sids">
                 <property name="toolTip">
                  <string>Wenn aktiviert. Wird auch auf die deaktivierte SID Emulation geschrieben)
 So kann man immer Nahtlos zwischen beide hin und her schalten.

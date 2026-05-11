@@ -212,15 +212,16 @@ public:
     bool StartIECDump(const char *filename);
     void StopIECDump();
 
-    void SetSidEmulation(int sid_emulation);  // SID Emulation (EMU64_SID oder RESID_SID)
-    void SetSidVolume(float_t volume);  // Lautstärke der SID's (0.0f - 1.0f)
-    void SetFirstSidTyp(int sid_typ);   // SID Typ des 1. SID (MOS_6581 oder MOS_8580)
-    void SetSecondSidTyp(int sid_typ);  // SID Typ des 2. SID (MOS_6581 oder MOS_8580)
-    void EnableStereoSid(bool enable);  // 2. SID aktivieren
-    void SetStereoSidAddress(uint16_t address);
-    void SetStereoSid6ChannelMode(bool enable);
-    void SetSidCycleExact(bool enable);
-    void SetSidFilter(bool enable);
+    void SetSidEmulation(int sid_emulation);            // SID Emulation (EMU64_SID oder RESID_SID)
+    void SetSidVolume(float_t volume);                  // Lautstärke der SID's (0.0f - 1.0f)
+    void SetFirstSidTyp(int sid_typ);                   // SID Typ des 1. SID (MOS_6581 oder MOS_8580)
+    void SetSecondSidTyp(int sid_typ);                  // SID Typ des 2. SID (MOS_6581 oder MOS_8580)
+    void EnableStereoSid(bool enable);                  // 2. SID aktivieren
+    void SetStereoSidAddress(uint16_t address);         // Adresse des 2. SID's im IO Bereich (0xD400 - 0xD7E0)
+    void SetStereoSid6ChannelMode(bool enable);         // 6 Kanal Modus für 2 SIDs aktivieren (nur bei aktiviertem 2. SID), es werden alle 6 Stimmen als Mono wiedergegeben
+    void SetSidCycleExact(bool enable);                 // Die SID Emulation wird Zyklus genau, dadurch wird die Soundqualität verbessert, aber die Emulation etwas langsamer (je nach Spiel spürbar)
+    void SetSidFilter(bool enable);                     // Es werden die Filter der SID's emuliert, dadurch wird die Soundqualität verbessert, aber die Emulation etwas langsamer (je nach Spiel spürbar)
+    void EnableWriteToAllEmulationSids(bool enable);    // Es wird immer in allen Registern der emulierten SID's (EMU64_SID und RESID_SID) geschrieben, egal welche gerade aktiv ist.
 
     bool StartSidDump(const char *filename);
     void StopSidDump();
@@ -561,7 +562,7 @@ private:
     uint8_t     rec_matrix_code;
 
     int         sid_emulation;
-    bool        write_in_all_emulation_sid_registers;   // Beim Schreiben in einen SID werden je nach Einstellung alle SIDs beschrieben oder nur die aktive SID
+    bool        write_to_all_emulation_sids;   // Beim Schreiben in einen SID werden je nach Einstellung alle SIDs beschrieben oder nur die aktive SID
 };
 
 #endif // C64CLASS_H

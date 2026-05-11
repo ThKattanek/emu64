@@ -16,8 +16,12 @@
 #include <QStyle>
 #include <QComboBox>
 
-#include "setup_window.h"
-#include "ui_setup_window.h"
+#include "./setup_window.h"
+#include "./ui_setup_window.h"
+
+#include "./button_mod.h"
+#include "./new_romset_window.h"
+#include "./user_palette_window.h"
 
 #define DEFAULT_ROMSET_NAME "Original C64 II"
 
@@ -42,7 +46,7 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoCrtClass *vid
     ui->setupUi(this);
 
     // Center Window
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens().at(0)->availableGeometry()));
 
     // VIC Farbmodi zur ComboBox hinzufügen
     ui->C64Farbmodus->addItems(QStringList()<<"Emu64"<<"Emu64 (bis 4.00)"<<"CCS64"<<"PC64"<<"C64S"<<"Vice"<<"Frodo"<<tr("Pepto")<<tr("Colodore")<<tr("Schwarz / Weiß"));
@@ -625,7 +629,7 @@ void SetupWindow::on_VJoySlots_cellChanged(int row, int column)
 {
     if(column == 0)
     {
-        strcpy(c64->virtual_joys[row].Name,ui->VJoySlots->item(row,column)->text().toLocal8Bit());
+        snprintf(c64->virtual_joys[row].Name, sizeof(c64->virtual_joys[row].Name), "%s", ui->VJoySlots->item(row,column)->text().toLocal8Bit().constData());
     }
 }
 
@@ -1181,5 +1185,11 @@ void SetupWindow::OnChangeUserColor(int color_number, QColor color)
 void SetupWindow::on_SounbufferChange_clicked()
 {
     QMessageBox::information(this,tr("Soundbuffer Größe"),tr("Die Soundbuffer Größe kann nur beim Starten des C64 emulators geändert werden.\n\nBitte starten Sie den C64 Emulator neu, damit die Änderung wirksam wird."));
+}
+
+
+void SetupWindow::on_write_to_all_emulation_sids_clicked(bool checked)
+{
+    c64->EnableWriteToAllEmulationSids(checked);
 }
 
