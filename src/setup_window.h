@@ -28,7 +28,7 @@
 #include "./c64_class.h"
 
 namespace Ui {
-    class SetupWindow;
+class SetupWindow;
 }
 
 class SetupWindow : public QDialog
@@ -43,11 +43,11 @@ public:
     void SaveINI();
     void ReSetup(void);
     int GetScreenshotFormat();
-	void DisableVideoCRT();			// Die Einstellmöglichkeit im Setup Window wird verhindert (--video-filter-off)
-	void DisableTextureDouble();	// Die Einstellmöglichkeit im Setup Window wird verhindert (--texture-double-off)
+    void DisableVideoCRT();			// Die Einstellmöglichkeit im Setup Window wird verhindert (--video-filter-off)
+    void DisableTextureDouble();	// Die Einstellmöglichkeit im Setup Window wird verhindert (--texture-double-off)
 
 protected:
-	void showEvent(QShowEvent *event);
+    void showEvent(QShowEvent *event);
 
 signals:
     void ChangeGrafikModi(bool fullscreen,bool palmode, bool doublemode, bool filter);
@@ -87,11 +87,11 @@ private slots:
     void on_default_50hz_clicked();
     void on_cycles_per_second_valueChanged(int arg1);
     void on_Vsync_clicked(bool checked);
-	void on_DisplayList_currentIndexChanged(int index);
-	void on_VideoModes_currentIndexChanged(int index);
-	void on_SettingUserPalette_clicked();
-	void on_EnableUserPalette_clicked(bool checked);
-	void OnChangeUserColor(int color_number, QColor color);
+    void on_DisplayList_currentIndexChanged(int index);
+    void on_VideoModes_currentIndexChanged(int index);
+    void on_SettingUserPalette_clicked();
+    void on_EnableUserPalette_clicked(bool checked);
+    void OnChangeUserColor(int color_number, QColor color);
     void on_default_60hz_clicked();
     void on_SounbufferChange_clicked();
     void on_emu64_sid_clicked();
@@ -105,8 +105,8 @@ private:
     QStringList GetAllRomsetNames(const QString *romset_dir);
     bool RemoveDir(const QString & dirName);
 
-	int video_display_mode_index[MAX_VIDEO_DISPLAYS];
-	bool is_filled_display_mode_list;
+    int video_display_mode_index[MAX_VIDEO_DISPLAYS];
+    bool is_filled_display_mode_list;
 
     Ui::SetupWindow *ui;
     QString *romsetPath;

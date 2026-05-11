@@ -27,9 +27,9 @@
 
 // Colodore Palette als Default
 static const uint8_t default_palette[4 * 16] = {0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0x00, 0x81, 0x33, 0x38, 0x00, 0x75, 0xce, 0xc8, 0x00, 0x8e, 0x3c, 0x97, 0x00,
-0x56, 0xac, 0x4d, 0x00, 0x2e, 0x2c, 0x9b, 0x00, 0xed, 0xf1, 0x71, 0x00, 0x8e, 0x50, 0x29, 0x00, 0x55, 0x38, 0x00, 0x00,
-0xc4, 0x6c, 0x71, 0x00, 0x4a, 0x4a, 0x4a, 0x00, 0x7b, 0x7b, 0x7b, 0x00, 0x9a, 0xff, 0x9f, 0x00, 0x70, 0x6d, 0xeb, 0x00,
-0xb2, 0xb2, 0xb2, 0x00};
+                                                0x56, 0xac, 0x4d, 0x00, 0x2e, 0x2c, 0x9b, 0x00, 0xed, 0xf1, 0x71, 0x00, 0x8e, 0x50, 0x29, 0x00, 0x55, 0x38, 0x00, 0x00,
+                                                0xc4, 0x6c, 0x71, 0x00, 0x4a, 0x4a, 0x4a, 0x00, 0x7b, 0x7b, 0x7b, 0x00, 0x9a, 0xff, 0x9f, 0x00, 0x70, 0x6d, 0xeb, 0x00,
+                                                0xb2, 0xb2, 0xb2, 0x00};
 
 SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoCrtClass *video_crt_output, QSettings *ini, QString *romsetPath, QString *dataPath) :
     QDialog(parent),
@@ -85,20 +85,20 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoCrtClass *vid
 
     FillRomSetCombo();
 
-	// Fullscreen Video Displays and Modes
-	int num_displays = c64->GetNumDisplays();
+    // Fullscreen Video Displays and Modes
+    int num_displays = c64->GetNumDisplays();
 
-	ui->DisplayList->clear();
+    ui->DisplayList->clear();
 
-	for(int i = 0; i < MAX_VIDEO_DISPLAYS; i++)
-		video_display_mode_index[i] = 0;
+    for(int i = 0; i < MAX_VIDEO_DISPLAYS; i++)
+        video_display_mode_index[i] = 0;
 
-	for(int i = 0; i < num_displays && i < MAX_VIDEO_DISPLAYS; i++)
-	{
-		ui->DisplayList->addItem(QString(c64->GetDisplayName(i)) + "  [" + QString::number(i,10) + "]");
-	}
+    for(int i = 0; i < num_displays && i < MAX_VIDEO_DISPLAYS; i++)
+    {
+        ui->DisplayList->addItem(QString(c64->GetDisplayName(i)) + "  [" + QString::number(i,10) + "]");
+    }
 
-	is_filled_display_mode_list = false;
+    is_filled_display_mode_list = false;
 }
 
 SetupWindow::~SetupWindow()
@@ -124,11 +124,11 @@ void SetupWindow::LoadINI(C64Class *c64)
         char group_name[32];
         ui->VJoySlots->setRowCount(MAX_VJOY_NUM);
         ui->VJoySlots->setColumnCount(5);
-		ui->VJoySlots->setColumnWidth(0,130);
-		ui->VJoySlots->setColumnWidth(1,50);
-		ui->VJoySlots->setColumnWidth(2,50);
-		ui->VJoySlots->setColumnWidth(3,90);
-		ui->VJoySlots->setColumnWidth(4,90);
+        ui->VJoySlots->setColumnWidth(0,130);
+        ui->VJoySlots->setColumnWidth(1,50);
+        ui->VJoySlots->setColumnWidth(2,50);
+        ui->VJoySlots->setColumnWidth(3,90);
+        ui->VJoySlots->setColumnWidth(4,90);
 
         QStringList header_label;
         //header_label << tr("Bezeichnung") << "Port 1" << "Port 2" << "" << "";
@@ -207,18 +207,18 @@ void SetupWindow::LoadINI(C64Class *c64)
         value = ini->value("NoPALColorMode",7).toInt();
         ui->C64Farbmodus->setCurrentIndex(value);
 
-		bvalue = ini->value("WindowPalMode",1).toBool();
+        bvalue = ini->value("WindowPalMode",1).toBool();
         ui->WPal->setChecked(bvalue);
         video_crt_output->start_c64_is_palmode = bvalue;
 
-		bvalue = ini->value("WindowDoubleSizeMode",1).toBool();
+        bvalue = ini->value("WindowDoubleSizeMode",1).toBool();
         ui->WDouble->setChecked(bvalue);
         video_crt_output->start_c64_is_doublesize = bvalue;
 
-		bvalue = ini->value("WindowFilter",1).toBool();
+        bvalue = ini->value("WindowFilter",1).toBool();
         ui->WFilter->setChecked(bvalue);
 
-		bvalue = ini->value("WindowAspectRatio",0).toBool();
+        bvalue = ini->value("WindowAspectRatio",0).toBool();
         ui->WAspectRatio->setChecked(bvalue);
         c64->SetWindowAspectRatio(bvalue);
 
@@ -236,7 +236,7 @@ void SetupWindow::LoadINI(C64Class *c64)
         ui->MausPort->setCurrentIndex(value);
         c64->SetMouse1351Port(value);
 
-		bvalue = ini->value("AutoMouseHide",true).toBool();
+        bvalue = ini->value("AutoMouseHide",true).toBool();
         value = ini->value("AutoMouseHideTime",3).toInt();
 
         if(!bvalue)
@@ -324,6 +324,24 @@ void SetupWindow::LoadINI(C64Class *c64)
         ui->SidFilterEnable->setChecked(bvalue);
         on_SidFilterEnable_toggled(bvalue);
 
+        bvalue = ini->value("ReSIDActiv",true).toBool();
+        if(bvalue)
+        {
+            c64->SetSidEmulation(RESID_SID);
+            ui->resid_sid->setChecked(true);
+            on_resid_sid_clicked();
+        }
+        else
+        {
+            c64->SetSidEmulation(EMU64_SID);
+            ui->emu64_sid->setChecked(true);
+            on_emu64_sid_clicked();
+        }
+
+        bvalue = ini->value("WriteToAllEmulationSids", false).toBool();
+        ui->write_to_all_emulation_sids->setChecked(bvalue);
+        on_write_to_all_emulation_sids_clicked(bvalue);
+
         ini->endGroup();
 
         ini->beginGroup("VIC");
@@ -358,20 +376,20 @@ void SetupWindow::LoadINI(C64Class *c64)
         value2 = ini->value("LastDisplayLineNTSC",288).toInt();
         c64->SetVicDisplaySizeNtsc(value1, value2);
 
-		bvalue = ini->value("VSync",false).toBool();
-		ui->Vsync->setChecked(bvalue);
-		on_Vsync_clicked(bvalue);
+        bvalue = ini->value("VSync",false).toBool();
+        ui->Vsync->setChecked(bvalue);
+        on_Vsync_clicked(bvalue);
 
 
-		char display_name[64];
-		for(int i=0; i<MAX_VIDEO_DISPLAYS; i++)
-		{
-			sprintf(display_name, "VideoDisplay_%d_FullscreenVideoMode",i);
-			video_display_mode_index[i] = ini->value(display_name,0).toInt();
-			c64->SetFullscreenDisplayMode(i,video_display_mode_index[i]);
-		}
+        char display_name[64];
+        for(int i=0; i<MAX_VIDEO_DISPLAYS; i++)
+        {
+            sprintf(display_name, "VideoDisplay_%d_FullscreenVideoMode",i);
+            video_display_mode_index[i] = ini->value(display_name,0).toInt();
+            c64->SetFullscreenDisplayMode(i,video_display_mode_index[i]);
+        }
 
-		ui->VideoModes->setCurrentIndex(video_display_mode_index[0]);
+        ui->VideoModes->setCurrentIndex(video_display_mode_index[0]);
 
         ini->endGroup();
 
@@ -386,28 +404,28 @@ void SetupWindow::LoadINI(C64Class *c64)
         c64->SetC64Frequency(value1);
         ini->endGroup();
 
-		ini->beginGroup("C64UserPalette");
-		bvalue = ini->value("EnableUserPalette", false).toBool();
-		video_crt_output->EnableUserPalette(bvalue);
-		ui->EnableUserPalette->setChecked(bvalue);
-		ini->endGroup();
+        ini->beginGroup("C64UserPalette");
+        bvalue = ini->value("EnableUserPalette", false).toBool();
+        video_crt_output->EnableUserPalette(bvalue);
+        ui->EnableUserPalette->setChecked(bvalue);
+        ini->endGroup();
 
-		char key_name[32];
-		QColor default_color = Qt::white;
+        char key_name[32];
+        QColor default_color = Qt::white;
 
-		ini->beginGroup("C64UserPalette");
-		for(int i=0; i<16; i++)
-		{
-			sprintf(key_name, "Color_%2.2d", i);
+        ini->beginGroup("C64UserPalette");
+        for(int i=0; i<16; i++)
+        {
+            sprintf(key_name, "Color_%2.2d", i);
 
-			default_color.setRed(default_palette[i*4+0]);
-			default_color.setGreen(default_palette[i*4+1]);
-			default_color.setBlue(default_palette[i*4+2]);
+            default_color.setRed(default_palette[i*4+0]);
+            default_color.setGreen(default_palette[i*4+1]);
+            default_color.setBlue(default_palette[i*4+2]);
 
-			QColor color = ini->value(key_name, default_color.rgba()).toUInt();
-			video_crt_output->SetUserPaletteColor(i, color.red(), color.green(), color.blue());
-		}
-		ini->endGroup();
+            QColor color = ini->value(key_name, default_color.rgba()).toUInt();
+            video_crt_output->SetUserPaletteColor(i, color.red(), color.green(), color.blue());
+        }
+        ini->endGroup();
     }
     ////////////////////////////////////
 
@@ -441,7 +459,7 @@ void SetupWindow::SaveINI()
         {
             sprintf(group_name,"VJSlot_%2.2d",i);
             ini->beginGroup(group_name);
-			ini->setValue("Name",QString(c64->virtual_joys[i].Name));
+            ini->setValue("Name",QString(c64->virtual_joys[i].Name));
             ini->setValue("Type",QByteArray((const char*)c64->virtual_joys[i].Type,5));
             ini->setValue("JoyIndex",QByteArray((const char*)c64->virtual_joys[i].JoyIndex,5));
             ini->setValue("KeyDown",QByteArray((const char*)c64->virtual_joys[i].KeyDown,5));
@@ -491,6 +509,9 @@ void SetupWindow::SaveINI()
         ini->setValue("CycleExact",ui->SidCycleExactEnable->isChecked());
         ini->setValue("Filter",ui->SidFilterEnable->isChecked());
 
+        ini->setValue("ReSIDActiv", ui->resid_sid->isChecked());
+        ini->setValue("WriteToAllEmulationSids", ui->write_to_all_emulation_sids->isChecked());
+
         ini->endGroup();
 
         ini->beginGroup("VIC");
@@ -505,14 +526,14 @@ void SetupWindow::SaveINI()
         ini->setValue("FirstDisplayLineNTSC",c64->GetVicFirstDisplayLineNtsc());
         ini->setValue("LastDisplayLineNTSC",c64->GetVicLastDisplayLineNtsc());
 
-		ini->setValue("VSync",ui->Vsync->isChecked());
+        ini->setValue("VSync",ui->Vsync->isChecked());
 
-		char display_name[64];
-		for(int i=0; i<MAX_VIDEO_DISPLAYS; i++)
-		{
-			sprintf(display_name, "VideoDisplay_%d_FullscreenVideoMode",i);
-			ini->setValue(QString(display_name), video_display_mode_index[i]);
-		}
+        char display_name[64];
+        for(int i=0; i<MAX_VIDEO_DISPLAYS; i++)
+        {
+            sprintf(display_name, "VideoDisplay_%d_FullscreenVideoMode",i);
+            ini->setValue(QString(display_name), video_display_mode_index[i]);
+        }
 
         ini->endGroup();
 
@@ -524,10 +545,10 @@ void SetupWindow::SaveINI()
         ini->setValue("C64CyclesPerSecond",ui->cycles_per_second->value());
         ini->endGroup();
 
-		ini->beginGroup("C64UserPalette");
-		ini->setValue("EnableUserPalette", ui->EnableUserPalette->isChecked());
+        ini->beginGroup("C64UserPalette");
+        ini->setValue("EnableUserPalette", ui->EnableUserPalette->isChecked());
 
-		ini->endGroup();
+        ini->endGroup();
     }
 }
 
@@ -539,16 +560,16 @@ void SetupWindow::on_C64Farbmodus_currentIndexChanged(int index)
 void SetupWindow::on_WPal_toggled(bool checked)
 {
     emit ChangeGrafikModi(false,ui->WPal->isChecked(),ui->WDouble->isChecked(),ui->WFilter->isChecked());
-	if(checked)
-	{
-		ui->EnableUserPalette->setEnabled(false);
-		ui->C64Farbmodus->setEnabled(false);
-	}
-	else
-	{
-		ui->EnableUserPalette->setEnabled(true);
-		ui->C64Farbmodus->setEnabled(true);
-	}
+    if(checked)
+    {
+        ui->EnableUserPalette->setEnabled(false);
+        ui->C64Farbmodus->setEnabled(false);
+    }
+    else
+    {
+        ui->EnableUserPalette->setEnabled(true);
+        ui->C64Farbmodus->setEnabled(true);
+    }
 }
 
 void SetupWindow::on_WDouble_toggled(bool)
@@ -568,39 +589,39 @@ void SetupWindow::ReSetup()
 
 int SetupWindow::GetScreenshotFormat()
 {
-	return ui->ScreenshotFormat->currentIndex();
+    return ui->ScreenshotFormat->currentIndex();
 }
 
 void SetupWindow::DisableVideoCRT()
 {
-	ui->WPal->setDisabled(true);
+    ui->WPal->setDisabled(true);
 }
 
 void SetupWindow::DisableTextureDouble()
 {
-	ui->WDouble->setDisabled(true);
+    ui->WDouble->setDisabled(true);
 }
 
 void SetupWindow::showEvent(QShowEvent *event)
 {
-	(void)event;
+    (void)event;
 
-	for(int i=0;i<MAX_VJOY_NUM;i++)
-	{
-		ui->VJoySlots->item(i,1)->setBackground(QBrush(QColor(255,255,255)));
-		ui->VJoySlots->item(i,1)->setText("");
+    for(int i=0;i<MAX_VJOY_NUM;i++)
+    {
+        ui->VJoySlots->item(i,1)->setBackground(QBrush(QColor(255,255,255)));
+        ui->VJoySlots->item(i,1)->setText("");
 
-		ui->VJoySlots->item(i,2)->setBackground(QBrush(QColor(255,255,255)));
-		ui->VJoySlots->item(i,2)->setText("");
-	}
+        ui->VJoySlots->item(i,2)->setBackground(QBrush(QColor(255,255,255)));
+        ui->VJoySlots->item(i,2)->setText("");
+    }
 
-	int row = c64->virtual_port1;
-	ui->VJoySlots->item(row,1)->setBackground(QBrush(QColor(50,255,50)));
-	ui->VJoySlots->item(row,1)->setText("Port 1");
+    int row = c64->virtual_port1;
+    ui->VJoySlots->item(row,1)->setBackground(QBrush(QColor(50,255,50)));
+    ui->VJoySlots->item(row,1)->setText("Port 1");
 
-	row = c64->virtual_port2;
-	ui->VJoySlots->item(row,2)->setBackground(QBrush(QColor(50,255,50)));
-	ui->VJoySlots->item(row,2)->setText("Port 2");
+    row = c64->virtual_port2;
+    ui->VJoySlots->item(row,2)->setBackground(QBrush(QColor(50,255,50)));
+    ui->VJoySlots->item(row,2)->setText("Port 2");
 }
 
 void SetupWindow::on_ResetSShotCounter_clicked()
@@ -771,8 +792,8 @@ void SetupWindow::on_MausPort_currentIndexChanged(int index)
 
 void SetupWindow::on_SIDVolume_valueChanged(int value)
 {
-   ui->SIDVolumeOut->setText(QVariant(value).toString() + "%");
-   c64->SetSidVolume(value / 100.0);
+    ui->SIDVolumeOut->setText(QVariant(value).toString() + "%");
+    c64->SetSidVolume(value / 100.0);
 }
 
 void SetupWindow::on_AutoMouseHide_clicked(bool checked)
@@ -1082,104 +1103,104 @@ void SetupWindow::on_Vsync_clicked(bool checked)
 
 void SetupWindow::on_DisplayList_currentIndexChanged(int index)
 {
-	int num_video_modes = c64->GetNumDisplayModes(index);
+    int num_video_modes = c64->GetNumDisplayModes(index);
 
-	int w, h, refresh_rate;
-	uint32_t format;
+    int w, h, refresh_rate;
+    uint32_t format;
 
-	is_filled_display_mode_list = true;
-	ui->VideoModes->clear();
-	for(int i = 0; i < num_video_modes; i++)
-	{
-		c64->GetDisplayMode(index, i, w, h, refresh_rate, format);
-		ui->VideoModes->addItem(QString::number(w) + " x " + QString::number(h) + " " + QString::number(SDL_BITSPERPIXEL(format)) + "-Bits" + " " + QString::number(refresh_rate) + "Hz");
-	}
-	is_filled_display_mode_list = false;
+    is_filled_display_mode_list = true;
+    ui->VideoModes->clear();
+    for(int i = 0; i < num_video_modes; i++)
+    {
+        c64->GetDisplayMode(index, i, w, h, refresh_rate, format);
+        ui->VideoModes->addItem(QString::number(w) + " x " + QString::number(h) + " " + QString::number(SDL_BITSPERPIXEL(format)) + "-Bits" + " " + QString::number(refresh_rate) + "Hz");
+    }
+    is_filled_display_mode_list = false;
 
-	ui->VideoModes->setCurrentIndex(video_display_mode_index[index]);
+    ui->VideoModes->setCurrentIndex(video_display_mode_index[index]);
 }
 
 void SetupWindow::on_VideoModes_currentIndexChanged(int index)
 {
-	if(c64 != nullptr)
-	{
-		c64->SetFullscreenDisplayMode(ui->DisplayList->currentIndex(),index);
+    if(c64 != nullptr)
+    {
+        c64->SetFullscreenDisplayMode(ui->DisplayList->currentIndex(),index);
 
-		if(!is_filled_display_mode_list)
-			video_display_mode_index[ui->DisplayList->currentIndex()] = index;
-	}
+        if(!is_filled_display_mode_list)
+            video_display_mode_index[ui->DisplayList->currentIndex()] = index;
+    }
 }
 
 void SetupWindow::on_SettingUserPalette_clicked()
 {
-	UserPaletteWindow *user_palette_window = new UserPaletteWindow(this);
+    UserPaletteWindow *user_palette_window = new UserPaletteWindow(this);
 
-	char key_name[32];
-	QColor default_color = Qt::white;
+    char key_name[32];
+    QColor default_color = Qt::white;
 
-	ini->beginGroup("C64UserPalette");
-	for(int i=0; i<16; i++)
-	{
-		sprintf(key_name, "Color_%2.2d", i);
+    ini->beginGroup("C64UserPalette");
+    for(int i=0; i<16; i++)
+    {
+        sprintf(key_name, "Color_%2.2d", i);
 
-		default_color.setRed(default_palette[i*4+0]);
-		default_color.setGreen(default_palette[i*4+1]);
-		default_color.setBlue(default_palette[i*4+2]);
+        default_color.setRed(default_palette[i*4+0]);
+        default_color.setGreen(default_palette[i*4+1]);
+        default_color.setBlue(default_palette[i*4+2]);
 
-		QColor color = ini->value(key_name, default_color.rgba()).toUInt();
-		user_palette_window->SetDefaultColor(i,default_color);
-		user_palette_window->SetColor(i,color);
-	}
-	ini->endGroup();
+        QColor color = ini->value(key_name, default_color.rgba()).toUInt();
+        user_palette_window->SetDefaultColor(i,default_color);
+        user_palette_window->SetColor(i,color);
+    }
+    ini->endGroup();
 
-	if(user_palette_window != nullptr)
-	{
-		QColor old_color[16];
-		for(int i=0; i<16; i++)
-			old_color[i] = user_palette_window->GetColor(i);
+    if(user_palette_window != nullptr)
+    {
+        QColor old_color[16];
+        for(int i=0; i<16; i++)
+            old_color[i] = user_palette_window->GetColor(i);
 
-		connect(user_palette_window, SIGNAL(ChangeColor(int,QColor)), this, SLOT(OnChangeUserColor(int, QColor)));
+        connect(user_palette_window, SIGNAL(ChangeColor(int,QColor)), this, SLOT(OnChangeUserColor(int, QColor)));
 
-		if(user_palette_window->exec())
-		{
-			// OK
-			ini->beginGroup("C64UserPalette");
-			for(int i=0; i<16; i++)
-			{
-				sprintf(key_name, "Color_%2.2d", i);
+        if(user_palette_window->exec())
+        {
+            // OK
+            ini->beginGroup("C64UserPalette");
+            for(int i=0; i<16; i++)
+            {
+                sprintf(key_name, "Color_%2.2d", i);
 
-				QColor color = user_palette_window->GetColor(i);
-				ini->setValue(key_name, color.rgba());
-			}
-			ini->endGroup();
+                QColor color = user_palette_window->GetColor(i);
+                ini->setValue(key_name, color.rgba());
+            }
+            ini->endGroup();
 
-			for(int i=0; i<16; i++)
-			{
-				QColor color = user_palette_window->GetColor(i);
-				video_crt_output->SetUserPaletteColor(i, color.red(), color.green(), color.blue());
-			}
-		}
-		else
-		{
-			// Cancel
-			for(int i=0; i<16; i++)
-				video_crt_output->SetUserPaletteColor(i,old_color[i].red(), old_color[i].green(), old_color[i].blue());
-		}
+            for(int i=0; i<16; i++)
+            {
+                QColor color = user_palette_window->GetColor(i);
+                video_crt_output->SetUserPaletteColor(i, color.red(), color.green(), color.blue());
+            }
+        }
+        else
+        {
+            // Cancel
+            for(int i=0; i<16; i++)
+                video_crt_output->SetUserPaletteColor(i,old_color[i].red(), old_color[i].green(), old_color[i].blue());
+        }
 
-		disconnect(user_palette_window, SIGNAL(ChangeColor(int,QColor)), this, SLOT(OnChangeUserColor(int, QColor)));
+        disconnect(user_palette_window, SIGNAL(ChangeColor(int,QColor)), this, SLOT(OnChangeUserColor(int, QColor)));
 
-		delete user_palette_window;
-	}
+        delete user_palette_window;
+    }
 }
 
 void SetupWindow::on_EnableUserPalette_clicked(bool checked)
 {
-	video_crt_output->EnableUserPalette(checked);
+    video_crt_output->EnableUserPalette(checked);
 }
 
 void SetupWindow::OnChangeUserColor(int color_number, QColor color)
 {
-	video_crt_output->SetUserPaletteColor(color_number, color.red(), color.green(), color.blue());
+    video_crt_output->SetUserPaletteColor(color_number, color.red(), color.green(), color.blue());
 }
 
 void SetupWindow::on_SounbufferChange_clicked()
