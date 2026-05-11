@@ -1435,7 +1435,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
         if(AudioOutProc != nullptr) AudioOutProc(reinterpret_cast<uint8_t*>(sid1->SoundBufferV0), reinterpret_cast<uint8_t*>(sid1->SoundBufferV1), reinterpret_cast<uint8_t*>(sid1->SoundBufferV2), sample_buffer_size_mono);
         break;
     case RESID_SID:
-        if(AudioOutProc != nullptr) AudioOutProc(reinterpret_cast<uint8_t*>(resid1->sound_buffer), reinterpret_cast<uint8_t*>(resid2->sound_buffer), nullptr, sample_buffer_size_mono);
+        if(AudioOutProc != nullptr) AudioOutProc(reinterpret_cast<uint8_t*>(resid1->sound_buffer_v0), reinterpret_cast<uint8_t*>(resid1->sound_buffer_v1), reinterpret_cast<uint8_t*>(resid1->sound_buffer_v2), sample_buffer_size_mono);
         break;
     default:
         break;

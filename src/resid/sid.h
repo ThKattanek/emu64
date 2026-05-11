@@ -103,6 +103,8 @@ public:
 
   void debugoutput(void);
 
+  Voice voice[3];
+
  protected:
   static double I0(double x);
   int clock_fast(cycle_count& delta_t, short* buf, int n, int interleave);
@@ -112,7 +114,6 @@ public:
   void write();
 
   chip_model sid_model;
-  Voice voice[3];
   Filter filter;
   ExternalFilter extfilt;
   Potentiometer potx;

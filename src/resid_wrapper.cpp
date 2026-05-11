@@ -67,6 +67,30 @@ ReSIDWrapperClass::~ReSIDWrapperClass()
         delete sid;
         sid = nullptr;
     }
+
+    if(sound_buffer != nullptr)
+    {
+        delete[] sound_buffer;
+        sound_buffer = nullptr;
+    }
+
+    if(sound_buffer_v0 != nullptr)
+    {
+        delete[] sound_buffer_v0;
+        sound_buffer_v0 = nullptr;
+    }
+
+    if(sound_buffer_v1 != nullptr)
+    {
+        delete[] sound_buffer_v1;
+        sound_buffer_v1 = nullptr;
+    }
+
+    if(sound_buffer_v2 != nullptr)
+    {
+        delete[] sound_buffer_v2;
+        sound_buffer_v2 = nullptr;
+    }
 }
 
 void ReSIDWrapperClass::SetClockFrequency(float clock_freq)
@@ -145,11 +169,6 @@ bool ReSIDWrapperClass::OneCycle()
         freq_conv_counter -= 1.0f;
         if(!cycle_exact)
         {
-            /*
-            OscZyklus(Zyklencounter);
-            EnvZyklus(Zyklencounter);
-            FilterZyklus(Zyklencounter,VoiceOutput(0),VoiceOutput(1),VoiceOutput(2),0);
-            */
             sid->clock(cycle_counter);
         }
         cycle_counter = 0;
@@ -158,23 +177,26 @@ bool ReSIDWrapperClass::OneCycle()
         {
             if(sound_buffer_pos < sound_buffer_size)
             {
-                /*
-                SoundBufferV0[SoundBufferPos] = VoiceOutput(0);
-                SoundBufferV1[SoundBufferPos] = VoiceOutput(1);
-                SoundBufferV2[SoundBufferPos] = VoiceOutput(2);
-                */
-                sound_buffer[sound_buffer_pos++] = sid->output() << 1;
+                sound_buffer_v0[sound_buffer_pos] = sid->voice[0].output();
+                sound_buffer_v1[sound_buffer_pos] = sid->voice[1].output();
+                sound_buffer_v2[sound_buffer_pos] = sid->voice[2].output();
+
+                int output = sid->output() << 1;
+
+                // Clipping, damit es nicht zu Übersteuer
+                if(output > 32767) output = 32767;
+                if(output < -32768) output = -32768;
+
+                sound_buffer[sound_buffer_pos++] = output;
             }
         }
         else
         {
             if(sound_buffer_pos < sound_buffer_size)
             {
-                /*
-                SoundBufferV0[SoundBufferPos] = VoiceOutput(0);
-                SoundBufferV1[SoundBufferPos] = VoiceOutput(1);
-                SoundBufferV2[SoundBufferPos] = VoiceOutput(2);
-                */
+                sound_buffer_v0[sound_buffer_pos] = sid->voice[0].output();
+                sound_buffer_v1[sound_buffer_pos] = sid->voice[1].output();
+                sound_buffer_v2[sound_buffer_pos] = sid->voice[2].output();
                 sound_buffer[sound_buffer_pos++] = 0;
             }
         }
