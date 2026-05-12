@@ -4253,6 +4253,14 @@ void C64Class::SetSidFilter(bool enable)
     resid2->EnableFilter(enable);
 }
 
+void C64Class::SetSidDigiBoost(bool enable)
+{
+    sid1->EnableDigiBoost(enable);
+    sid2->EnableDigiBoost(enable);
+    resid1->EnableDigiBoost(enable);
+    resid2->EnableDigiBoost(enable);
+}
+
 void C64Class::EnableWriteToAllEmulationSids(bool enable)
 {
     write_to_all_emulation_sids = enable;

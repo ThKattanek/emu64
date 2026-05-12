@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>551</width>
-    <height>741</height>
+    <width>515</width>
+    <height>639</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,8 +52,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>509</width>
-            <height>672</height>
+            <width>479</width>
+            <height>556</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -81,6 +81,45 @@
               <property name="horizontalSpacing">
                <number>6</number>
               </property>
+              <item row="3" column="1">
+               <widget class="QComboBox" name="SecondSidTyp">
+                <property name="minimumSize">
+                 <size>
+                  <width>90</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Auswahl des SID Typs für einen zweiten Steckplatz.</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="3" colspan="2">
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="3" column="0">
+               <widget class="QComboBox" name="FirstSidTyp">
+                <property name="minimumSize">
+                 <size>
+                  <width>90</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Auswahl des SID Typs für den Standard Steckplatz.</string>
+                </property>
+               </widget>
+              </item>
               <item row="2" column="1">
                <widget class="QCheckBox" name="SecondSidEnable">
                 <property name="text">
@@ -88,31 +127,15 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="sid1_label">
-                <property name="text">
-                 <string>1. SID</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QComboBox" name="FirstSidTyp">
+              <item row="0" column="1">
+               <widget class="QRadioButton" name="resid_sid">
                 <property name="toolTip">
-                 <string>Auswahl des SID Typs für den Standard Steckplatz.</string>
+                 <string>Hier arbeitet die reSID Emulation.
+reSID ist eine ursprünglich von Dag Lem in der Programmiersprache C++
+geschriebene Open Source-Bibliothek zur Emulation des Audio-Chips SID.</string>
                 </property>
-               </widget>
-              </item>
-              <item row="3" column="3">
-               <widget class="QComboBox" name="SecondSidAddress">
-                <property name="toolTip">
-                 <string>IO Bereich für einen zweiten SID.</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="3">
-               <widget class="QLabel" name="sid_io_label">
                 <property name="text">
-                 <string>IO Bereich</string>
+                 <string>reSID</string>
                 </property>
                </widget>
               </item>
@@ -136,10 +159,36 @@
                 </property>
                </widget>
               </item>
+              <item row="5" column="2">
+               <widget class="QCheckBox" name="SidDigiBoost">
+                <property name="text">
+                 <string>Digi-Boost (8580 Only)</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QCheckBox" name="write_to_all_emulation_sids">
+                <property name="toolTip">
+                 <string>Wenn aktiviert. Wird auch auf die deaktivierte SID Emulation geschrieben)
+So kann man immer Nahtlos zwischen beide hin und her schalten.
+Kann im Norfall aber deaktiviert bleiben.</string>
+                </property>
+                <property name="text">
+                 <string>Immer in beide SID Register schreiben</string>
+                </property>
+               </widget>
+              </item>
               <item row="4" column="0" colspan="2">
                <widget class="QCheckBox" name="SidCycleExactEnable">
                 <property name="text">
                  <string>Zyklengenaue Emulation</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="sid1_label">
+                <property name="text">
+                 <string>1. SID</string>
                 </property>
                </widget>
               </item>
@@ -150,35 +199,10 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="4">
-               <spacer name="horizontalSpacer_3">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="1">
-               <widget class="QRadioButton" name="resid_sid">
-                <property name="toolTip">
-                 <string>Hier arbeitet die reSID Emulation.
-reSID ist eine ursprünglich von Dag Lem in der Programmiersprache C++
-geschriebene Open Source-Bibliothek zur Emulation des Audio-Chips SID.</string>
-                </property>
+              <item row="2" column="2">
+               <widget class="QLabel" name="sid_io_label">
                 <property name="text">
-                 <string>reSID</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1" colspan="2">
-               <widget class="QComboBox" name="SecondSidTyp">
-                <property name="toolTip">
-                 <string>Auswahl des SID Typs für einen zweiten Steckplatz.</string>
+                 <string>IO Bereich</string>
                 </property>
                </widget>
               </item>
@@ -189,15 +213,16 @@ geschriebene Open Source-Bibliothek zur Emulation des Audio-Chips SID.</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="3">
-               <widget class="QCheckBox" name="write_to_all_emulation_sids">
-                <property name="toolTip">
-                 <string>Wenn aktiviert. Wird auch auf die deaktivierte SID Emulation geschrieben)
-So kann man immer Nahtlos zwischen beide hin und her schalten.
-Kann im Norfall aber deaktiviert bleiben.</string>
+              <item row="3" column="2">
+               <widget class="QComboBox" name="SecondSidAddress">
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>16777215</height>
+                 </size>
                 </property>
-                <property name="text">
-                 <string>Immer in beide SID Register schreiben</string>
+                <property name="toolTip">
+                 <string>IO Bereich für einen zweiten SID.</string>
                 </property>
                </widget>
               </item>
@@ -432,8 +457,8 @@ Kann im Norfall aber deaktiviert bleiben.</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>509</width>
-            <height>672</height>
+            <width>473</width>
+            <height>570</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -576,8 +601,8 @@ Kann im Norfall aber deaktiviert bleiben.</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>509</width>
-            <height>672</height>
+            <width>473</width>
+            <height>570</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_7">
@@ -877,8 +902,8 @@ Kann im Norfall aber deaktiviert bleiben.</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>509</width>
-            <height>672</height>
+            <width>473</width>
+            <height>570</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_13">

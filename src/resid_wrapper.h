@@ -33,6 +33,7 @@ public:
     void SetClockFrequency(float clock_freq);
     void SetChipModel(int model);
     void EnableFilter(bool enable);
+    void EnableDigiBoost(bool enable);
     void Reset();
     unsigned char ReadRegister(unsigned char offset);
     void WriteRegister(unsigned char offset, unsigned char value);
@@ -61,6 +62,8 @@ public:
 
 private:
     reSID::SID *sid;
+
+    bool enable_digi_boost;
 
     int	sid_number;
     int sid_model;

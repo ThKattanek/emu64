@@ -99,6 +99,8 @@ private slots:
 
     void on_write_to_all_emulation_sids_clicked(bool checked);
 
+    void on_SidDigiBoost_clicked(bool checked);
+
 private:
     void UpdateToolTips();
     void FillRomSetCombo();

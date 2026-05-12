@@ -62,6 +62,8 @@ MOS6581_8085::MOS6581_8085(int nummer,int samplerate,int puffersize,int *error)
     interpolate(f0_points_8580, f0_points_8580+ sizeof(f0_points_8580)/sizeof(*f0_points_8580) - 1,PointPlotter<int>(f0_8580), 1.0);
 
     SoundOutputEnable=false;
+    enable_digi_boost = false;
+    ext_in = 0;
 
     this->CycleExact=false;
 
@@ -148,6 +150,8 @@ void MOS6581_8085::SetChipType(int type)
         f0=f0_6581;
         f0_points=f0_points_6581;
         f0_count=sizeof(f0_points_6581)/sizeof(*f0_points_6581);
+
+        ext_in = 0;
     }
     else
     {
@@ -163,6 +167,11 @@ void MOS6581_8085::SetChipType(int type)
         f0=f0_8580;
         f0_points=f0_points_8580;
         f0_count=sizeof(f0_points_8580)/sizeof(*f0_points_8580);
+
+        if(enable_digi_boost)
+            ext_in = 0xfff00;
+        else
+            ext_in = 0;
     }
     SetW0();
     SetQ();
@@ -190,6 +199,19 @@ void MOS6581_8085::ZeroSoundBufferPos()
     SoundBufferPos = 0;
 }
 
+void MOS6581_8085::EnableDigiBoost(bool enable)
+{
+    enable_digi_boost = enable;
+    if(enable_digi_boost && (SidModel == MOS_8580))
+    {
+        ext_in = 0xfff00;
+    }
+    else
+    {
+        ext_in = 0;
+    }
+}
+
 bool MOS6581_8085::OneZyklus(void)
 {
     ret = false;
@@ -208,7 +230,7 @@ bool MOS6581_8085::OneZyklus(void)
     {
         OscZyklus();
         EnvZyklus();
-        FilterZyklus(VoiceOutput(0),VoiceOutput(1),VoiceOutput(2),0);
+        FilterZyklus(VoiceOutput(0),VoiceOutput(1),VoiceOutput(2), ext_in);
     }
     
     Zyklencounter++;
@@ -220,7 +242,7 @@ bool MOS6581_8085::OneZyklus(void)
         {
             OscZyklus(Zyklencounter);
             EnvZyklus(Zyklencounter);
-            FilterZyklus(Zyklencounter,VoiceOutput(0),VoiceOutput(1),VoiceOutput(2),0);
+            FilterZyklus(Zyklencounter,VoiceOutput(0),VoiceOutput(1),VoiceOutput(2), ext_in);
         }
         Zyklencounter=0;
 

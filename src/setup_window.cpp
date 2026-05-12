@@ -342,6 +342,10 @@ void SetupWindow::LoadINI(C64Class *c64)
         ui->write_to_all_emulation_sids->setChecked(bvalue);
         on_write_to_all_emulation_sids_clicked(bvalue);
 
+        bvalue = ini->value("SidDigiBoost", false).toBool();
+        ui->SidDigiBoost->setChecked(bvalue);
+        on_SidDigiBoost_clicked(bvalue);
+
         ini->endGroup();
 
         ini->beginGroup("VIC");
@@ -511,6 +515,7 @@ void SetupWindow::SaveINI()
 
         ini->setValue("ReSIDActiv", ui->resid_sid->isChecked());
         ini->setValue("WriteToAllEmulationSids", ui->write_to_all_emulation_sids->isChecked());
+        ini->setValue("SidDigiBoost", ui->SidDigiBoost->isChecked());
 
         ini->endGroup();
 
@@ -1212,5 +1217,11 @@ void SetupWindow::on_SounbufferChange_clicked()
 void SetupWindow::on_write_to_all_emulation_sids_clicked(bool checked)
 {
     c64->EnableWriteToAllEmulationSids(checked);
+}
+
+
+void SetupWindow::on_SidDigiBoost_clicked(bool checked)
+{
+    c64->SetSidDigiBoost(checked);
 }
 

@@ -54,6 +54,8 @@ ReSIDWrapperClass::ReSIDWrapperClass(int number, int samplerate, int buffersize,
     sid->set_chip_model(reSID::MOS6581);
     sid->adjust_filter_bias(0.0f);
 
+    enable_digi_boost = false;
+
     reset = nullptr;
     sid->reset();
 
@@ -96,7 +98,7 @@ ReSIDWrapperClass::~ReSIDWrapperClass()
 void ReSIDWrapperClass::SetClockFrequency(float clock_freq)
 {
     c64_cycle_sek = clock_freq;
-    sid->set_sampling_parameters(clock_freq, reSID::SAMPLE_INTERPOLATE, samplerate);
+    sid->set_sampling_parameters(clock_freq, reSID::SAMPLE_RESAMPLE, samplerate);
     freq_conv_add_value = 1.0f/(c64_cycle_sek/samplerate);
 }
 
@@ -107,10 +109,22 @@ void ReSIDWrapperClass::SetChipModel(int model)
     {
     case 0:
         sid->set_chip_model(reSID::MOS6581);
+        sid->set_voice_mask(0x07);
+        sid->input(0);
         break;
 
     case 1:
         sid->set_chip_model(reSID::MOS8580);
+        if(enable_digi_boost)
+        {
+            sid->set_voice_mask(0x0f);
+            sid->input(-32768);
+        }
+        else
+        {
+            sid->set_voice_mask(0x07);
+            sid->input(0);
+        }
         break;
     }
 }
@@ -118,6 +132,22 @@ void ReSIDWrapperClass::SetChipModel(int model)
 void ReSIDWrapperClass::EnableFilter(bool enable)
 {
     sid->enable_filter(enable);
+}
+
+void ReSIDWrapperClass::EnableDigiBoost(bool enable)
+{
+    enable_digi_boost = enable;
+
+    if(enable && (sid_model == 1))
+    {
+        sid->set_voice_mask(0x0f);
+        sid->input(-32768);
+    }
+    else
+    {
+        sid->set_voice_mask(0x07);
+        sid->input(0);
+    }
 }
 
 void ReSIDWrapperClass::Reset()

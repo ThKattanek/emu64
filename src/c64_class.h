@@ -221,6 +221,7 @@ public:
     void SetStereoSid6ChannelMode(bool enable);         // 6 Kanal Modus für 2 SIDs aktivieren (nur bei aktiviertem 2. SID), es werden alle 6 Stimmen als Mono wiedergegeben
     void SetSidCycleExact(bool enable);                 // Die SID Emulation wird Zyklus genau, dadurch wird die Soundqualität verbessert, aber die Emulation etwas langsamer (je nach Spiel spürbar)
     void SetSidFilter(bool enable);                     // Es werden die Filter der SID's emuliert, dadurch wird die Soundqualität verbessert, aber die Emulation etwas langsamer (je nach Spiel spürbar)
+    void SetSidDigiBoost(bool enable);                  // Es wird die DigiBoost Funktion der SID's "8580" emuliert. Dadurch werden Samples beim 8580 lauter abgespielt.
     void EnableWriteToAllEmulationSids(bool enable);    // Es wird immer in allen Registern der emulierten SID's (EMU64_SID und RESID_SID) geschrieben, egal welche gerade aktiv ist.
 
     bool StartSidDump(const char *filename);

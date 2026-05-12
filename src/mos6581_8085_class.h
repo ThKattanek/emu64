@@ -69,6 +69,7 @@ public:
     void SetVoiceEnable(int nr, bool enable);
     void SetPotXY(unsigned char pot_x, unsigned char pot_y);
     void ZeroSoundBufferPos();
+    void EnableDigiBoost(bool enable);
     bool OneZyklus(void);
 
     bool SaveFreez(FILE* File);
@@ -83,7 +84,7 @@ private:
     int                 Zyklencounter;
     bool                ret;
 
-    float              Samplerate;
+    float               Samplerate;
     VOICEClass          *Voice[3];
     unsigned char       IO[32];
 
@@ -101,6 +102,9 @@ private:
 
     int	SidNummer;
     int SidModel;
+
+    bool enable_digi_boost;
+    int ext_in;
 
     int                 C64ZyklenSek;
     float              FreqConvCounter;	// interner Counter für Fast Fast Fast Resampling ;-)
