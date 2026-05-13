@@ -27,7 +27,7 @@ ReSIDWrapperClass::ReSIDWrapperClass(int number, int samplerate, int buffersize,
     sid_number = number;
 
     this->samplerate = samplerate;
-    c64_cycle_sek = 985248;
+    c64_cycle_sek = 985248;             // Default Clockfrequenz eines C64 (PAL), wird aber später mit SetClockFrequency() überschrieben, damit die richtige Clockfrequenz verwendet wird, je nachdem ob es sich um einen PAL oder NTSC C64 handelt
     freq_conv_add_value = 1.0f/(c64_cycle_sek/samplerate);
     freq_conv_counter = 0.0;
 
@@ -52,9 +52,29 @@ ReSIDWrapperClass::ReSIDWrapperClass(int number, int samplerate, int buffersize,
 
     sid_model = reSID::MOS6581;
     sid->set_chip_model(reSID::MOS6581);
-    sid->adjust_filter_bias(0.0f);
 
     enable_digi_boost = false;
+
+    // Filtereinstellungen so setzen, dass es nicht zu Übersteuerungen kommt
+
+    // MOS6581
+    passband_frequency[0] = 0.9*samplerate/2;
+    filter_scale[0] = 0.97;
+    filter_bias[0] = 0.5f;
+
+    // MOS8580
+    passband_frequency[1] = 0.9*samplerate/2;
+    filter_scale[1] = 0.97;
+    filter_bias[1] = 0.0;
+
+    // MOS8580 mit DigiBoost
+    passband_frequency[2] = 0.9*samplerate/2;
+    filter_scale[2] = 0.97;
+    filter_bias[2] = 0.00; // DigiBoost benötigt etwas mehr Filter Bias, damit es nicht zu Übersteuerungen kommt
+
+    filter_settings_index = 0; // Standardmäßig die Filtereinstellungen für MOS6581 verwenden
+
+    SetClockFrequency(c64_cycle_sek);
 
     reset = nullptr;
     sid->reset();
@@ -98,7 +118,6 @@ ReSIDWrapperClass::~ReSIDWrapperClass()
 void ReSIDWrapperClass::SetClockFrequency(float clock_freq)
 {
     c64_cycle_sek = clock_freq;
-    sid->set_sampling_parameters(clock_freq, reSID::SAMPLE_RESAMPLE, samplerate);
     freq_conv_add_value = 1.0f/(c64_cycle_sek/samplerate);
 }
 
@@ -111,6 +130,7 @@ void ReSIDWrapperClass::SetChipModel(int model)
         sid->set_chip_model(reSID::MOS6581);
         sid->set_voice_mask(0x07);
         sid->input(0);
+        filter_settings_index = 0; // Filtereinstellungen für MOS6581 verwenden
         break;
 
     case 1:
@@ -119,14 +139,21 @@ void ReSIDWrapperClass::SetChipModel(int model)
         {
             sid->set_voice_mask(0x0f);
             sid->input(-32768);
+            filter_settings_index = 2; // Filtereinstellungen für MOS8580 mit DigiBoost verwenden
         }
         else
         {
             sid->set_voice_mask(0x07);
             sid->input(0);
+            filter_settings_index = 1; // Filtereinstellungen für MOS8580 ohne DigiBoost verwenden
         }
         break;
+    default:
+            filter_settings_index = 0; // Standardmäßig die Filtereinstellungen für MOS6581 verwenden
+        break;
     }
+
+    UpdateFilterSettings();
 }
 
 void ReSIDWrapperClass::EnableFilter(bool enable)
@@ -238,4 +265,10 @@ bool ReSIDWrapperClass::OneCycle()
 void ReSIDWrapperClass::SetSoundBufferPosToZero()
 {
     sound_buffer_pos = 0;
+}
+
+void ReSIDWrapperClass::UpdateFilterSettings()
+{
+    sid->set_sampling_parameters(c64_cycle_sek, reSID::SAMPLE_RESAMPLE, samplerate, passband_frequency[filter_settings_index], filter_scale[filter_settings_index]);
+    sid->adjust_filter_bias(filter_bias[filter_settings_index]);
 }

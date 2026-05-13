@@ -61,6 +61,8 @@ public:
     short rec_sample_buffer[19656];
 
 private:
+    void UpdateFilterSettings();
+
     reSID::SID *sid;
 
     bool enable_digi_boost;
@@ -74,6 +76,13 @@ private:
     float freq_conv_counter;	// interner Counter für Fast Fast Fast Resampling ;-)
     float freq_conv_add_value;
     int cycle_counter;
+
+    // Aktuelle Einstellungen für die Filter
+
+    double passband_frequency[3];   // Index 0 = 6581, Index 1 = 8580, Index 2 = 8580 + DigiBoost
+    double filter_scale[3];         // Index 0 = 6581, Index 1 = 8580, Index 2 = 8580 + DigiBoost
+    double filter_bias[3];          // Index 0 = 6581, Index 1 = 8580, Index 2 = 8580 + DigiBoost
+    int filter_settings_index;      // Index 0 = 6581, Index 1 = 8580, Index 2 = 8580 + DigiBoost
 
     unsigned char pot_x;
     unsigned char pot_y;
