@@ -276,6 +276,7 @@ bool MOS6581_8085::OneZyklus(void)
     IoDump->CycleTickCapture();
     // Playing
     if(IoDump->CycleTickPlay())WriteIO(IoDump->RegOut,IoDump->RegWertOut);
+    WriteReg = 0xFF;
 
     //////// RECORD ////////
     if(Recording)
@@ -283,7 +284,6 @@ bool MOS6581_8085::OneZyklus(void)
         RecSampleBuffer[RecSampleCounter++] = FilterOutput()>>4;
         if(RecSampleCounter == 19656) RecSampleCounter = 0;
     }
-    WriteReg = 0xFF;
 
     //////// IO Delay ///////
     if(IODelayEnable)

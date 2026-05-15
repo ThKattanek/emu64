@@ -23,6 +23,7 @@
 
 #include "siddump.h"
 #include "./resid/sid.h"
+#include <cstdint>
 
 class ReSIDWrapperClass
 {
@@ -35,9 +36,9 @@ public:
     void EnableFilter(bool enable);
     void EnableDigiBoost(bool enable);
     void Reset();
-    unsigned char ReadRegister(unsigned char offset);
-    void WriteRegister(unsigned char offset, unsigned char value);
-    void SetPotXY(unsigned char pot_x, unsigned char pot_y);
+    uint8_t ReadRegister(uint8_t offset);
+    void WriteRegister(uint8_t offset, uint8_t value);
+    void SetPotXY(uint8_t pot_x, uint8_t pot_y);
     bool OneCycle();
 
     void SetSoundBufferPosToZero();
@@ -53,7 +54,8 @@ public:
     bool *reset;
 
     SIDDumpClass *io_dump;
-    unsigned char	write_register;
+    uint8_t io[32];
+    uint8_t	write_register;
 
     /// Recording ///
     bool recording;
@@ -84,8 +86,8 @@ private:
     double filter_bias[3];          // Index 0 = 6581, Index 1 = 8580, Index 2 = 8580 + DigiBoost
     int filter_settings_index;      // Index 0 = 6581, Index 1 = 8580, Index 2 = 8580 + DigiBoost
 
-    unsigned char pot_x;
-    unsigned char pot_y;
+    uint8_t pot_x;
+    uint8_t pot_y;
 };
 
 #endif // RESID_WRAPPER_H

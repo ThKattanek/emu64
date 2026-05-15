@@ -71,10 +71,10 @@ static const char* CPU_OPC = {"\
                               BEQSBCJAMISBNOPSBCINCISBSEDSBCNOPISBNOPSBCINCISB\
                               RSTIRQNMI"};
 
-                              C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(const char*)> log_function, const char *data_path):
-                                  mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),resid1(nullptr),resid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
-                              {
-                                   *ret_error = 0;
+C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(const char*)> log_function, const char *data_path):
+  mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),resid1(nullptr),resid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
+{
+   *ret_error = 0;
 
 this->start_minimized = start_minimized;
 
@@ -386,6 +386,7 @@ resid2 = new ReSIDWrapperClass(1,audio_frequency,audio_spec_have.samples,&sid_re
 
 sid_emulation = SID_EMULATION::RESID_SID;
 write_to_all_emulation_sids = false;
+current_sid_dump = resid1->io_dump;
 
 cia1 = new MOS6526(0);
 cia2 = new MOS6526(1);
@@ -4180,6 +4181,7 @@ void C64Class::SetSidEmulation(int sid_emulation)
     switch(sid_emulation)
     {
     case EMU64_SID:
+        current_sid_dump = sid1->IoDump;
         sid1->ZeroSoundBufferPos();
         sid2->ZeroSoundBufferPos();
         sid1->SoundOutputEnable = !debug_mode;
@@ -4189,6 +4191,7 @@ void C64Class::SetSidEmulation(int sid_emulation)
         break;
 
     case RESID_SID:
+        current_sid_dump = resid1->io_dump;
         resid1->SetSoundBufferPosToZero();
         resid2->SetSoundBufferPosToZero();
         sid1->SoundOutputEnable = false;
@@ -4268,20 +4271,27 @@ void C64Class::EnableWriteToAllEmulationSids(bool enable)
 
 bool C64Class::StartSidDump(const char *filename)
 {
-    return sid1->IoDump->StartCapture(filename);
+    if(current_sid_dump != nullptr)
+    {
+        current_sid_dump->StartCapture(filename);
+        return true;
+    }
+    return false;
 }
 
 void C64Class::StopSidDump()
 {
-    if(sid1 != nullptr)
-        if(sid1->IoDump != nullptr)
-            sid1->IoDump->StopCapture();
+    if(current_sid_dump != nullptr)
+        current_sid_dump->StopCapture();
 }
 
 int C64Class::GetSidDumpFrames()
 {
     //This is PAL Only
-    return sid1->IoDump->GetCycleCounts() / (63*312); // a Frame in PAL is 63 Cycles with 312 rasterlines
+    if(current_sid_dump == nullptr)
+        return 0;
+    else
+        return current_sid_dump->GetCycleCounts() / (63*312); // a Frame in PAL is 63 Cycles with 312 rasterlines
 }
 
 void C64Class::SetVicConfig(int var, bool enable)

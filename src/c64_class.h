@@ -564,6 +564,8 @@ private:
 
     int         sid_emulation;
     bool        write_to_all_emulation_sids;   // Beim Schreiben in einen SID werden je nach Einstellung alle SIDs beschrieben oder nur die aktive SID
+
+    SIDDumpClass* current_sid_dump;
 };
 
 #endif // C64CLASS_H

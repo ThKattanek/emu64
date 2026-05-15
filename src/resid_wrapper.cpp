@@ -34,9 +34,6 @@ ReSIDWrapperClass::ReSIDWrapperClass(int number, int samplerate, int buffersize,
     sound_output_enable = false;
     cycle_exact = false;
 
-    io_dump = new SIDDumpClass((unsigned char*)(sid->read_state().sid_register));
-    io_dump->WriteReg = &write_register;
-
     cycle_counter = 0;
     sound_buffer_pos = 0;
     sound_buffer_size = buffersize;
@@ -76,6 +73,9 @@ ReSIDWrapperClass::ReSIDWrapperClass(int number, int samplerate, int buffersize,
 
     SetClockFrequency(c64_cycle_sek);
 
+    io_dump = new SIDDumpClass((unsigned char*)io);
+    io_dump->WriteReg = &write_register;
+
     reset = nullptr;
     sid->reset();
 
@@ -112,6 +112,12 @@ ReSIDWrapperClass::~ReSIDWrapperClass()
     {
         delete[] sound_buffer_v2;
         sound_buffer_v2 = nullptr;
+    }
+
+    if(io_dump != nullptr)
+    {
+        delete io_dump;
+        io_dump = nullptr;
     }
 }
 
@@ -182,7 +188,7 @@ void ReSIDWrapperClass::Reset()
     sid->reset();
 }
 
-unsigned char ReSIDWrapperClass::ReadRegister(unsigned char offset)
+uint8_t ReSIDWrapperClass::ReadRegister(uint8_t offset)
 {
     switch(offset & 0x1f)
     {
@@ -196,12 +202,14 @@ unsigned char ReSIDWrapperClass::ReadRegister(unsigned char offset)
     }
 }
 
-void ReSIDWrapperClass::WriteRegister(unsigned char offset, unsigned char value)
+void ReSIDWrapperClass::WriteRegister(uint8_t offset, uint8_t value)
 {
+    io[offset & 0x1f] = value;
+    write_register = offset & 0x1f;
     sid->write(offset & 0x1f, value);
 }
 
-void ReSIDWrapperClass::SetPotXY(unsigned char pot_x, unsigned char pot_y)
+void ReSIDWrapperClass::SetPotXY(uint8_t pot_x, uint8_t pot_y)
 {
     this->pot_x = pot_x;
     this->pot_y = pot_y;
@@ -259,6 +267,17 @@ bool ReSIDWrapperClass::OneCycle()
         }
         ret = true;
     }
+
+    ///////// IO DUMP //////////
+    ////////////////////////////
+
+    // Capture
+    io_dump->CycleTickCapture();
+    // Playing
+    if(io_dump->CycleTickPlay())
+        WriteRegister(io_dump->RegOut, io_dump->RegWertOut);
+    write_register = 0xff;
+
     return ret;
 }
 
