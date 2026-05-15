@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -61,8 +60,10 @@ MOS6581_8085::MOS6581_8085(int nummer,int samplerate,int puffersize,int *error)
 
     interpolate(f0_points_6581, f0_points_6581+ sizeof(f0_points_6581)/sizeof(*f0_points_6581) - 1,PointPlotter<int>(f0_6581), 1.0);
     interpolate(f0_points_8580, f0_points_8580+ sizeof(f0_points_8580)/sizeof(*f0_points_8580) - 1,PointPlotter<int>(f0_8580), 1.0);
-	
+
     SoundOutputEnable=false;
+    enable_digi_boost = false;
+    ext_in = 0;
 
     this->CycleExact=false;
 
@@ -78,9 +79,6 @@ MOS6581_8085::MOS6581_8085(int nummer,int samplerate,int puffersize,int *error)
     SoundBufferV2 = new short[SoundBufferSize];
 
     PotX = PotY = 0xFF;
-
-    Recording = false;
-    RecSampleCounter = 0;
 
     FilterResonanz = 0;
 
@@ -117,7 +115,7 @@ void MOS6581_8085::ChangeSampleRate(int samplerate,int puffersize)
 
     SoundBufferPos = 0;
     SoundBufferSize = puffersize;
-	
+
     SoundBuffer = new short[SoundBufferSize];
     SoundBufferV0 = new short[SoundBufferSize];
     SoundBufferV1 = new short[SoundBufferSize];
@@ -149,6 +147,8 @@ void MOS6581_8085::SetChipType(int type)
         f0=f0_6581;
         f0_points=f0_points_6581;
         f0_count=sizeof(f0_points_6581)/sizeof(*f0_points_6581);
+
+        ext_in = 0;
     }
     else
     {
@@ -164,6 +164,11 @@ void MOS6581_8085::SetChipType(int type)
         f0=f0_8580;
         f0_points=f0_points_8580;
         f0_count=sizeof(f0_points_8580)/sizeof(*f0_points_8580);
+
+        if(enable_digi_boost)
+            ext_in = 0xfff00;
+        else
+            ext_in = 0;
     }
     SetW0();
     SetQ();
@@ -191,11 +196,25 @@ void MOS6581_8085::ZeroSoundBufferPos()
     SoundBufferPos = 0;
 }
 
+void MOS6581_8085::EnableDigiBoost(bool enable)
+{
+    enable_digi_boost = enable;
+    if(enable_digi_boost && (SidModel == MOS_8580))
+    {
+        ext_in = 0xfff00;
+    }
+    else
+    {
+        ext_in = 0;
+    }
+}
+
 bool MOS6581_8085::OneZyklus(void)
 {
     ret = false;
     
-    if(!*RESET) Reset();
+    if(RESET != nullptr)
+        if(!*RESET) Reset();
 
     if(LastWriteCounter > 0)
     {
@@ -206,9 +225,9 @@ bool MOS6581_8085::OneZyklus(void)
 
     if(CycleExact)
     {
-    	OscZyklus();
-    	EnvZyklus();
-        FilterZyklus(VoiceOutput(0),VoiceOutput(1),VoiceOutput(2),0);
+        OscZyklus();
+        EnvZyklus();
+        FilterZyklus(VoiceOutput(0),VoiceOutput(1),VoiceOutput(2), ext_in);
     }
     
     Zyklencounter++;
@@ -216,14 +235,14 @@ bool MOS6581_8085::OneZyklus(void)
     if(FreqConvCounter>=1.0f)
     {
         FreqConvCounter-=1.0f;
-    	if(!CycleExact)
-    	{
+        if(!CycleExact)
+        {
             OscZyklus(Zyklencounter);
             EnvZyklus(Zyklencounter);
-            FilterZyklus(Zyklencounter,VoiceOutput(0),VoiceOutput(1),VoiceOutput(2),0);
-    	}
-    	Zyklencounter=0;
-		
+            FilterZyklus(Zyklencounter,VoiceOutput(0),VoiceOutput(1),VoiceOutput(2), ext_in);
+        }
+        Zyklencounter=0;
+
         if(SoundOutputEnable)
         {
             if(SoundBufferPos < SoundBufferSize)
@@ -254,13 +273,6 @@ bool MOS6581_8085::OneZyklus(void)
     IoDump->CycleTickCapture();
     // Playing
     if(IoDump->CycleTickPlay())WriteIO(IoDump->RegOut,IoDump->RegWertOut);
-
-    //////// RECORD ////////
-    if(Recording)
-    {
-        RecSampleBuffer[RecSampleCounter++] = FilterOutput()>>4;
-        if(RecSampleCounter == 19656) RecSampleCounter = 0;
-    }
     WriteReg = 0xFF;
 
     //////// IO Delay ///////
@@ -307,7 +319,7 @@ unsigned char MOS6581_8085::ReadIO(unsigned short adresse)
     case 25: // AD Wandler 1
         if(SidNummer == 0)
             return PotX;
-         break;
+        break;
 
     case 26: // AD Wandler 2
         if(SidNummer == 0)
@@ -393,13 +405,13 @@ void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)
         KeyNext = wert & 0x01;
         if (!Voice[0]->KeyBit&&KeyNext)
         {
-            Voice[0]->State=ATTACK;
+            Voice[0]->State=ATTACK_;
             Voice[0]->RatePeriod=RateCounterPeriod[Voice[0]->Attack];
             Voice[0]->HoldZero=false;
         }
         else if (Voice[0]->KeyBit&&!KeyNext)
         {
-            Voice[0]->State=RELEASE;
+            Voice[0]->State=RELEASE_;
             Voice[0]->RatePeriod=RateCounterPeriod[Voice[0]->Release];
         }
         Voice[0]->KeyBit=KeyNext;
@@ -408,14 +420,14 @@ void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)
     case 5: // Attack-Decay für Stimme 0
         Voice[0]->Attack=(wert>>4)&0x0F;
         Voice[0]->Decay=wert&0x0F;
-        if(Voice[0]->State==ATTACK) Voice[0]->RatePeriod=RateCounterPeriod[Voice[0]->Attack];
-        else if (Voice[0]->State==DECAY_SUSTAIN) Voice[0]->RatePeriod=RateCounterPeriod[Voice[0]->Decay];
+        if(Voice[0]->State==ATTACK_) Voice[0]->RatePeriod=RateCounterPeriod[Voice[0]->Attack];
+        else if (Voice[0]->State==DECAY_SUSTAIN_) Voice[0]->RatePeriod=RateCounterPeriod[Voice[0]->Decay];
         break;
 
     case 6:		// Sustain-Release für Stimme 0
         Voice[0]->Sustain=(wert>>4)&0x0F;
         Voice[0]->Release=wert&0x0F;
-        if (Voice[0]->State==RELEASE) Voice[0]->RatePeriod=RateCounterPeriod[Voice[0]->Release];
+        if (Voice[0]->State==RELEASE_) Voice[0]->RatePeriod=RateCounterPeriod[Voice[0]->Release];
         break;
         
         /////////////////////////////////////////////////////////////
@@ -451,13 +463,13 @@ void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)
         KeyNext=wert&0x01;
         if (!Voice[1]->KeyBit&&KeyNext)
         {
-            Voice[1]->State=ATTACK;
+            Voice[1]->State=ATTACK_;
             Voice[1]->RatePeriod=RateCounterPeriod[Voice[1]->Attack];
             Voice[1]->HoldZero=false;
         }
         else if (Voice[1]->KeyBit&&!KeyNext)
         {
-            Voice[1]->State=RELEASE;
+            Voice[1]->State=RELEASE_;
             Voice[1]->RatePeriod=RateCounterPeriod[Voice[1]->Release];
         }
         Voice[1]->KeyBit=KeyNext;
@@ -466,14 +478,14 @@ void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)
     case 12: // Attack-Decay für Stimme 1
         Voice[1]->Attack=(wert>>4)&0x0F;
         Voice[1]->Decay=wert&0x0F;
-        if(Voice[1]->State==ATTACK) Voice[1]->RatePeriod=RateCounterPeriod[Voice[1]->Attack];
-        else if (Voice[1]->State==DECAY_SUSTAIN) Voice[1]->RatePeriod=RateCounterPeriod[Voice[1]->Decay];
+        if(Voice[1]->State==ATTACK_) Voice[1]->RatePeriod=RateCounterPeriod[Voice[1]->Attack];
+        else if (Voice[1]->State==DECAY_SUSTAIN_) Voice[1]->RatePeriod=RateCounterPeriod[Voice[1]->Decay];
         break;
 
     case 13: // Sustain-Release für Stimme 1
         Voice[1]->Sustain=(wert>>4)&0x0F;
         Voice[1]->Release=wert&0x0F;
-        if (Voice[1]->State==RELEASE) Voice[1]->RatePeriod=RateCounterPeriod[Voice[1]->Release];
+        if (Voice[1]->State==RELEASE_) Voice[1]->RatePeriod=RateCounterPeriod[Voice[1]->Release];
         break;
         
         /////////////////////////////////////////////////////////////
@@ -509,13 +521,13 @@ void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)
         KeyNext=wert&0x01;
         if (!Voice[2]->KeyBit&&KeyNext)
         {
-            Voice[2]->State=ATTACK;
+            Voice[2]->State=ATTACK_;
             Voice[2]->RatePeriod=RateCounterPeriod[Voice[2]->Attack];
             Voice[2]->HoldZero=false;
         }
         else if (Voice[2]->KeyBit&&!KeyNext)
         {
-            Voice[2]->State=RELEASE;
+            Voice[2]->State=RELEASE_;
             Voice[2]->RatePeriod=RateCounterPeriod[Voice[2]->Release];
         }
         Voice[2]->KeyBit=KeyNext;
@@ -524,14 +536,14 @@ void MOS6581_8085::WriteIO(unsigned short adresse,unsigned char wert)
     case 19: // Attack-Decay für Stimme 2
         Voice[2]->Attack=(wert>>4)&0x0F;
         Voice[2]->Decay=wert&0x0F;
-        if(Voice[2]->State==ATTACK) Voice[2]->RatePeriod=RateCounterPeriod[Voice[2]->Attack];
-        else if (Voice[2]->State==DECAY_SUSTAIN) Voice[2]->RatePeriod=RateCounterPeriod[Voice[2]->Decay];
+        if(Voice[2]->State==ATTACK_) Voice[2]->RatePeriod=RateCounterPeriod[Voice[2]->Attack];
+        else if (Voice[2]->State==DECAY_SUSTAIN_) Voice[2]->RatePeriod=RateCounterPeriod[Voice[2]->Decay];
         break;
 
     case 20: // Sustain-Release für Stimme 2
         Voice[2]->Sustain=(wert>>4)&0x0F;
         Voice[2]->Release=wert&0x0F;
-        if (Voice[2]->State==RELEASE) Voice[2]->RatePeriod=RateCounterPeriod[Voice[2]->Release];
+        if (Voice[2]->State==RELEASE_) Voice[2]->RatePeriod=RateCounterPeriod[Voice[2]->Release];
         break;
 
     case 21: // FilterfrequenzLO
@@ -741,27 +753,27 @@ inline void MOS6581_8085::EnvZyklus(void)
         if(++v->RateCounter & 0x8000) ++v->RateCounter &= 0x7FFF;
         if(v->RateCounter != v->RatePeriod) goto L10;
         v->RateCounter=0;
-        if(v->State == ATTACK || ++v->ExponentialCounter == v->ExponentialCounterPeriod)
+        if(v->State == ATTACK_ || ++v->ExponentialCounter == v->ExponentialCounterPeriod)
         {
             v->ExponentialCounter=0;
             if(v->HoldZero) goto L10;
 
             switch(v->State)
             {
-            case ATTACK:
+            case ATTACK_:
                 ++v->EnvCounter &= 0xFF;
                 if(v->EnvCounter==0xFF)
                 {
-                    v->State=DECAY_SUSTAIN;
+                    v->State=DECAY_SUSTAIN_;
                     v->RatePeriod=RateCounterPeriod[v->Decay];
                 }
                 break;
 
-            case DECAY_SUSTAIN:
+            case DECAY_SUSTAIN_:
                 if(v->EnvCounter != SustainLevel[v->Sustain]) --v->EnvCounter;
                 break;
 
-            case RELEASE:
+            case RELEASE_:
                 --v->EnvCounter &= 0xFF;
                 break;
             }
@@ -798,7 +810,7 @@ inline void MOS6581_8085::EnvZyklus(void)
                 break;
             }
         }
-L10:;
+    L10:;
     }
 }
 
@@ -827,7 +839,7 @@ inline void MOS6581_8085::EnvZyklus(int zyklen)
             v->RateCounter = 0;
             zyklen -= rate_step;
 
-            if(v->State == ATTACK || ++v->ExponentialCounter == v->ExponentialCounterPeriod)
+            if(v->State == ATTACK_ || ++v->ExponentialCounter == v->ExponentialCounterPeriod)
             {
                 v->ExponentialCounter = 0;
                 if (v->HoldZero)
@@ -838,20 +850,20 @@ inline void MOS6581_8085::EnvZyklus(int zyklen)
 
                 switch(v->State)
                 {
-                case ATTACK:
+                case ATTACK_:
                     ++v->EnvCounter &= 0xFF;
                     if(v->EnvCounter==0xFF)
                     {
-                        v->State=DECAY_SUSTAIN;
+                        v->State=DECAY_SUSTAIN_;
                         v->RatePeriod=RateCounterPeriod[v->Decay];
                     }
                     break;
 
-                case DECAY_SUSTAIN:
+                case DECAY_SUSTAIN_:
                     if(v->EnvCounter != SustainLevel[v->Sustain]) --v->EnvCounter;
                     break;
 
-                case RELEASE:
+                case RELEASE_:
                     --v->EnvCounter &= 0xFF;
                     break;
                 }
@@ -889,7 +901,7 @@ inline void MOS6581_8085::EnvZyklus(int zyklen)
             }
             rate_step = v->RatePeriod;
         }
-	L10:;
+    L10:;
     }
 }
 
@@ -905,7 +917,7 @@ inline void MOS6581_8085::EnvReset(void)
         v->Release=0;
         v->KeyBit=false;
         v->RateCounter=0;
-        v->State=RELEASE;
+        v->State=RELEASE_;
         v->RatePeriod=RateCounterPeriod[v->Release];
         v->HoldZero=true;
         v->ExponentialCounter=0;
@@ -929,7 +941,7 @@ inline void MOS6581_8085::FilterZyklus(int voice1,int voice2,int voice3,int ext_
 
     if(Voice3Off&&!(FilterKey&0x04))
     {
-       voice3 = 0;
+        voice3 = 0;
     }
     else
     {

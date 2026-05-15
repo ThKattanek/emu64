@@ -71,10 +71,10 @@ static const char* CPU_OPC = {"\
                               BEQSBCJAMISBNOPSBCINCISBSEDSBCNOPISBNOPSBCINCISB\
                               RSTIRQNMI"};
 
-                              C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(const char*)> log_function, const char *data_path):
-                                  mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
-                              {
-                                   *ret_error = 0;
+C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(const char*)> log_function, const char *data_path):
+  mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),resid1(nullptr),resid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
+{
+   *ret_error = 0;
 
 this->start_minimized = start_minimized;
 
@@ -363,7 +363,6 @@ if(sdl_window_icon != nullptr)
         *ret_error = -4;
         return;
     }
-
 }
 else
     LogText("<< ERROR: Fehler beim laden des SLDFenster Icons\n");
@@ -376,8 +375,19 @@ mmu = new MMU();
 cpu = new MOS6510();
 vic = new VICII();
 int sid_ret_error;
+
+// Emu64 SID Emulation
 sid1 = new MOS6581_8085(0,audio_frequency,audio_spec_have.samples,&sid_ret_error);
 sid2 = new MOS6581_8085(1,audio_frequency,audio_spec_have.samples,&sid_ret_error);
+
+// Resid SID Emulation
+resid1 = new ReSIDWrapperClass(0,audio_frequency,audio_spec_have.samples,&sid_ret_error);
+resid2 = new ReSIDWrapperClass(1,audio_frequency,audio_spec_have.samples,&sid_ret_error);
+
+sid_emulation = SID_EMULATION::RESID_SID;
+write_to_all_emulation_sids = false;
+current_sid_dump = resid1->io_dump;
+
 cia1 = new MOS6526(0);
 cia2 = new MOS6526(1);
 crt = new CartridgeClass();
@@ -517,6 +527,8 @@ vic->color_ram = mmu->GetFarbramPointer();
 vic->cia2_port_a = cia2_port_a.GetOutputBitsPointer();
 sid1->RESET = &reset_wire;
 sid2->RESET = &reset_wire;
+resid1->reset = &reset_wire;
+resid2->reset = &reset_wire;
 reu->BA = &rdy_ba_wire;
 reu->CpuTriggerInterrupt = std::bind(&MOS6510::TriggerInterrupt,cpu,std::placeholders::_1);
 reu->CpuClearInterrupt = std::bind(&MOS6510::ClearInterrupt,cpu,std::placeholders::_1);
@@ -553,7 +565,6 @@ cia2->Reset();
 
 sid_volume = 1.0f;
 
-sid1->RESET = &reset_wire;
 sid1->SetC64Zyklen(c64_frequency);     // PAL 63*312*50 = 982800
 sid1->SetChipType(MOS_8580);
 sid1->SoundOutputEnable = true;
@@ -562,13 +573,27 @@ sid1->FilterOn = true;
 sid1->Reset();
 sid1->SetPotXY(poti_x, poti_y);
 
-sid2->RESET = &reset_wire;
 sid2->SetC64Zyklen(c64_frequency);     // PAL 63*312*50 = 982800
 sid2->SetChipType(MOS_8580);
 sid2->SoundOutputEnable = true;
 sid2->CycleExact = true;
 sid2->FilterOn = true;
 sid2->Reset();
+
+resid1->SetClockFrequency(c64_frequency);
+resid1->SetChipModel(MOS_8580);
+resid1->sound_output_enable = true;
+resid1->cycle_exact = true;
+resid1->EnableFilter(true);
+resid1->Reset();
+resid1->SetPotXY(poti_x, poti_y);
+
+resid2->SetClockFrequency(c64_frequency);
+resid2->SetChipModel(MOS_8580);
+resid2->sound_output_enable = true;
+resid2->cycle_exact = true;
+resid2->EnableFilter(true);
+resid2->Reset();
 
 enable_stereo_sid = false;
 enable_stereo_sid_6channel_mode = false;
@@ -608,8 +633,18 @@ C64Class::~C64Class()
     {
         StopSidDump();
         delete sid1;
+        sid1 = nullptr;
     }
     if(sid2 != nullptr) delete sid2;
+
+    if(resid1 != nullptr)
+    {
+        StopSidDump();
+        delete resid1;
+        resid1 = nullptr;
+    }
+    if(resid2 != nullptr) delete resid2;
+
     if(cia1 != nullptr) delete cia1;
     if(cia2 != nullptr) delete cia2;
     if(crt != nullptr) delete crt;
@@ -652,7 +687,6 @@ void C64Class::StartEmulation()
     else
     {
         LogText(">> C64Thread wurde gestartet.\n");
-
         SDL_PauseAudioDevice(audio_dev, 0);
         LogText(">> SDL Audiostream wurde getartet.\n");
     }
@@ -1046,6 +1080,10 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 {
     sid1->ZeroSoundBufferPos();
     sid2->ZeroSoundBufferPos();
+    resid1->SetSoundBufferPosToZero();
+    resid2->SetSoundBufferPosToZero();
+
+    int *current_soundbuffer_pos;
 
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
         floppy[i]->ZeroSoundBufferPos();
@@ -1056,7 +1094,20 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
     if(!debug_mode)
     {
-        while((sid1->SoundBufferPos < sample_buffer_size_mono) && (debug_mode == false))
+        switch(sid_emulation)
+        {
+        case EMU64_SID:
+            current_soundbuffer_pos = &sid1->SoundBufferPos;
+            break;
+        case RESID_SID:
+            current_soundbuffer_pos = &resid1->sound_buffer_pos;
+            break;
+        default:
+            current_soundbuffer_pos = nullptr;
+            break;
+        }
+
+        while((*current_soundbuffer_pos < sample_buffer_size_mono) && (debug_mode == false))
         {
             if(limit_cycles_counter > 0)
             {
@@ -1159,7 +1210,6 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 iec_export_vdc.SetWire(3,floppy_iec_wire & 64);
                 iec_export_vdc.SetWire(4,floppy_iec_wire & 128);
             }
-
         }
 
         int sample_buffer_size = ((laenge / audio_channels) * 2) / (audio_sample_bit_size/8);
@@ -1171,8 +1221,20 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 int j=0;
                 for(int i=0; i<(sample_buffer_size); i+=2)
                 {
-                    audio_16bit_buffer[i] = static_cast<int16_t>(sid1->SoundBuffer[j] * sid_volume);
-                    audio_16bit_buffer[i+1] = static_cast<int16_t>(sid2->SoundBuffer[j] * sid_volume);
+                    switch(sid_emulation)
+                    {
+                    case EMU64_SID:
+                        audio_16bit_buffer[i] = static_cast<int16_t>(sid1->SoundBuffer[j] * sid_volume);
+                        audio_16bit_buffer[i+1] = static_cast<int16_t>(sid2->SoundBuffer[j] * sid_volume);
+                        break;
+                    case RESID_SID:
+                        audio_16bit_buffer[i] = static_cast<int16_t>(resid1->sound_buffer[j] * sid_volume);
+                        audio_16bit_buffer[i+1] = static_cast<int16_t>(resid2->sound_buffer[j] * sid_volume);
+                        break;
+                    default:
+                        audio_16bit_buffer[i] = audio_16bit_buffer[i+1] = 0;
+                        break;
+                    }
                     j++;
                 }
             }
@@ -1181,7 +1243,18 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 int j=0;
                 for(int i=0; i<(sample_buffer_size); i+=2)
                 {
-                    audio_16bit_buffer[i] = audio_16bit_buffer[i+1] = static_cast<int16_t>(static_cast<float_t>(sid1->SoundBuffer[j] + sid2->SoundBuffer[j]) * sid_volume * 0.75f);
+                    switch (sid_emulation)
+                    {
+                    case EMU64_SID:
+                        audio_16bit_buffer[i] = audio_16bit_buffer[i+1] = static_cast<int16_t>(static_cast<float_t>(sid1->SoundBuffer[j] + sid2->SoundBuffer[j]) * sid_volume * 0.75f);
+                        break;
+                    case RESID_SID:
+                        audio_16bit_buffer[i] = audio_16bit_buffer[i+1] = static_cast<int16_t>(static_cast<float_t>(resid1->sound_buffer[j] + resid2->sound_buffer[j]) * sid_volume * 0.75f);
+                        break;
+                    default:
+                        audio_16bit_buffer[i] = audio_16bit_buffer[i+1] = 0;
+                        break;
+                    }
                     j++;
                 }
             }
@@ -1191,7 +1264,18 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             int j=0;
             for(int i=0; i<(sample_buffer_size); i+=2)
             {
-                audio_16bit_buffer[i] = audio_16bit_buffer[i+1] = static_cast<int16_t>(sid1->SoundBuffer[j] * sid_volume);
+                switch (sid_emulation)
+                {
+                case EMU64_SID:
+                    audio_16bit_buffer[i] = audio_16bit_buffer[i+1] = static_cast<int16_t>(sid1->SoundBuffer[j] * sid_volume);
+                    break;
+                case RESID_SID:
+                    audio_16bit_buffer[i] = audio_16bit_buffer[i+1] = static_cast<int16_t>(resid1->sound_buffer[j] * sid_volume);
+                    break;
+                default:
+                    audio_16bit_buffer[i] = audio_16bit_buffer[i+1] = 0;
+                    break;
+                }
                 j++;
             }
         }
@@ -1346,7 +1430,17 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
     }
 
     // Für Ozi Ausgabe
-    if(AudioOutProc != nullptr) AudioOutProc(reinterpret_cast<uint8_t*>(sid1->SoundBufferV0), reinterpret_cast<uint8_t*>(sid1->SoundBufferV1), reinterpret_cast<uint8_t*>(sid1->SoundBufferV2), sample_buffer_size_mono);
+    switch(sid_emulation)
+    {
+    case EMU64_SID:
+        if(AudioOutProc != nullptr) AudioOutProc(reinterpret_cast<uint8_t*>(sid1->SoundBufferV0), reinterpret_cast<uint8_t*>(sid1->SoundBufferV1), reinterpret_cast<uint8_t*>(sid1->SoundBufferV2), sample_buffer_size_mono);
+        break;
+    case RESID_SID:
+        if(AudioOutProc != nullptr) AudioOutProc(reinterpret_cast<uint8_t*>(resid1->sound_buffer_v0), reinterpret_cast<uint8_t*>(resid1->sound_buffer_v1), reinterpret_cast<uint8_t*>(resid1->sound_buffer_v2), sample_buffer_size_mono);
+        break;
+    default:
+        break;
+    }
 }
 
 void C64Class::KeyEvent(uint8_t matrix_code, KeyStatus key_status, bool isAutoShift)
@@ -1485,7 +1579,7 @@ void C64Class::SetFloppyWriteProtect(uint8_t floppy_nr, bool status)
 
 void C64Class::SetCommandLine(char *c64_command)
 {
-    strlcpy(c64_command_line, c64_command, sizeof(c64_command_line));
+    snprintf(c64_command_line, sizeof(c64_command_line), "%s", c64_command);
     c64_command_line_lenght = static_cast<uint16_t>(strlen(c64_command_line));
     c64_command_line_current_pos = 0;
     c64_command_line_status = true;
@@ -1535,7 +1629,7 @@ void C64Class::SetGrafikModi(bool enable_screen_doublesize, bool enable_screen_c
 
 void C64Class::SetSDLWindowName(const char *name)
 {
-    strlcpy(sdl_window_name, name, sizeof(sdl_window_name));
+    snprintf(sdl_window_name, sizeof(sdl_window_name), "%s", name);
     SDL_SetWindowTitle(sdl_window, name);
 }
 
@@ -2723,8 +2817,13 @@ void C64Class::SetC64Frequency(int c64_frequency)
 void C64Class::SetC64Speed(int speed)
 {
     c64_speed = speed;
+
     sid1->SetC64Zyklen(c64_frequency*(speed/100.f));
     sid2->SetC64Zyklen(c64_frequency*(speed/100.f));
+
+    resid1->SetClockFrequency(c64_frequency*(speed/100.f));
+    resid2->SetClockFrequency(c64_frequency*(speed/100.f));
+
     tape->SetC64Zyklen(c64_frequency*(speed/100.f));
 }
 
@@ -2815,7 +2914,8 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
 
         KillCommandLine();
         auto_load_mode = 0;
-        sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
+
+        snprintf(auto_load_command_line, sizeof(auto_load_command_line), "LOAD\"*\",%d,1%cRUN%c", floppy_nr + 8, 13, 13);
         HardReset();
         wait_reset_ready = true;
         c64_reset_ready = false;
@@ -2829,7 +2929,8 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
 
         KillCommandLine();
         auto_load_mode = 0;
-        sprintf(auto_load_command_line,"LOAD\"*\",%d,1%cRUN%c",floppy_nr+8,13,13);
+
+        snprintf(auto_load_command_line, sizeof(auto_load_command_line) , "LOAD\"*\",%d,1%cRUN%c", floppy_nr + 8, 13, 13);
         HardReset();
         wait_reset_ready = true;
         c64_reset_ready = false;
@@ -2842,7 +2943,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
         KillCommandLine();
         auto_load_mode = 1;
 
-        strlcpy(auto_load_filename, filename, sizeof(auto_load_filename));
+        snprintf(auto_load_filename, sizeof(auto_load_filename), "%s", filename);
         auto_load_file = file;
         auto_load_file_typ = typ;
 
@@ -2857,7 +2958,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
         KillCommandLine();
         auto_load_mode = 2;
 
-        strlcpy(auto_load_filename, filename, sizeof(auto_load_filename));
+        snprintf(auto_load_filename, sizeof(auto_load_filename), "%s", filename);
         auto_load_file = file;
         auto_load_file_typ = typ;
 
@@ -2872,7 +2973,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
         KillCommandLine();
         auto_load_mode = 1;
 
-        strlcpy(auto_load_filename, filename, sizeof(auto_load_filename));
+        snprintf(auto_load_filename, sizeof(auto_load_filename), "%s", filename);
         auto_load_file = file;
         auto_load_file_typ = typ;
 
@@ -3273,6 +3374,8 @@ void C64Class::SetDebugMode(bool status)
         one_opcode = false;
         sid1->SoundOutputEnable = false;
         sid2->SoundOutputEnable = false;
+        resid1->sound_output_enable = false;
+        resid2->sound_output_enable = false;
         for(int i=0; i<MAX_FLOPPY_NUM; i++) floppy[i]->SetEnableFloppySound(false);
     }
     else
@@ -3281,6 +3384,8 @@ void C64Class::SetDebugMode(bool status)
         one_opcode = false;
         sid1->SoundOutputEnable = true;
         sid2->SoundOutputEnable = true;
+        resid1->sound_output_enable = true;
+        resid2->sound_output_enable = true;
         for(int i=0; i<MAX_FLOPPY_NUM; i++) floppy[i]->SetEnableFloppySound(true);
     }
 }
@@ -3954,7 +4059,7 @@ void C64Class::SetScreenshotDir(const char *screenshot_dir)
 #ifdef __STDC_LIB_EXT1__
     strcpy_s(this->screenshot_dir, static_cast<size_t>(strlen(screenshot_dir))+1, screenshot_dir);
 #else
-    strlcpy(this->screenshot_dir, screenshot_dir, sizeof(strlen(screenshot_dir)+1));
+    snprintf(this->screenshot_dir, static_cast<size_t>(strlen(screenshot_dir))+1, "%s", screenshot_dir);
 #endif
 }
 
@@ -3995,7 +4100,7 @@ const char *C64Class::GetScreenshotFormatName(uint8_t format)
 
 void C64Class::SetExitScreenshot(const char *filename)
 {
-    strlcpy(exit_screenshot_filename, filename, sizeof(exit_screenshot_filename));
+    snprintf(exit_screenshot_filename, sizeof(exit_screenshot_filename), "%s", filename);
     enable_exit_screenshot = true;
 }
 
@@ -4064,7 +4169,42 @@ void C64Class::StopIECDump()
     iec_export_vdc.Close();
 }
 
-void C64Class::SetSIDVolume(float_t volume)
+void C64Class::SetSidEmulation(int sid_emulation)
+{
+    if(this->sid_emulation == sid_emulation)
+        return;
+
+    SDL_LockMutex(mutex1);           // ← ZUERST: Audio-Callback ausschließen
+
+    this->sid_emulation = sid_emulation;
+
+    switch(sid_emulation)
+    {
+    case EMU64_SID:
+        current_sid_dump = sid1->IoDump;
+        sid1->ZeroSoundBufferPos();
+        sid2->ZeroSoundBufferPos();
+        sid1->SoundOutputEnable = !debug_mode;
+        sid2->SoundOutputEnable = !debug_mode;
+        resid1->sound_output_enable = false;
+        resid2->sound_output_enable = false;
+        break;
+
+    case RESID_SID:
+        current_sid_dump = resid1->io_dump;
+        resid1->SetSoundBufferPosToZero();
+        resid2->SetSoundBufferPosToZero();
+        sid1->SoundOutputEnable = false;
+        sid2->SoundOutputEnable = false;
+        resid1->sound_output_enable = !debug_mode;
+        resid2->sound_output_enable = !debug_mode;
+        break;
+    }
+
+    SDL_UnlockMutex(mutex1);
+}
+
+void C64Class::SetSidVolume(float_t volume)
 {
     sid_volume = volume;
 }
@@ -4072,11 +4212,13 @@ void C64Class::SetSIDVolume(float_t volume)
 void C64Class::SetFirstSidTyp(int sid_typ)
 {
     sid1->SetChipType(sid_typ);
+    resid1->SetChipModel(sid_typ);
 }
 
 void C64Class::SetSecondSidTyp(int sid_typ)
 {
     sid2->SetChipType(sid_typ);
+    resid2->SetChipModel(sid_typ);
 }
 
 void C64Class::EnableStereoSid(bool enable)
@@ -4102,28 +4244,54 @@ void C64Class::SetSidCycleExact(bool enable)
 {
     sid1->CycleExact = enable;
     sid2->CycleExact = enable;
+    resid1->cycle_exact = enable;
+    resid2->cycle_exact = enable;
 }
 
 void C64Class::SetSidFilter(bool enable)
 {
     sid1->FilterOn = enable;
     sid2->FilterOn = enable;
+    resid1->EnableFilter(enable);
+    resid2->EnableFilter(enable);
+}
+
+void C64Class::SetSidDigiBoost(bool enable)
+{
+    sid1->EnableDigiBoost(enable);
+    sid2->EnableDigiBoost(enable);
+    resid1->EnableDigiBoost(enable);
+    resid2->EnableDigiBoost(enable);
+}
+
+void C64Class::EnableWriteToAllEmulationSids(bool enable)
+{
+    write_to_all_emulation_sids = enable;
 }
 
 bool C64Class::StartSidDump(const char *filename)
 {
-    return sid1->IoDump->StartCapture(filename);
+    if(current_sid_dump != nullptr)
+    {
+        current_sid_dump->StartCapture(filename);
+        return true;
+    }
+    return false;
 }
 
 void C64Class::StopSidDump()
 {
-    sid1->IoDump->StopCapture();
+    if(current_sid_dump != nullptr)
+        current_sid_dump->StopCapture();
 }
 
 int C64Class::GetSidDumpFrames()
 {
     //This is PAL Only
-    return sid1->IoDump->GetCycleCounts() / (63*312); // a Frame in PAL is 63 Cycles with 312 rasterlines
+    if(current_sid_dump == nullptr)
+        return 0;
+    else
+        return current_sid_dump->GetCycleCounts() / (63*312); // a Frame in PAL is 63 Cycles with 312 rasterlines
 }
 
 void C64Class::SetVicConfig(int var, bool enable)
@@ -4196,8 +4364,19 @@ void C64Class::NextSystemCycle()
     vic->OneCycle();
     cia1->OneZyklus();
     cia2->OneZyklus();
-    sid1->OneZyklus();
-    if(enable_stereo_sid) sid2->OneZyklus();
+    switch (sid_emulation)
+    {
+    case EMU64_SID:
+        sid1->OneZyklus();
+        if(enable_stereo_sid) sid2->OneZyklus();
+        break;
+    case RESID_SID:
+        resid1->OneCycle();
+        if(enable_stereo_sid) resid2->OneCycle();
+        break;
+    default:
+        break;
+    }
     reu->OneZyklus();
     tape->OneCycle();
     cpu->Phi1();
@@ -4427,6 +4606,8 @@ bool C64Class::CheckBreakpoints()
             one_opcode = false;
             sid1->SoundOutputEnable = false;
             sid2->SoundOutputEnable = false;
+            resid1->sound_output_enable = false;
+            resid2->sound_output_enable = false;
             for(int i=0; i<MAX_FLOPPY_NUM; i++) floppy[i]->SetEnableFloppySound(false);
             if(BreakpointProc != nullptr) BreakpointProc();
             return true;
@@ -4453,37 +4634,110 @@ void C64Class::WriteSidIO(uint16_t address, uint8_t value)
 
     if(enable_stereo_sid)
     {
-        if((address & 0xFFE0) == 0xD400) sid1->WriteIO(address,value);
-        if((address & 0xFFE0) == stereo_sid_address) sid2->WriteIO(address,value);
+        if(!write_to_all_emulation_sids)
+        {
+            switch (sid_emulation)
+            {
+            case EMU64_SID:
+                if((address & 0xFFE0) == 0xD400) sid1->WriteIO(address,value);
+                if((address & 0xFFE0) == stereo_sid_address) sid2->WriteIO(address,value);
+                break;
+            case RESID_SID:
+                if((address & 0xFFE0) == 0xD400) resid1->WriteRegister(address,value);
+                if((address & 0xFFE0) == stereo_sid_address) resid2->WriteRegister(address,value);
+                break;
+            default:
+                break;
+            }
+        }
+        else
+        {
+            if((address & 0xFFE0) == 0xD400) sid1->WriteIO(address,value);
+            if((address & 0xFFE0) == stereo_sid_address) sid2->WriteIO(address,value);
+            if((address & 0xFFE0) == 0xD400) resid1->WriteRegister(address,value);
+            if((address & 0xFFE0) == stereo_sid_address) resid2->WriteRegister(address,value);
+        }
     }
     else
     {
-        sid1->WriteIO(address,value);
+        if(!write_to_all_emulation_sids)
+        {
+            switch(sid_emulation)
+            {
+            case EMU64_SID:
+                sid1->WriteIO(address,value);
+                break;
+            case RESID_SID:
+                resid1->WriteRegister(address,value);
+                break;
+            default:
+                break;
+            }
+        }
+        else
+        {
+            sid1->WriteIO(address,value);
+            resid1->WriteRegister(address,value);
+        }
     }
 }
 
 uint8_t C64Class::ReadSidIO(uint16_t address)
 {
-    /*
-    if(StereoEnable)
+    if(enable_stereo_sid)
     {
-        if(Sid2Adresse == 0xD400)
+        if((address & 0xFFE0) == 0xD400)
         {
-            return sid1_ReadIO(adresse);
+            switch(sid_emulation)
+            {
+            case EMU64_SID:
+                return sid1->ReadIO(address);
+                break;
+            case RESID_SID:
+                return resid1->ReadRegister(address);
+                break;
+            default:
+                return 0x00;
+                break;
+            }
         }
         else
         {
-            if((adresse && 0x001F) == 0x00) return sid1_ReadIO(adresse);
-            else return sid2_ReadIO(adresse);
+            switch (sid_emulation)
+            {
+            case EMU64_SID:
+                if((address & 0xFFE0) == stereo_sid_address)
+                    return sid2->ReadIO(address);
+                else
+                    return 0x00;
+                break;
+            case RESID_SID:
+                if((address & 0xFFE0) == stereo_sid_address)
+                    return resid2->ReadRegister(address);
+                else
+                    return 0x00;
+                break;
+            default:
+                return 0x00;
+                break;
+            }
         }
     }
     else
     {
-        return sid1_ReadIO(adresse);
+        switch(sid_emulation)
+        {
+        case EMU64_SID:
+            return sid1->ReadIO(address);
+            break;
+        case RESID_SID:
+            return resid1->ReadRegister(address);
+            break;
+        default:
+            return 0x00;
+            break;
+        }
     }
-    */
-
-    return sid1->ReadIO(address);
 }
 
 /// $DE00
@@ -4590,7 +4844,7 @@ void C64Class::ClearJoystickMapping(int slot_nr)
 {
     char str00[32];
     sprintf(str00,"Slot %d",slot_nr+1);
-    strlcpy(virtual_joys[slot_nr].Name, str00, sizeof(virtual_joys[slot_nr].Name));
+    snprintf(virtual_joys[slot_nr].Name, sizeof(virtual_joys[slot_nr].Name), "%s", str00);
 
     for(int i=0;i<5;i++)
     {
@@ -4781,7 +5035,17 @@ void C64Class::ChangePOTSwitch()
         }
     }
 
-    sid1->SetPotXY(poti_x, poti_y);
+    switch (sid_emulation)
+    {
+    case EMU64_SID:
+        sid1->SetPotXY(poti_x, poti_y);
+        break;
+    case RESID_SID:
+        resid1->SetPotXY(poti_x, poti_y);
+        break;
+    default:
+        break;
+    }
 }
 
 void C64Class::UpdateMouse(void)

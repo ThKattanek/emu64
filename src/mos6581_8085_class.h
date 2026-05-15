@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.06.2023                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -23,11 +22,11 @@
 #define MOS_6581 0
 #define MOS_8580 1
 
-#define	ATTACK		0
-#define	DECAY_SUSTAIN   1
-#define RELEASE		2
+#define	ATTACK_         0
+#define	DECAY_SUSTAIN_  1
+#define RELEASE_		2
 
-#define	PUFFER_TIME	1
+#define	PUFFER_TIME_	1
 
 //// Zyklen die vergehen müssen bis der letzte geschriebene Wert auf Null gesetzt wird
 //// Beim lesen eines NoneRead Registers wird immer der zuletzt in den SID geschriebene Wert gelesen.
@@ -38,7 +37,7 @@ typedef int fc_point[2];
 
 class MOS6581_8085
 {
-  public:
+public:
     /* Variable */
     short               *SoundBuffer;
     short               *SoundBufferV0;
@@ -55,11 +54,6 @@ class MOS6581_8085
 
     SIDDumpClass	*IoDump;
 
-    /// Recording ///
-    bool            Recording;
-    int             RecSampleCounter;
-    short           RecSampleBuffer[19656];
-
     /* Funktionen */
     MOS6581_8085(int nummer, int samplerate,int puffersize,int *error);
     virtual ~MOS6581_8085(void);
@@ -70,6 +64,7 @@ class MOS6581_8085
     void SetVoiceEnable(int nr, bool enable);
     void SetPotXY(unsigned char pot_x, unsigned char pot_y);
     void ZeroSoundBufferPos();
+    void EnableDigiBoost(bool enable);
     bool OneZyklus(void);
 
     bool SaveFreez(FILE* File);
@@ -79,12 +74,12 @@ class MOS6581_8085
     unsigned char ReadIO(unsigned short adresse);
     void SetIODelayEnable(bool enable);
 
-  private:
+private:
     /* Variable */
     int                 Zyklencounter;
     bool                ret;
 
-    float              Samplerate;
+    float               Samplerate;
     VOICEClass          *Voice[3];
     unsigned char       IO[32];
 
@@ -102,6 +97,9 @@ class MOS6581_8085
 
     int	SidNummer;
     int SidModel;
+
+    bool enable_digi_boost;
+    int ext_in;
 
     int                 C64ZyklenSek;
     float              FreqConvCounter;	// interner Counter für Fast Fast Fast Resampling ;-)
@@ -140,7 +138,7 @@ class MOS6581_8085
     int*		f0;
     fc_point*           f0_points;
     int			f0_count;
-	
+
     /* Funktionen */
     int VoiceOutput(int voice);
     void OscZyklus(void);

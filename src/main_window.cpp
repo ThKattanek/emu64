@@ -904,7 +904,7 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
     for(int i=0; i<argc; i++)
     {
         arg[i] = new char[string_list.at(i).size()+1];
-        strlcpy(arg[i],string_list.at(i).toLatin1().data(), string_list.at(i).size()+1);
+        strncpy(arg[i],string_list.at(i).toLatin1().data(), string_list.at(i).size()+1);
     }
 
     CommandLineClass *cmd_line = new CommandLineClass(argc, arg, "emu64",command_list, command_list_count);
@@ -1044,6 +1044,20 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
                 break;
             }
             break;
+        case CMD_SET_SID_ENGINE:
+            val = cmd_line->GetArgInt(i+1, &error);
+            if(error) break;
+
+            switch(val)
+            {
+            case 0:
+                c64->SetSidEmulation(EMU64_SID);
+                break;
+            case 1:
+                c64->SetSidEmulation(RESID_SID);
+                break;
+            }
+            break;
         case CMD_SET_SIDTYPE:
             val = cmd_line->GetArgInt(i+1, &error);
             if(error) break;
@@ -1143,7 +1157,8 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
     {
         for(int i=0; i<argc; i++)
         {
-            delete[] arg[i];
+            if(arg[i] != nullptr)
+                delete[] arg[i];
         }
         delete[] arg;
     }

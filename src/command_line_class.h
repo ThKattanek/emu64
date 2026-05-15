@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 04.06.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,8 +15,6 @@
 #ifndef COMMAND_LINE_CLASS_H
 #define COMMAND_LINE_CLASS_H
 
-#include <cstdio>
-#include <vector>
 #include <QObject>
 
 #define MAX_COMMAND_NUM 512
@@ -39,6 +36,7 @@ class CommandLineClass : public QObject
 
 public:
     CommandLineClass(int argc, char *argv[], const char* app_name, const CMD_STRUCT *command_list, int command_list_count);
+    ~CommandLineClass();
     int GetCommandCount();
     int GetCommand(int number);
     const char *GetCommandLongString(int command);
@@ -64,7 +62,7 @@ private:
 
     int command_count;
     int command_list[MAX_COMMAND_NUM];
-    char *command_arg[MAX_COMMAND_NUM];
+    char *command_arg[MAX_COMMAND_NUM] = {nullptr};
 };
 
 #endif // COMMAND_LINE_CLASS_H
