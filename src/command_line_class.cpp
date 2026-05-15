@@ -103,11 +103,7 @@ CommandLineClass::CommandLineClass(int argc, char *argv[], const char *app_name,
 
 CommandLineClass::~CommandLineClass()
 {
-    for(int i=0; i<command_count; i++)
-    {
-        if(command_arg[i] != nullptr)
-            delete[] command_arg[i];
-    }
+
 }
 
 int CommandLineClass::GetCommandCount()
