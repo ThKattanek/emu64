@@ -16,7 +16,9 @@
 // resid muss kommplett in /src/resid/ liegen, so wie auf github zu finden:
 // https://github.com/libsidplayfp/resid
 // oder als Mirror auf: https://github.com/ThKattanek/resid
-// Für Emu64 müssen an den Original Code von ReSID keine Anpassungen vorgenommen werden, dafür ist dieser Wrapper da, damit die ReSID Library in Emu64 eingebunden werden kann.
+// Für Emu64 müssen an den Original Code von ReSID folgende Anpassungen vorgenommen werden:
+// 1. Voice voice[3] muss public sein (in sid.h)
+// 2. Wegen Warnung "shadowed declaration is here" muss in filter8580new.cc in Zeile 480 + 493 kVddt in kVddt1 umbenannt werden
 
 #ifndef RESID_WRAPPER_H
 #define RESID_WRAPPER_H
