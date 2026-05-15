@@ -80,9 +80,6 @@ MOS6581_8085::MOS6581_8085(int nummer,int samplerate,int puffersize,int *error)
 
     PotX = PotY = 0xFF;
 
-    Recording = false;
-    RecSampleCounter = 0;
-
     FilterResonanz = 0;
 
     SetChipType(0);
@@ -277,13 +274,6 @@ bool MOS6581_8085::OneZyklus(void)
     // Playing
     if(IoDump->CycleTickPlay())WriteIO(IoDump->RegOut,IoDump->RegWertOut);
     WriteReg = 0xFF;
-
-    //////// RECORD ////////
-    if(Recording)
-    {
-        RecSampleBuffer[RecSampleCounter++] = FilterOutput()>>4;
-        if(RecSampleCounter == 19656) RecSampleCounter = 0;
-    }
 
     //////// IO Delay ///////
     if(IODelayEnable)

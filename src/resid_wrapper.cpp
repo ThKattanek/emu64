@@ -44,9 +44,6 @@ ReSIDWrapperClass::ReSIDWrapperClass(int number, int samplerate, int buffersize,
 
     pot_x = pot_y = 0xff;
 
-    recording = false;
-    rec_sample_counter = 0;
-
     sid_model = reSID::MOS6581;
     sid->set_chip_model(reSID::MOS6581);
 

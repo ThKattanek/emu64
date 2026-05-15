@@ -54,11 +54,6 @@ public:
 
     SIDDumpClass	*IoDump;
 
-    /// Recording ///
-    bool            Recording;
-    int             RecSampleCounter;
-    short           RecSampleBuffer[19656];
-
     /* Funktionen */
     MOS6581_8085(int nummer, int samplerate,int puffersize,int *error);
     virtual ~MOS6581_8085(void);

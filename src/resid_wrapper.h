@@ -57,11 +57,6 @@ public:
     uint8_t io[32];
     uint8_t	write_register;
 
-    /// Recording ///
-    bool recording;
-    int rec_sample_counter;
-    short rec_sample_buffer[19656];
-
 private:
     void UpdateFilterSettings();
 
