@@ -477,7 +477,7 @@ Filter::Filter()
 
         // VCR table.
         double k = fi.k;
-        double kVddt = N16*(k*(fi.Vdd - fi.Vth));
+        double kVddt1 = N16*(k*(fi.Vdd - fi.Vth));
         vmin *= N16;
 
         for (int i = 0; i < (1 << 16); i++) {
@@ -490,7 +490,7 @@ Filter::Filter()
           //   k*Vg - Vx = (k*Vg - t) - (Vx - t)
           //
           // I.e. k*Vg - t must be returned.
-          double Vg = kVddt - sqrt((double)i*(1 << 16));
+          double Vg = kVddt1 - sqrt((double)i*(1 << 16));
           vcr_kVg[i] = (unsigned short)(k*Vg - vmin + 0.5);
         }
 
