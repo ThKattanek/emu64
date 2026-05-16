@@ -26,6 +26,7 @@
 
 #include "sid.h"
 #include <cmath>
+#include <cassert>
 
 #include <iostream>
 #include <fstream>
@@ -50,6 +51,11 @@ inline short clip(int input)
     return (short)input;
 }
 
+inline short amplify(int input, int scaleFactor)
+{
+    return clip((scaleFactor * input) / 2);
+}
+
 // ----------------------------------------------------------------------------
 // Constructor.
 // ----------------------------------------------------------------------------
@@ -64,6 +70,8 @@ SID::SID()
   fir_f_cycles_per_sample = 0;
   fir_filter_scale = 0;
 
+  filter = new Filter();
+
   sid_model = MOS6581;
   voice[0].set_sync_source(&voice[2]);
   voice[1].set_sync_source(&voice[0]);
@@ -76,6 +84,8 @@ SID::SID()
   write_pipeline = 0;
 
   databus_ttl = 0;
+
+  scaleFactor = 3;
 
   raw_debug_output = false;
 }
@@ -110,11 +120,13 @@ void SID::set_chip_model(chip_model model)
    */
   databus_ttl = sid_model == MOS8580 ? 0xa2000 : 0x1d00;
 
+  scaleFactor = sid_model == MOS8580 ? 5 : 3;
+
   for (int i = 0; i < 3; i++) {
     voice[i].set_chip_model(model);
   }
 
-  filter.set_chip_model(model);
+  filter->set_chip_model(model);
 }
 
 
@@ -126,7 +138,7 @@ void SID::reset()
   for (int i = 0; i < 3; i++) {
     voice[i].reset();
   }
-  filter.reset();
+  filter->reset();
   extfilt.reset();
 
   bus_value = 0;
@@ -142,7 +154,7 @@ void SID::reset()
 void SID::input(short sample)
 {
   // The input can be used to simulate the MOS8580 "digi boost" hardware hack.
-  filter.input(sample);
+  filter->input(sample);
 }
 
 
@@ -280,16 +292,16 @@ void SID::write()
     voice[2].envelope.writeSUSTAIN_RELEASE(bus_value);
     break;
   case 0x15:
-    filter.writeFC_LO(bus_value);
+    filter->writeFC_LO(bus_value);
     break;
   case 0x16:
-    filter.writeFC_HI(bus_value);
+    filter->writeFC_HI(bus_value);
     break;
   case 0x17:
-    filter.writeRES_FILT(bus_value);
+    filter->writeRES_FILT(bus_value);
     break;
   case 0x18:
-    filter.writeMODE_VOL(bus_value);
+    filter->writeMODE_VOL(bus_value);
     break;
   default:
     break;
@@ -362,10 +374,10 @@ SID::State SID::read_state()
     state.sid_register[j + 6] = (envelope.sustain << 4) | envelope.release;
   }
 
-  state.sid_register[j++] = filter.fc & 0x007;
-  state.sid_register[j++] = filter.fc >> 3;
-  state.sid_register[j++] = (filter.res << 4) | filter.filt;
-  state.sid_register[j++] = filter.mode | filter.vol;
+  state.sid_register[j++] = filter->fc & 0x007;
+  state.sid_register[j++] = filter->fc >> 3;
+  state.sid_register[j++] = (filter->res << 4) | filter->filt;
+  state.sid_register[j++] = filter->mode | filter->vol;
 
   // These registers are superfluous, but are included for completeness.
   for (; j < 0x1d; j++) {
@@ -379,7 +391,7 @@ SID::State SID::read_state()
   state.bus_value_ttl = bus_value_ttl;
   state.write_pipeline = write_pipeline;
   state.write_address = write_address;
-  state.voice_mask = filter.voice_mask;
+  state.voice_mask = filter->voice_mask;
 
   for (i = 0; i < 3; i++) {
     state.accumulator[i] = voice[i].wave.accumulator;
@@ -426,7 +438,7 @@ void SID::write_state(const State& state)
   bus_value_ttl = state.bus_value_ttl;
   write_pipeline = state.write_pipeline;
   write_address = state.write_address;
-  filter.set_voice_mask(state.voice_mask);
+  filter->set_voice_mask(state.voice_mask);
 
   for (i = 0; i < 3; i++) {
     voice[i].wave.accumulator = state.accumulator[i];
@@ -455,7 +467,7 @@ void SID::write_state(const State& state)
 // ----------------------------------------------------------------------------
 void SID::set_voice_mask(reg4 mask)
 {
-  filter.set_voice_mask(mask);
+  filter->set_voice_mask(mask);
 }
 
 
@@ -464,7 +476,7 @@ void SID::set_voice_mask(reg4 mask)
 // ----------------------------------------------------------------------------
 void SID::enable_filter(bool enable)
 {
-  filter.enable_filter(enable);
+  filter->enable_filter(enable);
 }
 
 
@@ -475,7 +487,7 @@ void SID::enable_filter(bool enable)
 // The setting is currently only effective for 6581.
 // ----------------------------------------------------------------------------
 void SID::adjust_filter_bias(double dac_bias) {
-  filter.adjust_filter_bias(dac_bias);
+  filter->adjust_filter_bias(dac_bias);
 }
 
 
@@ -495,7 +507,7 @@ void SID::debugoutput(void)
     static int recording = -1;
     static ofstream myFile;
     static int lastn;
-    int n = filter.output();
+    int n = filter->output();
     if (recording == -1) {
         /* the first call opens the file */
         recording = 0;
@@ -579,7 +591,7 @@ bool SID::set_sampling_parameters(double clock_freq, sampling_method method,
   if (method == SAMPLE_RESAMPLE || method == SAMPLE_RESAMPLE_FASTMEM)
   {
     // Check whether the sample ring buffer would overfill.
-    if (FIR_N*clock_freq/sample_freq >= RINGSIZE) {
+    if (static_cast<int>(static_cast<double>(FIR_N)*clock_freq/sample_freq) >= RINGSIZE) {
       return false;
     }
 
@@ -662,6 +674,9 @@ bool SID::set_sampling_parameters(double clock_freq, sampling_method method,
   // The filter length must be an odd number (sinc is symmetric about x = 0).
   int fir_N_new = int(N*f_cycles_per_sample) + 1;
   fir_N_new |= 1;
+
+  // Check whether the sample ring buffer would overflow.
+  assert(fir_N_new < RINGSIZE);
 
   // We clamp the filter table resolution to 2^n, making the fixed point
   // sample_offset a whole multiple of the filter table resolution.
@@ -812,10 +827,10 @@ void SID::clock(cycle_count delta_t)
   }
 
   // Clock filter.
-  filter.clock(delta_t, voice[0].output(), voice[1].output(), voice[2].output());
+  filter->clock(delta_t, voice[0].output(), voice[1].output(), voice[2].output());
 
   // Clock external filter.
-  extfilt.clock(delta_t, filter.output());
+  extfilt.clock(delta_t, filter->output());
 }
 
 
@@ -872,7 +887,7 @@ int SID::clock_fast(cycle_count& delta_t, short* buf, int n, int interleave)
     }
 
     sample_offset = (next_sample_offset & FIXP_MASK) - (1 << (FIXP_SHIFT - 1));
-    buf[s*interleave] = output();
+    buf[s*interleave] = amplify(output(), scaleFactor);
   }
 
   return s;
@@ -904,7 +919,7 @@ int SID::clock_interpolate(cycle_count& delta_t, short* buf, int n, int interlea
       clock();
       if (unlikely(i <= 2)) {
         sample_prev = sample_now;
-        sample_now = output();
+        sample_now = clip(output());
       }
     }
 
@@ -915,8 +930,10 @@ int SID::clock_interpolate(cycle_count& delta_t, short* buf, int n, int interlea
 
     sample_offset = next_sample_offset & FIXP_MASK;
 
-    buf[s*interleave] =
-      sample_prev + (sample_offset*(sample_now - sample_prev) >> FIXP_SHIFT);
+    buf[s*interleave] = amplify(
+      sample_prev + (sample_offset*(sample_now - sample_prev) >> FIXP_SHIFT),
+      scaleFactor
+    );
   }
 
   return s;
@@ -1016,7 +1033,7 @@ int SID::clock_resample(cycle_count& delta_t, short* buf, int n, int interleave)
 
     v >>= FIR_SHIFT;
 
-    buf[s*interleave] = clip(v);
+    buf[s*interleave] = amplify(v, scaleFactor);
   }
 
   return s;
@@ -1040,7 +1057,7 @@ int SID::clock_resample_fastmem(cycle_count& delta_t, short* buf, int n, int int
 
     for (int i = 0; i < delta_t_sample; i++) {
       clock();
-      sample[sample_index] = sample[sample_index + RINGSIZE] = output();
+      sample[sample_index] = sample[sample_index + RINGSIZE] = clip(output());
       ++sample_index &= RINGMASK;
     }
 
@@ -1063,7 +1080,7 @@ int SID::clock_resample_fastmem(cycle_count& delta_t, short* buf, int n, int int
 
     v >>= FIR_SHIFT;
 
-    buf[s*interleave] = clip(v);
+    buf[s*interleave] = amplify(v, scaleFactor);
   }
 
   return s;

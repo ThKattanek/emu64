@@ -295,6 +295,7 @@ SOURCES += \
     resid/dac.cc \
     resid/envelope.cc \
     resid/extfilt.cc \
+    #resid/filter.cc \
     resid/filter8580new.cc \
     resid/pot.cc \
     resid/sid.cc \
@@ -306,6 +307,7 @@ HEADERS += \
     resid/dac.h \
     resid/envelope.h \
     resid/extfilt.h \
+    #resid/filter.h \
     resid/filter8580new.h \
     resid/pot.h \
     resid/sid.h \
