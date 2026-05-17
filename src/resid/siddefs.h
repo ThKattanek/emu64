@@ -1,6 +1,6 @@
 //  ---------------------------------------------------------------------------
 //  This file is part of reSID, a MOS6581 SID emulator engine.
-//  Copyright (C) 1999  Dag Lem <resid@nimrod.no>
+//  Copyright (C) 2010  Dag Lem <resid@nimrod.no>
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,14 +17,33 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //  ---------------------------------------------------------------------------
 
-#ifndef __SIDDEFS_H__
-#define __SIDDEFS_H__
+#ifndef RESID_SIDDEFS_H
+#define RESID_SIDDEFS_H
+
+#define VERSION "0.16"
+
+// Compilation configuration.
+#define RESID_INLINING 1
+#define RESID_INLINE inline
+#define RESID_BRANCH_HINTS 1
+
+#define NEW_8580_FILTER 1
+
+// Compiler specifics.
+#define HAVE_BOOL 1
+#define HAVE_BUILTIN_EXPECT 1
+#define HAVE_LOG1P 1
+
+// Define bool, true, and false for C++ compilers that lack these keywords.
+#if !HAVE_BOOL
+typedef int bool;
+const bool true = 1;
+const bool false = 0;
+#endif
 
 #if HAVE_LOG1P
 #define HAS_LOG1P
 #endif
-
-#define RESID_INLINE
 
 // Branch prediction macros, lifted off the Linux kernel.
 #if RESID_BRANCH_HINTS && HAVE_BUILTIN_EXPECT
@@ -65,8 +84,6 @@ enum sampling_method {
 
 } // namespace reSID
 
-#define VERSION "0.16"
-
 extern "C"
 {
 #ifndef RESID_VERSION_CC
@@ -76,4 +93,4 @@ const char* resid_version_string = VERSION;
 #endif
 }
 
-#endif // not __SIDDEFS_H__
+#endif // not RESID_SIDDEFS_H

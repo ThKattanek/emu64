@@ -358,8 +358,7 @@ public:
     MOS6581_8085    *sid1;
     MOS6581_8085    *sid2;
 
-    ReSIDWrapperClass *resid1;
-    ReSIDWrapperClass *resid2;
+
 
     MOS6526         *cia1;
     MOS6526         *cia2;
@@ -413,6 +412,9 @@ public:
     float_t         sid_volume;
 
     VideoCaptureClass *video_capture;
+
+    ReSIDWrapperClass *resid1;
+    ReSIDWrapperClass *resid2;
 
 private:
     inline void NextSystemCycle();

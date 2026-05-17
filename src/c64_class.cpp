@@ -72,7 +72,7 @@ static const char* CPU_OPC = {"\
                               RSTIRQNMI"};
 
 C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(const char*)> log_function, const char *data_path):
-  mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),resid1(nullptr),resid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr)
+  mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr),resid1(nullptr),resid2(nullptr)
 {
    *ret_error = 0;
 
