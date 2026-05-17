@@ -268,8 +268,8 @@ Filter::Filter()
       // Convert op-amp voltage transfer to 16 bit values.
       double vmin = fi.opamp_voltage[0][0];
       double opamp_max = fi.opamp_voltage[0][1];
-      double kVddt = fi.k*(fi.Vdd - fi.Vth);
-      double vmax = kVddt < opamp_max ? opamp_max : kVddt;
+      double kVddt1 = fi.k*(fi.Vdd - fi.Vth);
+      double vmax = kVddt1 < opamp_max ? opamp_max : kVddt1;
       double denorm = vmax - vmin;
       double norm = 1.0/denorm;
 
@@ -294,7 +294,7 @@ Filter::Filter()
 
       // Vdd - Vth, normalized so that translated values can be subtracted:
       // k*Vddt - x = (k*Vddt - t) - (x - t)
-      mf.kVddt = (int)(N16*(kVddt - vmin) + 0.5);
+      mf.kVddt = (int)(N16*(kVddt1 - vmin) + 0.5);
 
       tmp_n_param[m] = denorm*(1 << 13)*((fi.uCox/2.)*1.0e-6/fi.C);
 

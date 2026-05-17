@@ -96,7 +96,7 @@ SID::SID()
 // ----------------------------------------------------------------------------
 SID::~SID()
 {
-  //delete filter;
+  delete filter;
   delete[] sample;
   delete[] fir;
 }
