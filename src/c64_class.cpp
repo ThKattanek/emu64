@@ -2882,7 +2882,7 @@ int SDLThreadLoad(void *userdat)
         c64->SetCommandLine(c64->auto_load_command_line);
         break;
     case 1:
-        if(0 == c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse))
+        if(0 == c64->LoadSingleFile(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse))
         {
             if(PRGStartAdresse <= 0x0801) sprintf(c64->auto_load_command_line,"RUN%c",13);
             else sprintf(c64->auto_load_command_line,"SYS %d%c",PRGStartAdresse,13);
@@ -2890,7 +2890,7 @@ int SDLThreadLoad(void *userdat)
         }
         break;
     case 2:
-        if(0 == c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse))
+        if(0 == c64->LoadSingleFile(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse))
         {
             //if(c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse) == 5) return 4; //Behandlung wenn mehr als 1 File in T64
             if(PRGStartAdresse <= 0x0801) sprintf(c64->auto_load_command_line,"RUN%c",13);
@@ -2999,7 +2999,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
     return 1;
 }
 
-int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *return_start_address)
+int C64Class::LoadSingleFile(FILE *file, const char *filename, int typ, uint16_t *return_start_address, uint16_t entry_number)
 {
     uint8_t *RAM = mmu->GetRAMPointer();
     char str00[256];
@@ -3011,6 +3011,8 @@ int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *retur
     char signature[32];
     uint16_t T64Entries;
     int FileStartOffset;
+
+    bool tape_found = false;
 
     if(file == nullptr)
     {
@@ -3074,15 +3076,32 @@ int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *retur
             return 0x02;
         }
 
-        // Es gibt irgendwie zu viele verschiedene Kennungen :(
-        /*
-		if((strcmp(Kennung, "C64 tape image file") != 0) && (strcmp(Kennung, "C64S tape image file") != 0))
-		{
-			cout << "Error T64 0x03" << endl;
-			fclose(file);
-			return 0x03;
-		}
-		*/
+        // Prüfe ob die ersten 3 BYTES 'C64' sind und ob in den ersten 15 Bytes irgendwo 'tape' steht
+        if((signature[0] != 'C') || (signature[1] != '6') || (signature[2] != '4'))
+        {
+            std::cout << "Error T64 0x03" << std::endl;
+            fclose(file);
+            file = nullptr;
+            return 0x03;
+        }
+
+        for(int i=3; i<15; i++)
+        {
+            if((signature[i] == 't') && (signature[i+1] == 'a') && (signature[i+2] == 'p') && (signature[i+3] == 'e'))
+            {
+                tape_found = true;
+                break;
+            }
+        }
+
+        if(tape_found == false)
+        {
+            std::cout << "Error T64 0x03" << std::endl;
+            fclose(file);
+            file = nullptr;
+            return 0x03;
+        }
+
 
         fseek(file,4,SEEK_CUR);
         reading_bytes = fread(&T64Entries,1,2,file);
@@ -3096,21 +3115,21 @@ int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *retur
 
         if(T64Entries==0)
         {
+            std::cout << "Error T64 0x04" << std::endl;
             fclose(file);
             file = nullptr;
             return 0x04;
         }
 
-        /*
-		if(T64Entries>1)
+        if(T64Entries <= entry_number)
 		{
+            std::cerr << "Anzahl Einträge in T64: " << T64Entries << " angefordertes Entry: " << entry_number << std::endl;
 			fclose(file);
 			file = nullptr;
 			return 0x05;
 		}
-		*/
 
-        fseek(file,0x42,SEEK_SET);
+        fseek(file,0x42 + 0x20 * entry_number, SEEK_SET);
         reading_bytes = fread(&start_address,1,2,file);
         if(reading_bytes != 2)
         {

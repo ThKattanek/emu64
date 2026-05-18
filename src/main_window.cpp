@@ -1448,7 +1448,7 @@ void MainWindow::on_actionC64_Programme_direkt_laden_triggered()
 
         FILE *file = qfopen(filename, "rb");
 
-        c64->LoadPRG(file, filename.toLocal8Bit(), typ, nullptr);
+        c64->LoadSingleFile(file, filename.toLocal8Bit(), typ, nullptr);
     }
 }
 

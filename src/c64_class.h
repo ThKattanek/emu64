@@ -127,7 +127,7 @@ public:
     void HardReset();
     void SetReset(int status, int hard_reset);
     int LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, int typ);
-    int LoadPRG(FILE *file, const char* filename, int typ, uint16_t *return_start_address);	// Filename ist nur für Logausgabe / Ausschlaggebend ist FILE*
+    int LoadSingleFile(FILE *file, const char* filename, int typ, uint16_t *return_start_address, uint16_t entry_number = 0);	// Filename ist nur für Logausgabe / Ausschlaggebend ist FILE*
 
     int LoadCRT(FILE *file);
     void RemoveCRT();
