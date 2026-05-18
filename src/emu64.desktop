@@ -1,9 +1,11 @@
 [Desktop Entry]
 Type=Application
 Name=Emu64
-Comment=A c64 emulator
+GenericName=Commodore 64 Emulator
+GenericName[de]=Commodore-64-Emulator
+Comment=A C64 emulator
 Comment[de]=Ein C64 Emulator
+Exec=emu64
+Terminal=false
 Icon=emu64
-TryExec=emu64
-Exec=emu64 %f
-Categories=Game;System;
+Categories=Game;X-Emulator;
