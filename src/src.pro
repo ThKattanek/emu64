@@ -200,6 +200,7 @@ SOURCES += \
     sid_dump_window.cpp \
     siddump.cpp \
     single_application.cpp \
+    t64_class.cpp \
     tape1530_class.cpp \
     tape_new_window.cpp \
     tape_window.cpp \
@@ -271,6 +272,7 @@ HEADERS += \
     siddump.h \
     single_application.h \
     structs.h \
+    t64_class.h \
     tape1530_class.h \
     tape_new_window.h \
     tape_window.h \

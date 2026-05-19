@@ -1207,8 +1207,6 @@ void MainWindow::AutoLoadAndRun(QString filename)
 
     if(c64->LoadAutoRun(0, file, filename.toLocal8Bit(), typ) == 0)
     {
-        std::cout << "AUTOLOAD: " << typ << ", FILE: " << file << std::endl;
-
         // Prüfen welche
         if(typ == D64)
         {
