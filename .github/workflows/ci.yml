@@ -10,6 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       CI_CXXFLAGS: -O2 -Wall -Wextra -Werror -pedantic
       WSHADOW_GCC: -Wshadow=local
       WSHADOW_CLANG: -Wshadow-uncaptured-local
