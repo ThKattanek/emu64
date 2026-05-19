@@ -8,7 +8,6 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 15.03.2026                //
 # // www.emu64-projekt.de                         //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -18,7 +17,7 @@ set -euo pipefail
 
 usage() {
   echo "Usage: $0 --qt <QT_ROOT>" >&2
-  echo "  Beispiel: $0 --qt \"$HOME/Qt/6.6.2/gcc_64\"" >&2
+  echo "  Beispiel: $0 --qt \"/usr/lib/qt6\"" >&2
   echo "  oder: QT_ROOT=\"$HOME/Qt/6.6.2/gcc_64\" $0" >&2
 }
 
