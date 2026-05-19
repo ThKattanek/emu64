@@ -201,6 +201,7 @@ SOURCES += \
     siddump.cpp \
     single_application.cpp \
     t64_class.cpp \
+    t64_entry_select_window.cpp \
     tape1530_class.cpp \
     tape_new_window.cpp \
     tape_window.cpp \
@@ -273,6 +274,7 @@ HEADERS += \
     single_application.h \
     structs.h \
     t64_class.h \
+    t64_entry_select_window.h \
     tape1530_class.h \
     tape_new_window.h \
     tape_window.h \
@@ -346,6 +348,7 @@ FORMS += \
     setup_window.ui \
     show_c64_key_mapping_window.ui \
     sid_dump_window.ui \
+    t64_entry_select_window.ui \
     tape_new_window.ui \
     tape_window.ui \
     user_palette_window.ui \

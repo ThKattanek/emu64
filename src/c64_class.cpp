@@ -2894,9 +2894,8 @@ int SDLThreadLoad(void *userdat)
         break;
     case 2:
         // T64 Files
-        if(0 == c64->LoadSingleFile(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse))
+        if(0 == c64->LoadSingleFile(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse, c64->auto_load_entry_number))
         {
-            //if(c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse) == 5) return 4; //Behandlung wenn mehr als 1 File in T64
             if(PRGStartAdresse <= 0x0801) sprintf(c64->auto_load_command_line,"RUN%c",13);
             else sprintf(c64->auto_load_command_line,"SYS %d%c",PRGStartAdresse,13);
             c64->SetCommandLine(c64->auto_load_command_line);
@@ -2909,7 +2908,7 @@ int SDLThreadLoad(void *userdat)
 }
 
 // ret 0=OK 1=nicht unterstütztes Format 2=D64 n.IO 3=G64 n.IO 4=OK nur es war ein CRT
-int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, int typ)
+int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, int typ, uint16_t entry_number)
 {
     switch(typ)
     {
@@ -2965,6 +2964,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
         snprintf(auto_load_filename, sizeof(auto_load_filename), "%s", filename);
         auto_load_file = file;
         auto_load_file_typ = typ;
+        auto_load_entry_number = entry_number;
 
         HardReset();
         wait_reset_ready = true;

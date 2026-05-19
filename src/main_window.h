@@ -162,6 +162,7 @@ private:
     bool ParseVersionNumber(QString version_string);
     int CompareVersionNumber(const VERSION_NUMBER *version1, const VERSION_NUMBER *version2); // compare result from version number in the ini file. INI Version: 0 = is equal, -1 is lesser, 1 = is greater
     void FixedVersionSettings();
+    uint64_t GetT64EntryNumber(QString filename);
 
     /// Variablen ///
     VERSION_NUMBER version_number;
