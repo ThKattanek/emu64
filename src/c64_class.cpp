@@ -3076,9 +3076,15 @@ int C64Class::LoadSingleFile(FILE *file, const char *filename, int typ, uint16_t
         case 0x00:
             sprintf(str00,">>   T64 Image Name: %s\n", t64->GetImageName());
             LogText(str00);
+            sprintf(str00,">>   Image Version: %4.4X\n", t64->GetVersion());
+            LogText(str00);
             sprintf(str00,">>   Anzahl Einträge: %d\n", t64->GetTotalEntries());
             LogText(str00);
             sprintf(str00,">>   C64 Filename [%d]: %s\n", entry_number, t64->GetFileName(entry_number));
+            LogText(str00);
+            sprintf(str00,">>   C64s Filetyp: %2.2X\n", t64->GetC64sFileType(entry_number));
+            LogText(str00);
+            sprintf(str00,">>   1541 Filetyp: %2.2X\n", t64->GetFloppy1541FileType(entry_number));
             LogText(str00);
             sprintf(str00,">>   SartAdresse: $%4.4X(%d) ", t64->GetFileStartAddress(entry_number), t64->GetFileStartAddress(entry_number));
             LogText(str00);
