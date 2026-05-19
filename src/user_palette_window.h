@@ -1,3 +1,17 @@
+//////////////////////////////////////////////////
+//                                              //
+// Emu64                                        //
+// von Thorsten Kattanek                        //
+//                                              //
+// #file: user_palette_window.h                 //
+//                                              //
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
+// www.emu64.de                                 //
+//                                              //
+//////////////////////////////////////////////////
+
 #ifndef USER_PALETTE_WINDOW_H
 #define USER_PALETTE_WINDOW_H
 
@@ -10,36 +24,36 @@ class UserPaletteWindow;
 
 class UserPaletteWindow : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	explicit UserPaletteWindow(QWidget *parent = nullptr);
-	~UserPaletteWindow();
+    explicit UserPaletteWindow(QWidget *parent = nullptr);
+    ~UserPaletteWindow();
 
-	void SetDefaultColor(int color_number, QColor color);
-	void SetColor(int color_number, QColor color);
-	QColor GetColor(int color_number);
+    void SetDefaultColor(int color_number, QColor color);
+    void SetColor(int color_number, QColor color);
+    QColor GetColor(int color_number);
 
 signals:
-	void ChangeColor(int color_number, QColor color);
+    void ChangeColor(int color_number, QColor color);
 
 private slots:
-	void on_red_slider_valueChanged(int value);
-	void on_green_slider_valueChanged(int value);
-	void on_blue_slider_valueChanged(int value);
-	void on_red_out_valueChanged(int arg1);
-	void on_green_out_valueChanged(int arg1);
-	void on_blue_out_valueChanged(int arg1);
+    void on_red_slider_valueChanged(int value);
+    void on_green_slider_valueChanged(int value);
+    void on_blue_slider_valueChanged(int value);
+    void on_red_out_valueChanged(int arg1);
+    void on_green_out_valueChanged(int arg1);
+    void on_blue_out_valueChanged(int arg1);
 
-	void ColorButtonClicked(int color_number);
+    void ColorButtonClicked(int color_number);
 
-	void on_SetDefaultColors_clicked();
+    void on_SetDefaultColors_clicked();
 
 private:
-	Ui::UserPaletteWindow *ui;
-	ColorButton *color_buttons[16];
+    Ui::UserPaletteWindow *ui;
+    ColorButton *color_buttons[16];
 
-	int current_select_color;
+    int current_select_color;
 };
 
 #endif // USER_PALETTE_WINDOW_H
