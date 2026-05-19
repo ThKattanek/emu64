@@ -1393,7 +1393,7 @@ uint64_t MainWindow::GetT64EntryNumber(QString filename)
         return 0;
     }
 
-    if(t64->GetTotalEntries() > 1)
+    if(t64->GetTotalEntries() > 1 && !nogui)
     {
         T64EntrySelectWindow t64_entry_select_window(this, t64);
         t64_entry_select_window.setWindowTitle(tr("T64 Einträge auswählen"));
