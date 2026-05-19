@@ -20,12 +20,14 @@
 #include "./main_window.h"
 #include "./ui_main_window.h"
 #include "./c64_file_types.h"
+#include "./t64_class.h"
 #include "./utils.h"
 
 #include "./custom_save_file_dialog.h"
 #include "./command_line_class.h"
 #include "./emu64_commands.h"
 #include "./widget_floppy_status.h"
+#include "./t64_entry_select_window.h"
 
 static QMutex mutex_log_text;
 
@@ -1174,6 +1176,7 @@ void MainWindow::AutoLoadAndRun(QString filename)
     // akutelles Autostart Verzeichnis abspeichern
     QFileInfo file_info(filename);
     lastAutoloadPath = file_info.absolutePath();
+    uint16_t entry_number = 0;
 
     int typ = NO_C64_FILE;
 
@@ -1184,7 +1187,14 @@ void MainWindow::AutoLoadAndRun(QString filename)
         typ = C64;
 
     if(file_info.suffix().toUpper() == "T64")
+    {
         typ = T64;
+        entry_number = GetT64EntryNumber(filename);
+        if(entry_number == 0xffff)
+        {
+            return;
+        }
+    }
 
     if(file_info.suffix().toUpper() == "P00")
         typ = P00;
@@ -1205,10 +1215,8 @@ void MainWindow::AutoLoadAndRun(QString filename)
 
     FILE *file = qfopen(filename, "rb");
 
-    if(c64->LoadAutoRun(0, file, filename.toLocal8Bit(), typ) == 0)
+    if(c64->LoadAutoRun(0, file, filename.toLocal8Bit(), typ, entry_number) == 0)
     {
-        std::cout << "AUTOLOAD: " << typ << ", FILE: " << file << std::endl;
-
         // Prüfen welche
         if(typ == D64)
         {
@@ -1364,6 +1372,53 @@ void MainWindow::FixedVersionSettings()
     }
 }
 
+uint64_t MainWindow::GetT64EntryNumber(QString filename)
+{
+    FILE *file = qfopen(filename, "rb");
+    T64Class* t64 = new T64Class(file);
+
+    if(t64->GetErrorCode() != 0)
+    {
+        QMessageBox::critical(this, tr("Fehler"), tr("Die T64 Datei konnte nicht geladen werden. Bitte überprüfen Sie die Datei."), QMessageBox::Ok);
+        delete t64;
+        fclose(file);
+        return 0;
+    }
+
+    if(t64->GetTotalEntries() == 0)
+    {
+        QMessageBox::critical(this, tr("Fehler"), tr("Die T64 Datei enthält keinen Eintrag."), QMessageBox::Ok);
+        delete t64;
+        fclose(file);
+        return 0;
+    }
+
+    if(t64->GetTotalEntries() > 1 && !nogui)
+    {
+        T64EntrySelectWindow t64_entry_select_window(this, t64);
+        t64_entry_select_window.setWindowTitle(tr("T64 Einträge auswählen"));
+        if(t64_entry_select_window.exec() == QDialog::Accepted)
+        {
+            uint16_t selected_entry = t64_entry_select_window.GetSelectedEntry();
+            delete t64;
+            fclose(file);
+            return selected_entry;
+        }
+        else
+        {
+            delete t64;
+            fclose(file);
+            return 0xffff;
+        }
+    }
+
+    delete t64;
+    fclose(file);
+
+    // wenn nur ein Eintrag in der T64 Datei vorhanden ist, wird dieser automatisch ausgewählt
+    return 0;
+}
+
 void MainWindow::on_menu_main_info_triggered()
 {
     SDL_version compiled;
@@ -1429,6 +1484,8 @@ void MainWindow::on_actionAutostart_triggered()
 void MainWindow::on_actionC64_Programme_direkt_laden_triggered()
 {
     QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),"",tr("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.frz);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
+    uint16_t entry_number = 0;
+
     if(filename != "")
     {
         QFileInfo file_info(filename);
@@ -1441,14 +1498,21 @@ void MainWindow::on_actionC64_Programme_direkt_laden_triggered()
             typ = C64;
 
         if(file_info.suffix().toUpper() == "T64")
+        {
             typ = T64;
+            entry_number = GetT64EntryNumber(filename);
+            if(entry_number == 0xffff)
+            {
+                return;
+            }
+        }
 
         if(file_info.suffix().toUpper() == "P00")
             typ = P00;
 
         FILE *file = qfopen(filename, "rb");
 
-        c64->LoadPRG(file, filename.toLocal8Bit(), typ, nullptr);
+        c64->LoadSingleFile(file, filename.toLocal8Bit(), typ, nullptr, entry_number);
     }
 }
 

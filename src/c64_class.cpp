@@ -17,6 +17,7 @@
 #include "./c64_file_types.h"
 #include "./cpu_info.h"
 #include "./savepng.h"
+#include "./t64_class.h"
 
 #include <QDebug>
 #include <iostream>
@@ -71,10 +72,10 @@ static const char* CPU_OPC = {"\
                               BEQSBCJAMISBNOPSBCINCISBSEDSBCNOPISBNOPSBCINCISB\
                               RSTIRQNMI"};
 
-C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(const char*)> log_function, const char *data_path):
-  mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr),resid1(nullptr),resid2(nullptr)
-{
-   *ret_error = 0;
+                              C64Class::C64Class(int *ret_error, int soundbuffer_size, VideoCrtClass *video_crt_output, bool start_minimized, std::function<void(const char*)> log_function, const char *data_path):
+                                  mmu(nullptr),cpu(nullptr),vic(nullptr),sid1(nullptr),sid2(nullptr),cia1(nullptr),cia2(nullptr),crt(nullptr),resid1(nullptr),resid2(nullptr)
+                              {
+                                   *ret_error = 0;
 
 this->start_minimized = start_minimized;
 
@@ -2879,10 +2880,12 @@ int SDLThreadLoad(void *userdat)
     switch(c64->auto_load_mode)
     {
     case 0:
+        // D64 + G64 Files
         c64->SetCommandLine(c64->auto_load_command_line);
         break;
     case 1:
-        if(0 == c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse))
+        // PRG + C64 Files
+        if(0 == c64->LoadSingleFile(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse))
         {
             if(PRGStartAdresse <= 0x0801) sprintf(c64->auto_load_command_line,"RUN%c",13);
             else sprintf(c64->auto_load_command_line,"SYS %d%c",PRGStartAdresse,13);
@@ -2890,9 +2893,9 @@ int SDLThreadLoad(void *userdat)
         }
         break;
     case 2:
-        if(0 == c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse))
+        // T64 Files
+        if(0 == c64->LoadSingleFile(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse, c64->auto_load_entry_number))
         {
-            //if(c64->LoadPRG(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse) == 5) return 4; //Behandlung wenn mehr als 1 File in T64
             if(PRGStartAdresse <= 0x0801) sprintf(c64->auto_load_command_line,"RUN%c",13);
             else sprintf(c64->auto_load_command_line,"SYS %d%c",PRGStartAdresse,13);
             c64->SetCommandLine(c64->auto_load_command_line);
@@ -2905,7 +2908,7 @@ int SDLThreadLoad(void *userdat)
 }
 
 // ret 0=OK 1=nicht unterstütztes Format 2=D64 n.IO 3=G64 n.IO 4=OK nur es war ein CRT
-int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, int typ)
+int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, int typ, uint16_t entry_number)
 {
     switch(typ)
     {
@@ -2961,6 +2964,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
         snprintf(auto_load_filename, sizeof(auto_load_filename), "%s", filename);
         auto_load_file = file;
         auto_load_file_typ = typ;
+        auto_load_entry_number = entry_number;
 
         HardReset();
         wait_reset_ready = true;
@@ -2999,7 +3003,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
     return 1;
 }
 
-int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *return_start_address)
+int C64Class::LoadSingleFile(FILE *file, const char *filename, int typ, uint16_t *return_start_address, uint16_t entry_number)
 {
     uint8_t *RAM = mmu->GetRAMPointer();
     char str00[256];
@@ -3009,8 +3013,8 @@ int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *retur
     size_t reading_bytes;
     uint8_t temp[2];
     char signature[32];
-    uint16_t T64Entries;
-    int FileStartOffset;
+
+    T64Class *t64 = nullptr;
 
     if(file == nullptr)
     {
@@ -3041,14 +3045,14 @@ int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *retur
         RAM[0x2B] = 0x01;
         RAM[0x2C] = 0x08;
 
-        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",start_address,start_address);
+        sprintf(str00,">>   SartAdresse: $%4.4X(%d)",start_address, start_address);
         LogText(str00);
 
-        start_address += static_cast<uint16_t>(reading_bytes);
-        RAM[0x2D] = static_cast<uint8_t>(start_address);
-        RAM[0x2E] = static_cast<uint8_t>(start_address>>8);
-        RAM[0xAE] = static_cast<uint8_t>(start_address);
-        RAM[0xAF] = static_cast<uint8_t>(start_address>>8);
+        end_address = start_address + static_cast<uint16_t>(reading_bytes);
+        RAM[0x2D] = static_cast<uint8_t>(end_address);
+        RAM[0x2E] = static_cast<uint8_t>(end_address>>8);
+        RAM[0xAE] = static_cast<uint8_t>(end_address);
+        RAM[0xAF] = static_cast<uint8_t>(end_address>>8);
 
         fclose(file);
         file = nullptr;
@@ -3065,108 +3069,39 @@ int C64Class::LoadPRG(FILE *file, const char *filename, int typ, uint16_t *retur
         LogText(filename);
         LogText("\n");
 
-        reading_bytes = fread(signature,1,32,file);
-        if(reading_bytes != 32)
+        t64 = new T64Class(file);
+
+        switch (t64->GetErrorCode())
         {
-            std::cout << "Error T64 0x02" << std::endl;
-            fclose(file);
-            file = nullptr;
-            return 0x02;
+        case 0x00:
+            sprintf(str00,">>   T64 Image Name: %s\n", t64->GetImageName());
+            LogText(str00);
+            sprintf(str00,">>   Image Version: %4.4X\n", t64->GetVersion());
+            LogText(str00);
+            sprintf(str00,">>   Anzahl Einträge: %d\n", t64->GetTotalEntries());
+            LogText(str00);
+            sprintf(str00,">>   C64 Filename [%d]: %s\n", entry_number, t64->GetFileName(entry_number));
+            LogText(str00);
+            sprintf(str00,">>   C64s Filetyp: %2.2X\n", t64->GetC64sFileType(entry_number));
+            LogText(str00);
+            sprintf(str00,">>   1541 Filetyp: %2.2X\n", t64->GetFloppy1541FileType(entry_number));
+            LogText(str00);
+            sprintf(str00,">>   SartAdresse: $%4.4X(%d) ", t64->GetFileStartAddress(entry_number), t64->GetFileStartAddress(entry_number));
+            LogText(str00);
+            sprintf(str00,"EndAdresse: $%4.4X(%d)\n", t64->GetFileEndAddress(entry_number), t64->GetFileEndAddress(entry_number));
+            LogText(str00);
+
+            t64->LoadFileToRAM(entry_number, RAM);
+            break;
+        default:
+            std::cout << "Error T64 0x" << std::hex << static_cast<int>(t64->GetErrorCode()) << std::dec << std::endl;
+            break;
         }
 
-        // Es gibt irgendwie zu viele verschiedene Kennungen :(
-        /*
-		if((strcmp(Kennung, "C64 tape image file") != 0) && (strcmp(Kennung, "C64S tape image file") != 0))
-		{
-			cout << "Error T64 0x03" << endl;
-			fclose(file);
-			return 0x03;
-		}
-		*/
-
-        fseek(file,4,SEEK_CUR);
-        reading_bytes = fread(&T64Entries,1,2,file);
-        if(reading_bytes != 2)
-        {
-            std::cout << "Error T64 0x02" << std::endl;
-            fclose(file);
-            file = nullptr;
-            return 0x02;
-        }
-
-        if(T64Entries==0)
-        {
-            fclose(file);
-            file = nullptr;
-            return 0x04;
-        }
-
-        /*
-		if(T64Entries>1)
-		{
-			fclose(file);
-			file = nullptr;
-			return 0x05;
-		}
-		*/
-
-        fseek(file,0x42,SEEK_SET);
-        reading_bytes = fread(&start_address,1,2,file);
-        if(reading_bytes != 2)
-        {
-            std::cout << "Error T64 0x02" << std::endl;
-            fclose(file);
-            file = nullptr;
-            return 0x02;
-        }
-
-        if(return_start_address != nullptr) *return_start_address = start_address;
-
-        reading_bytes = fread(&end_address,1,2,file);
-        if(reading_bytes != 2)
-        {
-            std::cout << "Error T64 0x02" << std::endl;
-            fclose(file);
-            file = nullptr;
-            return 0x02;
-        }
-
-        fseek(file,2,SEEK_CUR);
-        reading_bytes = fread(&FileStartOffset,1,4,file);
-        if(reading_bytes != 4)
-        {
-            std::cout << "Error T64 0x02" << std::endl;
-            fclose(file);
-            file = nullptr;
-            return 0x02;
-        }
-
-        fseek(file,FileStartOffset,SEEK_SET);
-        reading_bytes = fread(RAM + start_address,1,end_address - start_address,file);
-
-        if(reading_bytes != static_cast<size_t>(end_address - start_address))
-        {
-            std::cout << "Error T64 0x02" << std::endl;
-            fclose(file);
-            file = nullptr;
-            return 0x02;
-        }
+        if(t64 != nullptr)
+            delete t64;
 
         fclose(file);
-        file = nullptr;
-
-        RAM[0x2B] = 0x01;
-        RAM[0x2C] = 0x08;
-
-        RAM[0x2D] = static_cast<uint8_t>(end_address);
-        RAM[0x2E] = static_cast<uint8_t>(end_address>>8);
-        RAM[0xAE] = static_cast<uint8_t>(end_address);
-        RAM[0xAF] = static_cast<uint8_t>(end_address>>8);
-
-        sprintf(str00,">>   SartAdresse: $%4.4X(%d)", start_address, start_address);
-        LogText(str00);
-        sprintf(str00,"EndAdresse: $%4.4X(%d)\n", end_address, end_address);
-        LogText(str00);
 
         return 0x00;
         break;

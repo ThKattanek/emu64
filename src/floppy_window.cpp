@@ -369,7 +369,7 @@ void FloppyWindow::OnD64FileStart3(bool)
 
 		FILE *file = qfopen(filename, "rb");
 
-		c64->LoadPRG(file, filename.toLocal8Bit(), typ, nullptr);
+        c64->LoadSingleFile(file, filename.toLocal8Bit(), typ, nullptr);
     }
 }
 
