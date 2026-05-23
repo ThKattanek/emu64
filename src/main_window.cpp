@@ -1206,7 +1206,10 @@ void MainWindow::AutoLoadAndRun(QString filename)
         typ = G64;
 
     if(file_info.suffix().toUpper() == "CRT")
+    {
+        cartridge_window->SetCartridgeImage(filename);
         typ = CRT;
+    }
 
     if(file_info.suffix().toUpper() == "FRZ")
         typ = FRZ;
