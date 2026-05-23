@@ -1211,6 +1211,13 @@ void MainWindow::AutoLoadAndRun(QString filename)
     if(file_info.suffix().toUpper() == "FRZ")
         typ = FRZ;
 
+    if(file_info.suffix().toUpper() == "TAP")
+    {
+        tape_window->SetFileBrowserAktDir(file_info.absolutePath());
+        tape_window->SetFileBrowserAktFile(file_info.fileName());
+        typ = TAP;
+    }
+
     // QMessageBox::information(this,"Test",filename);
 
     FILE *file = qfopen(filename, "rb");
@@ -1473,7 +1480,7 @@ void MainWindow::on_actionAutostart_triggered()
         lastAutoloadPath = QDir::homePath();
     }
 
-    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),lastAutoloadPath,tr("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.d64 *.g64 *.crt *.frz);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
+    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),lastAutoloadPath,tr("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.tap *.d64 *.g64 *.crt *.frz);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
         AutoLoadAndRun(filename);

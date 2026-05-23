@@ -2901,6 +2901,14 @@ int SDLThreadLoad(void *userdat)
             c64->SetCommandLine(c64->auto_load_command_line);
         }
         break;
+    case 3:
+        // TAP Files for Datasette
+        if(c64->tape->LoadTapeImage(c64->auto_load_file, c64->auto_load_file_typ))
+        {
+            sprintf(c64->auto_load_command_line,"LOAD%cRUN%c", 13, 13);
+            c64->SetCommandLine(c64->auto_load_command_line);
+            c64->SetTapeKeys(TAPE_KEY_PLAY);
+        }
     default:
         break;
     }
@@ -2965,6 +2973,21 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
         auto_load_file = file;
         auto_load_file_typ = typ;
         auto_load_entry_number = entry_number;
+
+        HardReset();
+        wait_reset_ready = true;
+        c64_reset_ready = false;
+        floppy_reset_ready[0] = false;
+        return 0;
+        break;
+
+    case TAP:
+        KillCommandLine();
+        auto_load_mode = 3;
+
+        snprintf(auto_load_filename, sizeof(auto_load_filename), "%s", filename);
+        auto_load_file = file;
+        auto_load_file_typ = typ;
 
         HardReset();
         wait_reset_ready = true;

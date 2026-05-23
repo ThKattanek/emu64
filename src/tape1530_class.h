@@ -15,12 +15,12 @@
 #ifndef TAPE1530_H
 #define TAPE1530_H
 
-#include <cstring>
+//#include <cstring>
 #include <cstdio>
 #include <math.h>
 
 #ifndef M_PI
-    #define M_PI 3.14159265358979323846
+#define M_PI 3.14159265358979323846
 #endif
 
 #include "mos6510_class.h"
@@ -36,8 +36,8 @@ public:
     TAPE1530(int samplerate, int puffersize, float cycles_per_second);
     ~TAPE1530();
     void SetC64Zyklen(float cycles_per_second);
-	bool LoadTapeImage(FILE *file, int typ);
-	bool RecordTapeImage(FILE *file);
+    bool LoadTapeImage(FILE *file, int typ);
+    bool RecordTapeImage(FILE *file);
     void StopRecordImage();
     unsigned char SetTapeKeys(unsigned char pressed_key);
     void *GetSoundBuffer(void);
@@ -58,7 +58,7 @@ private:
     void CalcTime2CounterTbl(void);
     void CalcTapeLenTime();
 
-	FILE            *image_file;
+    FILE            *image_file;
 
     float           cycles_per_second;
 
