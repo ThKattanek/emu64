@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -18,6 +17,7 @@
 
 #include "tape_window.h"
 #include "ui_tape_window.h"
+#include "./tape_new_window.h"
 #include "./c64_file_types.h"
 #include "./utils.h"
 
@@ -29,7 +29,7 @@ TapeWindow::TapeWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QString 
     ui->setupUi(this);
 
     // Center Window
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens().at(0)->availableGeometry()));
 
     this->tmp_path = tmp_path;
     ui->FileBrowser->SetTempDir(tmp_path);
@@ -119,6 +119,16 @@ void TapeWindow::LoadIni()
     ////////////////////////////////////
 }
 
+void TapeWindow::SetFileBrowserAktDir(QString dir)
+{
+    ui->FileBrowser->SetAktDir(dir);
+}
+
+void TapeWindow::SetFileBrowserAktFile(QString file)
+{
+    ui->FileBrowser->SetAktFile(ui->FileBrowser->GetAktDir(), file);
+}
+
 void TapeWindow::showEvent(QShowEvent*)
 {
     isOneShowed = true;
@@ -134,18 +144,18 @@ void TapeWindow::OnSelectFile(QString filename)
 {
     UpdateStateTapeKeys(c64->SetTapeKeys(TAPE_KEY_STOP));
 
-	QFileInfo file_info(filename);
+    QFileInfo file_info(filename);
 
-	int typ = NO_C64_FILE;
-	if(file_info.suffix().toUpper() == "TAP")
-		typ = TAP;
+    int typ = NO_C64_FILE;
+    if(file_info.suffix().toUpper() == "TAP")
+        typ = TAP;
 
-	if(file_info.suffix().toUpper() == "WAV")
-		typ = WAV;
+    if(file_info.suffix().toUpper() == "WAV")
+        typ = WAV;
 
-	FILE *file = qfopen(filename, "rb");
+    FILE *file = qfopen(filename, "rb");
 
-	if(!c64->LoadTapeImage(file, typ))
+    if(!c64->LoadTapeImage(file, typ))
         QMessageBox::warning(this,tr("Fehler!"),tr("Fehler beim laden des TapeImages"));
 
     unsigned int tape_time = roundf(c64->GetTapeLenTime());
@@ -197,9 +207,9 @@ void TapeWindow::on_Rec_clicked()
             }
 
             // Theoretisch bereit zur Aufnahme		
-			FILE *file = qfopen(fullpath, "wb");
+            FILE *file = qfopen(fullpath, "wb");
 
-			if(!c64->RecordTapeImage(file))
+            if(!c64->RecordTapeImage(file))
             {
                 QMessageBox::information(this,tr("Achtung"),tr("Es konnte keine Aufnahme gestartet werden.\nBitte überprüfen Sie ob sie ausreichend Rechte besitzen."));
             }

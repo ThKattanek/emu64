@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 31.08.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -22,7 +21,6 @@
 #include <QShowEvent>
 
 #include "c64_class.h"
-#include "tape_new_window.h"
 
 namespace Ui {
 class TapeWindow;
@@ -37,6 +35,8 @@ public:
     ~TapeWindow();
     void RetranslateUi();
     void LoadIni();
+    void SetFileBrowserAktDir(QString dir);
+    void SetFileBrowserAktFile(QString file);
     void showEvent(QShowEvent*);
     void hideEvent(QHideEvent*);
 
