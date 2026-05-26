@@ -419,6 +419,7 @@ public:
 
 private:
     inline void NextSystemCycle();
+    inline void ClearAllInterrupts();
     void CalcDistortionGrid();
     void VicRefresh(uint8_t *vic_puffer);
     void CheckKeys();

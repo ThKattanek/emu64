@@ -172,22 +172,17 @@ int CartridgeClass::LoadCartridgeImage(FILE *file)
     {
         uint16_t chip_load_address = crt_image->GetChipLoadAddress(i);
 
-        switch (crt_image->GetChipType(i))
+        if(chip_load_address == 0x8000)
         {
-        case 0:    // 8KB ROM
-            if(chip_load_address == 0x8000)
+            crt_image->CopyChipRomData(i, rom_bank1 + (crt_image->GetChipBankNumber(i) * 0x2000), 0);
+            if(crt_image->GetChipRomSize(i) == 0x4000)
             {
-                crt_image->CopyChipRomData(i, rom_bank1 + (crt_image->GetChipBankNumber(i) * 0x2000), 0);
-                if(crt_image->GetChipRomSize(i) == 0x4000)
-                {
-                    crt_image->CopyChipRomData(i, rom_bank2 + (crt_image->GetChipBankNumber(i) * 0x2000), 0x2000);
-                }
+                crt_image->CopyChipRomData(i, rom_bank2 + (crt_image->GetChipBankNumber(i) * 0x2000), 0x2000);
             }
-            else if(chip_load_address == 0xa000 || chip_load_address == 0xe000)
-            {
-                crt_image->CopyChipRomData(i, rom_bank2 + (crt_image->GetChipBankNumber(i) * 0x2000), 0);
-            }
-            break;
+        }
+        else if(chip_load_address == 0xa000 || chip_load_address == 0xe000)
+        {
+            crt_image->CopyChipRomData(i, rom_bank2 + (crt_image->GetChipBankNumber(i) * 0x2000), 0);
         }
     }
 
