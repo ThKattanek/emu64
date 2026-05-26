@@ -166,6 +166,7 @@ SOURCES += \
     cartridge_class.cpp \
     cartridge_new_easyflash_window.cpp \
     cartridge_window.cpp \
+    crt_class.cpp \
     custom_splashscreen.cpp \
     d64_class.cpp \
     debugger_iec_window.cpp \
@@ -234,6 +235,7 @@ HEADERS += \
     cartridge_class.h \
     cartridge_new_easyflash_window.h \
     cartridge_window.h \
+    crt_class.h \
     custom_save_file_dialog.h \
     custom_splashscreen.h \
     d64_class.h \

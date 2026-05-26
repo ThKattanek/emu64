@@ -1472,6 +1472,7 @@ void C64Class::SoftReset()
     wait_reset_ready = false;
     SetReset(false,true);
     SDL_Delay(40);
+    ClearAllInterrupts();
     SetReset(true,true);
 }
 
@@ -1480,6 +1481,7 @@ void C64Class::HardReset()
     wait_reset_ready = false;
     SetReset(false,false);
     SDL_Delay(40);
+    ClearAllInterrupts();
     SetReset(true,true);
 }
 
@@ -4338,6 +4340,19 @@ void C64Class::NextSystemCycle()
     reu->OneZyklus();
     tape->OneCycle();
     cpu->Phi1();
+}
+
+void C64Class::ClearAllInterrupts()
+{
+    cpu->ClearInterrupt(CIA_IRQ);
+    cpu->ClearInterrupt(REU_IRQ);
+    cpu->ClearInterrupt(EXT_IRQ);
+    cpu->ClearInterrupt(VIC_IRQ);
+    cpu->ClearInterrupt(CRT_IRQ);
+    cpu->ClearInterrupt(EXT_NMI);
+    cpu->ClearInterrupt(CIA_NMI);
+    cpu->ClearInterrupt(CRT_NMI);
+    cpu->ClearInterrupt(RESTORE_NMI);
 }
 
 uint16_t C64Class::DisAss(FILE *file, uint16_t PC, bool line_draw, int source)

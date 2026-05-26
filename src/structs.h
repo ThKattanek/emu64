@@ -271,7 +271,7 @@ struct CHIP_INFO_STRUCT
 
 struct CARTRIDGE_INFO_STRUCT
 {
-    char                Name[32];
+    char                Name[33];
     char                Version[10];
     char*               HardwareTypeString;
     unsigned short      HardwareType;
@@ -279,7 +279,6 @@ struct CARTRIDGE_INFO_STRUCT
     unsigned char       GAME;
     int                 ChipCount;
     CHIP_INFO_STRUCT    ChipInfo[128];
-    CHIP_INFO_STRUCT    ChipInfoHi[128];
 };
 
 struct FREEZ_RETURN_STRUCT
