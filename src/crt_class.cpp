@@ -30,20 +30,7 @@ CRTClass::CRTClass(FILE *file)
 
 CRTClass::~CRTClass()
 {
-    for(int i=0; i<chip_count; ++i)
-    {
-        if(chip_header[i]->chip_rom != nullptr)
-        {
-            delete[] chip_header[i]->chip_rom;
-            chip_header[i]->chip_rom = nullptr;
-        }
-    }
-
-    if(header != nullptr)
-    {
-        delete header;
-        header = nullptr;
-    }
+    Cleanup();
 }
 
 uint16_t CRTClass::GetImageVersion()
@@ -88,7 +75,7 @@ uint16_t CRTClass::GetChipRomSize(int index)
     return chip_header[index]->rom_size << 8 | chip_header[index]->rom_size >> 8;
 }
 
-void CRTClass::CopyChipRomData(int index, uint8_t *destination)
+void CRTClass::CopyChipRomData(int index, uint8_t *destination, size_t offset)
 {
     if(index < 0 || index >= chip_count)
         return;  // Ungültiger Index
@@ -96,7 +83,7 @@ void CRTClass::CopyChipRomData(int index, uint8_t *destination)
     if(destination == nullptr)
         return;  // Ungültiger Zielpuffer
 
-    memcpy(destination, chip_header[index]->chip_rom, GetChipRomSize(index));
+    memcpy(destination, chip_header[index]->chip_rom + offset, 0x2000);
 }
 
 uint32_t CRTClass::GetHeaderLength()
@@ -176,4 +163,22 @@ inline uint32_t CRTClass::SwapEndianness(uint32_t value)
     value = h<<16 | l;
 
     return value;
+}
+
+void CRTClass::Cleanup()
+{
+    for(int i=0; i<chip_count; ++i)
+    {
+        if(chip_header[i]->chip_rom != nullptr)
+        {
+            delete[] chip_header[i]->chip_rom;
+            chip_header[i]->chip_rom = nullptr;
+        }
+    }
+
+    if(header != nullptr)
+    {
+        delete header;
+        header = nullptr;
+    }
 }

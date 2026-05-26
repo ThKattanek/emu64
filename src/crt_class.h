@@ -52,7 +52,7 @@ PACKED_STRUCT_START
 } PACKED_ATTR;
 PACKED_STRUCT_END
 
-PACKED_STRUCT_START
+        PACKED_STRUCT_START
     struct CHIP_HEADER
 {
     char signature[4];
@@ -65,7 +65,7 @@ PACKED_STRUCT_START
 } PACKED_ATTR;
 PACKED_STRUCT_END
 
-class CRTClass
+    class CRTClass
 {
 public:
     CRTClass(FILE *file);
@@ -77,24 +77,25 @@ public:
     int SaveCRT(FILE *file);
 
     char*GetCartridgeName()             // Gibt den Namen des Cartridges zurück (Nullterminiert)
-        { return header->cartridge_name; }
+    { return header->cartridge_name; }
     uint32_t GetHeaderLength();         // Gibt die Länge des Headers zurück (Defaultmäßig 0x40, aber es könnte auch länger sein, wenn zusätzliche Informationen im Header gespeichert sind)
     uint16_t GetImageVersion();         // High Byte = Major Version, Low Byte = Minor Version
     uint16_t GetCartridgeType();        // Gibt den Cartridge Type zurück (siehe CRT Dokumentation für die möglichen Werte)
     uint8_t GetExrom()                  // Gibt die Werte der Exrom und Game Leitungen zurück (0 = Leitung auf High, 1 = Leitung auf Low)
-        { return header->exrom; }
+    { return header->exrom; }
     uint8_t GetGame()                   // Gibt die Werte der Exrom und Game Leitungen zurück (0 = Leitung auf High, 1 = Leitung auf Low)
-        { return header->game; }
+    { return header->game; }
     int GetChipCount()                  // Gibt die Anzahl der Chips zurück, die im CRT Image enthalten sind
-        { return chip_count; }
+    { return chip_count; }
     int GetChipType(int index);         // Gibt den Chip Type für den Chip mit dem angegebenen Index zurück (siehe CRT Dokumentation für die möglichen Werte)
     uint16_t GetChipBankNumber(int index);  // Gibt die Bank Nummer für den Chip mit dem angegebenen Index zurück
     uint16_t GetChipLoadAddress(int index); // Gibt die Load Adresse für den Chip mit dem angegebenen Index zurück
     uint16_t GetChipRomSize(int index);     // Gibt die Größe der ROM Daten für den Chip mit dem angegebenen Index zurück
-    void CopyChipRomData(int index, uint8_t *destination);    // Kopiert die ROM Daten für den Chip mit dem angegebenen Index in den angegebenen Zielpuffer (Der Zielpuffer muss groß genug sein, um die ROM Daten aufzunehmen, siehe GetChipRomSize)
+    void CopyChipRomData(int index, uint8_t *destination, size_t offset); // Kopiert die ROM Daten für den Chip mit dem angegebenen Index in den angegebenen Zielpuffer (Der Zielpuffer muss groß genug sein, um die ROM Daten aufzunehmen, siehe GetChipRomSize)
 
 private:
     uint32_t SwapEndianness(uint32_t value);
+    void Cleanup();
 
     int error_code;
 

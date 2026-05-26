@@ -32,6 +32,12 @@ CartridgeWindow::CartridgeWindow(QWidget *parent, QSettings *_ini, C64Class *c64
     crt = c64->crt;
     this->tmp_path = tmp_path;
 
+    for(int i=0; i<128; i++)
+    {
+        crt_info.ChipInfo[i].BufferPointer = nullptr;
+    }
+    crt_info.ChipCount = 0;
+
     ui->setupUi(this);
 
     ui->ExportChip->setDisabled(true);
@@ -255,6 +261,17 @@ void CartridgeWindow::onSelectFile(QString filename)
 
     if(crt == nullptr) return;
 
+    // Cleanup vorheriger Daten
+    for(int i = 0; i<crt_info.ChipCount; i++)
+    {
+        if(crt_info.ChipInfo[i].BufferPointer != nullptr)
+        {
+            delete[] crt_info.ChipInfo[i].BufferPointer;
+            crt_info.ChipInfo[i].BufferPointer = nullptr;
+        }
+    }
+    crt_info.ChipCount = 0;
+
     FILE *file = qfopen(filename, "rb");
     if(file != nullptr)
     {
@@ -374,7 +391,10 @@ void CartridgeWindow::onSelectFile(QString filename)
             /* Kein ROM Image */
             break;
         }
+
+        fclose(file);
     }
+    else CRTIsSelected = false;
 }
 
 void CartridgeWindow::onChipList_currentChanged(const QModelIndex &current, const QModelIndex &)

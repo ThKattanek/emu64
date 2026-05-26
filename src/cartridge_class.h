@@ -19,8 +19,11 @@
 #include <cstdio>
 
 #include "./structs.h"
+#include "./crt_class.h"
 #include "./am29f040_class.h"
-#include "./mk7pla.h"
+
+#define RAED_OK 0
+#define READ_ERROR_FILE_CURRUPT 1
 
 class CartridgeClass
 {
@@ -31,11 +34,11 @@ public:
     // Funktionen
     bool *GetFlash040Dirty(uint16_t nr);
     uint8_t* GetFlash040Byte(uint16_t nr);
-	int LoadCartridgeImage(FILE *file);
+    int LoadCartridgeImage(FILE *file);
     void RemoveCartridgeImage();
-	int CreateNewEasyFlashImage(FILE *file, const char* crt_name);
-	int WriteEasyFlashImage(FILE *file, CARTRIDGE_INFO_STRUCT *cartridge_info);
-	int GetCartridgeInfo(FILE *file, CARTRIDGE_INFO_STRUCT *crt_info);
+    int CreateNewEasyFlashImage(FILE *file, const char* crt_name);
+    int WriteEasyFlashImage(FILE *file, CARTRIDGE_INFO_STRUCT *cartridge_info);
+    int GetCartridgeInfo(FILE *file, CARTRIDGE_INFO_STRUCT *crt_info);
     void SetEasyFlashJumper(bool enable);
     void Reset();
     void Freeze();
@@ -77,7 +80,7 @@ public:
     bool        led_01;                 // LED EF
     bool        led_01_old;
 
-    private:
+private:
     // Funktionen
     void ResetAllLEDS(void);
     void SetMemLogicAR(uint16_t address);
@@ -105,6 +108,8 @@ public:
     bool        ar_enable_ram;
     uint8_t     ar_ram[0x2000];             // 8KB
     uint8_t     pla_address;
+
+    CRTClass   *crt_image;
 };
 
 #endif // CARTRIDGE_CLASS_H

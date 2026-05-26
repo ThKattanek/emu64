@@ -13,21 +13,21 @@
 //////////////////////////////////////////////////
 
 #include "./cartridge_class.h"
-#include <cstring>
+#include "./mk7pla.h"
 
 static const char* TYPE_STRING[34] = { "Normal Cartridge","Action Replay","KCS Power Cartridge",
-                                "Final Cartridge III","Simons Basic","Ocean type 1 (128K and 256K)*",
-                                "Expert Cartridge","Fun Play","Super Games","Atomic Power",
-                                "Epyx Fastload","Westermann","Rex","Final Cartridge I",
-                                "Magic Formel","C64 Game System","Warpspeed","Dinamic","Zaxxon",
-                                "Magic Desk, Domark, HES Australia","Super Snapshot 5","COMAL 80",
-                                "Structured Basic","Ross","Dela EP64","Dela EP7x8","Dela EP256","Rex EP256",
-                                "Unbekannt", //28	Platzhalter
-                                "Unbekannt", //29	Platzhalter
-                                "Unbekannt", //30	Platzhalter
-                                "Unbekannt", //31 Platzhalter
-                                "EasyFlash Cartridge", //32
-                                "Unbekannt"};
+                                      "Final Cartridge III","Simons Basic","Ocean type 1 (128K and 256K)*",
+                                      "Expert Cartridge","Fun Play","Super Games","Atomic Power",
+                                      "Epyx Fastload","Westermann","Rex","Final Cartridge I",
+                                      "Magic Formel","C64 Game System","Warpspeed","Dinamic","Zaxxon",
+                                      "Magic Desk, Domark, HES Australia","Super Snapshot 5","COMAL 80",
+                                      "Structured Basic","Ross","Dela EP64","Dela EP7x8","Dela EP256","Rex EP256",
+                                      "Unbekannt", //28	Platzhalter
+                                      "Unbekannt", //29	Platzhalter
+                                      "Unbekannt", //30	Platzhalter
+                                      "Unbekannt", //31 Platzhalter
+                                      "EasyFlash Cartridge", //32
+                                      "Unbekannt"};
 
 CartridgeClass::CartridgeClass()
 {
@@ -147,99 +147,49 @@ uint8_t *CartridgeClass::GetFlash040Byte(uint16_t nr)
 
 int CartridgeClass::LoadCartridgeImage(FILE *file)
 {
-    char signature[17];
-    uint16_t version;
-    uint32_t header_lenght;
-    uint32_t akt_pos;
-    uint8_t exrom, game;
-    uint16_t chip_count;
-    uint16_t chip_address;
-    uint16_t chip_size;
-    size_t reading_bytes;
+    if(file == nullptr) return 0x01;
 
-	if(file == nullptr) return 0x01;
-
-    reading_bytes = fread(signature,1,16,file);
-
-    signature[16] = 0;
-
-    if(0!=strcmp("C64 CARTRIDGE   ",signature))
+    crt_image = new CRTClass(file);
+    int error = crt_image->GetErrorCode();
+    if(error != RAED_OK)
     {
-        fclose(file);
-        return 0x02;
+        delete crt_image;
+        crt_image = nullptr;
+        return error;
     }
 
-    reading_bytes = fread(&header_lenght,1,sizeof(header_lenght),file);
-    header_lenght = ConvertDWord(header_lenght);
+    cartridge_type = crt_image->GetCartridgeType();
 
-    reading_bytes = fread(&version,1,sizeof(version),file);
-
-    reading_bytes = fread(&cartridge_type,1,sizeof(cartridge_type),file);
-    cartridge_type = static_cast<uint16_t>(cartridge_type << 8) | (cartridge_type >> 8);
-
-    reading_bytes = fread(&exrom,1,sizeof(exrom),file);
-    reading_bytes = fread(&game,1,sizeof(game),file);
-
-    if(exrom == 0) cartridge_exrom = false;
+    if(crt_image->GetExrom() == 0) cartridge_exrom = false;
     else cartridge_exrom = true;
     *this->exrom = cartridge_exrom;
 
-    if(game == 0) cartridge_game = false;
+    if(crt_image->GetGame() == 0) cartridge_game = false;
     else cartridge_game = true;
     *this->game = cartridge_game;
 
-    fseek(file,0x0040,SEEK_SET);
-
-    akt_pos = 0x40;
-    chip_count = 0;
-    L1:
-    fseek(file,akt_pos,SEEK_SET);
-    reading_bytes = fread(signature,1,4,file);
-    if(4 > reading_bytes) goto L2;
-    signature[4] = 0;
-    if(0==strcmp("CHIP",signature))
+    for(int i=0; i<crt_image->GetChipCount(); ++i)
     {
-        if(chip_count == 128)
+        uint16_t chip_load_address = crt_image->GetChipLoadAddress(i);
+
+        switch (crt_image->GetChipType(i))
         {
-            //MessageBox(0,"Fehler 128 in CRT Modul","Emu64",0);
-            goto L2;
-        }
-        reading_bytes = fread(&header_lenght,1,sizeof(header_lenght),file);
-        header_lenght = ConvertDWord(header_lenght);
-        akt_pos += header_lenght;
-
-        fseek(file,2,SEEK_CUR);
-
-        uint16_t bank_pos;
-        reading_bytes = fread(&bank_pos,1,2,file);
-        bank_pos = static_cast<uint16_t>((bank_pos << 8) | (bank_pos >> 8));
-        bank_pos &= 0xFF;    // Maximal 256 Bänke je rom_bank1 + rom_bank2
-
-        reading_bytes = fread(&chip_address,1,2,file);
-        chip_address = static_cast<uint16_t>((chip_address << 8) | (chip_address >> 8));
-        reading_bytes = fread(&chip_size,1,2,file);
-        chip_size = static_cast<uint16_t>((chip_size << 8) | (chip_size >> 8));
-
-        switch(chip_address)
-        {
-        case 0x8000:
-            reading_bytes = fread(rom_bank1 + (bank_pos * 0x2000),1,0x2000,file);
-            if(chip_size == 0x4000)
+        case 0:    // 8KB ROM
+            if(chip_load_address == 0x8000)
             {
-                reading_bytes = fread(rom_bank2 + (bank_pos * 0x2000),1,0x2000,file);
+                crt_image->CopyChipRomData(i, rom_bank1 + (crt_image->GetChipBankNumber(i) * 0x2000), 0);
+                if(crt_image->GetChipRomSize(i) == 0x4000)
+                {
+                    crt_image->CopyChipRomData(i, rom_bank2 + (crt_image->GetChipBankNumber(i) * 0x2000), 0x2000);
+                }
+            }
+            else if(chip_load_address == 0xa000 || chip_load_address == 0xe000)
+            {
+                crt_image->CopyChipRomData(i, rom_bank2 + (crt_image->GetChipBankNumber(i) * 0x2000), 0);
             }
             break;
-        case 0xA000:
-            reading_bytes = fread(rom_bank2 + (bank_pos * 0x2000),1,0x2000,file);
-            break;
-        case 0xE000:
-            reading_bytes = fread(rom_bank2 + (bank_pos * 0x2000),1,0x2000,file);
-            break;
         }
-        chip_count ++;
-        goto L1;
     }
-    L2:
 
     lo_rom = rom_bank1;
     hi_rom = rom_bank2;
@@ -272,86 +222,86 @@ int CartridgeClass::CreateNewEasyFlashImage(FILE *file, const char* crt_name)
     uint16_t chip_typ;
     uint16_t chip_bank;
 
-	if (file == nullptr)
-		return 0x01;
+    if (file == nullptr)
+        return 0x01;
 
-	fwrite(signature,1,16,file);
+    fwrite(signature,1,16,file);
 
     /*****/ header_lenght = 0x40;
     header_lenght = ConvertDWord(header_lenght);
-	fwrite(&header_lenght,1,sizeof(header_lenght),file);
+    fwrite(&header_lenght,1,sizeof(header_lenght),file);
 
     /*****/ version = 0x0001;
-	fwrite(&version,1,sizeof(version),file);
+    fwrite(&version,1,sizeof(version),file);
 
     /*****/ cartridge_type = 32;
     cartridge_type = static_cast<uint16_t>((cartridge_type << 8) | (cartridge_type >> 8));
-	fwrite(&cartridge_type,1,sizeof(cartridge_type),file);
+    fwrite(&cartridge_type,1,sizeof(cartridge_type),file);
 
     /*****/ exrom = 1;
     /*****/ game = 0;
-	fwrite(&exrom,1,sizeof(exrom),file);
-	fwrite(&game,1,sizeof(game),file);
+    fwrite(&exrom,1,sizeof(exrom),file);
+    fwrite(&game,1,sizeof(game),file);
 
     /*****/ // 6 Byte Reserviert
-	fseek(file,0x0020,SEEK_SET);
+    fseek(file,0x0020,SEEK_SET);
 
     /*****/ // CRT Name
-	fwrite(crt_name,1,32,file);
+    fwrite(crt_name,1,32,file);
 
     for(int i=0;i<64;i++)
     {
-		fwrite(chip_signature,1,4,file);
+        fwrite(chip_signature,1,4,file);
         /*****/ header_lenght = 0x00002010;
         header_lenght = ConvertDWord(header_lenght);
-		fwrite(&header_lenght,1,sizeof(header_lenght),file);
+        fwrite(&header_lenght,1,sizeof(header_lenght),file);
 
         chip_typ = 2;
         chip_typ = static_cast<uint16_t>((chip_typ << 8) | (chip_typ >> 8));
-		fwrite(&chip_typ,1,sizeof(chip_typ),file);
+        fwrite(&chip_typ,1,sizeof(chip_typ),file);
 
         chip_bank = static_cast<uint16_t>(i);
         chip_bank = static_cast<uint16_t>((chip_bank << 8) | (chip_bank >> 8));
-		fwrite(&chip_bank,1,sizeof(chip_bank),file);
+        fwrite(&chip_bank,1,sizeof(chip_bank),file);
 
         chip_address = 0x8000;
         chip_address = static_cast<uint16_t>((chip_address << 8) | (chip_address >> 8));
-		fwrite(&chip_address,1,sizeof(chip_address),file);
+        fwrite(&chip_address,1,sizeof(chip_address),file);
 
         chip_size = 0x2000;
         chip_size = static_cast<uint16_t>((chip_size << 8) | (chip_size >> 8));
-		fwrite(&chip_size,1,sizeof(chip_size),file);
+        fwrite(&chip_size,1,sizeof(chip_size),file);
 
-		fseek(file,0x2000,SEEK_CUR);
+        fseek(file,0x2000,SEEK_CUR);
     }
 
     for(int i=0;i<64;i++)
     {
-		fwrite(chip_signature,1,4,file);
+        fwrite(chip_signature,1,4,file);
         /*****/ header_lenght = 0x00002010;
         header_lenght = ConvertDWord(header_lenght);
-		fwrite(&header_lenght,1,sizeof(header_lenght),file);
+        fwrite(&header_lenght,1,sizeof(header_lenght),file);
 
         chip_typ = 2;
         chip_typ = static_cast<uint16_t>((chip_typ << 8 | chip_typ >> 8));
-		fwrite(&chip_typ,1,sizeof(chip_typ),file);
+        fwrite(&chip_typ,1,sizeof(chip_typ),file);
 
         chip_bank = static_cast<uint16_t>(i);
         chip_bank = static_cast<uint16_t>((chip_bank << 8) | (chip_bank >> 8));
-		fwrite(&chip_bank,1,sizeof(chip_bank),file);
+        fwrite(&chip_bank,1,sizeof(chip_bank),file);
 
         chip_address = 0xA000;
         chip_address = static_cast<uint16_t>((chip_address << 8) | (chip_address >> 8));
-		fwrite(&chip_address,1,sizeof(chip_address),file);
+        fwrite(&chip_address,1,sizeof(chip_address),file);
 
         chip_size = 0x2000;
         chip_size = static_cast<uint16_t>((chip_size << 8) | (chip_size >> 8));
-		fwrite(&chip_size,1,sizeof(chip_size),file);
+        fwrite(&chip_size,1,sizeof(chip_size),file);
 
-		fseek(file,0x2000,SEEK_CUR);
+        fseek(file,0x2000,SEEK_CUR);
     }
 
-	fclose(file);
+    fclose(file);
 
     return 0;
 }
@@ -368,87 +318,87 @@ int CartridgeClass::WriteEasyFlashImage(FILE *file, CARTRIDGE_INFO_STRUCT *cartr
     uint16_t chip_typ;
     uint16_t chip_bank;
 
-	if (file == nullptr || cartridge_info == nullptr)
-		return 0x01;
+    if (file == nullptr || cartridge_info == nullptr)
+        return 0x01;
 
-	fwrite(signature,1,16,file);
+    fwrite(signature,1,16,file);
 
     /*****/ header_lenght = 0x40;
     header_lenght = ConvertDWord(header_lenght);
-	fwrite(&header_lenght,1,sizeof(header_lenght),file);
+    fwrite(&header_lenght,1,sizeof(header_lenght),file);
 
     /*****/ version = 0x0001;
-	fwrite(&version,1,sizeof(version),file);
+    fwrite(&version,1,sizeof(version),file);
 
     /*****/ cartridge_type = 32;
     cartridge_type = static_cast<uint16_t>((cartridge_type << 8) | (cartridge_type >> 8));
-	fwrite(&cartridge_type,1,sizeof(cartridge_type),file);
+    fwrite(&cartridge_type,1,sizeof(cartridge_type),file);
 
     /*****/ exrom = 1;
     /*****/ game = 0;
-	fwrite(&exrom,1,sizeof(exrom),file);
-	fwrite(&game,1,sizeof(game),file);
+    fwrite(&exrom,1,sizeof(exrom),file);
+    fwrite(&game,1,sizeof(game),file);
 
     /*****/ // 6 Byte Reserviert
-	fseek(file,0x0020,SEEK_SET);
+    fseek(file,0x0020,SEEK_SET);
 
     /*****/ // CRT Name
-	fwrite(cartridge_info->Name,1,32,file);
+    fwrite(cartridge_info->Name,1,32,file);
 
 
     for(int i=0;i<64;i++)
     {
-		fwrite(chip_signature,1,4,file);
+        fwrite(chip_signature,1,4,file);
         /*****/ header_lenght = 0x00002010;
         header_lenght = ConvertDWord(header_lenght);
-		fwrite(&header_lenght,1,sizeof(header_lenght),file);
+        fwrite(&header_lenght,1,sizeof(header_lenght),file);
 
         chip_typ = 2;
         chip_typ = static_cast<uint16_t>((chip_typ << 8) | (chip_typ >> 8));
-		fwrite(&chip_typ,1,sizeof(chip_typ),file);
+        fwrite(&chip_typ,1,sizeof(chip_typ),file);
 
         chip_bank = static_cast<uint16_t>(i);
         chip_bank = static_cast<uint16_t>((chip_bank << 8) | (chip_bank >> 8));
-		fwrite(&chip_bank,1,sizeof(chip_bank),file);
+        fwrite(&chip_bank,1,sizeof(chip_bank),file);
 
         chip_address = 0x8000;
         chip_address = static_cast<uint16_t>((chip_address << 8) | (chip_address >> 8));
-		fwrite(&chip_address,1,sizeof(chip_address),file);
+        fwrite(&chip_address,1,sizeof(chip_address),file);
 
         chip_size = 0x2000;
         chip_size = static_cast<uint16_t>((chip_size << 8) | (chip_size >> 8));
-		fwrite(&chip_size,1,sizeof(chip_size),file);
+        fwrite(&chip_size,1,sizeof(chip_size),file);
 
-		fwrite(&rom_bank1[i*0x2000],1,0x2000,file);
+        fwrite(&rom_bank1[i*0x2000],1,0x2000,file);
     }
 
     for(int i=0;i<64;i++)
     {
-		fwrite(chip_signature,1,4,file);
+        fwrite(chip_signature,1,4,file);
         /*****/ header_lenght = 0x00002010;
         header_lenght = ConvertDWord(header_lenght);
-		fwrite(&header_lenght,1,sizeof(header_lenght),file);
+        fwrite(&header_lenght,1,sizeof(header_lenght),file);
 
         chip_typ = 2;
         chip_typ = static_cast<uint16_t>((chip_typ << 8) | (chip_typ >> 8));
-		fwrite(&chip_typ,1,sizeof(chip_typ),file);
+        fwrite(&chip_typ,1,sizeof(chip_typ),file);
 
         chip_bank = static_cast<uint16_t>(i);
         chip_bank = static_cast<uint16_t>((chip_bank << 8) | (chip_bank >> 8));
-		fwrite(&chip_bank,1,sizeof(chip_bank),file);
+        fwrite(&chip_bank,1,sizeof(chip_bank),file);
 
         chip_address = 0xA000;
         chip_address = static_cast<uint16_t>((chip_address << 8) | (chip_address >> 8));
-		fwrite(&chip_address,1,sizeof(chip_address),file);
+        fwrite(&chip_address,1,sizeof(chip_address),file);
 
         chip_size = 0x2000;
         chip_size = static_cast<uint16_t>((chip_size << 8) | (chip_size >> 8));
-		fwrite(&chip_size,1,sizeof(chip_size),file);
+        fwrite(&chip_size,1,sizeof(chip_size),file);
 
-		fwrite(&rom_bank2[i*0x2000],1,0x2000,file);
+        fwrite(&rom_bank2[i*0x2000],1,0x2000,file);
     }
 
-	fclose(file);
+    fclose(file);
 
     return 0;
 }
@@ -460,106 +410,53 @@ void CartridgeClass::SetEasyFlashJumper(bool enable)
 
 int CartridgeClass::GetCartridgeInfo(FILE *file, CARTRIDGE_INFO_STRUCT* crt_info)
 {
-    char signature[17];
-    uint16_t version;
-    uint32_t header_lenght;
-    uint32_t akt_pos;
-    uint16_t tmp;
-    uint16_t Bank1Pos, Bank2Pos, Bank3Pos;
-    size_t reading_elements;
+    if(file == nullptr) return 0x01;
 
-	if (file == nullptr)
+    crt_image = new CRTClass(file);
+    int error = crt_image->GetErrorCode();
+    if(error != RAED_OK)
     {
-        return 0x01;
+        delete crt_image;
+        crt_image = nullptr;
+        return error;
     }
 
-	reading_elements = fread(signature,1,16,file);
-    if(reading_elements != 16)
-        return 0x01;
-
-    signature[16] = 0;
-
-    if(0!=strcmp("C64 CARTRIDGE   ",signature))
-    {
-		fclose(file);
-        return 0x02;
-    }
-
-	reading_elements = fread(&header_lenght,1,sizeof(header_lenght),file);
-    header_lenght = ConvertDWord(header_lenght);
-
-	reading_elements = fread(&version,1,sizeof(version),file);
-
-    sprintf(crt_info->Version,"%X.%2.2X",static_cast<uint8_t>(version), version>>8);
-
-	reading_elements = fread(&crt_info->HardwareType,1,sizeof(crt_info->HardwareType),file);
-    crt_info->HardwareType = static_cast<uint16_t>((crt_info->HardwareType << 8) | (crt_info->HardwareType >> 8));
+    sprintf(crt_info->Version,"%X.%2.2X",static_cast<uint8_t>(crt_image->GetImageVersion() >> 8), crt_image->GetImageVersion() & 0xff);
+    crt_info->HardwareType = crt_image->GetCartridgeType();
     if(crt_info->HardwareType > 32) crt_info->HardwareTypeString = const_cast<char*>(TYPE_STRING[33]);
     else crt_info->HardwareTypeString = const_cast<char*>(TYPE_STRING[crt_info->HardwareType]);
+    crt_info->EXROM = crt_image->GetExrom();
+    crt_info->GAME = crt_image->GetGame();
+    snprintf(crt_info->Name, sizeof(crt_info->Name), "%s", crt_image->GetCartridgeName());
+    //strncpy(crt_info->Name, crt_image->GetCartridgeName(), 32);
 
-	reading_elements = fread(&crt_info->EXROM,1,sizeof(crt_info->EXROM),file);
-	reading_elements = fread(&crt_info->GAME,1,sizeof(crt_info->GAME),file);
+    crt_info->ChipCount = crt_image->GetChipCount();
 
-	fseek(file,0x0020,SEEK_SET);
-	reading_elements = fread(crt_info->Name,1,32,file);
-
-    akt_pos = 0x40;
-    crt_info->ChipCount = 0;
-    Bank1Pos = Bank2Pos = Bank3Pos = 0;
-L1:
-	fseek(file,akt_pos,SEEK_SET);
-	if(4 > fread(signature,1,4,file)) goto L2;
-    signature[4] = 0;
-    if(0==strcmp("CHIP",signature))
+    for(int i=0; i<crt_info->ChipCount; ++i)
     {
-		reading_elements = fread(&header_lenght,1,sizeof(header_lenght),file);
-        header_lenght = ConvertDWord(header_lenght);
-
-		reading_elements = fread(&tmp,1,2,file);
-        tmp = static_cast<uint16_t>((tmp << 8) | (tmp >> 8));
-        crt_info->ChipInfo[crt_info->ChipCount].Type = tmp;
-		reading_elements = fread(&tmp,1,2,file);
-        tmp = static_cast<uint16_t>((tmp << 8) | (tmp >> 8));
-        crt_info->ChipInfo[crt_info->ChipCount].BankLocation = tmp;
-		reading_elements = fread(&tmp,1,2,file);
-        tmp = static_cast<uint16_t>((tmp << 8) | (tmp >> 8));
-        crt_info->ChipInfo[crt_info->ChipCount].LoadAdress = tmp;
-		reading_elements = fread(&tmp,1,2,file);
-        tmp = static_cast<uint16_t>((tmp << 8) | (tmp >> 8));
-        crt_info->ChipInfo[crt_info->ChipCount].ChipSize = tmp;
+        crt_info->ChipInfo[i].Type = crt_image->GetChipType(i);
+        crt_info->ChipInfo[i].BankLocation = crt_image->GetChipBankNumber(i);
+        crt_info->ChipInfo[i].LoadAdress = crt_image->GetChipLoadAddress(i);
+        crt_info->ChipInfo[i].ChipSize = crt_image->GetChipRomSize(i);
+        crt_info->ChipInfo[i].BufferPointer = new uint8_t[crt_info->ChipInfo[i].ChipSize];
 
         switch(crt_info->ChipInfo[crt_info->ChipCount].LoadAdress)
         {
         case 0x8000:
-			reading_elements = fread(rom_bank1_tmp + Bank1Pos,1,0x2000,file);
-            crt_info->ChipInfo[crt_info->ChipCount].BufferPointer = rom_bank1_tmp + Bank1Pos;
-            Bank1Pos += 0x2000;
-            if(tmp == 0x4000)
-            {
-				reading_elements = fread(rom_bank1_tmp + Bank1Pos,1,0x2000,file);
-                //crtinfo->ChipInfoHi[crtinfo->ChipCount].BufferPointer = rom_bank2_TMP + Bank2Pos;
-                Bank1Pos += 0x2000;
-            }
+            crt_image->CopyChipRomData(i, crt_info->ChipInfo[crt_info->ChipCount].BufferPointer, 0);
             break;
         case 0xA000:
-			reading_elements = fread(rom_bank2_tmp + Bank2Pos,1,0x2000,file);
-            crt_info->ChipInfo[crt_info->ChipCount].BufferPointer = rom_bank2_tmp + Bank2Pos;
-            Bank2Pos += 0x2000;
+            crt_image->CopyChipRomData(i, crt_info->ChipInfo[crt_info->ChipCount].BufferPointer, 0);
             break;
         case 0xE000:
-			reading_elements = fread(rom_bank2_tmp + Bank2Pos,1,0x2000,file);
-            crt_info->ChipInfo[crt_info->ChipCount].BufferPointer = rom_bank2_tmp + Bank2Pos;
-            Bank2Pos += 0x2000;
+            crt_image->CopyChipRomData(i, crt_info->ChipInfo[crt_info->ChipCount].BufferPointer, 0);
             break;
         }
 
-        crt_info->ChipCount ++;
-        akt_pos += header_lenght;
-        goto L1;
     }
-L2:
-		fclose(file);
-        return 0;
+
+    delete crt_image;
+    return 0;
 }
 
 void CartridgeClass::Reset()
@@ -606,18 +503,18 @@ void CartridgeClass::Freeze()
 
     switch(cartridge_type)
     {
-        case 1:
+    case 1:
         /// ActionReplay 4/5/6
-            ar_freez = true;
-            WriteIO1(0xDE00,0);
-            CpuTriggerInterrupt(CRT_IRQ);
-            CpuTriggerInterrupt(CRT_NMI);
-            break;
+        ar_freez = true;
+        WriteIO1(0xDE00,0);
+        CpuTriggerInterrupt(CRT_IRQ);
+        CpuTriggerInterrupt(CRT_NMI);
+        break;
 
-        /// Final Cartridge III
-        case 3:
-            WriteIO2(0xDFFF,16);
-            break;
+    /// Final Cartridge III
+    case 3:
+        WriteIO2(0xDFFF,16);
+        break;
     }
 }
 
@@ -639,21 +536,21 @@ void CartridgeClass::WriteIO1(uint16_t adresse, uint8_t value)
             switch(rom_lo_bank)
             {
             case 0x00:
-                    lo_rom = rom_bank1 + (0 * 0x2000);
-                    hi_rom = rom_bank1 + (0 * 0x2000);
-                    break;
+                lo_rom = rom_bank1 + (0 * 0x2000);
+                hi_rom = rom_bank1 + (0 * 0x2000);
+                break;
             case 0x01:
-                    lo_rom = rom_bank1 + (1 * 0x2000);
-                    hi_rom = rom_bank1 + (1 * 0x2000);
-                    break;
+                lo_rom = rom_bank1 + (1 * 0x2000);
+                hi_rom = rom_bank1 + (1 * 0x2000);
+                break;
             case 0x02:
-                    lo_rom = rom_bank1 + (2 * 0x2000);
-                    hi_rom = rom_bank1 + (2 * 0x2000);
-                    break;
+                lo_rom = rom_bank1 + (2 * 0x2000);
+                hi_rom = rom_bank1 + (2 * 0x2000);
+                break;
             case 0x03:
-                    lo_rom = rom_bank1 + (3 * 0x2000);
-                    hi_rom = rom_bank1 + (3 * 0x2000);
-                    break;
+                lo_rom = rom_bank1 + (3 * 0x2000);
+                hi_rom = rom_bank1 + (3 * 0x2000);
+                break;
             }
 
             ar_reg = value;
@@ -779,8 +676,8 @@ uint8_t CartridgeClass::ReadIO1(uint16_t address)
     case 4:
         if(address == 0xDE00)
         {
-                *game = true;
-                ChangeMemMapProc();
+            *game = true;
+            ChangeMemMapProc();
         }
         break;
     case 17:
@@ -853,14 +750,14 @@ uint8_t CartridgeClass::ReadIO2(uint16_t address)
     case 3:		// Final Cartridge III
         switch (rom_lo_bank)
         {
-            case 0:
-                return rom_bank1[address & 0x1fff];
-            case 1:
-                return rom_bank1[(address & 0x1fff) + 0x2000];
-            case 2:
-                return rom_bank1[(address & 0x1fff) + 0x4000];
-            case 3:
-                return rom_bank1[(address & 0x1fff) + 0x6000];
+        case 0:
+            return rom_bank1[address & 0x1fff];
+        case 1:
+            return rom_bank1[(address & 0x1fff) + 0x2000];
+        case 2:
+            return rom_bank1[(address & 0x1fff) + 0x4000];
+        case 3:
+            return rom_bank1[(address & 0x1fff) + 0x6000];
         }
         return 0;
 
