@@ -172,6 +172,11 @@ screenshot_number = 0;
 screenshot_dir = nullptr;
 screenshot_format = 0;
 
+texture_joy_arrow0_sdl = nullptr;
+texture_joy_arrow1_sdl = nullptr;
+texture_joy_button0_sdl = nullptr;
+texture_joy_button1_sdl = nullptr;
+
 video_capture = nullptr;
 
 /// SDL Installieren ///
@@ -1824,9 +1829,9 @@ void C64Class::InitGrafikForOpenGL()
 
     gl_context = SDL_GL_CreateContext(sdl_window);
     if(gl_context == nullptr)
-        LogText("\tInitGrafik: Fehler beim erstellen des GLContext.\n");
+        LogText("\tInitGrafik OpenGL: Fehler beim erstellen des GLContext.\n");
     else
-        LogText("\tInitGrafik: GLContext wurde erstellt.\n");
+        LogText("\tInitGrafik OpenGL: GLContext wurde erstellt.\n");
 
     glShadeModel(GL_SMOOTH);
     glEnable(GL_TEXTURE_2D);
@@ -1834,30 +1839,30 @@ void C64Class::InitGrafikForOpenGL()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glViewport(0,0,current_window_width,current_window_height);
-    LogText("\tInitGrafik: GLVieport wurde gesetzt.\n");
+    LogText("\tInitGrafik OpenGL: GLVieport wurde gesetzt.\n");
     glMatrixMode(GL_PROJECTION);
     glOrtho(0,current_window_width,current_window_height,0,-1,1);
-    LogText("\tInitGrafik: GLOrtho wurde gesetzt.\n");
+    LogText("\tInitGrafik OpenGL: GLOrtho wurde gesetzt.\n");
     glLoadIdentity();
 
     glGenTextures(1,&c64_screen_texture);
-    LogText("\tInitGrafik: C64 Screen Textur wurde generiert.\n");
+    LogText("\tInitGrafik OpenGL: C64 Screen Textur wurde generiert.\n");
 
     glBindTexture( GL_TEXTURE_2D, c64_screen_texture);
-    LogText("\tInitGrafik: C64 Screen Textur wurde gebunden.\n");
+    LogText("\tInitGrafik OpenGL: C64 Screen Textur wurde gebunden.\n");
 
     // Textur Stretching Parameter setzen
     if(enable_screen_filter)
     {
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-        LogText("\tInitGrafik: Screenfilter ist aktiviert.\n");
+        LogText("\tInitGrafik OpenGL: Screenfilter ist aktiviert.\n");
     }
     else
     {
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-        LogText("\tInitGrafik: Screenfilter ist deaktiviert.\n");
+        LogText("\tInitGrafik OpenGL: Screenfilter ist deaktiviert.\n");
     }
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -1866,21 +1871,21 @@ void C64Class::InitGrafikForOpenGL()
     if(c64_screen != nullptr)
     {
         SDL_FreeSurface(c64_screen);
-        LogText("\tInitGrafik: SDL Surface C64Screen wurde wieder freigegeben.\n");
+        LogText("\tInitGrafik OpenGL: SDL Surface C64Screen wurde wieder freigegeben.\n");
     }
 
     c64_screen = SDL_CreateRGBSurface(0, current_c64_screen_width, current_c64_screen_height, current_window_color_bits, 0, 0, 0, 0);
     if(c64_screen != nullptr)
-        LogText("\tInitGrafik: C64Screen - SDL RGB Surface wurde erstellt.\n");
+        LogText("\tInitGrafik OpenGL: C64Screen - SDL RGB Surface wurde erstellt.\n");
     else
-        LogText("\tInitGrafik: C64Screen - SDL RGB Surface konnte nicht erstellt werden.\n");
+        LogText("\tInitGrafik OpenGL: C64Screen - SDL RGB Surface konnte nicht erstellt werden.\n");
 
     glTexImage2D( GL_TEXTURE_2D, 0, 4, current_c64_screen_width, current_c64_screen_height, 0,GL_RGBA, GL_UNSIGNED_BYTE, c64_screen_buffer);
 
     if(glGetError() == GL_NO_ERROR)
-        LogText("\tInitGrafik: 2DTexturImage wurde aus C64ScreenBuffer erstellt.\n");
+        LogText("\tInitGrafik OpenGL: 2DTexturImage wurde aus C64ScreenBuffer erstellt.\n");
     else
-        LogText("\tInitGrafik: 2DTexturImage konnte nicht aus C64ScreenBuffer erstellt werden.\n");
+        LogText("\tInitGrafik OpenGL: 2DTexturImage konnte nicht aus C64ScreenBuffer erstellt werden.\n");
 
     GLenum  TextureFormat = 0;
     GLint   NofColors = 0;
@@ -1902,7 +1907,7 @@ void C64Class::InitGrafikForOpenGL()
     // Ich setze mal vorraus das alle 4 Images das selbe Format haben !! //
     if(img_joy_arrow0 != nullptr)
     {
-        LogText("\tInitGrafik: Textur ImgJoyArrow0 wird erstellt.\n");
+        LogText("\tInitGrafik OpenGL: Textur ImgJoyArrow0 wird erstellt.\n");
         glGenTextures(1,&texture_joy_arrow0);
         glBindTexture( GL_TEXTURE_2D, texture_joy_arrow0 );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -1913,14 +1918,14 @@ void C64Class::InitGrafikForOpenGL()
         gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, img_joy_arrow0->w, img_joy_arrow0->h,TextureFormat, GL_UNSIGNED_BYTE, img_joy_arrow0->pixels );
 
         if(glGetError() == GL_NO_ERROR)
-            LogText("\tInitGrafik: Textur konnte erstellt werden.\n");
+            LogText("\tInitGrafik OpenGL: Textur konnte erstellt werden.\n");
         else
-            LogText("\tInitGrafik: Textur konnte nicht erstellt werden.\n");
+            LogText("\tInitGrafik OpenGL: Textur konnte nicht erstellt werden.\n");
     }
 
     if(img_joy_arrow1 != nullptr)
     {
-        LogText("\tInitGrafik: Textur ImgJoyArrow1 wird erstellt.\n");
+        LogText("\tInitGrafik OpenGL: Textur ImgJoyArrow1 wird erstellt.\n");
         glGenTextures(1,&texture_joy_arrow1);
         glBindTexture( GL_TEXTURE_2D, texture_joy_arrow1 );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -1931,14 +1936,14 @@ void C64Class::InitGrafikForOpenGL()
         gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, img_joy_arrow1->w, img_joy_arrow1->h,TextureFormat, GL_UNSIGNED_BYTE, img_joy_arrow1->pixels );
 
         if(glGetError() == GL_NO_ERROR)
-            LogText("\tInitGrafik: Textur konnte erstellt werden.\n");
+            LogText("\tInitGrafik OpenGL: Textur konnte erstellt werden.\n");
         else
-            LogText("\tInitGrafik: Textur konnte nicht erstellt werden.\n");
+            LogText("\tInitGrafik OpenGL: Textur konnte nicht erstellt werden.\n");
     }
 
     if(img_joy_button0 != nullptr)
     {
-        LogText("\tInitGrafik: Textur ImgJoyButton0 wird erstellt.\n");
+        LogText("\tInitGrafik OpenGL: Textur ImgJoyButton0 wird erstellt.\n");
         glGenTextures(1,&texture_joy_button0);
         glBindTexture( GL_TEXTURE_2D, texture_joy_button0 );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -1949,14 +1954,14 @@ void C64Class::InitGrafikForOpenGL()
         gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, img_joy_button0->w, img_joy_button0->h,TextureFormat, GL_UNSIGNED_BYTE, img_joy_button0->pixels );
 
         if(glGetError() == GL_NO_ERROR)
-            LogText("\tInitGrafik: Textur konnte erstellt werden.\n");
+            LogText("\tInitGrafik OpenGL: Textur konnte erstellt werden.\n");
         else
-            LogText("\tInitGrafik: Textur konnte nicht erstellt werden.\n");
+            LogText("\tInitGrafik OpenGL: Textur konnte nicht erstellt werden.\n");
     }
 
     if(img_joy_button1 != nullptr)
     {
-        LogText("\tInitGrafik: Textur ImgJoyButton1 wird erstellt.\n");
+        LogText("\tInitGrafik OpenGL: Textur ImgJoyButton1 wird erstellt.\n");
         glGenTextures(1,&texture_joy_button1);
         glBindTexture( GL_TEXTURE_2D, texture_joy_button1 );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -1967,9 +1972,9 @@ void C64Class::InitGrafikForOpenGL()
         gluBuild2DMipmaps(GL_TEXTURE_2D, NofColors, img_joy_button1->w, img_joy_button1->h,TextureFormat, GL_UNSIGNED_BYTE, img_joy_button1->pixels );
 
         if(glGetError() == GL_NO_ERROR)
-            LogText("\tInitGrafik: Textur konnte erstellt werden.\n");
+            LogText("\tInitGrafik OpenGL: Textur konnte erstellt werden.\n");
         else
-            LogText("\tInitGrafik: Textur konnte nicht erstellt werden.\n");
+            LogText("\tInitGrafik OpenGL: Textur konnte nicht erstellt werden.\n");
     }
 
     // VSYNC
@@ -1978,31 +1983,54 @@ void C64Class::InitGrafikForOpenGL()
     else
         SDL_GL_SetSwapInterval(0);
 }
+
 void C64Class::InitGrafikForSDL()
 {
-    sdl_renderer = SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if(sdl_renderer == nullptr)
     {
-        LogText("\tInitGrafik: SDL Accelerated Renderer konnte nicht erstellt werden. Fallback auf Software Renderer.\n");
-        sdl_renderer = SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_SOFTWARE);
+        sdl_renderer = SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+        if(sdl_renderer == nullptr)
+        {
+            LogText("\tInitGrafik SDL: Accelerated Renderer konnte nicht erstellt werden. Fallback auf Software Renderer.\n");
+            sdl_renderer = SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_SOFTWARE);
+        }
+
+        SDL_RendererInfo info;
+        if (SDL_GetRendererInfo(sdl_renderer, &info) == 0) {
+            LogText("\tInitGrafik SDL: Aktiver SDL2-Treiber: ");
+            LogText(info.name);
+            LogText("\n");
+        } else {
+            LogText("\tInitGrafik SDL: Fehler beim Abrufen der Renderer-Infos.\n");
+        }
     }
 
     if(sdl_renderer == nullptr)
     {
-        LogText("\tInitGrafik: SDL Renderer konnte nicht erstellt werden.\n");
+        LogText("\tInitGrafik SDL: Renderer konnte nicht erstellt werden.\n");
     }
     else
     {
-        LogText("\tInitGrafik: SDL Renderer wurde erstellt.\n");
+        LogText("\tInitGrafik SDL: Renderer wurde erstellt.\n");
     }
 
-    c64_screen_texture_sdl = SDL_CreateTexture(
-        sdl_renderer,
-        SDL_PIXELFORMAT_ABGR8888,
-        SDL_TEXTUREACCESS_STREAMING,
-        current_c64_screen_width,
-        current_c64_screen_height
-        );
+    if(sdl_renderer != nullptr)
+        c64_screen_texture_sdl = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, current_c64_screen_width, current_c64_screen_height);
+
+    // Textur Stretching Parameter setzen
+    if(enable_screen_filter)
+    {
+        if(c64_screen_texture_sdl != nullptr)
+            SDL_SetTextureScaleMode(c64_screen_texture_sdl, SDL_ScaleModeLinear);
+
+        LogText("\tInitGrafik SDL: Screenfilter ist aktiviert.\n");
+    }
+    else
+    {
+        if(c64_screen_texture_sdl != nullptr)
+            SDL_SetTextureScaleMode(c64_screen_texture_sdl, SDL_ScaleModeNearest);
+        LogText("\tInitGrafik SDL: Screenfilter ist deaktiviert.\n");
+    }
 
     SDL_CreateRGBSurface(0, current_c64_screen_width, current_c64_screen_height, 32, 0, 0, 0, 0);
 
@@ -2016,6 +2044,32 @@ void C64Class::InitGrafikForSDL()
         0x000000ff,
         0xff000000
         );
+
+    if(img_joy_arrow0 != nullptr)
+        texture_joy_arrow0_sdl = SDL_CreateTextureFromSurface(sdl_renderer, img_joy_arrow0);
+
+    if(img_joy_arrow1 != nullptr)
+        texture_joy_arrow1_sdl = SDL_CreateTextureFromSurface(sdl_renderer, img_joy_arrow1);
+
+    if(img_joy_button0 != nullptr)
+        texture_joy_button0_sdl = SDL_CreateTextureFromSurface(sdl_renderer, img_joy_button0);
+
+    if(img_joy_button1 != nullptr)
+        texture_joy_button1_sdl = SDL_CreateTextureFromSurface(sdl_renderer, img_joy_button1);
+
+    SDL_SetTextureBlendMode(texture_joy_arrow0_sdl, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureBlendMode(texture_joy_arrow1_sdl, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureBlendMode(texture_joy_button0_sdl, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureBlendMode(texture_joy_button1_sdl, SDL_BLENDMODE_BLEND);
+
+    if(texture_joy_arrow0_sdl != nullptr)
+        SDL_SetTextureScaleMode(texture_joy_arrow0_sdl, SDL_ScaleModeNearest);
+    if(texture_joy_arrow1_sdl != nullptr)
+        SDL_SetTextureScaleMode(texture_joy_arrow1_sdl, SDL_ScaleModeNearest);
+    if(texture_joy_button0_sdl != nullptr)
+        SDL_SetTextureScaleMode(texture_joy_button0_sdl, SDL_ScaleModeNearest);
+    if(texture_joy_button1_sdl != nullptr)
+        SDL_SetTextureScaleMode(texture_joy_button1_sdl, SDL_ScaleModeNearest);
 }
 
 void C64Class::ChangeVSync()
@@ -2027,6 +2081,13 @@ void C64Class::ChangeVSync()
             SDL_GL_SetSwapInterval(1);
         else
             SDL_GL_SetSwapInterval(0);
+    }
+    else
+    {
+        if(enable_vsync)
+            SDL_RenderSetVSync(sdl_renderer, 1);
+        else
+            SDL_RenderSetVSync(sdl_renderer, 0);
     }
 }
 
@@ -2079,6 +2140,30 @@ void C64Class::ReleaseGrafik()
     {
         SDL_GL_DeleteContext(gl_context);
         gl_context = nullptr;
+    }
+
+    if(texture_joy_arrow0_sdl != nullptr)
+    {
+        SDL_DestroyTexture(texture_joy_arrow0_sdl);
+        texture_joy_arrow0_sdl = nullptr;
+    }
+
+    if(texture_joy_arrow1_sdl != nullptr)
+    {
+        SDL_DestroyTexture(texture_joy_arrow1_sdl);
+        texture_joy_arrow1_sdl = nullptr;
+    }
+
+    if(texture_joy_button0_sdl != nullptr)
+    {
+        SDL_DestroyTexture(texture_joy_button0_sdl);
+        texture_joy_button0_sdl = nullptr;
+    }
+
+    if(texture_joy_button1_sdl != nullptr)
+    {
+        SDL_DestroyTexture(texture_joy_button1_sdl);
+        texture_joy_button1_sdl = nullptr;
     }
 }
 
@@ -2152,82 +2237,84 @@ void C64Class::DrawC64ScreenWithOpenGL()
         SDL_UpdateWindowSurface(sdl_window);
     }
 
-    /// Pfeile für Joymapping darstenn
     if(rec_joy_mapping)
-    {
-        /// Nach Oben ///
-        if(rec_joy_mapping_pos == 0) glBindTexture(GL_TEXTURE_2D,texture_joy_arrow1);
-        else glBindTexture(GL_TEXTURE_2D,texture_joy_arrow0);
-        glBegin(GL_QUADS);
-        glTexCoord2i(1,0);
-        glVertex3f(0.3f,1.0f,0.0f);
-        glTexCoord2i(1,1);
-        glVertex3f(0.3f,0.1f,0.0f);
-        glTexCoord2i(0,1);
-        glVertex3f(-0.3f,0.1f,0.0f);
-        glTexCoord2i(0,0);
-        glVertex3f(-0.3f,1.0f,0.0f);
-        glEnd();
-
-        /// Nach Unten ///
-        if(rec_joy_mapping_pos == 1) glBindTexture(GL_TEXTURE_2D,texture_joy_arrow1);
-        else glBindTexture(GL_TEXTURE_2D,texture_joy_arrow0);
-        glBegin(GL_QUADS);
-        glTexCoord2i(1,0);
-        glVertex3f(0.3f,-1.0f,0.0f);
-        glTexCoord2i(1,1);
-        glVertex3f(0.3f,-0.1f,0.0f);
-        glTexCoord2i(0,1);
-        glVertex3f(-0.3f,-0.1f,0.0f);
-        glTexCoord2i(0,0);
-        glVertex3f(-0.3f,-1.0f,0.0f);
-        glEnd();
-
-        /// Nach Links ///
-        if(rec_joy_mapping_pos == 2) glBindTexture(GL_TEXTURE_2D,texture_joy_arrow1);
-        else glBindTexture(GL_TEXTURE_2D,texture_joy_arrow0);
-        glBegin(GL_QUADS);
-        glTexCoord2i(1,0);
-        glVertex3f(-0.75f,-0.4f,0.0f);
-        glTexCoord2i(1,1);
-        glVertex3f(-0.08f,-0.4f,0.0f);
-        glTexCoord2i(0,1);
-        glVertex3f(-0.08f,0.4f,0.0f);
-        glTexCoord2i(0,0);
-        glVertex3f(-0.75f,0.4f,0.0f);
-        glEnd();
-
-        /// Nach Rechts ///
-        if(rec_joy_mapping_pos == 3) glBindTexture(GL_TEXTURE_2D,texture_joy_arrow1);
-        else glBindTexture(GL_TEXTURE_2D,texture_joy_arrow0);
-        glBegin(GL_QUADS);
-        glTexCoord2i(1,0);
-        glVertex3f(0.75f,-0.4f,0.0f);
-        glTexCoord2i(1,1);
-        glVertex3f(0.08f,-0.4f,0.0f);
-        glTexCoord2i(0,1);
-        glVertex3f(0.08f,0.4f,0.0f);
-        glTexCoord2i(0,0);
-        glVertex3f(0.75f,0.4f,0.0f);
-        glEnd();
-
-        /// Fire ///
-        if(rec_joy_mapping_pos == 4) glBindTexture(GL_TEXTURE_2D,texture_joy_button1);
-        else glBindTexture(GL_TEXTURE_2D,texture_joy_button0);
-        glBegin(GL_QUADS);
-        glTexCoord2i(1,0);
-        glVertex3f(0.11f,-0.15f,0.0f);
-        glTexCoord2i(1,1);
-        glVertex3f(0.11f,0.15f,0.0f);
-        glTexCoord2i(0,1);
-        glVertex3f(-0.11f,0.15f,0.0f);
-        glTexCoord2i(0,0);
-        glVertex3f(-0.11f,-0.15f,0.0f);
-        glEnd();
-    }
+        DrawJoyMappingOverlayOpenGL();
 
     if(!use_sdl_renderer)
         SDL_GL_SwapWindow(sdl_window);
+}
+
+void C64Class::DrawJoyMappingOverlayOpenGL()
+{
+    /// Nach Oben ///
+    if(rec_joy_mapping_pos == 0) glBindTexture(GL_TEXTURE_2D,texture_joy_arrow1);
+    else glBindTexture(GL_TEXTURE_2D,texture_joy_arrow0);
+    glBegin(GL_QUADS);
+    glTexCoord2i(1,0);
+    glVertex3f(0.3f,1.0f,0.0f);
+    glTexCoord2i(1,1);
+    glVertex3f(0.3f,0.1f,0.0f);
+    glTexCoord2i(0,1);
+    glVertex3f(-0.3f,0.1f,0.0f);
+    glTexCoord2i(0,0);
+    glVertex3f(-0.3f,1.0f,0.0f);
+    glEnd();
+
+    /// Nach Unten ///
+    if(rec_joy_mapping_pos == 1) glBindTexture(GL_TEXTURE_2D,texture_joy_arrow1);
+    else glBindTexture(GL_TEXTURE_2D,texture_joy_arrow0);
+    glBegin(GL_QUADS);
+    glTexCoord2i(1,0);
+    glVertex3f(0.3f,-1.0f,0.0f);
+    glTexCoord2i(1,1);
+    glVertex3f(0.3f,-0.1f,0.0f);
+    glTexCoord2i(0,1);
+    glVertex3f(-0.3f,-0.1f,0.0f);
+    glTexCoord2i(0,0);
+    glVertex3f(-0.3f,-1.0f,0.0f);
+    glEnd();
+
+    /// Nach Links ///
+    if(rec_joy_mapping_pos == 2) glBindTexture(GL_TEXTURE_2D,texture_joy_arrow1);
+    else glBindTexture(GL_TEXTURE_2D,texture_joy_arrow0);
+    glBegin(GL_QUADS);
+    glTexCoord2i(1,0);
+    glVertex3f(-0.75f,-0.4f,0.0f);
+    glTexCoord2i(1,1);
+    glVertex3f(-0.08f,-0.4f,0.0f);
+    glTexCoord2i(0,1);
+    glVertex3f(-0.08f,0.4f,0.0f);
+    glTexCoord2i(0,0);
+    glVertex3f(-0.75f,0.4f,0.0f);
+    glEnd();
+
+    /// Nach Rechts ///
+    if(rec_joy_mapping_pos == 3) glBindTexture(GL_TEXTURE_2D,texture_joy_arrow1);
+    else glBindTexture(GL_TEXTURE_2D,texture_joy_arrow0);
+    glBegin(GL_QUADS);
+    glTexCoord2i(1,0);
+    glVertex3f(0.75f,-0.4f,0.0f);
+    glTexCoord2i(1,1);
+    glVertex3f(0.08f,-0.4f,0.0f);
+    glTexCoord2i(0,1);
+    glVertex3f(0.08f,0.4f,0.0f);
+    glTexCoord2i(0,0);
+    glVertex3f(0.75f,0.4f,0.0f);
+    glEnd();
+
+    /// Fire ///
+    if(rec_joy_mapping_pos == 4) glBindTexture(GL_TEXTURE_2D,texture_joy_button1);
+    else glBindTexture(GL_TEXTURE_2D,texture_joy_button0);
+    glBegin(GL_QUADS);
+    glTexCoord2i(1,0);
+    glVertex3f(0.11f,-0.15f,0.0f);
+    glTexCoord2i(1,1);
+    glVertex3f(0.11f,0.15f,0.0f);
+    glTexCoord2i(0,1);
+    glVertex3f(-0.11f,0.15f,0.0f);
+    glTexCoord2i(0,0);
+    glVertex3f(-0.11f,-0.15f,0.0f);
+    glEnd();
 }
 
 void C64Class::DrawC64ScreenWithSDL()
@@ -2235,7 +2322,13 @@ void C64Class::DrawC64ScreenWithSDL()
     if(sdl_renderer == nullptr || c64_screen_texture_sdl == nullptr || c64_screen == nullptr)
         return;
 
-    SDL_UpdateTexture(c64_screen_texture_sdl, nullptr, c64_screen->pixels, c64_screen->pitch);
+    if(SDL_UpdateTexture(c64_screen_texture_sdl, nullptr, c64_screen->pixels, c64_screen->pitch) != 0)
+    {
+        LogText("<< ERROR: SDL_UpdateTexture fehlgeschlagen.\n");
+        LogText("<< SDL_Error: ");
+        LogText(SDL_GetError());
+        LogText("\n");
+    }
 
     SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
     SDL_RenderClear(sdl_renderer);
@@ -2275,7 +2368,73 @@ void C64Class::DrawC64ScreenWithSDL()
     }
 
     SDL_RenderCopy(sdl_renderer, c64_screen_texture_sdl, nullptr, &dst);
+
+    if(rec_joy_mapping)
+        DrawJoyMappingOverlaySDL();
+
     SDL_RenderPresent(sdl_renderer);
+}
+
+void C64Class::DrawJoyMappingOverlaySDL()
+{
+    if(!rec_joy_mapping || sdl_renderer == nullptr)
+        return;
+
+    auto toScreenX = [this](float x) -> int
+    {
+        return static_cast<int>((x + 1.0f) * 0.5f * current_window_width);
+    };
+
+    auto toScreenY = [this](float y) -> int
+    {
+        return static_cast<int>((1.0f - (y + 1.0f) * 0.5f) * current_window_height);
+    };
+
+    auto drawTexRect = [this, &toScreenX, &toScreenY](SDL_Texture *tex, float x1, float y1, float x2, float y2, double angle)
+    {
+        if(tex == nullptr) return;
+
+        SDL_Rect dst;
+        dst.x = toScreenX(x1);
+        dst.y = toScreenY(y1);
+        dst.w = toScreenX(x2) - toScreenX(x1);
+        dst.h = toScreenY(y2) - toScreenY(y1);
+
+        if(dst.w < 0)
+        {
+            dst.x += dst.w;
+            dst.w = -dst.w;
+        }
+
+        if(dst.h < 0)
+        {
+            dst.y += dst.h;
+            dst.h = -dst.h;
+        }
+
+        SDL_RenderCopyEx(sdl_renderer, tex, nullptr, &dst, angle, nullptr, SDL_FLIP_NONE);
+    };
+
+    SDL_Texture *tex_up    = (rec_joy_mapping_pos == 0) ? texture_joy_arrow1_sdl  : texture_joy_arrow0_sdl;
+    SDL_Texture *tex_down  = (rec_joy_mapping_pos == 1) ? texture_joy_arrow1_sdl  : texture_joy_arrow0_sdl;
+    SDL_Texture *tex_left  = (rec_joy_mapping_pos == 2) ? texture_joy_arrow1_sdl  : texture_joy_arrow0_sdl;
+    SDL_Texture *tex_right = (rec_joy_mapping_pos == 3) ? texture_joy_arrow1_sdl  : texture_joy_arrow0_sdl;
+    SDL_Texture *tex_fire  = (rec_joy_mapping_pos == 4) ? texture_joy_button1_sdl : texture_joy_button0_sdl;
+
+    // Nach Oben
+    drawTexRect(tex_up,   -0.3f,  1.0f,  0.3f,  0.1f,   0.0);
+
+    // Nach Unten
+    drawTexRect(tex_down, -0.3f, -0.1f,  0.3f, -1.0f, 180.0);
+
+    // Nach Links
+    drawTexRect(tex_left, -0.75f,  0.4f, -0.08f, -0.4f, 270.0);
+
+    // Nach Rechts
+    drawTexRect(tex_right, 0.08f,  0.4f,  0.75f, -0.4f,  90.0);
+
+    // Fire
+    drawTexRect(tex_fire, -0.11f,  0.15f,  0.11f, -0.15f, 0.0);
 }
 
 void C64Class::SetFocusToC64Window()

@@ -323,6 +323,11 @@ public:
     GLuint          texture_joy_button0;
     GLuint          texture_joy_button1;
 
+    SDL_Texture     *texture_joy_arrow0_sdl;
+    SDL_Texture     *texture_joy_arrow1_sdl;
+    SDL_Texture     *texture_joy_button0_sdl;
+    SDL_Texture     *texture_joy_button1_sdl;
+
     bool            rec_joy_mapping;
     int             rec_joy_mapping_pos;          // 0-4 // Hoch - Runter - Links - Rechts - Feuer
     int             rec_joy_slot_nr;              // 0 - (MAX_VJOYS-1)
@@ -425,7 +430,9 @@ private:
     inline void InitGrafikForOpenGL();
     inline void InitGrafikForSDL();
     inline void DrawC64ScreenWithOpenGL();
+    inline void DrawJoyMappingOverlayOpenGL();
     inline void DrawC64ScreenWithSDL();
+    inline void DrawJoyMappingOverlaySDL();
     inline void NextSystemCycle();
     inline void ClearAllInterrupts();
     void CalcDistortionGrid();
