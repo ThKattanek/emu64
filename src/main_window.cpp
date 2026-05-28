@@ -1143,6 +1143,7 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             break;
         case CMD_USE_SDL_RENDERER:
             c64->use_sdl_renderer = true;
+            video_crt_setup_window->DisableVideoDistortion();
             break;
         }
 

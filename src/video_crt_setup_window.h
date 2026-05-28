@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 16.04.2023        		//
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -25,7 +24,7 @@
 #define MAX_DISTORTION 0.33f
 
 namespace Ui {
-    class VideoCrtSetupWindow;
+class VideoCrtSetupWindow;
 }
 
 class VideoCrtSetupWindow : public QDialog
@@ -37,6 +36,7 @@ public:
     ~VideoCrtSetupWindow();
     void RetranslateUi();
     void ResetAllSettings();
+    void DisableVideoDistortion();	// Die Einstellmöglichkeit im Setup Window wird verhindert (--use-sdl-renderer)
 
 private slots:
     void on_helligkeit_scroll_valueChanged(int value);
@@ -50,7 +50,7 @@ private slots:
     void on_FirstVicRevision_clicked(bool checked);
     void on_Reset_clicked();
 
-	void on_enable_user_palette_crt_mode_toggled(bool checked);
+    void on_enable_user_palette_crt_mode_toggled(bool checked);
 
     void on_pal_delayline_clicked(bool checked);
 
