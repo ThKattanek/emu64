@@ -1823,6 +1823,7 @@ void C64Class::InitGrafik()
 
 void C64Class::InitGrafikForOpenGL()
 {
+    LogText("\tInitGrafik OpenGL: Initialisiere OpenGL.\n");
     // OpenGL Initialisieren //
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
@@ -1986,6 +1987,7 @@ void C64Class::InitGrafikForOpenGL()
 
 void C64Class::InitGrafikForSDL()
 {
+    LogText("\tInitGrafik SDL: Initialisiere SDL Renderer.\n");
     if(sdl_renderer == nullptr)
     {
         sdl_renderer = SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
