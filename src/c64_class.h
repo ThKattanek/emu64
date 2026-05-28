@@ -266,10 +266,14 @@ public:
     float_t         screen_aspect_ratio;
     bool            enable_window_aspect_ratio;
     bool            enable_fullscreen_aspect_ratio;
+    bool            use_sdl_renderer;
 
     SDL_Window      *sdl_window;
     SDL_Surface     *sdl_window_icon;
     SDL_GLContext   gl_context;
+
+    SDL_Renderer    *sdl_renderer;
+    SDL_Texture     *c64_screen_texture_sdl;
 
     SDL_DisplayMode fullscreen_display_mode[MAX_VIDEO_DISPLAYS];
 
@@ -318,6 +322,11 @@ public:
     GLuint          texture_joy_arrow1;
     GLuint          texture_joy_button0;
     GLuint          texture_joy_button1;
+
+    SDL_Texture     *texture_joy_arrow0_sdl;
+    SDL_Texture     *texture_joy_arrow1_sdl;
+    SDL_Texture     *texture_joy_button0_sdl;
+    SDL_Texture     *texture_joy_button1_sdl;
 
     bool            rec_joy_mapping;
     int             rec_joy_mapping_pos;          // 0-4 // Hoch - Runter - Links - Rechts - Feuer
@@ -418,6 +427,12 @@ public:
     ReSIDWrapperClass *resid2;
 
 private:
+    inline void InitGrafikForOpenGL();
+    inline void InitGrafikForSDL();
+    inline void DrawC64ScreenWithOpenGL();
+    inline void DrawJoyMappingOverlayOpenGL();
+    inline void DrawC64ScreenWithSDL();
+    inline void DrawJoyMappingOverlaySDL();
     inline void NextSystemCycle();
     inline void ClearAllInterrupts();
     void CalcDistortionGrid();

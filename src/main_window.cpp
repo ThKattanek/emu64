@@ -1141,6 +1141,10 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             std::cout << "Video Record: " << cmd_line->GetArg(i+1) << std::endl;
             c64->StartVideoRecord(cmd_line->GetArg(i+1));
             break;
+        case CMD_USE_SDL_RENDERER:
+            c64->use_sdl_renderer = true;
+            video_crt_setup_window->DisableVideoDistortion();
+            break;
         }
 
         // ----------------------------------------------------

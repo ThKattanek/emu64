@@ -34,6 +34,10 @@ emu64 [PARAMETER]
 -R, --hard-reset
     Führt einen Hard Reset durch.
 
+--use-sdl-renderer
+    Emu64 wird mit SDL Renderer gestartet. Falls kein C64 Bild dargestellt wird.    
+    (z.B. In einer VM, dann könnte es helfen diesen Parameter zu verwenden.)
+
 --warp
     Aktiviert den WarpMode. (Maximum C64 Speed / kein Sound)
 

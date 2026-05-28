@@ -17,7 +17,7 @@
 
 // Defineren aller Kommandozeilen Parameter
 #include "command_line_class.h"
-enum CMD_COMMAND {CMD_HELP,CMD_VERSION,CMD_MULTIPLE_INSTANCE,CMD_NOSPLASH,CMD_MINIMIZED,CMD_SOFTRESET,CMD_HARDRESET,\
+enum CMD_COMMAND {CMD_HELP,CMD_VERSION,CMD_MULTIPLE_INSTANCE,CMD_NOSPLASH,CMD_MINIMIZED,CMD_SOFTRESET,CMD_HARDRESET,CMD_USE_SDL_RENDERER,\
                    CMD_MOUNT_DISK,CMD_MOUNT_CRT,CMD_UMOUNT_CRT,CMD_POKE_64,CMD_LIMITCYCLES,CMD_AUTOSTART,\
                    CMD_EXIT_SCREENSHOT,CMD_DEBUG_CART,CMD_WARP_MODE,CMD_RESET_INI,CMD_VIDEOCAPTURE,CMD_DATA_PATH,CMD_VIDEO_FILTER_OFF,CMD_SET_PALETTE,\
                    CMD_DOUBLE_TEXTURE_OFF, CMD_NOGUI, CMD_ENABLE_GEORAM, CMD_SET_GEORAM_SIZE, CMD_ENABLE_REU, CMD_SET_REU_SIZE, CMD_SET_SID_ENGINE, CMD_SET_SIDTYPE};
@@ -28,6 +28,7 @@ static const CMD_STRUCT command_list[]{
     {CMD_UMOUNT_CRT,"","umount-crt","Entfernt ein Modulimage aus dem Expansionsport. --umount-crt",0},
     {CMD_SOFTRESET,"r","soft-reset","Fuehrt einen Soft Reset durch.",0},
     {CMD_HARDRESET,"R","hard-reset","Fuehrt einen Hard Reset durch.",0},
+    {CMD_USE_SDL_RENDERER,"","use-sdl-renderer","Emu64 wird mit SDL Renderer gestartet. Falls kein C64 Bild dargestellt wird.\n\t\t\t\t(z.B. In einer VM, dann könnte es helfen diesen Parameter zu verwenden.)",0},
     {CMD_WARP_MODE,"","warp","Aktiviert den WarpMode. (Maximum C64 Speed / kein Sound)",0},
     {CMD_POKE_64,"","poke64","Schreibt ein Byte an eine C64 Adresse. --poke64 <Adresse (0-65535)> <Wert (0-255)>",2},
     {CMD_LIMITCYCLES,"","limitcycles","Beendet den Emulator nach n Zyklen mit Exitcode 1. --limitcycles <nZyklen>",1},
