@@ -266,10 +266,14 @@ public:
     float_t         screen_aspect_ratio;
     bool            enable_window_aspect_ratio;
     bool            enable_fullscreen_aspect_ratio;
+    bool            use_sdl_renderer;
 
     SDL_Window      *sdl_window;
     SDL_Surface     *sdl_window_icon;
     SDL_GLContext   gl_context;
+
+    SDL_Renderer    *sdl_renderer;
+    SDL_Texture     *c64_screen_texture_sdl;
 
     SDL_DisplayMode fullscreen_display_mode[MAX_VIDEO_DISPLAYS];
 
@@ -418,6 +422,10 @@ public:
     ReSIDWrapperClass *resid2;
 
 private:
+    inline void InitGrafikForOpenGL();
+    inline void InitGrafikForSDL();
+    inline void DrawC64ScreenWithOpenGL();
+    inline void DrawC64ScreenWithSDL();
     inline void NextSystemCycle();
     inline void ClearAllInterrupts();
     void CalcDistortionGrid();

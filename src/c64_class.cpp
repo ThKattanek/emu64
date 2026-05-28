@@ -150,6 +150,11 @@ if(!mutex1)
 
 sdl_window = nullptr;
 c64_screen = nullptr;
+sdl_renderer = nullptr;
+c64_screen_texture_sdl = nullptr;
+use_sdl_renderer = false;    // wenn "use_sdl_renderer" true ist, dann wird statt OpenGL Renderer der SDL Software Renderer, falls OpenGL nicht verfügbar ist, verwendet
+gl_context = nullptr;
+
 c64_screen_texture = 0;
 screen_aspect_ratio = SCREEN_RATIO_4_3;
 enable_window_aspect_ratio = true;
@@ -813,12 +818,20 @@ int SDLThread(void *userdat)
 
         if(c64->changed_window_size)
         {
-            c64->changed_window_size = false;
-            glViewport(0,0,c64->sdl_window_size_width, c64->sdl_window_size_height);
-            glMatrixMode(GL_PROJECTION);
-            glOrtho(0,c64->sdl_window_size_width, c64->sdl_window_size_height,0,-1,1);
-            glLoadIdentity();
-            SDL_SetWindowSize(c64->sdl_window, c64->sdl_window_size_width, c64->sdl_window_size_height);
+            if(!c64->use_sdl_renderer)
+            {
+                c64->changed_window_size = false;
+                glViewport(0,0,c64->sdl_window_size_width, c64->sdl_window_size_height);
+                glMatrixMode(GL_PROJECTION);
+                glOrtho(0,c64->sdl_window_size_width, c64->sdl_window_size_height,0,-1,1);
+                glLoadIdentity();
+                SDL_SetWindowSize(c64->sdl_window, c64->sdl_window_size_width, c64->sdl_window_size_height);
+            }
+            else
+            {
+                c64->changed_window_size = false;
+                SDL_SetWindowSize(c64->sdl_window, c64->sdl_window_size_width, c64->sdl_window_size_height);
+            }
         }
 
         /// Wird ausgeführt wenn Keine Thread Pause anliegt ///
@@ -1752,11 +1765,20 @@ void C64Class::InitGrafik()
     {
         LogText("\tInitGrafik: SDL_Window noch nicht vorhanden.\n");
 
-        // Wenn no-gui command
+
+        uint32_t window_flags;
+
         if(start_hidden_window)
-            sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_HIDDEN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+            // Fenster nicht Sichtbar
+            window_flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_RESIZABLE;
         else
-            sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,current_window_width,current_window_height,SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS |SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+            // Fenster Sichtbar
+            window_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_RESIZABLE;
+
+        if(!use_sdl_renderer) // OpenGL verwenden
+            window_flags |= SDL_WINDOW_OPENGL;
+
+        sdl_window = SDL_CreateWindow(sdl_window_name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, current_window_width, current_window_height, window_flags);
 
         if(sdl_window == nullptr)
             LogText("\tInitGrafik: Fehler beim erstellen des SDL_Window.\n");
@@ -1782,14 +1804,29 @@ void C64Class::InitGrafik()
     if(start_minimized && !start_hidden_window)
         SDL_MinimizeWindow(sdl_window);
 
+
+    if(!use_sdl_renderer)
+        InitGrafikForOpenGL();
+    else
+        InitGrafikForSDL();
+
+    /// VicRefresh wieder zulassen ///
+    enable_hold_vic_refresh = false;
+
+    LogText("\tInitGrafik: Vic-Refresh wurde wieder freigegeben.\n");
+}
+
+void C64Class::InitGrafikForOpenGL()
+{
+    // OpenGL Initialisieren //
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
+
     gl_context = SDL_GL_CreateContext(sdl_window);
     if(gl_context == nullptr)
         LogText("\tInitGrafik: Fehler beim erstellen des GLContext.\n");
     else
         LogText("\tInitGrafik: GLContext wurde erstellt.\n");
-
-    // OpenGL Initialisieren //
-    // SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,1);
 
     glShadeModel(GL_SMOOTH);
     glEnable(GL_TEXTURE_2D);
@@ -1863,7 +1900,6 @@ void C64Class::InitGrafik()
     }
 
     // Ich setze mal vorraus das alle 4 Images das selbe Format haben !! //
-
     if(img_joy_arrow0 != nullptr)
     {
         LogText("\tInitGrafik: Textur ImgJoyArrow0 wird erstellt.\n");
@@ -1941,20 +1977,57 @@ void C64Class::InitGrafik()
         SDL_GL_SetSwapInterval(1);
     else
         SDL_GL_SetSwapInterval(0);
+}
+void C64Class::InitGrafikForSDL()
+{
+    sdl_renderer = SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if(sdl_renderer == nullptr)
+    {
+        LogText("\tInitGrafik: SDL Accelerated Renderer konnte nicht erstellt werden. Fallback auf Software Renderer.\n");
+        sdl_renderer = SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_SOFTWARE);
+    }
 
-    /// VicRefresh wieder zulassen ///
-    enable_hold_vic_refresh = false;
+    if(sdl_renderer == nullptr)
+    {
+        LogText("\tInitGrafik: SDL Renderer konnte nicht erstellt werden.\n");
+    }
+    else
+    {
+        LogText("\tInitGrafik: SDL Renderer wurde erstellt.\n");
+    }
 
-    LogText("\tInitGrafik: Vic-Refresh wurde wieder freigegeben.\n");
+    c64_screen_texture_sdl = SDL_CreateTexture(
+        sdl_renderer,
+        SDL_PIXELFORMAT_ABGR8888,
+        SDL_TEXTUREACCESS_STREAMING,
+        current_c64_screen_width,
+        current_c64_screen_height
+        );
+
+    SDL_CreateRGBSurface(0, current_c64_screen_width, current_c64_screen_height, 32, 0, 0, 0, 0);
+
+    c64_screen = SDL_CreateRGBSurface(
+        0,
+        current_c64_screen_width,
+        current_c64_screen_height,
+        32,
+        0x00ff0000,
+        0x0000ff00,
+        0x000000ff,
+        0xff000000
+        );
 }
 
 void C64Class::ChangeVSync()
 {
     // VSYNC
-    if(enable_vsync)
-        SDL_GL_SetSwapInterval(1);
-    else
-        SDL_GL_SetSwapInterval(0);
+    if(!use_sdl_renderer)
+    {
+        if(enable_vsync)
+            SDL_GL_SetSwapInterval(1);
+        else
+            SDL_GL_SetSwapInterval(0);
+    }
 }
 
 void C64Class::ReleaseGrafik()
@@ -1989,9 +2062,35 @@ void C64Class::ReleaseGrafik()
         delete[] c64_screen_buffer;
         c64_screen_buffer = nullptr;
     }
+
+    if(c64_screen_texture_sdl != nullptr)
+    {
+        SDL_DestroyTexture(c64_screen_texture_sdl);
+        c64_screen_texture_sdl = nullptr;
+    }
+
+    if(sdl_renderer != nullptr)
+    {
+        SDL_DestroyRenderer(sdl_renderer);
+        sdl_renderer = nullptr;
+    }
+
+    if(gl_context != nullptr)
+    {
+        SDL_GL_DeleteContext(gl_context);
+        gl_context = nullptr;
+    }
 }
 
 void C64Class::DrawC64Screen()
+{
+    if(use_sdl_renderer)
+        DrawC64ScreenWithSDL();
+    else
+        DrawC64ScreenWithOpenGL();
+}
+
+void C64Class::DrawC64ScreenWithOpenGL()
 {
     /// Fensterinhalt löschen
     glClearColor(0.0f, 0.0f, 0.0f, 1.f);
@@ -2043,6 +2142,15 @@ void C64Class::DrawC64Screen()
         glVertex3f(distortion_grid[i+3].x*scale_x,distortion_grid[i+3].y*scale_y,0.0);
     }
     glEnd();
+
+    // Für den Fall das OpenGL nicht funktioniert, einfach mal die SDL Oberfläche benutzen (wird aber nicht skaliert oder gefiltert dargestellt)
+    if(use_sdl_renderer)
+    {
+        SDL_Surface *window_surface = SDL_GetWindowSurface(sdl_window);
+        SwapRBSurface(c64_screen);
+        SDL_BlitScaled(c64_screen, nullptr, window_surface, nullptr);
+        SDL_UpdateWindowSurface(sdl_window);
+    }
 
     /// Pfeile für Joymapping darstenn
     if(rec_joy_mapping)
@@ -2118,7 +2226,56 @@ void C64Class::DrawC64Screen()
         glEnd();
     }
 
-    SDL_GL_SwapWindow(sdl_window);
+    if(!use_sdl_renderer)
+        SDL_GL_SwapWindow(sdl_window);
+}
+
+void C64Class::DrawC64ScreenWithSDL()
+{
+    if(sdl_renderer == nullptr || c64_screen_texture_sdl == nullptr || c64_screen == nullptr)
+        return;
+
+    SDL_UpdateTexture(c64_screen_texture_sdl, nullptr, c64_screen->pixels, c64_screen->pitch);
+
+    SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
+    SDL_RenderClear(sdl_renderer);
+
+    SDL_Rect dst;
+    dst.x = 0;
+    dst.y = 0;
+    dst.w = current_window_width;
+    dst.h = current_window_height;
+
+    if((enable_window_aspect_ratio == false && enable_fullscreen == false) ||
+        (enable_fullscreen_aspect_ratio == false && enable_fullscreen == true))
+    {
+        dst.x = 0;
+        dst.y = 0;
+        dst.w = current_window_width;
+        dst.h = current_window_height;
+    }
+    else
+    {
+        float_t dst_ratio = static_cast<float_t>(current_window_width) / static_cast<float_t>(current_window_height);
+
+        if(dst_ratio >= screen_aspect_ratio)
+        {
+            dst.h = current_window_height;
+            dst.w = static_cast<int>(current_window_height * screen_aspect_ratio);
+            dst.x = (current_window_width - dst.w) / 2;
+            dst.y = 0;
+        }
+        else
+        {
+            dst.w = current_window_width;
+            dst.h = static_cast<int>(current_window_width / screen_aspect_ratio);
+            dst.x = 0;
+            dst.y = (current_window_height - dst.h) / 2;
+        }
+    }
+
+    SDL_RenderCopy(sdl_renderer, c64_screen_texture_sdl, nullptr, &dst);
+    SDL_RenderPresent(sdl_renderer);
 }
 
 void C64Class::SetFocusToC64Window()
@@ -2162,10 +2319,13 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             current_window_width = static_cast<uint16_t>(event->window.data1);
             current_window_height = static_cast<uint16_t>(event->window.data2);
 
-            glViewport(0,0,current_window_width,current_window_height);
-            glMatrixMode(GL_PROJECTION);
-            glOrtho(0,current_window_width,current_window_height,0,-1,1);
-            glLoadIdentity();
+            if(!use_sdl_renderer)
+            {
+                glViewport(0,0,current_window_width,current_window_height);
+                glMatrixMode(GL_PROJECTION);
+                glOrtho(0,current_window_width,current_window_height,0,-1,1);
+                glLoadIdentity();
+            }
             break;
 
         default:
