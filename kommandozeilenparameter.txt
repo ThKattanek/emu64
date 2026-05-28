@@ -34,6 +34,9 @@ emu64 [PARAMETER]
 -R, --hard-reset
     Führt einen Hard Reset durch.
 
+--no-opengl
+    Emu64 wird ohne OpenGL Unterstützung gestartet, es wird statt dessen der SDL Renderer verwendet.
+
 --warp
     Aktiviert den WarpMode. (Maximum C64 Speed / kein Sound)
 
