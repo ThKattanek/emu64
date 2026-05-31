@@ -45,9 +45,6 @@ MOS6510::MOS6510(void)
     irq_is_low_pegel = false;
     irq_is_active = false;
 
-    irq_delay = false;
-    irq_delay_sr_value = 0;
-
     nmi_state = false;
     nmi_state_old = false;
     nmi_fall_edge = false;
@@ -431,28 +428,24 @@ bool MOS6510::OneZyklus(void)
 
             CHK_RDY
 
-                if(nmi_is_active == true) // NMIStatePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der NMI schon angelegen haben also vor dem letzten Zyklus des vorigen Befehls
+                if(nmi_is_active == true)
             {
                 nmi_is_active = false;
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x102*MCTItemSize));
                 AktOpcode = 0x102;
 
-                irq_delay = false;
                 return false;
             }
             else
             {
-                if((irq_is_active == true) && (irq_delay ? ((irq_delay_sr_value&4)==0) : ((SR&4)==0))) // IRQLinePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der IRQ schon anliegen also vor dem letzten Zyklus des vorigen Befehls
+                if((irq_is_active == true) && ((SR & 4)==0))
                 {
                     MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
                     AktOpcode = 0x101;
 
-                    irq_delay = false;
                     return false;
                 }
             }
-
-            irq_delay = false;
 
             MCT = ((unsigned char*)MicroCodeTable6510 + (Read(PC)*MCTItemSize));
             AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
@@ -1075,9 +1068,7 @@ bool MOS6510::OneZyklus(void)
         case 71:
             CHK_RDY
                 TMPByte = Read(PC);
-            irq_delay_sr_value = SR;
             SR &= 0xFB;
-            irq_delay = true;
             break;
         //R // TMPByte von Adresse lesen // OverflowFalg=0
         case 72:
@@ -1101,9 +1092,7 @@ bool MOS6510::OneZyklus(void)
         case 75:
             CHK_RDY
                 TMPByte = Read(PC);
-            irq_delay_sr_value = SR;
             SR |= 0x04;
-            irq_delay = true;
             break;
         //R // TMPByte von Adresse lesen // BIT Operation
         case 76:

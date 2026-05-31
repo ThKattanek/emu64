@@ -4637,9 +4637,6 @@ void C64Class::NextSystemCycle()
     }
     floppy_iec_wire = ~floppy_iec_wire;
 
-    // PHI0
-    if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
-    cpu_states[0] = cpu->OneZyklus();
 
     // PHI1
     vic->OneCycle();
@@ -4660,7 +4657,12 @@ void C64Class::NextSystemCycle()
     }
     reu->OneZyklus();
     tape->OneCycle();
+
     cpu->Phi1();
+    // PHI0
+    if(enable_ext_wires) rdy_ba_wire = ext_rdy_wire;
+    cpu_states[0] = cpu->OneZyklus();
+
 }
 
 void C64Class::ClearAllInterrupts()
