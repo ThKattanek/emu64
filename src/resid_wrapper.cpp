@@ -245,7 +245,7 @@ bool ReSIDWrapperClass::OneCycle()
                 sound_buffer_v1[sound_buffer_pos] = sid->voice[1].output();
                 sound_buffer_v2[sound_buffer_pos] = sid->voice[2].output();
 
-                int output = sid->output() << 1;
+                int output = sid->output() << 2;
 
                 // Clipping, damit es nicht zu Übersteuer
                 if(output > 32767) output = 32767;
