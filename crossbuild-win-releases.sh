@@ -8,7 +8,6 @@
 # // Dieser Sourcecode ist Copyright geschützt!   //
 # // Geistiges Eigentum von Th.Kattanek           //
 # //                                              //
-# // Letzte Änderung am 15.03.2026                //
 # // www.emu64-projekt.de                         //
 # //                                              //
 # //////////////////////////////////////////////////
@@ -56,11 +55,11 @@ fi
 cd public_release
 
 # check of qmake for static i686 and x86_64
-declare i686_qmake=$mxe_path/usr/i686-w64-mingw32.static/qt5/bin/qmake
-# declare i686_qmake=$mxe_path/usr/i686-w64-mingw32.static/qt6/bin/qmake
+# declare i686_qmake=$mxe_path/usr/i686-w64-mingw32.static/qt5/bin/qmake
+declare i686_qmake=$mxe_path/usr/i686-w64-mingw32.static/qt6/bin/qmake
 declare i686_libpath=$mxe_path/usr/i686-w64-mingw32.static/lib
-declare x86_64_qmake=$mxe_path/usr/x86_64-w64-mingw32.static/qt5/bin/qmake
-# declare x86_64_qmake=$mxe_path/usr/x86_64-w64-mingw32.static/qt6/bin/qmake
+# declare x86_64_qmake=$mxe_path/usr/x86_64-w64-mingw32.static/qt5/bin/qmake
+declare x86_64_qmake=$mxe_path/usr/x86_64-w64-mingw32.static/qt6/bin/qmake
 declare x86_64_libpath=$mxe_path/usr/x86_64-w64-mingw32.static/lib
 
 if [ ! -e $i686_cmake ]; then
@@ -165,7 +164,7 @@ if [ $x86_64_ok ] && [ $x64 = true ]; then
     # compile ts files
     lrelease ../src/src.pro
 
-    # Alle PKG_CONFIG Pfade auf MXE umbiegen (hier für i686)
+    # Alle PKG_CONFIG Pfade auf MXE umbiegen (hier für x86-64)
     export PKG_CONFIG="$mxe_path/usr/bin/x86_64-w64-mingw32.static-pkg-config"
     export PKG_CONFIG_LIBDIR="$mxe_path/usr/x86_64-w64-mingw32.static/lib/pkgconfig:$mxe_path/usr/x86_64-w64-mingw32.static/share/pkgconfig"
     export PKG_CONFIG_PATH="$PKG_CONFIG_LIBDIR"
