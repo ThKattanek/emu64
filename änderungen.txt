@@ -1,3 +1,54 @@
+5.2.0
+------
+
+- NEW! [#224] Es kann nun die Größe der GeoRam eingestelltt werden. Es gibt 4 verschiedene Größen 512KB, 1MB, 2MB und 4MB
+- NEW! [#224] Neuer Kommandozeilenparameter "--set-georam-size" Setzt die Größe des GEORAM Speichers in KiB (512, 1024, 2048, 4096)
+- NEW! Es kann nun ein der Inhalt eines Chip Roms aus einem C64 Cartridge ausgelesen und als Binärdatei gespeichert werden
+- NEW! [#225] Es kann nun die Größe der REU eingestellt werden. Es kann zwischen 128KB, 256KB, 512KB, 1MB, 2MB, 4MB, 8MB und 16MB gewählt werden.
+- NEW! [#225] Neuer Kommandozeilenparameter "--set-reu-size" Setzt die Größe des REU Speichers in KiB (128, 256, 512, 1024, 2048, 4096, 8192, 16384).
+- NEW! reSID wurde jetzt zum Emu64 hinzugefügt. Es kann zwischen Emu64 SID und reSID gewählt werden. ReSID bietet eine genauere Emulation, aber auch mehr CPU Last.
+- NEW! DigiBoost nun für SID MOS-8580 einstellbar. Emu64 SID und reSID
+- NEW! Größe des Soundbuffer kann nun in den Einstellungen angepasst werden. Ein Neustart des Emu64 ist dafür notwendig.
+- NEW! Neuer Kommandozeilenparameter "--set-sid-engine" Setzt die SID Emulations Engine. Es kann zwischen "emu64" und "resid" gewählt werden (0=Emu64 1=reSID).
+- NEW! Nun kann bei einem T64, welches mehrere Dateien enthält, ausgewählt werden welche Datei gestartet werden soll. Es wird ein neues Fenster geöffnet in dem die enthaltenen Dateien angezeigt werden.
+- NEW! TAP Files wurden nun in den Autostart mit aufgenommen. Es können nun auch TAP Files automatisch gestartet werden.
+- NEW! Es kann nun beim Start von Emu64 ein alternativer Renderer ausgewählt werden. Nötig damit Emu64 auch in einer VM unter VBox laufen kann. C64 Screen war immer nur schwarz.
+- NEW! [#295] Neuer Kommandozeilenparameter "--use-sdl-renderer" Es kann jetzt der SDL2 renderer damit aktiviert werden. Man sollte ihn nur benutzen wenn es Probleme mit der Darstellung gibt.
+- [#233] Fixed: Es konnten dem Linux AppImage keine Kommandos übergeben werden. Das wurde behoben.
+- [#258] Fixed: Im Debugger / Disassembler wurde die Branch Target Adresse falsch berechnet.
+- [#252] Fixed: Das Kommando "--debugcart" hat nicht richtig funktioniert. Sollte jetzt laufen so wie es soll.
+- [#271] Fixed: Es gab ein Problem beim exportieren einer PRG Datei aus einem D64 Image. Es konnte in einer Endlosschleife enden, und die Datei wurde unendlich groß. :) Das Problem wurde behoben.
+- [#294] Fixed: Es kam zum Absturz, wenn das Userpaletten Fenster zweimal geöffnet wurde. Sollte jetzt behoben sein.
+- [#207] Fixed: Beim Autostart von diversen C64 Dateien (D64. CRT, TAP) wurden die entsprechenden Fenster nicht richtig aktualisiert. Das sollte jetzt behoben sein.
+- Fixed: Es kam zu sporadische Abstürze wenn "--debugcart" benutzt wurde. Das sollte jetzt auch behoben sein.
+- Fixed: Beim hin und her schalten zwischen Warp Modus und Normalmodus kam es ab und zu, zu abstürzen. Das sollte jetzt behoben sein.
+- Fixed: "--limitcycles" im zusammenhang mit "--autostart" hat nicht richtig funktioniert. Es wurde nicht automatisch beendet. Das sollte jetzt behoben sein.
+- FileBrowser überarbeitet, damit bei nutzung der Cursor Tasten auch information aktuallisiert werden und nicht nur beim anklicken. z.B. im Floppy Fenster oder Cartgridge Fenster.
+- Fixed: Behebung eines Problems bei der Videoaufnahme. Sollte wieder funktionieren.
+- Fixed: Behebung der „connectSlotsByName“-Warnungen in Qt6: Umbenennen von Slots und Hinzufügen expliziter Verbindungen
+- Fixed: Qt6 --nogui --limitcycles wird nicht beendet – rufe nun QCoreApplication::quit() explizit auf, statt nur close().
+- Fixed: korrektur des Break Flags in der 6502 und 6510 Emulation
+- Fixed: Es wurde nicht richtig in ein TAP Iamge abgespeichert. Jetzt funktioniert es wieder richtig.
+- Fixed: Gelegentlich kam es zu einem Absturz, wenn zwischen CRT Images im Cartgridge Fenster gewechselt wurde. Sollte nicht mehr passieren.
+- Fix in AM29F040Class
+- FloppyEmulation: Änderung von Byteweisen Zugriff jetzt Bitweise auf die GCR Daten. Damit wird die Emulation genauer und es werden die Sync Stellen besser erkannt.
+- REU: LoadRAM wurde überarbeitet, damit auch RAM Größen von 512KB, 1MB, 2MB und 4MB unterstützt werden können.
+
+- crossbuild-win-releases.sh angepasst
+- create_linux_appimage.sh angepasst / Benötigt jetzt auch die angabe des Qt Root Verzeichnisses. Bsp.: "create_linux_appimage.sh --qt /usr/lib/qt6"
+- einiges an Speicherlecks mit Valgrind und AddressSanitizer behoben. Emu64 sollte nun stabiler laufen und auch sauberer beenden.
+- strcpy wurde überall durch snprintf ersetzt, damit sollten jetzt auch keine Buffer Overflows mehr möglich sein.
+- <fstream> durch <csdio> ersetzt
+- QFontDatabase angepasst, auf neue Variante
+- viele "deprecated" Warnungen von ffmpeg besetigt, damit sollte Emu64 nun auch mit ffmpeg 6.x und größer compilieren und laufen.
+- und viele kleinere Bugfixes und Compiler Warnungen behoben
+
+From Felix Palmen (Zirias)
+--------------------------
+- Add a CI build with gcc and clang
+- Fixed quazip dependency for FreeBSD
+- code cleaning
+
 5.1.0
 ------
 
