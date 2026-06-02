@@ -116,7 +116,6 @@ equals(QT_MAJOR_VERSION, 5) {
 }
 
 equals(QT_MAJOR_VERSION, 6) {
-
     message("QT6 is active")
 
     # Use PKG_CONFIG from environment for cross builds, fallback to pkg-config
@@ -126,30 +125,21 @@ equals(QT_MAJOR_VERSION, 6) {
     }
 
     system($$PKG_CONFIG_BIN --exists quazip1-qt6) {
+        message("Quazip1-qt6 (pkg-config name: quazip1-qt6) found")
         PKGCONFIG += quazip1-qt6
         DEFINES += ZIP_SUPPORT
-    } else:system($$PKG_CONFIG_BIN --exists quazip) {
-
-        # Achtung: Wenn quazip1-qt5 installiert ist und quazip1-qt6 nicht, dann wird hier trotzdem quazip gefunden als Version5 und eingebunden.
-        # Unter Kubuntu 25.10
-        # pkg-config quazip1-qt5 --libs  --> -lquazip1-qt5 -lz -lQt5Core
-        # pkg-config quazip --libs  --> -lquazip5 -lQt5Core
-
-        # wenn beides installiert ist, quazip1-qt5 und quazip1-qt6
-        # Unter Kubuntu 25.10
-        # pkg-config quazip1-qt5 --libs  --> -lquazip1-qt5 -lz -lQt5Core
-        # pkg-config quazip --libs  --> -lquazip5 -lQt5Core
-        # pkg-config quazip1-qt6 --libs  --> -lquazip1-qt6 -lz -lQt6Core
-
-        # Also nach quazip zu suchen für qt6 ist nicht optimal, da es wahrscheinlich eher die qt5 Version findet, wenn nur qt5 oder beide installiert sind.
-
-        #message("Quazip (pkg-config name: quazip) found")
-        #PKGCONFIG += quazip
-        #DEFINES += ZIP_SUPPORT
-        #QUAZIPINC = $$system($$PKG_CONFIG_BIN --variable=includedir quazip)
-        #INCLUDEPATH += $${QUAZIPINC}/quazip5 $${QUAZIPINC}/quazip
     } else {
-        message("Quazip not found! No ZIP support will be available.")
+        # fallback for cross builds without usable Qt6 pkg-config support, e.g. MXE
+        QUAZIP_ROOT = /home/thorsten/mxe/usr/x86_64-w64-mingw32.static
+        exists($$QUAZIP_ROOT/lib/libquazip1-qt6.a) {
+            message("QuaZip Qt6 found via MXE fallback")
+            DEFINES += ZIP_SUPPORT
+            DEFINES += QUAZIP_STATIC
+            INCLUDEPATH += $$QUAZIP_ROOT/include/QuaZip-Qt6-1.7.1/quazip
+            LIBS += -L$$QUAZIP_ROOT/lib -lquazip1-qt6
+        } else {
+            message("QuaZip Qt6 not found! No ZIP support will be available.")
+        }
     }
 }
 
