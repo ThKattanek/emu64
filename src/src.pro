@@ -37,7 +37,7 @@ win32 {
     CONFIG += console
 }
 
-EMU64_VERSION = 5.1.0
+EMU64_VERSION = 5.2.0
 
 # Versionsnummer ermitteln aus Git Tag Nummer
 GIT_VERSION = $$system(git --git-dir \"../.git\" describe --always --tags)
