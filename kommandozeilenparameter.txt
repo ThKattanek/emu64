@@ -86,6 +86,12 @@ emu64 [PARAMETER]
 --set-reu-size
     Setzt die Größe des REU Speichers in KiB (128, 256, 512, 1024, 2048, 4096, 8192, 16384).
 
+--set-sid-engine
+    Setzt die SID Emulations Engine. --set-sid-engine <Engine>
+
+    0=Emu64
+    1=reSID
+
 --set-sidtype
     Setzt den Typ des ersten SID's.
 
