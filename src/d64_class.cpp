@@ -8,11 +8,11 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 26.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
+#include <cstring>
 #include "./d64_class.h"
 
 D64Class::D64Class()
@@ -100,12 +100,7 @@ bool D64Class::ExportPrg(int file_number, const char *filename)
 {
     FILE* file;
 
-    uint16_t block_count;
-
     if(file_count==0) return false;
-
-    block_count = d64_files[file_number].Laenge;
-    if( block_count == 0) return false;
 
     file = fopen(filename, "wb");
     if (file == nullptr)
@@ -115,15 +110,21 @@ bool D64Class::ExportPrg(int file_number, const char *filename)
 
     uint8_t current_track = d64_files[file_number].Track;
     uint8_t current_sector = d64_files[file_number].Sektor;
+    uint16_t max_blocks = 683; // Maximal mögliche Blockanzahl auf einem D64 Image
 
-    while(current_track != 0 && block_count > 0)
+    while(current_track != 0 && max_blocks > 0)
     {
+        max_blocks--;
         ReadBlock(current_track, current_sector, block);
         current_track = block[0];
         current_sector = block[1];
-        block_count--;
-        if(current_track == 0) fwrite(block+2, 1, current_sector - 1, file);
-        else fwrite(block+2, 1, 254, file);
+        fwrite(block+2, 1, 254, file);
+    }
+
+    if(current_track == 0) fwrite(block+2, 1, current_sector - 1, file);
+    else
+    {
+        // Hier ist die maximale anzahl von Blöcken erreicht, was auf ein beschädigtes D64 Image hinweisen könnte
     }
 
     fclose(file);

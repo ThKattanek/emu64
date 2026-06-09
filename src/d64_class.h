@@ -15,7 +15,6 @@
 #ifndef D64_CLASS_H
 #define D64_CLASS_H
 
-#include <cstring>
 #include <cstdio>
 
 #define D64_IMAGE_SIZE 174848
