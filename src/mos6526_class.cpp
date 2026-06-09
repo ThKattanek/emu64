@@ -42,10 +42,10 @@ void MOS6526::Reset()
     pa->SetOutput(pa_latch | ~ddr_a);
     pb->SetOutput(pb_latch | ~ddr_b);
 
-    timer_a_latch = 1;
-    timer_b_latch = 1;
-    timer_a = 0xFFFF;
-    timer_b = 0xFFFF;
+    timer_a_latch = 0xffff;
+    timer_b_latch = 0xffff;
+    timer_a = 0xffff;
+    timer_b = 0xffff;
 
     clock_is_latched = false;
     clock_is_stopped = true;
