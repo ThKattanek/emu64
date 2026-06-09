@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -16,7 +15,6 @@
 #ifndef MOS_6526_CLASS_H
 #define MOS_6526_CLASS_H
 
-#include <cstring>
 #include <functional>
 
 #include "./mos6526_port.h"
@@ -29,17 +27,17 @@
 
 class MOS6526
 {
-	// Timer states
-	enum 
-	{
-            STOP,
-            WAIT_THEN_COUNT,
-            LOAD_THEN_STOP,
-            LOAD_THEN_COUNT,
-            LOAD_THEN_WAIT_THEN_COUNT,
-            COUNT,
-            COUNT_THEN_STOP,
-	};
+    // Timer states
+    enum
+    {
+        STOP,
+        WAIT_THEN_COUNT,
+        LOAD_THEN_STOP,
+        LOAD_THEN_COUNT,
+        LOAD_THEN_WAIT_THEN_COUNT,
+        COUNT,
+        COUNT_THEN_STOP,
+    };
 public:
 
     /// Funktionen ///
