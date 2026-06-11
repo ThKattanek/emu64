@@ -622,11 +622,16 @@ uint8_t MOS6526::ReadIO(uint16_t address)
     case 0:
         if(cia_nr == 1)	/// Nur bei CIA2
         {
-            return ((pa_latch | ~ddr_a) & 0x3f) | (*c64_iec_wire & *floppy_iec_wire & 0xc0);
+            uint8_t value = ((pa_latch | ~ddr_a) & 0x3f) | (*c64_iec_wire & *floppy_iec_wire & 0xc0);
+            if((pa_latch | ~ddr_a) & 0x10)
+                value &= ~0x40;
+            if((pa_latch | ~ddr_a) & 0x20)
+                value &= ~0x80;
+            return value;
         }
-        return (0xFF & (pa_latch | ~(ddr_a)) & pa->GetInput());
+        return ((pa_latch | ~(ddr_a)) & pa->GetInput());
     case 1:
-        ret = (0xFF & (pb_latch | ~(ddr_b))) & pb->GetInput();
+        ret = ((pb_latch | ~(ddr_b))) & pb->GetInput();
 
         // Unterlauf Timer A an PIN PB6 anzeigen //
         if(enable_pb6)

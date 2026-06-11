@@ -301,12 +301,20 @@ unsigned char MOS6522::ReadIO(unsigned short adresse)
             {
                 case 0x00:
                 {
-                return (((PB & 0x1A)
+                    uint8_t value = (((PB & 0x1A)
                     | ((*FloppyIEC & *C64IEC) >> 7)             // DATA
                     | (((*FloppyIEC & *C64IEC) >> 4) & 0x04)	// CLK
                     | ((*C64IEC << 3) & 0x80)) ^ 0x85)          // ATN
                     | ((*Jumper<<5)&64)                         // Schalter S1 für Geräte Adresse
                     | ((*Jumper<<5)&32);                        // Schalter S2
+
+                    if((PB & ~DDRB) & 0x02)
+                        value &= ~0x01;
+                    if((PB & ~DDRB) & 0x08)
+                        value &= ~0x04;
+
+                    return value;
+
                     break;
                 }
                 case 0x01:
