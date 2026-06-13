@@ -31,7 +31,20 @@ greaterThan(QT_MAJOR_VERSION, 5){
 TARGET = emu64
 TEMPLATE = app
 
-CONFIG += lrelease c++17
+CONFIG += c++17
+
+greaterThan(QT_MAJOR_VERSION, 5) {
+    greaterThan(QT_MINOR_VERSION, 6) {
+        # Qt 6.7 oder neuer
+        QMAKE_CXXFLAGS += -Wno-c++26-extensions
+    } else {
+        # Qt 6.0–6.6
+        # keine speziellen Flags nötig
+    }
+} else {
+    # Qt 5.x
+    # ebenfalls keine speziellen Flags nötig
+}
 
 win32 {
     CONFIG += console

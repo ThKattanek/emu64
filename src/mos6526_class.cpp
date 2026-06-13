@@ -8,11 +8,11 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 22.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
 
+#include <cstring>
 #include "mos6526_class.h"
 
 MOS6526::MOS6526(uint8_t cia_nr)
@@ -42,35 +42,35 @@ void MOS6526::Reset()
     pa->SetOutput(pa_latch | ~ddr_a);
     pb->SetOutput(pb_latch | ~ddr_b);
 
-    timer_a_latch = 1;
-    timer_b_latch = 1;
-    timer_a = 0xFFFF;
-    timer_b = 0xFFFF;
+    timer_a_latch = 0xffff;
+    timer_b_latch = 0xffff;
+    timer_a = 0xffff;
+    timer_b = 0xffff;
 
     clock_is_latched = false;
     clock_is_stopped = true;
     io[0x0B] = 1;
-	
+
     if(io[14] & 0x80) clock_counter = clock_counter_latch = ClockCounterPAL; // PAL
     else clock_counter = clock_counter_latch = ClockCounterNTSC; // NTSC
 
-	/////// Für REG 14 und 15 //////
+    /////// Für REG 14 und 15 //////
     enable_pb6	= false;
     enable_pb7	= false;
     pb6_mode    = 0;
     pb7_mode	= 0;
     pb_6		= 0;
     pb_7		= 0;
-	////////////////////////////////
+    ////////////////////////////////
 
     sdr	= icr = cra = crb = interupt_mask = 0;
-	
+
     timer_a_status = timer_b_status = STOP;
     timer_a_cnt_phi2 = timer_b_cnt_phi2 = timer_b_cnt_timer_a = timer_b_cnt_cnt_pin = false;
 
     prev_lp = 0x10;
 
-	return;
+    return;
 }
 
 void MOS6526::OneZyklus()
@@ -78,70 +78,70 @@ void MOS6526::OneZyklus()
     uint8_t t, pm;
 
     if((*reset_wire == true) && (reset_wire_old == false))
-	{
-		Reset();
-	}
+    {
+        Reset();
+    }
     reset_wire_old = *reset_wire;
 
     if(!pb6_mode) pb_6 = 0;
     if(!pb7_mode) pb_7 = 0;
 
-	TimerCount();
+    TimerCount();
 
     clock_counter--;
     if (clock_counter==0)
-	{
+    {
         clock_counter = clock_counter_latch;
         if(!clock_is_stopped)
-		{
+        {
             t = BCD2Byte(io[8]);
-			t++;
+            t++;
             io[8] = Byte2BCD(t % 10);
-			if(t >= 10)
-			{
+            if(t >= 10)
+            {
                 t = BCD2Byte(io[9]);
-				t++;
+                t++;
                 io[9] = Byte2BCD(t % 60);
-				if(t >= 60)
-				{
+                if(t >= 60)
+                {
                     t = BCD2Byte(io[10]);
-					t++;
+                    t++;
                     io[10] = Byte2BCD(t % 60);
-					if(t >= 60)
-					{
+                    if(t >= 60)
+                    {
                         pm = io[11] & 0x80;
                         t = io[11] & 0x1F;
-						if(t == 0x11) pm ^= 0x80;
-						if(t == 0x12) t = 1;
-						else if(++t == 10) t = 0x10;
+                        if(t == 0x11) pm ^= 0x80;
+                        if(t == 0x12) t = 1;
+                        else if(++t == 10) t = 0x10;
                         io[11] = t | pm;
-					}
-				}
-			}
-			/// Auf Alarm rpüfen ///
+                    }
+                }
+            }
+            /// Auf Alarm rpüfen ///
             if(!memcmp(clock_alarm,io+8,4)) TriggerInterrupt(4);
-		}
-	}
+        }
+    }
 
     if(flag_pin != nullptr)
-	{
+    {
         if(*flag_pin != flag_pin_old)
-		{
-			TriggerInterrupt(16);
-		}
+        {
+            TriggerInterrupt(16);
+        }
         flag_pin_old = *flag_pin;
-	}
+    }
 }
 
 inline void MOS6526::TriggerInterrupt(int bit)
 {
     icr |= bit;
     if (interupt_mask & bit)
-	{
+    {
         icr |= 0x80;
         if(cia_nr == 0) CpuTriggerInterrupt(CIA_IRQ);
-		else CpuTriggerInterrupt(CIA_NMI);
-	}
+        else CpuTriggerInterrupt(CIA_NMI);
+    }
 }
 
 inline void MOS6526::CheckLP()
@@ -265,435 +265,440 @@ inline void MOS6526::TimerCount()
 {
     bool timer_a_underflow = false;
 
-	/// TimerA Status ///
+    /// TimerA Status ///
     switch (timer_a_status)
-	{
-        case WAIT_THEN_COUNT:
-            timer_a_status = COUNT;
+    {
+    case WAIT_THEN_COUNT:
+        timer_a_status = COUNT;
         [[fallthrough]]; case STOP:
+        goto TimerA_Idle;
+    case LOAD_THEN_STOP:
+        timer_a_status = STOP;
+        timer_a = timer_a_latch;
+        goto TimerA_Idle;
+    case LOAD_THEN_COUNT:
+        timer_a_status = COUNT;
+        timer_a = timer_a_latch;
+        goto TimerA_Idle;
+    case LOAD_THEN_WAIT_THEN_COUNT:
+        timer_a_status = WAIT_THEN_COUNT;
+        if (timer_a == 0) goto TimerA_Interrupt;
+        else
+        {
+            timer_a = timer_a_latch;
             goto TimerA_Idle;
-		case LOAD_THEN_STOP:
-            timer_a_status = STOP;
-            timer_a = timer_a_latch;
-			goto TimerA_Idle;
-		case LOAD_THEN_COUNT:
-            timer_a_status = COUNT;
-            timer_a = timer_a_latch;
-			goto TimerA_Idle;
-		case LOAD_THEN_WAIT_THEN_COUNT:
-            timer_a_status = WAIT_THEN_COUNT;
-            if (timer_a == 0) goto TimerA_Interrupt;
-			else 
-			{
-                timer_a = timer_a_latch;
-				goto TimerA_Idle;
-			}
-		case COUNT:
-			goto TimerA_Count;
-		case COUNT_THEN_STOP:
-            timer_a_status = STOP;
-			goto TimerA_Count;
-	}
+        }
+    case COUNT:
+        goto TimerA_Count;
+    case COUNT_THEN_STOP:
+        timer_a_status = STOP;
+        goto TimerA_Count;
+    }
 
-	/// Timer A runterzählen ///
+    /// Timer A runterzählen ///
 TimerA_Count:
     if (timer_a_cnt_phi2)
         if (!timer_a || !--timer_a)
-		{
+        {
             if (timer_a_status != STOP)
-			{
-TimerA_Interrupt:
+            {
+            TimerA_Interrupt:
                 timer_a = timer_a_latch;
                 TriggerInterrupt(1);
                 icr |= 1;
                 if (cra & 8)
-				{
+                {
                     cra &= 0xFE;
                     new_cra &= 0xFE;
                     timer_a_status = LOAD_THEN_STOP;
-				} 
+                }
                 else timer_a_status = LOAD_THEN_COUNT;
                 if(!pb6_mode) pb_6 = 1;
                 else pb_6 = ~pb_6;
-			}
+            }
             timer_a_underflow = true;
-		}
+        }
 
-	// Delayed write to CRA?
+    // Delayed write to CRA?
 TimerA_Idle:
     if (writing_new_cra)
-	{
+    {
         switch (timer_a_status)
-		{
-			case STOP:
-			case LOAD_THEN_STOP:
-                if (new_cra & 1)
-				{
-                    if (new_cra & 0x10) timer_a_status = LOAD_THEN_WAIT_THEN_COUNT;
-                    else timer_a_status = WAIT_THEN_COUNT;
-				} 
-				else 
-				{
-                    if (new_cra & 0x10) timer_a_status = LOAD_THEN_STOP;
-				}
-				break;
-			case COUNT:
-                if (new_cra & 1)
-				{
-                    if (new_cra & 0x10) timer_a_status = LOAD_THEN_WAIT_THEN_COUNT;
-				}
-				else
-				{
-                    if (new_cra & 0x10) timer_a_status = LOAD_THEN_STOP;
-                    else timer_a_status = COUNT_THEN_STOP;
-				}
-				break;
-			case LOAD_THEN_COUNT:
-			case WAIT_THEN_COUNT:
-                if (new_cra & 1)
-				{
-                    if (new_cra & 8)
-					{
-                        new_cra &= 0xFE;
-                        timer_a_status = STOP;
-					}
-                    else if (new_cra & 0x10) timer_a_status = LOAD_THEN_WAIT_THEN_COUNT;
-                    if(!pb6_mode) pb_6 = 1;
-                    else pb_6 = ~pb_6;
-                } else timer_a_status = STOP;
-				break;
-		}
+        {
+        case STOP:
+        case LOAD_THEN_STOP:
+            if (new_cra & 1)
+            {
+                if (new_cra & 0x10) timer_a_status = LOAD_THEN_WAIT_THEN_COUNT;
+                else timer_a_status = WAIT_THEN_COUNT;
+            }
+            else
+            {
+                if (new_cra & 0x10) timer_a_status = LOAD_THEN_STOP;
+            }
+            break;
+        case COUNT:
+            if (new_cra & 1)
+            {
+                if (new_cra & 0x10) timer_a_status = LOAD_THEN_WAIT_THEN_COUNT;
+            }
+            else
+            {
+                if (new_cra & 0x10) timer_a_status = LOAD_THEN_STOP;
+                else timer_a_status = COUNT_THEN_STOP;
+            }
+            break;
+        case LOAD_THEN_COUNT:
+        case WAIT_THEN_COUNT:
+            if (new_cra & 1)
+            {
+                if (new_cra & 8)
+                {
+                    new_cra &= 0xFE;
+                    timer_a_status = STOP;
+                }
+                else if (new_cra & 0x10) timer_a_status = LOAD_THEN_WAIT_THEN_COUNT;
+                if(!pb6_mode) pb_6 = 1;
+                else pb_6 = ~pb_6;
+            } else timer_a_status = STOP;
+            break;
+        }
         cra = new_cra & 0xEF;
         writing_new_cra = false;
-	}
+    }
 
-	/// TimerB Status ///
+    /// TimerB Status ///
     switch (timer_b_status)
-	{
-        case WAIT_THEN_COUNT:
-            timer_b_status = COUNT;
+    {
+    case WAIT_THEN_COUNT:
+        timer_b_status = COUNT;
         [[fallthrough]]; case STOP:
+        goto TimerB_Idle;
+    case LOAD_THEN_STOP:
+        timer_b_status = STOP;
+        timer_b = timer_b_latch;
+        goto TimerB_Idle;
+    case LOAD_THEN_COUNT:
+        timer_b_status = COUNT;
+        timer_b = timer_b_latch;
+        goto TimerB_Idle;					//?????? Es Stand TimerA_Idle
+    case LOAD_THEN_WAIT_THEN_COUNT:
+        timer_b_status = WAIT_THEN_COUNT;
+        if (timer_b == 0)
+            goto TimerB_Interrupt;
+        else
+        {
+            timer_b = timer_b_latch;
             goto TimerB_Idle;
-		case LOAD_THEN_STOP:
-            timer_b_status = STOP;
-            timer_b = timer_b_latch;
-			goto TimerB_Idle;
-		case LOAD_THEN_COUNT:
-            timer_b_status = COUNT;
-            timer_b = timer_b_latch;
-			goto TimerB_Idle;					//?????? Es Stand TimerA_Idle
-		case LOAD_THEN_WAIT_THEN_COUNT:
-            timer_b_status = WAIT_THEN_COUNT;
-            if (timer_b == 0)
-				goto TimerB_Interrupt;
-			else 
-			{
-                timer_b = timer_b_latch;
-				goto TimerB_Idle;
-			}
-		case COUNT:
-			goto TimerB_Count;
-		case COUNT_THEN_STOP:
-            timer_b_status = STOP;
-			goto TimerB_Count;
-	}
+        }
+    case COUNT:
+        goto TimerB_Count;
+    case COUNT_THEN_STOP:
+        timer_b_status = STOP;
+        goto TimerB_Count;
+    }
 
-	/// Timer B runterzählen ///
+    /// Timer B runterzählen ///
 TimerB_Count:
     if (timer_b_cnt_phi2 || (timer_b_cnt_timer_a && timer_a_underflow) || (timer_b_cnt_cnt_pin && timer_a_underflow && cnt_pin))
         if (!timer_b || !--timer_b)
-		{
+        {
             if (timer_b_status != STOP)
-			{
-TimerB_Interrupt:
+            {
+            TimerB_Interrupt:
                 timer_b = timer_b_latch;
                 TriggerInterrupt(2);
                 icr |= 2;
                 if (crb & 8)
-				{
+                {
                     crb &= 0xFE;
                     new_crb &= 0xFE;
                     timer_b_status = LOAD_THEN_STOP;
-				}
+                }
                 else timer_b_status = LOAD_THEN_COUNT;
                 if(!pb7_mode) pb_7 = 1;
                 else pb_7 = ~pb_7;
-			}
-		}
+            }
+        }
 
-	// Delayed write to CRB?
+    // Delayed write to CRB?
 TimerB_Idle:
     if (writing_new_crb)
-	{
+    {
         switch (timer_b_status)
-		{
-			case STOP:
-			case LOAD_THEN_STOP:
-                if (new_crb & 1)
-				{
-                    if (new_crb & 0x10) timer_b_status = LOAD_THEN_WAIT_THEN_COUNT;
-                    else timer_b_status = WAIT_THEN_COUNT;
-				}
-				else 
-				{
-                    if (new_crb & 0x10) timer_b_status = LOAD_THEN_STOP;
-				}
-				break;
-			case COUNT:
-                if (new_crb & 1)
-				{
-                    if (new_crb & 0x10) timer_b_status = LOAD_THEN_WAIT_THEN_COUNT;
-				}
-				else 
-				{
-                    if (new_crb & 0x10) timer_b_status = LOAD_THEN_STOP;
-                    else timer_b_status = COUNT_THEN_STOP;
-				}
-				break;
-			case LOAD_THEN_COUNT:
-			case WAIT_THEN_COUNT:
-                if (new_crb & 1)
-				{
-                    if (new_crb & 8)
-					{
-                        new_crb &= 0xFE;
-                        timer_b_status = STOP;
-					}
-                    else if (new_crb & 0x10) timer_b_status = LOAD_THEN_WAIT_THEN_COUNT;
-                    if(!pb7_mode) pb_7 = 1;
-                    else pb_7 = ~pb_7;
-				}
-                else timer_b_status = STOP;
-				break;
-		}
+        {
+        case STOP:
+        case LOAD_THEN_STOP:
+            if (new_crb & 1)
+            {
+                if (new_crb & 0x10) timer_b_status = LOAD_THEN_WAIT_THEN_COUNT;
+                else timer_b_status = WAIT_THEN_COUNT;
+            }
+            else
+            {
+                if (new_crb & 0x10) timer_b_status = LOAD_THEN_STOP;
+            }
+            break;
+        case COUNT:
+            if (new_crb & 1)
+            {
+                if (new_crb & 0x10) timer_b_status = LOAD_THEN_WAIT_THEN_COUNT;
+            }
+            else
+            {
+                if (new_crb & 0x10) timer_b_status = LOAD_THEN_STOP;
+                else timer_b_status = COUNT_THEN_STOP;
+            }
+            break;
+        case LOAD_THEN_COUNT:
+        case WAIT_THEN_COUNT:
+            if (new_crb & 1)
+            {
+                if (new_crb & 8)
+                {
+                    new_crb &= 0xFE;
+                    timer_b_status = STOP;
+                }
+                else if (new_crb & 0x10) timer_b_status = LOAD_THEN_WAIT_THEN_COUNT;
+                if(!pb7_mode) pb_7 = 1;
+                else pb_7 = ~pb_7;
+            }
+            else timer_b_status = STOP;
+            break;
+        }
         crb = new_crb & 0xEF;
         writing_new_crb = false;
-	}
+    }
 }
 
 void MOS6526::WriteIO(uint16_t address, uint8_t value)
 {
     address &= 0x0F;
-	
+
     switch(address)
-	{
-	case 0:
-                io[address]=value;
-                pa_latch = value;
-                pa->SetOutput(pa_latch | ~ddr_a);
+    {
+    case 0:
+        io[address]=value;
+        pa_latch = value;
+        pa->SetOutput(pa_latch | ~ddr_a);
 
-                if(cia_nr == 0)  /// Nur bei CIA1
-                    ChangePOTSwitch();
+        if(cia_nr == 0)  /// Nur bei CIA1
+            ChangePOTSwitch();
 
-                if(cia_nr == 1)	/// Nur bei CIA2
-                {
-                    value = ~pa_latch & ddr_a;
-                    //unsigned char  OLD_LINES = *C64IEC;
-                    *c64_iec_wire = ((value << 2) & 0x80)          // DATA
+        if(cia_nr == 1)	/// Nur bei CIA2
+        {
+            value = ~pa_latch & ddr_a;
+            //unsigned char  OLD_LINES = *C64IEC;
+            *c64_iec_wire = ((value << 2) & 0x80)    // DATA
                             | ((value << 2) & 0x40)          // CLK
                             | ((value << 1) & 0x10);         // ATN
-                }
-		break;
+        }
+        break;
 
-	case 1:
-                io[address]=value;
-                pb_latch = value;
-                pb->SetOutput(pb_latch | ~ddr_b);
-                if(cia_nr == 0)CheckLP();
-		break;
+    case 1:
+        io[address]=value;
+        pb_latch = value;
+        pb->SetOutput(pb_latch | ~ddr_b);
+        if(cia_nr == 0)CheckLP();
+        break;
 
-	case 2:
-                io[address]=value;
-                ddr_a = value;
-                pa->SetOutput(pa_latch | ~ddr_a);
+    case 2:
+        io[address]=value;
+        ddr_a = value;
+        pa->SetOutput(pa_latch | ~ddr_a);
 
-                if(cia_nr == 0)  /// Nur bei CIA1
-                    ChangePOTSwitch();
-		break;
+        if(cia_nr == 0)  /// Nur bei CIA1
+            ChangePOTSwitch();
+        break;
 
-	case 3:
-                io[address]=value;
-                ddr_b = value;
-                pb->SetOutput(pb_latch | ~ddr_b);
-                if(cia_nr == 0)CheckLP();
-		break;
+    case 3:
+        io[address]=value;
+        ddr_b = value;
+        pb->SetOutput(pb_latch | ~ddr_b);
+        if(cia_nr == 0)CheckLP();
+        break;
 
-	case 4:
-                timer_a_latch = (timer_a_latch & 0xFF00) | value;
-		break;
-	case 5:
-                timer_a_latch = static_cast<uint16_t>((timer_a_latch & 0x00FF) | (value << 8));
-                if(!(cra & 1)) timer_a = timer_a_latch;
-		break;
+    case 4:
+        timer_a_latch = (timer_a_latch & 0xFF00) | value;
+        break;
+    case 5:
+        timer_a_latch = static_cast<uint16_t>((timer_a_latch & 0x00FF) | (value << 8));
+        if(!(cra & 1)) timer_a = timer_a_latch;
+        break;
 
-	case 6:
-                timer_b_latch = (timer_b_latch & 0xFF00) | value;
-		break;
-	case 7:
-                timer_b_latch = static_cast<uint16_t>((timer_b_latch & 0x00FF) | (value << 8));
-                if(!(crb & 1)) timer_b = timer_b_latch;
-		break;
+    case 6:
+        timer_b_latch = (timer_b_latch & 0xFF00) | value;
+        break;
+    case 7:
+        timer_b_latch = static_cast<uint16_t>((timer_b_latch & 0x00FF) | (value << 8));
+        if(!(crb & 1)) timer_b = timer_b_latch;
+        break;
 
-	case 8: case 9: case 10: case 11:
+    case 8: case 9: case 10: case 11:
         if((address) == 11)
-		{
+        {
             value &= 0x9F;
-                        if((value & 0x1F) == 0x12 && !(crb & 0x80)) value ^= 0x80;
-		}
-                if(crb & 0x80)
-		{
-                        clock_alarm[address - 8] = value;
-		}
-		else
-		{
-                        if(address == 8)  clock_is_stopped = false;
-                        if(address == 11) clock_is_stopped = true;
-                        io[address]=value;
-		}
-		break;
+            if((value & 0x1F) == 0x12 && !(crb & 0x80)) value ^= 0x80;
+        }
+        if(crb & 0x80)
+        {
+            clock_alarm[address - 8] = value;
+        }
+        else
+        {
+            if(address == 8)  clock_is_stopped = false;
+            if(address == 11) clock_is_stopped = true;
+            io[address]=value;
+        }
+        break;
 
-	case 12:
-                io[address]=value;
-                sdr = value;
-                if((cra & 0x40))
-		{
-                TriggerInterrupt(8);	// Fake SDR interrupt for programs that need it
-		}
-		break;
+    case 12:
+        io[address]=value;
+        sdr = value;
+        if((cra & 0x40))
+        {
+            TriggerInterrupt(8);	// Fake SDR interrupt for programs that need it
+        }
+        break;
 
-	case 13:
-                io[address] = value;
+    case 13:
+        io[address] = value;
         if ((value&128)==128)
-		{
-                        interupt_mask |= value;
-		}
-		else
-		{
-                        interupt_mask &= ~value;
-		}
+        {
+            interupt_mask |= value;
+        }
+        else
+        {
+            interupt_mask &= ~value;
+        }
         if (value & 0x80)
-		{
-                        interupt_mask |= value & 0x7f;
-		}
-                else interupt_mask &= ~value;
+        {
+            interupt_mask |= value & 0x7f;
+        }
+        else interupt_mask &= ~value;
 
-                        if (icr & interupt_mask & 0x1f)
-			{ // Trigger IRQ if pending
-                                icr |= 0x80;
-                                if(cia_nr == 0) CpuTriggerInterrupt(CIA_IRQ);
-                                else CpuTriggerInterrupt(CIA_NMI);
-			}
-		break;
+        if (icr & interupt_mask & 0x1f)
+        { // Trigger IRQ if pending
+            icr |= 0x80;
+            if(cia_nr == 0) CpuTriggerInterrupt(CIA_IRQ);
+            else CpuTriggerInterrupt(CIA_NMI);
+        }
+        break;
 
-	case 14:
-                io[address] = value;
-                writing_new_cra = true;
-                new_cra = value;
-                timer_a_cnt_phi2 = ((value & 0x20) == 0x00);
-                if (value & 0x80) clock_counter = clock_counter_latch = ClockCounterPAL; // PAL
-                else clock_counter = clock_counter_latch = ClockCounterNTSC; // NTSC
-                enable_pb6 = (value & 0x02) >> 1;
-                pb6_mode = (value & 0x04) >> 2;
-		break;
+    case 14:
+        io[address] = value;
+        writing_new_cra = true;
+        new_cra = value;
+        timer_a_cnt_phi2 = ((value & 0x20) == 0x00);
+        if (value & 0x80) clock_counter = clock_counter_latch = ClockCounterPAL; // PAL
+        else clock_counter = clock_counter_latch = ClockCounterNTSC; // NTSC
+        enable_pb6 = (value & 0x02) >> 1;
+        pb6_mode = (value & 0x04) >> 2;
+        break;
 
-	case 15:
-                io[address] = value;
-                writing_new_crb = true;
-                new_crb = value;
-                timer_b_cnt_phi2 = ((value & 0x60) == 0x00);
-                timer_b_cnt_timer_a = ((value & 0x60) == 0x40);
-                timer_b_cnt_cnt_pin = ((value & 0x60) == 0x60);
-                enable_pb7 = (value & 0x02) >> 1;
-                pb7_mode = (value & 0x04) >> 2;
-		break;
-	}
-	return;
+    case 15:
+        io[address] = value;
+        writing_new_crb = true;
+        new_crb = value;
+        timer_b_cnt_phi2 = ((value & 0x60) == 0x00);
+        timer_b_cnt_timer_a = ((value & 0x60) == 0x40);
+        timer_b_cnt_cnt_pin = ((value & 0x60) == 0x60);
+        enable_pb7 = (value & 0x02) >> 1;
+        pb7_mode = (value & 0x04) >> 2;
+        break;
+    }
+    return;
 }
 
 static unsigned char temp;
 uint8_t MOS6526::ReadIO(uint16_t address)
 {
-	unsigned char ret;
+    unsigned char ret;
 
     address &= 0x0F;
 
     switch(address)
-	{
-	case 0:
+    {
+    case 0:
         if(cia_nr == 1)	/// Nur bei CIA2
-		{
-                return ((pa_latch | ~ddr_a) & 0x3F) | (*c64_iec_wire & *floppy_iec_wire);
-		}
-                return (0xFF & (pa_latch | ~(ddr_a)) & pa->GetInput());
-	case 1:
-                ret = (0xFF & (pb_latch | ~(ddr_b))) & pb->GetInput();
-		
-		// Unterlauf Timer A an PIN PB6 anzeigen //
-                if(enable_pb6)
-		{
-			ret &= 0xBF;
+        {
+            uint8_t value = ((pa_latch | ~ddr_a) & 0x3f) | (*c64_iec_wire & *floppy_iec_wire & 0xc0);
+            if((pa_latch | ~ddr_a) & 0x10)
+                value &= ~0x40;
+            if((pa_latch | ~ddr_a) & 0x20)
+                value &= ~0x80;
+            return value;
+        }
+        return ((pa_latch | ~(ddr_a)) & pa->GetInput());
+    case 1:
+        ret = ((pb_latch | ~(ddr_b))) & pb->GetInput();
+
+        // Unterlauf Timer A an PIN PB6 anzeigen //
+        if(enable_pb6)
+        {
+            ret &= 0xBF;
             ret |= (pb_6 & 0x01) << 6;
-		}
+        }
 
-		// Unterlauf Timer B an PIN PB7 anzeigen //
-                if(enable_pb7)
-		{
-			ret &= 0x7F;
+        // Unterlauf Timer B an PIN PB7 anzeigen //
+        if(enable_pb7)
+        {
+            ret &= 0x7F;
             ret |= (pb_7 & 0x01) << 7;
-		}
-		return ret;
+        }
+        return ret;
 
-	case 2:
+    case 2:
         return ddr_a;
 
-	case 3:
+    case 3:
         return ddr_b;
 
-	case 4:
+    case 4:
         return static_cast<uint8_t>(timer_a);
 
-	case 5:
+    case 5:
         return static_cast<uint8_t>(timer_a>>8);
 
-	case 6:
+    case 6:
         return static_cast<uint8_t>(timer_b);
 
-	case 7:
+    case 7:
         return static_cast<uint8_t>(timer_b>>8);
 
-	case 8: case 9: case 10: case 11:
-		/// Wenn UhrLatched = false --> Uhrzeit ins Latch schieben ///
+    case 8: case 9: case 10: case 11:
+        /// Wenn UhrLatched = false --> Uhrzeit ins Latch schieben ///
         if(!clock_is_latched) memcpy(clock_latch,io+8,4);
         if(address == 8)  clock_is_latched = false;
         if(address == 11) clock_is_latched = true;
         return clock_latch[address - 8];
 
-	case 12:
+    case 12:
         return sdr;
 
-	case 13:
+    case 13:
         temp = icr;
         icr = 0;
         if(cia_nr == 0) CpuClearInterrupt(CIA_IRQ);
         else CpuClearInterrupt(CIA_NMI);
-		return temp;
+        return temp;
 
-	case 14:
+    case 14:
         return cra;
 
-	case 15:
+    case 15:
         return crb;
 
-	default:
+    default:
         return io[address];
-	}
+    }
 }
 
 void MOS6526::SetSDR(uint8_t value)
 {
     if(!(io[14] & 0x40))
-	{
-                sdr = value;
-		TriggerInterrupt(8);
-	}
+    {
+        sdr = value;
+        TriggerInterrupt(8);
+    }
 }
