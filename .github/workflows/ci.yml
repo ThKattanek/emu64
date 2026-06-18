@@ -19,7 +19,6 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          asciidoctor-pdf \
           clang \
           libavcodec-dev \
           libavformat-dev \
@@ -31,7 +30,10 @@ jobs:
           libswresample-dev \
           libswscale-dev \
           qtbase5-dev \
-          qttools5-dev-tools
+          qttools5-dev-tools \
+          ruby-full \
+          build-essential
+        sudo gem install asciidoctor-pdf
     - name: build-gcc
       run: |
         mkdir build-gcc
