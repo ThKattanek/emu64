@@ -36,6 +36,7 @@
 
 #### Wichtige Voraussetzungen
 - qttools6-dev oder qt5
+- asciidoctor-pdf (für die Erstellung des Handbuches)
 
 #### Erforderliche Bibliotheken
 - qt6 oder qt5
@@ -68,6 +69,11 @@ lupdate src/src.pro
 ```
 
 Danach können Sie mit dem QLinguist-Tool die entsprechende `*.ts`-Datei laden und neue Wörter übersetzen. Nach dem Speichern werden die `qm`-Dateien automatisch beim Kompilieren erzeugt.
+
+#### Handbuch manuell erstellen
+```bash
+asciidoctor-pdf manual/index.adoc -o manual/emu64_manual_de.pdf
+```
 
 #### Fehlerbehebung: "make install"
 Falls dieser Fehler auftritt:

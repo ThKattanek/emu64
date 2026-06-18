@@ -150,6 +150,8 @@ private slots:
     void OnResetScreenshotCounter(void);
     void OnSetupFished(int result);
 
+    void on_actionHandbuch_triggered();
+
 private:
     /// Funktionen ///
     void changeEvent(QEvent *event);  
@@ -173,6 +175,7 @@ private:
 
     QString configPath;          // Pfad für emu64.ini und emu64.log
     QString dataPath;            // Pfad für alle Emu64 Daten
+    QString manualPath;          // Wo das Manual abgelegt wird. Muss sich dort befinden, liegt es im dataPath kann es nicht angezeigt werden
     QString custom_dataPath;     // Pfad für alle Emu64 Daten -> Wenn er per Komandozeile angegeben wurde (--data-path)
 
     bool nogui;					 // Wenn die GUI nicht angezeigt wird

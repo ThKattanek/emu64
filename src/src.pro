@@ -448,7 +448,8 @@ languages.files += ../grafik/flaggen/emu64_en.png
 
 # Manual
 manual.CONFIG += nostrip
-manual.files += ../manual/emu64_manual_de.pdf
+manual.files += $$MANUAL_OUTPUT
+manual.depends = manual_pdf
 
 # Linux Install Startmenü Eintrag
 ## /usr/local/share/icons/hicolor/64x64/apps/

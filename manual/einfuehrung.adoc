@@ -7,7 +7,7 @@ Emu64 ist ein reines Hobby Projekt und wird von mir ständig weiterentwickelt. D
  Das ist ei Zitat
  sdkaölsdk
 
-Hier ist alles wieder Normal. Du wichser :-)
+Hier ist alles wieder Normal. :-)
 
 === Etwas Code
 [, c++]

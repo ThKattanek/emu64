@@ -15,6 +15,7 @@
 #include <QCoreApplication>
 #include <QScreen>
 #include <QStyle>
+#include <QDesktopServices>
 #include <iostream>
 
 #include "./main_window.h"
@@ -212,17 +213,25 @@ int MainWindow::OnInit(bool nogui)
 
 #ifdef _WIN32
     if(custom_dataPath == "")
-        dataPath = QApplication::applicationDirPath();
+        dataPath = manualPath = QApplication::applicationDirPath();
     else
-        dataPath = custom_dataPath;
+        dataPath = manualPath = custom_dataPath;
 #else
     if(custom_dataPath == "")
     {
         dataPath = DATA_PATH;
         dataPath += "/share/emu64";
+
+        manualPath = DATA_PATH;
+        manualPath += "/share/doc/emu64";
     }
     else
+    {
         dataPath = custom_dataPath;
+
+        manualPath = custom_dataPath;
+        manualPath += "/../doc/emu64";
+    }
 #endif
     LogText((QString(">> Data Path = ") + dataPath + QString("\n")).toUtf8());
 
@@ -1998,5 +2007,18 @@ void MainWindow::on_actionREU_16MiB_triggered()
     ui->actionREU_16MiB->setChecked(true);
 
     c64->SetREUMode(REU_16MiB);
+}
+
+
+void MainWindow::on_actionHandbuch_triggered()
+{
+    QFileInfo file_info(manualPath + "/manual/emu64_manual_de.pdf");
+    if(!file_info.exists())
+    {
+        QMessageBox::warning(this,tr("Fehler..."),tr("Das Handbuch konnte nicht gefunden werden!"));
+        return;
+    }
+
+    QDesktopServices::openUrl(QUrl(manualPath + "/manual/emu64_manual_de.pdf"));
 }
 
