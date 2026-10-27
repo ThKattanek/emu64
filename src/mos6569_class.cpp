@@ -154,7 +154,7 @@ VICII::VICII()
 
     s_byte2_pending = 0;
     sprite_x_started = 0;
-    for(int i=0; i<8; i++) sprite_x_trigger[i] = reg_mx_prev[i] = 0;
+    for(int i=0; i<8; i++) sprite_x_trigger[i] = 0;
 
     uint16_t spr_x_start = 0x194;
     for(uint16_t x=0; x<0x200; x++)
@@ -1288,14 +1288,14 @@ void VICII::OneCycle()
     }
 
     // Ein Sprite startet in der Zeile erst wenn die Rasterposition seine X-Koordinate erreicht.
-    // Dabei gilt das X-Register wie es vor diesem Zyklus anlag (die CPU läuft vor dem VIC).
+    // Dabei gilt das X-Register wie es nach dem CPU-Zugriff dieses Zyklus anliegt (die CPU läuft vor dem VIC).
     if(current_cycle == 1) sprite_x_started = 0;
     for(int i=0; i<8; i++)
     {
-        if(reg_mx_prev[i] < 0x200 && sprite_x_cycle[reg_mx_prev[i]] == current_cycle && !(sprite_x_started & (1 << i)))
+        if(reg_mx[i] < 0x200 && sprite_x_cycle[reg_mx[i]] == current_cycle && !(sprite_x_started & (1 << i)))
         {
             sprite_x_started |= static_cast<uint8_t>(1 << i);
-            sprite_x_trigger[i] = reg_mx_prev[i];
+            sprite_x_trigger[i] = reg_mx[i];
             sprite_trigger_color[i] = reg_mcolor[i];
             sprite_trigger_mm0[i] = reg_mm0;
             sprite_trigger_mm1[i] = reg_mm1;
@@ -1304,7 +1304,6 @@ void VICII::OneCycle()
             sprite_trigger_mmc[i] = reg_mmc;
         }
     }
-    for(int i=0; i<8; i++) reg_mx_prev[i] = reg_mx[i];
 
     switch (current_cycle)
 	{

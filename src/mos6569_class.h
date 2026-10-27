@@ -200,7 +200,6 @@ private:
     uint8_t     sprite_trigger_mdp[8];
     uint8_t     sprite_trigger_mxe[8];
     uint8_t     sprite_trigger_mmc[8];
-    uint16_t    reg_mx_prev[8];             // Sprite X-Register vom Ende des vorherigen Zyklus
     uint8_t     sprite_x_started;           // Sprites die in dieser Zeile ihre X-Position erreicht haben
     uint8_t     sprite_y_exp_flip_flop;
     uint8_t     mc[8];
