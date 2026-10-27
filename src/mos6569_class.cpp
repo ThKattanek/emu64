@@ -1394,6 +1394,12 @@ void VICII::OneCycle()
 
         vc = vc_base;
 
+        /// Sprite MC + 3 (Sprite-DMA ist abgeschlossen)
+        for(int i=0;i<8;i++,sprite_bit<<=1)
+        {
+            if(sprite_dma & sprite_bit) mc[i] += 3;
+        }
+
         DrawGraphics();
         break;
 
@@ -1415,12 +1421,6 @@ void VICII::OneCycle()
         if(badline_status) SetBALow();
         if((badline_status == true) && (display_status == true)) rc = 0;
 
-        /// Sprite MC + 3
-        for(int i=0;i<8;i++,sprite_bit<<=1)
-        {
-            if(sprite_dma & sprite_bit) mc[i] += 3;
-        }
-
         DrawGraphics();
 		break;
 
@@ -1441,9 +1441,19 @@ void VICII::OneCycle()
         sprite_sequencer_current_line[7] = sprite_sequenzer[7];
 
         /// Sprite ///
+        // MCBASE wird mit MC geladen wenn das Expansions-Flipflop gesetzt ist.
+        // Hier wirkt auch der Sprite-Crunch (siehe Schreibzugriff auf $d017).
         for(int i=0;i<8;i++,sprite_bit<<=1)
         {
-            if((sprite_y_exp_flip_flop & sprite_bit) == sprite_bit) mc_base[i] += 2;
+            if((sprite_y_exp_flip_flop & sprite_bit) == sprite_bit)
+            {
+                mc_base[i] = mc[i];
+                if(mc_base[i] >= 63)
+                {
+                    sprite_dma  &= ~sprite_bit;
+                    sprite_view &= ~sprite_bit;
+                }
+            }
         }
 
         gAccess();
@@ -1453,17 +1463,6 @@ void VICII::OneCycle()
 		break;
 
     case 17:
-        /// Sprite ///
-        for(int i=0;i<8;i++,sprite_bit<<=1)
-        {
-            if((sprite_y_exp_flip_flop & sprite_bit) == sprite_bit) mc_base[i] ++;
-            if(mc_base[i] >= 63)
-            {
-                sprite_dma  &= ~sprite_bit;
-                sprite_view &= ~sprite_bit;
-            }
-        }
-
         gAccess();
         if (badline_status) SetBALow();
 
@@ -1999,6 +1998,18 @@ void VICII::WriteIO(uint16_t address, uint8_t value)
 
 		/// Sprite Y-Expansion
 		case 0x17:
+                        // Sprite-Crunch: Wird das Expansions-Flipflop in Zyklus 15 durch
+                        // Löschen von MxYE gesetzt, wird MC verfälscht. Die CPU läuft vor dem VIC,
+                        // der Schreibzugriff in Zyklus 15 sieht daher current_cycle == 16.
+                        if(current_cycle == 16)
+                        {
+                            uint8_t bit = 0x01;
+                            for(int i=0;i<8;i++,bit<<=1)
+                            {
+                                if(!(value & bit) && !(sprite_y_exp_flip_flop & bit))
+                                    mc[i] = (0x2a & (mc_base[i] & mc[i])) | (0x15 & (mc_base[i] | mc[i]));
+                            }
+                        }
                         reg_mye = value;
                         sprite_y_exp_flip_flop |= ~value;
 			break;
