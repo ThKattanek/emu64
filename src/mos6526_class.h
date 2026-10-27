@@ -27,16 +27,22 @@
 
 class MOS6526
 {
-    // Timer states
-    enum
+    // Zustand eines Timers (Timer A und Timer B benutzen die gleiche Struktur)
+    struct TIMER
     {
-        STOP,
-        WAIT_THEN_COUNT,
-        LOAD_THEN_STOP,
-        LOAD_THEN_COUNT,
-        LOAD_THEN_WAIT_THEN_COUNT,
-        COUNT,
-        COUNT_THEN_STOP,
+        uint16_t    counter;
+        uint16_t    latch;
+        bool        cr_start;           // Bit 0 vom Steuerregister (Timer laeuft)
+        bool        cr_oneshot;         // Bit 3 vom Steuerregister
+        bool        cr_force_load;      // Bit 4 vom Steuerregister (gilt nur einen Takt)
+        bool        count_phi2;         // Zaehlt mit PHI2 (sonst durch externe Impulse)
+        bool        count_step;         // Externer Zaehlimpuls (CNT Pin / Unterlauf von Timer A)
+        bool        count2;             // Zaehlpipeline Stufe 2
+        bool        count3;             // Zaehlpipeline Stufe 3 (in dieser Stufe wird der Zaehler verringert)
+        bool        load1;              // Ladepipeline Stufe 1
+        bool        load;               // Ladepipeline Stufe 2 (Latch wird in den Zaehler geladen)
+        bool        oneshot0;           // OneShot Pipeline Stufe 1
+        bool        oneshot;            // OneShot Pipeline Stufe 2
     };
 public:
 
@@ -80,6 +86,8 @@ private:
     /// Funktionen ///
     inline void TriggerInterrupt(int bit);
     inline void TimerCount();
+    inline void TimerReset(TIMER *timer);
+    inline bool TimerStep(TIMER *timer);
     inline void CheckLP();
 
     /// Variablen ///
@@ -87,18 +95,12 @@ private:
     uint8_t     io[16];
     uint8_t     interupt_mask;
     uint8_t     cra, crb, icr;
-    uint8_t     new_cra, new_crb;
-    bool        writing_new_cra, writing_new_crb;
-    bool        timer_a_cnt_phi2;
-    bool        timer_b_cnt_phi2;
-    bool        timer_b_cnt_timer_a;
-    bool        timer_b_cnt_cnt_pin;
-    uint8_t     timer_a_status;
-    uint8_t     timer_b_status;
-    uint16_t    timer_a;
-    uint16_t    timer_a_latch;
-    uint16_t    timer_b;
-    uint16_t    timer_b_latch;
+    uint8_t     timer_b_mode;       // Bit 5 und 6 aus CRB (0=PHI2, 1=CNT Pin, 2/3=Unterlauf von Timer A)
+    TIMER       timer_a;
+    TIMER       timer_b;
+    bool        timer_a_underflow_old;      // Timer A hatte im vorigen Takt einen Unterlauf
+    bool        timer_b_underflow_old;      // Timer B hatte im vorigen Takt einen Unterlauf
+    bool        cnt_pin_old;
 
     uint32_t    clock_counter_latch;
     uint32_t    clock_counter;
@@ -113,8 +115,8 @@ private:
     bool        enable_pb7;
     uint8_t     pb6_mode;
     uint8_t     pb7_mode;
-    uint8_t     pb_6;
-    uint8_t     pb_7;
+    uint8_t     pb_6;               // Zustand des Toggle Ausgangs von Timer A (PB6)
+    uint8_t     pb_7;               // Zustand des Toggle Ausgangs von Timer B (PB7)
     uint8_t     prev_lp;
 };
 #endif // MOS_6526_CLASS_H
