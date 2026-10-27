@@ -65,6 +65,15 @@ void MOS6526::Reset()
 
     sdr	= icr = cra = crb = interupt_mask = 0;
 
+    icr_new = 0;
+    icr_ack = 0;
+    irq_line = false;
+    ifr_done = false;
+    ifr_ack1 = ifr_ack0 = false;
+    ifr_d7set1 = ifr_d7set0 = false;
+    ifr_raise1 = ifr_raise0 = false;
+    ifr_read0 = ifr_read1 = false;
+
     timer_b_mode = 0;
     timer_a_underflow_old = false;
     timer_b_underflow_old = false;
@@ -84,6 +93,10 @@ void MOS6526::OneZyklus()
         Reset();
     }
     reset_wire_old = *reset_wire;
+
+    // Interrupt Pipeline fuer diesen Takt ausfuehren (falls das nicht schon durch einen Zugriff auf das ICR geschehen ist)
+    if(!ifr_done) IfrRun();
+    ifr_done = false;
 
     TimerCount();
 
@@ -133,17 +146,77 @@ void MOS6526::OneZyklus()
     }
 }
 
+// Interrupt Flag setzen (ein evtl. noch ausstehendes Loeschen dieses Flags wird verworfen)
 inline void MOS6526::TriggerInterrupt(int bit)
 {
     icr |= bit;
-    if (interupt_mask & bit)
+    icr_new |= bit;
+    icr_ack &= ~bit;
+}
+
+// Interrupt Ausgang setzen (IRQ bei CIA1, NMI bei CIA2)
+inline void MOS6526::SetIrqLine(bool state)
+{
+    if(irq_line == state)
+        return;
+
+    irq_line = state;
+
+    if(state)
     {
-        icr |= 0x80;
         if(cia_nr == 0)
             CpuTriggerInterrupt(CIA_IRQ);
         else
             CpuTriggerInterrupt(CIA_NMI);
     }
+    else
+    {
+        if(cia_nr == 0)
+            CpuClearInterrupt(CIA_IRQ);
+        else
+            CpuClearInterrupt(CIA_NMI);
+    }
+}
+
+// Interrupt Pipeline einen Takt weiter schalten (muss pro Takt genau einmal aufgerufen werden)
+inline void MOS6526::IfrRun()
+{
+    // Das Lesen vom ICR loescht die Flags erst zwei Takte spaeter
+    if(ifr_ack0)
+    {
+        icr &= ~icr_ack;
+        icr_ack = 0;
+    }
+
+    // Ein neues Flag, das freigegeben ist, hebt den Interrupt an. Wurde das ICR im vorigen Takt gelesen, dann einen Takt spaeter.
+    if(icr_new & interupt_mask & 0x1F)
+    {
+        if(ifr_read0)
+        {
+            ifr_raise1 = true;
+            ifr_d7set1 = true;
+        }
+        else
+        {
+            ifr_raise0 = true;
+            ifr_d7set0 = true;
+        }
+    }
+
+    if(ifr_d7set0) icr |= 0x80;
+    if(ifr_raise0) SetIrqLine(true);
+
+    icr_new = 0;
+
+    // Alle Stufen einen Takt weiter schieben
+    ifr_ack0 = ifr_ack1;
+    ifr_ack1 = false;
+    ifr_d7set0 = ifr_d7set1;
+    ifr_d7set1 = false;
+    ifr_raise0 = ifr_raise1;
+    ifr_raise1 = false;
+    ifr_read1 = ifr_read0;
+    ifr_read0 = false;
 }
 
 inline void MOS6526::CheckLP()
@@ -472,27 +545,22 @@ void MOS6526::WriteIO(uint16_t address, uint8_t value)
 
     case 13:
         io[address] = value;
-        if ((value&128)==128)
+        if(!ifr_done)
         {
-            interupt_mask |= value;
+            IfrRun();
+            ifr_done = true;
         }
-        else
-        {
-            interupt_mask &= ~value;
-        }
-        if (value & 0x80)
-        {
-            interupt_mask |= value & 0x7f;
-        }
-        else interupt_mask &= ~value;
 
-        if (icr & interupt_mask & 0x1f)
-        { // Trigger IRQ if pending
-            icr |= 0x80;
-            if(cia_nr == 0)
-                CpuTriggerInterrupt(CIA_IRQ);
-            else
-                CpuTriggerInterrupt(CIA_NMI);
+        if(value & 0x80)
+            interupt_mask |= value & 0x7F;
+        else
+            interupt_mask &= ~(value & 0x7F);
+
+        // Ein anstehendes freigegebenes Flag hebt den Interrupt an (nicht wenn das ICR im vorigen Takt gelesen wurde)
+        if((icr & interupt_mask & 0x7F) && !irq_line && !ifr_read1)
+        {
+            ifr_raise0 = true;
+            ifr_d7set0 = true;
         }
         break;
 
@@ -530,7 +598,6 @@ void MOS6526::WriteIO(uint16_t address, uint8_t value)
     return;
 }
 
-static unsigned char temp;
 uint8_t MOS6526::ReadIO(uint16_t address)
 {
     unsigned char ret;
@@ -603,13 +670,28 @@ uint8_t MOS6526::ReadIO(uint16_t address)
         return sdr;
 
     case 13:
-        temp = icr;
-        icr = 0;
-        if(cia_nr == 0)
-            CpuClearInterrupt(CIA_IRQ);
-        else
-            CpuClearInterrupt(CIA_NMI);
-        return temp;
+        if(!ifr_done)
+        {
+            IfrRun();
+            ifr_done = true;
+        }
+
+        // Steht der Interrupt kurz vor dem Anheben, dann ist Bit 7 schon zu sehen
+        if(ifr_raise0 && (icr & 0x1F))
+            icr |= 0x80;
+
+        // Die gelesenen Flags werden zwei Takte spaeter geloescht
+        if(icr & 0x9F)
+            icr_ack |= (icr & 0x9F) | 0x80;
+
+        ifr_ack1 = true;
+        ifr_raise0 = false;
+        ifr_d7set0 = false;
+        ifr_read0 = true;
+
+        ret = icr;
+        SetIrqLine(false);
+        return ret;
 
     case 14:
         return (cra & 0xFE) | (timer_a.cr_start ? 0x01 : 0x00);

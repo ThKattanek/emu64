@@ -50,8 +50,6 @@ MOS6510::MOS6510(void)
     branch_irq_sample = false;
     branch_nmi_sample = false;
     nmi_hijack = false;
-    cia_irq_prev = false;
-    cia_nmi_prev = false;
 
     for(int i=0; i<IntQuellenC64; i++) Interrupts[i] = false;
 
@@ -59,7 +57,7 @@ MOS6510::MOS6510(void)
     irq_delay_sr_value = 0;
 
     nmi_state = false;
-    nmi_state_old = false;
+    nmi_edge_event = false;
     nmi_fall_edge = false;
     nmi_is_active = false;
     nmi_fetch_decision = false;
@@ -98,7 +96,7 @@ void MOS6510::TriggerInterrupt(int typ)
     case CIA_NMI:
         if(Interrupts[CIA_NMI] == true) return;
         Interrupts[CIA_NMI] = true;
-        if((Interrupts[CRT_NMI] == false) && (Interrupts[RESTORE_NMI] == false)) nmi_state = true;
+        if((Interrupts[CRT_NMI] == false) && (Interrupts[RESTORE_NMI] == false)) { nmi_state = true; nmi_edge_event = true; }
         break;
     case VIC_IRQ:
         //Interrupts[VIC_IRQ] = true;
@@ -111,12 +109,12 @@ void MOS6510::TriggerInterrupt(int typ)
     case CRT_NMI:
         if(Interrupts[CRT_NMI] == true) return;
         Interrupts[CRT_NMI] = true;
-        if((Interrupts[CIA_NMI] == false) && (Interrupts[RESTORE_NMI] == false)) nmi_state = true;
+        if((Interrupts[CIA_NMI] == false) && (Interrupts[RESTORE_NMI] == false)) { nmi_state = true; nmi_edge_event = true; }
         break;
     case RESTORE_NMI:
         if(Interrupts[RESTORE_NMI] == true) return;
         Interrupts[RESTORE_NMI] = true;
-        if((Interrupts[CIA_NMI] == false) && (Interrupts[CRT_NMI] == false)) nmi_state = true;
+        if((Interrupts[CIA_NMI] == false) && (Interrupts[CRT_NMI] == false)) { nmi_state = true; nmi_edge_event = true; }
         break;
     default:
         break;
@@ -416,8 +414,6 @@ bool MOS6510::OneZyklus(void)
         branch_irq_early = false;
         i_flag_early = false;
         nmi_hijack = false;
-        cia_irq_prev = false;
-        cia_nmi_prev = false;
         irq_is_active = irq_fetch_decision = false;
         nmi_is_active = nmi_fetch_decision = false;
         SR = 0x04;
@@ -427,24 +423,14 @@ bool MOS6510::OneZyklus(void)
     RESET_OLD = *RESET;
 
     // IRQ auf low Pegel prüfen
-    // Der CIA IRQ wirkt erst einen Zyklus nach dem Setzen, das Löschen wirkt sofort
-    const bool cia_irq_line = ((irq_state & 0x01) != 0) && cia_irq_prev;
-    cia_irq_prev = ((irq_state & 0x01) != 0);
-    if(cia_irq_line || ((irq_state & 0xFE) != 0))
+    if(irq_state > 0)
         irq_is_low_pegel = true;
     else
         irq_is_low_pegel = false;
 
-    // NMI auf fallende Flanke überprüfen
-    // Der CIA NMI wird wie der CIA IRQ einen Zyklus später wirksam
-    const bool cia_nmi_line = cia_nmi_prev;
-    cia_nmi_prev = Interrupts[CIA_NMI];
-    const bool nmi_line = cia_nmi_line || Interrupts[CRT_NMI] || Interrupts[RESTORE_NMI];
-    if(nmi_line == true && nmi_state_old == false)
-        nmi_fall_edge = true;
-    else
-        nmi_fall_edge = false;
-    nmi_state_old = nmi_line;
+    // NMI Flanke auswerten (die Flanke wird beim Anheben der Leitung gemerkt, damit auch kurze Impulse erkannt werden)
+    nmi_fall_edge = nmi_edge_event;
+    nmi_edge_event = false;
 
     if(!CpuWait)
     {

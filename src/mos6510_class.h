@@ -96,8 +96,6 @@ private:
     bool            irq_is_active;
     bool            irq_fetch_decision; // IRQ Entscheidung vom Ende des vorigen Befehls (wird beim Opcode Fetch ausgewertet)
     bool            nmi_hijack;         // NMI hat waehrend BRK/IRQ den Vektor auf $FFFA/B umgelenkt
-    bool            cia_irq_prev;       // CIA IRQ Zustand des vorigen Zyklus (CIA meldet einen Zyklus verzoegert)
-    bool            cia_nmi_prev;       // CIA NMI Zustand des vorigen Zyklus
     bool            i_flag_early;       // CLI/SEI hat das I-Flag schon im RDY Wartezyklus geaendert
     bool            branch_irq_early;   // Taken Branch ohne Seitenwechsel: Interrupt wird einen Takt frueher entschieden
     bool            branch_irq_sample;  // IRQ Pegel im zweiten Zyklus eines Branches
@@ -107,7 +105,7 @@ private:
     uint8_t         irq_delay_sr_value;
 
     bool            nmi_state;
-    bool            nmi_state_old;
+    bool            nmi_edge_event;     // Die NMI Leitung wurde angehoben (die Flanke wird erst beim naechsten Takt ausgewertet)
     bool            nmi_fall_edge;
     bool            nmi_is_active;
     bool            nmi_fetch_decision; // NMI Entscheidung vom Ende des vorigen Befehls (wird beim Opcode Fetch ausgewertet)

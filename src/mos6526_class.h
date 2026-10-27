@@ -85,6 +85,8 @@ private:
 
     /// Funktionen ///
     inline void TriggerInterrupt(int bit);
+    inline void SetIrqLine(bool state);
+    inline void IfrRun();
     inline void TimerCount();
     inline void TimerReset(TIMER *timer);
     inline bool TimerStep(TIMER *timer);
@@ -95,6 +97,16 @@ private:
     uint8_t     io[16];
     uint8_t     interupt_mask;
     uint8_t     cra, crb, icr;
+    uint8_t     icr_new;            // Interrupt Flags die in diesem Takt neu gesetzt wurden
+    uint8_t     icr_ack;            // Interrupt Flags die nach dem Lesen vom ICR geloescht werden
+    bool        irq_line;           // Zustand vom Interrupt Ausgang (IRQ bei CIA1, NMI bei CIA2)
+    bool        ifr_done;           // Die Interrupt Pipeline wurde in diesem Takt schon ausgefuehrt
+
+    // Interrupt Pipeline (jede Stufe ist einen Takt spaeter dran, 1=naechster Takt, 0=dieser Takt)
+    bool        ifr_ack1, ifr_ack0;         // Interrupt Flags loeschen
+    bool        ifr_d7set1, ifr_d7set0;     // Bit 7 im ICR setzen
+    bool        ifr_raise1, ifr_raise0;     // Interrupt Ausgang anheben
+    bool        ifr_read0, ifr_read1;       // Das ICR wurde vor einem bzw. zwei Takten gelesen
     uint8_t     timer_b_mode;       // Bit 5 und 6 aus CRB (0=PHI2, 1=CNT Pin, 2/3=Unterlauf von Timer A)
     TIMER       timer_a;
     TIMER       timer_b;
