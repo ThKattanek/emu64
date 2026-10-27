@@ -467,19 +467,41 @@ inline void VICII::CheckBorder()
 
 inline void VICII::DrawGraphics()
 {
-    static uint16_t next_x_scroll;
+    // Jede 8 Pixel Gruppe wird erst einen Zyklus nach dem Zeichnen platziert. Dabei gilt der X-Scroll,
+    // wie er nach dem CPU Zugriff dieses Zyklus anliegt. Das entspricht dem X-Scroll Latch des VIC.
+    static uint8_t  group_buf[8];       // gezeichnete Gruppe vor dem X-Scroll
+    static uint8_t  pending_data[8];    // Gruppe die noch platziert werden muss
+    static uint8_t *pending_pos = nullptr;
+    static uint8_t  x_scroll_last;      // X-Scroll der zuletzt platzierten Gruppe
 
     if (!draw_this_line) return;
+
+    const bool group_cycle = (current_cycle >= 16) && (current_cycle <= 55);
 
     video_buffer_line_xscroll = video_buffer_line + 16;
 
     if(current_cycle == 14)
 	{
         for(int i=0;i<8;i++) video_buffer_line_xscroll[i] = reg_b0c | 0x40;
-        next_x_scroll = reg_x_scroll;
+        pending_pos = nullptr;
+        x_scroll_last = 7;
 	}
 
-    video_buffer_line_xscroll += next_x_scroll;
+    // Vorherige Gruppe mit dem aktuellen X-Scroll platzieren
+    if(pending_pos != nullptr)
+    {
+        const uint8_t x_scroll = reg_x_scroll;
+
+        // Wurde der X-Scroll erhöht, entsteht eine Lücke zur vorherigen Gruppe
+        const uint8_t gap_color = (display_status ? reg_b0c : 0) | 0x40;
+        for(int i=x_scroll_last;i<x_scroll;i++) pending_pos[i] = gap_color;
+
+        for(int i=0;i<8;i++) pending_pos[x_scroll + i] = pending_data[i];
+        x_scroll_last = x_scroll;
+        pending_pos = nullptr;
+    }
+
+    if(group_cycle) video_buffer_line_xscroll = group_buf;
 
     if(display_status)	// Display Mode
     {
@@ -687,6 +709,12 @@ inline void VICII::DrawGraphics()
                 video_buffer_line += 8;
         }
 	}
+
+    if(group_cycle)
+    {
+        for(int i=0;i<8;i++) pending_data[i] = group_buf[i];
+        pending_pos = video_buffer_line - 8 + 16;
+    }
 
     /// Im Aktuellen Zyklus Prüfen ob B0C Color verwendet wurde (16 Pixel vorlauf)
     /// Wenn ja mit aktuellen B0C überschreiben
