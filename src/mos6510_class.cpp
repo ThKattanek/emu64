@@ -788,6 +788,7 @@ bool MOS6510::OneZyklus(void)
                 SET_SR_NZ(AC);
                 MCT++;
             }
+            else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
             break;
         //R // Adresse Hi von PC-Adresse holen // PC=Adresse
         case 38:
@@ -972,6 +973,7 @@ bool MOS6510::OneZyklus(void)
                 AC = (unsigned char)tmp;
                 MCT++;
             }
+            else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
             break;
         //R // TMPByte von PC-Adresse lesen // AC - TMPByte - Carry // PC+1
         case 56:
@@ -1052,6 +1054,7 @@ bool MOS6510::OneZyklus(void)
                 }
                 MCT++;
             }
+            else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
             break;
         //R // TMPByte von SP+0x0100 holen
         case 59:
@@ -1116,6 +1119,7 @@ bool MOS6510::OneZyklus(void)
                 SET_SR_NZ(AC);
                 MCT++;
             }
+            else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
             break;
         //R // TMPByte von Adresse lesen // CarrayFalg=0
         case 69:
@@ -1227,6 +1231,7 @@ bool MOS6510::OneZyklus(void)
                 SET_SR_NZ(AC);
                 MCT++;
             }
+            else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
             break;
         //R // XR von PC-Adresse lesen // Set SR(NZ) // PC+1
         case 83:
@@ -1251,6 +1256,7 @@ bool MOS6510::OneZyklus(void)
                 SET_SR_NZ(XR);
                 MCT++;
             }
+            else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
             break;
         //R // YR von PC-Adresse lesen // Set SR(NZ) // PC+1
         case 86:
@@ -1275,6 +1281,7 @@ bool MOS6510::OneZyklus(void)
                 SET_SR_NZ(YR);
                 MCT++;
             }
+            else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
             break;
         //R // TMPByte von Adresse lesen // XR+1 // Set SR(NZ)
         case 89:
@@ -1360,6 +1367,7 @@ bool MOS6510::OneZyklus(void)
                 SET_ZERO(tmp &= 0xFF);
                 MCT++;
             }
+            else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
             break;
         //R // TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verÃ€ndert) // Set SR(NZC) // PC+1
         case 101:
@@ -1424,6 +1432,7 @@ bool MOS6510::OneZyklus(void)
                 SET_SR_NZ(AC);
                 MCT++;
             }
+            else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
             break;
         //R // TMPByte von PC-Adresse holen // AC>>1 // Set SR(NZC)
         case 108:
@@ -1516,6 +1525,20 @@ bool MOS6510::OneZyklus(void)
             CHK_RDY
                 SetPCHi(Read(0xFFFB));
             break;
+        //R // Indizierter Zugriff: Dummy Read von der nicht korrigierten Adresse (Seitenwechsel noch nicht ausgeglichen)
+        case 141:
+            // Prüfen ob DMA statt findet
+            if(!shxy_dma)
+            {
+                if(!*RDY && !CpuWait)
+                    shxy_dma = true;
+                else
+                    shxy_dma = false;
+            }
+
+            CHK_RDY
+                TMPByte = Read(((Adresse&0xFF) >= idxReg) ? Adresse : (unsigned short)(Adresse - 0x100));
+            break;
         //R // TMPByte von Adresse holen // Fix Adresse Hi MCT+1
         case 119:
             CHK_RDY
@@ -1524,6 +1547,7 @@ bool MOS6510::OneZyklus(void)
                 TMPByte = Read(Adresse);
                 MCT++;
             }
+            else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
             break;
         //W // TMPByte nach Adresse schreiben // Illegal [SLO]
         case 120:
@@ -1639,6 +1663,7 @@ bool MOS6510::OneZyklus(void)
                 SET_SR_NZ(AC);
                 MCT++;
             }
+            else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
             break;
         //W // TMPByte = AC & XR // TMPByte nach Adresse schreiben // Set SR(NZ) // Illegal [SAX]
         case 128:
@@ -1772,6 +1797,7 @@ bool MOS6510::OneZyklus(void)
                 SET_SR_NZ(AC);
                 MCT++;
             }
+            else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
             break;
         }
         MCT++;
