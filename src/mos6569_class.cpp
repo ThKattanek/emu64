@@ -2048,10 +2048,10 @@ void VICII::WriteIO(uint16_t address, uint8_t value)
                         if(current_cycle == 16)
                         {
                             uint8_t bit = 0x01;
-                            for(int i=0;i<8;i++,bit<<=1)
+                            for(int sp=0;sp<8;sp++,bit<<=1)
                             {
                                 if(!(value & bit) && !(sprite_y_exp_flip_flop & bit))
-                                    mc[i] = (0x2a & (mc_base[i] & mc[i])) | (0x15 & (mc_base[i] | mc[i]));
+                                    mc[sp] = (0x2a & (mc_base[sp] & mc[sp])) | (0x15 & (mc_base[sp] | mc[sp]));
                             }
                         }
                         reg_mye = value;
