@@ -44,6 +44,16 @@ MOS6510::MOS6510(void)
     irq_state = 0;
     irq_is_low_pegel = false;
     irq_is_active = false;
+    irq_fetch_decision = false;
+    branch_irq_early = false;
+    i_flag_early = false;
+    branch_irq_sample = false;
+    branch_nmi_sample = false;
+    nmi_hijack = false;
+    cia_irq_prev = false;
+    cia_nmi_prev = false;
+
+    for(int i=0; i<IntQuellenC64; i++) Interrupts[i] = false;
 
     irq_delay = false;
     irq_delay_sr_value = 0;
@@ -52,6 +62,7 @@ MOS6510::MOS6510(void)
     nmi_state_old = false;
     nmi_fall_edge = false;
     nmi_is_active = false;
+    nmi_fetch_decision = false;
 
     shxy_dma = false;
 }
@@ -402,6 +413,13 @@ bool MOS6510::OneZyklus(void)
         Interrupts[RESTORE_NMI] = false;
 
         JAMFlag = false;
+        branch_irq_early = false;
+        i_flag_early = false;
+        nmi_hijack = false;
+        cia_irq_prev = false;
+        cia_nmi_prev = false;
+        irq_is_active = irq_fetch_decision = false;
+        nmi_is_active = nmi_fetch_decision = false;
         SR = 0x04;
         MCT = ((unsigned char*)MicroCodeTable6510 + (0x100*MCTItemSize));
         AktOpcode = 0x100;
@@ -409,17 +427,24 @@ bool MOS6510::OneZyklus(void)
     RESET_OLD = *RESET;
 
     // IRQ auf low Pegel prüfen
-    if(irq_state > 0)
+    // Der CIA IRQ wirkt erst einen Zyklus nach dem Setzen, das Löschen wirkt sofort
+    const bool cia_irq_line = ((irq_state & 0x01) != 0) && cia_irq_prev;
+    cia_irq_prev = ((irq_state & 0x01) != 0);
+    if(cia_irq_line || ((irq_state & 0xFE) != 0))
         irq_is_low_pegel = true;
     else
         irq_is_low_pegel = false;
 
     // NMI auf fallende Flanke überprüfen
-    if(nmi_state == true && nmi_state_old == false)
+    // Der CIA NMI wird wie der CIA IRQ einen Zyklus später wirksam
+    const bool cia_nmi_line = cia_nmi_prev;
+    cia_nmi_prev = Interrupts[CIA_NMI];
+    const bool nmi_line = cia_nmi_line || Interrupts[CRT_NMI] || Interrupts[RESTORE_NMI];
+    if(nmi_line == true && nmi_state_old == false)
         nmi_fall_edge = true;
     else
         nmi_fall_edge = false;
-    nmi_state_old = nmi_state;
+    nmi_state_old = nmi_line;
 
     if(!CpuWait)
     {
@@ -431,9 +456,10 @@ bool MOS6510::OneZyklus(void)
 
             CHK_RDY
 
-                if(nmi_is_active == true) // NMIStatePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der NMI schon angelegen haben also vor dem letzten Zyklus des vorigen Befehls
+            if(nmi_fetch_decision == true) // NMIStatePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der NMI schon angelegen haben also vor dem letzten Zyklus des vorigen Befehls
             {
                 nmi_is_active = false;
+                nmi_fetch_decision = false;
                 MCT = ((unsigned char*)MicroCodeTable6510 + (0x102*MCTItemSize));
                 AktOpcode = 0x102;
 
@@ -442,7 +468,7 @@ bool MOS6510::OneZyklus(void)
             }
             else
             {
-                if((irq_is_active == true) && (irq_delay ? ((irq_delay_sr_value&4)==0) : ((SR&4)==0))) // IRQLinePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der IRQ schon anliegen also vor dem letzten Zyklus des vorigen Befehls
+                if((irq_fetch_decision == true) && (irq_delay ? ((irq_delay_sr_value&4)==0) : ((SR&4)==0))) // IRQLinePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der IRQ schon anliegen also vor dem letzten Zyklus des vorigen Befehls
                 {
                     MCT = ((unsigned char*)MicroCodeTable6510 + (0x101*MCTItemSize));
                     AktOpcode = 0x101;
@@ -454,8 +480,9 @@ bool MOS6510::OneZyklus(void)
 
             irq_delay = false;
 
-            MCT = ((unsigned char*)MicroCodeTable6510 + (Read(PC)*MCTItemSize));
-            AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
+            AktOpcodePC = PC;
+            AktOpcode = Read(PC);
+            MCT = ((unsigned char*)MicroCodeTable6510 + (AktOpcode*MCTItemSize));
 
             *HistoryPointer = *HistoryPointer+1;
             History[*HistoryPointer] = AktOpcodePC;
@@ -488,15 +515,27 @@ bool MOS6510::OneZyklus(void)
             SR|=4;
             SP--;
             break;
-        //R // PC Lo von 0xFFFE holen
+        //R // PC Lo von 0xFFFE holen // Liegt ein NMI an, wird stattdessen von 0xFFFA geholt (NMI Hijacking bei BRK/IRQ)
         case 5:
             CHK_RDY
+            if(nmi_is_active)
+            {
+                nmi_is_active = false;
+                nmi_fetch_decision = false;
+                nmi_hijack = true;
+                SetPCLo(Read(0xFFFA));
+            }
+            else
+            {
+                nmi_hijack = false;
                 SetPCLo(Read(0xFFFE));
+            }
             break;
-        //R // PC Hi von 0xFFFF holen
+        //R // PC Hi von 0xFFFF holen (bzw. 0xFFFB bei NMI Hijacking)
         case 6:
             CHK_RDY
-                SetPCHi(Read(0xFFFF));
+            SetPCHi(Read(nmi_hijack ? 0xFFFB : 0xFFFF));
+            nmi_hijack = false;
             break;
         //R // Pointer von PC-Adresse holen // PC++
         case 7:
@@ -643,6 +682,8 @@ bool MOS6510::OneZyklus(void)
             CHK_RDY
                 TMPByte = Read(PC);
             PC++;
+            branch_irq_sample = irq_is_low_pegel;
+            branch_nmi_sample = nmi_is_active || nmi_fall_edge;
             if((SR&0x80)!=0x00) MCT+=2;
             break;
         //R // TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prÃŒfen (BMI)
@@ -650,6 +691,8 @@ bool MOS6510::OneZyklus(void)
             CHK_RDY
                 TMPByte = Read(PC);
             PC++;
+            branch_irq_sample = irq_is_low_pegel;
+            branch_nmi_sample = nmi_is_active || nmi_fall_edge;
             if((SR&0x80)!=0x80) MCT+=2;
             break;
         //R // TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prÃŒfen (BVC)
@@ -657,6 +700,8 @@ bool MOS6510::OneZyklus(void)
             CHK_RDY
                 TMPByte = Read(PC);
             PC++;
+            branch_irq_sample = irq_is_low_pegel;
+            branch_nmi_sample = nmi_is_active || nmi_fall_edge;
             if((SR&0x40)!=0x00) MCT+=2;
             break;
         //R // TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prÃŒfen (BVS)
@@ -664,6 +709,8 @@ bool MOS6510::OneZyklus(void)
             CHK_RDY
                 TMPByte = Read(PC);
             PC++;
+            branch_irq_sample = irq_is_low_pegel;
+            branch_nmi_sample = nmi_is_active || nmi_fall_edge;
             if((SR&0x40)!=0x40) MCT+=2;
             break;
         //R // TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prÃŒfen (BCC)
@@ -671,6 +718,8 @@ bool MOS6510::OneZyklus(void)
             CHK_RDY
                 TMPByte = Read(PC);
             PC++;
+            branch_irq_sample = irq_is_low_pegel;
+            branch_nmi_sample = nmi_is_active || nmi_fall_edge;
             if((SR&0x01)!=0x00) MCT+=2;
             break;
         //R // TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prÃŒfen (BCS)
@@ -678,6 +727,8 @@ bool MOS6510::OneZyklus(void)
             CHK_RDY
                 TMPByte = Read(PC);
             PC++;
+            branch_irq_sample = irq_is_low_pegel;
+            branch_nmi_sample = nmi_is_active || nmi_fall_edge;
             if((SR&0x01)!=0x01) MCT+=2;
             break;
         //R // TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prÃŒfen (BNE)
@@ -685,6 +736,8 @@ bool MOS6510::OneZyklus(void)
             CHK_RDY
                 TMPByte = Read(PC);
             PC++;
+            branch_irq_sample = irq_is_low_pegel;
+            branch_nmi_sample = nmi_is_active || nmi_fall_edge;
             if((SR&0x02)!=0x00) MCT+=2;
             break;
         //R // TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prÃŒfen (BEQ)
@@ -692,6 +745,8 @@ bool MOS6510::OneZyklus(void)
             CHK_RDY
                 TMPByte = Read(PC);
             PC++;
+            branch_irq_sample = irq_is_low_pegel;
+            branch_nmi_sample = nmi_is_active || nmi_fall_edge;
             if((SR&0x02)!=0x02) MCT+=2;
             break;
         //R // Lesen von PC-Adresse und verwerfen // BranchAdresse=PC+TMPByte
@@ -707,6 +762,7 @@ bool MOS6510::OneZyklus(void)
             {
                 PC = BranchAdresse;
                 MCT+=1;
+                branch_irq_early = true;
             }
             break;
         //R // FIX PC Hi Adresse (Im Branchbefehl)
@@ -803,10 +859,12 @@ bool MOS6510::OneZyklus(void)
                 SR = Read(SP+0x0100)|32;
             SP++;
             break;
-        //R // SR von SP+0x0100 lesen
+        //R // SR von SP+0x0100 lesen // I-Flag wirkt erst nach dem naechsten Befehl (wie CLI/SEI)
         case 49:
             CHK_RDY
-                SR = Read(SP+0x0100)|32;
+                irq_delay_sr_value = SR;
+            SR = Read(SP+0x0100)|32;
+            irq_delay = true;
             break;
         //R // TMPByte von PC-Adresse lesen // AC + TMPByte + Carry // PC+1
         case 50:
@@ -1073,11 +1131,22 @@ bool MOS6510::OneZyklus(void)
             break;
         //R // TMPByte von Adresse lesen // InterruptFalg=0
         case 71:
+            if(!*RDY && !CpuWait)
+            {
+                // RDY Wartezyklus im letzten Zyklus: Das I-Flag wird schon beim ersten Versuch geändert
+                SR &= 0xFB;
+                i_flag_early = true;
+            }
             CHK_RDY
                 TMPByte = Read(PC);
-            irq_delay_sr_value = SR;
-            SR &= 0xFB;
-            irq_delay = true;
+            if(i_flag_early)
+                i_flag_early = false;
+            else
+            {
+                irq_delay_sr_value = SR;
+                SR &= 0xFB;
+                irq_delay = true;
+            }
             break;
         //R // TMPByte von Adresse lesen // OverflowFalg=0
         case 72:
@@ -1099,11 +1168,22 @@ bool MOS6510::OneZyklus(void)
             break;
         //R // TMPByte von Adresse lesen // InterruptFalg=1
         case 75:
+            if(!*RDY && !CpuWait)
+            {
+                // RDY Wartezyklus im letzten Zyklus: Das I-Flag wird schon beim ersten Versuch geändert
+                SR |= 0x04;
+                i_flag_early = true;
+            }
             CHK_RDY
                 TMPByte = Read(PC);
-            irq_delay_sr_value = SR;
-            SR |= 0x04;
-            irq_delay = true;
+            if(i_flag_early)
+                i_flag_early = false;
+            else
+            {
+                irq_delay_sr_value = SR;
+                SR |= 0x04;
+                irq_delay = true;
+            }
             break;
         //R // TMPByte von Adresse lesen // BIT Operation
         case 76:
@@ -1710,6 +1790,25 @@ bool MOS6510::OneZyklus(void)
 				return false;
 			}
 			*/
+
+            // Die Interrupt Entscheidung fällt im Takt vor dem letzten ausgeführten Zyklus des Befehls.
+            // RDY Wartezyklen davor (Takte mit Abtastung) zählen mit, Wartezyklen beim nächsten Fetch nicht mehr.
+            // (bei einem RDY Wartezyklus am Fetch bleibt *MCT == 0, dann darf die Entscheidung nicht neu gesetzt werden)
+            if(!CpuWait)
+            {
+                if(branch_irq_early)
+                {
+                    // Genommener Branch ohne Seitenwechsel: Die Entscheidung fällt einen Takt früher
+                    irq_fetch_decision = branch_irq_sample;
+                    nmi_fetch_decision = branch_nmi_sample;
+                }
+                else
+                {
+                    irq_fetch_decision = irq_is_low_pegel;
+                    nmi_fetch_decision = nmi_is_active || nmi_fall_edge;
+                }
+            }
+            branch_irq_early = false;
 
             AktOpcodePC = PC;
             if(Breakpoints[PC] & 1)
