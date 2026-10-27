@@ -163,6 +163,8 @@ private:
     uint16_t    g_address;
     uint16_t    p_address;
     uint16_t    s_address;
+    uint16_t    s_address_byte2[8];         // Adresse des 3. Sprite-Bytes (wird im Zyklus nach dem Sprite-Zugriff gelesen)
+    uint8_t     s_byte2_pending;            // Sprites deren 3. Byte noch gelesen werden muss
     uint8_t     p_data[8];
     uint8_t     c_data_buffer_8bit[64];
     uint8_t     c_data_buffer_4bit[64];
@@ -190,6 +192,16 @@ private:
     //////////////////////////////// Sprites //////////////////////////////////
 
     uint16_t    sprite_x_display_table[0x200];
+    uint8_t     sprite_x_cycle[0x200];      // Zyklus in dem die Rasterposition X erreicht wird (0 = nie)
+    uint16_t    sprite_x_trigger[8];        // X-Position mit der der Sprite in dieser Zeile gestartet wurde
+    uint8_t     sprite_trigger_color[8];    // Sprite Register wie sie beim Start des Sprites in der Zeile anlagen
+    uint8_t     sprite_trigger_mm0[8];
+    uint8_t     sprite_trigger_mm1[8];
+    uint8_t     sprite_trigger_mdp[8];
+    uint8_t     sprite_trigger_mxe[8];
+    uint8_t     sprite_trigger_mmc[8];
+    uint16_t    reg_mx_prev[8];             // Sprite X-Register vom Ende des vorherigen Zyklus
+    uint8_t     sprite_x_started;           // Sprites die in dieser Zeile ihre X-Position erreicht haben
     uint8_t     sprite_y_exp_flip_flop;
     uint8_t     mc[8];
     uint8_t     mc_base[8];
