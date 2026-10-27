@@ -145,6 +145,17 @@ VICII::VICII()
     sprite_dma = 0;
     sprite_view = 0;
 
+    for(int i=0; i<0x200; i++) sprite_x_cycle[i] = 0;
+    for(int i=1; i<64; i++)
+    {
+        // Die 8 Pixel eines Zyklus sind auf ein Vielfaches von 8 ausgerichtet
+        for(int j=0; j<8; j++) sprite_x_cycle[(x_coordinates_table[i] & 0x1F8) + j] = static_cast<uint8_t>(i);
+    }
+
+    s_byte2_pending = 0;
+    sprite_x_started = 0;
+    for(int i=0; i<8; i++) sprite_x_trigger[i] = 0;
+
     uint16_t spr_x_start = 0x194;
     for(uint16_t x=0; x<0x200; x++)
 	{
@@ -375,11 +386,13 @@ inline void VICII::pAccess(uint8_t sp_nr)
 
 inline void VICII::sAccess(uint8_t sp_nr)
 {
-	//// Es werden gleich alle 3 Bytes geladen ////
+    // Das 1. und 2. Byte werden im ersten Zyklus des Sprite-Zugriffs gelesen,
+    // das 3. Byte erst im folgenden Zyklus (siehe OneCycle)
     s_address = static_cast<uint16_t>((*cia2_port_a<<14)|(p_data[sp_nr]<<6)|(mc[sp_nr] & 0x3F));
     sprite_sequenzer[sp_nr] = static_cast<uint32_t>((Read(s_address)) << 16); s_address++;
     sprite_sequenzer[sp_nr] |= static_cast<uint32_t>(((Read(s_address)) << 8)); s_address++;
-    sprite_sequenzer[sp_nr] |= Read(s_address);
+    s_address_byte2[sp_nr] = s_address;
+    s_byte2_pending |= static_cast<uint8_t>(1 << sp_nr);
 }
 
 inline void VICII::CheckBorder()
@@ -744,20 +757,20 @@ inline void VICII::DrawSprites()
     while(sprite_nr >= 0)
     {
         // Ist Sprite Sichtbar ?
-        if(((sprite_view_current_line & current_sprite_bit) == current_sprite_bit) && (reg_mx[sprite_nr]<0x1F8))
+        if(((sprite_view_current_line & current_sprite_bit) == current_sprite_bit) && (sprite_x_started & current_sprite_bit) && (sprite_x_trigger[sprite_nr]<0x1F8))
 		{
-            sprite_buffer_line = (video_buffer_line - (62 * 8)) -4 + sprite_x_display_table[reg_mx[sprite_nr]];
+            sprite_buffer_line = (video_buffer_line - (62 * 8)) -4 + sprite_x_display_table[sprite_x_trigger[sprite_nr]];
 
             /// Temporärer Zeiger inerhalb des SpriteCollisionsPuffers auf das Aktuellen Sprites
-            unsigned char *q = sprite_collision_buffer + reg_mx[sprite_nr] + 8;
+            unsigned char *q = sprite_collision_buffer + sprite_x_trigger[sprite_nr] + 8;
 
-            if((reg_mdp & current_sprite_bit) == 0)	/// Prüfen auf Sprite Hinter Vordergrund
+            if((sprite_trigger_mdp[sprite_nr] & current_sprite_bit) == 0)	/// Prüfen auf Sprite Hinter Vordergrund
 			{
 				/// Sprites vor der Vordergrundgrafik
-                if((reg_mxe & current_sprite_bit) == current_sprite_bit)
+                if((sprite_trigger_mxe[sprite_nr] & current_sprite_bit) == current_sprite_bit)
 				{
                     /// Expandiertes Sprite
-                    if((reg_mmc & current_sprite_bit) == current_sprite_bit)
+                    if((sprite_trigger_mmc[sprite_nr] & current_sprite_bit) == current_sprite_bit)
 					{
                         /// MultiColor Sprite
                         for(int i=0;i<12;i++)
@@ -774,10 +787,10 @@ inline void VICII::DrawSprites()
                                 if(*(sprite_buffer_line+2) & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+3) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *sprite_buffer_line++ = reg_mm0;
-                                *sprite_buffer_line++ = reg_mm0;
-                                *sprite_buffer_line++ = reg_mm0;
-                                *sprite_buffer_line++ = reg_mm0;
+                                *sprite_buffer_line++ = sprite_trigger_mm0[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_mm0[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_mm0[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_mm0[sprite_nr];
 
                                 /// Sprite-Sprite Kollision (MuliColor Expand)
                                 if (q[i<<2]) current_sprite_collision |= q[i<<2] | current_sprite_bit;
@@ -797,10 +810,10 @@ inline void VICII::DrawSprites()
                                 if(*(sprite_buffer_line+2) & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+3) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
-                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
-                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
-                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
 
                                 /// Sprite-Sprite Kollision (MuliColor Expand)
                                 if (q[i<<2]) current_sprite_collision |= q[i<<2] | current_sprite_bit;
@@ -820,10 +833,10 @@ inline void VICII::DrawSprites()
                                 if(*(sprite_buffer_line+2) & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+3) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *sprite_buffer_line++ = reg_mm1;
-                                *sprite_buffer_line++ = reg_mm1;
-                                *sprite_buffer_line++ = reg_mm1;
-                                *sprite_buffer_line++ = reg_mm1;
+                                *sprite_buffer_line++ = sprite_trigger_mm1[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_mm1[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_mm1[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_mm1[sprite_nr];
 
                                 /// Sprite-Sprite Kollision (MuliColor Expand)
                                 if (q[i<<2]) current_sprite_collision |= q[i<<2] | current_sprite_bit;
@@ -851,8 +864,8 @@ inline void VICII::DrawSprites()
                                 if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
-                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
 
                                 /// Sprite-Sprite Kollision (SingleColor Expand)
                                 if (q[i<<1]) current_sprite_collision |= q[i<<1] | current_sprite_bit;
@@ -868,7 +881,7 @@ inline void VICII::DrawSprites()
 				else
 				{
                     /// Nicht Expandiertes Sprite
-                    if((reg_mmc & current_sprite_bit) == current_sprite_bit)
+                    if((sprite_trigger_mmc[sprite_nr] & current_sprite_bit) == current_sprite_bit)
 					{
                         /// MultiColor Sprite
                         for(int i=0;i<12;i++)
@@ -883,8 +896,8 @@ inline void VICII::DrawSprites()
                                 if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *sprite_buffer_line++ = reg_mm0;
-                                *sprite_buffer_line++ = reg_mm0;
+                                *sprite_buffer_line++ = sprite_trigger_mm0[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_mm0[sprite_nr];
 
                                 /// Sprite-Sprite Kollision (MuliColor)
                                 if (q[i<<1]) current_sprite_collision |= q[i<<1] | current_sprite_bit;
@@ -899,8 +912,8 @@ inline void VICII::DrawSprites()
                                 if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
-                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
 
                                 /// Sprite-Sprite Kollision (MuliColor)
                                 if (q[i<<1]) current_sprite_collision |= q[i<<1] | current_sprite_bit;
@@ -915,8 +928,8 @@ inline void VICII::DrawSprites()
                                 if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *sprite_buffer_line++ = reg_mm1;
-                                *sprite_buffer_line++ = reg_mm1;
+                                *sprite_buffer_line++ = sprite_trigger_mm1[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_mm1[sprite_nr];
 
                                 /// Sprite-Sprite Kollision (MuliColor)
                                 if (q[i<<1]) current_sprite_collision |= q[i<<1] | current_sprite_bit;
@@ -940,7 +953,7 @@ inline void VICII::DrawSprites()
                                 /// Sprite-Grafik Kollision
                                 if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                *sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                *sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
 
                                 /// Sprite-Sprite Kollision
                                 if (q[i]) current_sprite_collision |= q[i] | current_sprite_bit;
@@ -955,10 +968,10 @@ inline void VICII::DrawSprites()
 			else
 			{
 				/// Sprites hinter der Vordergrundgrafik
-                if((reg_mxe & current_sprite_bit) == current_sprite_bit)
+                if((sprite_trigger_mxe[sprite_nr] & current_sprite_bit) == current_sprite_bit)
 				{
                     /// Expandiertes Sprite
-                    if((reg_mmc & current_sprite_bit) == current_sprite_bit)
+                    if((sprite_trigger_mmc[sprite_nr] & current_sprite_bit) == current_sprite_bit)
 					{
                         /// MultiColor Sprite
                         for(int i=0;i<12;i++)
@@ -975,13 +988,13 @@ inline void VICII::DrawSprites()
                                 if(*(sprite_buffer_line+2) & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+3) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm0;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_mm0[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm0;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_mm0[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm0;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_mm0[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm0;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_mm0[sprite_nr];
                                 else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (MuliColor Expand)
@@ -1002,13 +1015,13 @@ inline void VICII::DrawSprites()
                                 if(*(sprite_buffer_line+2) & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+3) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
                                 else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (MuliColor Expand)
@@ -1029,13 +1042,13 @@ inline void VICII::DrawSprites()
                                 if(*(sprite_buffer_line+2) & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+3) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm1;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_mm1[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm1;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_mm1[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm1;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_mm1[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm1;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_mm1[sprite_nr];
                                 else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (MuliColor Expand)
@@ -1064,9 +1077,9 @@ inline void VICII::DrawSprites()
                                 if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
                                 else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (SingleColor Expand)
@@ -1083,7 +1096,7 @@ inline void VICII::DrawSprites()
 				else
 				{
                     /// Nicht Expandiertes Sprite
-                    if((reg_mmc & current_sprite_bit) == current_sprite_bit)
+                    if((sprite_trigger_mmc[sprite_nr] & current_sprite_bit) == current_sprite_bit)
 					{
                         /// MultiColor Sprite
                         for(int i=0;i<12;i++)
@@ -1098,9 +1111,9 @@ inline void VICII::DrawSprites()
                                 if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm0;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_mm0[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm0;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_mm0[sprite_nr];
                                 else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (MuliColor)
@@ -1116,9 +1129,9 @@ inline void VICII::DrawSprites()
                                 if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
                                 else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (MuliColor)
@@ -1134,9 +1147,9 @@ inline void VICII::DrawSprites()
                                 if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
                                 if(*(sprite_buffer_line+1) & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm1;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_mm1[sprite_nr];
                                 else sprite_buffer_line++;
-                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = reg_mm1;
+                                if(!(*sprite_buffer_line&0x80))*sprite_buffer_line++ = sprite_trigger_mm1[sprite_nr];
                                 else sprite_buffer_line++;
 
                                 /// Sprite-Sprite Kollision (MuliColor)
@@ -1163,7 +1176,7 @@ inline void VICII::DrawSprites()
                                     /// Sprite-Grafik Kollision
                                     if(*sprite_buffer_line & 0x80) current_gfx_collision |= current_sprite_bit;
 
-                                    *sprite_buffer_line++ = reg_mcolor[sprite_nr];
+                                    *sprite_buffer_line++ = sprite_trigger_color[sprite_nr];
 
                                     /// Sprite-Sprite Kollision
                                     if (q[i]) current_sprite_collision |= q[i] | current_sprite_bit;
@@ -1263,6 +1276,34 @@ void VICII::OneCycle()
         display_status = true;
     }
     else badline_status = false;
+
+    // 3. Byte der Sprite-Daten lesen
+    if(s_byte2_pending)
+    {
+        for(int i=0; i<8; i++)
+        {
+            if(s_byte2_pending & (1 << i)) sprite_sequenzer[i] |= Read(s_address_byte2[i]);
+        }
+        s_byte2_pending = 0;
+    }
+
+    // Ein Sprite startet in der Zeile erst wenn die Rasterposition seine X-Koordinate erreicht.
+    // Dabei gilt das X-Register wie es nach dem CPU-Zugriff dieses Zyklus anliegt (die CPU läuft vor dem VIC).
+    if(current_cycle == 1) sprite_x_started = 0;
+    for(int i=0; i<8; i++)
+    {
+        if(reg_mx[i] < 0x200 && sprite_x_cycle[reg_mx[i]] == current_cycle && !(sprite_x_started & (1 << i)))
+        {
+            sprite_x_started |= static_cast<uint8_t>(1 << i);
+            sprite_x_trigger[i] = reg_mx[i];
+            sprite_trigger_color[i] = reg_mcolor[i];
+            sprite_trigger_mm0[i] = reg_mm0;
+            sprite_trigger_mm1[i] = reg_mm1;
+            sprite_trigger_mdp[i] = reg_mdp;
+            sprite_trigger_mxe[i] = reg_mxe;
+            sprite_trigger_mmc[i] = reg_mmc;
+        }
+    }
 
     switch (current_cycle)
 	{
@@ -1394,6 +1435,12 @@ void VICII::OneCycle()
 
         vc = vc_base;
 
+        /// Sprite MC + 3 (Sprite-DMA ist abgeschlossen)
+        for(int i=0;i<8;i++,sprite_bit<<=1)
+        {
+            if(sprite_dma & sprite_bit) mc[i] += 3;
+        }
+
         DrawGraphics();
         break;
 
@@ -1415,12 +1462,6 @@ void VICII::OneCycle()
         if(badline_status) SetBALow();
         if((badline_status == true) && (display_status == true)) rc = 0;
 
-        /// Sprite MC + 3
-        for(int i=0;i<8;i++,sprite_bit<<=1)
-        {
-            if(sprite_dma & sprite_bit) mc[i] += 3;
-        }
-
         DrawGraphics();
 		break;
 
@@ -1441,9 +1482,19 @@ void VICII::OneCycle()
         sprite_sequencer_current_line[7] = sprite_sequenzer[7];
 
         /// Sprite ///
+        // MCBASE wird mit MC geladen wenn das Expansions-Flipflop gesetzt ist.
+        // Hier wirkt auch der Sprite-Crunch (siehe Schreibzugriff auf $d017).
         for(int i=0;i<8;i++,sprite_bit<<=1)
         {
-            if((sprite_y_exp_flip_flop & sprite_bit) == sprite_bit) mc_base[i] += 2;
+            if((sprite_y_exp_flip_flop & sprite_bit) == sprite_bit)
+            {
+                mc_base[i] = mc[i];
+                if(mc_base[i] >= 63)
+                {
+                    sprite_dma  &= ~sprite_bit;
+                    sprite_view &= ~sprite_bit;
+                }
+            }
         }
 
         gAccess();
@@ -1453,17 +1504,6 @@ void VICII::OneCycle()
 		break;
 
     case 17:
-        /// Sprite ///
-        for(int i=0;i<8;i++,sprite_bit<<=1)
-        {
-            if((sprite_y_exp_flip_flop & sprite_bit) == sprite_bit) mc_base[i] ++;
-            if(mc_base[i] >= 63)
-            {
-                sprite_dma  &= ~sprite_bit;
-                sprite_view &= ~sprite_bit;
-            }
-        }
-
         gAccess();
         if (badline_status) SetBALow();
 
@@ -1493,14 +1533,14 @@ void VICII::OneCycle()
 
         for (int i=0; i<8; i++, sprite_bit<<=1) if (reg_mye & sprite_bit) sprite_y_exp_flip_flop ^= sprite_bit;
 
-		// In der ersten Phasen von Zyklus 55 wird für Sprite 0-3 geprüft, 
+		// In der ersten Phase von Zyklus 55 wird für alle Sprites geprüft, 
 		// ob das entsprechende MxE-Bit in Register $d015 gesetzt und die Y-Koordinate 
 		// des Sprites (ungerade Register $d001-$d00f) gleich den unteren 8 Bits 
 		// von RASTER ist. Ist dies der Fall und der DMA für das Sprite noch 
 		// ausgeschaltet, wird der DMA angeschaltet, MCBASE gelöscht und, 
 		// wenn das MxYE-Bit gesetzt ist, das Expansions-Flipflop gelöscht.
         sprite_bit = 0x01;
-        for (int i=0; i<4; i++, sprite_bit<<=1)
+        for (int i=0; i<8; i++, sprite_bit<<=1)
 		{
             if ((reg_me & sprite_bit) && ((current_rasterline & 0xff) == reg_my[i]))
 			{
@@ -1522,14 +1562,14 @@ void VICII::OneCycle()
 	
 	case 56:
 		/// Sprite ///
-		// In der ersten Phasen von Zyklus 56 wird für Sprite 4-7 geprüft, 
+		// In der ersten Phase von Zyklus 56 wird (wie in Zyklus 55) für alle Sprites geprüft, 
 		// ob das entsprechende MxE-Bit in Register $d015 gesetzt und die Y-Koordinate 
 		// des Sprites (ungerade Register $d001-$d00f) gleich den unteren 8 Bits 
 		// von RASTER ist. Ist dies der Fall und der DMA für das Sprite noch 
 		// ausgeschaltet, wird der DMA angeschaltet, MCBASE gelöscht und, 
 		// wenn das MxYE-Bit gesetzt ist, das Expansions-Flipflop gelöscht.
-        sprite_bit = 0x10;
-        for (int i=4; i<8; i++, sprite_bit<<=1)
+        sprite_bit = 0x01;
+        for (int i=0; i<8; i++, sprite_bit<<=1)
 		{
             if ((reg_me & sprite_bit) && (current_rasterline & 0xff) == reg_my[i])
 			{
@@ -1580,8 +1620,11 @@ void VICII::OneCycle()
         for(int i=0;i<8;i++, sprite_bit<<=1)
 		{
             mc[i] = mc_base[i];
-            //if(((sprite_dma & bitc) == bitc) && ((current_rasterline&0xFF) == reg_my[i])) SpriteView |= bitc;
-            if(((sprite_dma & sprite_bit) == sprite_bit)) sprite_view |= sprite_bit;
+            if(sprite_dma & sprite_bit)
+            {
+                if((reg_me & sprite_bit) && ((current_rasterline & 0xff) == reg_my[i])) sprite_view |= sprite_bit;
+            }
+            else sprite_view &= ~sprite_bit;
 		}
 
 		// Sprite 0 //
@@ -1999,6 +2042,18 @@ void VICII::WriteIO(uint16_t address, uint8_t value)
 
 		/// Sprite Y-Expansion
 		case 0x17:
+                        // Sprite-Crunch: Wird das Expansions-Flipflop in Zyklus 15 durch
+                        // Löschen von MxYE gesetzt, wird MC verfälscht. Die CPU läuft vor dem VIC,
+                        // der Schreibzugriff in Zyklus 15 sieht daher current_cycle == 16.
+                        if(current_cycle == 16)
+                        {
+                            uint8_t bit = 0x01;
+                            for(int sp=0;sp<8;sp++,bit<<=1)
+                            {
+                                if(!(value & bit) && !(sprite_y_exp_flip_flop & bit))
+                                    mc[sp] = (0x2a & (mc_base[sp] & mc[sp])) | (0x15 & (mc_base[sp] | mc[sp]));
+                            }
+                        }
                         reg_mye = value;
                         sprite_y_exp_flip_flop |= ~value;
 			break;
