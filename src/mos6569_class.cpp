@@ -153,6 +153,14 @@ VICII::VICII()
     }
 
     s_byte2_pending = 0;
+    gfx_pipe0_g = gfx_pipe0_c = gfx_pipe0_v = 0;
+    gfx_pipe1_g = gfx_pipe1_c = gfx_pipe1_v = 0;
+    gfx_reg_g = gfx_reg_c = gfx_reg_v = 0;
+    gfx_pixel_reg = 0;
+    gfx_x_scroll = 0;
+    gfx_vmode11 = gfx_vmode16 = gfx_vmode16_2 = 0;
+    gfx_mc_flop = false;
+    color_latency = true;
     sprite_x_started = 0;
     for(int i=0; i<8; i++) sprite_x_trigger[i] = 0;
 
@@ -388,10 +396,13 @@ inline void VICII::sAccess(uint8_t sp_nr)
 {
     // Das 1. und 2. Byte werden im ersten Zyklus des Sprite-Zugriffs gelesen,
     // das 3. Byte erst im folgenden Zyklus (siehe OneCycle)
-    s_address = static_cast<uint16_t>((*cia2_port_a<<14)|(p_data[sp_nr]<<6)|(mc[sp_nr] & 0x3F));
-    sprite_sequenzer[sp_nr] = static_cast<uint32_t>((Read(s_address)) << 16); s_address++;
-    sprite_sequenzer[sp_nr] |= static_cast<uint32_t>(((Read(s_address)) << 8)); s_address++;
-    s_address_byte2[sp_nr] = s_address;
+    // MC ist ein 6-Bit-Zaehler: Die Adressen der drei Bytes laufen innerhalb des 64-Byte-Blocks um
+    uint16_t s_base = static_cast<uint16_t>((*cia2_port_a<<14)|(p_data[sp_nr]<<6));
+    s_address = static_cast<uint16_t>(s_base | (mc[sp_nr] & 0x3F));
+    sprite_sequenzer[sp_nr] = static_cast<uint32_t>((Read(s_address)) << 16);
+    s_address = static_cast<uint16_t>(s_base | ((mc[sp_nr] + 1) & 0x3F));
+    sprite_sequenzer[sp_nr] |= static_cast<uint32_t>(((Read(s_address)) << 8));
+    s_address_byte2[sp_nr] = static_cast<uint16_t>(s_base | ((mc[sp_nr] + 2) & 0x3F));
     s_byte2_pending |= static_cast<uint8_t>(1 << sp_nr);
 }
 
@@ -465,244 +476,144 @@ inline void VICII::CheckBorder()
 	}
 }
 
-inline void VICII::DrawGraphics()
+// Farbquellen der Pixel je Videomodus (MCM=4, BMM=8, ECM=16) und Pixelwert, wie im VIC
+enum { GFX_D021, GFX_D022, GFX_D023, GFX_CBUF, GFX_CBUF_MC, GFX_VBUF_L, GFX_VBUF_H, GFX_D02X_EXT, GFX_NONE };
+
+static const uint8_t gfx_color_source[32] =
 {
-    static uint16_t next_x_scroll;
+    GFX_D021, GFX_D021, GFX_CBUF, GFX_CBUF,                 // ECM=0 BMM=0 MCM=0
+    GFX_D021, GFX_D022, GFX_D023, GFX_CBUF_MC,              // ECM=0 BMM=0 MCM=1
+    GFX_VBUF_L, GFX_VBUF_L, GFX_VBUF_H, GFX_VBUF_H,         // ECM=0 BMM=1 MCM=0
+    GFX_D021, GFX_VBUF_H, GFX_VBUF_L, GFX_CBUF,             // ECM=0 BMM=1 MCM=1
+    GFX_D02X_EXT, GFX_D02X_EXT, GFX_CBUF, GFX_CBUF,         // ECM=1 BMM=0 MCM=0
+    GFX_NONE, GFX_NONE, GFX_NONE, GFX_NONE,                 // ECM=1 BMM=0 MCM=1
+    GFX_NONE, GFX_NONE, GFX_NONE, GFX_NONE,                 // ECM=1 BMM=1 MCM=0
+    GFX_NONE, GFX_NONE, GFX_NONE, GFX_NONE                  // ECM=1 BMM=1 MCM=1
+};
 
-    if (!draw_this_line) return;
-
-    video_buffer_line_xscroll = video_buffer_line + 16;
-
-    if(current_cycle == 14)
-	{
-        for(int i=0;i<8;i++) video_buffer_line_xscroll[i] = reg_b0c | 0x40;
-        next_x_scroll = reg_x_scroll;
-	}
-
-    video_buffer_line_xscroll += next_x_scroll;
-
-    if(display_status)	// Display Mode
+// Erzeugt die 8 Pixel eines Zyklus aus dem Schieberegister. Der Videomodus wird in der Mitte
+// des Zyklus gelatcht (MCM bei Pixel 4, ECM/BMM je nach Chip bei Pixel 4 bzw. 6 bzw. am Ende).
+// Danach rutschen die im Zyklus abgerufenen Daten in die Pipeline.
+inline void VICII::RenderGfxCycle(uint8_t *out)
+{
+    for(int i=0;i<8;i++)
     {
-        if((current_cycle >= 16) && (current_cycle <= 55)) // Grafiksequenzer --> muss um 16 Pixel verzögert werden
+        if(i == 4)
         {
-            switch(graphic_mode)
-			{
-			case 0:
-				/// Standard Text Modus (ECM/BMM/MCM = 0/0/0) ///
-                colors[0] = reg_b0c | 0x40;
-                colors[1] = color_data | 0x80;
-					
-                for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = colors[(gfx_data>>(i))&1];
-                video_buffer_line += 8;
-				break;
-			case 1:
-				/// Multicolor Text Modus (ECM/BMM/MCM = 0/0/1) ///
-                if(!(color_data&8))
-				{
-					/// MC-Flag = 0 ///
-                    colors[0] = reg_b0c | 0x40;
-                    colors[1] = (color_data&7) | 0x80;
+            gfx_vmode16 = static_cast<uint8_t>((reg_ctrl_2 & 0x10) >> 2);
+            if(color_latency) gfx_vmode11 |= static_cast<uint8_t>((reg_ctrl_1 & 0x60) >> 2);
+        }
+        else if(i == 6)
+        {
+            if(color_latency) gfx_vmode11 &= static_cast<uint8_t>((reg_ctrl_1 & 0x60) >> 2);
+        }
+        else if(i == 7)
+        {
+            if(gfx_vmode16 && !gfx_vmode16_2) gfx_mc_flop = false;
+            gfx_vmode16_2 = gfx_vmode16;
+        }
 
-                    for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = colors[(gfx_data>>(i))&1];
-                    video_buffer_line += 8;
-				}
-				else
-				{
-					/// MC-Flag = 1 ///
-                    colors[0] = reg_b0c | 0x40;
-                    colors[1] = reg_b1c;
-                    colors[2] = reg_b2c | 0x80;
-                    colors[3] = (color_data&7) | 0x80;
+        // Neue Zellendaten werden beim X-Scroll Offset ins Schieberegister geladen
+        if(i == gfx_x_scroll)
+        {
+            gfx_reg_v = gfx_pipe1_v;
+            gfx_reg_c = gfx_pipe1_c;
+            gfx_reg_g = gfx_pipe1_g;
+            gfx_mc_flop = true;
+        }
 
-					for(int i=6;i>-1;i-=2)
-					{
-                        *video_buffer_line_xscroll = colors[(gfx_data>>(i))&3];
-                        video_buffer_line_xscroll++;
-                        *video_buffer_line_xscroll = video_buffer_line_xscroll[-1];
-                        video_buffer_line_xscroll++;
-					}
-                    video_buffer_line += 8;
-				}
-				break;
-			case 2:
-				/// Standard Bitmap Modus (ECM/BMM/MCM = 0/1/0) ///
-                colors[0] = char_data&0x0F;
-                colors[1] = (char_data>>4) | 0x80;
-				
-                for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = colors[(gfx_data>>(i))&1];
-                video_buffer_line += 8;
-				break;
-			case 3:
-				/// Multicolor Bitmap Modus (ECM/BMM/MCM = 0/1/1) ///
-                colors[0] = reg_b0c | 0x40;
-                colors[1] = char_data>>4;
-                colors[2] = (char_data&0x0F) | 0x80;
-                colors[3] = color_data | 0x80;
-				
-				for(int i=6;i>-1;i-=2)
-				{
-                    *video_buffer_line_xscroll = colors[(gfx_data>>(i))&3];
-                    video_buffer_line_xscroll++;
-                    *video_buffer_line_xscroll = video_buffer_line_xscroll[-1];
-                    video_buffer_line_xscroll++;
-				}
-                video_buffer_line += 8;
-				break;
-			case 4:
-				/// ECM Text Modus (ECM/BMM/MCM = 1/0/0) ///
-                switch((char_data >> 6) & 0x03)
-				{
-				case 0:
-                    colors[0] = reg_b0c | 0x40;
-					break;
-				case 1:
-                    colors[0] = reg_b1c;
-					break;
-				case 2:
-                    colors[0] = reg_b2c;
-					break;
-				case 3:
-                    colors[0] = reg_b3c;
-					break;
-				}
-                colors[1] = color_data | 0x80;
-					
-                for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = colors[(gfx_data>>(i))&1];
-                video_buffer_line += 8;
-				break;
-			default:
-                *video_buffer_line_xscroll++ = 0;
-                *video_buffer_line_xscroll++ = 0;
-                *video_buffer_line_xscroll++ = 0;
-                *video_buffer_line_xscroll++ = 0;
-                *video_buffer_line_xscroll++ = 0;
-                *video_buffer_line_xscroll++ = 0;
-                *video_buffer_line_xscroll++ = 0;
-                *video_buffer_line_xscroll++ = 0;
-                video_buffer_line += 8;
-				break;
-			}
-		}
+        // Pixelwert lesen
+        const bool mc_cell = ((gfx_vmode11 & 0x08) != 0) || ((gfx_reg_c & 0x08) != 0);
+        if(gfx_vmode16_2)
+        {
+            if(mc_cell)
+            {
+                if(gfx_mc_flop) gfx_pixel_reg = gfx_reg_g >> 6;
+            }
+            else gfx_pixel_reg = (gfx_reg_g & 0x80) ? 3 : 0;
+        }
         else
         {
-                *video_buffer_line_xscroll++ = colors[0];
-                *video_buffer_line_xscroll++ = colors[0];
-                *video_buffer_line_xscroll++ = colors[0];
-                *video_buffer_line_xscroll++ = colors[0];
-                *video_buffer_line_xscroll++ = colors[0];
-                *video_buffer_line_xscroll++ = colors[0];
-                *video_buffer_line_xscroll++ = colors[0];
-                *video_buffer_line_xscroll++ = colors[0];
-                video_buffer_line += 8;
+            if(mc_cell) gfx_pixel_reg = (gfx_reg_g & 0x80) ? 2 : 0;
+            else gfx_pixel_reg = (gfx_reg_g & 0x80) ? 3 : 0;
         }
-	}
-	else	// Idle Mode
+
+        const uint8_t px = gfx_pixel_reg;
+        gfx_reg_g <<= 1;
+        gfx_mc_flop = !gfx_mc_flop;
+
+        // Farbe bestimmen. Hintergrund (0x40) wird später mit $d021 aufgelöst, Vordergrund bekommt 0x80
+        uint8_t color;
+        switch(gfx_color_source[gfx_vmode11 | gfx_vmode16 | px])
+        {
+        case GFX_D021:      color = reg_b0c | 0x40;                 break;
+        case GFX_D022:      color = reg_b1c;                        break;
+        case GFX_D023:      color = reg_b2c;                        break;
+        case GFX_CBUF:      color = gfx_reg_c;                      break;
+        case GFX_CBUF_MC:   color = gfx_reg_c & 0x07;               break;
+        case GFX_VBUF_L:    color = gfx_reg_v & 0x0F;               break;
+        case GFX_VBUF_H:    color = gfx_reg_v >> 4;                 break;
+        case GFX_D02X_EXT:
+            switch(gfx_reg_v >> 6)
+            {
+            case 0:         color = reg_b0c | 0x40;                 break;
+            case 1:         color = reg_b1c;                        break;
+            case 2:         color = reg_b2c;                        break;
+            default:        color = reg_b3c;                        break;
+            }
+            break;
+        default:            color = 0;                              break;
+        }
+
+        if(px & 0x02) color |= 0x80;
+        out[i] = color;
+    }
+
+    if(!color_latency) gfx_vmode11 = static_cast<uint8_t>((reg_ctrl_1 & 0x60) >> 2);
+
+    // Pipeline weiterschieben und die im Zyklus abgerufenen Daten übernehmen
+    gfx_pipe1_v = gfx_pipe0_v;
+    gfx_pipe1_c = gfx_pipe0_c;
+    gfx_pipe1_g = gfx_pipe0_g;
+
+    if((current_cycle >= 16) && (current_cycle <= 55))
     {
-        colors[0] = 0 | 0x40;
+        gfx_pipe0_g = gfx_data;
+        gfx_x_scroll = static_cast<uint8_t>(reg_x_scroll);
 
-        if((current_cycle >= 16) && (current_cycle <= 55)) // Grafiksequenzer --> muss um 16 Pixel verzögert werden
-		{
-            // Grafiksequenzer --> muss um 16 Pixel verzögert werden
-            switch(graphic_mode)
-			{
-			case 0:
-                /// Standard Text Modus (ECM/BMM/MCM = 0/0/0) ///
-                colors[1] = 0 | 0x80;
-                for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = colors[(gfx_data>>(i))&1];
-                video_buffer_line += 8;
-				break;
-			case 1:
-				/// Multicolor Text Modus (ECM/BMM/MCM = 0/0/1) ///
-                if(!(color_data&8))
-				{
-                    /// MC-Flag = 0 ///
-                    colors[1] = 0 | 0x80;
-
-                    for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = colors[(gfx_data>>(i))&1];
-                    video_buffer_line += 8;
-				}
-				else
-				{
-                    /// MC-Flag = 1 ///
-                    colors[1] = 0;
-                    colors[2] = 0 | 0x80;
-                    colors[3] = 0 | 0x80;
-
-					for(int i=6;i>-1;i-=2)
-					{
-                        *video_buffer_line_xscroll = colors[(gfx_data>>(i))&3];
-                        video_buffer_line_xscroll++;
-                        *video_buffer_line_xscroll = video_buffer_line_xscroll[-1];
-                        video_buffer_line_xscroll++;
-					}
-                    video_buffer_line += 8;
-				}
-				break;
-			case 2:
-				/// Standard Bitmap Modus (ECM/BMM/MCM = 0/1/0) ///
-                colors[1] = 0 | 0x80;
-				
-                for(int i=7;i>-1;i--) *video_buffer_line_xscroll++ = colors[(gfx_data>>(i))&1];
-                video_buffer_line += 8;
-				break;
-			case 3:
-                /// Multicolor Bitmap Modus (ECM/BMM/MCM = 1/0/0) ///
-                colors[1] = 0;
-                colors[2] = 0 | 0x80;
-                colors[3] = 0 | 0x80;
-				
-				for(int i=6;i>-1;i-=2)
-				{
-                    *video_buffer_line_xscroll = colors[(gfx_data>>(i))&3];
-                    video_buffer_line_xscroll++;
-                    *video_buffer_line_xscroll = video_buffer_line_xscroll[-1];
-                    video_buffer_line_xscroll++;
-				}
-                video_buffer_line += 8;
-
-				break;
-			default:
-                *video_buffer_line_xscroll++ = 0;
-                *video_buffer_line_xscroll++ = 0;
-                *video_buffer_line_xscroll++ = 0;
-                *video_buffer_line_xscroll++ = 0;
-                *video_buffer_line_xscroll++ = 0;
-                *video_buffer_line_xscroll++ = 0;
-                *video_buffer_line_xscroll++ = 0;
-                *video_buffer_line_xscroll++ = 0;
-                video_buffer_line += 8;
-				break;
-			}
-		}
+        if(display_status)
+        {
+            gfx_pipe0_v = char_data;
+            gfx_pipe0_c = color_data;
+        }
         else
         {
-                *video_buffer_line_xscroll++ = colors[0];
-                *video_buffer_line_xscroll++ = colors[0];
-                *video_buffer_line_xscroll++ = colors[0];
-                *video_buffer_line_xscroll++ = colors[0];
-                *video_buffer_line_xscroll++ = colors[0];
-                *video_buffer_line_xscroll++ = colors[0];
-                *video_buffer_line_xscroll++ = colors[0];
-                *video_buffer_line_xscroll++ = colors[0];
-                video_buffer_line += 8;
+            gfx_pipe0_v = 0;
+            gfx_pipe0_c = 0;
         }
-	}
+    }
+    else gfx_pipe0_g = 0;
+}
 
-    /// Im Aktuellen Zyklus Prüfen ob B0C Color verwendet wurde (16 Pixel vorlauf)
-    /// Wenn ja mit aktuellen B0C überschreiben
-
-    video_buffer_line_xscroll = video_buffer_line - 8;
-
+// Grey Dot und Hintergrundfarbe ($d021) für die 8 Pixel eines Zyklus
+inline void VICII::ResolveBackground(uint8_t *slot)
+{
     /// Grey Dot zeichnen
-    ///
-    if(is_write_reg_b0c && (video_buffer_line_xscroll[0] & 0x40) && display_status)
-        video_buffer_line_xscroll[0] = 0x0f;
-
+    if(is_write_reg_b0c && (slot[0] & 0x40) && display_status) slot[0] = 0x0f;
 
     for(int i=0;i<8;i++)
     {
-        if(video_buffer_line_xscroll[i] & 0x40) video_buffer_line_xscroll[i] =  reg_b0c;
+        if(slot[i] & 0x40) slot[i] = reg_b0c;
     }
+}
+
+inline void VICII::DrawGraphics()
+{
+    if (!draw_this_line) return;
+
+    RenderGfxCycle(video_buffer_line);
+    ResolveBackground(video_buffer_line);
+    video_buffer_line += 8;
 
     ////////////////////////// Draw Border //////////////////////////
     CheckBorder();
@@ -710,6 +621,13 @@ inline void VICII::DrawGraphics()
 
 inline void VICII::DrawGraphicsPseudo()
 {
+    // Auch in den Zyklen ohne Grafikabruf läuft das Schieberegister weiter (z.B. bei geöffnetem Rand)
+    if(draw_this_line && current_cycle >= 14)
+    {
+        RenderGfxCycle(video_buffer_line);
+        ResolveBackground(video_buffer_line);
+    }
+
     /// Für Anzeige Aller Zyklen
     video_buffer_line += 8;
 
@@ -1196,6 +1114,20 @@ inline void VICII::DrawSprites()
         current_sprite_bit >>= 1;
     }
 
+    // Platzhalter der Sprite-Farben mit dem Registerstand des Zyklus aufloesen, in dem das Pixel
+    // ausgegeben wird (ein Pixel Verzoegerung wie beim 6569)
+    {
+        unsigned char *line_start = video_buffer_line - (62 * 8);
+        for(int n=0; n<504; n++)
+        {
+            if((line_start[n] & 0xF0) == SPRITE_COLOR_PLACEHOLDER)
+            {
+                int cycle = (n > 0 ? (n - 1) : 0) / 8 + 1;
+                line_start[n] = sprite_color_history[cycle][line_start[n] & 0x0F] & 0x0F;
+            }
+        }
+    }
+
     //////////////////////// Sprite Collision ///////////////////////////
 
     // Prüfe sprite-sprite kollisions
@@ -1277,6 +1209,11 @@ void VICII::OneCycle()
     }
     else badline_status = false;
 
+    // Sprite-Farbregister dieses Zyklus merken (Aufloesung der Sprite-Pixel erst am Zeilenende)
+    sprite_color_history[current_cycle][0] = reg_mm0;
+    sprite_color_history[current_cycle][1] = reg_mm1;
+    for(int i=0; i<8; i++) sprite_color_history[current_cycle][2+i] = reg_mcolor[i];
+
     // 3. Byte der Sprite-Daten lesen
     if(s_byte2_pending)
     {
@@ -1296,9 +1233,10 @@ void VICII::OneCycle()
         {
             sprite_x_started |= static_cast<uint8_t>(1 << i);
             sprite_x_trigger[i] = reg_mx[i];
-            sprite_trigger_color[i] = reg_mcolor[i];
-            sprite_trigger_mm0[i] = reg_mm0;
-            sprite_trigger_mm1[i] = reg_mm1;
+            // Farben werden erst nach dem Zeichnen der Zeile mit dem Registerstand des jeweiligen Zyklus aufgeloest
+            sprite_trigger_color[i] = static_cast<uint8_t>(SPRITE_COLOR_PLACEHOLDER + 2 + i);
+            sprite_trigger_mm0[i] = SPRITE_COLOR_PLACEHOLDER;
+            sprite_trigger_mm1[i] = SPRITE_COLOR_PLACEHOLDER + 1;
             sprite_trigger_mdp[i] = reg_mdp;
             sprite_trigger_mxe[i] = reg_mxe;
             sprite_trigger_mmc[i] = reg_mmc;
@@ -1435,10 +1373,10 @@ void VICII::OneCycle()
 
         vc = vc_base;
 
-        /// Sprite MC + 3 (Sprite-DMA ist abgeschlossen)
+        /// Sprite MC + 3 (Sprite-DMA ist abgeschlossen), MC ist ein 6-Bit-Zähler
         for(int i=0;i<8;i++,sprite_bit<<=1)
         {
-            if(sprite_dma & sprite_bit) mc[i] += 3;
+            if(sprite_dma & sprite_bit) mc[i] = static_cast<uint8_t>((mc[i] + 3) & 0x3F);
         }
 
         DrawGraphics();
@@ -1489,7 +1427,7 @@ void VICII::OneCycle()
             if((sprite_y_exp_flip_flop & sprite_bit) == sprite_bit)
             {
                 mc_base[i] = mc[i];
-                if(mc_base[i] >= 63)
+                if(mc_base[i] == 63)
                 {
                     sprite_dma  &= ~sprite_bit;
                     sprite_view &= ~sprite_bit;
@@ -1528,11 +1466,6 @@ void VICII::OneCycle()
         *ba = true;
 
 		/// Sprite ///
-		// In der ersten Phase von Zyklus 55 wird das Expansions-Flipflop
-		// invertiert, wenn das MxYE-Bit gesetzt ist.
-
-        for (int i=0; i<8; i++, sprite_bit<<=1) if (reg_mye & sprite_bit) sprite_y_exp_flip_flop ^= sprite_bit;
-
 		// In der ersten Phase von Zyklus 55 wird für alle Sprites geprüft, 
 		// ob das entsprechende MxE-Bit in Register $d015 gesetzt und die Y-Koordinate 
 		// des Sprites (ungerade Register $d001-$d00f) gleich den unteren 8 Bits 
@@ -1548,7 +1481,7 @@ void VICII::OneCycle()
 				{
                     sprite_dma |= sprite_bit;
                     mc_base[i] = 0;
-                    if (reg_mye & sprite_bit) sprite_y_exp_flip_flop &= ~sprite_bit;
+                    sprite_y_exp_flip_flop |= sprite_bit;
 				}
 			}
 		}
@@ -1577,10 +1510,16 @@ void VICII::OneCycle()
 				{
                     sprite_dma |= sprite_bit;
                     mc_base[i] = 0;
-                    if (reg_mye & sprite_bit) sprite_y_exp_flip_flop &= ~sprite_bit;
+                    sprite_y_exp_flip_flop |= sprite_bit;
 				}
 			}
 		}	
+
+		// Danach wird das Expansions-Flipflop invertiert, wenn der DMA des Sprites
+		// läuft und das MxYE-Bit gesetzt ist (wie bei VICE in Zyklus 56). Ein $d017-Schreibzugriff
+		// in Zyklus 55 wirkt daher noch auf das Flipflop (Sprite-Crunch).
+        sprite_bit = 0x01;
+        for (int i=0; i<8; i++, sprite_bit<<=1) if ((sprite_dma & sprite_bit) && (reg_mye & sprite_bit)) sprite_y_exp_flip_flop ^= sprite_bit;
 
         DrawGraphics();
 		break;

@@ -1,3 +1,32 @@
+Alle Änderungen ab V5.2.0 bis jetzt
+-----------------------------------
+
+- [#311] Fixed: VIC - Sprite-Expansions-Flipflop wird (wie bei VICE) in Zyklus 56 und nur bei laufendem DMA invertiert, damit wirkt ein $d017-Schreibzugriff in Zyklus 55 noch auf das Flipflop (Sprite-Crunch);
+  der Sprite-Zähler MC ist ein 6-Bit-Zähler (Wrap bei 64), der DMA endet bei MCBASE = 63 (unholy.prg)
+  Sprite-Daten: Die drei Bytes eines Sprites werden innerhalb des 64-Byte-Blocks umgebrochen (MC ist 6 Bit); die Sprite-Farben werden pro Pixel aus dem Registerstand des jeweiligen Zyklus bestimmt (heraklion.prg)
+- [#30] Fixed: Die Grafikausgabe wurde nach dem Vorbild von VICE neu programmiert (Schieberegister mit 2-stufiger Pipeline, MCM/ECM/BMM pro Pixel zwischengespeichert, Farbtabelle); der Mid-Line-Modus und die X-Scroll-Änderungen funktionieren nun
+- [#30] Fixed: VIC - Bei Sprite-Start wird das X-Register so verglichen, wie es nach dem CPU-Zugriff desselben Zyklus vorliegt (keine zusätzliche Zyklusverzögerung)
+- [#212] Fixed: VIC - Sprites starten, sobald das Raster ihre X-Position erreicht (8-Pixel-Ausrichtung wie bei VICE) und behalten ab diesem Zeitpunkt Farben und Modi bei;
+  das dritte Sprite-Byte wird im folgenden Zyklus abgerufen; Sprite-DMA-Prüfung für alle Sprites in den Zyklen 55 und 56; Anzeige nur bei Übereinstimmung der Y-Koordinate
+- [#212] Fixed: VIC - Sprite-Crunch (MCBASE wird aus dem MC geladen, MC wird beschädigt, wenn in Zyklus 15 in $d017 geschrieben wird), MC+3 nach Sprite-DMA
+- Fixed: CIA - Pipeline in der CIA unterbrechen (Flag, Bit 7, IRQ/NMI-Ausgabe, verzögerte Bestätigung beim ICR-Lesevorgang) Der Sonderfall der CIA wurde aus dem 6510 entfernt; die NMI-Flanke wird gespeichert, wenn die Leitung hochgeht
+- Fixed: CIA - Timer-Pipeline neu geschrieben (Zähl-/Lade-/One-Shot-Stufen), Schreibvorgänge in das Steuerregister werden sofort wirksam; Toggle-Zustand von PB6/PB7 bleibt erhalten; CNT-Pin zählt für beide Timer
+  - Timer A und B teilen sich eine TIMER-Struktur und eine TimerStep-Funktion (ersetzt     die alte Zustandsmaschine und die verzögerte CRA/CRB-Aktualisierung)
+  - „Force Load“, „One-Shot“ und „Underflow“ folgen der Pipeline des realen Chips
+  - PB6/PB7: Das Toggle-Flipflop behält seinen Zustand auch im Impulsmodus bei, der Impulsausgang entspricht dem Underflow des letzten Zyklus
+- Fixed: 6510 – Bei der indizierten Adressierung wird beim Seitenwechsel ein Dummy-Lesevorgang von der unkorrigierten Adresse ausgeführt; RTI-Dummy-Lesevorgang vom PC Zyklus für Zyklus anhand von SingleStepTests/65x02 überprüft;
+  alle Opcodes mit Ausnahme von JAM und den instabilen SHA/TAS-Varianten (93, 9B, 9F) stimmen nun mit der tatsächlichen Bus Aktivität überein.
+- Fixed: CLI/SEI setzen das I-Flag bereits, wenn die CPU im letzten Zyklus auf RDY wartet
+- Fixed: Wird eine Verzweigung ohne Seitenwechsel ausgeführt, wird der Interrupt einen Zyklus früher ausgelöst
+- Fixed: Die Entscheidung über den Interrupt wird am Ende des vorherigen Befehls getroffen und wird während der RDY-Wartezyklen beim Abruf des Opcodes nicht mehr überschrieben. (irqdma tests, badline and sprite DMA)
+- Fixed: CIA-IRQ und NMI erreichen die CPU einen Takt später (neues CIA-Timing), VIC-/REU-/Kassetten-Interrupts bleiben unverändert
+- Fixed: Beim Opcode-Abruf wird der Speicher nur einmal gelesen (kein doppeltes Lesen aus E/A-Bereichen)
+- Fixed: NMI-Hijacking, ein NMI, der vor dem Abruf des Vektors von BRK/IRQ ansteht, leitet den Vektor zu $FFFA / $FFFB um
+- Fixed: CPU 6510 PLP, eine Änderung des I-Flags wird erst einen Befehl später wirksam (wie bei CLI/SEI)
+- Fixed: CPU 6510, IRQ/NMI-Eintrag: Der Dummy-Lesevorgang im zweiten Zyklus liest nun aus dem PC anstelle der veralteten Operandenadresse (könnte I/O-Register wie $DC0D lesen)
+
+
+
 5.2.0
 ------
 

@@ -24,6 +24,7 @@
 
 #define MAX_XW 504
 #define MAX_YW MAX_RASTERLINES
+#define SPRITE_COLOR_PLACEHOLDER 0x20  // Pixelwert im Zeilenpuffer: Sprite-Farbe, wird erst am Zeilenende aus dem Registerverlauf aufgeloest
 #define VIDEO_BUFFER_SIZE MAX_XW * MAX_YW // 504*312 = 157248 Bytes (War fürher MAX_XW * MAX_YW * 4)
 
 enum
@@ -97,6 +98,8 @@ private:
     void sAccess(uint8_t sp_nr);
     void CheckBorder();
     void DrawGraphics();
+    void RenderGfxCycle(uint8_t *out);
+    void ResolveBackground(uint8_t *slot);
     void DrawGraphicsPseudo();
     void DrawSprites();
     void DrawBorder();
@@ -134,6 +137,7 @@ private:
     uint8_t     reg_mm0;
     uint8_t     reg_mm1;
     uint8_t     reg_mcolor[8];
+    uint8_t     sprite_color_history[66][10];    // Sprite-Farbregister (D025, D026, D027-D02E) je Zyklus der aktuellen Zeile
 
     uint8_t     current_cycle;
     uint16_t    current_rasterline;
@@ -229,6 +233,16 @@ private:
     ///////////////////////////////////////////////////////////////////////////
 
     uint8_t     colors[4];
+
+    // Grafikausgabe: Schieberegister und Pipeline des VIC (8 Pixel pro Zyklus)
+    uint8_t     gfx_pipe0_g, gfx_pipe0_c, gfx_pipe0_v;      // Daten des zuletzt abgerufenen Zyklus
+    uint8_t     gfx_pipe1_g, gfx_pipe1_c, gfx_pipe1_v;      // Daten des vorletzten Zyklus
+    uint8_t     gfx_reg_g, gfx_reg_c, gfx_reg_v;            // Schieberegister und aktuelle Zellenwerte
+    uint8_t     gfx_pixel_reg;                              // zuletzt gelesener Pixelwert (0-3)
+    uint8_t     gfx_x_scroll;                               // X-Scroll mit dem die Daten ins Schieberegister geladen werden
+    uint8_t     gfx_vmode11, gfx_vmode16, gfx_vmode16_2;    // ECM/BMM und MCM wie sie im Zyklus gelatcht wurden
+    bool        gfx_mc_flop;
+    bool        color_latency;                              // true: 6569 (ECM/BMM wirken verzögert), false: 8565
     uint8_t     *video_buffer_line_xscroll;
     uint8_t     *sprite_buffer_line;            /// Erstes Sichtbares Pixel
     uint8_t     *border_buffer_line;            /// Erstes Sichtbares Pixel
