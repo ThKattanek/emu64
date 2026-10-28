@@ -1350,10 +1350,10 @@ void VICII::OneCycle()
 
         vc = vc_base;
 
-        /// Sprite MC + 3 (Sprite-DMA ist abgeschlossen)
+        /// Sprite MC + 3 (Sprite-DMA ist abgeschlossen), MC ist ein 6-Bit-Zähler
         for(int i=0;i<8;i++,sprite_bit<<=1)
         {
-            if(sprite_dma & sprite_bit) mc[i] += 3;
+            if(sprite_dma & sprite_bit) mc[i] = static_cast<uint8_t>((mc[i] + 3) & 0x3F);
         }
 
         DrawGraphics();
@@ -1404,7 +1404,7 @@ void VICII::OneCycle()
             if((sprite_y_exp_flip_flop & sprite_bit) == sprite_bit)
             {
                 mc_base[i] = mc[i];
-                if(mc_base[i] >= 63)
+                if(mc_base[i] == 63)
                 {
                     sprite_dma  &= ~sprite_bit;
                     sprite_view &= ~sprite_bit;
@@ -1443,11 +1443,6 @@ void VICII::OneCycle()
         *ba = true;
 
 		/// Sprite ///
-		// In der ersten Phase von Zyklus 55 wird das Expansions-Flipflop
-		// invertiert, wenn das MxYE-Bit gesetzt ist.
-
-        for (int i=0; i<8; i++, sprite_bit<<=1) if (reg_mye & sprite_bit) sprite_y_exp_flip_flop ^= sprite_bit;
-
 		// In der ersten Phase von Zyklus 55 wird für alle Sprites geprüft, 
 		// ob das entsprechende MxE-Bit in Register $d015 gesetzt und die Y-Koordinate 
 		// des Sprites (ungerade Register $d001-$d00f) gleich den unteren 8 Bits 
@@ -1463,7 +1458,7 @@ void VICII::OneCycle()
 				{
                     sprite_dma |= sprite_bit;
                     mc_base[i] = 0;
-                    if (reg_mye & sprite_bit) sprite_y_exp_flip_flop &= ~sprite_bit;
+                    sprite_y_exp_flip_flop |= sprite_bit;
 				}
 			}
 		}
@@ -1492,10 +1487,16 @@ void VICII::OneCycle()
 				{
                     sprite_dma |= sprite_bit;
                     mc_base[i] = 0;
-                    if (reg_mye & sprite_bit) sprite_y_exp_flip_flop &= ~sprite_bit;
+                    sprite_y_exp_flip_flop |= sprite_bit;
 				}
 			}
 		}	
+
+		// Danach wird das Expansions-Flipflop invertiert, wenn der DMA des Sprites
+		// läuft und das MxYE-Bit gesetzt ist (wie bei VICE in Zyklus 56). Ein $d017-Schreibzugriff
+		// in Zyklus 55 wirkt daher noch auf das Flipflop (Sprite-Crunch).
+        sprite_bit = 0x01;
+        for (int i=0; i<8; i++, sprite_bit<<=1) if ((sprite_dma & sprite_bit) && (reg_mye & sprite_bit)) sprite_y_exp_flip_flop ^= sprite_bit;
 
         DrawGraphics();
 		break;
