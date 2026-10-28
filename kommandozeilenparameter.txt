@@ -98,6 +98,11 @@ emu64 [PARAMETER]
     0=MOS-6581
     1=MOS-8085
 
+--set-vicmodel <Modell>
+    Setzt das Modell des VIC-II (gilt nur für diesen Start).
+
+    0=MOS-6569 1=MOS-8565 (C64C)
+
 --multiple-instance
     Ermöglicht das starten mehrerer Emu64 Instanzen.
 

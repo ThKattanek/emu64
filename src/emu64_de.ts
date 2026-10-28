@@ -2895,6 +2895,11 @@ Möchtest du fortfahren?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="setup_window.ui" line="179"/>
+        <source>VIC-II 8565 (C64C)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="setup_window.ui" line="366"/>
         <source>Sound</source>
         <translation></translation>

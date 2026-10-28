@@ -4579,6 +4579,7 @@ void C64Class::SetVicConfig(int var, bool enable)
 {
     if(var >= VIC_CONFIG_NUM) return;
     vic->vic_config[var] = enable;
+    if(var == VIC_MODEL_8565) vic->SetVicModel8565(enable);
 }
 
 bool C64Class::GetVicConfig(int var)
