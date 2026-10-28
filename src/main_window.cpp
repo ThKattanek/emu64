@@ -1080,6 +1080,17 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             }
             c64->SetFirstSidTyp(val);
             break;
+        case CMD_SET_VICMODEL:
+            val = cmd_line->GetArgInt(i+1, &error);
+            if(error) break;
+
+            if(val < 0 || val > 1)
+            {
+                cmd_line->OutErrorMsg("Das VIC Modell muss zwischen 0 und 1 sein.","--help");
+                break;
+            }
+            c64->SetVicConfig(VIC_MODEL_8565, val == 1);
+            break;
         case CMD_WARP_MODE:
             c64->EnableWarpMode(true);
             break;

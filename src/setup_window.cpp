@@ -57,6 +57,7 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoCrtClass *vid
     ui->VicSprSprCollisionEnable->setEnabled(true);
     ui->VicSprBgrCollisionEnable->setEnabled(true);
     ui->VicGreyDotsEnable->setEnabled(true);
+    ui->VicModel8565->setEnabled(true);
 
     // SID Emulation Emu64 oder reSID
     ui->resid_sid->setChecked(true);
@@ -370,6 +371,10 @@ void SetupWindow::LoadINI(C64Class *c64)
         ui->VicGreyDotsEnable->setChecked(bvalue);
         on_VicGreyDotsEnable_toggled(bvalue);
 
+        bvalue = ini->value("Model8565",true).toBool();
+        ui->VicModel8565->setChecked(bvalue);
+        on_VicModel8565_toggled(bvalue);
+
         //FirstLine PAL: VICE - 16, Emu64 - 26
         //LastLine PAL:  VICE - 288, Emu64 - 292
         value1 = ini->value("FirstDisplayLinePAL",16).toInt();
@@ -525,6 +530,7 @@ void SetupWindow::SaveINI()
         ini->setValue("SpriteSpriteCollision",ui->VicSprSprCollisionEnable->isChecked());
         ini->setValue("SpriteBackgroundCollision",ui->VicSprBgrCollisionEnable->isChecked());
         ini->setValue("GreyDots",ui->VicGreyDotsEnable->isChecked());
+        ini->setValue("Model8565",ui->VicModel8565->isChecked());
 
         ini->setValue("FirstDisplayLinePAL",c64->GetVicFirstDisplayLinePal());
         ini->setValue("LastDisplayLinePAL",c64->GetVicLastDisplayLinePal());
@@ -1079,6 +1085,11 @@ void SetupWindow::on_VicSprBgrCollisionEnable_toggled(bool checked)
 void SetupWindow::on_VicGreyDotsEnable_toggled(bool checked)
 {
     c64->SetVicConfig(VIC_GREY_DOTS_ON, checked);
+}
+
+void SetupWindow::on_VicModel8565_toggled(bool checked)
+{
+    c64->SetVicConfig(VIC_MODEL_8565, checked);
 }
 
 void SetupWindow::on_default_pal_c64_clicked()
