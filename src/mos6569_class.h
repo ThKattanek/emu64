@@ -24,7 +24,10 @@
 
 #define MAX_XW 504
 #define MAX_YW MAX_RASTERLINES
-#define SPRITE_COLOR_PLACEHOLDER 0x20  // Pixelwert im Zeilenpuffer: Sprite-Farbe, wird erst am Zeilenende aus dem Registerverlauf aufgeloest
+
+// Pixel im Zeilenpuffer: Bit 6 gesetzt = Farbregister $d020 + (Wert & 15), sonst direkter Farbwert (Bit 7 = Vordergrund)
+#define COLOR_REG(r) (0x40 | ((r) - 0x20))
+#define BORDER_COLOR_REG COLOR_REG(0x20)
 #define VIDEO_BUFFER_SIZE MAX_XW * MAX_YW // 504*312 = 157248 Bytes (War fürher MAX_XW * MAX_YW * 4)
 
 enum
@@ -34,6 +37,7 @@ enum
         VIC_SPR_SPR_COLL_ON,
         VIC_SPR_BCK_COLL_ON,
         VIC_GREY_DOTS_ON,
+        VIC_MODEL_8565,                         // false: 6569, true: 8565 (C64C)
         VIC_CONFIG_NUM
 };
 
@@ -59,6 +63,7 @@ public:
     uint16_t GetVicDisplayNtscFirstLine();
     uint16_t GetVicDisplayNtscLastLine();
     void SetVicType(uint8_t system);
+    void SetVicModel8565(bool enable);
     void OneCycle();
     //bool SaveFreez(FILE* File);
     //bool LoadFreez(FILE *file,unsigned short version);
@@ -99,9 +104,10 @@ private:
     void CheckBorder();
     void DrawGraphics();
     void RenderGfxCycle(uint8_t *out);
-    void ResolveBackground(uint8_t *slot);
+    void RenderSpriteCycle(uint8_t *slot);
+    void UpdateColorRegs();
+    void ResolveLine();
     void DrawGraphicsPseudo();
-    void DrawSprites();
     void DrawBorder();
 
     /// Variablen ///
@@ -137,7 +143,14 @@ private:
     uint8_t     reg_mm0;
     uint8_t     reg_mm1;
     uint8_t     reg_mcolor[8];
-    uint8_t     sprite_color_history[66][10];    // Sprite-Farbregister (D025, D026, D027-D02E) je Zyklus der aktuellen Zeile
+
+    // Farbregister $d020-$d02e wie im VICE (cregs): Ein Schreibzugriff wirkt erst im Folgezyklus,
+    // Pixel im Zeilenpuffer tragen den Registerindex (0x40 | Register-0x20) und werden am Zeilenende aufgeloest
+    uint8_t     creg[16];
+    uint8_t     creg_hist[66][16];                          // Zustand der Farbregister je Zyklus (nach Uebernahme des vorherigen Schreibzugriffs)
+    uint8_t     creg_w_reg[66];                             // Im Zyklus geschriebenes Farbregister (0xff = keins)
+    uint8_t     creg_cur_reg, creg_cur_val;                 // Schreibzugriff im aktuellen Zyklus
+    uint8_t     creg_pend_reg, creg_pend_val;               // Schreibzugriff des vorherigen Zyklus
 
     uint8_t     current_cycle;
     uint16_t    current_rasterline;
@@ -195,26 +208,20 @@ private:
 
     //////////////////////////////// Sprites //////////////////////////////////
 
-    uint16_t    sprite_x_display_table[0x200];
-    uint8_t     sprite_x_cycle[0x200];      // Zyklus in dem die Rasterposition X erreicht wird (0 = nie)
-    uint16_t    sprite_x_trigger[8];        // X-Position mit der der Sprite in dieser Zeile gestartet wurde
-    uint8_t     sprite_trigger_color[8];    // Sprite Register wie sie beim Start des Sprites in der Zeile anlagen
-    uint8_t     sprite_trigger_mm0[8];
-    uint8_t     sprite_trigger_mm1[8];
-    uint8_t     sprite_trigger_mdp[8];
-    uint8_t     sprite_trigger_mxe[8];
-    uint8_t     sprite_trigger_mmc[8];
-    uint8_t     sprite_x_started;           // Sprites die in dieser Zeile ihre X-Position erreicht haben
     uint8_t     sprite_y_exp_flip_flop;
     uint8_t     mc[8];
     uint8_t     mc_base[8];
     uint8_t     sprite_dma;
-    uint8_t     sprite_view;
-    uint8_t     sprite_view_current_line;
-    uint32_t    sprite_sequenzer[8];
-    uint32_t    sprite_sequencer_current_line[8];
-    uint8_t     sprite_collision_buffer[MAX_XW + 4*24];
+    uint8_t     sprite_view;                // Anzeige-Bits der Sprites (VICE: sprite_display_bits)
+    uint32_t    sprite_sequenzer[8];        // 24 Bit Sprite-Daten wie sie per DMA geladen wurden
 
+    // Sprite-Ausgabe: pro Zyklus 8 Pixel wie im VICE
+    uint16_t    sprite_x_pipe[8];
+    uint8_t     sprite_pri_bits, sprite_mc_bits, sprite_expx_bits;
+    uint8_t     sprite_pending_bits, sprite_active_bits, sprite_halt_bits;
+    uint32_t    sbuf_reg[8];
+    uint8_t     sbuf_pixel_reg[8];
+    uint8_t     sbuf_expx_flops, sbuf_mc_flops;
     ///////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////// Rahmenstufe ////////////////////////////////
@@ -243,6 +250,7 @@ private:
     uint8_t     gfx_vmode11, gfx_vmode16, gfx_vmode16_2;    // ECM/BMM und MCM wie sie im Zyklus gelatcht wurden
     bool        gfx_mc_flop;
     bool        color_latency;                              // true: 6569 (ECM/BMM wirken verzögert), false: 8565
+    uint8_t     reg11_delay;                                // $d011 des vorherigen Zyklus (8565: Videomodus der Grafik-Abrufe um einen Zyklus verzögert)
     uint8_t     *video_buffer_line_xscroll;
     uint8_t     *sprite_buffer_line;            /// Erstes Sichtbares Pixel
     uint8_t     *border_buffer_line;            /// Erstes Sichtbares Pixel

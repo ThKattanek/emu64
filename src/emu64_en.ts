@@ -2948,6 +2948,11 @@ Please check the file access rights of the directory!</translation>
         <translation>Grey Dots showing</translation>
     </message>
     <message>
+        <location filename="setup_window.ui" line="179"/>
+        <source>VIC-II 8565 (C64C)</source>
+        <translation>VIC-II 8565 (C64C)</translation>
+    </message>
+    <message>
         <location filename="setup_window.ui" line="366"/>
         <source>Sound</source>
         <translation>Sound</translation>

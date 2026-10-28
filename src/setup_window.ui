@@ -261,6 +261,13 @@ Kann im Norfall aber deaktiviert bleiben.</string>
                 </property>
                </widget>
               </item>
+              <item row="2" column="1">
+               <widget class="QCheckBox" name="VicModel8565">
+                <property name="text">
+                 <string>VIC-II 8565 (C64C)</string>
+                </property>
+               </widget>
+              </item>
               <item row="1" column="0">
                <widget class="QCheckBox" name="VicBorderViewEnable">
                 <property name="text">

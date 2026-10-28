@@ -1,6 +1,9 @@
 Alle Änderungen ab V5.2.0 bis jetzt
 -----------------------------------
 
+- [#77] NEW! Kommandozeilenparameter --set-vicmodel <0|1> (0=MOS-6569, 1=MOS-8565) wählt das VIC-II Modell für diesen Start
+- [#77] Fixed: VIC - Die Sprite-Ausgabe arbeitet jetzt wie bei VICE zyklusweise (8 Pixel je Zyklus): Start bei erreichter X-Position, Sprite-DMA-Fenster (Halt/Abbruch), Multicolor- und Expansions-Umschaltung mitten im Sprite (6569 und 8565 unterschiedlich), Priorität und Kollisionen pro Pixel. Die Sprite-Farben und alle  Hintergrundfarben werden über ein Abbild der Farbregister $d020-$d02e aufgelöst, ein Schreibzugriff wirkt erst im Folgezyklus (6569: ein Pixel Verzögerung). Beim 8565 erscheinen Grey Dots automatisch
+- [#77] NEW! VIC - Einstellung „VIC-II 8565 (C64C)“ im Setup (Gruppe VIC, Standard aus = 6569): Beim 8565 wirkt der Videomodus ($d011) auf die Grafik-Abrufe (auch im Idle-Zustand) einen Zyklus später. Damit funktioniert der „9 Sprites“-Trick (nine_sprites.prg: Idle-Grafik aus $39FF im offenen Rahmen) wie bei VICE
 - [#311] Fixed: VIC - Sprite-Expansions-Flipflop wird (wie bei VICE) in Zyklus 56 und nur bei laufendem DMA invertiert, damit wirkt ein $d017-Schreibzugriff in Zyklus 55 noch auf das Flipflop (Sprite-Crunch);
   der Sprite-Zähler MC ist ein 6-Bit-Zähler (Wrap bei 64), der DMA endet bei MCBASE = 63 (unholy.prg)
   Sprite-Daten: Die drei Bytes eines Sprites werden innerhalb des 64-Byte-Blocks umgebrochen (MC ist 6 Bit); die Sprite-Farben werden pro Pixel aus dem Registerstand des jeweiligen Zyklus bestimmt (heraklion.prg)
