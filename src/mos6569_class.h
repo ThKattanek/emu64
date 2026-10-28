@@ -24,6 +24,7 @@
 
 #define MAX_XW 504
 #define MAX_YW MAX_RASTERLINES
+#define SPRITE_COLOR_PLACEHOLDER 0x20  // Pixelwert im Zeilenpuffer: Sprite-Farbe, wird erst am Zeilenende aus dem Registerverlauf aufgeloest
 #define VIDEO_BUFFER_SIZE MAX_XW * MAX_YW // 504*312 = 157248 Bytes (War fürher MAX_XW * MAX_YW * 4)
 
 enum
@@ -136,6 +137,7 @@ private:
     uint8_t     reg_mm0;
     uint8_t     reg_mm1;
     uint8_t     reg_mcolor[8];
+    uint8_t     sprite_color_history[66][10];    // Sprite-Farbregister (D025, D026, D027-D02E) je Zyklus der aktuellen Zeile
 
     uint8_t     current_cycle;
     uint16_t    current_rasterline;

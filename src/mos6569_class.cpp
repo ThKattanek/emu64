@@ -396,10 +396,13 @@ inline void VICII::sAccess(uint8_t sp_nr)
 {
     // Das 1. und 2. Byte werden im ersten Zyklus des Sprite-Zugriffs gelesen,
     // das 3. Byte erst im folgenden Zyklus (siehe OneCycle)
-    s_address = static_cast<uint16_t>((*cia2_port_a<<14)|(p_data[sp_nr]<<6)|(mc[sp_nr] & 0x3F));
-    sprite_sequenzer[sp_nr] = static_cast<uint32_t>((Read(s_address)) << 16); s_address++;
-    sprite_sequenzer[sp_nr] |= static_cast<uint32_t>(((Read(s_address)) << 8)); s_address++;
-    s_address_byte2[sp_nr] = s_address;
+    // MC ist ein 6-Bit-Zaehler: Die Adressen der drei Bytes laufen innerhalb des 64-Byte-Blocks um
+    uint16_t s_base = static_cast<uint16_t>((*cia2_port_a<<14)|(p_data[sp_nr]<<6));
+    s_address = static_cast<uint16_t>(s_base | (mc[sp_nr] & 0x3F));
+    sprite_sequenzer[sp_nr] = static_cast<uint32_t>((Read(s_address)) << 16);
+    s_address = static_cast<uint16_t>(s_base | ((mc[sp_nr] + 1) & 0x3F));
+    sprite_sequenzer[sp_nr] |= static_cast<uint32_t>(((Read(s_address)) << 8));
+    s_address_byte2[sp_nr] = static_cast<uint16_t>(s_base | ((mc[sp_nr] + 2) & 0x3F));
     s_byte2_pending |= static_cast<uint8_t>(1 << sp_nr);
 }
 
@@ -1111,6 +1114,20 @@ inline void VICII::DrawSprites()
         current_sprite_bit >>= 1;
     }
 
+    // Platzhalter der Sprite-Farben mit dem Registerstand des Zyklus aufloesen, in dem das Pixel
+    // ausgegeben wird (ein Pixel Verzoegerung wie beim 6569)
+    {
+        unsigned char *line_start = video_buffer_line - (62 * 8);
+        for(int n=0; n<504; n++)
+        {
+            if((line_start[n] & 0xF0) == SPRITE_COLOR_PLACEHOLDER)
+            {
+                int cycle = (n > 0 ? (n - 1) : 0) / 8 + 1;
+                line_start[n] = sprite_color_history[cycle][line_start[n] & 0x0F] & 0x0F;
+            }
+        }
+    }
+
     //////////////////////// Sprite Collision ///////////////////////////
 
     // Prüfe sprite-sprite kollisions
@@ -1192,6 +1209,11 @@ void VICII::OneCycle()
     }
     else badline_status = false;
 
+    // Sprite-Farbregister dieses Zyklus merken (Aufloesung der Sprite-Pixel erst am Zeilenende)
+    sprite_color_history[current_cycle][0] = reg_mm0;
+    sprite_color_history[current_cycle][1] = reg_mm1;
+    for(int i=0; i<8; i++) sprite_color_history[current_cycle][2+i] = reg_mcolor[i];
+
     // 3. Byte der Sprite-Daten lesen
     if(s_byte2_pending)
     {
@@ -1211,9 +1233,10 @@ void VICII::OneCycle()
         {
             sprite_x_started |= static_cast<uint8_t>(1 << i);
             sprite_x_trigger[i] = reg_mx[i];
-            sprite_trigger_color[i] = reg_mcolor[i];
-            sprite_trigger_mm0[i] = reg_mm0;
-            sprite_trigger_mm1[i] = reg_mm1;
+            // Farben werden erst nach dem Zeichnen der Zeile mit dem Registerstand des jeweiligen Zyklus aufgeloest
+            sprite_trigger_color[i] = static_cast<uint8_t>(SPRITE_COLOR_PLACEHOLDER + 2 + i);
+            sprite_trigger_mm0[i] = SPRITE_COLOR_PLACEHOLDER;
+            sprite_trigger_mm1[i] = SPRITE_COLOR_PLACEHOLDER + 1;
             sprite_trigger_mdp[i] = reg_mdp;
             sprite_trigger_mxe[i] = reg_mxe;
             sprite_trigger_mmc[i] = reg_mmc;
@@ -1350,10 +1373,10 @@ void VICII::OneCycle()
 
         vc = vc_base;
 
-        /// Sprite MC + 3 (Sprite-DMA ist abgeschlossen)
+        /// Sprite MC + 3 (Sprite-DMA ist abgeschlossen), MC ist ein 6-Bit-Zähler
         for(int i=0;i<8;i++,sprite_bit<<=1)
         {
-            if(sprite_dma & sprite_bit) mc[i] += 3;
+            if(sprite_dma & sprite_bit) mc[i] = static_cast<uint8_t>((mc[i] + 3) & 0x3F);
         }
 
         DrawGraphics();
@@ -1404,7 +1427,7 @@ void VICII::OneCycle()
             if((sprite_y_exp_flip_flop & sprite_bit) == sprite_bit)
             {
                 mc_base[i] = mc[i];
-                if(mc_base[i] >= 63)
+                if(mc_base[i] == 63)
                 {
                     sprite_dma  &= ~sprite_bit;
                     sprite_view &= ~sprite_bit;
@@ -1443,11 +1466,6 @@ void VICII::OneCycle()
         *ba = true;
 
 		/// Sprite ///
-		// In der ersten Phase von Zyklus 55 wird das Expansions-Flipflop
-		// invertiert, wenn das MxYE-Bit gesetzt ist.
-
-        for (int i=0; i<8; i++, sprite_bit<<=1) if (reg_mye & sprite_bit) sprite_y_exp_flip_flop ^= sprite_bit;
-
 		// In der ersten Phase von Zyklus 55 wird für alle Sprites geprüft, 
 		// ob das entsprechende MxE-Bit in Register $d015 gesetzt und die Y-Koordinate 
 		// des Sprites (ungerade Register $d001-$d00f) gleich den unteren 8 Bits 
@@ -1463,7 +1481,7 @@ void VICII::OneCycle()
 				{
                     sprite_dma |= sprite_bit;
                     mc_base[i] = 0;
-                    if (reg_mye & sprite_bit) sprite_y_exp_flip_flop &= ~sprite_bit;
+                    sprite_y_exp_flip_flop |= sprite_bit;
 				}
 			}
 		}
@@ -1492,10 +1510,16 @@ void VICII::OneCycle()
 				{
                     sprite_dma |= sprite_bit;
                     mc_base[i] = 0;
-                    if (reg_mye & sprite_bit) sprite_y_exp_flip_flop &= ~sprite_bit;
+                    sprite_y_exp_flip_flop |= sprite_bit;
 				}
 			}
 		}	
+
+		// Danach wird das Expansions-Flipflop invertiert, wenn der DMA des Sprites
+		// läuft und das MxYE-Bit gesetzt ist (wie bei VICE in Zyklus 56). Ein $d017-Schreibzugriff
+		// in Zyklus 55 wirkt daher noch auf das Flipflop (Sprite-Crunch).
+        sprite_bit = 0x01;
+        for (int i=0; i<8; i++, sprite_bit<<=1) if ((sprite_dma & sprite_bit) && (reg_mye & sprite_bit)) sprite_y_exp_flip_flop ^= sprite_bit;
 
         DrawGraphics();
 		break;
