@@ -29,6 +29,7 @@ public:
     void Phi1();
     void ClearJAMFlag(void);
     void GetRegister(REG_STRUCT *reg);
+    unsigned short GetPC() const { return PC; }
     void SetRegister(REG_STRUCT *reg);
     bool GetInterrupts(int typ);
     void GetInterneRegister(IREG_STRUCT *ireg);

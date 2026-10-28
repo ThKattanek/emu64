@@ -350,9 +350,19 @@ inline void VICII::cAccess()
 		/// Grafikdaten ///
         if(current_cycle >= 15 && current_cycle <= 54 && display_status == true && badline_status == true)
         {
-            c_address = static_cast<uint16_t>((*cia2_port_a<<14)|matrix_base|(vc & 0x3FF));
-            c_data_buffer_8bit[vmli] = Read(c_address);
-            c_data_buffer_4bit[vmli] = color_ram[(vc & 0x3FF)] & 0x0F;
+            if(current_cycle - first_ba_cycle < 3)
+            {
+                // FLI-Bug: Die CPU hat den Bus noch (BA ist erst weniger als 3 Zyklen low). Der VIC liest $ff
+                // und als Farbe das untere Nibble des Bytes, das die CPU gerade am Bus hat.
+                c_data_buffer_8bit[vmli] = 0xFF;
+                c_data_buffer_4bit[vmli] = CpuBusByte() & 0x0F;
+            }
+            else
+            {
+                c_address = static_cast<uint16_t>((*cia2_port_a<<14)|matrix_base|(vc & 0x3FF));
+                c_data_buffer_8bit[vmli] = Read(c_address);
+                c_data_buffer_4bit[vmli] = color_ram[(vc & 0x3FF)] & 0x0F;
+            }
         }
 	}
 }

@@ -75,6 +75,7 @@ public:
     std::function<void(uint8_t*)> RefreshProc;
     std::function<void(int)> CpuTriggerInterrupt;
     std::function<void(int)> CpuClearInterrupt;
+    std::function<uint8_t()> CpuBusByte;            // Byte das die CPU gerade am Bus hat (für den FLI-Bug)
 
     /// Variablen ///
     bool        *ba;
