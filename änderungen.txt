@@ -1,6 +1,7 @@
 Alle Änderungen ab V5.2.0 bis jetzt
 -----------------------------------
 
+- [#321] Fixed: Floppy - D64->GCR: Das letzte (10.) Byte des Sektor-Headers wurde vom folgenden SYNC-Byte überschrieben. Loader, die den kompletten Header dekodieren, sahen ungültige GCR-Daten
 - [#321] Fixed: CIA2 - Ein Schreibzugriff auf das Datenrichtungsregister $dd02 aktualisiert jetzt die IEC-Leitungen (ATN/CLK/DATA). Loader, die die Leitungen nur über die Datenrichtung umschalten, hingen vorher an Spur 18 fest (sceniorsander.d64)
 - NEW! Debugger - Option "Gesamtes Bild": zeigt alle Rasterzeilen und alle Zyklen (504 Pixel) des VIC, auch Rand und Austastlücke (nur für die Sitzung)
 - [#32] Fixed: Debugger - Im Einzelschritt-/Animationsmodus zeigt das C64-Bild jetzt zyklusgenau den aktuellen Bildaufbau (Rest aus dem letzten fertigen Frame). Der Rasterstrahl ist markiert (gepunktete blinkende Linien über/unter der Rasterzeile, roter Rahmen um den letzten Zyklus), abschaltbar per Checkbox im Debugger (nur für die Sitzung). Ab ca. einem Frame pro Sekunde Animationsgeschwindigkeit werden nur noch volle Frames ohne Markierung angezeigt
