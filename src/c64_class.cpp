@@ -78,6 +78,7 @@ static const char* CPU_OPC = {"\
                                    *ret_error = 0;
 
 this->start_minimized = start_minimized;
+mute_audio = false;
 
 LimitCyclesEvent = nullptr;
 DebugCartEvent = nullptr;
@@ -1313,6 +1314,9 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
         /// Tapesound dazu mixen ///
         SDL_MixAudioFormat(reinterpret_cast<uint8_t*>(audio_16bit_buffer),reinterpret_cast<uint8_t*>(tape->GetSoundBuffer()), AUDIO_S16,static_cast<uint32_t>(sample_buffer_size*2),SDL_MIX_MAXVOLUME);
 
+        /// Bei --nosound (oder --nogui) Nullen statt der Audiodaten ausgeben (Taktung bleibt erhalten)
+        if(mute_audio) memset(audio_16bit_buffer, 0, static_cast<size_t>(sample_buffer_size) * sizeof(int16_t));
+
         /// Audio auf Output Stream ausgeben
         if(!is_audio_sample_float && audio_sample_bit_size == 16)
         {
@@ -1461,6 +1465,11 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
     default:
         break;
     }
+}
+
+void C64Class::MuteAudioOutput(bool mute)
+{
+    mute_audio = mute;
 }
 
 void C64Class::KeyEvent(uint8_t matrix_code, KeyStatus key_status, bool isAutoShift)

@@ -72,6 +72,7 @@ public:
     void WarpModeLoop();
     int GetAudioSampleRate();
     void FillAudioBuffer(uint8_t *stream, int laenge); // Über diese Funktion wird der C64 Takt erzeugt !! //
+    void MuteAudioOutput(bool mute);
     void KeyEvent(uint8_t  matrix_code, KeyStatus status, bool isAutoShift);
     bool LoadC64Roms(const char *kernalrom, const char *basicrom, const char *charrom);
     bool LoadFloppyRom(uint8_t floppy_nr, const char *dos1541rom);
@@ -583,6 +584,7 @@ private:
 
     int         sid_emulation;
     bool        write_to_all_emulation_sids;   // Beim Schreiben in einen SID werden je nach Einstellung alle SIDs beschrieben oder nur die aktive SID
+    bool		mute_audio;                    // Komplette Audio (SID + Floppy Sounds) Ausgabe wird mit Nullen gefüllt (--nosound)
 
     SIDDumpClass* current_sid_dump;
 };

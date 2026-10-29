@@ -53,6 +53,10 @@ emu64 [PARAMETER]
 --nogui
     Es werden keine Fenster angezeigt. Also Vorsicht, sollte nur mit --limitcycles verwendet werden.
 
+--nosound
+    Die Audio Ausgabe wird stumm geschaltet.
+    Bei --nogui automatisch aktiv.
+
 --minimized
     Emu64 wird mit minimierten Fenstern gestartet.
 
