@@ -358,6 +358,7 @@ public:
     uint8_t         *vic_buffer;
     std::vector<uint8_t> debug_frame_buffer;
     int             debug_blink_phase;
+    uint32_t        debug_last_refresh_ticks;
     bool            debug_beam_marker;
     VideoCrtClass   *video_crt_output;
 

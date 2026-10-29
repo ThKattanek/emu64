@@ -460,6 +460,7 @@ c64_command_line_status = false;
 c64_command_line_count_s = false;
 debug_mode = one_cycle = one_opcode = false;
 debug_blink_phase = 0;
+debug_last_refresh_ticks = 0;
 debug_beam_marker = true;
 cycle_counter = 0;
 limit_cycles_counter = 0;
@@ -1015,6 +1016,7 @@ void C64Class::DebugRefreshScreen()
     // Rasterstrahl markieren: Blinkende Linien über und unter der aktuellen Rasterzeile (weiß/schwarz im Wechsel),
     // roter Rahmen um die 8 Pixel des zuletzt ausgeführten Zyklus
     debug_blink_phase = static_cast<int>((SDL_GetTicks() / 250) & 1);
+    debug_last_refresh_ticks = SDL_GetTicks();
 
     if(debug_beam_marker && beam_row >= 0)
     {
@@ -1431,9 +1433,11 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
         if(debug_animation)
         {
             animation_speed_counter += animation_speed_add;
+            int animation_cycles = 0;
             if(animation_speed_counter >= 1)
             {
-                for(int i=0;i<static_cast<int>(animation_speed_counter);i++)
+                animation_cycles = static_cast<int>(animation_speed_counter);
+                for(int i=0;i<animation_cycles;i++)
                 {
                     NextSystemCycle();
 
@@ -1454,8 +1458,10 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 }
                 animation_speed_counter = 0;
             }
-            DebugRefreshScreen();
-                if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
+            // Zeitlich begrenzen (~30 Hz): Ein Konvertieren bei jedem (nur ~1,4 ms langen) Audio-Callback bremst die Emulation aus und führt zu einem Audio-Rückstau
+            if(animation_cycles > 0 && (SDL_GetTicks() - debug_last_refresh_ticks) >= 33) DebugRefreshScreen();
+            else DebugBlinkRefresh();
+            if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
         }
         else
         {
