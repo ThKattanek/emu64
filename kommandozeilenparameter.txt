@@ -54,8 +54,8 @@ emu64 [PARAMETER]
     Es werden keine Fenster angezeigt. Also Vorsicht, sollte nur mit --limitcycles verwendet werden.
 
 --nosound
-    Die Audio Ausgabe wird stumm geschaltet.
-    Bei --nogui automatisch aktiv.
+    Die Audio Ausgabe wird stumm geschaltet (Emulation läuft unverändert weiter).
+    Bei --nogui automatisch aktiv. Eine Videoaufnahme (--video-capture) enthält weiterhin den Ton.
 
 --minimized
     Emu64 wird mit minimierten Fenstern gestartet.

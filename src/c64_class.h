@@ -35,6 +35,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_image.h>
+#include <atomic>
 #include <functional>
 
 #define AudioSampleRate 44100
@@ -584,7 +585,7 @@ private:
 
     int         sid_emulation;
     bool        write_to_all_emulation_sids;   // Beim Schreiben in einen SID werden je nach Einstellung alle SIDs beschrieben oder nur die aktive SID
-    bool		mute_audio;                    // Komplette Audio (SID + Floppy Sounds) Ausgabe wird mit Nullen gefüllt (--nosound)
+    std::atomic<bool> mute_audio;                    // Komplette Audio (SID + Floppy Sounds) Ausgabe wird mit Nullen gefüllt (--nosound)
 
     SIDDumpClass* current_sid_dump;
 };

@@ -34,7 +34,7 @@ static const CMD_STRUCT command_list[]{
     {CMD_LIMITCYCLES,"","limitcycles","Beendet den Emulator nach n Zyklen mit Exitcode 1. --limitcycles <nZyklen>",1},
     {CMD_NOSPLASH,"","nosplash","Der SplashScreen wird beim Start nicht angezeigt.",0},
     {CMD_NOGUI,"","nogui","Es werden keine Fenster angezeigt. Also Vorsicht, sollte nur mit --limitcycles verwendet werden.",0},
-    {CMD_NOSOUND,"","nosound","Die Audio Ausgabe wird stumm geschaltet (Emulation läuft unverändert weiter). Bei --nogui automatisch aktiv.",0},
+    {CMD_NOSOUND,"","nosound","Die Audio Ausgabe wird stumm geschaltet (Emulation läuft unverändert weiter). Bei --nogui automatisch aktiv. Eine Videoaufnahme enthält weiterhin den Ton.",0},
     {CMD_MINIMIZED,"","minimized","Emu64 wird mit mimimierten Fenstern gestartet.",0},
     {CMD_DOUBLE_TEXTURE_OFF,"","double-texture-off","Die Video Ausgabe Texture wird temporär nicht verdoppelt.",0},
     {CMD_VIDEO_FILTER_OFF,"","video-filter-off","Es wird die Video CRT Emulation temporär ausgeschaltet.",0},
