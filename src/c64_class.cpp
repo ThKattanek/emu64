@@ -459,12 +459,16 @@ c64_command_line_current_pos = 0;
 c64_command_line_status = false;
 c64_command_line_count_s = false;
 debug_mode = one_cycle = one_opcode = false;
+debug_blink_phase = 0;
+debug_last_refresh_ticks = 0;
+debug_beam_marker = true;
 cycle_counter = 0;
 limit_cycles_counter = 0;
 hold_next_system_cycle = false;
 debug_animation = false;
 debug_logging = false;
 animation_speed_add = audio_spec_have.samples/audio_frequency;
+animation_cycles_per_sec = 1;
 animation_speed_counter = 0;
 
 for(i=0;i<8;i++)
@@ -996,6 +1000,67 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
     c64_screen_is_obselete = true;
 }
 
+void C64Class::DebugRefreshScreen()
+{
+    // Im Debugger (Einzelschritt/Animation) das gerade im Aufbau befindliche Bild anzeigen,
+    // ohne den Videopuffer zu wechseln und ohne Capture/Screenshot auszulösen
+    if(enable_hold_vic_refresh) return;
+    if((video_crt_output == nullptr) || (sdl_thread_pause == true)) return;
+    if(SDL_LockSurface(c64_screen) != 0) return;
+
+    if(debug_frame_buffer.size() != VIDEO_BUFFER_SIZE) debug_frame_buffer.assign(VIDEO_BUFFER_SIZE, 0);
+    uint8_t *buf = debug_frame_buffer.data();
+
+    int beam_row, beam_x;
+    vic->GetDebugFrame(buf, &beam_row, &beam_x);
+
+    // Rasterstrahl markieren: Blinkende Linien über und unter der aktuellen Rasterzeile (weiß/schwarz im Wechsel),
+    // roter Rahmen um die 8 Pixel des zuletzt ausgeführten Zyklus
+    debug_blink_phase = static_cast<int>((SDL_GetTicks() / 250) & 1);
+    debug_last_refresh_ticks = SDL_GetTicks();
+
+    if(debug_beam_marker && beam_row >= 0)
+    {
+        const uint8_t blink_color = debug_blink_phase ? 1 : 0;
+        const uint8_t frame_color = 2;
+
+        // Gepunktet (jedes 2. Pixel), damit die Bilddaten daneben sichtbar bleiben
+        for(int x=0; x<504; x+=2)
+        {
+            if(beam_row > 0) buf[(beam_row - 1) * 504 + x] = blink_color;
+            if(beam_row < 311) buf[(beam_row + 1) * 504 + x] = blink_color;
+        }
+
+        int x0 = beam_x - 8;
+        if(x0 < 0) x0 = 0;
+        const int x1 = (beam_x > 0) ? beam_x - 1 : 0;
+        const int y0 = (beam_row > 0) ? beam_row - 1 : 0;
+        const int y1 = (beam_row < 311) ? beam_row + 1 : 311;
+
+        for(int x=x0; x<=x1; x++)
+        {
+            buf[y0 * 504 + x] = frame_color;
+            buf[y1 * 504 + x] = frame_color;
+        }
+        for(int y=y0; y<=y1; y++)
+        {
+            buf[y * 504 + x0] = frame_color;
+            buf[y * 504 + x1] = frame_color;
+        }
+    }
+
+    video_crt_output->ConvertVideo(static_cast<void*>(c64_screen->pixels),c64_screen->pitch,buf,104,current_c64_screen_width,current_c64_screen_height,504,312,false);
+
+    SDL_UnlockSurface(c64_screen);
+    c64_screen_is_obselete = true;
+}
+
+void C64Class::DebugBlinkRefresh()
+{
+    // Im Debugger-Stillstand die Markierung blinken lassen
+    if(debug_blink_phase != static_cast<int>((SDL_GetTicks() / 250) & 1)) DebugRefreshScreen();
+}
+
 void C64Class::WarpModeLoop()
 {
     if(limit_cycles_counter > 0)
@@ -1369,9 +1434,11 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
         if(debug_animation)
         {
             animation_speed_counter += animation_speed_add;
+            int animation_cycles = 0;
             if(animation_speed_counter >= 1)
             {
-                for(int i=0;i<static_cast<int>(animation_speed_counter);i++)
+                animation_cycles = static_cast<int>(animation_speed_counter);
+                for(int i=0;i<animation_cycles;i++)
                 {
                     NextSystemCycle();
 
@@ -1392,10 +1459,19 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 }
                 animation_speed_counter = 0;
             }
+            // Ab ca. einem Frame pro Sekunde ist die Rasterposition nicht mehr sinnvoll verfolgbar: Nur noch volle Frames (VicRefresh), keine Markierung
+            if(animation_cycles_per_sec < vic->GetCyclesPerFrame())
+            {
+                // Zeitlich begrenzen (~30 Hz): Ein Konvertieren bei jedem (nur ~1,4 ms langen) Audio-Callback bremst die Emulation aus und führt zu einem Audio-Rückstau
+                if(animation_cycles > 0 && (SDL_GetTicks() - debug_last_refresh_ticks) >= 33) DebugRefreshScreen();
+                else DebugBlinkRefresh();
+            }
             if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
         }
         else
         {
+            DebugBlinkRefresh();
+
             if(one_cycle)
             {
                 one_cycle = false;
@@ -1407,6 +1483,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
                 if((break_status != 0) || (floppy_found_breakpoint == true )) CheckBreakpoints();
 
+                DebugRefreshScreen();
                 if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
 
                 if(iec_is_dumped)
@@ -1435,6 +1512,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
                 if((break_status != 0) || (floppy_found_breakpoint == true )) CheckBreakpoints();
 
+                DebugRefreshScreen();
                 if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
 
                 if(iec_is_dumped)
@@ -3721,6 +3799,7 @@ void C64Class::SetDebugAnimation(bool status)
 void C64Class::SetDebugAnimationSpeed(int cycle_sek)
 {
     animation_speed_counter = 0;
+    animation_cycles_per_sec = cycle_sek;
     animation_speed_add = static_cast<float_t>(audio_spec_have.samples) / static_cast<float_t>(audio_frequency) * static_cast<float_t>(cycle_sek);
 }
 

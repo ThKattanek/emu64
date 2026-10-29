@@ -49,6 +49,8 @@ public:
     ~VICII();
     void SwitchVideoBuffer();
     void GetRegister(VIC_STRUCT *vic_reg);
+    void GetDebugFrame(uint8_t *dst, int *beam_row, int *beam_x);
+    int GetCyclesPerFrame() const { return total_rasterlines * total_cycles_per_rasterline; }
     void SetVicVDisplayPalSize(uint16_t first_line, uint16_t last_line);
 
     uint16_t GetVicFirstDisplayLinePal();
@@ -108,6 +110,7 @@ private:
     void RenderSpriteCycle(uint8_t *slot);
     void UpdateColorRegs();
     void ResolveLine();
+    uint8_t ResolveColorPixel(uint8_t v, int n, const uint8_t *last, int valid_cycles) const;
     void DrawGraphicsPseudo();
     void DrawBorder();
 

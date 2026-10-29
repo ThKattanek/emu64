@@ -29,7 +29,7 @@
    </font>
   </property>
   <property name="contextMenuPolicy">
-   <enum>Qt::CustomContextMenu</enum>
+   <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
   </property>
   <property name="windowTitle">
    <string>Debugger / Disassembler </string>
@@ -113,7 +113,7 @@
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -480,7 +480,7 @@ background-color: rgb(220,220, 255);</string>
             <item row="1" column="4">
              <spacer name="horizontalSpacer_3">
               <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+               <enum>Qt::Orientation::Horizontal</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -666,7 +666,7 @@ background-color: rgb(220,220, 255);</string>
             <item>
              <spacer name="horizontalSpacer_2">
               <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+               <enum>Qt::Orientation::Horizontal</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -707,7 +707,7 @@ background-color: rgb(220,220, 255);</string>
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="text">
             <string>VIC</string>
@@ -723,7 +723,7 @@ background-color: rgb(220,220, 255);</string>
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="text">
             <string>SID</string>
@@ -739,7 +739,7 @@ background-color: rgb(220,220, 255);</string>
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="text">
             <string>CIA 1</string>
@@ -755,7 +755,7 @@ background-color: rgb(220,220, 255);</string>
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="text">
             <string>CIA 2</string>
@@ -771,7 +771,7 @@ background-color: rgb(220,220, 255);</string>
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="text">
             <string notr="true">VIA 1</string>
@@ -787,7 +787,7 @@ background-color: rgb(220,220, 255);</string>
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="text">
             <string notr="true">VIA 2</string>
@@ -797,7 +797,7 @@ background-color: rgb(220,220, 255);</string>
          <item>
           <spacer name="horizontalSpacer_4">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -814,7 +814,7 @@ background-color: rgb(220,220, 255);</string>
      <item>
       <spacer name="horizontalSpacer_11">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -1202,7 +1202,7 @@ Hier wird die Sprungadresse der Brachbefehle gebildet.</string>
           <item row="2" column="6">
            <spacer name="horizontalSpacer_5">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1259,13 +1259,13 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;TMPByte von Adresse lesen // AC - TMPByte (AC wird nicht verändert) // if(idxReg&amp;lt;Adresse Lo) MCT++&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="textFormat">
-           <enum>Qt::RichText</enum>
+           <enum>Qt::TextFormat::RichText</enum>
           </property>
           <property name="scaledContents">
            <bool>false</bool>
           </property>
           <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -1321,88 +1321,6 @@ p, li { white-space: pre-wrap; }
         <property name="verticalSpacing">
          <number>4</number>
         </property>
-        <item row="0" column="2">
-         <widget class="QPushButton" name="AnimationStart">
-          <property name="toolTip">
-           <string>Die Programmausführung wird animiert. 
-Die Geschwindigkeit ist Einstellbar.</string>
-          </property>
-          <property name="text">
-           <string notr="true"/>
-          </property>
-          <property name="icon">
-           <iconset resource="emu64.qrc">
-            <normaloff>:/grafik/animation.png</normaloff>:/grafik/animation.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QPushButton" name="OneOpcode">
-          <property name="toolTip">
-           <string>Es wird genau ein Opcode abgearbeitet.</string>
-          </property>
-          <property name="text">
-           <string notr="true"/>
-          </property>
-          <property name="icon">
-           <iconset resource="emu64.qrc">
-            <normaloff>:/grafik/one_opcode.png</normaloff>:/grafik/one_opcode.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="0">
-         <widget class="QPushButton" name="OneZyklus">
-          <property name="toolTip">
-           <string>Es wird genau ein C64 Zyklus abgearbeitet.</string>
-          </property>
-          <property name="text">
-           <string notr="true"/>
-          </property>
-          <property name="icon">
-           <iconset resource="emu64.qrc">
-            <normaloff>:/grafik/one_zyklus.png</normaloff>:/grafik/one_zyklus.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="4">
-         <widget class="QScrollBar" name="AnimationSpeed">
-          <property name="toolTip">
-           <string>Hiermit stellen sie die Animationsgeschwindigkeit ein.
-In Zyklen pro Sekunde.</string>
-          </property>
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>985248</number>
-          </property>
-          <property name="pageStep">
-           <number>1000</number>
-          </property>
-          <property name="tracking">
-           <bool>true</bool>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="invertedControls">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
         <item row="5" column="0" colspan="4">
          <layout class="QHBoxLayout" name="horizontalLayout_6">
           <property name="leftMargin">
@@ -1427,7 +1345,7 @@ In Zyklen pro Sekunde.</string>
           <item>
            <spacer name="horizontalSpacer_6">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1438,6 +1356,95 @@ In Zyklen pro Sekunde.</string>
            </spacer>
           </item>
          </layout>
+        </item>
+        <item row="0" column="0">
+         <widget class="QPushButton" name="OneZyklus">
+          <property name="toolTip">
+           <string>Es wird genau ein C64 Zyklus abgearbeitet.</string>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="icon">
+           <iconset resource="emu64.qrc">
+            <normaloff>:/grafik/one_zyklus.png</normaloff>:/grafik/one_zyklus.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="OneOpcode">
+          <property name="toolTip">
+           <string>Es wird genau ein Opcode abgearbeitet.</string>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="icon">
+           <iconset resource="emu64.qrc">
+            <normaloff>:/grafik/one_opcode.png</normaloff>:/grafik/one_opcode.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_anispeed">
+          <property name="text">
+           <string>Speed:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="4">
+         <widget class="QScrollBar" name="AnimationSpeed">
+          <property name="toolTip">
+           <string>Hiermit stellen sie die Animationsgeschwindigkeit ein.
+In Zyklen pro Sekunde.</string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>985248</number>
+          </property>
+          <property name="pageStep">
+           <number>1000</number>
+          </property>
+          <property name="tracking">
+           <bool>true</bool>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="invertedControls">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="AnimationStart">
+          <property name="toolTip">
+           <string>Die Programmausführung wird animiert. 
+Die Geschwindigkeit ist Einstellbar.</string>
+          </property>
+          <property name="text">
+           <string notr="true"/>
+          </property>
+          <property name="icon">
+           <iconset resource="emu64.qrc">
+            <normaloff>:/grafik/animation.png</normaloff>:/grafik/animation.png</iconset>
+          </property>
+         </widget>
         </item>
         <item row="0" column="3">
          <widget class="QPushButton" name="AnimationStop">
@@ -1450,13 +1457,6 @@ In Zyklen pro Sekunde.</string>
           <property name="icon">
            <iconset resource="emu64.qrc">
             <normaloff>:/grafik/stop.png</normaloff>:/grafik/stop.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_anispeed">
-          <property name="text">
-           <string>Speed:</string>
           </property>
          </widget>
         </item>
@@ -1676,7 +1676,7 @@ In Zyklen pro Sekunde.</string>
           <item row="1" column="7">
            <spacer name="horizontalSpacer_7">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1840,7 +1840,7 @@ Testzwecken.</string>
        <item>
         <spacer name="verticalSpacer_2">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -1894,7 +1894,7 @@ border-right-color: rgb(255, 255, 255);</string>
              <string notr="true">0000000000</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <set>Qt::AlignmentFlag::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -1908,7 +1908,7 @@ border-right-color: rgb(255, 255, 255);</string>
           <item row="0" column="2">
            <spacer name="horizontalSpacer_8">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1956,10 +1956,10 @@ border-right-color: rgb(255, 255, 255);</string>
            </font>
           </property>
           <property name="verticalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOff</enum>
+           <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
           </property>
           <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOff</enum>
+           <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
           </property>
          </widget>
         </item>
@@ -1969,7 +1969,7 @@ border-right-color: rgb(255, 255, 255);</string>
            <number>255</number>
           </property>
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Orientation::Vertical</enum>
           </property>
          </widget>
         </item>
@@ -1977,6 +1977,19 @@ border-right-color: rgb(255, 255, 255);</string>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="BeamMarkerCheck">
+     <property name="toolTip">
+      <string>Markiert im C64-Bild die aktuelle Rasterposition (gepunktete Linien über/unter der Rasterzeile, roter Rahmen um den letzten Zyklus). Gilt nur für diese Sitzung.</string>
+     </property>
+     <property name="text">
+      <string>Rasterstrahl markieren</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -2067,13 +2080,13 @@ border-right-color: rgb(255, 255, 255);</string>
             <item>
              <widget class="QLineEdit" name="AssAdresseIn">
               <property name="focusPolicy">
-               <enum>Qt::ClickFocus</enum>
+               <enum>Qt::FocusPolicy::ClickFocus</enum>
               </property>
               <property name="styleSheet">
                <string notr="true">color: rgb(0, 0, 200);</string>
               </property>
               <property name="inputMethodHints">
-               <set>Qt::ImhNone</set>
+               <set>Qt::InputMethodHint::ImhNone</set>
               </property>
               <property name="text">
                <string notr="true"/>
@@ -2082,20 +2095,20 @@ border-right-color: rgb(255, 255, 255);</string>
                <number>10</number>
               </property>
               <property name="echoMode">
-               <enum>QLineEdit::Normal</enum>
+               <enum>QLineEdit::EchoMode::Normal</enum>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QLineEdit" name="AssMnemonicIn">
               <property name="focusPolicy">
-               <enum>Qt::ClickFocus</enum>
+               <enum>Qt::FocusPolicy::ClickFocus</enum>
               </property>
               <property name="styleSheet">
                <string notr="true">color: rgb(0, 0, 200);</string>
               </property>
               <property name="inputMethodHints">
-               <set>Qt::ImhNone</set>
+               <set>Qt::InputMethodHint::ImhNone</set>
               </property>
               <property name="text">
                <string notr="true"/>
@@ -2108,13 +2121,13 @@ border-right-color: rgb(255, 255, 255);</string>
             <item>
              <widget class="QLineEdit" name="AssAdressierungIn">
               <property name="focusPolicy">
-               <enum>Qt::ClickFocus</enum>
+               <enum>Qt::FocusPolicy::ClickFocus</enum>
               </property>
               <property name="styleSheet">
                <string notr="true">color: rgb(0, 0, 200);</string>
               </property>
               <property name="inputMethodHints">
-               <set>Qt::ImhNone</set>
+               <set>Qt::InputMethodHint::ImhNone</set>
               </property>
               <property name="text">
                <string notr="true"/>
@@ -2127,10 +2140,10 @@ border-right-color: rgb(255, 255, 255);</string>
             <item>
              <spacer name="horizontalSpacer_9">
               <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+               <enum>Qt::Orientation::Horizontal</enum>
               </property>
               <property name="sizeType">
-               <enum>QSizePolicy::Preferred</enum>
+               <enum>QSizePolicy::Policy::Preferred</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -2151,25 +2164,25 @@ border-right-color: rgb(255, 255, 255);</string>
              </size>
             </property>
             <property name="contextMenuPolicy">
-             <enum>Qt::CustomContextMenu</enum>
+             <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
             </property>
             <property name="verticalScrollBarPolicy">
-             <enum>Qt::ScrollBarAlwaysOff</enum>
+             <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
             </property>
             <property name="horizontalScrollBarPolicy">
-             <enum>Qt::ScrollBarAlwaysOff</enum>
+             <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
             </property>
             <property name="editTriggers">
-             <set>QAbstractItemView::NoEditTriggers</set>
+             <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
             </property>
             <property name="selectionMode">
-             <enum>QAbstractItemView::NoSelection</enum>
+             <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
             </property>
             <property name="selectionBehavior">
-             <enum>QAbstractItemView::SelectRows</enum>
+             <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
             </property>
             <property name="gridStyle">
-             <enum>Qt::SolidLine</enum>
+             <enum>Qt::PenStyle::SolidLine</enum>
             </property>
             <attribute name="horizontalHeaderVisible">
              <bool>false</bool>
@@ -2200,7 +2213,7 @@ border-right-color: rgb(255, 255, 255);</string>
              <number>256</number>
             </property>
             <property name="orientation">
-             <enum>Qt::Vertical</enum>
+             <enum>Qt::Orientation::Vertical</enum>
             </property>
            </widget>
           </item>
@@ -2285,7 +2298,7 @@ border-right-color: rgb(255, 255, 255);</string>
           <item>
            <spacer name="horizontalSpacer_10">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -2356,7 +2369,7 @@ border-right-color: rgb(255, 255, 255);</string>
              <string>Liste aller Haltepunkte.</string>
             </property>
             <property name="editTriggers">
-             <set>QAbstractItemView::DoubleClicked</set>
+             <set>QAbstractItemView::EditTrigger::DoubleClicked</set>
             </property>
             <property name="tabKeyNavigation">
              <bool>false</bool>
@@ -2527,10 +2540,10 @@ border-right-color: rgb(255, 255, 255);</string>
           <item row="2" column="2">
            <spacer name="horizontalSpacer_12">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::MinimumExpanding</enum>
+             <enum>QSizePolicy::Policy::MinimumExpanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>

@@ -119,6 +119,7 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     ui->HistoryList->setFont(font1);
 
     history_rows = 0;
+    connect(ui->BeamMarkerCheck, &QCheckBox::toggled, this, [this](bool status){ if(c64 != nullptr) c64->SetDebugBeamMarker(status); });
     connect(ui->HistoryList, SIGNAL(resize(int,int)),this,SLOT(onResizeHistoryList(int,int)));
 
     disass_rows = 0;
