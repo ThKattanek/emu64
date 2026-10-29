@@ -437,7 +437,7 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor, uint
     buffer[2] = 0x0F;
     buffer[3] = 0x0F;
     ConvertToGCR(buffer, P+5);
-    P += 10;
+    P += 9;
 
     // Create GCR data (338 Bytes)
     uint8_t SUM;
@@ -514,7 +514,7 @@ inline void Floppy1541::GCRToSector(unsigned int spur, unsigned int sektor)
     uint8_t *gcr = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCR_SECTOR_SIZE;
     uint8_t *d64 = D64Image + ((track_index[spur]+sektor)*256);
 
-    gcr += 12;
+    gcr += 11;
 
     ConvertToD64(gcr,BUFFER);
     *d64++ = BUFFER[1];
