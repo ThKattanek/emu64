@@ -392,6 +392,9 @@ int MainWindow::OnInit(bool nogui)
 
     c64->start_hidden_window = nogui;
 
+    // Wenn NOGUI dann wird der Sound automatisch stumm geschaltet
+    c64->MuteAudioOutput(nogui);
+
     SetC64ScreenTitle();
     c64->EnableScreenshots(ScreenshotsEnable);
     c64->SetScreenshotDir(screenshotPath.toLocal8Bit());
@@ -1081,6 +1084,9 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
                 break;
             }
             c64->SetVicConfig(VIC_MODEL_8565, val == 1);
+            break;
+        case CMD_NOSOUND:
+            c64->MuteAudioOutput(true);
             break;
         case CMD_WARP_MODE:
             c64->EnableWarpMode(true);
