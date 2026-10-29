@@ -110,6 +110,7 @@ private:
     void RenderSpriteCycle(uint8_t *slot);
     void UpdateColorRegs();
     void ResolveLine();
+    uint8_t ResolveColorPixel(uint8_t v, int n, const uint8_t *last, int valid_cycles) const;
     void DrawGraphicsPseudo();
     void DrawBorder();
 

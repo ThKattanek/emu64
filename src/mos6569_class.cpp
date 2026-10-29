@@ -215,7 +215,7 @@ void VICII::SwitchVideoBuffer()
 
 // Liefert für den Debugger das aktuelle Bild: Fertige Zeilen und der bisher gezeichnete Teil der aktuellen Zeile
 // stammen aus dem Puffer im Aufbau, der Rest aus dem letzten fertigen Frame. Noch nicht aufgelöste Farbregister
-// und der Rand der aktuellen Zeile werden mit den aktuellen Farbregistern aufgelöst.
+// und der Rand der aktuellen Zeile werden wie in ResolveLine mit der Registerhistorie der bereits ausgeführten Zyklen aufgelöst.
 // beam_row = Pufferzeile der aktuellen Rasterzeile (-1 wenn nicht sichtbar), beam_x = Anzahl bereits gezeichneter Pixel
 void VICII::GetDebugFrame(uint8_t *dst, int *beam_row, int *beam_x)
 {
@@ -244,11 +244,18 @@ void VICII::GetDebugFrame(uint8_t *dst, int *beam_row, int *beam_x)
         const uint8_t *in = cur + row * MAX_XW;
         const bool border = vic_config[VIC_BORDER_ON] && (current_rasterline >= first_display_line);
 
+        // Registerzustand für Zyklen, die noch nicht ausgeführt wurden (inkl. Schreibzugriff des Vorzyklus)
+        uint8_t last[16];
+        for(int i=0; i<16; i++) last[i] = creg[i];
+        if(creg_pend_reg != 0xFF) last[creg_pend_reg] = creg_pend_val;
+
+        const int done_cycles = x_end >> 3;
+
         for(int x=0; x<x_end; x++)
         {
             uint8_t v = in[x];
             if(border && x < border_line_pos && !(border_line[x] & 128)) v = border_line[x];
-            out[x] = (v & 0x40) ? (creg[v & 0x0F] & 0x0F) : (v & 0x0F);
+            out[x] = ResolveColorPixel(v, x, last, done_cycles);
         }
     }
 
@@ -676,25 +683,26 @@ void VICII::ResolveLine()
     const int total = total_cycles_per_rasterline;
 
     for(int n=0; n<504; n++)
-    {
-        const uint8_t v = line[n];
-        if(v & 0x40)
-        {
-            const int e = (n >> 3) + 1;
-            const int p = n & 7;
-            const int k = v & 0x0F;
-            const uint8_t *next = (e < total) ? creg_hist[e+1] : last;
+        line[n] = ResolveColorPixel(line[n], n, last, total);
+}
 
-            // Grey Dots gehören beim 8565 zum Chip, beim 6569 nur wenn sie im Setup eingeschaltet sind
-            if(p == 0 && creg_w_reg[e] == k && (!color_latency || vic_config[VIC_GREY_DOTS_ON]))
-                line[n] = 0x0F;
-            else if(color_latency)
-                line[n] = (p == 0) ? creg_hist[e][k] : next[k];
-            else
-                line[n] = next[k];
-        }
-        else line[n] = v & 0x0F;
-    }
+// Löst ein Pixel auf. valid_cycles = Anzahl der Zyklen der Zeile, deren Registerzustand in creg_hist bereits vorliegt,
+// last = Registerzustand für alle späteren Zyklen
+uint8_t VICII::ResolveColorPixel(uint8_t v, int n, const uint8_t *last, int valid_cycles) const
+{
+    if(!(v & 0x40)) return v & 0x0F;
+
+    const int e = (n >> 3) + 1;
+    const int p = n & 7;
+    const int k = v & 0x0F;
+    const uint8_t *next = (e + 1 <= valid_cycles) ? creg_hist[e+1] : last;
+
+    // Grey Dots gehören beim 8565 zum Chip, beim 6569 nur wenn sie im Setup eingeschaltet sind
+    if(p == 0 && creg_w_reg[e] == k && (!color_latency || vic_config[VIC_GREY_DOTS_ON]))
+        return 0x0F;
+    if(color_latency)
+        return (p == 0) ? creg_hist[e][k] : next[k];
+    return next[k];
 }
 
 inline void VICII::DrawGraphics()
