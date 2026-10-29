@@ -1,6 +1,7 @@
 Alle Änderungen ab V5.2.0 bis jetzt
 -----------------------------------
 
+- Fixed: VIC - Der g-Abruf sieht den Display-Zustand vor der Badline-Prüfung des aktuellen Zyklus. Ein $d011-Zugriff kurz vor Zeilenende (VSP) erzeugt damit keinen zusätzlichen Zeichenzähler-Schritt mehr (wonderland_x_2.prg: Bild zuckte seitlich)
 - Fixed: VIC - FLI-Bug: Beginnt der c-Zugriff einer Badline bevor die CPU 3 Zyklen lang angehalten wurde, liest der VIC $ff und als Farbe das untere Nibble des Bytes am CPU-Bus (blackmail-ee.prg, blackmail-fixed.prg)
 - [#77] NEW! Kommandozeilenparameter --set-vicmodel <0|1> (0=MOS-6569, 1=MOS-8565) wählt das VIC-II Modell für diesen Start
 - [#77] Fixed: VIC - Die Sprite-Ausgabe arbeitet jetzt wie bei VICE zyklusweise (8 Pixel je Zyklus): Start bei erreichter X-Position, Sprite-DMA-Fenster (Halt/Abbruch), Multicolor- und Expansions-Umschaltung mitten im Sprite (6569 und 8565 unterschiedlich), Priorität und Kollisionen pro Pixel. Die Sprite-Farben und alle  Hintergrundfarben werden über ein Abbild der Farbregister $d020-$d02e aufgelöst, ein Schreibzugriff wirkt erst im Folgezyklus (6569: ein Pixel Verzögerung). Beim 8565 erscheinen Grey Dots automatisch

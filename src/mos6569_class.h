@@ -168,6 +168,7 @@ private:
     bool        badline_enable;
     bool        badline_status;
     bool        display_status;	// false = Idle / true = Display
+    bool        display_status_g;	// Display-Zustand vor der Badline-Prüfung des aktuellen Zyklus (für den g-Abruf)
     bool        lp_triggered;
     uint8_t     rc;
     uint16_t    vc;

@@ -117,6 +117,7 @@ VICII::VICII()
     badline_enable = false;
     badline_status = false;
     display_status = false;
+    display_status_g = false;
     matrix_base = 0;
     char_base = 0;
     bitmap_base = 0;
@@ -369,7 +370,7 @@ inline void VICII::cAccess()
 
 inline void VICII::gAccess()
 {
-    if (display_status) // DisplayModus
+    if (display_status_g) // DisplayModus
 	{
         // 8565: Der Videomodus für die Abrufe wirkt einen Zyklus später
         const uint8_t r11 = color_latency ? reg_ctrl_1 : reg11_delay;
@@ -904,6 +905,9 @@ void VICII::OneCycle()
 
     // Prüfen ob Badlines zugelassen sind
     if(current_rasterline == 0x30) badline_enable = den;
+
+    // Der g-Abruf dieses Zyklus sieht den Display-Zustand noch vor der Badline-Prüfung (wie VICE, wichtig für VSP)
+    display_status_g = display_status;
 
     // Prüfen auf Badline zustand
     if((current_rasterline>=0x30) && (current_rasterline<=0xF7) && (reg_y_scroll == (current_rasterline&7)) && (badline_enable == true))
