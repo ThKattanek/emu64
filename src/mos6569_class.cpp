@@ -107,6 +107,7 @@ VICII::VICII()
         x_pos += 8;
     }
 
+	full_view = false;
 	SetVicType(0);
 
     draw_line_counter = 0;
@@ -374,6 +375,36 @@ void VICII::SetVicType(uint8_t system)
         last_display_line = last_display_line_ntsc;
 		break;
 	}
+
+    if(full_view) ApplyDisplayLines();
+}
+
+// Setzt die sichtbaren Rasterzeilen entsprechend dem Systemtyp, im Vollbild-Modus des Debuggers alle Zeilen
+void VICII::ApplyDisplayLines()
+{
+    if(full_view)
+    {
+        first_display_line = 0;
+        last_display_line = total_rasterlines;
+        return;
+    }
+
+    if(system == 0)
+    {
+        first_display_line = first_display_line_pal;
+        last_display_line = last_display_line_pal;
+    }
+    else
+    {
+        first_display_line = first_display_line_ntsc;
+        last_display_line = last_display_line_ntsc;
+    }
+}
+
+void VICII::SetFullView(bool status)
+{
+    full_view = status;
+    ApplyDisplayLines();
 }
 
 inline void VICII::RasterIRQ()
