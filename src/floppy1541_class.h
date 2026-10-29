@@ -164,6 +164,7 @@ private:
     //uint8_t             AktGCRWert;
     static const int	NUM_TRACKS = 42;
     static const int	GCR_SECTOR_SIZE = 364;      // SYNC Header Gap SYNC Data Gap (should be 5 SYNC bytes each) ///  ALF Sector in Byte
+    static const int	GCR_DATA_BLOCK_SIZE = 325;      // Datenblock im GCR Format (Marker, 256 Datenbytes, Prüfsumme, 2 Füllbytes)
     static const int	GCR_TRACK_SIZE = 7928;      // Each track in gcr_data has 21 sectors
     uint8_t             AktHalbSpur;                // Aktuelle Halbspur Nummer (2..70)
     uint8_t *           GCR_PTR;                    // Zeiger auf GCR Daten Unter R/W Kopf

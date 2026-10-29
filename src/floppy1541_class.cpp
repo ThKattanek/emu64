@@ -509,31 +509,62 @@ inline void Floppy1541::GCRImageToD64Image()
 
 inline void Floppy1541::GCRToSector(unsigned int spur, unsigned int sektor)
 {
+    // Ein Sektor wird nur dann ins D64 übernommen, wenn der Datenblock im GCR Slot gültig ist
+    // (nur gültige GCR Codes, Datenmarker 0x07, Prüfsumme stimmt). Sonst bleibt der Sektor im D64
+    // unverändert, damit ein Schreibzugriff mit anderer Lage des Datenblocks das Image nicht zerstört.
     uint8_t BUFFER[4];
+    uint8_t block[256];
 
     uint8_t *gcr = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCR_SECTOR_SIZE;
     uint8_t *d64 = D64Image + ((track_index[spur]+sektor)*256);
 
     gcr += 11;
 
+    // Alle 5 Bit Codes des Datenblocks (Marker, 256 Datenbytes, Prüfsumme, 2 Füllbytes = 260 Bytes = 325 GCR Bytes) müssen gültig sein
+    static const bool valid_code[32] = {false,false,false,false,false,false,false,false,false,true,true,true,false,true,true,true,
+                                        false,false,true,true,false,true,true,true,false,true,true,true,false,true,true,false};
+    for (int bit=0; bit<GCR_DATA_BLOCK_SIZE*8; bit+=5)
+    {
+        unsigned int code = 0;
+        for (int i=0; i<5; i++)
+        {
+            int pos = bit + i;
+            code = (code << 1) | ((gcr[pos >> 3] >> (7 - (pos & 7))) & 1);
+        }
+        if (!valid_code[code])
+            return;
+    }
+
+    uint8_t *dst = block;
+    uint8_t sum = 0;
+
     ConvertToD64(gcr,BUFFER);
-    *d64++ = BUFFER[1];
-    *d64++ = BUFFER[2];
-    *d64++ = BUFFER[3];
+    if (BUFFER[0] != 0x07)
+        return;
+    *dst++ = BUFFER[1];
+    *dst++ = BUFFER[2];
+    *dst++ = BUFFER[3];
+    sum ^= BUFFER[1] ^ BUFFER[2] ^ BUFFER[3];
     gcr += 5;
 
     for (int i=3; i<255; i+=4)
     {
         ConvertToD64(gcr,BUFFER);
-        *d64++ = BUFFER[0];
-        *d64++ = BUFFER[1];
-        *d64++ = BUFFER[2];
-        *d64++ = BUFFER[3];
+        *dst++ = BUFFER[0];
+        *dst++ = BUFFER[1];
+        *dst++ = BUFFER[2];
+        *dst++ = BUFFER[3];
+        sum ^= BUFFER[0] ^ BUFFER[1] ^ BUFFER[2] ^ BUFFER[3];
         gcr += 5;
     }
 
     ConvertToD64(gcr,BUFFER);
-    *d64 = BUFFER[0];
+    *dst = BUFFER[0];
+    sum ^= BUFFER[0];
+    if (sum != BUFFER[1])
+        return;
+
+    memcpy(d64, block, 256);
 }
 
 inline void Floppy1541::ConvertToD64(uint8_t *source_buffer, uint8_t *destination_buffer)
