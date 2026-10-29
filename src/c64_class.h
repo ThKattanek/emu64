@@ -161,6 +161,7 @@ public:
     void OneCycle();
     void DebugRefreshScreen();
     void DebugBlinkRefresh();
+    bool SetDebugFullView(bool status);
     void SetDebugBeamMarker(bool status) { debug_beam_marker = status; if(debug_mode) DebugRefreshScreen(); }
     void OneOpcode(int source);
     void SetDebugAnimation(bool status);
@@ -360,6 +361,8 @@ public:
     int             debug_blink_phase;
     uint32_t        debug_last_refresh_ticks;
     bool            debug_beam_marker;
+    bool            debug_full_view;            // Debugger: Gesamtes Bild (alle Rasterzeilen, alle Zyklen)
+    int             video_x_offset;             // Erstes sichtbares Pixel in der VIC-Zeile
     VideoCrtClass   *video_crt_output;
 
     int             c64_frequency;   // Normaler PAL Takt ist 985248 Hz (985248 / (312 Rz * 63 Cycles) = 50,124542 Hz)

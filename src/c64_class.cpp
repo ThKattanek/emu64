@@ -462,6 +462,8 @@ debug_mode = one_cycle = one_opcode = false;
 debug_blink_phase = 0;
 debug_last_refresh_ticks = 0;
 debug_beam_marker = true;
+debug_full_view = false;
+video_x_offset = 104;
 cycle_counter = 0;
 limit_cycles_counter = 0;
 hold_next_system_cycle = false;
@@ -937,7 +939,7 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
         return;
     }
 
-    video_crt_output->ConvertVideo(static_cast<void*>(c64_screen->pixels),c64_screen->pitch,vic_puffer,104,current_c64_screen_width,current_c64_screen_height,504,312,false);
+    video_crt_output->ConvertVideo(static_cast<void*>(c64_screen->pixels),c64_screen->pitch,vic_puffer,video_x_offset,current_c64_screen_width,current_c64_screen_height,504,312,false);
 
     this->vic_buffer = vic_puffer;
     vic->SwitchVideoBuffer();
@@ -1004,11 +1006,16 @@ void C64Class::DebugRefreshScreen()
 {
     // Im Debugger (Einzelschritt/Animation) das gerade im Aufbau befindliche Bild anzeigen,
     // ohne den Videopuffer zu wechseln und ohne Capture/Screenshot auszulösen
-    if(enable_hold_vic_refresh) return;
+    if(enable_hold_vic_refresh)
+    {
+        vic_refresh_is_holded = true;
+        return;
+    }
     if((video_crt_output == nullptr) || (sdl_thread_pause == true)) return;
     if(SDL_LockSurface(c64_screen) != 0) return;
 
-    if(debug_frame_buffer.size() != VIDEO_BUFFER_SIZE) debug_frame_buffer.assign(VIDEO_BUFFER_SIZE, 0);
+    // Etwas Reserve: ConvertVideo liest bis zu 3 Pixel hinter dem Zeilenende
+    if(debug_frame_buffer.size() != VIDEO_BUFFER_SIZE + 16) debug_frame_buffer.assign(VIDEO_BUFFER_SIZE + 16, 0);
     uint8_t *buf = debug_frame_buffer.data();
 
     int beam_row, beam_x;
@@ -1049,10 +1056,20 @@ void C64Class::DebugRefreshScreen()
         }
     }
 
-    video_crt_output->ConvertVideo(static_cast<void*>(c64_screen->pixels),c64_screen->pitch,buf,104,current_c64_screen_width,current_c64_screen_height,504,312,false);
+    video_crt_output->ConvertVideo(static_cast<void*>(c64_screen->pixels),c64_screen->pitch,buf,video_x_offset,current_c64_screen_width,current_c64_screen_height,504,312,false);
 
     SDL_UnlockSurface(c64_screen);
     c64_screen_is_obselete = true;
+}
+
+// Schaltet das Gesamtbild des Debuggers um. Während einer Videoaufnahme nicht möglich (Bildgröße ändert sich), Rückgabe false
+bool C64Class::SetDebugFullView(bool status)
+{
+    if(video_capture != nullptr && video_capture->IsCaptureActive()) return false;
+
+    debug_full_view = status;
+    changed_graphic_modi = true;
+    return true;
 }
 
 void C64Class::DebugBlinkRefresh()
@@ -1819,7 +1836,16 @@ void C64Class::InitGrafik()
     sprintf(out_string,"\tInitGrafik: EnableFullscreen: %d\n",enable_fullscreen);
     LogText(out_string);
 
-    current_window_width = current_c64_screen_width = C64ScreenXW;
+    // Im Gesamtbild des Debuggers alle Rasterzeilen und alle 63 Zyklen (504 Pixel) anzeigen
+    vic->SetFullView(debug_full_view);
+    video_x_offset = debug_full_view ? 0 : 104;
+
+    current_window_width = current_c64_screen_width = debug_full_view ? MAX_XW : C64ScreenXW;
+
+    // Im Gesamtbild gleiche Pixelform wie im normalen Bild (4:3 bei 384 x 272), sonst wirkt es verzerrt
+    screen_aspect_ratio = SCREEN_RATIO_4_3;
+    if(debug_full_view)
+        screen_aspect_ratio *= (static_cast<float_t>(MAX_XW) / static_cast<float_t>(vic->GetAktVicDisplayLastLine() - vic->GetAktVicDisplayFirstLine())) / (static_cast<float_t>(C64ScreenXW) / 272.0f);
     current_window_height = current_c64_screen_height = vic->GetAktVicDisplayLastLine() - vic->GetAktVicDisplayFirstLine();
 
     if(enable_screen_doublesize)

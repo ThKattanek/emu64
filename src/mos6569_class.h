@@ -50,6 +50,7 @@ public:
     void SwitchVideoBuffer();
     void GetRegister(VIC_STRUCT *vic_reg);
     void GetDebugFrame(uint8_t *dst, int *beam_row, int *beam_x);
+    void SetFullView(bool status);
     int GetCyclesPerFrame() const { return total_rasterlines * total_cycles_per_rasterline; }
     void SetVicVDisplayPalSize(uint16_t first_line, uint16_t last_line);
 
@@ -110,6 +111,7 @@ private:
     void RenderSpriteCycle(uint8_t *slot);
     void UpdateColorRegs();
     void ResolveLine();
+    void ApplyDisplayLines();
     uint8_t ResolveColorPixel(uint8_t v, int n, const uint8_t *last, int valid_cycles) const;
     void DrawGraphicsPseudo();
     void DrawBorder();
@@ -119,6 +121,7 @@ private:
     uint8_t *video_buffer_line;
     int     draw_line_counter;
     bool    draw_this_line;
+    bool    full_view;                  // Debugger: Alle Rasterzeilen in den Videopuffer schreiben
 
     //// Interne Register ////
     uint16_t    reg_mx[8];

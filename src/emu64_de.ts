@@ -1205,6 +1205,16 @@ Möchtest du fortfahren?</translation>
         <source>Markiert im C64-Bild die aktuelle Rasterposition (gepunktete Linien über/unter der Rasterzeile, roter Rahmen um den letzten Zyklus). Gilt nur für diese Sitzung.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="debugger_window.ui" line="2000"/>
+        <source>Gesamtes Bild</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="debugger_window.ui" line="2000"/>
+        <source>Zeigt das gesamte Bild des VIC: alle Rasterzeilen und alle Zyklen einer Zeile, auch Rand und Austastlücke. Gilt nur für diese Sitzung.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FloppyNewD64Window</name>

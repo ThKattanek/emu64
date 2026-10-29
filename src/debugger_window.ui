@@ -1992,6 +1992,16 @@ border-right-color: rgb(255, 255, 255);</string>
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="FullViewCheck">
+     <property name="toolTip">
+      <string>Zeigt das gesamte Bild des VIC: alle Rasterzeilen und alle Zyklen einer Zeile, auch Rand und Austastlücke. Gilt nur für diese Sitzung.</string>
+     </property>
+     <property name="text">
+      <string>Gesamtes Bild</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_8">
      <property name="leftMargin">
       <number>4</number>

@@ -107,6 +107,7 @@ VICII::VICII()
         x_pos += 8;
     }
 
+	full_view = false;
 	SetVicType(0);
 
     draw_line_counter = 0;
@@ -374,6 +375,36 @@ void VICII::SetVicType(uint8_t system)
         last_display_line = last_display_line_ntsc;
 		break;
 	}
+
+    if(full_view) ApplyDisplayLines();
+}
+
+// Setzt die sichtbaren Rasterzeilen entsprechend dem Systemtyp, im Vollbild-Modus des Debuggers alle Zeilen
+void VICII::ApplyDisplayLines()
+{
+    if(full_view)
+    {
+        first_display_line = 0;
+        last_display_line = total_rasterlines;
+        return;
+    }
+
+    if(system == 0)
+    {
+        first_display_line = first_display_line_pal;
+        last_display_line = last_display_line_pal;
+    }
+    else
+    {
+        first_display_line = first_display_line_ntsc;
+        last_display_line = last_display_line_ntsc;
+    }
+}
+
+void VICII::SetFullView(bool status)
+{
+    full_view = status;
+    ApplyDisplayLines();
 }
 
 inline void VICII::RasterIRQ()
@@ -733,7 +764,14 @@ inline void VICII::DrawGraphicsPseudo()
     /// Für Anzeige Aller Zyklen
     video_buffer_line += 8;
 
-    //CheckBorder
+    // Rand auch in diesen Zyklen füllen (sichtbar im Gesamtbild des Debuggers): Hier gibt es keine Rand-Flanken,
+    // der Rand ist an wenn das Haupt-Flipflop gesetzt ist
+    if(draw_this_line && (border_line_pos + 8 <= static_cast<int>(sizeof(border_line))))
+    {
+        const uint8_t v = border_flip_flop0 ? BORDER_COLOR_REG : 128;
+        for(int i=0; i<8; i++) border_line[border_line_pos + i] = v;
+    }
+
     border_line_pos += 8;
     return;
 }
