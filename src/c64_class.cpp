@@ -996,6 +996,20 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
     c64_screen_is_obselete = true;
 }
 
+void C64Class::DebugRefreshScreen()
+{
+    // Im Debugger (Einzelschritt/Animation) das gerade im Aufbau befindliche Bild anzeigen,
+    // ohne den Videopuffer zu wechseln und ohne Capture/Screenshot auszulösen
+    if(enable_hold_vic_refresh) return;
+    if((video_crt_output == nullptr) || (sdl_thread_pause == true)) return;
+    if(SDL_LockSurface(c64_screen) != 0) return;
+
+    video_crt_output->ConvertVideo(static_cast<void*>(c64_screen->pixels),c64_screen->pitch,vic->video_buffer,104,current_c64_screen_width,current_c64_screen_height,504,312,false);
+
+    SDL_UnlockSurface(c64_screen);
+    c64_screen_is_obselete = true;
+}
+
 void C64Class::WarpModeLoop()
 {
     if(limit_cycles_counter > 0)
@@ -1392,7 +1406,8 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 }
                 animation_speed_counter = 0;
             }
-            if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
+            DebugRefreshScreen();
+                if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
         }
         else
         {
@@ -1407,6 +1422,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
                 if((break_status != 0) || (floppy_found_breakpoint == true )) CheckBreakpoints();
 
+                DebugRefreshScreen();
                 if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
 
                 if(iec_is_dumped)
@@ -1435,6 +1451,7 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
                 if((break_status != 0) || (floppy_found_breakpoint == true )) CheckBreakpoints();
 
+                DebugRefreshScreen();
                 if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
 
                 if(iec_is_dumped)

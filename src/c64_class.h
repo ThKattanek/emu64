@@ -158,6 +158,7 @@ public:
     void SetCpuExtLines(bool status);
     void SetExtRDY(bool status);
     void OneCycle();
+    void DebugRefreshScreen();
     void OneOpcode(int source);
     void SetDebugAnimation(bool status);
     void SetDebugAnimationSpeed(int cycle_sek);
