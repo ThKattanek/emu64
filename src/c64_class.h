@@ -573,6 +573,7 @@ private:
     bool        debug_mode;
     bool        debug_animation;
     float_t     animation_speed_add;
+    int         animation_cycles_per_sec;
     float_t     animation_speed_counter;
     bool        one_cycle;
     bool        one_opcode;

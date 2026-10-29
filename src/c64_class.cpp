@@ -468,6 +468,7 @@ hold_next_system_cycle = false;
 debug_animation = false;
 debug_logging = false;
 animation_speed_add = audio_spec_have.samples/audio_frequency;
+animation_cycles_per_sec = 1;
 animation_speed_counter = 0;
 
 for(i=0;i<8;i++)
@@ -1458,9 +1459,13 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                 }
                 animation_speed_counter = 0;
             }
-            // Zeitlich begrenzen (~30 Hz): Ein Konvertieren bei jedem (nur ~1,4 ms langen) Audio-Callback bremst die Emulation aus und führt zu einem Audio-Rückstau
-            if(animation_cycles > 0 && (SDL_GetTicks() - debug_last_refresh_ticks) >= 33) DebugRefreshScreen();
-            else DebugBlinkRefresh();
+            // Ab ca. einem Frame pro Sekunde ist die Rasterposition nicht mehr sinnvoll verfolgbar: Nur noch volle Frames (VicRefresh), keine Markierung
+            if(animation_cycles_per_sec < vic->GetCyclesPerFrame())
+            {
+                // Zeitlich begrenzen (~30 Hz): Ein Konvertieren bei jedem (nur ~1,4 ms langen) Audio-Callback bremst die Emulation aus und führt zu einem Audio-Rückstau
+                if(animation_cycles > 0 && (SDL_GetTicks() - debug_last_refresh_ticks) >= 33) DebugRefreshScreen();
+                else DebugBlinkRefresh();
+            }
             if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
         }
         else
@@ -3794,6 +3799,7 @@ void C64Class::SetDebugAnimation(bool status)
 void C64Class::SetDebugAnimationSpeed(int cycle_sek)
 {
     animation_speed_counter = 0;
+    animation_cycles_per_sec = cycle_sek;
     animation_speed_add = static_cast<float_t>(audio_spec_have.samples) / static_cast<float_t>(audio_frequency) * static_cast<float_t>(cycle_sek);
 }
 
