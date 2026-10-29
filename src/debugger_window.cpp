@@ -119,6 +119,7 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     ui->HistoryList->setFont(font1);
 
     history_rows = 0;
+    connect(ui->FullViewCheck, &QCheckBox::toggled, this, [this](bool status){ if(c64 != nullptr) c64->SetDebugFullView(status); });
     connect(ui->BeamMarkerCheck, &QCheckBox::toggled, this, [this](bool status){ if(c64 != nullptr) c64->SetDebugBeamMarker(status); });
     connect(ui->HistoryList, SIGNAL(resize(int,int)),this,SLOT(onResizeHistoryList(int,int)));
 
@@ -352,6 +353,7 @@ void DebuggerWindow::hideEvent(QHideEvent*)
 
     c64->SetDebugMode(false);
     c64->SetDebugAnimation(false);
+    ui->FullViewCheck->setChecked(false);
 
     ui->OneOpcode->setEnabled(true);
     ui->OneZyklus->setEnabled(true);
