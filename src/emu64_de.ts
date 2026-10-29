@@ -1195,6 +1195,16 @@ Möchtest du fortfahren?</translation>
         <source>Die Haltepunkte konnten nicht gespeichert werden.</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="debugger_window.ui" line="127"/>
+        <source>Rasterstrahl markieren</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="debugger_window.ui" line="127"/>
+        <source>Markiert im C64-Bild die aktuelle Rasterposition (gepunktete Linien über/unter der Rasterzeile, roter Rahmen um den letzten Zyklus). Gilt nur für diese Sitzung.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FloppyNewD64Window</name>

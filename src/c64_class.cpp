@@ -459,6 +459,8 @@ c64_command_line_current_pos = 0;
 c64_command_line_status = false;
 c64_command_line_count_s = false;
 debug_mode = one_cycle = one_opcode = false;
+debug_blink_phase = 0;
+debug_beam_marker = true;
 cycle_counter = 0;
 limit_cycles_counter = 0;
 hold_next_system_cycle = false;
@@ -1004,10 +1006,56 @@ void C64Class::DebugRefreshScreen()
     if((video_crt_output == nullptr) || (sdl_thread_pause == true)) return;
     if(SDL_LockSurface(c64_screen) != 0) return;
 
-    video_crt_output->ConvertVideo(static_cast<void*>(c64_screen->pixels),c64_screen->pitch,vic->video_buffer,104,current_c64_screen_width,current_c64_screen_height,504,312,false);
+    if(debug_frame_buffer.size() != VIDEO_BUFFER_SIZE) debug_frame_buffer.assign(VIDEO_BUFFER_SIZE, 0);
+    uint8_t *buf = debug_frame_buffer.data();
+
+    int beam_row, beam_x;
+    vic->GetDebugFrame(buf, &beam_row, &beam_x);
+
+    // Rasterstrahl markieren: Blinkende Linien über und unter der aktuellen Rasterzeile (weiß/schwarz im Wechsel),
+    // roter Rahmen um die 8 Pixel des zuletzt ausgeführten Zyklus
+    debug_blink_phase = static_cast<int>((SDL_GetTicks() / 250) & 1);
+
+    if(debug_beam_marker && beam_row >= 0)
+    {
+        const uint8_t blink_color = debug_blink_phase ? 1 : 0;
+        const uint8_t frame_color = 2;
+
+        // Gepunktet (jedes 2. Pixel), damit die Bilddaten daneben sichtbar bleiben
+        for(int x=0; x<504; x+=2)
+        {
+            if(beam_row > 0) buf[(beam_row - 1) * 504 + x] = blink_color;
+            if(beam_row < 311) buf[(beam_row + 1) * 504 + x] = blink_color;
+        }
+
+        int x0 = beam_x - 8;
+        if(x0 < 0) x0 = 0;
+        const int x1 = (beam_x > 0) ? beam_x - 1 : 0;
+        const int y0 = (beam_row > 0) ? beam_row - 1 : 0;
+        const int y1 = (beam_row < 311) ? beam_row + 1 : 311;
+
+        for(int x=x0; x<=x1; x++)
+        {
+            buf[y0 * 504 + x] = frame_color;
+            buf[y1 * 504 + x] = frame_color;
+        }
+        for(int y=y0; y<=y1; y++)
+        {
+            buf[y * 504 + x0] = frame_color;
+            buf[y * 504 + x1] = frame_color;
+        }
+    }
+
+    video_crt_output->ConvertVideo(static_cast<void*>(c64_screen->pixels),c64_screen->pitch,buf,104,current_c64_screen_width,current_c64_screen_height,504,312,false);
 
     SDL_UnlockSurface(c64_screen);
     c64_screen_is_obselete = true;
+}
+
+void C64Class::DebugBlinkRefresh()
+{
+    // Im Debugger-Stillstand die Markierung blinken lassen
+    if(debug_blink_phase != static_cast<int>((SDL_GetTicks() / 250) & 1)) DebugRefreshScreen();
 }
 
 void C64Class::WarpModeLoop()
@@ -1411,6 +1459,8 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
         }
         else
         {
+            DebugBlinkRefresh();
+
             if(one_cycle)
             {
                 one_cycle = false;

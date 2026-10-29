@@ -49,6 +49,7 @@ public:
     ~VICII();
     void SwitchVideoBuffer();
     void GetRegister(VIC_STRUCT *vic_reg);
+    void GetDebugFrame(uint8_t *dst, int *beam_row, int *beam_x);
     void SetVicVDisplayPalSize(uint16_t first_line, uint16_t last_line);
 
     uint16_t GetVicFirstDisplayLinePal();

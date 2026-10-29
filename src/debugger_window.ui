@@ -123,6 +123,19 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QCheckBox" name="BeamMarkerCheck">
+       <property name="toolTip">
+        <string>Markiert im C64-Bild die aktuelle Rasterposition (gepunktete Linien über/unter der Rasterzeile, roter Rahmen um den letzten Zyklus). Gilt nur für diese Sitzung.</string>
+       </property>
+       <property name="text">
+        <string>Rasterstrahl markieren</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

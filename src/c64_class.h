@@ -36,6 +36,7 @@
 #include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_image.h>
 #include <atomic>
+#include <vector>
 #include <functional>
 
 #define AudioSampleRate 44100
@@ -159,6 +160,8 @@ public:
     void SetExtRDY(bool status);
     void OneCycle();
     void DebugRefreshScreen();
+    void DebugBlinkRefresh();
+    void SetDebugBeamMarker(bool status) { debug_beam_marker = status; if(debug_mode) DebugRefreshScreen(); }
     void OneOpcode(int source);
     void SetDebugAnimation(bool status);
     void SetDebugAnimationSpeed(int cycle_sek);
@@ -353,6 +356,9 @@ public:
     bool            warp_thread_is_end;
 
     uint8_t         *vic_buffer;
+    std::vector<uint8_t> debug_frame_buffer;
+    int             debug_blink_phase;
+    bool            debug_beam_marker;
     VideoCrtClass   *video_crt_output;
 
     int             c64_frequency;   // Normaler PAL Takt ist 985248 Hz (985248 / (312 Rz * 63 Cycles) = 50,124542 Hz)
