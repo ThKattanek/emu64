@@ -119,7 +119,13 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     ui->HistoryList->setFont(font1);
 
     history_rows = 0;
-    connect(ui->FullViewCheck, &QCheckBox::toggled, this, [this](bool status){ if(c64 != nullptr) c64->SetDebugFullView(status); });
+    connect(ui->FullViewCheck, &QCheckBox::toggled, this, [this](bool status){
+        if(c64 == nullptr || c64->SetDebugFullView(status)) return;
+        // Nicht möglich (z.B. Videoaufnahme läuft): Checkbox zurücksetzen
+        ui->FullViewCheck->blockSignals(true);
+        ui->FullViewCheck->setChecked(!status);
+        ui->FullViewCheck->blockSignals(false);
+    });
     connect(ui->BeamMarkerCheck, &QCheckBox::toggled, this, [this](bool status){ if(c64 != nullptr) c64->SetDebugBeamMarker(status); });
     connect(ui->HistoryList, SIGNAL(resize(int,int)),this,SLOT(onResizeHistoryList(int,int)));
 
@@ -353,7 +359,7 @@ void DebuggerWindow::hideEvent(QHideEvent*)
 
     c64->SetDebugMode(false);
     c64->SetDebugAnimation(false);
-    ui->FullViewCheck->setChecked(false);
+    ui->FullViewCheck->setChecked(false);       // Läuft eine Videoaufnahme, bleibt das Gesamtbild aktiv und die Checkbox springt zurück
 
     ui->OneOpcode->setEnabled(true);
     ui->OneZyklus->setEnabled(true);

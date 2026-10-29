@@ -1062,6 +1062,16 @@ void C64Class::DebugRefreshScreen()
     c64_screen_is_obselete = true;
 }
 
+// Schaltet das Gesamtbild des Debuggers um. Während einer Videoaufnahme nicht möglich (Bildgröße ändert sich), Rückgabe false
+bool C64Class::SetDebugFullView(bool status)
+{
+    if(video_capture != nullptr && video_capture->IsCaptureActive()) return false;
+
+    debug_full_view = status;
+    changed_graphic_modi = true;
+    return true;
+}
+
 void C64Class::DebugBlinkRefresh()
 {
     // Im Debugger-Stillstand die Markierung blinken lassen
@@ -1831,6 +1841,11 @@ void C64Class::InitGrafik()
     video_x_offset = debug_full_view ? 0 : 104;
 
     current_window_width = current_c64_screen_width = debug_full_view ? MAX_XW : C64ScreenXW;
+
+    // Im Gesamtbild gleiche Pixelform wie im normalen Bild (4:3 bei 384 x 272), sonst wirkt es verzerrt
+    screen_aspect_ratio = SCREEN_RATIO_4_3;
+    if(debug_full_view)
+        screen_aspect_ratio *= (static_cast<float_t>(MAX_XW) / static_cast<float_t>(vic->GetAktVicDisplayLastLine() - vic->GetAktVicDisplayFirstLine())) / (static_cast<float_t>(C64ScreenXW) / 272.0f);
     current_window_height = current_c64_screen_height = vic->GetAktVicDisplayLastLine() - vic->GetAktVicDisplayFirstLine();
 
     if(enable_screen_doublesize)

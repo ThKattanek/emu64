@@ -65,6 +65,7 @@ public:
     void AddFrame(uint8_t *data, int linesize);
     void FillSourceAudioBuffer(int16_t *data, int len);
     int GetRecordedFrameCount();
+    bool IsCaptureActive() const { return is_capture_cctive; }
 
     int WriteVideoFrame(AVFormatContext *oc, OutputStream *ost);
     int encode_video;

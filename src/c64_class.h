@@ -161,7 +161,7 @@ public:
     void OneCycle();
     void DebugRefreshScreen();
     void DebugBlinkRefresh();
-    void SetDebugFullView(bool status) { debug_full_view = status; changed_graphic_modi = true; }
+    bool SetDebugFullView(bool status);
     void SetDebugBeamMarker(bool status) { debug_beam_marker = status; if(debug_mode) DebugRefreshScreen(); }
     void OneOpcode(int source);
     void SetDebugAnimation(bool status);
