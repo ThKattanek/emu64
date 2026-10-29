@@ -91,6 +91,7 @@ private:
     inline void TimerReset(TIMER *timer);
     inline bool TimerStep(TIMER *timer);
     inline void CheckLP();
+    inline void UpdateIecWire();
 
     /// Variablen ///
     uint8_t     cia_nr;
