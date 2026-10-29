@@ -764,7 +764,14 @@ inline void VICII::DrawGraphicsPseudo()
     /// Für Anzeige Aller Zyklen
     video_buffer_line += 8;
 
-    //CheckBorder
+    // Rand auch in diesen Zyklen füllen (sichtbar im Gesamtbild des Debuggers): Hier gibt es keine Rand-Flanken,
+    // der Rand ist an wenn das Haupt-Flipflop gesetzt ist
+    if(draw_this_line && (border_line_pos + 8 <= static_cast<int>(sizeof(border_line))))
+    {
+        const uint8_t v = border_flip_flop0 ? BORDER_COLOR_REG : 128;
+        for(int i=0; i<8; i++) border_line[border_line_pos + i] = v;
+    }
+
     border_line_pos += 8;
     return;
 }
