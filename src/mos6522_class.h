@@ -29,6 +29,8 @@ public:
 
     void Reset(void);
     unsigned char GetIO_Zero(void);
+    unsigned char GetPCR(void) { return IO[0x0C]; }   // Peripheral Control Register (VIA2: Bit 5-7 = CB2, 110 = Schreibmodus)
+    unsigned char GetPA(void) { return PA; }          // Ausgangslatch Port A (VIA2: Datenbyte für den Schreibkopf)
 	float GetIOPB3_RMS(void);
     void OneZyklus(void);
     void WriteIO(unsigned short adresse, unsigned char);

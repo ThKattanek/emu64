@@ -28,7 +28,7 @@
 #define D64_IMAGE_SIZE 174848
 #define G64_IMAGE_SIZE 665952
 
-#define SYNC_BIT_THRESHOLD 8   // Minimale Anzahl der aufeinander folgenden 1er Bits die als SYNC Markierung gewertet wird (Naormal ist 10)
+#define SYNC_BIT_THRESHOLD 10   // Minimale Anzahl der aufeinander folgenden 1er Bits die als SYNC Markierung gewertet wird (Naormal ist 10)
 
 #define DISK_CHANGE_STATE_COUNTS 4
 #define DISK_CHANGE_STATE_CYCLES 1000
@@ -114,7 +114,10 @@ private:
     void SectorToGCR(unsigned int spur, unsigned int sektor, uint16_t disk_id);
     void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
     void GCRImageToD64Image();
-    void GCRToSector(unsigned int spur, unsigned int sektor);
+    void DecodeTrackToD64(unsigned int spur);
+    void RotateDisk();
+    int GCRSectorSize(unsigned int spur);
+    uint16_t RealTrackSize(unsigned int spur);
     void ConvertToD64(uint8_t *source_buffer, uint8_t *destination_buffer);
     void RenderFloppySound();
     void StartDiskChange();
@@ -150,6 +153,14 @@ private:
     bool IRQ;
 
     int CycleCounter;
+    // Rotierende Disk (Zeitgesteuert)
+    int     BitAccu;                    // Zyklen Akkumulator für den Bittakt (ein Bit alle 3,25 bis 4 Zyklen je nach Zone)
+    int     BitCounter;                 // Anzahl Bits des aktuellen Bytes (0..7)
+    int     OnesCount;                  // Anzahl aufeinander folgender 1er Bits
+    bool    SyncActive;                 // Sync Signal aktiv (mindestens 10 aufeinander folgende 1er Bits)
+    uint8_t ReadShift;                  // Schieberegister Lesen
+    uint8_t ReadLatch;                  // Letztes vollständiges Byte (VIA2 Port A beim Lesen)
+    uint8_t WriteShift;                 // Schieberegister Schreiben
 
     MOS6502 *cpu;
     MOS6522 *via1;
@@ -157,14 +168,14 @@ private:
 
     ////////// Fürs Disk Image //////////
 
-#define             FileNameSize 1024
-
     FILE *              image_file;
     int                 ImageTyp;
     //uint8_t             AktGCRWert;
     static const int	NUM_TRACKS = 42;
-    static const int	GCR_SECTOR_SIZE = 364;      // SYNC Header Gap SYNC Data Gap (should be 5 SYNC bytes each) ///  ALF Sector in Byte
-    static const int	GCR_DATA_BLOCK_SIZE = 325;      // Datenblock im GCR Format (Marker, 256 Datenbytes, Prüfsumme, 2 Füllbytes)
+    static const int	GCR_SYNC_SIZE = 5;          // Anzahl SYNC Bytes vor Header und vor Datenblock
+    static const int	GCR_HEADER_SIZE = 10;       // Sektor Header in GCR Bytes
+    static const int	GCR_HEADER_GAP_SIZE = 9;    // Lücke zwischen Header und Datenblock in Bytes
+    static const int	GCR_DATA_BLOCK_SIZE = 325;  // Datenblock im GCR Format (Marker, 256 Datenbytes, Prüfsumme, 2 Füllbytes)
     static const int	GCR_TRACK_SIZE = 7928;      // Each track in gcr_data has 21 sectors
     uint8_t             AktHalbSpur;                // Aktuelle Halbspur Nummer (2..70)
     uint8_t *           GCR_PTR;                    // Zeiger auf GCR Daten Unter R/W Kopf
@@ -192,23 +203,23 @@ private:
     int                 SoundBufferPos;
     int                 SoundBufferSize;
     short               *SoundBuffer;
-    unsigned short*	FloppySound00;
-    int			FloppySound00Size;
+    unsigned short*     FloppySound00;
+    int                 FloppySound00Size;
     int                 FloppySound00Pos;
-    unsigned short*	FloppySound01;
-    int			FloppySound01Size;
+    unsigned short*     FloppySound01;
+    int                 FloppySound01Size;
     int                 FloppySound01Pos;
-    unsigned short*	FloppySound02;
-    int			FloppySound02Size;
+    unsigned short*     FloppySound02;
+    int                 FloppySound02Size;
     int                 FloppySound02Pos;
-    unsigned short*	FloppySound03;
-    int			FloppySound03Size;
+    unsigned short*     FloppySound03;
+    int                 FloppySound03Size;
     int                 FloppySound03Pos;
-    unsigned short*	FloppySound04;
-    int			FloppySound04Size;
+    unsigned short*     FloppySound04;
+    int                 FloppySound04Size;
     int                 FloppySound04Pos;
-    unsigned short*	FloppySound05;
-    int			FloppySound05Size;
+    unsigned short*     FloppySound05;
+    int                 FloppySound05Size;
     int                 FloppySound05Pos;
     bool                MotorStatusOld;
     int                 MotorLoopStatus;

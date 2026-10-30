@@ -40,6 +40,15 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
     image_file = nullptr;
 
     CycleCounter = 0;
+    GCRBitTrackSize = 0;
+    GCRBitTrackPos = 0;
+    BitAccu = 0;
+    BitCounter = 0;
+    OnesCount = 0;
+    SyncActive = false;
+    ReadShift = 0;
+    ReadLatch = 0;
+    WriteShift = 0;
 
     cpu = new MOS6502();
     via1 = new MOS6522(0);
@@ -389,17 +398,35 @@ inline void Floppy1541::CheckImageWrite()
     }
 }
 
+inline int Floppy1541::GCRSectorSize(unsigned int spur)
+{
+    return GCR_SYNC_SIZE + GCR_HEADER_SIZE + GCR_HEADER_GAP_SIZE + GCR_SYNC_SIZE + GCR_DATA_BLOCK_SIZE + d64_sector_gap[d64_track_zone[spur]];
+}
+
 inline void Floppy1541::D64ImageToGCRImage()
 {
     uint16_t disk_id = GetDiskIDFromBAM();
 
     for (int track=1; track<=35; track++)
     {
-        TrackSize[(track-1)*2] = GCR_SECTOR_SIZE*num_sectors[track-1];
-        TrackSize[((track-1)*2)+1] = GCR_SECTOR_SIZE*num_sectors[track-1];
+        TrackSize[(track-1)*2] = RealTrackSize(track);
+        TrackSize[((track-1)*2)+1] = RealTrackSize(track);
+        memset(GCRImage + ((track-1)*2) * GCR_TRACK_SIZE, 0x55, TrackSize[(track-1)*2]);   // Lücke bis zum Spurende
         for(int sector=0; sector<num_sectors[track-1];sector++)
         {
             SectorToGCR(track, sector, disk_id);
+        }
+
+        // Wie bei einer vom DOS formatierten Disk sind die Spuren gegeneinander versetzt (Skew): Der Spuranfang liegt je Spur 2 Sektoren weiter
+        uint8_t *track_data = GCRImage + ((track-1)*2) * GCR_TRACK_SIZE;
+        uint16_t track_size = TrackSize[(track-1)*2];
+        uint32_t skew = ((track-1) * GCRSectorSize(track) * 2) % track_size;
+        if(skew > 0)
+        {
+            uint8_t tmp[GCR_TRACK_SIZE];
+            memcpy(tmp, track_data, track_size);
+            memcpy(track_data, tmp + track_size - skew, skew);
+            memcpy(track_data + skew, tmp, track_size - skew);
         }
     }
     ImageWriteStatus=false;
@@ -412,7 +439,7 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor, uint
     uint8_t id2 = disk_id >> 8;
     uint8_t block[256];
     uint8_t buffer[4];
-    uint8_t *P = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCR_SECTOR_SIZE;
+    uint8_t *P = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCRSectorSize(spur);
 
     int TEMP;
     TEMP=track_index[spur]+(sektor);
@@ -422,11 +449,8 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor, uint
 
     // Create GCR header (15 Bytes)
     // SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    *P++ = 0xFF;								// SYNC
+    for(int i=0; i<GCR_SYNC_SIZE; i++)
+        *P++ = 0xFF;
     buffer[0] = 0x08;							// Header mark
     buffer[1] = sektor ^ spur ^ id2 ^ id1;		// Checksum
     buffer[2] = sektor;
@@ -437,16 +461,17 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor, uint
     buffer[2] = 0x0F;
     buffer[3] = 0x0F;
     ConvertToGCR(buffer, P+5);
-    P += 9;
+    P += GCR_HEADER_SIZE;
 
-    // Create GCR data (338 Bytes)
+    // Lücke zwischen Header und Datenblock
+    memset(P, 0x55, GCR_HEADER_GAP_SIZE);
+    P += GCR_HEADER_GAP_SIZE;
+
+    // Create GCR data (325 Bytes)
     uint8_t SUM;
     // SYNC
-    //*P++ = 0xFF;                                // SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    //*P++ = 0xFF;								// SYNC
-    *P++ = 0xFF;								// SYNC
+    for(int i=0; i<GCR_SYNC_SIZE; i++)
+        *P++ = 0xFF;
     buffer[0] = 0x07;							// Data mark
     SUM = buffer[1] = block[0];
     SUM ^= buffer[2] = block[1];
@@ -500,71 +525,138 @@ inline void Floppy1541::ConvertToGCR(uint8_t *source_buffer, uint8_t *destinatio
     *destination_buffer = (uint8_t)tmp;
 }
 
+inline uint16_t Floppy1541::RealTrackSize(unsigned int spur)
+{
+    // Länge einer Spur in Bytes (eine Umdrehung = 200ms) abhängig von der Zone
+    static const uint16_t real_track_size[4] = {7692, 7142, 6666, 6250};
+    return real_track_size[d64_track_zone[spur]];
+}
+
 inline void Floppy1541::GCRImageToD64Image()
 {
     for (int spur=1; spur<=35; spur++)
-        for(int sector=0; sector<num_sectors[spur-1];sector++)
-            GCRToSector(spur,sector);
+        DecodeTrackToD64(spur);
 }
 
-inline void Floppy1541::GCRToSector(unsigned int spur, unsigned int sektor)
+// Sucht in der GCR Spur nach Sektor Headern mit folgendem Datenblock und übernimmt den Datenblock in das D64 Image.
+// Die Lage der Sektoren in der Spur spielt keine Rolle (z.B. nach einem FORMAT oder Schreibzugriffen).
+// Ein Sektor wird nur übernommen, wenn Header und Datenblock gültig sind (gültige GCR Codes, Marker, Prüfsummen).
+// Sonst bleibt der Sektor im D64 unverändert, damit ein Schreibzugriff das Image nicht zerstören kann.
+inline void Floppy1541::DecodeTrackToD64(unsigned int spur)
 {
-    // Ein Sektor wird nur dann ins D64 übernommen, wenn der Datenblock im GCR Slot gültig ist
-    // (nur gültige GCR Codes, Datenmarker 0x07, Prüfsumme stimmt). Sonst bleibt der Sektor im D64
-    // unverändert, damit ein Schreibzugriff mit anderer Lage des Datenblocks das Image nicht zerstört.
-    uint8_t BUFFER[4];
-    uint8_t block[256];
-
-    uint8_t *gcr = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCR_SECTOR_SIZE;
-    uint8_t *d64 = D64Image + ((track_index[spur]+sektor)*256);
-
-    gcr += 11;
-
-    // Alle 5 Bit Codes des Datenblocks (Marker, 256 Datenbytes, Prüfsumme, 2 Füllbytes = 260 Bytes = 325 GCR Bytes) müssen gültig sein
     static const bool valid_code[32] = {false,false,false,false,false,false,false,false,false,true,true,true,false,true,true,true,
                                         false,false,true,true,false,true,true,true,false,true,true,true,false,true,true,false};
-    for (int bit=0; bit<GCR_DATA_BLOCK_SIZE*8; bit+=5)
-    {
+
+    const uint8_t *base = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE;
+    const uint32_t nbits = TrackSize[(spur-1)*2] * 8;
+    if(nbits == 0)
+        return;
+
+    auto get_bit = [&](uint32_t pos) -> unsigned int {
+        pos %= nbits;
+        return (base[pos >> 3] >> (7 - (pos & 7))) & 1;
+    };
+
+    // Liest count Bytes ab Bitposition pos (beliebige Bitlage) und prüft ob alle 5 Bit GCR Codes gültig sind
+    auto get_bytes = [&](uint32_t pos, uint8_t *dst, int count) -> bool {
         unsigned int code = 0;
-        for (int i=0; i<5; i++)
+        int code_bits = 0;
+        bool ok = true;
+        for(int i=0; i<count; i++)
         {
-            int pos = bit + i;
-            code = (code << 1) | ((gcr[pos >> 3] >> (7 - (pos & 7))) & 1);
+            uint8_t v = 0;
+            for(int j=0; j<8; j++)
+            {
+                unsigned int b = get_bit(pos++);
+                v = (v << 1) | b;
+                code = ((code << 1) | b) & 31;
+                if(++code_bits == 5)
+                {
+                    code_bits = 0;
+                    if(!valid_code[code])
+                        ok = false;
+                }
+            }
+            dst[i] = v;
         }
-        if (!valid_code[code])
-            return;
-    }
+        return ok;
+    };
 
-    uint8_t *dst = block;
-    uint8_t sum = 0;
+    int pending_sector = -1;
+    uint32_t ones = 0;
 
-    ConvertToD64(gcr,BUFFER);
-    if (BUFFER[0] != 0x07)
-        return;
-    *dst++ = BUFFER[1];
-    *dst++ = BUFFER[2];
-    *dst++ = BUFFER[3];
-    sum ^= BUFFER[1] ^ BUFFER[2] ^ BUFFER[3];
-    gcr += 5;
-
-    for (int i=3; i<255; i+=4)
+    // Zwei Durchläufe, damit auch Header und Datenblock über den Spuranfang hinweg gefunden werden
+    for(uint32_t pos=0; pos<2*nbits; pos++)
     {
-        ConvertToD64(gcr,BUFFER);
-        *dst++ = BUFFER[0];
-        *dst++ = BUFFER[1];
-        *dst++ = BUFFER[2];
-        *dst++ = BUFFER[3];
-        sum ^= BUFFER[0] ^ BUFFER[1] ^ BUFFER[2] ^ BUFFER[3];
-        gcr += 5;
+        if(get_bit(pos))
+        {
+            ones++;
+            continue;
+        }
+
+        if(ones < SYNC_BIT_THRESHOLD)
+        {
+            ones = 0;
+            continue;
+        }
+        ones = 0;
+
+        // Hier endet eine Sync Markierung, ab pos beginnen die Daten
+        uint8_t mark;
+        get_bytes(pos, &mark, 1);
+
+        if(mark == 0x52)
+        {
+            uint8_t g[10], b1[4], b2[4];
+            pending_sector = -1;
+            if(!get_bytes(pos, g, 10))
+                continue;
+
+            ConvertToD64(g, b1);
+            ConvertToD64(g+5, b2);
+
+            if(b1[0] == 0x08 && b1[3] == spur && b1[2] < num_sectors[spur-1] && b1[1] == (uint8_t)(b1[2] ^ b1[3] ^ b2[0] ^ b2[1]))
+                pending_sector = b1[2];
+        }
+        else if(mark == 0x55 && pending_sector >= 0)
+        {
+            uint8_t g[GCR_DATA_BLOCK_SIZE], b[4], block[256];
+            int sector = pending_sector;
+            pending_sector = -1;
+
+            if(!get_bytes(pos, g, GCR_DATA_BLOCK_SIZE))
+                continue;
+
+            uint8_t *dst = block;
+            uint8_t sum = 0;
+
+            ConvertToD64(g, b);
+            if(b[0] != 0x07)
+                continue;
+            *dst++ = b[1];
+            *dst++ = b[2];
+            *dst++ = b[3];
+            sum ^= b[1] ^ b[2] ^ b[3];
+
+            for(int i=3, n=5; i<255; i+=4, n+=5)
+            {
+                ConvertToD64(g+n, b);
+                *dst++ = b[0];
+                *dst++ = b[1];
+                *dst++ = b[2];
+                *dst++ = b[3];
+                sum ^= b[0] ^ b[1] ^ b[2] ^ b[3];
+            }
+
+            ConvertToD64(g + 5*64, b);
+            *dst = b[0];
+            sum ^= b[0];
+            if(sum != b[1])
+                continue;
+
+            memcpy(D64Image + ((track_index[spur]+sector)*256), block, 256);
+        }
     }
-
-    ConvertToD64(gcr,BUFFER);
-    *dst = BUFFER[0];
-    sum ^= BUFFER[0];
-    if (sum != BUFFER[1])
-        return;
-
-    memcpy(d64, block, 256);
 }
 
 inline void Floppy1541::ConvertToD64(uint8_t *source_buffer, uint8_t *destination_buffer)
@@ -897,7 +989,8 @@ bool Floppy1541::OneCycle()
     via1->OneZyklus();
     via2->OneZyklus();
 
-    if(via2->GetIO_Zero() & 4) cpu->SET_SR_BIT6();
+    if(DiskMotorOn)
+        RotateDisk();
 
     if((VIA1_IRQ == true) || (VIA2_IRQ == true)) IRQ = true;
     else IRQ = false;
@@ -976,128 +1069,114 @@ uint8_t Floppy1541::ReadRom(uint16_t address)
     return ROM[address-0xC000];
 }
 
-#define NEW_SYNC_METHOD
 bool Floppy1541::SyncFound()
 {
+    // Sync Signal (VIA2 PB7 ist low solange mindestens 10 aufeinander folgende 1er Bits unter dem Kopf sind)
     if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr) || (DiskMotorOn == false)) return false;
 
-#ifdef NEW_SYNC_METHOD
-
-    uint32_t pos = GCRBitTrackPos;
-    bool sync_found = false;
-    uint32_t sync_pos;
-
-    for(int i=0; i<8; i++)
-    {
-        if(PeekGCRBit(pos) == true)
-        {
-            SyncBitCounter++;
-
-            if(SyncBitCounter >= SYNC_BIT_THRESHOLD)
-            {
-                SyncBitsFound = true;
-            }
-        }
-        else
-        {
-            SyncBitCounter = 0;
-
-            if(SyncBitsFound)
-            {
-                SyncBitsFound = false;
-                sync_found = true;
-                sync_pos = pos - 8;
-                if(sync_pos >= GCRBitTrackSize)
-                    sync_pos -= GCRBitTrackSize;
-            }
-        }
-
-        pos++;
-        if(pos >= GCRBitTrackSize)
-            pos -= GCRBitTrackSize;
-    }
-
-    if(sync_found)
-    {
-        GCRBitTrackPos = sync_pos;
-        return true;
-    }
-    else
-    {
-        GCRBitTrackPos = pos;
-        return false;
-    }
-
-#else
-    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr) || (DiskMotorOn == false)) return false;
-
-    uint32_t pos = GCRBitTrackPos;
-    uint8_t gcr_byte = PeekGCRByte(pos);
-
-    if(gcr_byte == 0xff)
-    {
-        do{
-            GCRBitTrackPos += 8;
-            if(GCRBitTrackPos >= GCRBitTrackSize)
-                GCRBitTrackPos -= GCRBitTrackSize;
-
-            pos = GCRBitTrackPos;
-
-
-            gcr_byte = PeekGCRByte(pos);
-        }while(gcr_byte == 0xff);
-
-        // Anzahl der 1er Bits zählen
-        unsigned n = 0;
-        while (n < 8 && (gcr_byte & 0x80)) { // höchstes Bit ist 1?
-            n++;
-            gcr_byte <<= 1;
-        }
-        GCRBitTrackPos -= (8 - n);  // zurück zum Anfang der Sync-Sequenz
-
-        // Sicherstellen, dass wir am Anfang der Sync-Sequenz stehen
-        if(GCRBitTrackPos >= GCRBitTrackSize)
-            GCRBitTrackPos -= GCRBitTrackSize;
-
-        return true;
-    }
-    else
-    {
-        GCRBitTrackPos += 8;
-        if(GCRBitTrackPos >= GCRBitTrackSize)
-            GCRBitTrackPos -= GCRBitTrackSize;
-
-        return false;
-    }
-#endif
+    return SyncActive;
 }
 
 uint8_t Floppy1541::ReadGCRByte()
 {
-    uint32_t pos = GCRBitTrackPos;
-    uint8_t gcr_byte = PeekGCRByte(pos);
-
-    GCRBitTrackPos += 8;
-    if(GCRBitTrackPos >= GCRBitTrackSize)
-        GCRBitTrackPos -= GCRBitTrackSize;
-
-    return gcr_byte;
+    return ReadLatch;
 }
 
 void Floppy1541::WriteGCRByte(uint8_t value)
 {
-    ImageWriteStatus = true;
+    // Der Schreibkopf schreibt das Datenbyte aus dem Latch von VIA2 Port A im Takt der Disk (siehe RotateDisk).
+    // Ein Schreibzugriff des Prozessors auf $1C01 setzt nur das Latch.
+    (void)value;
+}
 
-    if(AktHalbSpur == (DIRECTORY_TRACK-1) * 2)
+// Dreht die Disk um ein Bit weiter, wenn die Zeit für ein Bit abgelaufen ist (3,25 bis 4 Zyklen je nach Zone).
+// Beim Lesen wird das Byte Ready (SO) nach jedem vollständigen Byte gesetzt, außer während des Sync Signals.
+// Im Schreibmodus (PCR CB2 = low) wird das Latch von VIA2 Port A Bit für Bit auf die Disk geschrieben.
+inline void Floppy1541::RotateDisk()
+{
+    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr) || (GCRBitTrackSize == 0))
+        return;
+
+    unsigned int spur = (AktHalbSpur >> 1) + 1;
+    int cycles_per_byte = 26 + 2 * d64_track_zone[spur <= 40 ? spur : 40];
+
+    BitAccu += 8;
+    if(BitAccu < cycles_per_byte)
+        return;
+    BitAccu -= cycles_per_byte;
+
+    bool byte_ready = false;
+
+    if((via2->GetPCR() & 0xE0) == 0xC0)
     {
-        ImageDirectoryWriteStatus = true;
+        // Schreibmodus
+        if(BitCounter == 0)
+            WriteShift = via2->GetPA();
+
+        if(!WriteProtect)
+        {
+            ImageWriteStatus = true;
+            if(AktHalbSpur == (DIRECTORY_TRACK-1) * 2)
+                ImageDirectoryWriteStatus = true;
+            PokeGCRBit(GCRBitTrackPos, (WriteShift & 0x80) != 0);
+        }
+        WriteShift <<= 1;
+
+        OnesCount = 0;
+        SyncActive = false;
+
+        if(++BitCounter == 8)
+        {
+            BitCounter = 0;
+            byte_ready = true;
+        }
+    }
+    else
+    {
+        // Lesemodus
+        bool bit = PeekGCRBit(GCRBitTrackPos);
+        ReadShift = (ReadShift << 1) | (bit ? 1 : 0);
+
+        if(bit)
+        {
+            if(OnesCount < 255)
+                OnesCount++;
+
+            if(OnesCount >= SYNC_BIT_THRESHOLD)
+            {
+                // Während des Sync Signals ist der Bitzähler angehalten
+                SyncActive = true;
+                BitCounter = 0;
+            }
+            else if(++BitCounter == 8)
+            {
+                BitCounter = 0;
+                byte_ready = true;
+            }
+        }
+        else
+        {
+            OnesCount = 0;
+            SyncActive = false;
+
+            if(++BitCounter == 8)
+            {
+                BitCounter = 0;
+                byte_ready = true;
+            }
+        }
+
+        if(byte_ready)
+            ReadLatch = ReadShift;
     }
 
-    GCRBitTrackPos += 8;
+    GCRBitTrackPos++;
     if(GCRBitTrackPos >= GCRBitTrackSize)
-        GCRBitTrackPos -= GCRBitTrackSize;
+        GCRBitTrackPos = 0;
 
-    PokeGCRByte(GCRBitTrackPos, value);
+    // Byte Ready (SO) nur wenn CA2 high ist (Byte Ready Enable)
+    if(byte_ready && ((via2->GetPCR() & 0x0E) == 0x0E))
+        cpu->SET_SR_BIT6();
 }
 
 void Floppy1541::SpurInc()
@@ -1218,8 +1297,14 @@ void Floppy1541::UpdateGCRPointer()
     GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
     GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
 
+    // Die Winkelposition der Disk bleibt beim Spurwechsel erhalten
+    uint32_t old_size = GCRBitTrackSize;
+    uint32_t old_pos = GCRBitTrackPos;
     GCRBitTrackSize = TrackSize[AktHalbSpur] * 8;
-    GCRBitTrackPos = 0;
+    if(old_size > 0 && GCRBitTrackSize > 0)
+        GCRBitTrackPos = (uint32_t)(((uint64_t)old_pos * GCRBitTrackSize) / old_size);
+    else
+        GCRBitTrackPos = 0;
     SyncBitCounter = 0;
     SyncBitsFound = false;
 }
