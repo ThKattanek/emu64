@@ -1,6 +1,9 @@
 Alle Änderungen ab V5.2.0 bis jetzt
 -----------------------------------
 
+- [#323] Fixed: Floppy - Die Disk dreht sich jetzt zeitgesteuert (ein Bit alle 3,25 bis 4 Zyklen je nach Zone, Sync nach 10 aufeinander folgenden 1er Bits, Byte Ready im Byte-Takt). Der Schreibkopf schreibt im Schreibmodus (PCR) das Latch im Takt der Disk. Damit funktioniert FORMAT (vorher Fehler 21), und die D64 Spuren haben echte Längen, echte Sync- und Lückenlängen und einen Spur-Versatz. Beim Zurückschreiben ins D64 werden die Sektoren über ihre Header gefunden (unabhängig von der Lage in der Spur). VICE Testbench (Laufwerk): 18 statt 6 Tests ok.
+- [#323] Fixed: Floppy - Beim Zurückschreiben der GCR Daten ins D64 Image wird ein Sektor nur noch übernommen, wenn sein Datenblock gültig ist (gültige GCR Codes, Datenmarker, Prüfsumme). Sonst bleibt der Sektor im Image unverändert, damit ein Schreibzugriff das Image nicht mehr zerstören kann.
+- [#321] Fixed: CIA2 - Ein Schreibzugriff auf das Datenrichtungsregister $dd02 aktualisiert jetzt die IEC-Leitungen (ATN/CLK/DATA). Loader, die die Leitungen nur über die Datenrichtung umschalten, hingen vorher an Spur 18 fest (sceniorsander.d64)
 - NEW! Debugger - Option "Gesamtes Bild": zeigt alle Rasterzeilen und alle Zyklen (504 Pixel) des VIC, auch Rand und Austastlücke (nur für die Sitzung)
 - [#32] Fixed: Debugger - Im Einzelschritt-/Animationsmodus zeigt das C64-Bild jetzt zyklusgenau den aktuellen Bildaufbau (Rest aus dem letzten fertigen Frame). Der Rasterstrahl ist markiert (gepunktete blinkende Linien über/unter der Rasterzeile, roter Rahmen um den letzten Zyklus), abschaltbar per Checkbox im Debugger (nur für die Sitzung). Ab ca. einem Frame pro Sekunde Animationsgeschwindigkeit werden nur noch volle Frames ohne Markierung angezeigt
 - NEW! Kommandozeilenparameter --nosound schaltet die Audio-Ausgabe stumm (der Audiopuffer wird mit Nullen gefüllt, die Taktung bleibt unverändert). Bei --nogui ist das automatisch aktiv

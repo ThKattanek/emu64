@@ -219,6 +219,14 @@ inline void MOS6526::IfrRun()
     ifr_read0 = false;
 }
 
+inline void MOS6526::UpdateIecWire()
+{
+    uint8_t value = ~pa_latch & ddr_a;
+    *c64_iec_wire = ((value << 2) & 0x80)    // DATA
+                    | ((value << 2) & 0x40)  // CLK
+                    | ((value << 1) & 0x10); // ATN
+}
+
 inline void MOS6526::CheckLP()
 {
     if(((pb_latch | ~ddr_b) & 0x10) != prev_lp)
@@ -457,11 +465,7 @@ void MOS6526::WriteIO(uint16_t address, uint8_t value)
 
         if(cia_nr == 1)	/// Nur bei CIA2
         {
-            value = ~pa_latch & ddr_a;
-            //unsigned char  OLD_LINES = *C64IEC;
-            *c64_iec_wire = ((value << 2) & 0x80)    // DATA
-                            | ((value << 2) & 0x40)          // CLK
-                            | ((value << 1) & 0x10);         // ATN
+            UpdateIecWire();
         }
         break;
 
@@ -480,6 +484,9 @@ void MOS6526::WriteIO(uint16_t address, uint8_t value)
 
         if(cia_nr == 0)  /// Nur bei CIA1
             ChangePOTSwitch();
+
+        if(cia_nr == 1)	/// Nur bei CIA2 (Datenrichtung bestimmt, welche IEC Leitungen getrieben werden)
+            UpdateIecWire();
         break;
 
     case 3:
