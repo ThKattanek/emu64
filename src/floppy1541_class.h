@@ -25,7 +25,9 @@
 
 #define MAX_BREAK_GROUP_NUM 255
 
-#define D64_IMAGE_SIZE 174848
+#define D64_IMAGE_SIZE 174848       // D64 mit 35 Spuren (ohne Fehlerinfo)
+#define D64_IMAGE_SIZE_MAX 205312   // D64 mit 42 Spuren (802 Sektoren)
+#define D64_MAX_SECTORS 802
 #define G64_IMAGE_SIZE 665952
 
 #define SYNC_BIT_THRESHOLD 10   // Minimale Anzahl der aufeinander folgenden 1er Bits die als SYNC Markierung gewertet wird (Naormal ist 10)
@@ -116,6 +118,7 @@ private:
     void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
     void GCRImageToD64Image();
     void DecodeTrackToD64(unsigned int spur);
+    void InitEmptyTracks();
     void RotateDisk();
     int GCRSectorSize(unsigned int spur);
     uint16_t RealTrackSize(unsigned int spur);
@@ -133,7 +136,7 @@ private:
     /// Variablen ///
 
     static const uint8_t num_sectors[42];
-    static const uint8_t d64_track_zone[41];
+    static const uint8_t d64_track_zone[43];
     static const uint8_t d64_sector_gap[4];
 
     bool    FloppyEnabled;
@@ -184,7 +187,10 @@ private:
     uint8_t *           GCRSpurEnde;                // Zeiger auf Ende der GCR Daten auf Aktuellen Track
     bool                ImageWriteStatus;           // Sowie in Image geschrieben wird gehts auf true
     bool                ImageDirectoryWriteStatus;  // Sowie in das Image auf Spur 18 geschrieben wird wird es true
-    uint8_t             D64Image[D64_IMAGE_SIZE];   // Aktuelles D64 Image
+    uint8_t             D64Image[D64_IMAGE_SIZE_MAX];   // Aktuelles D64 Image (35, 40 oder 42 Spuren)
+    uint8_t             D64ErrorMap[D64_MAX_SECTORS];   // Fehlerinfo des D64 Images (ein Byte pro Sektor)
+    bool                D64HasErrorMap;             // D64 Image enthaelt eine Fehlerinfo
+    int                 D64Tracks;                  // Anzahl der Spuren des D64 Images (35, 40 oder 42)
     uint8_t             GCRImage[G64_IMAGE_SIZE];   // Aktuelles GCR Image
     uint16_t            TrackSize[256];             // Größe der einzelnen Spuren in Byte
     uint32_t            GCRBitTrackSize;            // Größe der einzelnen Spuren in Bit
