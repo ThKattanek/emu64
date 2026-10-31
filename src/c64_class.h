@@ -579,7 +579,9 @@ private:
     bool        c64_command_line_count_s;
 
     uint32_t    cycle_counter;
-    int         limit_cycles_counter;       // Dieser Counter wird wenn er > 0 ist bei jeden Zyklus um 1 runtergezählt
+    std::atomic<uint32_t> limit_cycles_target;  // Anzahl Zyklen ab dem Ende des letzten Resets bis LimitCyclesEvent ausgelöst wird
+    std::atomic<bool>     limit_cycles_active;  // true solange das Limit noch nicht erreicht wurde
+    std::atomic<uint32_t> last_reset_cycle;     // cycle_counter beim Ende des letzten Resets (Bezugspunkt für das Limit)
     bool		hold_next_system_cycle;     // Wird dieses Flag gesetzt wird verhindert das ein C64 Cylce ausgeführt wird
 
     bool        enable_debug_cart;          // Wird auf true gesetzt wenn der Debug Cart aktiviert ist

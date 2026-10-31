@@ -465,7 +465,9 @@ debug_beam_marker = true;
 debug_full_view = false;
 video_x_offset = 104;
 cycle_counter = 0;
-limit_cycles_counter = 0;
+limit_cycles_target = 0;
+limit_cycles_active = false;
+last_reset_cycle = 0;
 hold_next_system_cycle = false;
 debug_animation = false;
 debug_logging = false;
@@ -751,7 +753,11 @@ void C64Class::EndEmulation()
 
 void C64Class::SetLimitCycles(int nCycles)
 {
-    limit_cycles_counter = nCycles;
+    // Das Limit zählt ab dem Ende des letzten Resets, nicht ab dem Aufruf.
+    // Das Ende eines Resets liegt zyklusgenau fest, so endet ein Lauf immer am gleichen Zyklus,
+    // unabhängig davon wann die Kommandozeile verarbeitet wurde.
+    limit_cycles_target = static_cast<uint32_t>(nCycles);
+    limit_cycles_active = true;
 }
 
 void C64Class::SetEnableDebugCart(bool enable)
@@ -1084,14 +1090,11 @@ void C64Class::DebugBlinkRefresh()
 
 void C64Class::WarpModeLoop()
 {
-    if(limit_cycles_counter > 0)
+    if(limit_cycles_active && ((cycle_counter - last_reset_cycle) >= limit_cycles_target))
     {
-        limit_cycles_counter--;
-        if(limit_cycles_counter == 0)
-        {
-            // Event auslösen
-            if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
-        }
+        limit_cycles_active = false;
+        // Event auslösen
+        if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
     }
 
     // DebugCartEvent soll nur maximal einmal aufgerufen werden
@@ -1202,14 +1205,11 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
         while((*current_soundbuffer_pos < sample_buffer_size_mono) && (debug_mode == false))
         {
-            if(limit_cycles_counter > 0)
+            if(limit_cycles_active && ((cycle_counter - last_reset_cycle) >= limit_cycles_target))
             {
-                limit_cycles_counter--;
-                if(limit_cycles_counter == 0)
-                {
-                    // Event auslösen
-                    if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
-                }
+                limit_cycles_active = false;
+                // Event auslösen
+                if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
             }
 
 
@@ -1609,6 +1609,7 @@ void C64Class::RequestReset(int request)
         SDL_Delay(40);
         ClearAllInterrupts();
         SetReset(true, true);
+        last_reset_cycle = __atomic_load_n(&cycle_counter, __ATOMIC_RELAXED);
     }
     else
     {
@@ -1653,6 +1654,7 @@ inline void C64Class::CheckKeys()
 void C64Class::ResetC64CycleCounter()
 {
     cycle_counter = 0;
+    last_reset_cycle = 0;
 }
 
 bool C64Class::LoadC64Roms(const char *kernalrom, const char *basicrom, const char *charrom)
@@ -3369,6 +3371,9 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
     case D64:
         if(!LoadDiskImage(floppy_nr, file, typ)) return 2;
 
+        // Laufwerk vor dem Reset einschalten, damit es zyklusgenau mit dem C64 startet
+        floppy[floppy_nr]->SetEnableFloppy(true);
+
         KillCommandLine();
         auto_load_mode = 0;
 
@@ -4757,12 +4762,18 @@ void C64Class::NextSystemCycle()
         reset_hold_soft = (reset_request == 2);
         reset_request = 0;
         SetReset(false, reset_hold_soft);
+        if(!reset_hold_soft)
+        {
+            for(int i=0; i<MAX_FLOPPY_NUM; i++)
+                floppy[i]->PrepareHardReset();
+        }
         reset_hold_counter = c64_frequency / RESET_DIV;
     }
     else if(reset_hold_counter > 0 && --reset_hold_counter == 0)
     {
         ClearAllInterrupts();
         SetReset(true, true);
+        last_reset_cycle = cycle_counter;
         reset_request_done = true;
     }
 

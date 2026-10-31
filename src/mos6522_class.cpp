@@ -22,7 +22,14 @@ MOS6522::MOS6522(unsigned char via_nr):
     Jumper(0)
 {
     VIANummer = via_nr;
+    ResetTimers();
     Reset();
+}
+
+void MOS6522::ResetTimers()
+{
+    TimerA = TimerALatch = 0xFFFF;
+    TimerB = TimerBLatch = 0xFFFF;
 }
 
 MOS6522::~MOS6522()

@@ -45,6 +45,7 @@ public:
     ~Floppy1541();
 
     void SetEnableFloppy(bool status);
+    void PrepareHardReset();                    // Setzt Drehposition der Disk, Schieberegister und VIA Timer auf einen festen Zustand (Hard Reset)
     bool GetEnableFloppy(void);
     void SetEnableFloppySound(bool status);
     bool GetEnableFloppySound();

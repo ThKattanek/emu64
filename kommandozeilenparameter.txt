@@ -45,7 +45,8 @@ emu64 [PARAMETER]
     Schreibt ein Byte an eine C64 Adresse.
 
 --limitcycles <nZyklen>
-    Beendet den Emulator nach n Zyklen mit Exitcode 1.
+    Beendet den Emulator mit Exitcode 1, sobald n Zyklen seit dem Ende des letzten Resets vergangen sind
+    (unabhängig davon, wann die Kommandozeile verarbeitet wurde; Läufe enden so immer am gleichen Zyklus).
 
 --nosplash
     Der SplashScreen wird beim Start nicht angezeigt.

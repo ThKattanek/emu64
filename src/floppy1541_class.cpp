@@ -185,6 +185,23 @@ void Floppy1541::SetEnableFloppy(bool status)
         FloppyIECLocal = 0xFF;
 }
 
+void Floppy1541::PrepareHardReset()
+{
+    // Damit ein Hard Reset immer zum gleichen Laufwerkszustand führt, unabhängig davon
+    // wie lange das Laufwerk vorher schon lief
+    GCRBitTrackPos = 0;
+    BitAccu = 0;
+    BitCounter = 0;
+    OnesCount = 0;
+    SyncActive = false;
+    ReadShift = 0;
+    ReadLatch = 0;
+    WriteShift = 0;
+
+    via1->ResetTimers();
+    via2->ResetTimers();
+}
+
 bool Floppy1541::GetEnableFloppy()
 {
     return FloppyEnabled;

@@ -31,7 +31,7 @@ static const CMD_STRUCT command_list[]{
     {CMD_USE_SDL_RENDERER,"","use-sdl-renderer","Emu64 wird mit SDL Renderer gestartet. Falls kein C64 Bild dargestellt wird.\n\t\t\t\t(z.B. In einer VM, dann könnte es helfen diesen Parameter zu verwenden.)",0},
     {CMD_WARP_MODE,"","warp","Aktiviert den WarpMode. (Maximum C64 Speed / kein Sound)",0},
     {CMD_POKE_64,"","poke64","Schreibt ein Byte an eine C64 Adresse. --poke64 <Adresse (0-65535)> <Wert (0-255)>",2},
-    {CMD_LIMITCYCLES,"","limitcycles","Beendet den Emulator nach n Zyklen mit Exitcode 1. --limitcycles <nZyklen>",1},
+    {CMD_LIMITCYCLES,"","limitcycles","Beendet den Emulator nach n Zyklen (ab Ende des letzten Resets) mit Exitcode 1. --limitcycles <nZyklen>",1},
     {CMD_NOSPLASH,"","nosplash","Der SplashScreen wird beim Start nicht angezeigt.",0},
     {CMD_NOGUI,"","nogui","Es werden keine Fenster angezeigt. Also Vorsicht, sollte nur mit --limitcycles verwendet werden.",0},
     {CMD_NOSOUND,"","nosound","Die Audio Ausgabe wird stumm geschaltet (Emulation läuft unverändert weiter). Bei --nogui automatisch aktiv. Eine Videoaufnahme enthält weiterhin den Ton.",0},
