@@ -10,3 +10,7 @@ appimage
 CMakeLists.txt.user.*
 manual/index.html
 manual/index.pdf
+
+# Testbench: lokale Einstellungen und Teilläufe
+testbench/config.local.sh
+testbench/results/partial/
