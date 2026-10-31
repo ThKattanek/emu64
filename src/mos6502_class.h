@@ -92,6 +92,9 @@ private:
     unsigned char   irq_state;          // if Größer 0 ist die Leitung low
     bool            irq_is_low_pegel;
     bool            irq_is_active;
+    bool            branch_irq_early;    // Taken Branch ohne Seitenwechsel: Interrupt wird einen Takt frueher entschieden
+    bool            branch_irq_sample;   // IRQ Pegel im zweiten Zyklus eines Branches
+    bool            branch_irq_override; // Beim naechsten Fetch zaehlt branch_irq_sample
 
     bool            irq_delay;
     uint8_t         irq_delay_sr_value;
