@@ -1,6 +1,7 @@
 Alle Änderungen ab V5.2.0 bis jetzt
 -----------------------------------
 
+- [#323] Fixed: Autostart - Reset (Soft/Hard) und Autostart laufen jetzt zyklusgenau im Emulationsthread statt über Host-Zeit (SDL_Delay/Thread). Läufe mit gleichem Startwert sind damit reproduzierbar. Mit der Umgebungsvariable EMU64_SEED lässt sich der Startwert des zufälligen RAM-Musters festlegen.
 - [#323] Fixed: Floppy - Die Disk dreht sich jetzt zeitgesteuert (ein Bit alle 3,25 bis 4 Zyklen je nach Zone, Sync nach 10 aufeinander folgenden 1er Bits, Byte Ready im Byte-Takt). Der Schreibkopf schreibt im Schreibmodus (PCR) das Latch im Takt der Disk. Damit funktioniert FORMAT (vorher Fehler 21), und die D64 Spuren haben echte Längen, echte Sync- und Lückenlängen und einen Spur-Versatz. Beim Zurückschreiben ins D64 werden die Sektoren über ihre Header gefunden (unabhängig von der Lage in der Spur). VICE Testbench (Laufwerk): 18 statt 6 Tests ok.
 - [#323] Fixed: Floppy - Beim Zurückschreiben der GCR Daten ins D64 Image wird ein Sektor nur noch übernommen, wenn sein Datenblock gültig ist (gültige GCR Codes, Datenmarker, Prüfsumme). Sonst bleibt der Sektor im Image unverändert, damit ein Schreibzugriff das Image nicht mehr zerstören kann.
 - [#321] Fixed: CIA2 - Ein Schreibzugriff auf das Datenrichtungsregister $dd02 aktualisiert jetzt die IEC-Leitungen (ATN/CLK/DATA). Loader, die die Leitungen nur über die Datenrichtung umschalten, hingen vorher an Spur 18 fest (sceniorsander.d64)

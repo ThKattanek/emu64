@@ -577,6 +577,10 @@ game_wire = true;
 exrom_wire = true;
 
 wait_reset_ready = false;
+reset_request = 0;
+reset_request_done = false;
+reset_hold_counter = 0;
+reset_hold_soft = false;
 
 mmu->Reset();
 cia1->Reset();
@@ -1101,24 +1105,16 @@ void C64Class::WarpModeLoop()
     NextSystemCycle();
 
     ////////////////////////// Testweise //////////////////////////
-    static int zyklen_counter = 0;
-    if(++zyklen_counter == 19656)
+    if(cycle_counter % 19656 == 0)
     {
-        zyklen_counter = 0;
         if(wait_reset_ready)
         {
             if(!floppy[0]->GetEnableFloppy())
             {
                 if(c64_reset_ready)
                 {
-                    SDL_ClearError();
-                    if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
-                    {
-                        LogText("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n");
-                        LogText("<< SDL_Error: ");
-                        LogText(SDL_GetError());
-                        LogText("\n");
-                    }
+                    // synchron im Emulationsthread, damit der Autostart zyklusgenau und reproduzierbar ist
+                    SDLThreadLoad(this);
                     wait_reset_ready = false;
                 }
             }
@@ -1126,14 +1122,8 @@ void C64Class::WarpModeLoop()
             {
                 if((c64_reset_ready == true) && (floppy_reset_ready[0] == true))
                 {
-                    SDL_ClearError();
-                    if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
-                    {
-                        LogText("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n");
-                        LogText("<< SDL_Error: ");
-                        LogText(SDL_GetError());
-                        LogText("\n");
-                    }
+                    // synchron im Emulationsthread, damit der Autostart zyklusgenau und reproduzierbar ist
+                    SDLThreadLoad(this);
                     wait_reset_ready = false;
                 }
             }
@@ -1241,24 +1231,16 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
 
             ////////////////////////// Testweise //////////////////////////
 
-            static int zyklen_counter = 0;
-            if(++zyklen_counter == 19656)
+            if(cycle_counter % 19656 == 0)
             {
-                zyklen_counter = 0;
                 if(wait_reset_ready)
                 {
                     if(!floppy[0]->GetEnableFloppy())
                     {
                         if(c64_reset_ready)
                         {
-                            SDL_ClearError();
-                            if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
-                            {
-                                LogText("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n");
-                                LogText("<< SDL_Error: ");
-                                LogText(SDL_GetError());
-                                LogText("\n");
-                            }
+                            // synchron im Emulationsthread, damit der Autostart zyklusgenau und reproduzierbar ist
+                            SDLThreadLoad(this);
                             wait_reset_ready = false;
                         }
                     }
@@ -1266,14 +1248,8 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
                     {
                         if((c64_reset_ready == true) && (floppy_reset_ready[0] == true))
                         {
-                            SDL_ClearError();
-                            if(SDL_CreateThread(SDLThreadLoad ,"C64ThreadLoad",this) == nullptr)
-                            {
-                                LogText("<< ERROR: SDL Thread (C64ThreadLoad) konnte nicht erstellt werden.\n");
-                                LogText("<< SDL_Error: ");
-                                LogText(SDL_GetError());
-                                LogText("\n");
-                            }
+                            // synchron im Emulationsthread, damit der Autostart zyklusgenau und reproduzierbar ist
+                            SDLThreadLoad(this);
                             wait_reset_ready = false;
                         }
                     }
@@ -1592,20 +1568,53 @@ void C64Class::KeyEvent(uint8_t matrix_code, KeyStatus key_status, bool isAutoSh
 
 void C64Class::SoftReset()
 {
-    wait_reset_ready = false;
-    SetReset(false,true);
-    SDL_Delay(40);
-    ClearAllInterrupts();
-    SetReset(true,true);
+    RequestReset(2);
 }
 
 void C64Class::HardReset()
 {
+    RequestReset(1);
+}
+
+void C64Class::RequestReset(int request)
+{
+    // Aufrufer serialisieren, damit sich Reset Anforderungen nicht überschreiben
+    std::lock_guard<std::mutex> lock(reset_mutex);
+
     wait_reset_ready = false;
-    SetReset(false,false);
-    SDL_Delay(40);
-    ClearAllInterrupts();
-    SetReset(true,true);
+
+    // Der Reset beginnt und endet zyklusgenau im Emulationsthread (siehe NextSystemCycle)
+    reset_request_done = false;
+    reset_request = request;
+
+    // Warten bis der Emulationsthread den Reset beendet hat. Laufen keine Zyklen mehr (z.B. angehalten),
+    // wird nicht gewartet, sondern der Reset direkt ausgeführt.
+    uint32_t last_cycle = __atomic_load_n(&cycle_counter, __ATOMIC_RELAXED);
+    int stall_ms = 0;
+    for(int i=0; i<RESET_MAX_WAIT_MS && !reset_request_done && stall_ms < RESET_STALL_MS; i++)
+    {
+        SDL_Delay(1);
+        const uint32_t now = __atomic_load_n(&cycle_counter, __ATOMIC_RELAXED);
+        stall_ms = (now == last_cycle) ? stall_ms + 1 : 0;
+        last_cycle = now;
+    }
+
+    if(reset_request_done) return;
+
+    int expected = request;
+    if(reset_request.compare_exchange_strong(expected, 0))
+    {
+        // Der Emulationsthread hat die Anforderung nicht übernommen -> Reset direkt ausführen
+        SetReset(false, request == 2);
+        SDL_Delay(40);
+        ClearAllInterrupts();
+        SetReset(true, true);
+    }
+    else
+    {
+        // Der Emulationsthread hat den Reset bereits gestartet -> auf das Ende warten
+        for(int i=0; i<RESET_MAX_WAIT_MS && !reset_request_done; i++) SDL_Delay(1);
+    }
 }
 
 inline void C64Class::SetReset(int status, int hard_reset)
@@ -4741,6 +4750,21 @@ void C64Class::NextSystemCycle()
         return;
 
     cycle_counter++;
+
+    // Reset Anforderung: Start nur auf einer festen Zyklusgrenze, Dauer 40ms
+    if(reset_request != 0 && (cycle_counter & RESET_CYCLE_MASK) == 0)
+    {
+        reset_hold_soft = (reset_request == 2);
+        reset_request = 0;
+        SetReset(false, reset_hold_soft);
+        reset_hold_counter = c64_frequency / RESET_DIV;
+    }
+    else if(reset_hold_counter > 0 && --reset_hold_counter == 0)
+    {
+        ClearAllInterrupts();
+        SetReset(true, true);
+        reset_request_done = true;
+    }
 
     /// Für Externe Erweiterungen ///
     //if(ExtZyklus) ZyklusProcExt();

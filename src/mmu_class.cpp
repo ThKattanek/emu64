@@ -34,7 +34,9 @@ MMU::MMU(void)
 
     InitProcTables();
 
-    std::srand (std::time(NULL));
+    // EMU64_SEED legt den Startwert fuer das zufaellige RAM-Muster fest (reproduzierbare Laeufe)
+    const char *seed_env = std::getenv("EMU64_SEED");
+    std::srand(seed_env != nullptr ? static_cast<unsigned int>(std::strtoul(seed_env, nullptr, 0)) : static_cast<unsigned int>(std::time(NULL)));
 }
 
 MMU::~MMU(void)
@@ -55,59 +57,50 @@ unsigned char* MMU::GetFarbramPointer(void)
 
 bool MMU::LoadKernalRom(const char* filename)
 {
-	FILE *file;
-        file = fopen(filename, "rb");
+    bool ret = true;
+    FILE *file = fopen(filename, "rb");
+
 	if (file == NULL) 
-	{
-		return false;
-	}
+        return false;
 
 	if(0x2000 != fread (KERNAL_ROM,1,0x2000,file))
-	{
-		return false;
-	}
+        ret = false;
 
 	fclose(file);
 
-	return true;
+    return ret;
 }
 
 bool MMU::LoadBasicRom(const char* filename)
 {
-	FILE *file;
-        file = fopen(filename, "rb");
-	if (file == NULL) 
-	{
+    bool ret = true;
+    FILE *file = fopen(filename, "rb");
+
+    if (file == NULL)
 		return false;
-	}
 
 	if(0x2000 != fread (BASIC_ROM,1,0x2000,file))
-	{
-		return false;
-	}
+        ret = false;
 
 	fclose(file);
 
-	return true;
+    return ret;
 }
 
 bool MMU::LoadCharRom(const char* filename)
 {
-	FILE *file;
-        file = fopen (filename, "rb");
-	if (file == NULL) 
-	{
+    bool ret = true;
+    FILE *file = fopen (filename, "rb");
+
+    if (file == NULL)
 		return false;
-	}
 
 	if(0x1000 != fread (CHAR_ROM,1,0x1000,file))
-	{
-		return false;
-	}
+        ret = false;
 
 	fclose(file);
 
-	return true;
+    return ret;
 }
 
 /*
