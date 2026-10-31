@@ -41,6 +41,9 @@ MOS6502::MOS6502(void)
 
     irq_delay = false;
     irq_delay_sr_value = 0;
+    branch_irq_early = false;
+    branch_irq_sample = false;
+    irq_fetch_decision = false;
 }
 
 MOS6502::~MOS6502(void)
@@ -250,6 +253,8 @@ bool MOS6502::OneZyklus(void)
     {
         SR=0x24;
         JAMFlag = false;
+        irq_fetch_decision = false;
+        branch_irq_early = false;
         AktOpcodePC = PC;
         PC++;
         MCT = ((unsigned char*)MicroCodeTable6502 + (0x100*MCTItemSize));
@@ -268,7 +273,7 @@ bool MOS6502::OneZyklus(void)
     case 0:
         if(JAMFlag) return false;
 
-        if((irq_is_active == true) && (irq_delay ? ((irq_delay_sr_value&4)==0) : ((SR&4)==0)))
+        if((irq_fetch_decision == true) && (irq_delay ? ((irq_delay_sr_value&4)==0) : ((SR&4)==0)))
         {
             MCT = ((unsigned char*)MicroCodeTable6502 + (0x101*MCTItemSize));
             AktOpcode = 0x101;
@@ -286,8 +291,9 @@ bool MOS6502::OneZyklus(void)
 
         irq_delay = false;
 
-        MCT = ((unsigned char*)MicroCodeTable6502 + (Read(PC)*MCTItemSize));
-        AktOpcode = ReadProcTbl[(AktOpcodePC)>>8](AktOpcodePC);
+        AktOpcodePC = PC;
+        AktOpcode = Read(PC);
+        MCT = ((unsigned char*)MicroCodeTable6502 + (AktOpcode*MCTItemSize));
 
         if(irq_delay)
         {
@@ -461,48 +467,56 @@ bool MOS6502::OneZyklus(void)
     case 26:
         TMPByte = Read(PC);
         PC++;
+        branch_irq_sample = irq_is_low_pegel;
         if((SR&0x80)!=0x00) MCT+=2;
         break;
     //R // TMPByte von PC-Adresse holen // PC+1 // SR(N) auf TRUE prüfen (BMI)
     case 27:
         TMPByte = Read(PC);
         PC++;
+        branch_irq_sample = irq_is_low_pegel;
         if((SR&0x80)!=0x80) MCT+=2;
         break;
     //R // TMPByte von PC-Adresse holen // PC+1 // SR(V) auf FALSE prüfen (BVC)
     case 28:
         TMPByte = Read(PC);
         PC++;
+        branch_irq_sample = irq_is_low_pegel;
         if((SR&0x40)!=0x00) MCT+=2;
         break;
     //R // TMPByte von PC-Adresse holen // PC+1 // SR(V) auf TRUE prüfen (BVS)
     case 29:
         TMPByte = Read(PC);
         PC++;
+        branch_irq_sample = irq_is_low_pegel;
         if((SR&0x40)!=0x40) MCT+=2;
         break;
     //R // TMPByte von PC-Adresse holen // PC+1 // SR(C) auf FALSE prüfen (BCC)
     case 30:
         TMPByte = Read(PC);
         PC++;
+        branch_irq_sample = irq_is_low_pegel;
         if((SR&0x01)!=0x00) MCT+=2;
         break;
     //R // TMPByte von PC-Adresse holen // PC+1 // SR(C) auf TRUE prüfen (BCS)
     case 31:
         TMPByte = Read(PC);
         PC++;
+        branch_irq_sample = irq_is_low_pegel;
         if((SR&0x01)!=0x01) MCT+=2;
         break;
     //R // TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf FALSE prüfen (BNE)
     case 32:
         TMPByte = Read(PC);
         PC++;
+        branch_irq_sample = irq_is_low_pegel;
         if((SR&0x02)!=0x00) MCT+=2;
         break;
     //R // TMPByte von PC-Adresse holen // PC+1 // SR(Z) auf TRUE prüfen (BEQ)
     case 33:
         TMPByte = Read(PC);
         PC++;
+        branch_irq_sample = irq_is_low_pegel;
         if((SR&0x02)!=0x02) MCT+=2;
         break;
     //R // Lesen von PC-Adresse und verwerfen // BranchAdresse=PC+TMPByte
@@ -517,6 +531,7 @@ bool MOS6502::OneZyklus(void)
         {
             PC = BranchAdresse;
             MCT+=1;
+            branch_irq_early = true;
         }
         break;
     //R // FIX PC Hi Adresse (Im Branchbefehl)
@@ -539,6 +554,7 @@ bool MOS6502::OneZyklus(void)
             SET_SR_NZ(AC);
             MCT++;
         }
+        else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
         break;
     //R // Adresse Hi von PC-Adresse holen // PC=Adresse
     case 38:
@@ -602,7 +618,9 @@ bool MOS6502::OneZyklus(void)
         break;
     //R // SR von SP+0x0100 lesen
     case 49:
+        irq_delay_sr_value = SR;
         SR = Read(SP+0x0100)|32;
+        irq_delay = true;
         break;
     //R // TMPByte von PC-Adresse lesen // AC + TMPByte + Carry // PC+1
     case 50:
@@ -702,6 +720,7 @@ bool MOS6502::OneZyklus(void)
             AC = (unsigned char)tmp;
             MCT++;
         }
+        else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
         break;
     //R // TMPByte von PC-Adresse lesen // AC - TMPByte - Carry // PC+1
     case 56:
@@ -776,6 +795,7 @@ bool MOS6502::OneZyklus(void)
             }
             MCT++;
         }
+        else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
         break;
     //R // TMPByte von SP+0x0100 holen
     case 59:
@@ -832,6 +852,7 @@ bool MOS6502::OneZyklus(void)
             SET_SR_NZ(AC);
             MCT++;
         }
+        else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
         break;
     //R // TMPByte von Adresse lesen // CarrayFalg=0
     case 69:
@@ -910,6 +931,7 @@ bool MOS6502::OneZyklus(void)
             SET_SR_NZ(AC);
             MCT++;
         }
+        else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
         break;
     //R // XR von PC-Adresse lesen // Set SR(NZ) // PC+1
     case 83:
@@ -931,6 +953,7 @@ bool MOS6502::OneZyklus(void)
             SET_SR_NZ(XR);
             MCT++;
         }
+        else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
         break;
     //R // YR von PC-Adresse lesen // Set SR(NZ) // PC+1
     case 86:
@@ -952,6 +975,7 @@ bool MOS6502::OneZyklus(void)
             SET_SR_NZ(YR);
             MCT++;
         }
+        else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
         break;
     //R // TMPByte von Adresse lesen // XR+1 // Set SR(NZ)
     case 89:
@@ -1026,6 +1050,7 @@ bool MOS6502::OneZyklus(void)
             SET_ZERO(tmp &= 0xFF);
             MCT++;
         }
+        else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
         break;
     //R // TMPByte von PC-Adresse lesen // XR - TMPByte (XR wird nicht verändert) // Set SR(NZC) // PC+1
     case 101:
@@ -1083,6 +1108,7 @@ bool MOS6502::OneZyklus(void)
             SET_SR_NZ(AC);
             MCT++;
         }
+        else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
         break;
     //R // TMPByte von PC-Adresse holen // AC>>1 // Set SR(NZC)
     case 108:
@@ -1170,6 +1196,10 @@ bool MOS6502::OneZyklus(void)
     case 118:
         SetPCHi(Read(0xFFFB));
         break;
+    //R // Indizierter Zugriff: Dummy Read von der nicht korrigierten Adresse (Seitenwechsel noch nicht ausgeglichen)
+    case 141:
+        TMPByte = Read(((Adresse&0xFF) >= idxReg) ? Adresse : (unsigned short)(Adresse - 0x100));
+        break;
     //R // TMPByte von Adresse holen // Fix Adresse Hi MCT+1
     case 119:
         if((Adresse&0xFF)>=(idxReg))
@@ -1177,6 +1207,7 @@ bool MOS6502::OneZyklus(void)
             TMPByte = Read(Adresse);
             MCT++;
         }
+        else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
         break;
     //W // TMPByte nach Adresse schreiben // Illegal [SLO]
     case 120:
@@ -1290,6 +1321,7 @@ bool MOS6502::OneZyklus(void)
             SET_SR_NZ(AC);
             MCT++;
         }
+        else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
         break;
     //W // TMPByte = AC & XR // TMPByte nach Adresse schreiben // Set SR(NZ) // Illegal [SAX]
     case 128:
@@ -1389,12 +1421,18 @@ bool MOS6502::OneZyklus(void)
             SET_SR_NZ(AC);
             MCT++;
         }
+        else Read((unsigned short)(Adresse - 0x100));    // Dummy Read von der nicht korrigierten Adresse bei Seitenwechsel
         break;
     }
     MCT++;
 
     if(*MCT == 0)
     {
+        // Die IRQ Entscheidung fällt im Takt vor dem letzten Zyklus des Befehls und wird im Fetch ausgewertet.
+        // Genommener Branch ohne Seitenwechsel: Die Entscheidung fällt einen Takt früher.
+        irq_fetch_decision = branch_irq_early ? branch_irq_sample : irq_is_low_pegel;
+        branch_irq_early = false;
+
         AktOpcodePC = PC;
         if(ResetReadyAdr == PC) *ResetReady = true;
 
