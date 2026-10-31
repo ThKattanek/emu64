@@ -21,7 +21,7 @@ const uint8_t Floppy1541::num_sectors[] = {21,21,21,21,21,21,21,21,21,21,21,21,2
 const uint8_t Floppy1541::d64_track_zone[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
                                               1,1,1,1,1,1,1,
                                               2,2,2,2,2,2,
-                                              3,3,3,3,3,3,3,3,3,3};
+                                              3,3,3,3,3,3,3,3,3,3,3,3};
 
 // Zeiger auf Track Anfang //	<------------------------- Track 1-17 ----------------------> <------ Track 18-24 ------> <---- Track 25-30 ----> <---- Track 31-36 ---->
 const uint16_t track_index[]={0,0,21,42,63,84,105,126,147,168,189,210,231,252,273,294,315,336,357,376,395,414,433,452,471,490,508,526,544,562,580,598,615,632,649,666,683,700,717,734,751,768,785,802};
@@ -371,6 +371,9 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
         if(reading_elements != 84)
             return false;
 
+        for(int i=0;i<NUM_TRACKS*2;i++)
+            TrackSize[i] = 0;
+
         for(int i=0;i<trackanzahl;i++)
         {
             if(trackpos[i] != 0)
@@ -381,11 +384,17 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
                 if(reading_elements != 2)
                     return false;
 
+                // Die letzte Spur im G64 kann kuerzer sein als die maximale Spurgroesse (Dateiende), sie muss nur ihre eigene Laenge enthalten
+                if(TrackSize[i] > tracksize-2)
+                    return false;
+
                 reading_elements = fread(GCRImage+(i*tracksize),1,tracksize-2,file);
-                if(reading_elements != size_t(tracksize-2))
+                if(reading_elements < size_t(TrackSize[i]))
                     return false;
             }
         }
+
+        InitEmptyTracks();
 
         // GCR_PTR = GCRSpurStart = GCRImage + ((AktHalbSpur)) * GCR_TRACK_SIZE;
         // GCRSpurEnde = GCRSpurStart + TrackSize[AktHalbSpur];
@@ -479,12 +488,13 @@ inline void Floppy1541::D64ImageToGCRImage()
         }
     }
 
-    // Spuren hinter dem Image sind leer
+    // Spuren hinter dem Image sind unformatiert
     for (int track=D64Tracks+1; track<=NUM_TRACKS; track++)
     {
         TrackSize[(track-1)*2] = 0;
         TrackSize[((track-1)*2)+1] = 0;
     }
+    InitEmptyTracks();
 
     ImageWriteStatus=false;
     ImageDirectoryWriteStatus=false;
@@ -506,16 +516,13 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor, uint
 
     // Fehlerinfo des D64 Images (1 = kein Fehler)
     uint8_t error_code = D64HasErrorMap ? D64ErrorMap[track_index[spur]+sektor] : 1;
-    if(error_code == 0x0B)  // 29 Disk ID mismatch
-    {
+    if(error_code == 0x0B)  // 29 Disk ID mismatch (wie VICE: nur ID1 ist invertiert, die Header Pruefsumme passt dazu)
         id1 ^= 0xFF;
-        id2 ^= 0xFF;
-    }
 
     // Create GCR header (15 Bytes)
-    // SYNC
+    // SYNC (21 No sync character: Header und Datenblock haben keinen Sync)
     for(int i=0; i<GCR_SYNC_SIZE; i++)
-        *P++ = 0xFF;
+        *P++ = (error_code == 0x03) ? 0x55 : 0xFF;
     buffer[0] = (error_code == 0x02) ? 0xFF : 0x08;   // Header mark (20 Header descriptor not found)
     buffer[1] = sektor ^ spur ^ id2 ^ id1;		// Checksum
     if(error_code == 0x09) buffer[1] ^= 0xFF;   // 27 Checksum error in header
@@ -538,7 +545,9 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor, uint
     // SYNC
     for(int i=0; i<GCR_SYNC_SIZE; i++)
         *P++ = (error_code == 0x03) ? 0x55 : 0xFF;   // 21 No sync character
-    buffer[0] = (error_code == 0x04) ? 0xFF : 0x07;	// Data mark (22 Data descriptor not found)
+    // 22 Data descriptor not found ist ein "weicher" Fehler, die Daten bleiben lesbar. Der Marker muss in GCR mit einer 0 beginnen
+    // (wie VICE: 0x00), sonst wird er als Teil des Sync gelesen und der Datenblock verschiebt sich.
+    buffer[0] = (error_code == 0x04) ? 0x00 : 0x07;	// Data mark
     SUM = buffer[1] = block[0];
     SUM ^= buffer[2] = block[1];
     SUM ^= buffer[3] = block[2];
@@ -589,6 +598,19 @@ inline void Floppy1541::ConvertToGCR(uint8_t *source_buffer, uint8_t *destinatio
     tmp = (GCR_TBL[*source_buffer >> 4] << 5) | GCR_TBL[*source_buffer & 15];
     *destination_buffer++ |= (tmp >> 8) & 0x03;
     *destination_buffer = (uint8_t)tmp;
+}
+
+// Spuren ohne Daten (hinter dem D64 Image oder fehlende Spuren im G64) sind eine unformatierte Disk:
+// Sie drehen sich mit der normalen Spurlaenge ihrer Zone und liefern nur 0 Bits (kein Sync).
+// Ohne diese Spurlaenge bliebe der Kopf dort stehen (kein Byte Ready) und Programme die dort
+// eine Spur schreiben (z.B. rpm3 auf Spur 36) haengen. Geschriebene Daten bleiben im Speicher, kommen aber nicht ins D64.
+inline void Floppy1541::InitEmptyTracks()
+{
+    for (int half_track=0; half_track<NUM_TRACKS*2; half_track++)
+    {
+        if(TrackSize[half_track] == 0)
+            TrackSize[half_track] = RealTrackSize((half_track >> 1) + 1);
+    }
 }
 
 inline uint16_t Floppy1541::RealTrackSize(unsigned int spur)
@@ -1138,7 +1160,7 @@ uint8_t Floppy1541::ReadRom(uint16_t address)
 bool Floppy1541::SyncFound()
 {
     // Sync Signal (VIA2 PB7 ist low solange mindestens 10 aufeinander folgende 1er Bits unter dem Kopf sind)
-    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr) || (DiskMotorOn == false)) return false;
+    if ((AktHalbSpur > ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr) || (DiskMotorOn == false)) return false;
 
     return SyncActive;
 }
@@ -1160,11 +1182,11 @@ void Floppy1541::WriteGCRByte(uint8_t value)
 // Im Schreibmodus (PCR CB2 = low) wird das Latch von VIA2 Port A Bit für Bit auf die Disk geschrieben.
 inline void Floppy1541::RotateDisk()
 {
-    if ((AktHalbSpur >= ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr) || (GCRBitTrackSize == 0))
+    if ((AktHalbSpur > ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr) || (GCRBitTrackSize == 0))
         return;
 
     unsigned int spur = (AktHalbSpur >> 1) + 1;
-    int cycles_per_byte = 26 + 2 * d64_track_zone[spur <= 40 ? spur : 40];
+    int cycles_per_byte = 26 + 2 * d64_track_zone[spur];
 
     BitAccu += 8;
     if(BitAccu < cycles_per_byte)

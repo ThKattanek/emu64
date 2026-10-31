@@ -118,6 +118,7 @@ private:
     void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);
     void GCRImageToD64Image();
     void DecodeTrackToD64(unsigned int spur);
+    void InitEmptyTracks();
     void RotateDisk();
     int GCRSectorSize(unsigned int spur);
     uint16_t RealTrackSize(unsigned int spur);
@@ -135,7 +136,7 @@ private:
     /// Variablen ///
 
     static const uint8_t num_sectors[42];
-    static const uint8_t d64_track_zone[41];
+    static const uint8_t d64_track_zone[43];
     static const uint8_t d64_sector_gap[4];
 
     bool    FloppyEnabled;
