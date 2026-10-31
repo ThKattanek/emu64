@@ -6,6 +6,9 @@
 #   ./run_release.sh -j 8                 8 parallele Worker
 #   ./run_release.sh -g drive/scanner     nur Tests, deren Pfad "drive/scanner" enthält (Teillauf)
 #   ./run_release.sh -e /pfad/emu64       andere Binary testen
+#   ./run_release.sh -e /pfad/emu64 -s /pfad/quellen -v 5.2.0
+#                                         ältere Version testen: -s ist das Git-Verzeichnis, aus dem die Binary
+#                                         gebaut wurde (für Commit und Datum), -d JJJJMMTT überschreibt das Datum
 #
 # Ein kompletter Lauf wird als results/emu64-<Version>-<Datum>-result.txt gespeichert und danach wird
 # results/index.html neu erzeugt. Teilläufe (-g) landen in results/partial/ und nicht in der Tabelle.
@@ -23,13 +26,16 @@ set -u
 source "$(dirname "${BASH_SOURCE[0]}")/config.sh"
 
 VERSION=""
+DATE=""
+SOURCE_DIR="$REPO_DIR"
+SOURCE_GIVEN=0
 GROUPS_FILTER=()
 FORCE=0
 NO_SYNC=0
 
 usage()
 {
-    sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
     echo "  -f, --force      vorhandenes Ergebnis gleichen Namens überschreiben"
     echo "      --no-sync    die Kopie der VICE testprogs nicht aktualisieren"
     exit "${1:-0}"
@@ -41,6 +47,8 @@ while [ $# -gt 0 ]; do
         -j|--jobs)    JOBS="$2"; shift 2 ;;
         -g|--groups)  IFS=',' read -r -a GROUPS_FILTER <<< "$2"; shift 2 ;;
         -e|--emu)     EMU64_BIN="$2"; shift 2 ;;
+        -s|--source)  SOURCE_DIR="$2"; SOURCE_GIVEN=1; shift 2 ;;
+        -d|--date)    DATE="$2"; shift 2 ;;
         -f|--force)   FORCE=1; shift ;;
         --no-sync)    NO_SYNC=1; shift ;;
         -h|--help)    usage 0 ;;
@@ -53,6 +61,9 @@ die() { echo "Fehler: $*" >&2; exit 1; }
 # --- Voraussetzungen ---------------------------------------------------------------------------------------
 
 [ -x "$EMU64_BIN" ] || die "Emu64 Binary nicht gefunden: $EMU64_BIN (siehe config.sh / -e)"
+# Die Worker starten in anderen Verzeichnissen, relative Pfade (z.B. -e ../build/...) würden dort nicht mehr gelten
+EMU64_BIN="$(realpath "$EMU64_BIN")"
+SOURCE_DIR="$(realpath "$SOURCE_DIR")"
 [ -f "$VICE_TESTBENCH/testbench.sh" ] || die "VICE Testbench nicht gefunden: $VICE_TESTBENCH (siehe config.sh)"
 for f in emu64-testlist.txt emu64-hooks.sh Makefile.config cmpscreens; do
     [ -e "$VICE_TESTBENCH/$f" ] || die "$f fehlt in $VICE_TESTBENCH. Dort einmal 'make prereq' ausführen."
@@ -64,11 +75,21 @@ done
 
 # --- Name des Laufs ----------------------------------------------------------------------------------------
 
+git -C "$SOURCE_DIR" rev-parse --git-dir > /dev/null 2>&1 || die "$SOURCE_DIR ist kein Git-Verzeichnis (-s)"
 if [ -z "$VERSION" ]; then
-    VERSION="$(git -C "$REPO_DIR" describe --tags --always --dirty 2> /dev/null || echo unbekannt)"
+    VERSION="$(git -C "$SOURCE_DIR" describe --tags --always --dirty 2> /dev/null || echo unbekannt)"
 fi
 VERSION="$(echo "$VERSION" | tr -c 'A-Za-z0-9._+\n-' '_')"
-DATE="$(date +%Y%m%d)"
+if [ -z "$DATE" ]; then
+    # Bei einer älteren Version (-s) gilt das Datum ihres Commits, sonst das von heute.
+    # Das Datum bestimmt die Reihenfolge der Spalten in der Tabelle.
+    if [ "$SOURCE_GIVEN" = 1 ]; then
+        DATE="$(git -C "$SOURCE_DIR" log -1 --format=%cd --date=format:%Y%m%d HEAD)"
+    else
+        DATE="$(date +%Y%m%d)"
+    fi
+fi
+[[ "$DATE" =~ ^[0-9]{8}$ ]] || die "Ungültiges Datum '$DATE', erwartet JJJJMMTT"
 RUN_NAME="emu64-${VERSION}-${DATE}"
 
 if [ ${#GROUPS_FILTER[@]} -gt 0 ]; then
@@ -93,6 +114,7 @@ mkdir -p "$RUN_DIR"
 
 echo "Emu64:    $EMU64_BIN"
 echo "Version:  $VERSION ($DATE)"
+echo "Quellen:  $SOURCE_DIR"
 echo "Worker:   $JOBS"
 [ "$PARTIAL" = 1 ] && echo "Teillauf: ${GROUPS_FILTER[*]}"
 
@@ -197,8 +219,8 @@ cp "$TMP" "$OUT_FILE"
 cat > "$OUT_META" <<EOF
 version=$VERSION
 date=$DATE
-git_commit=$(git -C "$REPO_DIR" rev-parse HEAD 2> /dev/null || echo unbekannt)
-git_dirty=$(git -C "$REPO_DIR" diff --quiet HEAD 2> /dev/null && echo nein || echo ja)
+git_commit=$(git -C "$SOURCE_DIR" rev-parse HEAD 2> /dev/null || echo unbekannt)
+git_dirty=$(git -C "$SOURCE_DIR" diff --quiet HEAD 2> /dev/null && echo nein || echo ja)
 binary=$EMU64_BIN
 testbench_flags=$TESTBENCH_FLAGS
 workers=$WORKERS
