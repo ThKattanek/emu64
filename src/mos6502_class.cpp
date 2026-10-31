@@ -43,7 +43,7 @@ MOS6502::MOS6502(void)
     irq_delay_sr_value = 0;
     branch_irq_early = false;
     branch_irq_sample = false;
-    branch_irq_override = false;
+    irq_fetch_decision = false;
 }
 
 MOS6502::~MOS6502(void)
@@ -253,6 +253,8 @@ bool MOS6502::OneZyklus(void)
     {
         SR=0x24;
         JAMFlag = false;
+        irq_fetch_decision = false;
+        branch_irq_early = false;
         AktOpcodePC = PC;
         PC++;
         MCT = ((unsigned char*)MicroCodeTable6502 + (0x100*MCTItemSize));
@@ -271,10 +273,7 @@ bool MOS6502::OneZyklus(void)
     case 0:
         if(JAMFlag) return false;
 
-        if(branch_irq_override) irq_is_active = branch_irq_sample;
-        branch_irq_override = false;
-
-        if((irq_is_active == true) && (irq_delay ? ((irq_delay_sr_value&4)==0) : ((SR&4)==0)))
+        if((irq_fetch_decision == true) && (irq_delay ? ((irq_delay_sr_value&4)==0) : ((SR&4)==0)))
         {
             MCT = ((unsigned char*)MicroCodeTable6502 + (0x101*MCTItemSize));
             AktOpcode = 0x101;
@@ -1429,8 +1428,9 @@ bool MOS6502::OneZyklus(void)
 
     if(*MCT == 0)
     {
-        // Genommener Branch ohne Seitenwechsel: Die IRQ Entscheidung fällt einen Takt früher
-        branch_irq_override = branch_irq_early;
+        // Die IRQ Entscheidung fällt im Takt vor dem letzten Zyklus des Befehls und wird im Fetch ausgewertet.
+        // Genommener Branch ohne Seitenwechsel: Die Entscheidung fällt einen Takt früher.
+        irq_fetch_decision = branch_irq_early ? branch_irq_sample : irq_is_low_pegel;
         branch_irq_early = false;
 
         AktOpcodePC = PC;
