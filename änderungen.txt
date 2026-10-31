@@ -1,6 +1,7 @@
 Alle Änderungen ab V5.2.0 bis jetzt
 -----------------------------------
 
+- [#331] Fixed: Floppy - D64 Images mit 40 und 42 Spuren (196.608 bzw. 205.312 Byte) werden jetzt vollständig in GCR umgesetzt (vorher nur die ersten 35 Spuren). Eine angehängte Fehlerinfo (ein Byte pro Sektor) wird ausgewertet (20, 21, 22, 23, 27 und 29 werden im GCR Abbild nachgebildet) und beim Zurückschreiben unverändert erhalten. Spuren hinter dem Image sind leer. VICE Testbench: scanner40, scanner40e, scanner42, scanner42e ok (mit D64 und G64).
 - Fixed: 6502 (Floppy-CPU) - Indizierte Adressierung (abs,X / abs,Y / (zp),Y): Bei einem Seitenwechsel liest die CPU im Zwischenzyklus von der unkorrigierten Adresse (Dummy-Read, wie die 6510). RTI und PLP lesen im ersten Zyklus dummy von der PC-Adresse. Der Opcode wird nur noch einmal gelesen (vorher doppelt, mit doppeltem Seiteneffekt).
 - Fixed: 6502 (Floppy-CPU) - Die IRQ-Entscheidung fällt am Ende des vorherigen Befehls (irq_fetch_decision) und wird beim Opcode-Fetch ausgewertet, wie bei der 6510. Ein genommener Branch ohne Seitenwechsel entscheidet einen Takt früher (Branch-IRQ-Eigenheit). PLP ändert das I-Flag erst um einen Befehl verzögert.
 - [#323] Fixed: Floppy - Beim Autostart einer D64 wird das Laufwerk vor dem Reset eingeschaltet (nicht mehr danach über Host-Zeit). Ein Hard Reset setzt Drehposition der Disk, Schieberegister und VIA-Timer auf einen festen Zustand, die VIA-Timer sind jetzt auch beim Start initialisiert. Läufe sind damit vollständig reproduzierbar.
