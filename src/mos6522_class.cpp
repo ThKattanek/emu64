@@ -22,7 +22,14 @@ MOS6522::MOS6522(unsigned char via_nr):
     Jumper(0)
 {
     VIANummer = via_nr;
+    ResetTimers();
     Reset();
+}
+
+void MOS6522::ResetTimers()
+{
+    TimerA = TimerALatch = 0xFFFF;
+    TimerB = TimerBLatch = 0xFFFF;
 }
 
 MOS6522::~MOS6522()
@@ -110,6 +117,7 @@ void MOS6522::OneZyklus()
     {
         if(VIANummer == 0)ClearInterrupt(VIA1_IRQ);
         else ClearInterrupt(VIA2_IRQ);
+        IO[0x0D]&=0x7F;
     }
 
 	if(VIANummer == 1)
@@ -141,6 +149,21 @@ float MOS6522::GetIOPB3_RMS()
 
 void MOS6522::WriteIO(unsigned short adresse, unsigned char wert)
 {
+    // IFR: Eine 1 löscht das jeweilige Flag, die anderen Flags bleiben erhalten
+    if((adresse & 0xF) == 0x0D)
+    {
+        IO[0x0D] &= ~(wert & 0x7F);
+        return;
+    }
+
+    // IER: Bit 7 = 1 setzt, Bit 7 = 0 löscht die angegebenen Bits
+    if((adresse & 0xF) == 0x0E)
+    {
+        if(wert & 0x80) IO[0x0E] |= (wert & 0x7F);
+        else IO[0x0E] &= ~(wert & 0x7F);
+        return;
+    }
+
     IO[adresse & 0xF] = wert;
 
     switch(VIANummer)
@@ -208,11 +231,6 @@ void MOS6522::WriteIO(unsigned short adresse, unsigned char wert)
                 TimerB = TimerBLatch;
                 break;
             }
-            case 0x0D:
-            {
-                IO[0x0D]&= ~wert;
-                break;
-            }
         }
         break;
     }
@@ -276,11 +294,6 @@ void MOS6522::WriteIO(unsigned short adresse, unsigned char wert)
                 TimerBLatch = (TimerBLatch & 0x00FF) | (wert << 8);
                 IO[0x0D] &=0xDF;
                 TimerB = TimerBLatch;
-                break;
-            }
-            case 0x0D:
-            {
-                IO[0x0D]&= ~wert;
                 break;
             }
         }
@@ -363,7 +376,13 @@ unsigned char MOS6522::ReadIO(unsigned short adresse)
                 }
                 case 0x0D:
                 {
-                    return IO[0x0D] | (IO[0x0D] & IO[0x0E] ? 0x80 : 0);
+                    // Bit 7 ist gesetzt solange ein freigegebenes Flag gesetzt ist
+                    return (IO[0x0D] & 0x7F) | ((IO[0x0D] & IO[0x0E] & 0x7F) ? 0x80 : 0);
+                }
+                case 0x0E:
+                {
+                    // Bit 7 des IER wird immer als 1 gelesen
+                    return IO[0x0E] | 0x80;
                 }
             }
             return IO[adresse & 0xF];
@@ -421,7 +440,13 @@ unsigned char MOS6522::ReadIO(unsigned short adresse)
                 }
                 case 0x0D:
                 {
-                    return IO[0x0D] | (IO[0x0D] & IO[0x0E] ? 0x80 : 0);
+                    // Bit 7 ist gesetzt solange ein freigegebenes Flag gesetzt ist
+                    return (IO[0x0D] & 0x7F) | ((IO[0x0D] & IO[0x0E] & 0x7F) ? 0x80 : 0);
+                }
+                case 0x0E:
+                {
+                    // Bit 7 des IER wird immer als 1 gelesen
+                    return IO[0x0E] | 0x80;
                 }
                 default:
                     return IO[adresse & 0xF];

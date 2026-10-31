@@ -36,6 +36,7 @@
 #include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_image.h>
 #include <atomic>
+#include <mutex>
 #include <vector>
 #include <functional>
 
@@ -400,6 +401,18 @@ public:
     uint8_t         io_source;
 
     bool            wait_reset_ready;
+
+    // Reset wird zyklusgenau im Emulationsthread ausgeführt (nicht über Host-Zeit), damit Läufe reproduzierbar sind
+    std::atomic<int>  reset_request;                // 0 = keine Anforderung, 1 = Hard Reset, 2 = Soft Reset
+    std::atomic<bool> reset_request_done;           // Wird vom Emulationsthread gesetzt wenn der Reset beendet ist
+    int             reset_hold_counter;             // Verbleibende Zyklen in denen die Reset Leitung gehalten wird
+    bool            reset_hold_soft;
+    std::mutex      reset_mutex;                    // Serialisiert gleichzeitige Reset Anforderungen
+    static const uint32_t RESET_CYCLE_MASK = 0x1FFFF;   // Ein Reset beginnt nur wenn (cycle_counter & Maske) == 0
+    static const int RESET_DIV = 25;                // Dauer der Reset Leitung: c64_frequency / 25 = 40ms
+    static const int RESET_MAX_WAIT_MS = 2000;      // Maximale Wartezeit auf den Emulationsthread
+    static const int RESET_STALL_MS = 50;           // So lange darf der Zykluszähler stehen bleiben (Emulation angehalten)
+    void            RequestReset(int request);
     uint8_t         auto_load_mode;
     char            auto_load_command_line[MAX_STRING_LENGTH];
     char            auto_load_filename[MAX_STRING_LENGTH];
@@ -566,7 +579,9 @@ private:
     bool        c64_command_line_count_s;
 
     uint32_t    cycle_counter;
-    int         limit_cycles_counter;       // Dieser Counter wird wenn er > 0 ist bei jeden Zyklus um 1 runtergezählt
+    std::atomic<uint32_t> limit_cycles_target;  // Anzahl Zyklen ab dem Ende des letzten Resets bis LimitCyclesEvent ausgelöst wird
+    std::atomic<bool>     limit_cycles_active;  // true solange das Limit noch nicht erreicht wurde
+    std::atomic<uint32_t> last_reset_cycle;     // cycle_counter beim Ende des letzten Resets (Bezugspunkt für das Limit)
     bool		hold_next_system_cycle;     // Wird dieses Flag gesetzt wird verhindert das ein C64 Cylce ausgeführt wird
 
     bool        enable_debug_cart;          // Wird auf true gesetzt wenn der Debug Cart aktiviert ist
