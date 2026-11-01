@@ -1,0 +1,15 @@
+version=5.2.0
+date=20261101
+git_commit=9af27afbc66218b680a8985de887d44b294c23e9
+git_dirty=nein
+binary=/usr/local/bin/emu64
+testbench_flags=--ciaold
+workers=12
+wall_seconds=1222
+tests_in_list=1310
+results=1183
+ok=603
+error=491
+timeout=80
+noref=9
+partial=0
