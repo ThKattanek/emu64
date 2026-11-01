@@ -1442,6 +1442,10 @@ void VICII::OneCycle()
         if(border_flip_flop1 == false) border_flip_flop0 = false;
     }
 
+    // Oberer Rahmen: Wie im VICE (check_vborder_top) wird in jedem Zyklus geprüft, nicht nur am Zeilenende.
+    // Wird RSEL/DEN in der Startzeile erst im Laufe der Zeile umgeschaltet, öffnet der Rahmen trotzdem (#328).
+    if(current_rasterline == v_border_compare_top[rsel] && (den == true)) border_flip_flop1 = false;
+
     // Ist ein Spritesequenzer aktiv ?
     // NEU
     //DrawSprites();
