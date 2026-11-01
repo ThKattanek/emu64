@@ -19,7 +19,9 @@
 #include <QWidget>
 #include <QFileSystemModel>
 #include <QMessageBox>
-#include <QRegExp>
+#include <QSettings>
+#include <QList>
+#include <QTreeWidgetItem>
 
 #ifdef ZIP_SUPPORT
 #include <quazip.h>
@@ -44,6 +46,7 @@ public:
     void SetAktDir(QString akt_dir);
     void SetAktFile(QString akt_dir, QString akt_file);
     void RefreshAktDir(void);
+    void SetIni(QSettings *ini, const QString &local_group = QString(), const QString &local_name = QString());
     void EnableWriteProtectCheck(bool enabled);
     bool isFileWriteProtect(QString filename);
     ~WidgetFileBrowse();
@@ -64,11 +67,30 @@ private slots:
     void on_view_refresh_clicked();
     void on_delete_file_clicked();
     void on_to_home_clicked();
-    void on_DriveListCurrentIndexChanged(int index);
+    void on_sidebar_itemClicked(QTreeWidgetItem *item, int column);
+    void on_sidebar_customContextMenuRequested(const QPoint &pos);
+    void on_listView_filebrowser_customContextMenuRequested(const QPoint &pos);
+    void onSplitterMoved();
     void on_listView_filebrowser_activated(const QModelIndex &index);
 
 private:
-    QString rootPathName(const QString &aPath);
+    enum SidebarRole { RolePath = Qt::UserRole, RoleFavorite = Qt::UserRole + 1 };
+    enum FavoriteKind { FavNone = 0, FavGlobal = 1, FavLocal = 2 };
+
+    void BuildSidebar();
+    void SelectSidebarItem(const QString &path);
+    void AddFavorite(const QString &path, bool local);
+    void RemoveFavorite(const QString &path, bool local);
+    void SaveFavorites(bool local);
+    static void UpdateAllSidebars();
+    static QStringList favorites;       // global
+    QStringList local_favorites;        // nur dieses Fenster
+    QString local_group;
+    QString local_name;
+    static QSettings *ini;
+    static QList<WidgetFileBrowse*> instances;
+    static int sidebar_width;
+    bool ignore_splitter_moved;
 
     QString tmp_path;
 

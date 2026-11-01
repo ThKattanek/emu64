@@ -39,6 +39,7 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QStr
     this->tmp_path = tmp_path;
 
     ui->FileBrowser->SetTempDir(tmp_path);
+    ui->FileBrowser->SetIni(ini, "FloppyWindow", tr("Floppy"));
 
     FileTypes = QStringList() << "DEL" << "SEQ" << "PRG" << "USR" << "REL" << "CBM" << "E00" << "E?C";
 

@@ -33,6 +33,7 @@ TapeWindow::TapeWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QString 
 
     this->tmp_path = tmp_path;
     ui->FileBrowser->SetTempDir(tmp_path);
+    ui->FileBrowser->SetIni(ini, "TapeWindow", tr("Datasette"));
 
     // ICON's für LED's laden
     GreenLEDOff = new QIcon(":/grafik/green_led_off.png");

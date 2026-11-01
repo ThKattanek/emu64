@@ -15,7 +15,11 @@ make -j$(nproc)
 - Abhängigkeiten (pkg-config): sdl2, SDL2_image, libpng, glu, gl, ffmpeg-Libs (avutil, avformat, avcodec, swresample, swscale), quazip (`quazip1-qt5` bzw. Qt6-Variante).
 - Version kommt aus `git describe` (Fallback `EMU64_VERSION` in `src/src.pro`).
 - CI (`.github/workflows/ci.yml`, Branches `master` und `working_branch`) baut mit gcc und clang und `-O2 -Wall -Wextra -Werror -pedantic -Wshadow=local`. **Neuer Code muss warnungsfrei sein**, sonst schlägt CI fehl.
-- Neue Dateien müssen in `src/src.pro` eingetragen werden. Neue UI-Strings über `emu64_de.ts` / `emu64_en.ts` (die `.qm` sind eingecheckt).
+- Neue Dateien müssen in `src/src.pro` eingetragen werden. Neue UI-Strings nur per `tr()` im Code (oder in `.ui`) anlegen.
+- **Übersetzungsdateien nie anfassen:** `src/emu64_de.ts` / `src/emu64_en.ts` pflegt der User selbst im Qt Linguist. Kein `lupdate`, kein `lrelease`, kein manuelles Editieren. Am Ende nur auflisten, welche neuen `tr()`-Strings dazugekommen sind. Die `.qm` sind git-ignoriert.
+- **Alle Texte in `tr()` sind deutsch** (Quellsprache), auch Begriffe wie "Steckmodule" statt "Cartridge" oder "Homeverzeichnis" statt "Home"; Vokabular aus den bestehenden Fenstertiteln übernehmen. Englisch entsteht nur über die `.ts`.
+- **Zeilenenden beachten:** Viele Quelldateien (z.B. `widget_file_browse.*`, `cartridge_window.cpp`, `floppy_window.cpp`) haben CRLF, andere LF. Beim Bearbeiten (auch per Skript/`sed`) die Zeilenenden der Datei erhalten, sonst entstehen riesige Diffs. Mit `git diff --stat` prüfen.
+- `.ui`-Dateien nicht unnötig umformatieren (Qt Designer speichert sie gern komplett neu); eigene Änderungen minimal halten.
 - Release-Skripte: `create_linux_appimage.sh --qt /usr/lib/qt6`, `crossbuild-win-releases.sh`.
 
 ## Tests

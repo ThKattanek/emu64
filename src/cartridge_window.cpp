@@ -42,6 +42,7 @@ CartridgeWindow::CartridgeWindow(QWidget *parent, QSettings *_ini, C64Class *c64
 
     ui->ExportChip->setDisabled(true);
     ui->FileBrowser->SetTempDir(tmp_path);
+    ui->FileBrowser->SetIni(ini, "CrtWindow", tr("Steckmodule"));
 
     LedRedOff = new QIcon(":/grafik/red_led_off.png");
     LedRedOn = new QIcon(":/grafik/red_led_on.png");
