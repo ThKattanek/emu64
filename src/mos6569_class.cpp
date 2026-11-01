@@ -513,63 +513,10 @@ inline void VICII::sAccess(uint8_t sp_nr)
 
 inline void VICII::CheckBorder()
 {
-	///////////////// Rahmen ///////////////
-    if(border_flip_flop0)
-	{
-        if(csel==1 && current_cycle == BORDER_CSEL1_RIGHT && border_flip_flop1 == false)
-        {
-            border_line[border_line_pos++] = 128;
-            border_line[border_line_pos++] = 128;
-            border_line[border_line_pos++] = 128;
-            border_line[border_line_pos++] = 128;
-            border_line[border_line_pos++] = 128;
-            border_line[border_line_pos++] = 128;
-            border_line[border_line_pos++] = 128;
-            border_line[border_line_pos++] = 128;
-        }
-        else if(csel==0 && current_cycle == BORDER_CSEL0_RIGHT && border_flip_flop1 == false)
-        {
-            border_line[border_line_pos++] = 128;
-            border_line[border_line_pos++] = 128;
-            border_line[border_line_pos++] = 128;
-            border_line[border_line_pos++] = 128;
-            border_line[border_line_pos++] = 128;
-            border_line[border_line_pos++] = 128;
-            border_line[border_line_pos++] = 128;
-            border_line[border_line_pos++] = BORDER_COLOR_REG;
-        }
-        else
-        {
-            int i=8;
-            do{
-                border_line[border_line_pos++] = BORDER_COLOR_REG;
-                i--;
-            } while(i>0);
-
-        }
-	}
-	else
-	{
-        if(csel==0 && current_cycle == BORDER_CSEL0_LEFT && border_flip_flop1 == true)
-        {
-            border_line[border_line_pos++] = BORDER_COLOR_REG;
-            border_line[border_line_pos++] = BORDER_COLOR_REG;
-            border_line[border_line_pos++] = BORDER_COLOR_REG;
-            border_line[border_line_pos++] = BORDER_COLOR_REG;
-            border_line[border_line_pos++] = BORDER_COLOR_REG;
-            border_line[border_line_pos++] = BORDER_COLOR_REG;
-            border_line[border_line_pos++] = 128;
-            border_line[border_line_pos++] = 128;
-        }
-        else
-        {
-            int i=8;
-            do{
-                border_line[border_line_pos++] = 128;
-                i--;
-            } while(i>0);
-        }
-	}
+    // Rahmen wie im VICE (draw_border8): Die 8 Pixel des Zyklus zeigen den Zustand des Haupt-FlipFlops vor der
+    // Rahmenprüfung dieses Zyklus. Bei CSEL=0 wird das letzte Pixel nach der Prüfung in OneCycle() nachgetragen.
+    const uint8_t v = border_flip_flop0 ? BORDER_COLOR_REG : 128;
+    for(int i=0; i<8; i++) border_line[border_line_pos++] = v;
 }
 
 // Farbquellen der Pixel je Videomodus (MCM=4, BMM=8, ECM=16) und Pixelwert, wie im VIC
@@ -1438,6 +1385,11 @@ void VICII::OneCycle()
     if(current_rasterline == v_border_compare_top[rsel] && (den == true)) border_flip_flop1 = border_set_v = false;
     if(current_rasterline == v_border_compare_bottom[rsel]) border_set_v = true;
     if(current_cycle == 1) border_flip_flop1 = border_set_v;
+
+    // 38 Spalten (CSEL=0): Das letzte Pixel des Zyklus zeigt bereits den neuen Zustand des Haupt-FlipFlops
+    // (wie VICE draw_border8). Der Rahmen beginnt und endet dadurch 1 Pixel früher als bei 40 Spalten (border-250/-251).
+    if(csel == 0 && draw_this_line && border_line_pos >= 8 && border_line_pos <= static_cast<int>(sizeof(border_line)))
+        border_line[border_line_pos - 1] = border_flip_flop0 ? BORDER_COLOR_REG : 128;
 
     // Ist ein Spritesequenzer aktiv ?
     // NEU
