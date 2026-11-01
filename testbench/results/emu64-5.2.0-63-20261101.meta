@@ -1,0 +1,15 @@
+version=5.2.0-63
+date=20261101
+git_commit=6c75d7a5e4bec52439ec528cea21b757d19c9d6a
+git_dirty=nein
+binary=/home/thorsten/Programmierung/Aktuelle_Projekte/qtcreator/emu64/build/install_linux/bin/emu64
+testbench_flags=--ciaold
+workers=12
+wall_seconds=1702
+tests_in_list=1310
+results=1183
+ok=716
+error=393
+timeout=65
+noref=9
+partial=0

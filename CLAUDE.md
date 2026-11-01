@@ -22,6 +22,7 @@ make -j$(nproc)
 
 Es gibt keine Unit-Tests. Genauigkeit wird mit der VICE-Testbench geprüft: `testbench/start.sh [testname]` (erwartet das VICE-Repo `testprogs/testbench` und eine installierte Emu64-Binary unter `build/install_linux/bin`; Pfade im Skript sind lokal fest verdrahtet).
 Headless-Läufe: `--nogui`, `--autostart <datei>`, `--limitcycles <n>`, `--debugcart` (siehe `kommandozeilenparameter.txt`).
+Release-Läufe der kompletten Testbench (parallel, mit Ergebnis-Historie): `testbench/run_release.sh` (siehe `testbench/README.md`). Ergebnisse und `index.html` liegen in `testbench/results/`. **Testläufe immer mit `--multiple-instance` starten** (macht `run_release.sh` selbst): Ohne den Parameter reicht Emu64 die Argumente an eine laufende Instanz weiter und beendet sich sofort mit Exitcode 0, die Testbench zeigt dann fälschlich "ok".
 
 ## Architektur (`src/`)
 
