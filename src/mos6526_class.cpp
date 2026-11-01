@@ -229,10 +229,11 @@ inline void MOS6526::UpdateIecWire()
 
 inline void MOS6526::CheckLP()
 {
-    if(((pb_latch | ~ddr_b) & 0x10) != prev_lp)
-        VicTriggerLP();
+    const uint8_t lp = (pb_latch | ~ddr_b) & 0x10;
+    if(lp != prev_lp)
+        VicSetLP(lp == 0);
 
-    prev_lp = (pb_latch | ~ddr_b) & 0x10;
+    prev_lp = lp;
 }
 
 void MOS6526::GetRegister(CIA_STRUCT *cia_reg)

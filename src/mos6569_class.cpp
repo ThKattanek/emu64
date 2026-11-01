@@ -111,7 +111,7 @@ VICII::VICII()
 	SetVicType(0);
 
     draw_line_counter = 0;
-    lp_triggered = draw_this_line = vertical_blanking = false;
+    lp_triggered = lp_line_low = lp_pending = draw_this_line = vertical_blanking = false;
 
     is_write_reg_ec = false;
     is_write_reg_b0c = false;
@@ -993,6 +993,13 @@ void VICII::OneCycle()
 
     current_x_coordinate = x_coordinates_table[current_cycle];
 
+    // Lightpen: Auslösung einen Takt nach dem Pegelwechsel (wie VICE)
+    if(lp_pending)
+    {
+        lp_pending = false;
+        TriggerLightpen(false);
+    }
+
     // Prüfen ob Badlines zugelassen sind
     if(current_rasterline == 0x30) badline_enable = den;
 
@@ -1062,6 +1069,9 @@ void VICII::OneCycle()
         if (vertical_blanking)
         {
             lp_triggered = vertical_blanking = false;
+
+            // Liegt die Lightpen-Leitung beim Bildanfang noch auf Low, wird sofort erneut ausgelöst
+            if(lp_line_low) TriggerLightpen(true);
             //if (reg_irq_raster == 0) RasterIRQ();
         }
 
@@ -1958,20 +1968,48 @@ uint8_t VICII::ReadIO(uint16_t address)
 	}
 }
 
-void VICII::TriggerLightpen()
+void VICII::SetLightpen(bool low)
 {
-    if(!lp_triggered)
-	{
-        lp_triggered = true;
+    lp_line_low = low;
 
-        reg_lpx = static_cast<uint8_t>(current_x_coordinate >> 1);
-        reg_lpy = static_cast<uint8_t>(current_rasterline);
+    // Nur die fallende Flanke löst aus. Das Latchen erfolgt einen Takt später.
+    if(low) lp_pending = true;
+}
 
-        irq_flag |= 0x08;
-        if (irq_mask & 0x08)
-		{
-            irq_flag |= 0x80;
-            CpuTriggerInterrupt(VIC_IRQ);
-		}
-	}
+void VICII::TriggerLightpen(bool retrigger)
+{
+    if(lp_triggered) return;
+    lp_triggered = true;
+
+    uint8_t x;
+    uint8_t y;
+
+    if(retrigger)
+    {
+        // Leitung liegt am Bildanfang noch auf Low
+        x = (total_cycles_per_rasterline == 65) ? 0xd5 : 0xd1;
+        y = 0;
+    }
+    else
+    {
+        // Im ersten Zyklus ist die Rasterzeile noch nicht weitergezählt
+        const int line = (current_cycle == 1) ? ((current_rasterline + 1) % total_rasterlines) : current_rasterline;
+
+        // In der letzten Zeile wird nur im ersten Zyklus ausgelöst
+        if(line == total_rasterlines - 1 && current_cycle > 1) return;
+
+        // X-Position auf 8 Pixel genau (wie VICE) plus Offset je nach VIC-Modell (6569: +2, 8565: +1)
+        x = static_cast<uint8_t>(((current_x_coordinate & ~7) >> 1) + (color_latency ? 2 : 1));
+        y = static_cast<uint8_t>(line);
+    }
+
+    reg_lpx = x;
+    reg_lpy = y;
+
+    irq_flag |= 0x08;
+    if (irq_mask & 0x08)
+    {
+        irq_flag |= 0x80;
+        CpuTriggerInterrupt(VIC_IRQ);
+    }
 }

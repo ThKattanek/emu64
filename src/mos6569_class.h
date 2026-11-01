@@ -72,7 +72,7 @@ public:
     //bool LoadFreez(FILE *file,unsigned short version);
     void WriteIO(uint16_t address, uint8_t value);
     uint8_t ReadIO(uint16_t address);
-    void TriggerLightpen();
+    void SetLightpen(bool low);
 
     std::function<uint8_t(uint16_t)> *ReadProcTbl;
     std::function<void(uint8_t*)> RefreshProc;
@@ -176,6 +176,9 @@ private:
     bool        display_status;	// false = Idle / true = Display
     bool        display_status_g;	// Display-Zustand vor der Badline-Prüfung des aktuellen Zyklus (für den g-Abruf)
     bool        lp_triggered;
+    bool        lp_line_low;        // Lightpen-Leitung liegt auf Low
+    bool        lp_pending;         // Auslösung erfolgt im nächsten Zyklus (1 Takt Verzögerung wie VICE)
+    void        TriggerLightpen(bool retrigger);
     uint8_t     rc;
     uint16_t    vc;
     uint16_t    vc_base;

@@ -65,7 +65,7 @@ public:
     bool reset_wire_old;
     std::function<void(int)> CpuTriggerInterrupt;
     std::function<void(int)> CpuClearInterrupt;
-    std::function<void(void)> VicTriggerLP;
+    std::function<void(bool)> VicSetLP;     // Pegel der Lightpen-Leitung (true = Low)
 
     std::function<void(void)> ChangePOTSwitch;
 
