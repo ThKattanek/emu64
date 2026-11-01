@@ -14,16 +14,33 @@
 //////////////////////////////////////////////////
 
 #include <QDebug>
-#include <QComboBox>
+#include <QMenu>
+#include <QStorageInfo>
+#include <QStandardPaths>
+#include <QSplitter>
 
 #include "widget_file_browse.h"
 #include "ui_widget_file_browse.h"
+
+QStringList WidgetFileBrowse::favorites;
+QSettings *WidgetFileBrowse::ini = nullptr;
+QList<WidgetFileBrowse*> WidgetFileBrowse::instances;
+int WidgetFileBrowse::sidebar_width = 120;
 
 WidgetFileBrowse::WidgetFileBrowse(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WidgetFileBrowse)
 {
     ui->setupUi(this);
+
+    ignore_splitter_moved = false;
+    ui->verticalLayout->setContentsMargins(0,0,0,0);
+    ui->splitter->setStretchFactor(0,0);
+    ui->splitter->setStretchFactor(1,1);
+    ui->splitter->setCollapsible(1,false);
+    ui->listView_filebrowser->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->splitter, &QSplitter::splitterMoved, this, [this](int, int){ onSplitterMoved(); });
+    instances.append(this);
 
     tmp_path = nullptr;
 
@@ -58,23 +75,20 @@ WidgetFileBrowse::WidgetFileBrowse(QWidget *parent) :
                 on_listView_filebrowser_clicked(current);
             });
 
-    // Laufwerke in Liste eintragen
-    QFileInfoList file_info_list = QDir::drives();
-
-    for(int i=0; i < file_info_list.count(); i++)
-    {
-        ui->drive_list->addItem(file_info_list.at(i).absoluteFilePath());
-    }
+    BuildSidebar();
+    ui->splitter->setSizes(QList<int>() << sidebar_width << qMax(1, width() - sidebar_width));
 }
 
 void WidgetFileBrowse::RetranslateUi()
 {
     ui->retranslateUi(this);
+    BuildSidebar();
     this->update();
 }
 
 WidgetFileBrowse::~WidgetFileBrowse()
 {
+    instances.removeAll(this);
     delete dirmodel;
     delete ui;
 }
@@ -114,16 +128,7 @@ void WidgetFileBrowse::SetAktDir(QString akt_dir)
     akt_fullpath = dirmodel->rootPath();
     ui->AktPath->setText(akt_fullpath);
 
-    QString lw = rootPathName(akt_dir);
-
-    if(lw == "")
-    {
-        QDir dir(akt_dir);
-        lw = dir.rootPath();
-    }
-
-    int idx = ui->drive_list->findText(lw);
-    ui->drive_list->setCurrentIndex(idx);
+    SelectSidebarItem(akt_fullpath);
 }
 
 void WidgetFileBrowse::SetAktFile(QString akt_dir, QString akt_file)
@@ -364,23 +369,263 @@ void WidgetFileBrowse::on_to_home_clicked()
     SetAktDir(QDir::homePath());
 }
 
-QString WidgetFileBrowse::rootPathName(const QString &aPath)
+void WidgetFileBrowse::SetIni(QSettings *_ini, const QString &_local_group, const QString &_local_name)
 {
-    QRegExp reg("([A-Za-z]:[\\\\|/])");
+    ini = _ini;
+    if(ini == nullptr) return;
 
-    int nIndex = reg.indexIn(aPath);
-
-    QString strRootPathName;
-
-    if (nIndex > -1)
+    local_group = _local_group;
+    local_name = _local_name;
+    local_favorites.clear();
+    if(!local_group.isEmpty())
     {
-        strRootPathName = reg.cap(1);
+        ini->beginGroup(local_group);
+        local_favorites = ini->value("Favorites").toStringList();
+        ini->endGroup();
     }
-    return strRootPathName;
+
+    ini->beginGroup("FileBrowser");
+    favorites = ini->value("Favorites").toStringList();
+    sidebar_width = ini->value("SidebarWidth", 120).toInt();
+    ini->endGroup();
+
+    UpdateAllSidebars();
 }
 
-void WidgetFileBrowse::on_DriveListCurrentIndexChanged(int index)
+void WidgetFileBrowse::UpdateAllSidebars()
 {
-    SetAktDir(ui->drive_list->itemText(index));
+    for(WidgetFileBrowse *w : instances)
+    {
+        w->BuildSidebar();
+        w->ignore_splitter_moved = true;
+        w->ui->splitter->setSizes(QList<int>() << sidebar_width << qMax(1, w->width() - sidebar_width));
+        w->ignore_splitter_moved = false;
+        w->SelectSidebarItem(w->akt_fullpath);
+    }
 }
 
+void WidgetFileBrowse::onSplitterMoved()
+{
+    if(ignore_splitter_moved) return;
+
+    sidebar_width = ui->splitter->sizes().value(0);
+    if(ini != nullptr)
+    {
+        ini->beginGroup("FileBrowser");
+        ini->setValue("SidebarWidth", sidebar_width);
+        ini->endGroup();
+    }
+
+    for(WidgetFileBrowse *w : instances)
+    {
+        if(w == this) continue;
+        w->ignore_splitter_moved = true;
+        w->ui->splitter->setSizes(QList<int>() << sidebar_width << qMax(1, w->width() - sidebar_width));
+        w->ignore_splitter_moved = false;
+    }
+}
+
+void WidgetFileBrowse::BuildSidebar()
+{
+    QTreeWidget *tree = ui->sidebar;
+    tree->clear();
+
+    auto add_group = [tree](const QString &title) -> QTreeWidgetItem*
+    {
+        QTreeWidgetItem *g = new QTreeWidgetItem(tree, QStringList(title));
+        QFont f = g->font(0);
+        f.setBold(true);
+        g->setFont(0, f);
+        g->setFlags(Qt::ItemIsEnabled);
+        return g;
+    };
+
+    auto add_entry = [](QTreeWidgetItem *parent, const QString &text, const QString &path, int favorite)
+    {
+        QTreeWidgetItem *i = new QTreeWidgetItem(parent, QStringList(text));
+        i->setData(0, RolePath, path);
+        i->setData(0, RoleFavorite, favorite);
+        i->setToolTip(0, QDir::toNativeSeparators(path));
+        if(favorite != FavNone && !QDir(path).exists()) i->setFlags(Qt::NoItemFlags);
+    };
+
+    // Favoriten
+    QTreeWidgetItem *g_fav = add_group(tr("Favoriten (alle)"));
+    for(const QString &f : favorites)
+    {
+        QString name = QFileInfo(f).fileName();
+        if(name.isEmpty()) name = QDir::toNativeSeparators(f);
+        add_entry(g_fav, name, f, FavGlobal);
+    }
+
+    // Lokale Favoriten (nur dieses Fenster)
+    if(!local_group.isEmpty())
+    {
+        QTreeWidgetItem *g_local = add_group(local_name.isEmpty() ? tr("Favoriten (lokal)") : tr("Favoriten (%1)").arg(local_name));
+        for(const QString &f : local_favorites)
+        {
+            QString name = QFileInfo(f).fileName();
+            if(name.isEmpty()) name = QDir::toNativeSeparators(f);
+            add_entry(g_local, name, f, FavLocal);
+        }
+    }
+
+    // Orte
+    QTreeWidgetItem *g_places = add_group(tr("Orte"));
+    add_entry(g_places, tr("Homeverzeichnis"), QDir::homePath(), FavNone);
+
+    const QList<QStandardPaths::StandardLocation> locs = {QStandardPaths::DesktopLocation, QStandardPaths::DocumentsLocation, QStandardPaths::DownloadLocation};
+    for(QStandardPaths::StandardLocation loc : locs)
+    {
+        const QString p = QStandardPaths::writableLocation(loc);
+        if(!p.isEmpty() && QDir(p).exists() && p != QDir::homePath())
+            add_entry(g_places, QFileInfo(p).fileName(), p, FavNone);
+    }
+
+    // Laufwerke (inkl. Netzlaufwerke)
+    QTreeWidgetItem *g_drives = add_group(tr("Laufwerke"));
+    const QList<QStorageInfo> volumes = QStorageInfo::mountedVolumes();
+    for(const QStorageInfo &v : volumes)
+    {
+        if(!v.isValid() || !v.isReady()) continue;
+
+        const QString fs = QString::fromLatin1(v.fileSystemType());
+        static const QStringList pseudo = {"tmpfs","devtmpfs","proc","sysfs","cgroup","cgroup2","squashfs","overlay","devpts","securityfs","pstore","bpf","tracefs","debugfs","configfs","fusectl","efivarfs","autofs","mqueue","hugetlbfs","binfmt_misc","ramfs","nsfs"};
+        if(pseudo.contains(fs)) continue;
+
+        const QString root = v.rootPath();
+        if(root.startsWith("/boot") || root.startsWith("/snap") || root.startsWith("/var/lib")) continue;
+
+        QString name = v.displayName();
+        if(name.isEmpty()) name = QDir::toNativeSeparators(root);
+        if(name != QDir::toNativeSeparators(root)) name += " (" + QDir::toNativeSeparators(root) + ")";
+        add_entry(g_drives, name, root, FavNone);
+    }
+
+    tree->expandAll();
+}
+
+void WidgetFileBrowse::SelectSidebarItem(const QString &path)
+{
+    QTreeWidgetItem *best = nullptr;
+    int best_len = -1;
+    const QString p = QDir::cleanPath(path);
+
+    for(int g = 0; g < ui->sidebar->topLevelItemCount(); g++)
+    {
+        QTreeWidgetItem *group = ui->sidebar->topLevelItem(g);
+        for(int i = 0; i < group->childCount(); i++)
+        {
+            QTreeWidgetItem *it = group->child(i);
+            const QString ip = QDir::cleanPath(it->data(0, RolePath).toString());
+            if(ip.isEmpty()) continue;
+            const bool match = (p == ip) || p.startsWith(ip.endsWith('/') ? ip : ip + "/");
+            if(match && ip.length() > best_len)
+            {
+                best = it;
+                best_len = ip.length();
+            }
+        }
+    }
+
+    ui->sidebar->blockSignals(true);
+    ui->sidebar->setCurrentItem(best);
+    ui->sidebar->blockSignals(false);
+}
+
+void WidgetFileBrowse::on_sidebar_itemClicked(QTreeWidgetItem *item, int)
+{
+    const QString path = item->data(0, RolePath).toString();
+    if(path.isEmpty()) return;
+    SetAktDir(path);
+}
+
+void WidgetFileBrowse::on_sidebar_customContextMenuRequested(const QPoint &pos)
+{
+    QTreeWidgetItem *item = ui->sidebar->itemAt(pos);
+    if(item == nullptr || item->data(0, RoleFavorite).toInt() == FavNone) return;
+    const bool local = item->data(0, RoleFavorite).toInt() == FavLocal;
+
+    QMenu menu(this);
+    QAction *remove = menu.addAction(tr("Aus Favoriten entfernen"));
+    if(menu.exec(ui->sidebar->viewport()->mapToGlobal(pos)) == remove)
+        RemoveFavorite(item->data(0, RolePath).toString(), local);
+}
+
+void WidgetFileBrowse::on_listView_filebrowser_customContextMenuRequested(const QPoint &pos)
+{
+    QModelIndex index = ui->listView_filebrowser->indexAt(pos);
+
+    // Ohne Auswahl: aktuelles Verzeichnis
+    QString path = index.isValid() ? dirmodel->filePath(index) : akt_fullpath;
+    if(!QFileInfo(path).isDir() || path.isEmpty()) return;
+
+    const QString clean = QDir::cleanPath(path);
+    QMenu menu(this);
+    QAction *act_global = nullptr;
+    QAction *act_local = nullptr;
+
+    if(favorites.contains(clean))
+        act_global = menu.addAction(tr("Aus Favoriten entfernen (alle Fenster)"));
+    else
+        act_global = menu.addAction(tr("Zu Favoriten hinzufügen (alle Fenster)"));
+
+    if(!local_group.isEmpty())
+    {
+        if(local_favorites.contains(clean))
+            act_local = menu.addAction(local_name.isEmpty() ? tr("Aus Favoriten entfernen (nur dieses Fenster)") : tr("Aus Favoriten entfernen (nur %1)").arg(local_name));
+        else
+            act_local = menu.addAction(local_name.isEmpty() ? tr("Zu Favoriten hinzufügen (nur dieses Fenster)") : tr("Zu Favoriten hinzufügen (nur %1)").arg(local_name));
+    }
+
+    QAction *sel = menu.exec(ui->listView_filebrowser->viewport()->mapToGlobal(pos));
+    if(sel == nullptr) return;
+
+    if(sel == act_global)
+    {
+        if(favorites.contains(clean)) RemoveFavorite(clean, false);
+        else AddFavorite(clean, false);
+    }
+    else if(sel == act_local)
+    {
+        if(local_favorites.contains(clean)) RemoveFavorite(clean, true);
+        else AddFavorite(clean, true);
+    }
+}
+
+void WidgetFileBrowse::AddFavorite(const QString &path, bool local)
+{
+    QStringList &list = local ? local_favorites : favorites;
+    if(list.contains(path)) return;
+    list.append(path);
+    SaveFavorites(local);
+}
+
+void WidgetFileBrowse::RemoveFavorite(const QString &path, bool local)
+{
+    (local ? local_favorites : favorites).removeAll(path);
+    SaveFavorites(local);
+}
+
+void WidgetFileBrowse::SaveFavorites(bool local)
+{
+    if(ini != nullptr)
+    {
+        if(local)
+        {
+            ini->beginGroup(local_group);
+            ini->setValue("Favorites", local_favorites);
+            ini->endGroup();
+        }
+        else
+        {
+            ini->beginGroup("FileBrowser");
+            ini->setValue("Favorites", favorites);
+            ini->endGroup();
+        }
+    }
+
+    if(local) BuildSidebar();
+    else UpdateAllSidebars();
+    SelectSidebarItem(akt_fullpath);
+}

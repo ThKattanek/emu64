@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>195</width>
-    <height>360</height>
+    <width>694</width>
+    <height>809</height>
    </rect>
   </property>
   <property name="font">
@@ -36,171 +36,200 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="spacing">
-      <number>2</number>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
-     <item>
-      <widget class="QLineEdit" name="AktPath">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+     <property name="childrenCollapsible">
+      <bool>true</bool>
+     </property>
+     <widget class="QTreeWidget" name="sidebar">
+      <property name="contextMenuPolicy">
+       <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+      </property>
+      <property name="indentation">
+       <number>8</number>
+      </property>
+      <property name="rootIsDecorated">
+       <bool>false</bool>
+      </property>
+      <property name="headerHidden">
+       <bool>true</bool>
+      </property>
+      <column>
+       <property name="text">
+        <string notr="true">1</string>
        </property>
-       <property name="readOnly">
-        <bool>true</bool>
+      </column>
+     </widget>
+     <widget class="QWidget" name="contentWidget">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>2</number>
        </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
-        <widget class="QComboBox" name="drive_list"/>
+        <widget class="QLineEdit" name="AktPath">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="to_parent">
-         <property name="toolTip">
-          <string>Eine Verzeichnisebene höher</string>
-         </property>
-         <property name="text">
-          <string>...</string>
-         </property>
-         <property name="icon">
-          <iconset resource="emu64.qrc">
-           <normaloff>:/grafik/go-up.png</normaloff>:/grafik/go-up.png</iconset>
-         </property>
-         <property name="iconSize">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QToolButton" name="to_parent">
+           <property name="toolTip">
+            <string>Eine Verzeichnisebene höher</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="emu64.qrc">
+             <normaloff>:/grafik/go-up.png</normaloff>:/grafik/go-up.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="to_home">
+           <property name="toolTip">
+            <string>Wechselt in das Homeverzeichnis</string>
+           </property>
+           <property name="text">
+            <string>Home</string>
+           </property>
+           <property name="icon">
+            <iconset resource="emu64.qrc">
+             <normaloff>:/grafik/go-home.png</normaloff>:/grafik/go-home.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="view_refresh">
+           <property name="toolTip">
+            <string>Aktualisieren</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="emu64.qrc">
+             <normaloff>:/grafik/view-refresh.png</normaloff>:/grafik/view-refresh.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="delete_file">
+           <property name="toolTip">
+            <string>Datei löschen</string>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="emu64.qrc">
+             <normaloff>:/grafik/delete.png</normaloff>:/grafik/delete.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QListView" name="listView_filebrowser"/>
+       </item>
+       <item>
+        <widget class="QListWidget" name="listWidget_zip">
+         <property name="minimumSize">
           <size>
-           <width>16</width>
-           <height>16</height>
+           <width>0</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>100</height>
           </size>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="to_home">
-         <property name="toolTip">
-          <string>Wechselt in das Homeverzeichnis</string>
-         </property>
-         <property name="text">
-          <string>Home</string>
-         </property>
-         <property name="icon">
-          <iconset resource="emu64.qrc">
-           <normaloff>:/grafik/go-home.png</normaloff>:/grafik/go-home.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>16</width>
-           <height>16</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="view_refresh">
-         <property name="toolTip">
-          <string>Aktualisieren</string>
-         </property>
-         <property name="text">
-          <string>...</string>
-         </property>
-         <property name="icon">
-          <iconset resource="emu64.qrc">
-           <normaloff>:/grafik/view-refresh.png</normaloff>:/grafik/view-refresh.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>16</width>
-           <height>16</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="delete_file">
-         <property name="toolTip">
-          <string>Datei löschen</string>
-         </property>
-         <property name="text">
-          <string>...</string>
-         </property>
-         <property name="icon">
-          <iconset resource="emu64.qrc">
-           <normaloff>:/grafik/delete.png</normaloff>:/grafik/delete.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>16</width>
-           <height>16</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_2">
+        <spacer name="horizontalSpacer">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
-           <height>20</height>
+           <height>0</height>
           </size>
          </property>
         </spacer>
        </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QListView" name="listView_filebrowser"/>
-     </item>
-     <item>
-      <widget class="QListWidget" name="listWidget_zip">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>100</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>100</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>0</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
-        <widget class="QCheckBox" name="WriteProtected">
-         <property name="toolTip">
-          <string>Setzt den Schreibschutz der Datei.
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QCheckBox" name="WriteProtected">
+           <property name="toolTip">
+            <string>Setzt den Schreibschutz der Datei.
 Ein nachträgliches setzen verhindert das überschreiben des Images.</string>
-         </property>
-         <property name="text">
-          <string>Disk Schreibschutz</string>
-         </property>
-        </widget>
+           </property>
+           <property name="text">
+            <string>Disk Schreibschutz</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
-     </item>
-    </layout>
+     </widget>
+    </widget>
    </item>
   </layout>
  </widget>
