@@ -1000,14 +1000,18 @@ void VICII::OneCycle()
         TriggerLightpen(false);
     }
 
+    // Rasterzeile für die Badline-Prüfung: In Zyklus 1 wird die Zeile erst weiter unten hochgezählt,
+    // die Prüfung gehört aber schon zur neuen Zeile (wie VICE, dort zählt raster_line vor check_badline).
+    const int badline_check_line = (current_cycle == 1) ? ((current_rasterline == total_rasterlines - 1) ? 0 : current_rasterline + 1) : current_rasterline;
+
     // Prüfen ob Badlines zugelassen sind
-    if(current_rasterline == 0x30) badline_enable = den;
+    if(badline_check_line == 0x30) badline_enable = den;
 
     // Der g-Abruf dieses Zyklus sieht den Display-Zustand noch vor der Badline-Prüfung (wie VICE, wichtig für VSP)
     display_status_g = display_status;
 
     // Prüfen auf Badline zustand
-    if((current_rasterline>=0x30) && (current_rasterline<=0xF7) && (reg_y_scroll == (current_rasterline&7)) && (badline_enable == true))
+    if((badline_check_line>=0x30) && (badline_check_line<=0xF7) && (reg_y_scroll == (badline_check_line&7)) && (badline_enable == true))
     {
         badline_status = true;
         display_status = true;
