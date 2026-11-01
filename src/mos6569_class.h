@@ -241,6 +241,7 @@ private:
     uint8_t     rsel;
     bool        border_flip_flop0;                // Haupt Rahmen FlipFlop
     bool        border_flip_flop1;                // Vertikal Rahmen FlipFlop
+    bool        border_set_v;                     // Vorgemerkter Wert für das vertikale Rahmen FlipFlop (wie VICE set_vborder)
     uint16_t    h_border_compare_left[2];
     uint16_t    h_border_compare_right[2];
     uint16_t    v_border_compare_top[2];
