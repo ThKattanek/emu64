@@ -1,6 +1,7 @@
 Alle Änderungen ab V5.2.0 bis jetzt
 -----------------------------------
 
+- [#338] Fixed: VIC - Die Badline-Prüfung in Zyklus 1 einer Zeile benutzt jetzt die neue Rasterzeile (wie VICE, wo raster_line vor check_badline hochgezählt wird). Vorher wurde noch die alte Zeile geprüft, ein $d011-Schreibzugriff im letzten Zyklus der Vorzeile konnte dadurch fälschlich eine Badline auslösen (fldscroll-21-60, dmadelay test1-2a-04, test2-28-06, test3-28-08).
 - [#329] Fixed: VIC - Lightpen wie bei VICE: Die Auslösung (fallende Flanke von CIA1 PB4) wirkt einen Takt später, $d013 liefert die X-Position auf 8 Pixel genau plus 2 (6569) bzw. 1 (8565), in der letzten Rasterzeile wird nur im ersten Zyklus ausgelöst, und liegt die Leitung am Bildanfang noch auf Low, wird mit X=$d1 (NTSC $d5), Y=0 erneut ausgelöst. Demos, die ihren Raster-Jitter über das Lightpen-X ausgleichen (crest_light.prg), öffneten den Seitenrand wegen eines um 3 zu kleinen Wertes nicht.
 - [#331] Fixed: Floppy - Spuren ohne Daten (hinter dem D64 Image oder fehlende Spuren in einem G64) sind jetzt unformatiert statt stehend: Sie drehen sich mit der Spurlänge ihrer Zone und liefern nur 0 Bits. Programme, die auf so einer Spur schreiben (rpm3 auf Spur 36), hängen nicht mehr. Geschriebene Daten bleiben im Speicher und kommen nicht ins D64.
 - [#331] Fixed: Floppy - Ein G64 Image, dessen letzte Spur kürzer ist als die maximale Spurgröße (Spur am Dateiende), wurde nicht vollständig geladen. Es muss jetzt nur die eigene Spurlänge enthalten sein.
