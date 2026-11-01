@@ -112,6 +112,7 @@ VICII::VICII()
 
     draw_line_counter = 0;
     lp_triggered = lp_line_low = lp_pending = draw_this_line = vertical_blanking = false;
+    border_flip_flop0 = border_flip_flop1 = border_set_v = true;
 
     is_write_reg_ec = false;
     is_write_reg_b0c = false;
@@ -1391,18 +1392,6 @@ void VICII::OneCycle()
 		break;
 	
 	case 63:
-		/// Rahmen ///
-        if(rsel == 0)
-		{
-            if(current_rasterline == BORDER_RSEL0_YSTOP) border_flip_flop1 = true;
-            if((current_rasterline == BORDER_RSEL0_YSTART) && (den == true)) border_flip_flop1 = false;
-		}
-		else
-		{
-            if(current_rasterline == BORDER_RSEL1_YSTOP) border_flip_flop1 = true;
-            if((current_rasterline == BORDER_RSEL1_YSTART) && (den == true)) border_flip_flop1 = false;
-		}
-
 		/// Sprite 4 ///
         if(sprite_dma & 0x10)  SetBALow();
 
@@ -1435,16 +1424,20 @@ void VICII::OneCycle()
         border_flip_flop0 = true;
     }
 
+    // Linker Rahmen: Das vorgemerkte vertikale FlipFlop wird übernommen (wie VICE check_hborder)
     if(current_cycle == h_border_compare_left[csel])
     {
-        if(current_rasterline == v_border_compare_bottom[rsel]) border_flip_flop1 = true;
-        if(current_rasterline == v_border_compare_top[rsel]  && (den == true)) border_flip_flop1 = false;
+        if(current_rasterline == v_border_compare_bottom[rsel]) border_set_v = true;
+        border_flip_flop1 = border_set_v;
         if(border_flip_flop1 == false) border_flip_flop0 = false;
     }
 
-    // Oberer Rahmen: Wie im VICE (check_vborder_top) wird in jedem Zyklus geprüft, nicht nur am Zeilenende.
-    // Wird RSEL/DEN in der Startzeile erst im Laufe der Zeile umgeschaltet, öffnet der Rahmen trotzdem (#328).
-    if(current_rasterline == v_border_compare_top[rsel] && (den == true)) border_flip_flop1 = false;
+    // Vertikaler Rahmen: Wie im VICE (check_vborder_top/check_vborder_bottom) wird in jedem Zyklus geprüft, nicht nur am Zeilenende.
+    // Oben öffnet der Rahmen sofort, auch wenn RSEL/DEN in der Startzeile erst im Laufe der Zeile umgeschaltet wird (#328).
+    // Unten wird das Schließen nur vorgemerkt und erst beim linken Rahmen oder in Zyklus 1 übernommen (vborder2-22/-36).
+    if(current_rasterline == v_border_compare_top[rsel] && (den == true)) border_flip_flop1 = border_set_v = false;
+    if(current_rasterline == v_border_compare_bottom[rsel]) border_set_v = true;
+    if(current_cycle == 1) border_flip_flop1 = border_set_v;
 
     // Ist ein Spritesequenzer aktiv ?
     // NEU
