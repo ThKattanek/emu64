@@ -1246,9 +1246,9 @@ bool DebuggerWindow::Assemble(QString address, QString mnemonic, QString address
 {
     uint32_t start_address;
     uint8_t opcode[32];
-    uint8_t opcode_count;
-    uint8_t address_type;
-    uint16_t address_value;
+    uint8_t opcode_count = 0;
+    uint8_t address_type = 0;
+    uint16_t address_value = 0;
 
     bool ok;
 
