@@ -39,12 +39,14 @@
 #include <mutex>
 #include <vector>
 #include <functional>
+#include "delegate.h"
 
 #define AudioSampleRate 44100
 
 #define MAX_STRING_LENGTH 1024
 
 #define MAX_FLOPPY_NUM 4
+#define WARP_CYCLE_BLOCK 1024       // Zyklen pro Durchlauf im Warp-Thread
 #define MAX_BREAK_GROUP_NUM 255
 #define MAX_SDL_JOYSTICK_NUM 16
 #define MAX_VJOY_NUM 16
@@ -358,6 +360,8 @@ public:
     bool            warp_thread_is_end;
 
     uint8_t         *vic_buffer;
+    bool            video_convert_pending;      // Frameskip: Der letzte fertige Frame (vic_buffer) wurde noch nicht umgerechnet
+    uint32_t        last_video_convert_ticks;
     std::vector<uint8_t> debug_frame_buffer;
     int             debug_blink_phase;
     uint32_t        debug_last_refresh_ticks;
@@ -460,9 +464,13 @@ private:
     inline void DrawC64ScreenWithSDL();
     inline void DrawJoyMappingOverlaySDL();
     inline void NextSystemCycle();
+    inline void WarpModeCycle();
     inline void ClearAllInterrupts();
     void CalcDistortionGrid();
     void VicRefresh(uint8_t *vic_puffer);
+    bool IsVideoConvertSkippable();
+    bool IsFrameRenderNeeded();
+    void ConvertPendingVideo();
     void CheckKeys();
     uint16_t DisAss(FILE *file, uint16_t pc, bool line_draw, int source);
     bool CheckBreakpoints();
@@ -483,8 +491,8 @@ private:
     void SwapRBSurface(SDL_Surface *surface); // swaps the color red with blue in sdl surface
     void DebugLogging();
 
-    std::function<uint8_t(uint16_t)> *ReadProcTbl;
-    std::function<void(uint16_t, uint8_t)> *WriteProcTbl;
+    Delegate<uint8_t(uint16_t)> *ReadProcTbl;
+    Delegate<void(uint16_t, uint8_t)> *WriteProcTbl;
 
     char  gfx_path[MAX_STRING_LENGTH];
     char  floppy_sound_path[MAX_STRING_LENGTH];
@@ -541,6 +549,12 @@ private:
 
     uint8_t     key_matrix_to_port_a[8];
     uint8_t     key_matrix_to_port_b[8];
+
+    // CheckKeys: Zustand der letzten Berechnung (die CIA1 Eingänge werden nur bei einer Änderung neu berechnet)
+    bool        keys_cache_valid;
+    uint8_t     keys_cache_out_pa, keys_cache_out_pb;
+    uint8_t     keys_cache_game_port1, keys_cache_game_port2;
+    uint64_t    keys_cache_matrix[4];
 
     bool return_key_is_down;
 

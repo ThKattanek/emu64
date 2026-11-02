@@ -18,6 +18,7 @@
 #include <math.h>
 #include <cstdio>
 #include <functional>
+#include "delegate.h"
 
 #include "./mos6502_class.h"
 #include "./mos6522_class.h"
@@ -146,8 +147,8 @@ private:
     int     DiskChangeSimState;         // 0 = momentan kein Diskwechsel
     int     DiskChangeSimCycleCounter;
 
-    std::function<uint8_t(uint16_t)>  ReadProcTbl[256];
-    std::function<void(uint16_t, uint8_t)> WriteProcTbl[256];
+    Delegate<uint8_t(uint16_t)>  ReadProcTbl[256];
+    Delegate<void(uint16_t, uint8_t)> WriteProcTbl[256];
 
     uint8_t RAM[0x800];   // 2KB
     uint8_t ROM[0x4000];  // 16KB

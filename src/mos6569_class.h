@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include <functional>
+#include "delegate.h"
 
 #include "./structs.h"
 
@@ -48,6 +49,8 @@ public:
     VICII();
     ~VICII();
     void SwitchVideoBuffer();
+    void SetFrameRendering(bool render_all, int row);
+    bool IsFrameRendered() const { return render_frame_pixels; }
     void GetRegister(VIC_STRUCT *vic_reg);
     void GetDebugFrame(uint8_t *dst, int *beam_row, int *beam_x);
     void SetFullView(bool status);
@@ -74,10 +77,10 @@ public:
     uint8_t ReadIO(uint16_t address);
     void SetLightpen(bool low);
 
-    std::function<uint8_t(uint16_t)> *ReadProcTbl;
-    std::function<void(uint8_t*)> RefreshProc;
-    std::function<void(int)> CpuTriggerInterrupt;
-    std::function<void(int)> CpuClearInterrupt;
+    Delegate<uint8_t(uint16_t)> *ReadProcTbl;
+    Delegate<void(uint8_t*)> RefreshProc;
+    Delegate<void(int)> CpuTriggerInterrupt;
+    Delegate<void(int)> CpuClearInterrupt;
     std::function<uint8_t()> CpuBusByte;            // Byte das die CPU gerade am Bus hat (für den FLI-Bug)
 
     /// Variablen ///
@@ -109,6 +112,7 @@ private:
     void DrawGraphics();
     void RenderGfxCycle(uint8_t *out);
     void RenderSpriteCycle(uint8_t *slot);
+    void LatchSpriteRegs(int k, uint8_t dma_cycle_0, uint8_t dma_cycle_2, int dma2_sprite, bool spr_en);
     void UpdateColorRegs();
     void ResolveLine();
     void ApplyDisplayLines();
@@ -121,6 +125,11 @@ private:
     uint8_t *video_buffer_line;
     int     draw_line_counter;
     bool    draw_this_line;
+    // Frameskip: Bei render_frame_pixels = false werden die Farben der Pixel nicht erzeugt (Bild wird nicht angezeigt).
+    // Ausnahme ist die Pufferzeile render_row (für die PAL Delay Line der Ausgabe). Alle Zustände inkl. Kollisionen laufen weiter.
+    bool    render_frame_pixels;
+    int     render_row;
+    bool    render_line_pixels;
     bool    full_view;                  // Debugger: Alle Rasterzeilen in den Videopuffer schreiben
 
     //// Interne Register ////

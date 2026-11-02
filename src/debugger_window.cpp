@@ -1194,8 +1194,8 @@ bool DebuggerWindow::FindAddressing(QString address_string, uint8_t *address_typ
 
 void DebuggerWindow::on_AssAdressierungIn_returnPressed()
 {
-    uint16_t ass_adress;
-    uint16_t new_adress;
+    uint16_t ass_adress = 0;
+    uint16_t new_adress = 0;
 
     if(Assemble(ui->AssAdresseIn->text(), ui->AssMnemonicIn->text(), ui->AssAdressierungIn->text(), &ass_adress, &new_adress))
     {
@@ -1246,9 +1246,9 @@ bool DebuggerWindow::Assemble(QString address, QString mnemonic, QString address
 {
     uint32_t start_address;
     uint8_t opcode[32];
-    uint8_t opcode_count;
-    uint8_t address_type;
-    uint16_t address_value;
+    uint8_t opcode_count = 0;
+    uint8_t address_type = 0;
+    uint16_t address_value = 0;
 
     bool ok;
 

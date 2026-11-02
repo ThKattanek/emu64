@@ -27,7 +27,7 @@ cd testbench
 ```
 
 - Ohne `-v` wird die Version aus `git describe` genommen. Das Datum ist das von heute.
-- Die Dauer hängt von der Zahl der Worker ab. Der letzte Lauf ohne Parallelisierung brauchte rund 80 Minuten, der erste parallele Lauf mit 12 Workern 28 Minuten. Der Fortschritt wird angezeigt.
+- Die Dauer hängt von der Zahl der Worker ab. Der letzte Lauf ohne Parallelisierung brauchte rund 80 Minuten, der erste parallele Lauf mit 12 Workern 28 Minuten, mit der Verteilung in Pakete rund 10 Minuten. Der Fortschritt wird angezeigt.
 - Mit `-j 8` bestimmst du die Zahl der parallelen Worker (Standard: halbe Kernzahl, höchstens 12).
 - Ein Lauf braucht eine Desktop-Sitzung (Qt), so wie die bisherigen Läufe auch. Emu64 lässt sich währenddessen normal weiter benutzen, die Tests laufen in eigenen Prozessen.
 
@@ -83,7 +83,7 @@ cd <hauptverzeichnis> && git worktree remove build/release-5.2.0 # wenn fertig
 ### Wie der Lauf aufgebaut ist
 
 1. Die VICE `testprogs` werden nach `build/testbench_work/` gespiegelt. Die Tests schreiben auf Disk-Images und legen Screenshots ab. Das VICE-Verzeichnis bleibt unverändert, jeder Lauf startet mit sauberen Images.
-2. `split_testlist.py` teilt die Testliste auf die Worker auf. Tests im selben Verzeichnis bleiben zusammen, weil sie sich Images und Screenshot-Ordner teilen.
+2. `split_testlist.py` zerlegt die Testliste in Pakete. Tests, die dieselbe Image-Datei einbinden (Disk-Image oder Steckmodul) oder denselben Screenshot-Dateinamen haben, bleiben in einem Paket, weil sie sonst gleichzeitig in dieselbe Datei schreiben könnten. Alle anderen Tests werden frei auf Pakete verteilt. Jeder Worker holt sich nacheinander das nächste freie Paket (die teuersten zuerst), so bleibt am Ende kein Worker untätig.
 3. Jeder Worker hat ein eigenes `testbench`-Verzeichnis (eigene Testliste und Ergebnisdatei) und ein eigenes `HOME` (sonst teilen sich alle Prozesse eine `emu64.ini`).
 4. Emu64 wird immer mit `--multiple-instance` gestartet.
 5. Nur wenn alle Worker sauber fertig sind, werden die Ergebnisse zusammengeführt und übernommen.
@@ -116,7 +116,7 @@ cd testbench
 ```
 
 - Without `-v` the version is taken from `git describe`. The date is today's date.
-- The duration depends on the number of workers. The last run without parallelism took about 80 minutes, the first parallel run with 12 workers took 28 minutes. Progress is shown while it runs.
+- The duration depends on the number of workers. The last run without parallelism took about 80 minutes, the first parallel run with 12 workers took 28 minutes, with the distribution in packages about 10 minutes. Progress is shown while it runs.
 - `-j 8` sets the number of parallel workers (default: half the cores, at most 12).
 - A run needs a desktop session (Qt), like the earlier runs did. You can keep using Emu64 normally meanwhile, the tests run in their own processes.
 
@@ -172,7 +172,7 @@ cd <main-directory> && git worktree remove build/release-5.2.0   # when done
 ### How a run is built
 
 1. The VICE `testprogs` are mirrored to `build/testbench_work/`. The tests write to disk images and create screenshots. The VICE directory stays unchanged, every run starts with clean images.
-2. `split_testlist.py` distributes the test list over the workers. Tests in the same directory stay together because they share images and screenshot folders.
+2. `split_testlist.py` splits the test list into packages. Tests that mount the same image file (disk image or cartridge) or share a screenshot file name stay in one package, otherwise they could write to the same file at the same time. All other tests are spread freely over packages. Each worker fetches the next free package one after the other (the most expensive first), so no worker sits idle at the end.
 3. Each worker has its own `testbench` directory (own test list and result file) and its own `HOME` (otherwise all processes share one `emu64.ini`).
 4. Emu64 is always started with `--multiple-instance`.
 5. Only if all workers finish cleanly are the results merged and stored.

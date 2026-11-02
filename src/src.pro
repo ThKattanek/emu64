@@ -92,6 +92,9 @@ QMAKE_CXXFLAGS += -fopenmp
 
 LIBS += -fopenmp
 
+# Link Time Optimization (wirkt nur bei Release Builds), bringt ca. 10-14% mehr Emulationsgeschwindigkeit
+CONFIG += ltcg
+
 # Für AddressSanitize -> im Projekt kann als Compiler-Option LIBS="-lasan" angegen werden das Flag -fsanitize=address wird dann wohl automatisch gesetzt
 #QMAKE_CXXFLAGS += -fsanitize=address
 #LIBS += -lasan
@@ -245,6 +248,7 @@ HEADERS += \
     debugger_iec_window.h \
     debugger_vic_window.h \
     debugger_window.h \
+    delegate.h \
     dos_error_messages.h \
     emu64_commands.h \
     floppy1541_class.h \

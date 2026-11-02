@@ -16,6 +16,7 @@
 #define MMU_CLASS_H
 
 #include <functional>
+#include "delegate.h"
 
 #include "./mos6510_class.h"
 
@@ -45,31 +46,31 @@ public:
     // Diese werden Teilweise Intern und Extern gesetzt ///
     // Ein Aufruf erfolg immer ohne Überprüfung auf gültigen Zeiger !!! //
 
-    std::function<unsigned char(unsigned short)> CPUReadProcTbl[0x100];
-    std::function<void(unsigned short,unsigned char)> CPUWriteProcTbl[0x100];
-    std::function<unsigned char(unsigned short)> VICReadProcTbl[0x100];
+    Delegate<unsigned char(unsigned short)> CPUReadProcTbl[0x100];
+    Delegate<void(unsigned short,unsigned char)> CPUWriteProcTbl[0x100];
+    Delegate<unsigned char(unsigned short)> VICReadProcTbl[0x100];
 
-    std::function<unsigned char(unsigned short)>* GetCPUReadProcTable;
-    std::function<unsigned char(unsigned short)>* GetVICReadProcTable;
-    std::function<void(unsigned short, unsigned char)>* GetCPUWriteProcTable();
-    std::function<void(unsigned short,unsigned char)> VicIOWriteProc;
-    std::function<void(unsigned short,unsigned char)> SidIOWriteProc;
-    std::function<void(unsigned short,unsigned char)> Cia1IOWriteProc;
-    std::function<void(unsigned short,unsigned char)> Cia2IOWriteProc;
-    std::function<void(unsigned short,unsigned char)> IO1WriteProc;
-    std::function<void(unsigned short,unsigned char)> IO2WriteProc;
-    std::function<void(unsigned short,unsigned char)> CRTRom1WriteProc;
-    std::function<void(unsigned short,unsigned char)> CRTRom2WriteProc;
-    std::function<void(unsigned short,unsigned char)> CRTRom3WriteProc;
-    std::function<unsigned char(unsigned short)> CRTRom1ReadProc;
-    std::function<unsigned char(unsigned short)> CRTRom2ReadProc;
-    std::function<unsigned char(unsigned short)> CRTRom3ReadProc;
-    std::function<unsigned char(unsigned short)> VicIOReadProc;
-    std::function<unsigned char(unsigned short)> SidIOReadProc;
-    std::function<unsigned char(unsigned short)> Cia1IOReadProc;
-    std::function<unsigned char(unsigned short)> Cia2IOReadProc;
-    std::function<unsigned char(unsigned short)> IO1ReadProc;
-    std::function<unsigned char(unsigned short)> IO2ReadProc;
+    Delegate<unsigned char(unsigned short)>* GetCPUReadProcTable;
+    Delegate<unsigned char(unsigned short)>* GetVICReadProcTable;
+    Delegate<void(unsigned short, unsigned char)>* GetCPUWriteProcTable();
+    Delegate<void(unsigned short,unsigned char)> VicIOWriteProc;
+    Delegate<void(unsigned short,unsigned char)> SidIOWriteProc;
+    Delegate<void(unsigned short,unsigned char)> Cia1IOWriteProc;
+    Delegate<void(unsigned short,unsigned char)> Cia2IOWriteProc;
+    Delegate<void(unsigned short,unsigned char)> IO1WriteProc;
+    Delegate<void(unsigned short,unsigned char)> IO2WriteProc;
+    Delegate<void(unsigned short,unsigned char)> CRTRom1WriteProc;
+    Delegate<void(unsigned short,unsigned char)> CRTRom2WriteProc;
+    Delegate<void(unsigned short,unsigned char)> CRTRom3WriteProc;
+    Delegate<unsigned char(unsigned short)> CRTRom1ReadProc;
+    Delegate<unsigned char(unsigned short)> CRTRom2ReadProc;
+    Delegate<unsigned char(unsigned short)> CRTRom3ReadProc;
+    Delegate<unsigned char(unsigned short)> VicIOReadProc;
+    Delegate<unsigned char(unsigned short)> SidIOReadProc;
+    Delegate<unsigned char(unsigned short)> Cia1IOReadProc;
+    Delegate<unsigned char(unsigned short)> Cia2IOReadProc;
+    Delegate<unsigned char(unsigned short)> IO1ReadProc;
+    Delegate<unsigned char(unsigned short)> IO2ReadProc;
 
     bool *GAME;
     bool *EXROM;

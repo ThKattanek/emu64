@@ -16,6 +16,7 @@
 #define MOS_6526_CLASS_H
 
 #include <functional>
+#include "delegate.h"
 
 #include "./mos6526_port.h"
 #include "./structs.h"
@@ -63,11 +64,11 @@ public:
 
     bool *reset_wire;
     bool reset_wire_old;
-    std::function<void(int)> CpuTriggerInterrupt;
-    std::function<void(int)> CpuClearInterrupt;
-    std::function<void(bool)> VicSetLP;     // Pegel der Lightpen-Leitung (true = Low)
+    Delegate<void(int)> CpuTriggerInterrupt;
+    Delegate<void(int)> CpuClearInterrupt;
+    Delegate<void(bool)> VicSetLP;     // Pegel der Lightpen-Leitung (true = Low)
 
-    std::function<void(void)> ChangePOTSwitch;
+    Delegate<void(void)> ChangePOTSwitch;
 
     PORT        *pa;
     PORT        *pb;

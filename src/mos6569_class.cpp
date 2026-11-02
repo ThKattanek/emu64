@@ -112,6 +112,8 @@ VICII::VICII()
 
     draw_line_counter = 0;
     lp_triggered = lp_line_low = lp_pending = draw_this_line = vertical_blanking = false;
+    render_frame_pixels = render_line_pixels = true;
+    render_row = -1;
     border_flip_flop0 = border_flip_flop1 = border_set_v = true;
 
     is_write_reg_ec = false;
@@ -213,6 +215,14 @@ void VICII::SwitchVideoBuffer()
 {
     current_video_buffer++;
     video_buffer = video_buffer_back[current_video_buffer & 1];
+}
+
+// Legt fest, ob im nächsten Bild die Pixelfarben erzeugt werden (Aufruf zu Beginn eines Bildes aus RefreshProc).
+// row = Pufferzeile, die trotzdem vollständig erzeugt wird (-1 = keine)
+void VICII::SetFrameRendering(bool render_all, int row)
+{
+    render_frame_pixels = render_all;
+    render_row = row;
 }
 
 // Liefert für den Debugger das aktuelle Bild: Fertige Zeilen und der bisher gezeichnete Teil der aktuellen Zeile
@@ -585,6 +595,13 @@ inline void VICII::RenderGfxCycle(uint8_t *out)
         gfx_reg_g <<= 1;
         gfx_mc_flop = !gfx_mc_flop;
 
+        // Frameskip: Ohne Farben wird nur das Vordergrund-Bit (0x80) für die Sprite-Hintergrund-Kollision gebraucht
+        if(!render_line_pixels)
+        {
+            out[i] = (px & 0x02) ? 0x80 : 0;
+            continue;
+        }
+
         // Farbe bestimmen. Die Hintergrundfarben sind Registerindizes und werden am Zeilenende aufgelöst, Vordergrund bekommt 0x80
         uint8_t color;
         switch(gfx_color_source[gfx_vmode11 | gfx_vmode16 | px])
@@ -728,6 +745,74 @@ inline void VICII::DrawGraphicsPseudo()
 static const uint8_t sprite_ptr_cycle[8] = {58, 60, 62, 1, 3, 5, 7, 9};
 static const uint8_t sprite_dma12_cycle[8] = {59, 61, 63, 2, 4, 6, 8, 10};
 
+// Nachschlagetabelle: Sprite-Bit des Pointer-Zyklus und des Zyklus für das 2./3. Byte je Zyklusnummer
+#define SPRITE_DMA_TBL_SIZE 72
+struct SpriteDmaCycleTable
+{
+    uint8_t cycle_0[SPRITE_DMA_TBL_SIZE];
+    uint8_t cycle_2[SPRITE_DMA_TBL_SIZE];
+    uint8_t sprite_2[SPRITE_DMA_TBL_SIZE];
+
+    SpriteDmaCycleTable()
+    {
+        for(int pc=0; pc<SPRITE_DMA_TBL_SIZE; pc++)
+        {
+            cycle_0[pc] = cycle_2[pc] = sprite_2[pc] = 0;
+            for(int s=0; s<8; s++)
+            {
+                if(pc == sprite_ptr_cycle[s]) cycle_0[pc] = static_cast<uint8_t>(1 << s);
+                if(pc == sprite_dma12_cycle[s])
+                {
+                    cycle_2[pc] = static_cast<uint8_t>(1 << s);
+                    sprite_2[pc] = static_cast<uint8_t>(s);
+                }
+            }
+        }
+    }
+};
+
+// Registerübernahmen der Sprite-Logik bei Pixel k eines Zyklus (Teil von RenderSpriteCycle)
+inline void VICII::LatchSpriteRegs(int k, uint8_t dma_cycle_0, uint8_t dma_cycle_2, int dma2_sprite, bool spr_en)
+{
+    switch(k)
+    {
+    case 2:
+        sprite_active_bits &= static_cast<uint8_t>(~dma_cycle_2);
+        break;
+    case 3:
+        sprite_halt_bits |= dma_cycle_0;
+        break;
+    case 4:
+        if(spr_en) sprite_pending_bits = sprite_view;
+        if(dma_cycle_2) sbuf_reg[dma2_sprite] = sprite_sequenzer[dma2_sprite];
+        break;
+    case 6:
+        if(!color_latency)
+        {
+            // 8565: MC-Bits werden bei Pixel 6 übernommen
+            const uint8_t toggled = static_cast<uint8_t>(reg_mmc ^ sprite_mc_bits);
+            sbuf_mc_flops ^= static_cast<uint8_t>(toggled & ~sbuf_expx_flops);
+            sbuf_mc_flops |= static_cast<uint8_t>(toggled & ~sbuf_expx_flops & ~reg_mmc);
+            sprite_mc_bits = reg_mmc;
+        }
+        sprite_pri_bits = reg_mdp;
+        sprite_expx_bits = reg_mxe;
+        break;
+    case 7:
+        if(color_latency)
+        {
+            // 6569: MC-Bits werden bei Pixel 7 übernommen
+            const uint8_t toggled = static_cast<uint8_t>(reg_mmc ^ sprite_mc_bits);
+            sbuf_mc_flops &= static_cast<uint8_t>(~toggled);
+            sprite_mc_bits = reg_mmc;
+        }
+        sprite_halt_bits &= static_cast<uint8_t>(~dma_cycle_2);
+        break;
+    default:
+        break;
+    }
+}
+
 // Sprite-Ausgabe wie im VICE (draw_sprites8): Pro Zyklus werden 8 Pixel erzeugt. Die Zyklusdaten (X-Position,
 // DMA-Zyklen) sind wie bei der Grafik um einen Zyklus verzögert, das X-Register wird einen Zyklus verzögert
 // übernommen. Sprite-Pixel tragen den Farbregisterindex und werden am Zeilenende aufgelöst.
@@ -744,60 +829,43 @@ inline void VICII::RenderSpriteCycle(uint8_t *slot)
     // Die X-Position eines Zyklus ist wie im VICE auf ein Vielfaches von 8 ausgerichtet
     const int xpos = ((pc < 64) ? x_coordinates_table[pc] : (x_coordinates_table[63] + 8 * (pc - 63))) & 0x1F8;
 
-    uint8_t dma_cycle_0 = 0;
-    uint8_t dma_cycle_2 = 0;
-    int dma2_sprite = 0;
-    for(int s=0; s<8; s++)
-    {
-        if(pc == sprite_ptr_cycle[s]) dma_cycle_0 = static_cast<uint8_t>(1 << s);
-        if(pc == sprite_dma12_cycle[s])
-        {
-            dma_cycle_2 = static_cast<uint8_t>(1 << s);
-            dma2_sprite = s;
-        }
-    }
+    // DMA-Zyklen des Vorzyklus aus der Tabelle (einmalig aus sprite_ptr_cycle/sprite_dma12_cycle aufgebaut)
+    static const SpriteDmaCycleTable dma_tbl;
+    const int pci = (pc < SPRITE_DMA_TBL_SIZE) ? pc : 0;
+    const uint8_t dma_cycle_0 = dma_tbl.cycle_0[pci];
+    const uint8_t dma_cycle_2 = dma_tbl.cycle_2[pci];
+    const int dma2_sprite = dma_tbl.sprite_2[pci];
     const bool spr_en = (pc == 58);
 
+    // Schneller Weg: Kein Sprite aktiv und keines kann in diesem Zyklus starten (nichts anstehend bzw. kein X-Treffer).
+    // Dann entstehen weder Pixel noch Kollisionen, es laufen nur die Registerübernahmen in derselben Reihenfolge.
     uint8_t candidate_bits = 0;
-    for(int s=0; s<8; s++)
-        if((xpos & 0x1F8) == (sprite_x_pipe[s] & 0x1F8)) candidate_bits |= static_cast<uint8_t>(1 << s);
+    bool no_start = !sprite_pending_bits && !spr_en;
+    if(!sprite_active_bits && !no_start)
+    {
+        for(int s=0; s<8; s++)
+            if((xpos & 0x1F8) == (sprite_x_pipe[s] & 0x1F8)) candidate_bits |= static_cast<uint8_t>(1 << s);
+        no_start = !candidate_bits;
+    }
+    else if(sprite_active_bits)
+    {
+        for(int s=0; s<8; s++)
+            if((xpos & 0x1F8) == (sprite_x_pipe[s] & 0x1F8)) candidate_bits |= static_cast<uint8_t>(1 << s);
+    }
+
+    if(!sprite_active_bits && no_start)
+    {
+        for(int k=2; k<8; k++) LatchSpriteRegs(k, dma_cycle_0, dma_cycle_2, dma2_sprite, spr_en);
+        for(int s=0; s<8; s++) sprite_x_pipe[s] = reg_mx[s];
+        return;
+    }
 
     uint8_t sprite_collision = 0;
     uint8_t gfx_collision = 0;
 
     for(int k=0; k<8; k++)
     {
-        if(k == 2) sprite_active_bits &= static_cast<uint8_t>(~dma_cycle_2);
-        if(k == 3) sprite_halt_bits |= dma_cycle_0;
-        if(k == 4)
-        {
-            if(spr_en) sprite_pending_bits = sprite_view;
-            if(dma_cycle_2) sbuf_reg[dma2_sprite] = sprite_sequenzer[dma2_sprite];
-        }
-        if(k == 6)
-        {
-            if(!color_latency)
-            {
-                // 8565: MC-Bits werden bei Pixel 6 übernommen
-                const uint8_t toggled = static_cast<uint8_t>(reg_mmc ^ sprite_mc_bits);
-                sbuf_mc_flops ^= static_cast<uint8_t>(toggled & ~sbuf_expx_flops);
-                sbuf_mc_flops |= static_cast<uint8_t>(toggled & ~sbuf_expx_flops & ~reg_mmc);
-                sprite_mc_bits = reg_mmc;
-            }
-            sprite_pri_bits = reg_mdp;
-            sprite_expx_bits = reg_mxe;
-        }
-        if(k == 7)
-        {
-            if(color_latency)
-            {
-                // 6569: MC-Bits werden bei Pixel 7 übernommen
-                const uint8_t toggled = static_cast<uint8_t>(reg_mmc ^ sprite_mc_bits);
-                sbuf_mc_flops &= static_cast<uint8_t>(~toggled);
-                sprite_mc_bits = reg_mmc;
-            }
-            sprite_halt_bits &= static_cast<uint8_t>(~dma_cycle_2);
-        }
+        LatchSpriteRegs(k, dma_cycle_0, dma_cycle_2, dma2_sprite, spr_en);
 
         // Sprites starten wenn die X-Position erreicht ist
         if(candidate_bits && sprite_pending_bits)
@@ -926,6 +994,7 @@ inline void VICII::DrawBorder()
 {
     if(!vic_config[VIC_BORDER_ON]) return;
     if(current_rasterline < first_display_line) return;
+    if(draw_this_line && !render_line_pixels) return;   // Frameskip: Zeile wird nicht gebraucht
     border_buffer_line = video_buffer_line - 504;	/// Erstes Sichtbares Pixel
 
     for(int x=0;x<504;x++)
@@ -1000,6 +1069,9 @@ void VICII::OneCycle()
             //if (current_rasterline == reg_irq_raster) RasterIRQ();
             draw_this_line = (current_rasterline >= first_display_line && current_rasterline <= last_display_line);
 		}
+
+        // Farben nur erzeugen, wenn die Zeile im Puffer landet und gebraucht wird (sonst zählt nur das Vordergrund-Bit für die Kollisionen)
+        render_line_pixels = draw_this_line && (render_frame_pixels || (draw_line_counter == render_row));
 
         if(draw_this_line)
         {
@@ -1344,7 +1416,7 @@ void VICII::OneCycle()
 
         DrawGraphicsPseudo();
         DrawBorder();
-        if(draw_this_line) ResolveLine();
+        if(draw_this_line && render_line_pixels) ResolveLine();
 
         if(total_cycles_per_rasterline == 63) current_cycle = 0;
 

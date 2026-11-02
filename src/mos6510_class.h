@@ -17,6 +17,7 @@
 
 #include "./structs.h"
 #include <functional>
+#include "delegate.h"
 
 class MOS6510
 {
@@ -39,8 +40,8 @@ public:
     void TriggerInterrupt(int typ);
     void ClearInterrupt(int typ);
 
-    std::function<unsigned char(unsigned short)> *ReadProcTbl;
-    std::function<void(unsigned short,unsigned char)> *WriteProcTbl;
+    Delegate<unsigned char(unsigned short)> *ReadProcTbl;
+    Delegate<void(unsigned short,unsigned char)> *WriteProcTbl;
 
     /// Variablen ///
 
