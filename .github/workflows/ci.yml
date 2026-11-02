@@ -23,6 +23,7 @@ jobs:
           libavcodec-dev \
           libavformat-dev \
           libavutil-dev \
+          libomp-dev \
           libpng-dev \
           libquazip5-dev \
           libsdl2-dev \
