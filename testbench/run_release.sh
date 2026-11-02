@@ -16,6 +16,8 @@
 # Wichtig zum Aufbau:
 #  - Die VICE testprogs werden nach $WORK_DIR gespiegelt. Die Tests schreiben auf Disk Images und legen
 #    Screenshots ab, das VICE Verzeichnis bleibt damit unverändert und jeder Lauf startet mit sauberen Images.
+#  - Die Testliste wird in Pakete zerlegt (split_testlist.py). Jeder Worker holt sich nacheinander das nächste
+#    freie Paket (teuerste zuerst), bis alle Pakete erledigt sind. So bleibt kein Worker am Ende untätig.
 #  - Jeder Worker bekommt ein eigenes testbench Verzeichnis (eigene Testliste, eigene Ergebnisdatei) und
 #    ein eigenes HOME (die emu64.ini ist sonst für alle Prozesse dieselbe Datei).
 #  - Emu64 wird immer mit --multiple-instance gestartet. Ohne den Parameter reicht Emu64 die Argumente an
@@ -130,11 +132,13 @@ fi
 # --- Testliste aufteilen -----------------------------------------------------------------------------------
 
 echo "Teile die Testliste auf ..."
-"$TESTBENCH_DIR/split_testlist.py" "$MIRROR/testbench/emu64-testlist.txt" "$JOBS" "$RUN_DIR/chunks" \
-    "${GROUPS_FILTER[@]}" > "$RUN_DIR/chunks.txt" || die "Aufteilen der Testliste fehlgeschlagen"
-WORKERS=$(wc -l < "$RUN_DIR/chunks.txt")
-TOTAL_TESTS=$(awk '{s += $2} END {print s}' "$RUN_DIR/chunks.txt")
-echo "$TOTAL_TESTS Tests auf $WORKERS Worker verteilt."
+"$TESTBENCH_DIR/split_testlist.py" "$MIRROR/testbench/emu64-testlist.txt" "$JOBS" "$RUN_DIR/packages" \
+    "${GROUPS_FILTER[@]}" > "$RUN_DIR/packages.txt" || die "Aufteilen der Testliste fehlgeschlagen"
+PACKAGES=$(wc -l < "$RUN_DIR/packages.txt")
+WORKERS=$(( JOBS < PACKAGES ? JOBS : PACKAGES ))
+TOTAL_TESTS=$(awk '{s += $2} END {print s}' "$RUN_DIR/packages.txt")
+mkdir -p "$RUN_DIR/claimed"
+echo "$TOTAL_TESTS Tests in $PACKAGES Paketen für $WORKERS Worker."
 
 # --- Worker vorbereiten und starten ------------------------------------------------------------------------
 
@@ -158,7 +162,6 @@ for i in $(seq 1 "$WORKERS"); do
         ln -s "$f" "$W/testbench/$b"
     done
     printf 'prereq:\n\t@true\n' > "$W/testbench/Makefile"     # testbench.sh ruft "make prereq" auf, das ist bereits erledigt
-    cp "$RUN_DIR/chunks/chunk-$i.txt" "$W/testbench/emu64-testlist.txt"
 
     cat > "$W/bin/emu64" <<EOF
 #!/bin/bash
@@ -168,13 +171,42 @@ EOF
     chmod +x "$W/bin/emu64"
 done
 
+# Ein Worker holt sich so lange das nächste freie Paket, bis keines mehr übrig ist.
+# Ein Paket gehört dem Worker, dem das Anlegen der Datei claimed/<paket> gelingt. Das geschieht mit "noclobber"
+# der Bash (open mit O_EXCL, atomar). Nicht mit mkdir: Die uutils Variante von mkdir (z.B. Ubuntu 25.10+)
+# meldet bei gleichzeitigen Aufrufen mehreren Prozessen Erfolg, dann liefe ein Paket doppelt.
+# Die Ergebnisse jedes Pakets werden in results.txt gesammelt, fehlerhafte Pakete in failed.txt vermerkt.
+run_worker()
+{
+    local W="$RUN_DIR/w$1"
+    local status=0
+    cd "$W/testbench" || return 1
+    : > "$W/results.txt"
+    : > "$W/log.txt"
+    for P in "$RUN_DIR"/packages/pkg-*.txt; do
+        local name
+        name="$(basename "$P" .txt)"
+        ( set -o noclobber; : > "$RUN_DIR/claimed/$name" ) 2> /dev/null || continue
+        cp "$P" emu64-testlist.txt
+        rm -f emu64-result.txt
+        echo "=== $name" >> "$W/log.txt"
+        EMUDIR="$W/bin/" ./testbench.sh emu64 $TESTBENCH_FLAGS >> "$W/log.txt" 2>&1
+        local rc=$?
+        if [ "$rc" != 0 ] || [ ! -f emu64-result.txt ] || ! tail -n 1 emu64-result.txt | grep -q 'elapsed'; then
+            echo "$name (Exitcode $rc)" >> "$W/failed.txt"
+            status=1
+        fi
+        [ -f emu64-result.txt ] && grep -v '^#' emu64-result.txt >> "$W/results.txt"
+        rm -f emu64-result.txt
+    done
+    return $status
+}
+
 START=$SECONDS
 for i in $(seq 1 "$WORKERS"); do
-    W="$RUN_DIR/w$i"
     (
-        cd "$W/testbench" || exit 1
-        EMUDIR="$W/bin/" ./testbench.sh emu64 $TESTBENCH_FLAGS > "$W/log.txt" 2>&1
-        echo $? > "$W/exitcode"
+        run_worker "$i"
+        echo $? > "$RUN_DIR/w$i/exitcode"
     ) &
 done
 
@@ -183,8 +215,9 @@ while [ "$(jobs -rp | wc -l)" -gt 0 ]; do
     sleep 20
     DONE=0
     for i in $(seq 1 "$WORKERS"); do
-        R="$RUN_DIR/w$i/testbench/emu64-result.txt"
-        [ -f "$R" ] && DONE=$(( DONE + $(grep -vc '^#' "$R") ))
+        for R in "$RUN_DIR/w$i/results.txt" "$RUN_DIR/w$i/testbench/emu64-result.txt"; do
+            [ -f "$R" ] && DONE=$(( DONE + $(grep -vc '^#' "$R") ))
+        done
     done
     printf '\r%d von %d Tests fertig, %d Minuten vergangen ...   ' "$DONE" "$TOTAL_TESTS" $(( (SECONDS - START) / 60 ))
 done
@@ -197,16 +230,21 @@ WALL=$(( SECONDS - START ))
 FAILED=0
 for i in $(seq 1 "$WORKERS"); do
     W="$RUN_DIR/w$i"
-    R="$W/testbench/emu64-result.txt"
-    if [ ! -f "$R" ] || [ "$(cat "$W/exitcode" 2> /dev/null)" != "0" ] || ! tail -n 1 "$R" | grep -q 'elapsed'; then
+    if [ "$(cat "$W/exitcode" 2> /dev/null)" != "0" ] || [ -s "$W/failed.txt" ]; then
         echo "Worker $i ist nicht sauber durchgelaufen, siehe $W/log.txt" >&2
+        [ -s "$W/failed.txt" ] && sed 's/^/    Paket /' "$W/failed.txt" >&2
         FAILED=1
     fi
 done
+CLAIMED=$(find "$RUN_DIR/claimed" -mindepth 1 -maxdepth 1 -type f | wc -l)
+if [ "$CLAIMED" != "$PACKAGES" ]; then
+    echo "Es wurden nur $CLAIMED von $PACKAGES Paketen bearbeitet." >&2
+    FAILED=1
+fi
 [ "$FAILED" = 0 ] || die "Das Ergebnis wurde nicht übernommen. Die Arbeitsdateien liegen in $RUN_DIR"
 
 TMP="$RUN_DIR/result.txt"
-cat "$RUN_DIR"/w*/testbench/emu64-result.txt | grep -v '^#' | LC_ALL=C sort -t, -k1,1 -k2,2 -s > "$TMP"
+cat "$RUN_DIR"/w*/results.txt | grep -v '^#' | LC_ALL=C sort -t, -k1,1 -k2,2 -s > "$TMP"
 echo "# $((WALL / 60)) minutes and $((WALL % 60)) seconds elapsed (wall time, $WORKERS workers)." >> "$TMP"
 
 COUNT_OK=$(awk -F, '!/^#/ && $3 == "ok"' "$TMP" | wc -l)
