@@ -39,6 +39,7 @@
 #include <mutex>
 #include <vector>
 #include <functional>
+#include "delegate.h"
 
 #define AudioSampleRate 44100
 
@@ -490,8 +491,8 @@ private:
     void SwapRBSurface(SDL_Surface *surface); // swaps the color red with blue in sdl surface
     void DebugLogging();
 
-    std::function<uint8_t(uint16_t)> *ReadProcTbl;
-    std::function<void(uint16_t, uint8_t)> *WriteProcTbl;
+    Delegate<uint8_t(uint16_t)> *ReadProcTbl;
+    Delegate<void(uint16_t, uint8_t)> *WriteProcTbl;
 
     char  gfx_path[MAX_STRING_LENGTH];
     char  floppy_sound_path[MAX_STRING_LENGTH];

@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include <functional>
+#include "delegate.h"
 
 class MOS6522
 {
@@ -37,13 +38,13 @@ public:
     void WriteIO(unsigned short adresse, unsigned char);
     unsigned char ReadIO(unsigned short adresse);
 
-    std::function<bool(void)> SyncFound;
-    std::function<unsigned char(void)> ReadGCRByte;
-    std::function<void(unsigned char)> WriteGCRByte;
-    std::function<void(void)> SpurInc;
-    std::function<void(void)> SpurDec;
-    std::function<void(int)> TriggerInterrupt;
-    std::function<void(int)> ClearInterrupt;
+    Delegate<bool(void)> SyncFound;
+    Delegate<unsigned char(void)> ReadGCRByte;
+    Delegate<void(unsigned char)> WriteGCRByte;
+    Delegate<void(void)> SpurInc;
+    Delegate<void(void)> SpurDec;
+    Delegate<void(int)> TriggerInterrupt;
+    Delegate<void(int)> ClearInterrupt;
 
     /// Variablen ///
 

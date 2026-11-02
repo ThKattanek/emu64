@@ -248,6 +248,7 @@ HEADERS += \
     debugger_iec_window.h \
     debugger_vic_window.h \
     debugger_window.h \
+    delegate.h \
     dos_error_messages.h \
     emu64_commands.h \
     floppy1541_class.h \

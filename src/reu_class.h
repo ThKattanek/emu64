@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <functional>
+#include "delegate.h"
 
 #define MAX_BANK_COUNT 256
 
@@ -51,10 +52,10 @@ public:
     bool SaveFreez(FILE *File);
     bool LoadFreez(FILE *File,unsigned short Version);
 
-    std::function<unsigned char(unsigned short)> *ReadProcTbl;
-    std::function<void(unsigned short,unsigned char)> *WriteProcTbl;
-    std::function<void(int)> CpuTriggerInterrupt;
-    std::function<void(int)> CpuClearInterrupt;
+    Delegate<unsigned char(unsigned short)> *ReadProcTbl;
+    Delegate<void(unsigned short,unsigned char)> *WriteProcTbl;
+    Delegate<void(int)> CpuTriggerInterrupt;
+    Delegate<void(int)> CpuClearInterrupt;
 
     // Variablen
     bool *BA;			// Extern

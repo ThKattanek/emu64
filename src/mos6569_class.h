@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include <functional>
+#include "delegate.h"
 
 #include "./structs.h"
 
@@ -76,10 +77,10 @@ public:
     uint8_t ReadIO(uint16_t address);
     void SetLightpen(bool low);
 
-    std::function<uint8_t(uint16_t)> *ReadProcTbl;
-    std::function<void(uint8_t*)> RefreshProc;
-    std::function<void(int)> CpuTriggerInterrupt;
-    std::function<void(int)> CpuClearInterrupt;
+    Delegate<uint8_t(uint16_t)> *ReadProcTbl;
+    Delegate<void(uint8_t*)> RefreshProc;
+    Delegate<void(int)> CpuTriggerInterrupt;
+    Delegate<void(int)> CpuClearInterrupt;
     std::function<uint8_t()> CpuBusByte;            // Byte das die CPU gerade am Bus hat (für den FLI-Bug)
 
     /// Variablen ///

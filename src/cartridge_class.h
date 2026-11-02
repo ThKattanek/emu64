@@ -16,6 +16,7 @@
 #define CARTRIDGE_CLASS_H
 
 #include <functional>
+#include "delegate.h"
 #include <cstdio>
 
 #include "./structs.h"
@@ -55,9 +56,9 @@ public:
     uint8_t ReadRom2(uint16_t address);
     uint8_t ReadRom3(uint16_t address);
 
-    std::function<void(void)> ChangeMemMapProc;
-    std::function<void(int)> CpuTriggerInterrupt;
-    std::function<void(int)> CpuClearInterrupt;
+    Delegate<void(void)> ChangeMemMapProc;
+    Delegate<void(int)> CpuTriggerInterrupt;
+    Delegate<void(int)> CpuClearInterrupt;
     std::function<void(int,bool)> ChangeLED;
 
     // Variablen

@@ -16,6 +16,7 @@
 #define MOS6502_CLASS_H
 
 #include <functional>
+#include "delegate.h"
 
 #include "./structs.h"
 
@@ -40,8 +41,8 @@ public:
     void TriggerInterrupt(int typ);
     void ClearInterrupt(int typ);
 
-    std::function<unsigned char(unsigned short)> *ReadProcTbl;
-    std::function<void(unsigned short,unsigned char)> *WriteProcTbl;
+    Delegate<unsigned char(unsigned short)> *ReadProcTbl;
+    Delegate<void(unsigned short,unsigned char)> *WriteProcTbl;
 
     /// Variablen ///
 
