@@ -381,6 +381,7 @@ else
 
 game_port1 = 0;
 game_port2 = 0;
+keys_cache_valid = false;
 
 /// Init Classes ///
 mmu = new MMU();
@@ -408,6 +409,8 @@ geo = new GEORAMClass();
 tape = new TAPE1530(audio_frequency,audio_spec_have.samples,C64Takt);
 
 vic_buffer = vic->video_buffer;
+video_convert_pending = false;
+last_video_convert_ticks = 0;
 
 cia2->floppy_iec_wire = &floppy_iec_wire;
 cia2->c64_iec_wire = &c64_iec_wire;
@@ -727,6 +730,11 @@ void C64Class::EndEmulation()
     if(enable_exit_screenshot)
     {
         hold_next_system_cycle = true;
+        // Per Frameskip ausgelassene Umrechnung des letzten fertigen Bildes nachholen.
+        // Kein mutex1: Ein laufender Audio-Callback käme mit gesetztem hold_next_system_cycle nie zum Ende (keine Samples).
+        // Kurz warten, damit ein gerade laufender Zyklus abgeschlossen ist.
+        SDL_Delay(1);
+        ConvertPendingVideo();
         SwapRBSurface(c64_screen);
         SDL_SavePNG(c64_screen, exit_screenshot_filename);
         hold_next_system_cycle = false;
@@ -940,6 +948,26 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
 
     if((video_crt_output == nullptr) || (sdl_thread_pause == true)) return;
 
+    // Frameskip: Die Umrechnung ins Ausgabebild (CRT-Emulation) entfällt, wenn das Bild nicht angezeigt wird
+    // (--nogui) bzw. im WarpMode schneller entsteht als es angezeigt werden kann.
+    // Hat der VIC in diesem Bild keine Pixelfarben erzeugt, kann es ohnehin nicht umgerechnet werden.
+    // Die Emulation ist davon nicht betroffen: Der VIC-Puffer wird wie immer gewechselt, die Maus aktualisiert.
+    const bool skip_convert = !vic->IsFrameRendered() || IsVideoConvertSkippable();
+
+    // Für das jetzt beginnende Bild festlegen, ob der VIC die Pixelfarben erzeugen muss
+    vic->SetFrameRendering(IsFrameRenderNeeded(), video_crt_output->GetDelayLineSourceRow(video_x_offset,current_c64_screen_height,504));
+
+    if(skip_convert)
+    {
+        video_crt_output->SkipVideo(vic_puffer,video_x_offset,current_c64_screen_width,current_c64_screen_height,504);
+        this->vic_buffer = vic_puffer;
+        vic->SwitchVideoBuffer();
+        video_convert_pending = true;
+        if(enable_mouse_1351) UpdateMouse();
+        return;
+    }
+    video_convert_pending = false;
+
     if(SDL_LockSurface(c64_screen) != 0)
     {
         LogText("<< ERROR: SDL Surface (VicRefresh) konnte nicht gelockt werden.\n");
@@ -1009,6 +1037,51 @@ void C64Class::VicRefresh(uint8_t *vic_puffer)
 
     if(enable_mouse_1351) UpdateMouse();
 
+    c64_screen_is_obselete = true;
+}
+
+bool C64Class::IsFrameRenderNeeded()
+{
+    // Muss das nächste Bild vollständig erzeugt werden? (Screenshot, Videoaufnahme, Debugger, Anzeige)
+    if(start_screenshot || debug_mode) return true;
+    if((video_capture != nullptr) && video_capture->IsCaptureActive()) return true;
+
+    // Ohne GUI wird nur für den Exit-Screenshot ein Bild gebraucht
+    if(start_hidden_window) return enable_exit_screenshot;
+
+    // Im WarpMode nur, wenn die nächste Anzeige fällig ist (siehe IsVideoConvertSkippable)
+    if(warp_mode) return (SDL_GetTicks() - last_video_convert_ticks) >= 20;
+
+    return true;
+}
+
+bool C64Class::IsVideoConvertSkippable()
+{
+    // Screenshot und Videoaufnahme brauchen jedes Bild
+    if(start_screenshot) return false;
+    if((video_capture != nullptr) && video_capture->IsCaptureActive()) return false;
+
+    // Ohne GUI wird das Bild nie angezeigt (der Exit-Screenshot holt die Umrechnung nach)
+    if(start_hidden_window) return true;
+
+    // Im WarpMode höchstens ca. 50 Bilder pro Sekunde (Echtzeit) umrechnen
+    if(warp_mode)
+    {
+        uint32_t now = SDL_GetTicks();
+        if((now - last_video_convert_ticks) < 20) return true;
+        last_video_convert_ticks = now;
+    }
+    return false;
+}
+
+void C64Class::ConvertPendingVideo()
+{
+    // Holt die Umrechnung des letzten fertigen Frames nach, falls diese per Frameskip ausgelassen wurde
+    if(!video_convert_pending || (vic_buffer == nullptr) || (video_crt_output == nullptr)) return;
+    if(SDL_LockSurface(c64_screen) != 0) return;
+    video_crt_output->ConvertSkippedVideo(static_cast<void*>(c64_screen->pixels),c64_screen->pitch,vic_buffer,video_x_offset,current_c64_screen_width,current_c64_screen_height,504,312,false);
+    SDL_UnlockSurface(c64_screen);
+    video_convert_pending = false;
     c64_screen_is_obselete = true;
 }
 
@@ -1089,6 +1162,13 @@ void C64Class::DebugBlinkRefresh()
 }
 
 void C64Class::WarpModeLoop()
+{
+    // Mehrere Zyklen am Stück, die Abbruchbedingung des Warp-Threads wird nur zwischen den Blöcken geprüft
+    for(int i=0; i<WARP_CYCLE_BLOCK; i++)
+        WarpModeCycle();
+}
+
+inline void C64Class::WarpModeCycle()
 {
     if(limit_cycles_active && ((cycle_counter - last_reset_cycle) >= limit_cycles_target))
     {
@@ -1637,6 +1717,27 @@ inline void C64Class::CheckKeys()
 
     out_pa = ~cia1_port_a.GetOutput();
     out_pb = ~cia1_port_b.GetOutput();
+
+    // Nur neu berechnen, wenn sich ein Eingangswert geändert hat (sonst wären die Porteingänge identisch).
+    // Nur CheckKeys setzt die Eingänge von CIA1.
+    uint64_t matrix[4];
+    memcpy(&matrix[0], key_matrix_to_port_a, 8);
+    memcpy(&matrix[1], key_matrix_to_port_b, 8);
+    memcpy(&matrix[2], key_matrix_to_port_a_ext, 8);
+    memcpy(&matrix[3], key_matrix_to_port_b_ext, 8);
+
+    if(keys_cache_valid && (out_pa == keys_cache_out_pa) && (out_pb == keys_cache_out_pb) &&
+       (game_port1 == keys_cache_game_port1) && (game_port2 == keys_cache_game_port2) &&
+       (matrix[0] == keys_cache_matrix[0]) && (matrix[1] == keys_cache_matrix[1]) &&
+       (matrix[2] == keys_cache_matrix[2]) && (matrix[3] == keys_cache_matrix[3]))
+        return;
+
+    keys_cache_valid = true;
+    keys_cache_out_pa = out_pa;
+    keys_cache_out_pb = out_pb;
+    keys_cache_game_port1 = game_port1;
+    keys_cache_game_port2 = game_port2;
+    for(int i=0; i<4; i++) keys_cache_matrix[i] = matrix[i];
 
     in_pa = in_pb = 0;
 

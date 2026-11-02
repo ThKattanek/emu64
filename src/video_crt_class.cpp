@@ -17,6 +17,7 @@
 #include "c64_colors.h"
 #include <math.h>
 #include <algorithm>
+#include <cstring>
 
 #include <iostream>
 
@@ -47,6 +48,9 @@ static uint8_t COLOR_ANGLES[16] =
 VideoCrtClass::VideoCrtClass()
 {
     is_first_pal_vic_revision = false;
+
+    skip_line_valid[0] = skip_line_valid[1] = false;
+    skip_line_parity[0] = skip_line_parity[1] = 0;
 
     enable_user_palette = false;
     enable_user_palette_crt_mode = false;
@@ -310,6 +314,69 @@ inline void VideoCrtClass::CreateVicIIColors(void)
 }
 
 void VideoCrtClass::ConvertVideo(void* Outpuffer,long Pitch,unsigned char* VICOutPuffer,int VICOutPufferOffset,int OutXW,int OutYW,int InXW,int,bool)
+{
+    // Wurde das vorherige Bild ausgelassen, die Delay Line mit dessen letzter Zeile füllen
+    if(skip_line_valid[0]) PrimeDelayLine(0, OutXW);
+    skip_line_valid[0] = skip_line_valid[1] = false;
+    ConvertVideoIntern(Outpuffer, Pitch, VICOutPuffer, VICOutPufferOffset, OutXW, OutYW, InXW);
+}
+
+void VideoCrtClass::ConvertSkippedVideo(void* Outpuffer,long Pitch,unsigned char* VICOutPuffer,int VICOutPufferOffset,int OutXW,int OutYW,int InXW,int,bool)
+{
+    // Das zuletzt ausgelassene Bild nachträglich umrechnen: Delay Line mit der letzten Zeile des Bildes davor füllen
+    if(skip_line_valid[1]) PrimeDelayLine(1, OutXW);
+    skip_line_valid[0] = skip_line_valid[1] = false;
+    ConvertVideoIntern(Outpuffer, Pitch, VICOutPuffer, VICOutPufferOffset, OutXW, OutYW, InXW);
+}
+
+void VideoCrtClass::SkipVideo(unsigned char* VICOutPuffer, int VICOutPufferOffset, int OutXW, int OutYW, int InXW)
+{
+    // Das Bild wird nicht umgerechnet: Nur die letzte Quellzeile merken (bestimmt den Zustand der Delay Line)
+    memcpy(skip_line[1], skip_line[0], SKIP_LINE_SIZE);
+    skip_line_valid[1] = skip_line_valid[0];
+    skip_line_parity[1] = skip_line_parity[0];
+
+    const int rows = is_double2x ? OutYW / 2 : OutYW;
+    const int width = (is_double2x ? OutXW / 2 : OutXW) + 4;   // Die Filter lesen bis zu 3 Pixel voraus
+
+    if(!is_crt_output || rows < 1 || width > SKIP_LINE_SIZE)
+    {
+        skip_line_valid[0] = false;
+        return;
+    }
+
+    memcpy(skip_line[0], VICOutPuffer + VICOutPufferOffset + (rows - 1) * InXW, static_cast<size_t>(width));
+    skip_line_parity[0] = (rows - 1) & 1;
+    skip_line_valid[0] = true;
+}
+
+// Quellzeile, deren Inhalt die PAL Delay Line für das folgende Bild bestimmt (letzte umgerechnete Zeile), -1 = keine
+int VideoCrtClass::GetDelayLineSourceRow(int VICOutPufferOffset, int OutYW, int InXW) const
+{
+    if(!is_crt_output || InXW <= 0) return -1;
+    const int rows = is_double2x ? OutYW / 2 : OutYW;
+    if(rows < 1) return -1;
+    return VICOutPufferOffset / InXW + rows - 1;
+}
+
+void VideoCrtClass::PrimeDelayLine(int index, int OutXW)
+{
+    // Die gemerkte Zeile mit derselben Zeilenparität (y & 1) wie im Originalbild umrechnen, die Ausgabe wird verworfen.
+    // Bei ungerader Parität wird eine Füllzeile vorangestellt; die Delay Line hängt nur von der letzten Zeile ab.
+    uint8_t *src = prime_source;
+    const int parity = skip_line_parity[index];
+
+    memset(src, 0, sizeof(prime_source));
+    memcpy(src + parity * SKIP_LINE_SIZE, skip_line[index], SKIP_LINE_SIZE);
+
+    const int src_rows = parity + 1;
+    const int out_rows = is_double2x ? src_rows * 2 : src_rows;
+
+    prime_buffer.resize(static_cast<size_t>(OutXW) * static_cast<size_t>(out_rows));
+    ConvertVideoIntern(prime_buffer.data(), OutXW * 4, src, 0, OutXW, out_rows, SKIP_LINE_SIZE);
+}
+
+void VideoCrtClass::ConvertVideoIntern(void* Outpuffer,long Pitch,unsigned char* VICOutPuffer,int VICOutPufferOffset,int OutXW,int OutYW,int InXW)
 {
 	// Outbuffer -> uint32 (ABGR)
 

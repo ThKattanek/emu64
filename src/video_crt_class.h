@@ -17,6 +17,9 @@
 #define VIDEOCRT_CLASS_H
 
 #include <stdint.h>
+#include <vector>
+
+#define SKIP_LINE_SIZE 1032     // Max. Breite einer Quellzeile für den Frameskip (inkl. 3 Pixel Vorlauf der Filter)
 
 typedef struct COLOR_STRUCT
 {
@@ -40,6 +43,9 @@ public:
         VideoCrtClass();
         ~VideoCrtClass();
         void ConvertVideo(void* Outpuffer, long Pitch, unsigned char* VICOutPuffer, int VICOutPufferOffset, int OutXW, int OutYW, int InXW, int InYW, bool FlipTex);
+        void SkipVideo(unsigned char* VICOutPuffer, int VICOutPufferOffset, int OutXW, int OutYW, int InXW);
+        int GetDelayLineSourceRow(int VICOutPufferOffset, int OutYW, int InXW) const;
+        void ConvertSkippedVideo(void* Outpuffer, long Pitch, unsigned char* VICOutPuffer, int VICOutPufferOffset, int OutXW, int OutYW, int InXW, int InYW, bool FlipTex);
         void UpdateParameter(void);
         void SetFirstVicRevision(bool enabled);
         void SetPhaseAlternatingLineOffset(int offset);
@@ -64,6 +70,17 @@ public:
 
 private:
         void CreateVicIIColors(void);
+        void ConvertVideoIntern(void* Outpuffer, long Pitch, unsigned char* VICOutPuffer, int VICOutPufferOffset, int OutXW, int OutYW, int InXW);
+        void PrimeDelayLine(int index, int OutXW);
+
+        // Frameskip: Die PAL Delay Line überträgt die letzte Zeile eines Bildes in die erste des nächsten.
+        // Für ausgelassene Bilder wird die letzte Quellzeile gemerkt, damit das nächste umgerechnete Bild identisch bleibt.
+        // [0] = zuletzt ausgelassenes Bild, [1] = das Bild davor
+        uint8_t     skip_line[2][SKIP_LINE_SIZE];
+        bool        skip_line_valid[2];
+        int         skip_line_parity[2];
+        uint8_t     prime_source[2 * SKIP_LINE_SIZE];
+        std::vector<uint32_t> prime_buffer;
 
         inline void ConvertYUVToRGB(COLOR_STRUCT *color_out);
 		inline void ConvertRGBToYUV();

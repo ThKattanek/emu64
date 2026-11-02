@@ -48,6 +48,8 @@ public:
     VICII();
     ~VICII();
     void SwitchVideoBuffer();
+    void SetFrameRendering(bool render_all, int row);
+    bool IsFrameRendered() const { return render_frame_pixels; }
     void GetRegister(VIC_STRUCT *vic_reg);
     void GetDebugFrame(uint8_t *dst, int *beam_row, int *beam_x);
     void SetFullView(bool status);
@@ -109,6 +111,7 @@ private:
     void DrawGraphics();
     void RenderGfxCycle(uint8_t *out);
     void RenderSpriteCycle(uint8_t *slot);
+    void LatchSpriteRegs(int k, uint8_t dma_cycle_0, uint8_t dma_cycle_2, int dma2_sprite, bool spr_en);
     void UpdateColorRegs();
     void ResolveLine();
     void ApplyDisplayLines();
@@ -121,6 +124,11 @@ private:
     uint8_t *video_buffer_line;
     int     draw_line_counter;
     bool    draw_this_line;
+    // Frameskip: Bei render_frame_pixels = false werden die Farben der Pixel nicht erzeugt (Bild wird nicht angezeigt).
+    // Ausnahme ist die Pufferzeile render_row (für die PAL Delay Line der Ausgabe). Alle Zustände inkl. Kollisionen laufen weiter.
+    bool    render_frame_pixels;
+    int     render_row;
+    bool    render_line_pixels;
     bool    full_view;                  // Debugger: Alle Rasterzeilen in den Videopuffer schreiben
 
     //// Interne Register ////
