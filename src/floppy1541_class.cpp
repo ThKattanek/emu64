@@ -73,22 +73,34 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
         WriteProcTbl[i] = BindDelegate<&Floppy1541::WriteNoMem>(this);
     }
 
-    for(int i=0;i<8;i++)
+    // Adressdekodierung wie beim echten 1541 (und VICE): A13/A14 sind nicht angeschlossen, der Bereich $0000-$1FFF
+    // wiederholt sich also 4x bis $7FFF. Darin liegen RAM ($0000-$07FF, 2 KiB), VIA1 ($1800-$1BFF) und VIA2 ($1C00-$1FFF).
+    // Die VIAs spiegeln ihre 16 Register jeweils im ganzen 1 KiB Bereich. Das ROM (16 KiB) liegt bei $C000 und ist bei $8000 gespiegelt.
+    // Schnelllader nutzen diese Spiegel (z.B. LDA ($xx,X) auf $1F05 = Timer 1 von VIA2).
+    for(int block=0; block<4; block++)
     {
-        ReadProcTbl[i] = BindDelegate<&Floppy1541::ReadRam>(this);
-        WriteProcTbl[i] = BindDelegate<&Floppy1541::WriteRam>(this);
+        const int base = block * 0x20;
+
+        for(int i=0;i<8;i++)
+        {
+            ReadProcTbl[base+i] = BindDelegate<&Floppy1541::ReadRam>(this);
+            WriteProcTbl[base+i] = BindDelegate<&Floppy1541::WriteRam>(this);
+        }
+
+        for(int i=0;i<4;i++)
+        {
+            ReadProcTbl[base+0x18+i] = BindDelegate<&MOS6522::ReadIO>(via1);
+            WriteProcTbl[base+0x18+i] = BindDelegate<&MOS6522::WriteIO>(via1);
+
+            ReadProcTbl[base+0x1C+i] = BindDelegate<&MOS6522::ReadIO>(via2);
+            WriteProcTbl[base+0x1C+i] = BindDelegate<&MOS6522::WriteIO>(via2);
+        }
     }
 
-    for(int i=0;i<64;i++)
+    for(int i=0;i<128;i++)
     {
-        ReadProcTbl[i+0xC0] = BindDelegate<&Floppy1541::ReadRom>(this);
+        ReadProcTbl[i+0x80] = BindDelegate<&Floppy1541::ReadRom>(this);
     }
-
-    ReadProcTbl[0x18] = BindDelegate<&MOS6522::ReadIO>(via1);
-    WriteProcTbl[0x18] = BindDelegate<&MOS6522::WriteIO>(via1);
-
-    ReadProcTbl[0x1C] = BindDelegate<&MOS6522::ReadIO>(via2);
-    WriteProcTbl[0x1C] = BindDelegate<&MOS6522::WriteIO>(via2);
 
     via2->SyncFound = BindDelegate<&Floppy1541::SyncFound>(this);
     via2->ReadGCRByte = BindDelegate<&Floppy1541::ReadGCRByte>(this);
@@ -1144,17 +1156,17 @@ uint8_t Floppy1541::ReadNoMem(uint16_t /*address*/)
 
 void Floppy1541::WriteRam(uint16_t address, uint8_t value)
 {
-    RAM[address] = value;
+    RAM[address & 0x7FF] = value;
 }
 
 uint8_t Floppy1541::ReadRam(uint16_t address)
 {
-    return RAM[address];
+    return RAM[address & 0x7FF];
 }
 
 uint8_t Floppy1541::ReadRom(uint16_t address)
 {
-    return ROM[address-0xC000];
+    return ROM[address & 0x3FFF];
 }
 
 bool Floppy1541::SyncFound()
