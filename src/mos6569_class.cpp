@@ -1196,7 +1196,10 @@ void VICII::OneCycle()
     case 12:
         vc = vc_base;
 
+        // Die Badline-Bedingung wird in jedem Zyklus neu geprueft. Faellt sie weg (z.B. durch ein $d011-Schreiben
+        // im Zyklus 11/12), muss BA sofort wieder hoch, sonst bleibt die CPU bis Zyklus 55 gestoppt (FLI/Plasma-Effekte).
         if(badline_status) SetBALow();
+        else *ba = true;
         DrawGraphics();
         break;
 
@@ -1204,11 +1207,13 @@ void VICII::OneCycle()
         vc = vc_base;
 
         if(badline_status) SetBALow();
+        else *ba = true;
         DrawGraphics();
 		break;
 
 	case 14:
         if(badline_status) SetBALow();
+        else *ba = true;
         if((badline_status == true) && (display_status == true)) rc = 0;
 
         DrawGraphics();
@@ -1216,6 +1221,7 @@ void VICII::OneCycle()
 
     case 15:
         if (badline_status) SetBALow();
+        else *ba = true;
         DrawGraphics();
         break;
 
@@ -1238,6 +1244,7 @@ void VICII::OneCycle()
 
         gAccess();
         if (badline_status) SetBALow();
+        else *ba = true;
 
         DrawGraphics();
 		break;
@@ -1245,6 +1252,7 @@ void VICII::OneCycle()
     case 17:
         gAccess();
         if (badline_status) SetBALow();
+        else *ba = true;
 
         DrawGraphics();
         break;
@@ -1259,6 +1267,7 @@ void VICII::OneCycle()
 
         gAccess();
         if (badline_status) SetBALow();
+        else *ba = true;
 
         DrawGraphics();
 		break;
