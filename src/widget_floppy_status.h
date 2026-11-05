@@ -38,6 +38,7 @@ public:
     void SetAktFilename(QString filename, QString d64name);
     void SetEnableFloppy(bool status);
     void SetFloppyVolume(int mode);
+    void ShowFloppyOff();
     int GetFloppyVolume(void);
 
 signals:
@@ -82,6 +83,9 @@ private:
 
     uint8_t old_Sektor;
     uint8_t old_Spur;
+    uint8_t old_Bereich;
+    uint8_t pending_Spur;       // Ungerade Halbspur, die auf Stabilität geprüft wird
+    int     pending_Ticks;
 
     QString AktFileName;
 };

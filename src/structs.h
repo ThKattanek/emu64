@@ -206,13 +206,48 @@ struct BREAK_GROUP
     boolean         bTrue;
 };
 
+#define FLOPPY_MAX_SECTORS      32      // Maximale Anzahl erkannter Sektoren pro Spur
+#define FLOPPY_SECTOR_NONE      0xFF    // Kein Sektor unter dem Kopf
+
+// Bereich einer Sektors, ueber dem sich der Kopf gerade befindet
+enum FLOPPY_AREA
+{
+    FLOPPY_AREA_NONE = 0,       // Kein Sektor (unformatiert, keine Disk)
+    FLOPPY_AREA_HEADER,         // Sync + Sektor Header
+    FLOPPY_AREA_HEADER_GAP,     // Luecke zwischen Header und Datenblock
+    FLOPPY_AREA_DATA,           // Sync + Datenblock
+    FLOPPY_AREA_GAP             // Luecke nach dem Sektor
+};
+
+// Ein auf der Spur gefundener Sektor (alle Angaben in Bits)
+struct FLOPPY_SECTOR
+{
+    uint32_t        Start;          // Position des Sync vor dem Header in der Spur
+    uint32_t        HeaderEnde;     // Ende des Headers (relativ zu Start)
+    uint32_t        DatenStart;     // Beginn des Sync vor dem Datenblock (relativ zu Start)
+    uint32_t        DatenEnde;      // Ende des Datenblocks (relativ zu Start)
+    bool            HatDaten;       // Auf den Header folgt ein Datenblock
+    uint8_t         Nr;             // Sektornummer aus dem Header
+};
+
+// Sektorlage der Spur unter dem Kopf
+struct FLOPPY_TRACK_MAP
+{
+    uint32_t        Bits;           // Laenge der Spur in Bits
+    uint8_t         HalbSpur;       // Halbspur auf die sich die Map bezieht
+    uint8_t         Anzahl;         // Anzahl der Sektoren
+    FLOPPY_SECTOR   Sektor[FLOPPY_MAX_SECTORS];
+};
+
 struct FLOPPY_INFO
 {
     bool            Motor;
     bool            Data;
 	float			Data_RMS;
     unsigned char   Spur;
-    unsigned char   Sektor;
+    unsigned char   HalbSpur;       // Bit 0 = Halbspur (zwischen zwei Spuren)
+    unsigned char   Sektor;         // Sektor unter dem Kopf (FLOPPY_SECTOR_NONE = keiner)
+    unsigned char   Bereich;        // FLOPPY_AREA
 	bool			ErrorFlag;
 	char	    	ErrorMsg[36];
 };
