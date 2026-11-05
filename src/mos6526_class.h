@@ -15,7 +15,6 @@
 #ifndef MOS_6526_CLASS_H
 #define MOS_6526_CLASS_H
 
-#include <functional>
 #include "delegate.h"
 
 #include "./mos6526_port.h"
@@ -59,6 +58,7 @@ public:
     void SetSDR(uint8_t value);
     void WriteIO(uint16_t address, uint8_t value);
     uint8_t ReadIO(uint16_t address);
+    void SetOldModel(bool enable);     // true: alte 6526 (Interrupt kommt einen Takt spaeter), false: neue 6526A
 
     /// Variablen ///
 
@@ -96,6 +96,7 @@ private:
 
     /// Variablen ///
     uint8_t     cia_nr;
+    bool        old_model;          // Alte 6526 statt neuer 6526A
     uint8_t     io[16];
     uint8_t     interupt_mask;
     uint8_t     cra, crb, icr;
@@ -105,7 +106,7 @@ private:
     bool        ifr_done;           // Die Interrupt Pipeline wurde in diesem Takt schon ausgefuehrt
 
     // Interrupt Pipeline (jede Stufe ist einen Takt spaeter dran, 1=naechster Takt, 0=dieser Takt)
-    bool        ifr_ack1, ifr_ack0;         // Interrupt Flags loeschen
+    bool        ifr_ack1, ifr_ack0, ifr_ack_m1;     // Interrupt Flags loeschen (ack_m1: das ICR wurde vor zwei Takten gelesen)
     bool        ifr_d7set1, ifr_d7set0;     // Bit 7 im ICR setzen
     bool        ifr_raise1, ifr_raise0;     // Interrupt Ausgang anheben
     bool        ifr_read0, ifr_read1;       // Das ICR wurde vor einem bzw. zwei Takten gelesen

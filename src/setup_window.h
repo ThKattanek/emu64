@@ -84,6 +84,7 @@ private slots:
     void on_VicSprBgrCollisionEnable_toggled(bool checked);
     void on_VicGreyDotsEnable_toggled(bool checked);
     void on_VicModel8565_toggled(bool checked);
+    void on_CiaModelOld_toggled(bool checked);
     void on_default_pal_c64_clicked();
     void on_default_50hz_clicked();
     void on_cycles_per_second_valueChanged(int arg1);

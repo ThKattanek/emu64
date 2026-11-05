@@ -238,6 +238,7 @@ public:
     void StopSidDump();
     int GetSidDumpFrames();
 
+    void SetCiaModel(bool old_model);           // true: alte 6526, false: neue 6526A (beide CIAs)
     void SetVicConfig(int var, bool enable);    // var = VIC_BORDER_ON, VIC_SPRITES_ON, VIC_SPR_SPR_COLL_ON, VIC_SPR_BCK_COLL_ON
     bool GetVicConfig(int var);
 
