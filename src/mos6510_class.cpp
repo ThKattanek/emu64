@@ -442,6 +442,8 @@ bool MOS6510::OneZyklus(void)
 
             CHK_RDY
 
+            shxy_dma = false; // DMA-Merker gilt nur fuer den aktuellen Befehl (SHX/SHY)
+
             if(nmi_fetch_decision == true) // NMIStatePuffer[CYCLES] --> 2 CYCLES Sagt zwei Zyklen vorher muss der NMI schon angelegen haben also vor dem letzten Zyklus des vorigen Befehls
             {
                 nmi_is_active = false;
