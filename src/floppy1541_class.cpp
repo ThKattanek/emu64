@@ -1010,7 +1010,8 @@ uint8_t *Floppy1541::GetRamPointer()
     return RAM;
 }
 
-bool Floppy1541::OneCycle()
+// Floppy Sound: wird genau einmal pro C64 Takt aufgerufen (unabhaengig vom Laufwerkstakt)
+void Floppy1541::SoundCycle()
 {
     if(FloppySoundEnabled)
     {
@@ -1064,7 +1065,11 @@ bool Floppy1541::OneCycle()
             }
         }
     }
+}
 
+// Ein Takt der Laufwerks CPU (1 MHz), wird von C64Class im Verhaeltnis Laufwerkstakt zu C64 Takt aufgerufen
+bool Floppy1541::OneCycle()
+{
     if(!FloppyEnabled) return true;
 
     // Disk Wechsel Simulieren

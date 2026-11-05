@@ -519,8 +519,10 @@ private:
     bool enable_ext_wires;
     bool ext_rdy_wire;
 
+    uint8_t c64_iec_wire_drv;   // Sicht der Floppy auf c64_iec_wire (um einen Laufwerkstakt verzoegert)
     uint8_t c64_iec_wire;       // Leitungen vom C64 zur Floppy Bit 4=ATN 6=CLK 7=DATA
     uint8_t floppy_iec_wire;    // Leitungen von Floppy zur c64 Bit 6=CLK 7=DATA
+    int     floppy_clock_acc;   // Akkumulator fuer das Verhaeltnis Laufwerkstakt (1 MHz) zu C64 Takt
 
     VCDClass iec_export_vdc;      // Klasse zum Exportieren der IEC Signale
     bool iec_is_dumped;

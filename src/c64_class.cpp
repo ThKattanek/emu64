@@ -28,6 +28,7 @@ int SDLThreadLoad(void *userdat);
 int SDLThreadWarp(void *userdat);
 
 #define C64Takt 985248  // 50,124542Hz (Original C64 PAL)
+#define FLOPPY_CLOCK 1000000    // Takt der 1541 (16 MHz Quarz / 16)
 
 #define RecPollingWaitStart 20
 
@@ -443,7 +444,7 @@ for(i=0; i<MAX_FLOPPY_NUM; i++)
 {
     floppy[i] = new Floppy1541(&reset_wire,audio_frequency,audio_spec_have.samples,&floppy_found_breakpoint);
     floppy[i]->SetResetReady(&floppy_reset_ready[i],0xEBFF);
-    floppy[i]->SetC64IEC(&c64_iec_wire);
+    floppy[i]->SetC64IEC(&c64_iec_wire_drv);
     floppy[i]->SetDeviceNumber(static_cast<uint8_t>(8+i));
     floppy[i]->LoadDosRom(filename);
     //floppy[i]->LoadFloppySounds((char*)"floppy_sounds/motor.raw",(char*)"floppy_sounds/motor_on.raw",(char*)"floppy_sounds/motor_off.raw",(char*)"floppy_sounds/anschlag.raw",(char*)"floppy_sounds/stepper_inc.raw",(char*)"floppy_sounds/stepper_dec.raw");
@@ -471,6 +472,8 @@ cycle_counter = 0;
 limit_cycles_target = 0;
 limit_cycles_active = false;
 last_reset_cycle = 0;
+floppy_clock_acc = 0;
+c64_iec_wire_drv = 0xff;
 hold_next_system_cycle = false;
 debug_animation = false;
 debug_logging = false;
@@ -4875,16 +4878,33 @@ void C64Class::NextSystemCycle()
         ClearAllInterrupts();
         SetReset(true, true);
         last_reset_cycle = cycle_counter;
+        floppy_clock_acc = 0;
         reset_request_done = true;
     }
 
     /// Für Externe Erweiterungen ///
     //if(ExtZyklus) ZyklusProcExt();
 
+    // Die 1541 laeuft mit 1 MHz, der C64 mit c64_frequency (PAL 985248 Hz). Das Verhaeltnis ist fuer
+    // zyklusgenaue Fastloader (IEC Bitbanging) entscheidend. Pro C64 Takt sind es daher 0, 1 oder 2 Laufwerkstakte.
+    floppy_clock_acc += FLOPPY_CLOCK;
+    int floppy_cycles = 0;
+    while(floppy_clock_acc >= c64_frequency)
+    {
+        floppy_clock_acc -= c64_frequency;
+        floppy_cycles++;
+    }
+
     floppy_iec_wire = 0;
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
-        cpu_states[i+1] = floppy[i]->OneCycle();
+        floppy[i]->SoundCycle();
+        for(int c=0; c<floppy_cycles; c++)
+        {
+            cpu_states[i+1] = floppy[i]->OneCycle();
+            // Die Floppy sieht Aenderungen der C64 Leitungen erst einen Laufwerkstakt spaeter (Signallaufzeit/Abtastung)
+            c64_iec_wire_drv = c64_iec_wire;
+        }
         floppy_iec_wire |= ~floppy[i]->FloppyIECLocal;
     }
     floppy_iec_wire = ~floppy_iec_wire;
