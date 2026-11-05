@@ -42,6 +42,8 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
     CycleCounter = 0;
     GCRBitTrackSize = 0;
     GCRBitTrackPos = 0;
+    SectorMapDirty = true;
+    memset(&SectorMap, 0, sizeof(SectorMap));
     BitAccu = 0;
     BitCounter = 0;
     OnesCount = 0;
@@ -311,6 +313,7 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
         D64ImageToGCRImage();
 
         UpdateGCRPointer();
+        SectorMapDirty = true;
 
         ImageWriteStatus = false;
         ImageDirectoryWriteStatus = false;
@@ -417,6 +420,7 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
         //fclose(file);
 
         UpdateGCRPointer();
+        SectorMapDirty = true;
 
         ImageWriteStatus = false;
         ImageDirectoryWriteStatus = false;
@@ -443,6 +447,7 @@ void Floppy1541::UnLoadDiskImage()
 
     fclose(image_file);
     image_file = nullptr;
+    SectorMapDirty = true;
 }
 
 inline void Floppy1541::CheckImageWrite()
@@ -759,6 +764,124 @@ inline void Floppy1541::DecodeTrackToD64(unsigned int spur)
     }
 }
 
+// Ermittelt die Lage der Sektoren auf der Spur unter dem Kopf (nur fuer die Anzeige).
+// Es zaehlt allein der Inhalt der GCR Spur, nicht das DOS. Deshalb funktioniert es auch mit Fastloadern, G64 und nach Schreibzugriffen.
+// Sektoren mit ungueltigem Header werden ignoriert, die Datenpruefsumme wird nicht geprueft.
+void Floppy1541::ScanSectorMap()
+{
+    static const bool valid_code[32] = {false,false,false,false,false,false,false,false,false,true,true,true,false,true,true,true,
+                                        false,false,true,true,false,true,true,true,false,true,true,true,false,true,true,false};
+
+    SectorMapDirty = false;
+
+    FLOPPY_TRACK_MAP map;
+    memset(&map, 0, sizeof(map));
+    map.HalbSpur = AktHalbSpur;
+
+    const uint32_t nbits = (AktHalbSpur <= (NUM_TRACKS-1) * 2) ? (uint32_t)TrackSize[AktHalbSpur] * 8 : 0;
+
+    if(nbits > 0)
+    {
+        map.Bits = nbits;
+        const uint8_t *base = GCRImage + AktHalbSpur * GCR_TRACK_SIZE;
+
+        auto get_bit = [&](uint32_t pos) -> unsigned int {
+            pos %= nbits;
+            return (base[pos >> 3] >> (7 - (pos & 7))) & 1;
+        };
+
+        // Liest count Bytes ab Bitposition pos (beliebige Bitlage) und prueft ob alle 5 Bit GCR Codes gueltig sind
+        auto get_bytes = [&](uint32_t pos, uint8_t *dst, int count) -> bool {
+            unsigned int code = 0;
+            int code_bits = 0;
+            bool ok = true;
+            for(int i=0; i<count; i++)
+            {
+                uint8_t v = 0;
+                for(int j=0; j<8; j++)
+                {
+                    unsigned int b = get_bit(pos++);
+                    v = (v << 1) | b;
+                    code = ((code << 1) | b) & 31;
+                    if(++code_bits == 5)
+                    {
+                        code_bits = 0;
+                        if(!valid_code[code])
+                            ok = false;
+                    }
+                }
+                dst[i] = v;
+            }
+            return ok;
+        };
+
+        // Dreimal durch die Spur: Im ersten Durchlauf wird nur die Sync Zaehlung aufgebaut, Header werden im zweiten
+        // gesucht (so ist auch ein Sync ueber den Spuranfang vollstaendig) und der dritte liefert die Datenbloecke dazu.
+        int pending = -1;
+        uint32_t pending_start = 0;
+        uint32_t ones = 0;
+
+        for(uint32_t pos=0; pos<3*nbits; pos++)
+        {
+            if(get_bit(pos))
+            {
+                ones++;
+                continue;
+            }
+
+            const uint32_t sync_len = ones;
+            ones = 0;
+
+            if(sync_len < SYNC_BIT_THRESHOLD || pos < nbits)
+                continue;
+
+            uint8_t mark;
+            get_bytes(pos, &mark, 1);
+
+            if(mark == 0x52)
+            {
+                pending = -1;
+                if(pos >= 2*nbits || map.Anzahl >= FLOPPY_MAX_SECTORS)
+                    continue;
+
+                uint8_t g[10], b1[4], b2[4];
+                if(!get_bytes(pos, g, 10))
+                    continue;
+
+                ConvertToD64(g, b1);
+                ConvertToD64(g+5, b2);
+
+                if(b1[0] != 0x08 || b1[2] >= 32 || b1[1] != (uint8_t)(b1[2] ^ b1[3] ^ b2[0] ^ b2[1]))
+                    continue;
+
+                pending_start = pos - sync_len;
+
+                FLOPPY_SECTOR &s = map.Sektor[map.Anzahl];
+                s.Nr = b1[2];
+                s.Start = pending_start % nbits;
+                s.HeaderEnde = sync_len + GCR_HEADER_SIZE * 8;
+                s.HatDaten = false;
+                s.DatenStart = s.DatenEnde = s.HeaderEnde;
+                pending = map.Anzahl++;
+            }
+            else if(mark == 0x55 && pending >= 0)
+            {
+                FLOPPY_SECTOR &s = map.Sektor[pending];
+                pending = -1;
+
+                s.HatDaten = true;
+                s.DatenStart = (pos - sync_len) - pending_start;
+                s.DatenEnde = (pos - pending_start) + GCR_DATA_BLOCK_SIZE * 8;
+                if(s.DatenEnde > nbits)
+                    s.DatenEnde = nbits;
+            }
+        }
+    }
+
+    std::lock_guard<std::mutex> lock(SectorMapMutex);
+    SectorMap = map;
+}
+
 inline void Floppy1541::ConvertToD64(uint8_t *source_buffer, uint8_t *destination_buffer)
 {
     static uint8_t CONV_TBL[32]={32,32,32,32,32,32,32,32,32,8,0,1,32,12,4,5,32,32,2,3,32,15,6,7,32,9,10,11,32,13,14,32};
@@ -811,8 +934,49 @@ void Floppy1541::SetWriteProtect(bool status)
 
 void Floppy1541::GetFloppyInfo(FLOPPY_INFO *fi)
 {
-    fi->Sektor = RAM[0x19];
-    fi->Spur = (AktHalbSpur+1)>>1;
+    fi->HalbSpur = AktHalbSpur & 1;
+    fi->Spur = (AktHalbSpur >> 1) + 1;
+    fi->Sektor = FLOPPY_SECTOR_NONE;
+    fi->Bereich = FLOPPY_AREA_NONE;
+
+    {
+        // Sektor unter dem Kopf: Der zuletzt passierte Sektor Header der Spur
+        std::lock_guard<std::mutex> lock(SectorMapMutex);
+
+        const uint32_t n = SectorMap.Bits;
+        if(n > 0 && n == GCRBitTrackSize && SectorMap.HalbSpur == AktHalbSpur && SectorMap.Anzahl > 0)
+        {
+            const uint32_t pos = GCRBitTrackPos % n;
+            uint32_t best_rel = n;
+            int best = -1;
+            for(int i=0; i<SectorMap.Anzahl; i++)
+            {
+                uint32_t rel = (pos + n - SectorMap.Sektor[i].Start) % n;
+                if(rel < best_rel)
+                {
+                    best_rel = rel;
+                    best = i;
+                }
+            }
+
+            if(best >= 0)
+            {
+                const FLOPPY_SECTOR &s = SectorMap.Sektor[best];
+                fi->Sektor = s.Nr;
+
+                if(best_rel < s.HeaderEnde)
+                    fi->Bereich = FLOPPY_AREA_HEADER;
+                else if(!s.HatDaten)
+                    fi->Bereich = FLOPPY_AREA_GAP;
+                else if(best_rel < s.DatenStart)
+                    fi->Bereich = FLOPPY_AREA_HEADER_GAP;
+                else if(best_rel < s.DatenEnde)
+                    fi->Bereich = FLOPPY_AREA_DATA;
+                else
+                    fi->Bereich = FLOPPY_AREA_GAP;
+            }
+        }
+    }
 
     uint8_t tmp = via2->GetIO_Zero();
     fi->Motor = !!(tmp&4);
@@ -1221,6 +1385,7 @@ inline void Floppy1541::RotateDisk()
         if(!WriteProtect)
         {
             ImageWriteStatus = true;
+            SectorMapDirty = true;
             if(AktHalbSpur == (DIRECTORY_TRACK-1) * 2)
                 ImageDirectoryWriteStatus = true;
             PokeGCRBit(GCRBitTrackPos, (WriteShift & 0x80) != 0);
@@ -1239,6 +1404,9 @@ inline void Floppy1541::RotateDisk()
     else
     {
         // Lesemodus
+        if(SectorMapDirty)
+            ScanSectorMap();
+
         bool bit = PeekGCRBit(GCRBitTrackPos);
         ReadShift = (ReadShift << 1) | (bit ? 1 : 0);
 
@@ -1412,6 +1580,10 @@ void Floppy1541::UpdateGCRPointer()
         GCRBitTrackPos = 0;
     SyncBitCounter = 0;
     SyncBitsFound = false;
+
+    // Wird bei jedem Reset Zyklus aufgerufen: Die Sektorlage nur neu ermitteln, wenn sich die Spur wirklich geaendert hat
+    if(SectorMap.HalbSpur != AktHalbSpur || SectorMap.Bits != GCRBitTrackSize)
+        SectorMapDirty = true;
 }
 
 inline bool Floppy1541::PeekGCRBit(int pos)

@@ -17,6 +17,7 @@
 
 #include <math.h>
 #include <cstdio>
+#include <mutex>
 #include <functional>
 #include "delegate.h"
 
@@ -122,6 +123,7 @@ private:
     void DecodeTrackToD64(unsigned int spur);
     void InitEmptyTracks();
     void RotateDisk();
+    void ScanSectorMap();
     int GCRSectorSize(unsigned int spur);
     uint16_t RealTrackSize(unsigned int spur);
     void ConvertToD64(uint8_t *source_buffer, uint8_t *destination_buffer);
@@ -197,6 +199,9 @@ private:
     uint16_t            TrackSize[256];             // Größe der einzelnen Spuren in Byte
     uint32_t            GCRBitTrackSize;            // Größe der einzelnen Spuren in Bit
     uint32_t            GCRBitTrackPos;             // Aktuelle Position in der Spur in Bit
+    bool                SectorMapDirty;             // Sektorlage der aktuellen Spur muss neu ermittelt werden
+    std::mutex          SectorMapMutex;             // Schuetzt SectorMap (Emulation schreibt, GUI liest)
+    FLOPPY_TRACK_MAP    SectorMap;                  // Sektorlage der aktuellen Spur (nur fuer die Anzeige)
     uint32_t            SyncBitCounter;             // Zählt die Anzahl der aufeinander folgenden 1er Bits, ohne Unterbrechung durch eine 0, um eine Sync Sequenz zu erkennen
     bool                SyncBitsFound;              // Zeigt an, dass eine Sync Sequenz gefunden wurde, damit die nächsten Bytes als Header oder Daten interpretiert werden können
 

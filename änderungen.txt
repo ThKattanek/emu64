@@ -1,6 +1,7 @@
 Alle Änderungen ab V5.2.0 bis jetzt
 -----------------------------------
 
+- NEW! Floppy - Sektoranzeige: Der Sektor wird jetzt aus der Position des Schreib-/Lesekopfes in der GCR-Spur bestimmt (statt aus dem DOS-Speicher $19), Halbspuren werden angezeigt.
 - NEW! WarpMode und --nogui etwa doppelt so schnell: Das Ausgabebild (CRT-Emulation) wird im WarpMode nur noch ca. 50 Mal pro Sekunde umgerechnet, bei --nogui gar nicht (Screenshot, Exit-Screenshot und Videoaufnahme bekommen weiterhin jedes Bild). Der VIC erzeugt in nicht angezeigten Bildern keine Pixelfarben, Sprite-Kollisionen und alle übrigen Zustände laufen unverändert weiter. Dazu ein schneller Weg in der Sprite-Ausgabe, wenn kein Sprite aktiv ist, die Tastaturmatrix wird nur noch bei Änderungen neu berechnet und Release Builds verwenden Link Time Optimization (LTO). Die Emulation bleibt zyklusgenau identisch (VICE Testbench unverändert).
 - Fixed: Debugger - Assembler: Die Folgeadresse war bei einem unbekannten Adressierungstyp nicht initialisiert.
 - NEW! [#325] FileBrowser: Neue einklappbare Seitenleiste (Cartridge-, Floppy- und Tape-Fenster) mit Favoriten (Rechtsklick auf Ordner; global für alle Fenster oder lokal nur für das jeweilige Fenster), Orten (Home, Desktop, Dokumente, Downloads) und allen Laufwerken inklusive Netzlaufwerken. Die Breite der Seitenleiste wird in der Ini gespeichert. Die Laufwerks-ComboBox entfällt.

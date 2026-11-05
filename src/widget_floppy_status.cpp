@@ -53,6 +53,22 @@ WidgetFloppyStatus::WidgetFloppyStatus(QWidget *parent, int floppy_nr, Floppy154
 
     ui->DisknameOut->setFont(font1);
 
+    // Festbreiten-Schrift und feste Breite für Spur und Sektor, damit der Diskname bei wechselnden Werten nicht springt
+    {
+        QFont mono_font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+        mono_font.setPointSize(12);
+        ui->TrackOut->setFont(mono_font);
+        ui->Label1->setFont(mono_font);
+        ui->SekcorOut->setFont(mono_font);
+
+        const QFontMetrics fm_track(ui->TrackOut->font());
+        ui->TrackOut->setFixedWidth(fm_track.boundingRect("88.8").width() + 2);
+
+        const QFontMetrics fm_sector(ui->SekcorOut->font());
+        ui->Label1->setFixedWidth(QFontMetrics(ui->Label1->font()).boundingRect("-").width() + 2);
+        ui->SekcorOut->setFixedWidth(qMax(fm_sector.boundingRect("88").width(), fm_sector.boundingRect("--").width()) + 2);
+    }
+
     iGreenLedOff = new QIcon(":/grafik/green_off_32.png");
     iGreenLedOn = new QIcon(":/grafik/green_on_32.png");
 
@@ -78,9 +94,13 @@ WidgetFloppyStatus::WidgetFloppyStatus(QWidget *parent, int floppy_nr, Floppy154
     SetFloppyVolume(2);
 
     ui->PowerLED->setIcon(*iGreenLedOff);
+    ShowFloppyOff();
 
-    old_Sektor = 0;
-    old_Spur = 0;
+    old_Sektor = 255;
+    old_Spur = 255;
+    old_Bereich = 255;
+    pending_Spur = 255;
+    pending_Ticks = 0;
 
     timer = new QTimer(this);
 	timer->setInterval(10);
@@ -102,9 +122,28 @@ WidgetFloppyStatus::~WidgetFloppyStatus()
     if(iError != nullptr) delete iError;
 }
 
+// Anzeige bei ausgeschalteter Floppy: "01.0 - --"
+void WidgetFloppyStatus::ShowFloppyOff()
+{
+    ui->TrackOut->setText("01.0");
+    ui->Label1->setText("-");
+    ui->SekcorOut->setText("--");
+    ui->SekcorOut->setToolTip("");
+    ui->TrackOut->setStatusTip("");
+    ui->SekcorOut->setStatusTip("");
+
+    old_Spur = 255;
+    old_Sektor = 255;
+    old_Bereich = 255;
+    pending_Spur = 255;
+    pending_Ticks = 0;
+}
+
 void WidgetFloppyStatus::RetranslateUi()
 {
     ui->retranslateUi(this);
+    if(!PowerLED)
+        ShowFloppyOff();
     this->update();
 }
 
@@ -123,21 +162,75 @@ void WidgetFloppyStatus::onTimer()
 
 	ui->rw_led->SetBrightness(info.Data_RMS);
 
-    if(old_Spur != (info.Spur))
+    // Spur immer als "NN.0" oder "NN.5" (feste Breite). Das DOS fährt Halbspuren nur im Durchgang an,
+    // eine ungerade Halbspur wird deshalb erst angezeigt, wenn der Kopf dort ca. 50ms stehen bleibt.
+    uint8_t halb_spur = (info.Spur << 1) | info.HalbSpur;
+    if(info.HalbSpur)
     {
-        int spur = info.Spur+1;
-        if(spur > 99)
-            spur = 99;
-        snprintf(str,MAX_STRLEN,"%02d",static_cast<unsigned int>(spur));
-        ui->TrackOut->setText(str);
-        old_Spur = info.Spur;
+        if(pending_Spur != halb_spur)
+        {
+            pending_Spur = halb_spur;
+            pending_Ticks = 0;
+        }
+        if(pending_Ticks < 5 && old_Spur != 255)
+        {
+            pending_Ticks++;
+            halb_spur = old_Spur;   // Noch die zuletzt angezeigte Spur beibehalten
+        }
+    }
+    else
+    {
+        pending_Spur = 255;
+        pending_Ticks = 0;
     }
 
-    if(old_Sektor != info.Sektor)
+    if(old_Spur != halb_spur)
     {
-        snprintf(str,MAX_STRLEN,"%02d",static_cast<unsigned int>(info.Sektor));
-        ui->SekcorOut->setText(str);
-        old_Sektor = info.Sektor;
+        unsigned int spur = halb_spur >> 1;
+        if(spur > 99)
+            spur = 99;
+        snprintf(str,MAX_STRLEN,"%02u.%u",spur,static_cast<unsigned int>(halb_spur & 1));
+        ui->TrackOut->setText(str);
+        old_Spur = halb_spur;
+    }
+
+    // Sektor unter dem Kopf (nur bei laufendem Motor)
+    const uint8_t sektor = info.Motor ? info.Sektor : FLOPPY_SECTOR_NONE;
+    if(old_Sektor != sektor)
+    {
+        if(sektor == FLOPPY_SECTOR_NONE)
+            ui->SekcorOut->setText("--");
+        else
+        {
+            snprintf(str,MAX_STRLEN,"%02u",static_cast<unsigned int>(sektor));
+            ui->SekcorOut->setText(str);
+        }
+        old_Sektor = sektor;
+    }
+
+    // Bereich unter dem Kopf als Tooltip
+    const uint8_t bereich = info.Motor ? info.Bereich : static_cast<uint8_t>(FLOPPY_AREA_NONE);
+    if(old_Bereich != bereich)
+    {
+        switch(bereich)
+        {
+        case FLOPPY_AREA_HEADER:
+            ui->SekcorOut->setToolTip(tr("Kopf über einem Sektor-Header."));
+            break;
+        case FLOPPY_AREA_HEADER_GAP:
+            ui->SekcorOut->setToolTip(tr("Kopf zwischen Sektor-Header und Datenblock."));
+            break;
+        case FLOPPY_AREA_DATA:
+            ui->SekcorOut->setToolTip(tr("Kopf über einem Datenblock."));
+            break;
+        case FLOPPY_AREA_GAP:
+            ui->SekcorOut->setToolTip(tr("Kopf in der Lücke nach einem Sektor."));
+            break;
+        default:
+            ui->SekcorOut->setToolTip(tr("Kein Sektor unter dem Kopf (Motor aus, keine Diskette oder unformatierte Spur)."));
+            break;
+        }
+        old_Bereich = bereich;
     }
 
 	// Icon Anzeigen wenn Floppy Ram $026D != 0
@@ -206,11 +299,14 @@ void WidgetFloppyStatus::SetEnableFloppy(bool status)
 
         floppy->SetEnableFloppy(false);
         timer->stop();
+        ShowFloppyOff();
     }
     else
     {
         PowerLED = true;
         ui->PowerLED->setIcon(*iGreenLedOn);
+        ui->TrackOut->setStatusTip(tr("Aktuelle Spur."));
+        ui->SekcorOut->setStatusTip(tr("Aktueller Sektor."));
         floppy->SetEnableFloppy(true);
         timer->start();
     }
