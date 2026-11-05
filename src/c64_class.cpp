@@ -4808,6 +4808,12 @@ int C64Class::GetSidDumpFrames()
         return current_sid_dump->GetCycleCounts() / (63*312); // a Frame in PAL is 63 Cycles with 312 rasterlines
 }
 
+void C64Class::SetCiaModel(bool old_model)
+{
+    cia1->SetOldModel(old_model);
+    cia2->SetOldModel(old_model);
+}
+
 void C64Class::SetVicConfig(int var, bool enable)
 {
     if(var >= VIC_CONFIG_NUM) return;

@@ -1824,6 +1824,11 @@ bool MOS6510::OneZyklus(void)
             }
             branch_irq_early = false;
 
+            // Nach BRK und nach dem Eintritt in einen Interrupt wird ein NMI um einen Befehl verzoegert
+            // (der erste Befehl der Interrupt Routine wird immer noch ausgefuehrt)
+            if(!CpuWait && (AktOpcode == 0x00 || AktOpcode == 0x101 || AktOpcode == 0x102))
+                nmi_fetch_decision = false;
+
             AktOpcodePC = PC;
             if(Breakpoints[PC] & 1)
             {

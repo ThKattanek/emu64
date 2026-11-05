@@ -18,6 +18,7 @@
 MOS6526::MOS6526(uint8_t cia_nr)
 {
     this->cia_nr = cia_nr;
+    old_model = false;
 
     c64_iec_wire = nullptr;
     floppy_iec_wire = nullptr;
@@ -32,6 +33,11 @@ MOS6526::MOS6526(uint8_t cia_nr)
 
 MOS6526::~MOS6526()
 {
+}
+
+void MOS6526::SetOldModel(bool enable)
+{
+    old_model = enable;
 }
 
 void MOS6526::Reset()
@@ -69,7 +75,7 @@ void MOS6526::Reset()
     icr_ack = 0;
     irq_line = false;
     ifr_done = false;
-    ifr_ack1 = ifr_ack0 = false;
+    ifr_ack1 = ifr_ack0 = ifr_ack_m1 = false;
     ifr_d7set1 = ifr_d7set0 = false;
     ifr_raise1 = ifr_raise0 = false;
     ifr_read0 = ifr_read1 = false;
@@ -186,12 +192,13 @@ inline void MOS6526::IfrRun()
     {
         icr &= ~icr_ack;
         icr_ack = 0;
+        if(old_model) icr &= ~0x80;     // Die alte CIA loescht auch Bit 7
     }
 
     // Ein neues Flag, das freigegeben ist, hebt den Interrupt an. Wurde das ICR im vorigen Takt gelesen, dann einen Takt spaeter.
     if(icr_new & interupt_mask & 0x1F)
     {
-        if(ifr_read0)
+        if(old_model || ifr_read0)
         {
             ifr_raise1 = true;
             ifr_d7set1 = true;
@@ -209,6 +216,7 @@ inline void MOS6526::IfrRun()
     icr_new = 0;
 
     // Alle Stufen einen Takt weiter schieben
+    ifr_ack_m1 = ifr_ack0;
     ifr_ack0 = ifr_ack1;
     ifr_ack1 = false;
     ifr_d7set0 = ifr_d7set1;
@@ -565,10 +573,24 @@ void MOS6526::WriteIO(uint16_t address, uint8_t value)
             interupt_mask &= ~(value & 0x7F);
 
         // Ein anstehendes freigegebenes Flag hebt den Interrupt an (nicht wenn das ICR im vorigen Takt gelesen wurde)
-        if((icr & interupt_mask & 0x7F) && !irq_line && !ifr_read1)
+        if((icr & interupt_mask & 0x7F) && !irq_line)
         {
-            ifr_raise0 = true;
-            ifr_d7set0 = true;
+            if(old_model)
+            {
+                ifr_raise1 = true;
+                ifr_d7set1 = true;
+            }
+            else if(!ifr_read1)
+            {
+                ifr_raise0 = true;
+                ifr_d7set0 = true;
+            }
+        }
+        else if(old_model && ifr_ack_m1)
+        {
+            // Alte CIA: Das ICR wurde vor zwei Takten gelesen, der anstehende Interrupt entfaellt
+            ifr_raise0 = false;
+            ifr_d7set0 = false;
         }
         break;
 
@@ -682,6 +704,20 @@ uint8_t MOS6526::ReadIO(uint16_t address)
         {
             IfrRun();
             ifr_done = true;
+        }
+
+        if(old_model)
+        {
+            // Die alte CIA loescht beim Lesen alle Flags ausser Bit 7 (das folgt zwei Takte spaeter)
+            ifr_ack1 = true;
+            ifr_raise0 = false;
+            ifr_read0 = true;
+
+            ret = icr;
+            icr &= 0x80;
+            icr_new = 0;
+            SetIrqLine(false);
+            return ret;
         }
 
         // Steht der Interrupt kurz vor dem Anheben, dann ist Bit 7 schon zu sehen

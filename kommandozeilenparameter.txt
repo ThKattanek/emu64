@@ -108,6 +108,11 @@ emu64 [PARAMETER]
 
     0=MOS-6569 1=MOS-8565 (C64C)
 
+--set-ciamodel <Modell>
+    Setzt das Modell der beiden CIAs (gilt nur für diesen Start).
+
+    0=MOS-6526 (alt) 1=MOS-6526A (neu)
+
 --multiple-instance
     Ermöglicht das starten mehrerer Emu64 Instanzen.
 

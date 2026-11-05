@@ -57,7 +57,10 @@ SetupWindow::SetupWindow(QWidget *parent, const char *member, VideoCrtClass *vid
     ui->VicSprSprCollisionEnable->setEnabled(true);
     ui->VicSprBgrCollisionEnable->setEnabled(true);
     ui->VicGreyDotsEnable->setEnabled(true);
+    ui->VicModel6569->setEnabled(true);
     ui->VicModel8565->setEnabled(true);
+    ui->CiaModelNew->setEnabled(true);
+    ui->CiaModelOld->setEnabled(true);
 
     // SID Emulation Emu64 oder reSID
     ui->resid_sid->setChecked(true);
@@ -372,7 +375,8 @@ void SetupWindow::LoadINI(C64Class *c64)
         on_VicGreyDotsEnable_toggled(bvalue);
 
         bvalue = ini->value("Model8565",true).toBool();
-        ui->VicModel8565->setChecked(bvalue);
+        if(bvalue) ui->VicModel8565->setChecked(true);
+        else ui->VicModel6569->setChecked(true);
         on_VicModel8565_toggled(bvalue);
 
         //FirstLine PAL: VICE - 16, Emu64 - 26
@@ -400,6 +404,13 @@ void SetupWindow::LoadINI(C64Class *c64)
 
         ui->VideoModes->setCurrentIndex(video_display_mode_index[0]);
 
+        ini->endGroup();
+
+        ini->beginGroup("CIA");
+        bvalue = ini->value("ModelOld",false).toBool();
+        if(bvalue) ui->CiaModelOld->setChecked(true);
+        else ui->CiaModelNew->setChecked(true);
+        on_CiaModelOld_toggled(bvalue);
         ini->endGroup();
 
         ini->beginGroup("MainWindow");
@@ -546,6 +557,10 @@ void SetupWindow::SaveINI()
             ini->setValue(QString(display_name), video_display_mode_index[i]);
         }
 
+        ini->endGroup();
+
+        ini->beginGroup("CIA");
+        ini->setValue("ModelOld",ui->CiaModelOld->isChecked());
         ini->endGroup();
 
         ini->beginGroup("MainWindow");
@@ -1090,6 +1105,11 @@ void SetupWindow::on_VicGreyDotsEnable_toggled(bool checked)
 void SetupWindow::on_VicModel8565_toggled(bool checked)
 {
     c64->SetVicConfig(VIC_MODEL_8565, checked);
+}
+
+void SetupWindow::on_CiaModelOld_toggled(bool checked)
+{
+    c64->SetCiaModel(checked);
 }
 
 void SetupWindow::on_default_pal_c64_clicked()
