@@ -170,8 +170,8 @@ void REUClass::OneZyklus(void)
 
         if(reu_wait_ff00)
         {
-            BA_STATUS = false;		// CPU anhalten
-            cpu_wait_counter = 3;		// 3 Zyklen Warten bis CPU anhält
+            BA_STATUS = false;          // CPU anhalten
+            cpu_wait_counter = 1;		// DMA beginnt im Zyklus nach dem Ausloeser
             tarnsfer_start = true;
             switch(transfer_typ)
             {
@@ -379,8 +379,8 @@ void REUClass::WriteIO2(uint16_t adresse, uint8_t wert)
         {
             if((io[1] & 0x10) == 0x10)
             {
-                BA_STATUS = false;		// CPU anhalten
-                cpu_wait_counter = 3;		// 3 Zyklen Warten bis CPU anhält
+                BA_STATUS = false;          // CPU anhalten
+                cpu_wait_counter = 1;		// DMA beginnt im Zyklus nach dem Ausloeser
                 tarnsfer_start = true;
                 switch(transfer_typ)
                 {
