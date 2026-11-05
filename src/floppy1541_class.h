@@ -61,6 +61,7 @@ public:
     void SetDeviceNumber(uint8_t number);
     void SetWriteProtect(bool status);
     bool LoadDosRom(const char* filename);
+    void SoundCycle();
     bool OneCycle();
     void GetCpuReg(REG_STRUCT *reg, IREG_STRUCT *ireg);
     void SetCpuReg(REG_STRUCT *reg);
