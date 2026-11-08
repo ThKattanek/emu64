@@ -16,6 +16,7 @@
 #define WIDGET_FILE_BROWSE_H
 
 #include <QWidget>
+#include <QSplitter>
 #include <QFileSystemModel>
 #include <QMessageBox>
 #include <QSettings>
@@ -71,6 +72,7 @@ private slots:
     void on_sidebar_customContextMenuRequested(const QPoint &pos);
     void on_listView_filebrowser_customContextMenuRequested(const QPoint &pos);
     void onSplitterMoved();
+    void onZipSplitterMoved();
     void on_listView_filebrowser_activated(const QModelIndex &index);
 
 private:
@@ -90,6 +92,9 @@ private:
     static QSettings *ini;
     static QList<WidgetFileBrowse*> instances;
     static int sidebar_width;
+    static int zip_height;
+    QSplitter *zip_splitter;
+    void ShowZipList(bool show);
     bool ignore_splitter_moved;
 
     QString tmp_path;
