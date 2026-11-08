@@ -24,12 +24,10 @@
 #include "./mos6502_class.h"
 #include "./mos6522_class.h"
 #include "./structs.h"
+#include "./d64_layout.h"
 
 #define MAX_BREAK_GROUP_NUM 255
 
-#define D64_IMAGE_SIZE 174848       // D64 mit 35 Spuren (ohne Fehlerinfo)
-#define D64_IMAGE_SIZE_MAX 205312   // D64 mit 42 Spuren (802 Sektoren)
-#define D64_MAX_SECTORS 802
 #define G64_IMAGE_SIZE 665952
 
 #define SYNC_BIT_THRESHOLD 10   // Minimale Anzahl der aufeinander folgenden 1er Bits die als SYNC Markierung gewertet wird (Naormal ist 10)
@@ -84,6 +82,7 @@ public:
     bool CheckBreakpoints();
     bool CheckImageDirectoryWrite();
     uint8_t *GetCurrentD64ImageBuffer();
+    int GetCurrentD64Tracks();
 
     /// Wird mit den einzelnen Chips verbunden via "bind" ///
 
@@ -139,7 +138,6 @@ private:
 
     /// Variablen ///
 
-    static const uint8_t num_sectors[42];
     static const uint8_t d64_track_zone[43];
     static const uint8_t d64_sector_gap[4];
 

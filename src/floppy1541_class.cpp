@@ -17,14 +17,10 @@
 
 #include <cstring>
 
-const uint8_t Floppy1541::num_sectors[] = {21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,19,19,19,19,19,19,19,18,18,18,18,18,18,17,17,17,17,17,17,17,17,17,17,17,17};
 const uint8_t Floppy1541::d64_track_zone[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
                                               1,1,1,1,1,1,1,
                                               2,2,2,2,2,2,
                                               3,3,3,3,3,3,3,3,3,3,3,3};
-
-// Zeiger auf Track Anfang //	<------------------------- Track 1-17 ----------------------> <------ Track 18-24 ------> <---- Track 25-30 ----> <---- Track 31-36 ---->
-const uint16_t track_index[]={0,0,21,42,63,84,105,126,147,168,189,210,231,252,273,294,315,336,357,376,395,414,433,452,471,490,508,526,544,562,580,598,615,632,649,666,683,700,717,734,751,768,785,802};
 
 const uint8_t Floppy1541::d64_sector_gap[] = {12, 21, 16, 13};  // von GPZ Code übermommen imggen
 //const uint8_t Floppy1541::d64_sector_gap[] = {1, 10, 5, 2};   // Meine alten Werte
@@ -288,14 +284,12 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
             memset(D64Image, 0, sizeof(D64Image));
             memset(D64ErrorMap, 0, sizeof(D64ErrorMap));
 
-            if(file_size >= 205312)      { D64Tracks = 42; D64HasErrorMap = (file_size >= 206114); }
-            else if(file_size >= 196608) { D64Tracks = 40; D64HasErrorMap = (file_size >= 197376); }
-            else if(file_size >= 174848) { D64Tracks = 35; D64HasErrorMap = (file_size >= 175531); }
-            else return false;
+            if(!D64DetectLayout(file_size, &D64Tracks, &D64HasErrorMap))
+                return false;
         }
 
         {
-            size_t image_size = (size_t)track_index[D64Tracks + 1] * 256;
+            size_t image_size = (size_t)D64_TRACK_INDEX[D64Tracks + 1] * 256;
             reading_elements = fread (D64Image,1,image_size,file);
             if(reading_elements != image_size)
             {
@@ -304,7 +298,7 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
 
             if(D64HasErrorMap)
             {
-                size_t sectors = track_index[D64Tracks + 1];
+                size_t sectors = D64_TRACK_INDEX[D64Tracks + 1];
                 if(fread(D64ErrorMap,1,sectors,file) != sectors)
                     D64HasErrorMap = false;
             }
@@ -462,9 +456,9 @@ inline void Floppy1541::CheckImageWrite()
         case D64:
             GCRImageToD64Image();
             fseek(image_file, 0, SEEK_SET);
-            fwrite(D64Image,1,(size_t)track_index[D64Tracks + 1] * 256, image_file);
+            fwrite(D64Image,1,(size_t)D64_TRACK_INDEX[D64Tracks + 1] * 256, image_file);
             if(D64HasErrorMap)
-                fwrite(D64ErrorMap,1,track_index[D64Tracks + 1], image_file);
+                fwrite(D64ErrorMap,1,D64_TRACK_INDEX[D64Tracks + 1], image_file);
             break;
 
         case G64:
@@ -487,7 +481,7 @@ inline void Floppy1541::D64ImageToGCRImage()
         TrackSize[(track-1)*2] = RealTrackSize(track);
         TrackSize[((track-1)*2)+1] = RealTrackSize(track);
         memset(GCRImage + ((track-1)*2) * GCR_TRACK_SIZE, 0x55, TrackSize[(track-1)*2]);   // Lücke bis zum Spurende
-        for(int sector=0; sector<num_sectors[track-1];sector++)
+        for(int sector=0; sector<D64_NUM_SECTORS[track-1];sector++)
         {
             SectorToGCR(track, sector, disk_id);
         }
@@ -526,13 +520,13 @@ inline void Floppy1541::SectorToGCR(unsigned int spur, unsigned int sektor, uint
     uint8_t *P = GCRImage + ((spur-1)*2) * GCR_TRACK_SIZE + sektor * GCRSectorSize(spur);
 
     int TEMP;
-    TEMP=track_index[spur]+(sektor);
+    TEMP=D64_TRACK_INDEX[spur]+(sektor);
     TEMP*=256;
 
     for (int z=0;z<256;z++) block[z]=D64Image[TEMP+z];
 
     // Fehlerinfo des D64 Images (1 = kein Fehler)
-    uint8_t error_code = D64HasErrorMap ? D64ErrorMap[track_index[spur]+sektor] : 1;
+    uint8_t error_code = D64HasErrorMap ? D64ErrorMap[D64_TRACK_INDEX[spur]+sektor] : 1;
     if(error_code == 0x0B)  // 29 Disk ID mismatch (wie VICE: nur ID1 ist invertiert, die Header Pruefsumme passt dazu)
         id1 ^= 0xFF;
 
@@ -720,7 +714,7 @@ inline void Floppy1541::DecodeTrackToD64(unsigned int spur)
             ConvertToD64(g, b1);
             ConvertToD64(g+5, b2);
 
-            if(b1[0] == 0x08 && b1[3] == spur && b1[2] < num_sectors[spur-1] && b1[1] == (uint8_t)(b1[2] ^ b1[3] ^ b2[0] ^ b2[1]))
+            if(b1[0] == 0x08 && b1[3] == spur && b1[2] < D64_NUM_SECTORS[spur-1] && b1[1] == (uint8_t)(b1[2] ^ b1[3] ^ b2[0] ^ b2[1]))
                 pending_sector = b1[2];
         }
         else if(mark == 0x55 && pending_sector >= 0)
@@ -759,7 +753,7 @@ inline void Floppy1541::DecodeTrackToD64(unsigned int spur)
             if(sum != b[1])
                 continue;
 
-            memcpy(D64Image + ((track_index[spur]+sector)*256), block, 256);
+            memcpy(D64Image + ((D64_TRACK_INDEX[spur]+sector)*256), block, 256);
         }
     }
 }
@@ -1651,7 +1645,7 @@ uint16_t Floppy1541::GetDiskIDFromBAM()
 
     int index;
 
-    index = track_index[track] + sector;
+    index = D64_TRACK_INDEX[track] + sector;
     index *= 256;
 
     disk_id = D64Image[index + 162];
@@ -2054,6 +2048,11 @@ bool Floppy1541::CheckImageDirectoryWrite()
 
     return  ret;
 #endif
+}
+
+int Floppy1541::GetCurrentD64Tracks()
+{
+    return D64Tracks;
 }
 
 uint8_t *Floppy1541::GetCurrentD64ImageBuffer()
