@@ -543,6 +543,9 @@ int MainWindow::OnInit(bool nogui)
     /// Audio mit Oszilloskope verbinden
     c64->AudioOutProc = std::bind(&OscilloscopeWindow::AudioStreamEvent,oscilloscope_window,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4);
 
+    /// Nächstes oder Voriges Diskimage wählen
+    c64->NextPrevDiskImage = std::bind(&FloppyWindow::NextPrevDiskimage, floppy_window, std::placeholders::_1);
+
     ////////// Load from INI ///////////
     SplashMessage(tr("Einstellungen werden von INI geladen und gesetzt."),Qt::darkBlue);
     if(ini != nullptr)

@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -113,6 +112,34 @@ QString WidgetFileBrowse::GetAktDir(void)
 QString WidgetFileBrowse::GetAktFile(void)
 {
     return dirmodel->fileName(ui->listView_filebrowser->currentIndex());
+}
+
+void WidgetFileBrowse::SelectRelative(int delta)
+{
+    QAbstractItemModel *m = ui->listView_filebrowser->model();
+    if(!m) return;
+
+    QModelIndex cur = ui->listView_filebrowser->currentIndex();
+    int row = cur.isValid() ? cur.row() + delta : 0;
+    row = qBound(0, row, m->rowCount(ui->listView_filebrowser->rootIndex()) - 1);
+
+    QModelIndex next = m->index(row, 0 , ui->listView_filebrowser->rootIndex());
+    if(!next.isValid()) return;
+
+    ui->listView_filebrowser->setCurrentIndex(next);
+    ui->listView_filebrowser->scrollTo(next);
+
+    on_listView_filebrowser_clicked(next);
+
+    // Prüfen ob Aktuell ausgewählte Datei ein Verzeichnis ist oder nicht
+    // In Abhängigkeit davon den Delete Button setzen
+    if(!dirmodel->fileInfo(ui->listView_filebrowser->currentIndex()).isDir())
+        ui->delete_file->setDisabled(false);
+    else
+        ui->delete_file->setDisabled(true);
+
+
+    emit SelectFile(dirmodel->fileInfo(next).absoluteFilePath());
 }
 
 void WidgetFileBrowse::SetTempDir(QString tmp_path)

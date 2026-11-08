@@ -428,6 +428,7 @@ public:
     bool            loop_thread_end;
     bool            loop_thread_is_end;
 
+    std::function<void(bool next_or_prev)> NextPrevDiskImage;    // true = Next ; false = Prev
     std::function<void(void)> AnimationRefreshProc;
     std::function<void(void)> BreakpointProc;
     std::function<void(const char*)> LogText;

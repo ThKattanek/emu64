@@ -372,7 +372,7 @@ struct C64_KEYS
 {
     unsigned char MatrixCode;
     int SDLKeyCode;
-    bool          Shift;
+    bool Shift;
 };
 
 struct VERSION_NUMBER

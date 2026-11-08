@@ -2994,6 +2994,16 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             }
             break;
 
+        case SDLK_AUDIONEXT:
+            // Kommt nur in Verbindung mit STRG oder ALT
+            if(NextPrevDiskImage != nullptr) NextPrevDiskImage(true);
+            break;
+
+        case SDLK_AUDIOPREV:
+            // Kommt nur in Verbindung mit STRG oder ALT
+            if(NextPrevDiskImage != nullptr) NextPrevDiskImage(false);
+            break;
+
         default:
             break;
         }
