@@ -25,6 +25,7 @@ QStringList WidgetFileBrowse::favorites;
 QSettings *WidgetFileBrowse::ini = nullptr;
 QList<WidgetFileBrowse*> WidgetFileBrowse::instances;
 int WidgetFileBrowse::sidebar_width = 120;
+int WidgetFileBrowse::zip_height = 120;
 
 WidgetFileBrowse::WidgetFileBrowse(QWidget *parent) :
     QWidget(parent),
@@ -45,8 +46,18 @@ WidgetFileBrowse::WidgetFileBrowse(QWidget *parent) :
 
     ui->delete_file->setDisabled(true);
 
-    ui->listWidget_zip->setMinimumHeight(0);
-    ui->listWidget_zip->setMaximumHeight(0);
+    // Dateiliste und ZIP-Inhalt in vertikalem Splitter (Höhe der ZIP-Liste veränderbar)
+    zip_splitter = new QSplitter(Qt::Vertical, this);
+    zip_splitter->setChildrenCollapsible(false);
+    ui->verticalLayout->replaceWidget(ui->listView_filebrowser, zip_splitter);
+    zip_splitter->addWidget(ui->listView_filebrowser);
+    zip_splitter->addWidget(ui->listWidget_zip);
+    zip_splitter->setStretchFactor(0,1);
+    zip_splitter->setStretchFactor(1,0);
+    ui->listWidget_zip->setMinimumHeight(40);
+    ui->listWidget_zip->setMaximumHeight(QWIDGETSIZE_MAX);
+    ui->listWidget_zip->setVisible(false);
+    connect(zip_splitter, &QSplitter::splitterMoved, this, [this](int, int){ onZipSplitterMoved(); });
 
     // Schreibschutzoption defaultmäßig verbergen
     ui->WriteProtected->setVisible(false);
@@ -280,8 +291,7 @@ void WidgetFileBrowse::on_listView_filebrowser_clicked(const QModelIndex &index)
         if("ZIP" == AktFileName.right(3).toUpper())
         {
             ui->listWidget_zip->clear();
-            ui->listWidget_zip->setMaximumHeight(120);
-            ui->listWidget_zip->setMinimumHeight(120);
+            ShowZipList(true);
 
             ui->WriteProtected->setChecked(true);
             ui->WriteProtected->setEnabled(false);
@@ -308,8 +318,7 @@ void WidgetFileBrowse::on_listView_filebrowser_clicked(const QModelIndex &index)
         else
 #endif
         {
-            ui->listWidget_zip->setMaximumHeight(0);
-            ui->listWidget_zip->setMinimumHeight(0);
+            ShowZipList(false);
             ui->WriteProtected->setEnabled(true);
 
             QFileInfo file(AktFileName);
@@ -329,8 +338,7 @@ void WidgetFileBrowse::on_listView_filebrowser_clicked(const QModelIndex &index)
     {
         ui->delete_file->setEnabled(false);
 
-        ui->listWidget_zip->setMaximumHeight(0);
-        ui->listWidget_zip->setMinimumHeight(0);
+        ShowZipList(false);
     }
 }
 
@@ -411,6 +419,7 @@ void WidgetFileBrowse::SetIni(QSettings *_ini, const QString &_local_group, cons
     ini->beginGroup("FileBrowser");
     favorites = ini->value("Favorites").toStringList();
     sidebar_width = ini->value("SidebarWidth", 120).toInt();
+    zip_height = ini->value("ZipHeight", 120).toInt();
     ini->endGroup();
 
     UpdateAllSidebars();
@@ -424,6 +433,7 @@ void WidgetFileBrowse::UpdateAllSidebars()
         w->ignore_splitter_moved = true;
         w->ui->splitter->setSizes(QList<int>() << sidebar_width << qMax(1, w->width() - sidebar_width));
         w->ignore_splitter_moved = false;
+        w->ShowZipList(w->ui->listWidget_zip->isVisible());
         w->SelectSidebarItem(w->akt_fullpath);
     }
 }
@@ -446,6 +456,36 @@ void WidgetFileBrowse::onSplitterMoved()
         w->ignore_splitter_moved = true;
         w->ui->splitter->setSizes(QList<int>() << sidebar_width << qMax(1, w->width() - sidebar_width));
         w->ignore_splitter_moved = false;
+    }
+}
+
+void WidgetFileBrowse::ShowZipList(bool show)
+{
+    ui->listWidget_zip->setVisible(show);
+    if(show)
+    {
+        ignore_splitter_moved = true;
+        zip_splitter->setSizes(QList<int>() << qMax(1, zip_splitter->height() - zip_height) << zip_height);
+        ignore_splitter_moved = false;
+    }
+}
+
+void WidgetFileBrowse::onZipSplitterMoved()
+{
+    if(ignore_splitter_moved || !ui->listWidget_zip->isVisible()) return;
+
+    zip_height = zip_splitter->sizes().value(1);
+    if(ini != nullptr)
+    {
+        ini->beginGroup("FileBrowser");
+        ini->setValue("ZipHeight", zip_height);
+        ini->endGroup();
+    }
+
+    for(WidgetFileBrowse *w : instances)
+    {
+        if(w == this || !w->ui->listWidget_zip->isVisible()) continue;
+        w->ShowZipList(true);
     }
 }
 
