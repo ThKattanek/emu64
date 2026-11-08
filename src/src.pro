@@ -245,6 +245,7 @@ HEADERS += \
     custom_save_file_dialog.h \
     custom_splashscreen.h \
     d64_class.h \
+    d64_layout.h \
     debugger_iec_window.h \
     debugger_vic_window.h \
     debugger_window.h \

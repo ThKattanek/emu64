@@ -19,6 +19,11 @@ D64Class::D64Class()
 {
     file_count = 0;
     d64_size = 0;
+    d64_tracks = 35;
+    d64_has_error_map = false;
+    memset(d64_image, 0, sizeof(d64_image));
+    memset(block, 0, sizeof(block));
+    memset(block_tmp, 0, sizeof(block_tmp));
 
     for(int i=0; i<D64_NAME_LENGHT+1; i++) d64_name[i] = 0;
 }
@@ -62,186 +67,173 @@ bool D64Class::CreateDiskImage(FILE *file, const char *diskname, const char *dis
 
 int D64Class::LoadD64(FILE *file)
 {
-    size_t reading_elements;
-
     if (file == nullptr)
+    {
+        UnLoadD64();
         return 1;
+    }
 
-    reading_elements = fread (d64_image,1,D64_IMAGE_SIZE,file);
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    int tracks;
+    bool has_error_map;
+    if(!D64DetectLayout(file_size, &tracks, &has_error_map))
+    {
+        fclose(file);
+        UnLoadD64();
+        return 1;
+    }
+
+    size_t image_size = static_cast<size_t>(D64_TRACK_INDEX[tracks + 1]) * 256;
+    memset(d64_image, 0, sizeof(d64_image));
+    size_t reading_elements = fread(d64_image, 1, image_size, file);
     fclose(file);
 
-    if(reading_elements != D64_IMAGE_SIZE)
-        return 0;
+    if(reading_elements != image_size)
+    {
+        UnLoadD64();
+        return 1;
+    }
+
+    d64_tracks = tracks;
+    d64_has_error_map = has_error_map;
 
     UpdateImageData();
 
     return 0;
 }
 
-void D64Class::ReLoad(uint8_t *d64_image_buffer)
+void D64Class::ReLoad(const uint8_t *d64_image_buffer, int tracks)
 {
-    memcpy(d64_image, d64_image_buffer, D64_IMAGE_SIZE);
+    if(tracks < 35 || tracks > D64_MAX_TRACKS) tracks = 35;
+
+    memset(d64_image, 0, sizeof(d64_image));
+    memcpy(d64_image, d64_image_buffer, static_cast<size_t>(D64_TRACK_INDEX[tracks + 1]) * 256);
+    d64_tracks = tracks;
     UpdateImageData();
 }
 
 void D64Class::UnLoadD64()
 {
-    for(int i=0; i<D64_IMAGE_SIZE; i++) d64_image[i] = 0;
-    for(int i=0; i<25; i++) d64_name[i] = 0;
-    for(int i=0; i<256; i++)
-    {
-        block[i] = 0;
-        block_tmp[i] = 0;
-    }
+    memset(d64_image, 0, sizeof(d64_image));
+    memset(d64_name, 0, sizeof(d64_name));
+    memset(block, 0, sizeof(block));
+    memset(block_tmp, 0, sizeof(block_tmp));
+    memset(d64_files, 0, sizeof(d64_files));
     file_count = 0;
+    d64_size = 0;
+    d64_tracks = 35;
+    d64_has_error_map = false;
 }
 
 bool D64Class::ExportPrg(int file_number, const char *filename)
 {
-    FILE* file;
+    if(file_number < 0 || file_number >= file_count) return false;
 
-    if(file_count==0) return false;
-
-    file = fopen(filename, "wb");
+    FILE* file = fopen(filename, "wb");
     if (file == nullptr)
-    {
         return false;
-    }
 
     uint8_t current_track = d64_files[file_number].Track;
     uint8_t current_sector = d64_files[file_number].Sektor;
-    uint16_t max_blocks = 683; // Maximal mögliche Blockanzahl auf einem D64 Image
+    uint16_t max_blocks = D64_MAX_SECTORS; // Mehr Blöcke kann das Image nicht enthalten
 
     while(current_track != 0 && max_blocks > 0)
     {
         max_blocks--;
-        ReadBlock(current_track, current_sector, block);
+        if(!ReadBlock(current_track, current_sector, block))
+            break;
         current_track = block[0];
         current_sector = block[1];
-        fwrite(block+2, 1, 254, file);
+        if(current_track != 0)
+            fwrite(block+2, 1, 254, file);
     }
 
-    if(current_track == 0) fwrite(block+2, 1, current_sector - 1, file);
-    else
-    {
-        // Hier ist die maximale anzahl von Blöcken erreicht, was auf ein beschädigtes D64 Image hinweisen könnte
-    }
+    // Letzter Block: block[1] ist der Index des letzten genutzten Bytes
+    if(current_track == 0 && current_sector > 1)
+        fwrite(block+2, 1, current_sector - 1u, file);
+    // Sonst ist die maximale Blockanzahl erreicht oder ein Block ungültig: Image vermutlich beschädigt
 
     fclose(file);
     return true;
 }
 
-void D64Class::ReadBlock(uint8_t track, uint8_t sector, uint8_t *buffer)
+bool D64Class::ReadBlock(uint8_t track, uint8_t sector, uint8_t *buffer)
 {
-    // Zeiger auf Track Anfang //	     <------------------------- Track 1-17 ----------------------> <------ Track 18-24 ------> <---- Track 25-30 ----> <-- Track 31-35 -->
-    static uint16_t track_index[36]={0,0,21,42,63,84,105,126,147,168,189,210,231,252,273,294,315,336,357,376,395,414,433,452,471,490,508,526,544,562,580,598,615,632,649,666};
-    // Sektoren pro Track //			  <------------------ Track 1-17 ------------------> <--- Track 18-24 --> <- Track 25-30 -> <-  31-35   ->
-    static uint16_t track_max_sector[36]={0,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,19,19,19,19,19,19,19,18,18,18,18,18,18,17,17,17,17,17};
-
-    if(track > 35)
+    if(track < 1 || track > d64_tracks || sector >= D64_NUM_SECTORS[track-1])
     {
-        for (int z=0;z<256;z++) buffer[z]=0;
-        return;
+        memset(buffer, 0, 256);
+        return false;
     }
 
-    if(sector >= track_max_sector[track])
-    {
-        for (int z=0;z<256;z++) buffer[z]=0;
-        return;
-    }
-
-    int tmp;
-
-    tmp = track_index[track] + sector;
-    tmp *= 256;
-    for (int z=0; z<256; z++) buffer[z] = d64_image[tmp + z];
-}
-
-void D64Class::OutputBlock(uint8_t *buffer)
-{
-    for(int i=0; i<16; i++)
-    {
-        int adr = i*16;
-        for(int j=0; j<16; j++)
-        {
-            printf("%2.2X ",buffer[adr+j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
+    memcpy(buffer, d64_image + (D64_TRACK_INDEX[track] + sector) * 256, 256);
+    return true;
 }
 
 void D64Class::UpdateImageData()
 {
-    uint8_t track, sector;
+    file_count = 0;
+    d64_size = 0;
+    memset(d64_name, 0, sizeof(d64_name));
 
-    ReadBlock(18, 0, block);
+    if(!ReadBlock(18, 0, block))
+        return;
 
-    // OutputBlock(Block);
+    uint8_t track = block[0];
+    uint8_t sector = block[1];
 
-    track = block[0];
-    sector = block[1];
+    for (int z=0; z<23; z++)
+        d64_name[z] = static_cast<char>(block[0x90+z]);
 
     // Wenn Spur oder Sektor außerhalb der D64 Spezifikation ist
     // wird der Standard Ort gesetzt (18/1)
-    if(track > 35) track = 18;
-    if(sector > 21) sector = 1;
+    if(track < 1 || track > d64_tracks) track = 18;
+    if(sector >= D64_NUM_SECTORS[track-1]) sector = 1;
 
-    for (int z=0; z<23; z++)
+    // Directory Kette durchlaufen. Jeder Sektor wird nur einmal besucht (Schutz vor Schleifen)
+    static bool visited[D64_MAX_SECTORS];
+    memset(visited, 0, sizeof(visited));
+
+    while(track != 0 && file_count < D64_MAX_FILES)
     {
-        d64_name[z] = static_cast<char>(block[0x90+z]);
-    }
+        if(!ReadBlock(track, sector, block))
+            break;
 
-    d64_name[D64_NAME_LENGHT]=0;
+        int sector_index = D64_TRACK_INDEX[track] + sector;
+        if(visited[sector_index])
+            break;
+        visited[sector_index] = true;
 
-    file_count=0;
+        uint8_t next_track = block[0];
+        uint8_t next_sector = block[1];
 
-    if(track != 0)
-    {
-        L20:
-        int si = 0;
-        int bx = 0;
-
-        ReadBlock(track, sector,block);
-
-        if(!((track == block[0]) && (sector == block[1])))
+        for(int si=0; si<256 && file_count < D64_MAX_FILES; si+=32)
         {
-            track = block[0];
-            sector = block[1];
-            L30:
-            d64_files[file_count].Typ = block[si+2];
+            // Leerer Eintrag (Typ und Spur 0) überspringen. Gelöschte Dateien (Typ ohne
+            // Bit 7, "Splat-Files") bleiben erhalten, die GUI blendet sie optional aus.
+            if(block[si+2] == 0 && block[si+3] == 0)
+                continue;
 
-            if(block[si+3] != 0xFF)
-            {
-                d64_files[file_count].Track = block[si+3];
-                d64_files[file_count].Sektor = block[si+4];
+            D64_FILES &entry = d64_files[file_count];
+            entry.Typ = block[si+2];
+            entry.Track = block[si+3];
+            entry.Sektor = block[si+4];
 
-                ReadBlock(block[si+3],block[si+4], block_tmp);
-                d64_files[file_count].Adresse = static_cast<uint16_t>(block_tmp[3] << 8);
-                d64_files[file_count].Adresse += block_tmp[2];
+            ReadBlock(entry.Track, entry.Sektor, block_tmp);
+            entry.Adresse = static_cast<uint16_t>((block_tmp[3] << 8) | block_tmp[2]);
+            entry.Laenge = static_cast<uint16_t>((block[si+31] << 8) | block[si+30]);
 
-                uint16_t tmp;
-                tmp = static_cast<uint16_t>(block[si+31] << 8);
-                tmp += block[si+30];
-                d64_files[file_count].Laenge = tmp;
+            for (int z=0; z<16; z++)
+                entry.Name[z] = static_cast<char>(block[si+5+z]);
+            entry.Name[16] = 0;
 
-                d64_files[file_count].Name[16] = 0;
-
-                for (int z=0; z<16; z++)
-                {
-                    d64_files[file_count].Name[z] = static_cast<char>(block[si+5+z]);
-                }
-
-                si += 32;
-                bx++;
-                file_count++;
-
-                d64_size += d64_files[file_count].Laenge;
-
-
-                if (bx<8) goto L30;
-                else goto L20;
-            }
+            d64_size += entry.Laenge;
+            file_count++;
         }
+
+        track = next_track;
+        sector = next_sector;
     }
 }

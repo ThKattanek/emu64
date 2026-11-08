@@ -454,7 +454,7 @@ void FloppyWindow::OnCheckWriteDiskImageDir()
 
     if(c64->floppy[floppy_nr]->CheckImageDirectoryWrite())
     {
-       d64[ui->FloppySelect->currentIndex()].ReLoad(c64->floppy[floppy_nr]->GetCurrentD64ImageBuffer());
+       d64[ui->FloppySelect->currentIndex()].ReLoad(c64->floppy[floppy_nr]->GetCurrentD64ImageBuffer(), c64->floppy[floppy_nr]->GetCurrentD64Tracks());
        RefreshD64FileList();
     }
 }
