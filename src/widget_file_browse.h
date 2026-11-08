@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 02.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -42,6 +41,7 @@ public:
     void SetFileFilter(const QStringList & filters);
     QString GetAktDir(void);
     QString GetAktFile(void);
+    void SelectRelative(int delta);
     void SetTempDir(QString tmp_path);
     void SetAktDir(QString akt_dir);
     void SetAktFile(QString akt_dir, QString akt_file);

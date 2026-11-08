@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 13.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -113,6 +112,31 @@ QString WidgetFileBrowse::GetAktDir(void)
 QString WidgetFileBrowse::GetAktFile(void)
 {
     return dirmodel->fileName(ui->listView_filebrowser->currentIndex());
+}
+
+void WidgetFileBrowse::SelectRelative(int delta)
+{
+    QAbstractItemModel *m = ui->listView_filebrowser->model();
+    if(!m || delta == 0) return;
+
+    const QModelIndex root = ui->listView_filebrowser->rootIndex();
+    const int count = m->rowCount(root);
+    const int step = delta > 0 ? 1 : -1;
+
+    const QModelIndex cur = ui->listView_filebrowser->currentIndex();
+    int row = cur.isValid() ? cur.row() : (step > 0 ? -1 : count);
+
+    // In Richtung step die nächste Datei suchen (Verzeichnisse überspringen)
+    for(row += step; row >= 0 && row < count; row += step)
+    {
+        const QModelIndex idx = m->index(row, 0, root);
+        if(dirmodel->fileInfo(idx).isDir()) continue;
+
+        // Löst über currentRowChanged die Auswahl (SelectFile) genau einmal aus
+        ui->listView_filebrowser->setCurrentIndex(idx);
+        ui->listView_filebrowser->scrollTo(idx);
+        return;
+    }
 }
 
 void WidgetFileBrowse::SetTempDir(QString tmp_path)

@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -20,6 +19,8 @@
 #include "./ui_floppy_window.h"
 #include "./c64_file_types.h"
 #include "./utils.h"
+#include "./floppy_new_d64_window.h"
+#include "./custom_save_file_dialog.h"
 
 #define MAX_D64_FILES 128
 
@@ -466,6 +467,11 @@ QString FloppyWindow::GetAktFilename(int floppynr)
 QString FloppyWindow::GetAktD64Name(int floppynr)
 {
     return ConvC64Name(d64[floppynr].d64_name, true);
+}
+
+void FloppyWindow::NextPrevDiskimage(bool next)
+{
+    ui->FileBrowser->SelectRelative(next ? 1 : -1);
 }
 
 void FloppyWindow::RefreshD64FileList()

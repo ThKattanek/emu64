@@ -2,6 +2,7 @@ Alle Änderungen ab V5.2.0 bis jetzt
 -----------------------------------
 
 - NEW! [#325] FileBrowser: Neue einklappbare Seitenleiste (Cartridge-, Floppy- und Tape-Fenster) mit Favoriten (Rechtsklick auf Ordner; global für alle Fenster oder lokal nur für das jeweilige Fenster), Orten (Home, Desktop, Dokumente, Downloads) und allen Laufwerken inklusive Netzlaufwerken. Die Breite der Seitenleiste wird in der Ini gespeichert. Die Laufwerks-ComboBox entfällt.
+- NEW! Floppy - Mit den Medientasten „Nächster/Voriger Titel“ (SDLK_AUDIONEXT/AUDIOPREV) wird im Floppy-Fenster das nächste bzw. vorige Diskimage der Dateiliste gewählt (Verzeichnisse werden übersprungen)
 - NEW! [#361] CIA: Modell der alten MOS 6526 (Interrupt-Ausgang und Bit 7 im ICR kommen einen Takt später, ICR-Lesen löscht alle Flags außer Bit 7). Auswahl im Setup (Gruppe CIA, Radiobuttons MOS 6526A neu / MOS 6526 alt, Standard neu) und per Kommandozeilenparameter --set-ciamodel <0|1> (0=MOS-6526, 1=MOS-6526A). Lorenz irq/nmi und viele weitere cia-old Tests der VICE-Testbench laufen damit durch
 - Fixed: 6510 - Ein NMI direkt nach BRK bzw. nach dem Eintritt in einen Interrupt wird jetzt um einen Befehl verzögert (der erste Befehl der Interrupt-Routine wird noch ausgeführt, wie in VICE). Lorenz nminew läuft damit durch [#361]
 - NEW! VIC - Das VIC-II Modell (6569 / 8565) wird im Setup jetzt über zwei Radiobuttons gewählt (statt einer Checkbox)

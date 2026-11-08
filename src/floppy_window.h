@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 11.09.2019                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -24,8 +23,6 @@
 
 #include "./d64_class.h"
 #include "./c64_class.h"
-#include "./floppy_new_d64_window.h"
-#include "./custom_save_file_dialog.h"
 
 namespace Ui {
     class FloppyWindow;
@@ -46,6 +43,8 @@ public:
     QString GetAktFilename(int floppynr);
     QString GetAktD64Name(int floppynr);
     QStringList FileTypes;
+
+    void NextPrevDiskimage(bool next);
 
 signals:
     void ChangeFloppyImage(int floppynr);
