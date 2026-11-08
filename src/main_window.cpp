@@ -544,7 +544,11 @@ int MainWindow::OnInit(bool nogui)
     c64->AudioOutProc = std::bind(&OscilloscopeWindow::AudioStreamEvent,oscilloscope_window,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4);
 
     /// Nächstes oder Voriges Diskimage wählen
-    c64->NextPrevDiskImage = std::bind(&FloppyWindow::NextPrevDiskimage, floppy_window, std::placeholders::_1);
+    /// (Aufruf kommt aus dem Emulations-Thread, die GUI wird deshalb im GUI-Thread angesprochen)
+    c64->NextPrevDiskImage = [this](bool next)
+    {
+        QMetaObject::invokeMethod(floppy_window, [this, next]() { floppy_window->NextPrevDiskimage(next); }, Qt::QueuedConnection);
+    };
 
     ////////// Load from INI ///////////
     SplashMessage(tr("Einstellungen werden von INI geladen und gesetzt."),Qt::darkBlue);

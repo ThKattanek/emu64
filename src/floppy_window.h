@@ -44,7 +44,7 @@ public:
     QString GetAktD64Name(int floppynr);
     QStringList FileTypes;
 
-    void NextPrevDiskimage(bool next_prev);
+    void NextPrevDiskimage(bool next);
 
 signals:
     void ChangeFloppyImage(int floppynr);

@@ -117,29 +117,26 @@ QString WidgetFileBrowse::GetAktFile(void)
 void WidgetFileBrowse::SelectRelative(int delta)
 {
     QAbstractItemModel *m = ui->listView_filebrowser->model();
-    if(!m) return;
+    if(!m || delta == 0) return;
 
-    QModelIndex cur = ui->listView_filebrowser->currentIndex();
-    int row = cur.isValid() ? cur.row() + delta : 0;
-    row = qBound(0, row, m->rowCount(ui->listView_filebrowser->rootIndex()) - 1);
+    const QModelIndex root = ui->listView_filebrowser->rootIndex();
+    const int count = m->rowCount(root);
+    const int step = delta > 0 ? 1 : -1;
 
-    QModelIndex next = m->index(row, 0 , ui->listView_filebrowser->rootIndex());
-    if(!next.isValid()) return;
+    const QModelIndex cur = ui->listView_filebrowser->currentIndex();
+    int row = cur.isValid() ? cur.row() : (step > 0 ? -1 : count);
 
-    ui->listView_filebrowser->setCurrentIndex(next);
-    ui->listView_filebrowser->scrollTo(next);
+    // In Richtung step die nächste Datei suchen (Verzeichnisse überspringen)
+    for(row += step; row >= 0 && row < count; row += step)
+    {
+        const QModelIndex idx = m->index(row, 0, root);
+        if(dirmodel->fileInfo(idx).isDir()) continue;
 
-    on_listView_filebrowser_clicked(next);
-
-    // Prüfen ob Aktuell ausgewählte Datei ein Verzeichnis ist oder nicht
-    // In Abhängigkeit davon den Delete Button setzen
-    if(!dirmodel->fileInfo(ui->listView_filebrowser->currentIndex()).isDir())
-        ui->delete_file->setDisabled(false);
-    else
-        ui->delete_file->setDisabled(true);
-
-
-    emit SelectFile(dirmodel->fileInfo(next).absoluteFilePath());
+        // Löst über currentRowChanged die Auswahl (SelectFile) genau einmal aus
+        ui->listView_filebrowser->setCurrentIndex(idx);
+        ui->listView_filebrowser->scrollTo(idx);
+        return;
+    }
 }
 
 void WidgetFileBrowse::SetTempDir(QString tmp_path)

@@ -469,18 +469,9 @@ QString FloppyWindow::GetAktD64Name(int floppynr)
     return ConvC64Name(d64[floppynr].d64_name, true);
 }
 
-void FloppyWindow::NextPrevDiskimage(bool next_prev)
+void FloppyWindow::NextPrevDiskimage(bool next)
 {
-    if(next_prev)
-    {
-        //qDebug() << "Nächstes Diskimage setzen" << ui->FileBrowser->GetCurrentFileCount();
-        ui->FileBrowser->SelectRelative(1);
-    }
-    else
-    {
-        //qDebug() << "Voriges Diskimage1 setzen" << ui->FileBrowser->GetCurrentFileCount();
-        ui->FileBrowser->SelectRelative(-1);
-    }
+    ui->FileBrowser->SelectRelative(next ? 1 : -1);
 }
 
 void FloppyWindow::RefreshD64FileList()
