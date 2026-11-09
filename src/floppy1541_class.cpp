@@ -1635,6 +1635,19 @@ inline void Floppy1541::PokeGCRByte(uint32_t pos, uint8_t value)
     }
 }
 
+// Das DOS der 1541 liest die Disk-ID erst beim ersten Diskzugriff (INITIALIZE) nach $12/$13.
+// Nachlader, die ohne vorherigen Zugriff direkt per Job (z.B. JSR $D586) lesen, bekommen sonst
+// "ID mismatch" (Fehler 11). Beim PRG-Autostart aus dem Floppy-Fenster fehlt dieser Zugriff.
+void Floppy1541::InitDosDiskId()
+{
+    if(!FloppyEnabled || image_file == nullptr || ImageTyp != D64) return;
+    if(RAM[0x12] != 0 || RAM[0x13] != 0) return;
+
+    uint16_t disk_id = GetDiskIDFromBAM();
+    RAM[0x12] = static_cast<uint8_t>(disk_id);
+    RAM[0x13] = static_cast<uint8_t>(disk_id >> 8);
+}
+
 uint16_t Floppy1541::GetDiskIDFromBAM()
 {
     // position for BAM

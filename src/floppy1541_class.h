@@ -56,6 +56,7 @@ public:
     void SetFloppySoundVolume(float_t volume);
     bool LoadDiskImage(FILE *file, int typ);		// 0=D64 , 1=G64
     void UnLoadDiskImage();
+    void InitDosDiskId();                       // Setzt die Disk-ID im Floppy-RAM ($12/$13), falls das DOS die Disk noch nicht initialisiert hat (D64)
     void SetC64IEC(uint8_t* port);
     void SetDeviceNumber(uint8_t number);
     void SetWriteProtect(bool status);
