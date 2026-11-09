@@ -12,6 +12,7 @@ Alle Änderungen ab V5.2.0 bis jetzt
 - [#77] NEW! VIC - Einstellung „VIC-II 8565 (C64C)“ im Setup (Gruppe VIC, Standard aus = 6569): Beim 8565 wirkt der Videomodus ($d011) auf die Grafik-Abrufe (auch im Idle-Zustand) einen Zyklus später. Damit funktioniert der „9 Sprites“-Trick (nine_sprites.prg: Idle-Grafik aus $39FF im offenen Rahmen) wie bei VICE
 - NEW! Debugger - Option "Gesamtes Bild": zeigt alle Rasterzeilen und alle Zyklen (504 Pixel) des VIC, auch Rand und Austastlücke (nur für die Sitzung)
 - NEW! Kommandozeilenparameter --nosound schaltet die Audio-Ausgabe stumm (der Audiopuffer wird mit Nullen gefüllt, die Taktung bleibt unverändert). Bei --nogui ist das automatisch aktiv
+- Fixed: [#322] Floppy - Beim PRG-Autostart aus dem Floppy-Fenster wird die Disk-ID im DOS-RAM ($12/$13) gesetzt. Nachlader, die ohne vorherigen Diskzugriff per Job lesen (z.B. Spindle), bekamen "ID mismatch" und hingen.
 - [#352] Fixed: REU - Ein DMA-Transfer begann 2 Zyklen zu spät (Wartezähler 3 statt 1), VICE startet im Zyklus nach dem auslösenden Schreibzugriff. Programme, die DMAs zyklusgenau gegen Raster-IRQs takten (z.B. Blue-REU-Demo, Videoplayer), verloren dadurch die Synchronisation und zeigten jedes 4. Frame als Datenmüll.
 - Fixed: Debugger - Assembler: Die Folgeadresse war bei einem unbekannten Adressierungstyp nicht initialisiert.
 - Fixed: 1541 läuft jetzt mit 1 MHz (Fastloader, #354/#351/#355)

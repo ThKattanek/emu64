@@ -3447,6 +3447,7 @@ int SDLThreadLoad(void *userdat)
         break;
     case 1:
         // PRG + C64 Files
+        c64->floppy[0]->InitDosDiskId();
         if(0 == c64->LoadSingleFile(c64->auto_load_file, c64->auto_load_filename, c64->auto_load_file_typ, &PRGStartAdresse))
         {
             if(PRGStartAdresse <= 0x0801) sprintf(c64->auto_load_command_line,"RUN%c",13);
