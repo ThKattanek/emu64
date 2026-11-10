@@ -620,7 +620,11 @@ inline void Floppy1541::InitEmptyTracks()
     for (int half_track=0; half_track<NUM_TRACKS*2; half_track++)
     {
         if(TrackSize[half_track] == 0)
-            TrackSize[half_track] = RealTrackSize((half_track >> 1) + 1);
+        {
+            // Hinter Spur 35 stellt die ROM PB6:5 = 10 ein (28 Takte/Byte): 7142 Bytes ergeben dort wie bei VICE 200 ms je Umdrehung
+            const unsigned int spur = (half_track >> 1) + 1;
+            TrackSize[half_track] = (spur > 35) ? 7142 : RealTrackSize(spur);
+        }
     }
 }
 
@@ -1360,8 +1364,8 @@ inline void Floppy1541::RotateDisk()
     if ((AktHalbSpur > ((NUM_TRACKS-1) * 2)) || (GCR_PTR == nullptr) || (GCRBitTrackSize == 0))
         return;
 
-    unsigned int spur = (AktHalbSpur >> 1) + 1;
-    int cycles_per_byte = 26 + 2 * d64_track_zone[spur];
+    // Die Lesegeschwindigkeit kommt wie bei der echten Hardware aus den Dichte-Bits PB6:5 von VIA2 (11 = schnellste Zone, 26 Takte/Byte)
+    int cycles_per_byte = 26 + 2 * (3 - ((via2->GetIO_Zero() >> 5) & 3));
 
     BitAccu += 8;
     if(BitAccu < cycles_per_byte)
