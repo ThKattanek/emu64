@@ -3,7 +3,7 @@
 
 **EMU64** ist ein Emulator für den Commodore 64, einen legendären Home-Computer aus den 1980er Jahren. Das Projekt bietet authentische Emulation mit umfangreichen Features für Retro-Gaming und Softwareentwicklung.
 
-### [Letzte offizielle Linuix & Windows Version](https://github.com/ThKattanek/emu64/releases/latest)
+### [Letzte offizielle Linux & Windows Version](https://github.com/ThKattanek/emu64/releases/latest)
 (Die Windows Version (32 + 64Bit) läuft auch unter Linux mit Wine - getestet unter Kubuntu 26.04 LTS)
 
 ## Inhaltsverzeichnis
@@ -14,10 +14,17 @@
 - [Lizenz](#lizenz)
 
 ## Features
-- Authentischer Commodore 64 Emulator
+- Authentischer, zyklusgenauer Commodore 64 Emulator (6510, VIC-II 6569/8565, CIA 6526/6526A, SID, 1541)
 - Multi-Plattform Support (Windows, Linux)
-- SDL2-basierte Audio- und Video-Ausgabe
-- Unterstützung für verschiedene Roms und Dateiformate
+- SDL2-basierte Audio- und Video-Ausgabe, OpenGL mit CRT-Emulation (Shader/Filter)
+- SID wahlweise mit eigener Engine oder reSID (zur Laufzeit wählbar)
+- Bitgenaue 1541-Floppyemulation (D64 mit 35/40/42 Spuren, G64, Fastloader), Datasette (TAP, T64)
+- Steckmodule (CRT, u.a. EasyFlash), REU und GeoRAM
+- Eingebauter Debugger mit zyklusgenauer Einzelschrittanzeige des Bildaufbaus
+- Warp-Modus, Videoaufnahme (ffmpeg), Screenshots, Snapshots
+- Kommandozeilenparameter für Autostart und Headless-Läufe (`--nogui`, `--autostart`, `--limitcycles`, ...), siehe [kommandozeilenparameter.txt](kommandozeilenparameter.txt)
+- Tastenbelegung siehe [hotkeys.txt](hotkeys.txt), Änderungen siehe [änderungen.txt](änderungen.txt)
+- Mehrsprachige Oberfläche (Deutsch, Englisch)
 - Qt6 oder Qt5 GUI
 
 ## Links
@@ -35,14 +42,16 @@
 ### Emu64 erstellen unter Linux
 
 #### Wichtige Voraussetzungen
-- qttools6-dev oder qt5
+- C++17-Compiler (gcc oder clang), make, pkg-config
+- qttools6-dev (Qt6) oder Qt5 inkl. Qt-Tools
 
 #### Erforderliche Bibliotheken
 - qt6 oder qt5
 - sdl2
 - sdl2-image
-- png
-- quazip5
+- libpng
+- OpenGL und GLU (`gl`, `glu`)
+- quazip (`quazip1-qt5` bzw. die Qt6-Variante)
 - ffmpeg (mit: avcodec, avutil, swresample, avformat, swscale)
 
 #### Build- und Installationsanleitung
@@ -51,12 +60,15 @@ git clone https://github.com/ThKattanek/emu64.git
 cd emu64
 # Optional: Eine spezifische Release-Version verwenden (z.B. 5.2.0)
 # git checkout 5.2.0
-mkdir build
-cd build
-qmake6 .. PREFIX="/usr/local"
+# Die Version wird aus `git describe` ermittelt
+mkdir -p build/tmp
+cd build/tmp
+qmake6 ../.. PREFIX="/usr/local"
 make -j$(nproc)
 sudo make install
 ```
+
+Für Qt5 statt `qmake6` einfach `qmake` verwenden. Das Verzeichnis `build/` wird von Git ignoriert.
 
 #### Übersetzung aktualisieren
 Um die Übersetzung auf andere Sprachen zu aktualisieren, müssen die `*.ts`-Dateien aktualisiert werden:
@@ -89,6 +101,9 @@ xargs rm < install_manifest.txt
 ```
 
 **Hinweis:** Verzeichnisse, die während der Installation erstellt wurden, werden nicht entfernt, aber alle Dateien werden gelöscht.
+
+#### Tests
+Die Emulationsgenauigkeit wird mit der VICE-Testbench geprüft, siehe [testbench/README.md](testbench/README.md).
 
 #### Weitere Informationen
 Detaillierte Anleitungen für ein Windows-Build mit MXE:
