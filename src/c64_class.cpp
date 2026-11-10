@@ -3501,7 +3501,7 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
         return 0;
         break;
 
-    case G64:
+    case G64: case NIB:
         if(!LoadDiskImage(floppy_nr, file, typ)) return 3;
 
         KillCommandLine();

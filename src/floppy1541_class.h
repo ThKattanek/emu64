@@ -54,7 +54,7 @@ public:
     void* GetSoundBuffer();
     void ZeroSoundBufferPos();
     void SetFloppySoundVolume(float_t volume);
-    bool LoadDiskImage(FILE *file, int typ);		// 0=D64 , 1=G64
+    bool LoadDiskImage(FILE *file, int typ);		// D64, G64 oder NIB (siehe c64_file_types.h)
     void UnLoadDiskImage();
     void InitDosDiskId();                       // Setzt die Disk-ID im Floppy-RAM ($12/$13), falls das DOS die Disk noch nicht initialisiert hat (D64)
     void SetC64IEC(uint8_t* port);
@@ -116,6 +116,8 @@ private:
     /// Funktionen ///
 
     void CheckImageWrite();
+    bool NIBImageToGCRImage(FILE *file);
+    uint16_t NIBTrackToGCR(const uint8_t *raw, unsigned int density, uint8_t *destination);
     void D64ImageToGCRImage();
     void SectorToGCR(unsigned int spur, unsigned int sektor, uint16_t disk_id);
     void ConvertToGCR(uint8_t *source_buffer, uint8_t *destination_buffer);

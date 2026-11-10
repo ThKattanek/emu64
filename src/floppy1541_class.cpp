@@ -424,8 +424,213 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
 
         return true;
         break;
+
+    case NIB:
+        // Diskwechsel simulieren
+        StartDiskChange();
+
+        if (file == nullptr)
+            return false;
+
+        for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i]=0x00;
+        for(int i=0;i<NUM_TRACKS*2;i++)
+            TrackSize[i] = 0;
+
+        if(!NIBImageToGCRImage(file))
+            return false;
+
+        InitEmptyTracks();
+
+        GCRBitTrackSize = TrackSize[AktHalbSpur] * 8;
+        GCRBitTrackPos = 0;
+
+        UpdateGCRPointer();
+        SectorMapDirty = true;
+
+        ImageWriteStatus = false;
+        ImageDirectoryWriteStatus = false;
+        ImageTyp = NIB;
+
+        return true;
+        break;
     }
     return false;
+}
+
+// NIB Image (MNIB-1541-RAW, nibtools): 256 Byte Header, danach je Halbspur 8192 Bytes Rohdaten (GCR Bytes wie sie der Lesekopf liefert).
+// Header: Offset 0 Kennung "MNIB-1541-RAW", ab Offset 16 je Halbspur 2 Bytes (Halbspurnummer 2=Spur 1, 3=Spur 1.5, 4=Spur 2 ... und Dichte in Bit 0-1), Ende bei Halbspurnummer 0.
+// Die Spurdaten folgen in der Reihenfolge der Header Eintraege.
+bool Floppy1541::NIBImageToGCRImage(FILE *file)
+{
+    static const uint32_t NIB_HEADER_SIZE = 256;
+    static const uint32_t NIB_TRACK_SIZE = 8192;
+    static const uint32_t NIB_MAX_ENTRIES = (NIB_HEADER_SIZE - 16) / 2;
+
+    uint8_t header[NIB_HEADER_SIZE];
+    uint8_t raw[NIB_TRACK_SIZE];
+
+    if(fseek(file, 0, SEEK_SET) != 0)
+        return false;
+
+    if(fread(header, 1, NIB_HEADER_SIZE, file) != NIB_HEADER_SIZE)
+        return false;
+
+    if(0 != memcmp(header, "MNIB-1541-RAW", 13))
+        return false;
+
+    int loaded_tracks = 0;
+
+    for(uint32_t entry=0; entry<NIB_MAX_ENTRIES; entry++)
+    {
+        const unsigned int half_track_nr = header[16 + entry*2];
+        const unsigned int density = header[17 + entry*2];
+
+        if(half_track_nr == 0)
+            break;
+
+        // Unvollstaendige Datei: Es zaehlen nur komplette Spuren
+        if(fread(raw, 1, NIB_TRACK_SIZE, file) != NIB_TRACK_SIZE)
+            break;
+
+        // Halbspurnummer 2 = Spur 1 = Halbspur 0 im Emulator
+        if(half_track_nr < 2 || half_track_nr - 2 >= (unsigned int)(NUM_TRACKS*2))
+            continue;
+
+        const unsigned int half_track = half_track_nr - 2;
+        const uint16_t size = NIBTrackToGCR(raw, density, GCRImage + half_track * GCR_TRACK_SIZE);
+        TrackSize[half_track] = size;
+        loaded_tracks++;
+    }
+
+    return loaded_tracks > 0;
+}
+
+// Schneidet aus den 8192 Rohbytes einer Spur genau eine Umdrehung heraus (liefert die Laenge in Bytes, 0 = unformatierte Spur ohne Sync).
+// Der Dump enthaelt mehr als eine Umdrehung und beginnt an beliebiger Stelle. Die Umdrehungslaenge steht nicht im Image und wird gesucht:
+// Ab einem Spuranfang (erstes Byte hinter einem Sync) wird um die Nominallaenge der Dichte herum der Punkt gesucht, an dem sich die Daten wiederholen.
+// Die Syncs werden dabei auf ein Byte zusammengefasst, weil ihre Laenge von Umdrehung zu Umdrehung um ein Byte abweichen kann.
+// Ohne eindeutige Wiederholung (z.B. gezielt zerstoerte Spur) wird die Nominallaenge ab dem ersten Sync verwendet.
+uint16_t Floppy1541::NIBTrackToGCR(const uint8_t *raw, unsigned int density, uint8_t *destination)
+{
+    static const uint32_t RAW_SIZE = 8192;
+    static const uint32_t SEARCH_RANGE = 500;           // Suchbereich um die Nominallaenge (Laufwerke drehen etwas schneller oder langsamer)
+    static const uint32_t MIN_COMPARE = 128;            // Mindestlaenge des Vergleichs (nach dem Zusammenfassen der Syncs)
+    static const int MIN_SCORE = 600;                   // Mindest-Uebereinstimmung in Promille
+    static const int GOOD_SCORE = 950;                  // Ab hier wird nicht weiter gesucht
+    static const unsigned int MAX_STARTS = 8;           // Anzahl Spuranfaenge, die probiert werden
+    static const uint16_t nominal_size[4] = {6250, 6666, 7142, 7692};
+
+    const uint32_t nominal = nominal_size[density & 3];
+
+    uint8_t c[RAW_SIZE];            // Spur mit zusammengefassten Syncs
+    uint16_t idx[RAW_SIZE];         // Position des Bytes in den Rohdaten
+    uint32_t nc = 0;
+    uint32_t ff_count = 0;
+
+    for(uint32_t i=0; i<RAW_SIZE; i++)
+    {
+        if(raw[i] == 0xFF)
+        {
+            ff_count++;
+            if(nc > 0 && c[nc-1] == 0xFF)
+                continue;
+        }
+        c[nc] = raw[i];
+        idx[nc] = (uint16_t)i;
+        nc++;
+    }
+
+    // Spur nur aus Syncs (Killer Track)
+    if(ff_count == RAW_SIZE)
+    {
+        memset(destination, 0xFF, nominal);
+        return (uint16_t)nominal;
+    }
+
+    // Ende eines Syncs (mindestens 2 Bytes $FF) vor Position k im zusammengefassten Strom
+    auto is_sync_end = [&](uint32_t k) -> bool {
+        return k >= 1 && c[k] != 0xFF && c[k-1] == 0xFF && (idx[k] - idx[k-1]) >= 2;
+    };
+
+    uint32_t first_sync_end = 0;
+    bool sync_found = false;
+    for(uint32_t k=1; k<nc; k++)
+    {
+        if(is_sync_end(k))
+        {
+            first_sync_end = idx[k];
+            sync_found = true;
+            break;
+        }
+    }
+
+    // Keine Syncs: Daten sind nicht lesbar, die Spur gilt als unformatiert
+    if(!sync_found)
+        return 0;
+
+    int best_score = -1;
+    uint32_t best_start = 0;
+    uint32_t best_size = 0;
+    unsigned int starts_tried = 0;
+
+    for(uint32_t k=1; k<nc && starts_tried<MAX_STARTS; k++)
+    {
+        if(!is_sync_end(k))
+            continue;
+
+        const uint32_t start = idx[k];
+        if(start + nominal - SEARCH_RANGE + MIN_COMPARE > RAW_SIZE)
+            break;
+
+        starts_tried++;
+
+        for(uint32_t kk=k+1; kk<nc; kk++)
+        {
+            if(idx[kk] < start + nominal - SEARCH_RANGE)
+                continue;
+            if(idx[kk] > start + nominal + SEARCH_RANGE)
+                break;
+            if(!is_sync_end(kk))
+                continue;
+
+            const uint32_t n = nc - kk;
+            if(n < MIN_COMPARE)
+                break;
+
+            const uint32_t size = idx[kk] - start;
+            if(size > (uint32_t)GCR_TRACK_SIZE)
+                continue;
+
+            uint32_t matches = 0;
+            for(uint32_t j=0; j<n; j++)
+            {
+                if(c[k+j] == c[kk+j])
+                    matches++;
+            }
+
+            const int score = (int)(matches * 1000 / n);
+            if(score > best_score)
+            {
+                best_score = score;
+                best_start = start;
+                best_size = size;
+            }
+        }
+
+        if(best_score >= GOOD_SCORE)
+            break;
+    }
+
+    if(best_score >= MIN_SCORE)
+    {
+        memcpy(destination, raw + best_start, best_size);
+        return (uint16_t)best_size;
+    }
+
+    // Keine Wiederholung gefunden: Nominallaenge ab dem ersten Sync (ringfoermig)
+    for(uint32_t i=0; i<nominal; i++)
+        destination[i] = raw[(first_sync_end + i) % RAW_SIZE];
+    return (uint16_t)nominal;
 }
 
 void Floppy1541::UnLoadDiskImage()
@@ -464,6 +669,9 @@ inline void Floppy1541::CheckImageWrite()
             break;
 
         case G64:
+            break;
+
+        case NIB:
             break;
         }
     }
