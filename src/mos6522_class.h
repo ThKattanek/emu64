@@ -69,6 +69,7 @@ private:
     unsigned short  TimerALatch;
     unsigned short  TimerB;
     unsigned short  TimerBLatch;
+    bool            TimerBArmed;                // T2 One-Shot: Interrupt-Flag nur einmal pro Schreiben von T2C-H
     bool            ATNState;
     bool            IECInterrupt;
     unsigned char   OldIECLines;

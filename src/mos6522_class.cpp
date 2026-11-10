@@ -30,6 +30,7 @@ void MOS6522::ResetTimers()
 {
     TimerA = TimerALatch = 0xFFFF;
     TimerB = TimerBLatch = 0xFFFF;
+    TimerBArmed = false;
 }
 
 MOS6522::~MOS6522()
@@ -73,10 +74,12 @@ void MOS6522::OneZyklus()
         TimerA = TimerALatch;
     }
 
-    if(TimerB == 0)
+    if(TimerB == 0 && TimerBArmed)
     {
+        // T2 ist One-Shot: Das Flag wird nur einmal pro Schreiben von T2C-H gesetzt,
+        // der Zaehler laeuft danach ohne Reload ueber $FFFF weiter
         IO[0x0D] |= 0x20;
-        TimerB = TimerBLatch;
+        TimerBArmed = false;
     }
 
     if(VIANummer == 0)
@@ -228,7 +231,8 @@ void MOS6522::WriteIO(unsigned short adresse, unsigned char wert)
             {
                 TimerBLatch = (TimerBLatch & 0x00FF) | (wert << 8);
                 IO[0x0D] &=0xDF;
-                TimerB = TimerBLatch;
+                TimerB = TimerBLatch + 1;   // Der Zaehler startet erst im Folgezyklus (+1 gleicht das Dekrement im Schreibzyklus aus)
+                TimerBArmed = true;
                 break;
             }
         }
@@ -293,7 +297,8 @@ void MOS6522::WriteIO(unsigned short adresse, unsigned char wert)
             {
                 TimerBLatch = (TimerBLatch & 0x00FF) | (wert << 8);
                 IO[0x0D] &=0xDF;
-                TimerB = TimerBLatch;
+                TimerB = TimerBLatch + 1;   // Der Zaehler startet erst im Folgezyklus (+1 gleicht das Dekrement im Schreibzyklus aus)
+                TimerBArmed = true;
                 break;
             }
         }
