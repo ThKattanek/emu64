@@ -552,13 +552,13 @@ uint16_t Floppy1541::NIBTrackToGCR(const uint8_t *raw, unsigned int density, uin
         return k >= 1 && c[k] != 0xFF && c[k-1] == 0xFF && (idx[k] - idx[k-1]) >= 2;
     };
 
-    uint32_t first_sync_end = 0;
+    uint32_t first_sync_start = 0;
     bool sync_found = false;
     for(uint32_t k=1; k<nc; k++)
     {
         if(is_sync_end(k))
         {
-            first_sync_end = idx[k];
+            first_sync_start = idx[k-1];
             sync_found = true;
             break;
         }
@@ -627,9 +627,9 @@ uint16_t Floppy1541::NIBTrackToGCR(const uint8_t *raw, unsigned int density, uin
         return (uint16_t)best_size;
     }
 
-    // Keine Wiederholung gefunden: Nominallaenge ab dem ersten Sync (ringfoermig)
+    // Keine Wiederholung gefunden: Nominallaenge ab dem Anfang des ersten Syncs (ringfoermig), damit der Sync selbst in der Spur bleibt
     for(uint32_t i=0; i<nominal; i++)
-        destination[i] = raw[(first_sync_end + i) % RAW_SIZE];
+        destination[i] = raw[(first_sync_start + i) % RAW_SIZE];
     return (uint16_t)nominal;
 }
 
