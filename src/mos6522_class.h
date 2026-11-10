@@ -32,6 +32,7 @@ public:
     void ResetTimers(void);     // Timer Zähler und Latches auf festen Wert (werden vom Reset Pin nicht verändert)
     unsigned char GetIO_Zero(void);
     unsigned char GetPCR(void) { return IO[0x0C]; }   // Peripheral Control Register (VIA2: Bit 5-7 = CB2, 110 = Schreibmodus)
+    unsigned char GetACR(void) { return IO[0x0B]; }   // Auxiliary Control Register (Bit 0 = Port A Eingangslatch über CA1)
     unsigned char GetPA(void) { return PA; }          // Ausgangslatch Port A (VIA2: Datenbyte für den Schreibkopf)
 	float GetIOPB3_RMS(void);
     void OneZyklus(void);

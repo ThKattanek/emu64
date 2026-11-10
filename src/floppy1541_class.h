@@ -166,7 +166,8 @@ private:
     int     OnesCount;                  // Anzahl aufeinander folgender 1er Bits
     bool    SyncActive;                 // Sync Signal aktiv (mindestens 10 aufeinander folgende 1er Bits)
     uint8_t ReadShift;                  // Schieberegister Lesen
-    uint8_t ReadLatch;                  // Letztes vollständiges Byte (VIA2 Port A beim Lesen)
+    uint8_t ReadLatch;                  // Von Byte Ready (CA1) gelatchtes Byte (VIA2 Port A beim Lesen)
+    bool    ReadLatched;                // Port A Latch belegt, bis der Prozessor Port A liest (danach latcht das nächste Byte Ready neu)
     uint8_t WriteShift;                 // Schieberegister Schreiben
 
     MOS6502 *cpu;

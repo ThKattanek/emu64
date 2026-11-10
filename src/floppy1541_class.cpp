@@ -46,6 +46,7 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
     SyncActive = false;
     ReadShift = 0;
     ReadLatch = 0;
+    ReadLatched = false;
     WriteShift = 0;
 
     cpu = new MOS6502();
@@ -209,6 +210,7 @@ void Floppy1541::PrepareHardReset()
     SyncActive = false;
     ReadShift = 0;
     ReadLatch = 0;
+    ReadLatched = false;
     WriteShift = 0;
 
     via1->ResetTimers();
@@ -1346,7 +1348,15 @@ bool Floppy1541::SyncFound()
 
 uint8_t Floppy1541::ReadGCRByte()
 {
-    return ReadLatch;
+    // Lesen von VIA2 Port A ($1C01 / $1C0F)
+    // Mit Eingangslatch (ACR Bit 0, setzt die ROM) liefert der Port das von Byte Ready (CA1) gelatchte Byte.
+    // Das Lesen gibt das Latch wieder frei. Ist nichts gelatcht, liegen die Ausgänge des Schieberegisters direkt an.
+    if((via2->GetACR() & 0x01) && ReadLatched)
+    {
+        ReadLatched = false;
+        return ReadLatch;
+    }
+    return ReadShift;
 }
 
 void Floppy1541::WriteGCRByte(uint8_t value)
@@ -1437,8 +1447,14 @@ inline void Floppy1541::RotateDisk()
             }
         }
 
-        if(byte_ready)
+        // Byte Ready erreicht CA1 nur bei aktivem SOE (CA2 high). Die VIA latcht Port A nur, wenn das Latch
+        // seit dem letzten Lesen von Port A frei ist. Bis dahin bleibt das zuerst gelatchte Byte stehen
+        // (z.B. Turrican Spur 37: das erste $1C01 nach dem Sync-Warten liefert das $55 aus der Lücke hinter dem letzten gelesenen Sektor).
+        if(byte_ready && ((via2->GetPCR() & 0x0E) == 0x0E) && (via2->GetACR() & 0x01) && !ReadLatched)
+        {
             ReadLatch = ReadShift;
+            ReadLatched = true;
+        }
     }
 
     GCRBitTrackPos++;
