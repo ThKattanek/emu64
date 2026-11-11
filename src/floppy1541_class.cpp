@@ -16,6 +16,7 @@
 #include "./c64_file_types.h"
 
 #include <cstring>
+#include <vector>
 
 const uint8_t Floppy1541::d64_track_zone[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
                                               1,1,1,1,1,1,1,
@@ -44,6 +45,10 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
     BitCounter = 0;
     OnesCount = 0;
     SyncActive = false;
+    NoFluxCells = 0;
+    CellsSinceOne = 0;
+    RandFluxCountdown = 0;
+    ReadNoiseSeed = 0x2545F491;
     ReadShift = 0;
     ReadLatch = 0;
     ReadLatched = false;
@@ -208,6 +213,10 @@ void Floppy1541::PrepareHardReset()
     BitCounter = 0;
     OnesCount = 0;
     SyncActive = false;
+    NoFluxCells = 0;
+    CellsSinceOne = 0;
+    RandFluxCountdown = 0;
+    ReadNoiseSeed = 0x2545F491;
     ReadShift = 0;
     ReadLatch = 0;
     ReadLatched = false;
@@ -499,6 +508,7 @@ bool Floppy1541::NIBImageToGCRImage(FILE *file)
 
         const unsigned int half_track = half_track_nr - 2;
         const uint16_t size = NIBTrackToGCR(raw, density, GCRImage + half_track * GCR_TRACK_SIZE);
+        NIBClearNoise(GCRImage + half_track * GCR_TRACK_SIZE, size);
         TrackSize[half_track] = size;
         entry_present[half_track] = true;
         loaded_tracks++;
@@ -524,6 +534,54 @@ bool Floppy1541::NIBImageToGCRImage(FILE *file)
     }
 
     return loaded_tracks > 0;
+}
+
+// Zufallszahl fuer schwache Bits (xorshift32). Der Startwert wird beim Hard Reset gesetzt, damit Laeufe reproduzierbar bleiben.
+uint32_t Floppy1541::ReadNoiseNext()
+{
+    ReadNoiseSeed ^= ReadNoiseSeed << 13;
+    ReadNoiseSeed ^= ReadNoiseSeed >> 17;
+    ReadNoiseSeed ^= ReadNoiseSeed << 5;
+    return ReadNoiseSeed;
+}
+
+// Wandelt das Rauschen eines NIB Images in Bereiche ohne Fluss (Nullbits) um.
+// Wo auf der Disk kein Fluss ist, liefert die Leseelektronik ein Muster aus 1en im Abstand von 4 Zellen ($11/$22/$44/$88), das bei jeder Umdrehung
+// anders aussieht (freilaufender Teiler + zufaellige Flussumkehrungen, siehe RotateDisk). nibtools speichert davon nur eine zufaellige Probe.
+// Gueltiges GCR hat nie mehr als 2 Nullen zwischen zwei 1en. Eine 1, die auf beiden Seiten mindestens 3 Nullen neben sich hat, ist deshalb Rauschen
+// und wird entfernt, den Rest erzeugt der Emulator beim Lesen selbst neu (mit den echten Flussumkehrungen dazwischen, z.B. die Signatur im X-Out Schutz).
+void Floppy1541::NIBClearNoise(uint8_t *data, uint16_t size)
+{
+    const uint32_t nbits = (uint32_t)size * 8;
+    if(nbits == 0)
+        return;
+
+    std::vector<uint32_t> pulses;
+    pulses.reserve(nbits / 2);
+    for(uint32_t i=0; i<nbits; i++)
+    {
+        if(data[i >> 3] & (0x80 >> (i & 7)))
+            pulses.push_back(i);
+    }
+
+    const size_t count = pulses.size();
+    if(count < 2)
+        return;
+
+    // Entscheidung immer anhand der urspruenglichen Abstaende (ringfoermig)
+    std::vector<uint32_t> noise;
+    for(size_t i=0; i<count; i++)
+    {
+        const uint32_t prev = pulses[(i + count - 1) % count];
+        const uint32_t next = pulses[(i + 1) % count];
+        const uint32_t gap_prev = (pulses[i] + nbits - prev - 1) % nbits;
+        const uint32_t gap_next = (next + nbits - pulses[i] - 1) % nbits;
+        if(gap_prev >= 3 && gap_next >= 3)
+            noise.push_back(pulses[i]);
+    }
+
+    for(size_t i=0; i<noise.size(); i++)
+        data[noise[i] >> 3] &= (uint8_t)~(0x80 >> (noise[i] & 7));
 }
 
 // Prueft, ob zwei Spuren (je eine Umdrehung) denselben Inhalt haben, auch wenn sie an unterschiedlicher Stelle beginnen.
@@ -1718,6 +1776,42 @@ inline void Floppy1541::RotateDisk()
             ScanSectorMap();
 
         bool bit = PeekGCRBit(GCRBitTrackPos);
+
+        // Leseelektronik wie bei der echten Hardware (und VICE rotation.c): Ohne Flussumkehr laeuft der Teiler frei und liefert
+        // alle 4 Bitzellen eine 1. Nach ca. 18us (6 Zellen) ohne echte Flussumkehr kommen zufaellige Flussumkehrungen im Abstand von
+        // 1 bis 8 Zellen (schwache Bits / Bereiche ohne Fluss, z.B. Kopierschutz X-Out Spur 18 Sektor 6). Gueltiges GCR hat nie mehr
+        // als 2 Nullen hintereinander und bleibt davon unberuehrt.
+        if(bit)
+        {
+            NoFluxCells = 0;
+            CellsSinceOne = 0;
+            RandFluxCountdown = 0;
+        }
+        else
+        {
+            if(NoFluxCells < 255)
+                NoFluxCells++;
+
+            if(++CellsSinceOne >= 4)
+            {
+                bit = true;
+                CellsSinceOne = 0;
+            }
+
+            if(NoFluxCells == READ_NOISE_START)
+            {
+                bit = true;
+                CellsSinceOne = 0;
+                RandFluxCountdown = 1 + (int)(ReadNoiseNext() % 8);
+            }
+            else if(RandFluxCountdown > 0 && --RandFluxCountdown == 0)
+            {
+                bit = true;
+                CellsSinceOne = 0;
+                RandFluxCountdown = 1 + (int)(ReadNoiseNext() % 8);
+            }
+        }
+
         ReadShift = (ReadShift << 1) | (bit ? 1 : 0);
 
         if(bit)

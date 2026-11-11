@@ -30,6 +30,7 @@
 
 #define G64_IMAGE_SIZE 665952
 
+#define READ_NOISE_START 6    // Bitzellen ohne echte Flussumkehr, ab denen zufaellige Flussumkehrungen auftreten (ca. 18us)
 #define SYNC_BIT_THRESHOLD 10   // Minimale Anzahl der aufeinander folgenden 1er Bits die als SYNC Markierung gewertet wird (Naormal ist 10)
 
 #define DISK_CHANGE_STATE_COUNTS 4
@@ -118,6 +119,8 @@ private:
     void CheckImageWrite();
     bool NIBImageToGCRImage(FILE *file);
     bool NIBTracksEquivalent(const uint8_t *a, uint16_t size_a, const uint8_t *b, uint16_t size_b);
+    void NIBClearNoise(uint8_t *data, uint16_t size);
+    uint32_t ReadNoiseNext();
     uint16_t NIBTrackToGCR(const uint8_t *raw, unsigned int density, uint8_t *destination);
     void D64ImageToGCRImage();
     void SectorToGCR(unsigned int spur, unsigned int sektor, uint16_t disk_id);
@@ -168,6 +171,10 @@ private:
     int     BitCounter;                 // Anzahl Bits des aktuellen Bytes (0..7)
     int     OnesCount;                  // Anzahl aufeinander folgender 1er Bits
     bool    SyncActive;                 // Sync Signal aktiv (mindestens 10 aufeinander folgende 1er Bits)
+    int     NoFluxCells;                // Bitzellen seit der letzten echten Flussumkehr (Bit 1 im Image)
+    int     CellsSinceOne;              // Bitzellen seit der letzten gelesenen 1 (echt, freilaufender Teiler oder zufaellig)
+    int     RandFluxCountdown;          // Bitzellen bis zur naechsten zufaelligen Flussumkehr (0 = noch keine)
+    uint32_t ReadNoiseSeed;             // Zufallszahlengenerator fuer schwache Bits
     uint8_t ReadShift;                  // Schieberegister Lesen
     uint8_t ReadLatch;                  // Von Byte Ready (CA1) gelatchtes Byte (VIA2 Port A beim Lesen)
     bool    ReadLatched;                // Port A Latch belegt, bis der Prozessor Port A liest (danach latcht das nächste Byte Ready neu)
