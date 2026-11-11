@@ -587,6 +587,10 @@ int MainWindow::OnInit(bool nogui)
             FILE *file = qfopen(floppy_window->GetAktFilename(i), "r+b");
             c64->LoadDiskImage(i,file, typ);
 
+            // G64/NIB: Directory erst jetzt aus dem Laufwerk lesbar
+            floppy_window->UpdateDirFromDrive(i);
+            w->SetAktFilename(floppy_window->GetAktFilename(i),floppy_window->GetAktD64Name(i));
+
             w->SetEnableFloppy(ini->value("Enabled",false).toBool());
             w->SetFloppyVolume(ini->value("VolumeMode",2).toInt());
             ini->endGroup();
