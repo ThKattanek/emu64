@@ -1,6 +1,7 @@
 Alle Änderungen ab V5.2.0 bis jetzt
 -----------------------------------
 
+- NEW! [#139] Floppy - Das Directory im FloppyWindow wird jetzt auch bei G64 und NIB Images angezeigt (aus dem GCR Image des Laufwerks decodiert, Sektoren mit ungültigem Header oder Prüfsumme werden ignoriert). Der Zeichenmüll beim Start mit eingelegtem G64 ist weg, G64/NIB werden nicht mehr als D64 geparst.
 - NEW! Floppy - NIB Images (MNIB-1541-RAW von nibtools) werden unterstützt (nur Lesen, wie beim G64): Aus den 8192 Rohbytes jeder (Halb-)Spur wird genau eine Umdrehung herausgeschnitten, indem die Wiederholung der Daten gesucht wird (Syncs werden dabei zusammengefasst, da ihre Länge je Umdrehung schwankt). Spuren ohne Sync sind unformatiert, Spuren nur aus $FF ein Killer-Track. Geschriebene Daten bleiben im Speicher.
 - Fixed: Floppy - NIB: Fehlende Halbspuren zwischen zwei Spuren mit gleichem Inhalt werden aus den Nachbarn ergänzt (NIB Images enthalten Halbspuren nur auf Wunsch). Predator (Activision) liest Spur 35 mit Sonder-ID auf den Kopfpositionen 35,0 / 35,5 / 36,0 und lädt jetzt durch statt nach Spur 23 zurückzusetzen. Bei verschiedenen Nachbarspuren bleibt die Halbspur unformatiert.
 - Fixed: Floppy - NIB: Beim Spurschnitt wird auch der Bereich vor dem ersten Sync mit der Wiederholung verglichen. Beginnt der Dump mitten in einem Sektor, blieb hinter dem Spuranfang zu wenig Platz für die Wiederholung und es wurde die Nominallänge verwendet (Turrican II Seite 2, Spuren 5 und 8: jetzt richtig 7813 statt 7692 Bytes, die Nahtstelle lag vorher an der falschen Stelle).

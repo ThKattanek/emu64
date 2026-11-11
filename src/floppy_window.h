@@ -41,6 +41,7 @@ public:
     void showEvent(QShowEvent *event);
     void hideEvent(QHideEvent*);
     QString GetAktFilename(int floppynr);
+    void UpdateDirFromDrive(int floppynr);
     QString GetAktD64Name(int floppynr);
     QStringList FileTypes;
 
@@ -72,6 +73,7 @@ private slots:
 
 private:
     void RefreshD64FileList(void);
+    static bool IsD64File(const QString &filename);
     void SetD64BigSize(bool enable);
     QString ConvC64Name(const char* name, bool invers = false);
 

@@ -169,8 +169,13 @@ void FloppyWindow::LoadIni()
             AktFile[i] = ini->value("AktFile","").toString();
             AktFileName[i] = AktDir[i] + "/" + AktFile[i];
 
-			FILE *file = qfopen(AktFileName[i], "rb");
-			d64[i].LoadD64(file);
+			if(IsD64File(AktFileName[i]))
+			{
+				FILE *file = qfopen(AktFileName[i], "rb");
+				d64[i].LoadD64(file);
+			}
+			else
+				d64[i].UnLoadD64();
 
             // Write Protect für alle Floppys setzen
             c64->floppy[i]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktFileName[i]));
@@ -199,8 +204,13 @@ bool FloppyWindow::SetDiskImage(uint8_t floppynr, QString filename)
     AktFile[floppynr] = fi.fileName();
     AktFileName[floppynr] = AktDir[floppynr] + "/" + AktFile[floppynr];
 
-	FILE *file = qfopen(AktFileName[floppynr], "rb");
-	d64[floppynr].LoadD64(file);
+	if(IsD64File(AktFileName[floppynr]))
+	{
+		FILE *file = qfopen(AktFileName[floppynr], "rb");
+		d64[floppynr].LoadD64(file);
+	}
+	else
+		d64[floppynr].UnLoadD64();
 
     c64->floppy[floppynr]->SetWriteProtect(ui->FileBrowser->isFileWriteProtect(AktFileName[floppynr]));
 
@@ -210,6 +220,7 @@ bool FloppyWindow::SetDiskImage(uint8_t floppynr, QString filename)
 
     RefreshD64FileList();
     emit ChangeFloppyImage(floppynr);
+    UpdateDirFromDrive(floppynr);
 
     return true;
 }
@@ -238,30 +249,32 @@ void FloppyWindow::OnSelectFile(QString filename)
             emit ChangeFloppyImage(FloppyNr);
         }
 
-        if("G64" == AktFileName[FloppyNr].right(3).toUpper())
+        if("G64" == AktFileName[FloppyNr].right(3).toUpper() || "NIB" == AktFileName[FloppyNr].right(3).toUpper())
         {
-            //d64[FloppyNr].LoadD64(AktFileName[FloppyNr].toLocal8Bit());
-            //RefreshD64FileList();
-
-            // D64 File-Anzeige löschen
-            ui->D64FileTable->clear();
-
-            // D64 Name ermitteln und anzeigen
-            ui->DiskName->setText("G64 IMAGE");
-
             emit ChangeFloppyImage(FloppyNr);
-        }
-
-        if("NIB" == AktFileName[FloppyNr].right(3).toUpper())
-        {
-            // D64 File-Anzeige löschen
-            ui->D64FileTable->clear();
-
-            ui->DiskName->setText("NIB IMAGE");
-
-            emit ChangeFloppyImage(FloppyNr);
+            UpdateDirFromDrive(FloppyNr);
         }
     }
+}
+
+bool FloppyWindow::IsD64File(const QString &filename)
+{
+    return "D64" == filename.right(3).toUpper();
+}
+
+// Bei G64/NIB wird das Directory aus dem GCR Image des Laufwerks decodiert (Image muss bereits im Laufwerk liegen)
+void FloppyWindow::UpdateDirFromDrive(int floppynr)
+{
+    if(floppynr < 0 || floppynr >= MAX_FLOPPY_NUM) return;
+    if(IsD64File(AktFileName[floppynr])) return;
+
+    QString ext = AktFileName[floppynr].right(3).toUpper();
+    if(ext != "G64" && ext != "NIB") return;
+
+    d64[floppynr].ReLoad(c64->floppy[floppynr]->GetCurrentD64ImageBuffer(), c64->floppy[floppynr]->GetCurrentD64Tracks());
+
+    if(floppynr == ui->FloppySelect->currentIndex())
+        RefreshD64FileList();
 }
 
 void FloppyWindow::OnChangeFloppyNummer(int floppynr)
