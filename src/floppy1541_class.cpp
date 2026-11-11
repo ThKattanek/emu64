@@ -16,6 +16,7 @@
 #include "./c64_file_types.h"
 
 #include <cstring>
+#include <vector>
 
 const uint8_t Floppy1541::d64_track_zone[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
                                               1,1,1,1,1,1,1,
@@ -44,6 +45,10 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
     BitCounter = 0;
     OnesCount = 0;
     SyncActive = false;
+    NoFluxCells = 0;
+    CellsSinceOne = 0;
+    RandFluxCountdown = 0;
+    ReadNoiseSeed = 0x2545F491;
     ReadShift = 0;
     ReadLatch = 0;
     ReadLatched = false;
@@ -208,6 +213,10 @@ void Floppy1541::PrepareHardReset()
     BitCounter = 0;
     OnesCount = 0;
     SyncActive = false;
+    NoFluxCells = 0;
+    CellsSinceOne = 0;
+    RandFluxCountdown = 0;
+    ReadNoiseSeed = 0x2545F491;
     ReadShift = 0;
     ReadLatch = 0;
     ReadLatched = false;
@@ -424,8 +433,373 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
 
         return true;
         break;
+
+    case NIB:
+        // Diskwechsel simulieren
+        StartDiskChange();
+
+        if (file == nullptr)
+            return false;
+
+        for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i]=0x00;
+        for(int i=0;i<NUM_TRACKS*2;i++)
+            TrackSize[i] = 0;
+
+        if(!NIBImageToGCRImage(file))
+            return false;
+
+        InitEmptyTracks();
+
+        GCRBitTrackSize = TrackSize[AktHalbSpur] * 8;
+        GCRBitTrackPos = 0;
+
+        UpdateGCRPointer();
+        SectorMapDirty = true;
+
+        ImageWriteStatus = false;
+        ImageDirectoryWriteStatus = false;
+        ImageTyp = NIB;
+
+        return true;
+        break;
     }
     return false;
+}
+
+// NIB Image (MNIB-1541-RAW, nibtools): 256 Byte Header, danach je Halbspur 8192 Bytes Rohdaten (GCR Bytes wie sie der Lesekopf liefert).
+// Header: Offset 0 Kennung "MNIB-1541-RAW", ab Offset 16 je Halbspur 2 Bytes (Halbspurnummer 2=Spur 1, 3=Spur 1.5, 4=Spur 2 ... und Dichte in Bit 0-1), Ende bei Halbspurnummer 0.
+// Die Spurdaten folgen in der Reihenfolge der Header Eintraege.
+bool Floppy1541::NIBImageToGCRImage(FILE *file)
+{
+    static const uint32_t NIB_HEADER_SIZE = 256;
+    static const uint32_t NIB_TRACK_SIZE = 8192;
+    static const uint32_t NIB_MAX_ENTRIES = (NIB_HEADER_SIZE - 16) / 2;
+
+    uint8_t header[NIB_HEADER_SIZE];
+    uint8_t raw[NIB_TRACK_SIZE];
+
+    if(fseek(file, 0, SEEK_SET) != 0)
+        return false;
+
+    if(fread(header, 1, NIB_HEADER_SIZE, file) != NIB_HEADER_SIZE)
+        return false;
+
+    if(0 != memcmp(header, "MNIB-1541-RAW", 13))
+        return false;
+
+    int loaded_tracks = 0;
+    bool entry_present[NUM_TRACKS*2] = {false};
+
+    for(uint32_t entry=0; entry<NIB_MAX_ENTRIES; entry++)
+    {
+        const unsigned int half_track_nr = header[16 + entry*2];
+        const unsigned int density = header[17 + entry*2];
+
+        if(half_track_nr == 0)
+            break;
+
+        // Unvollstaendige Datei: Es zaehlen nur komplette Spuren
+        if(fread(raw, 1, NIB_TRACK_SIZE, file) != NIB_TRACK_SIZE)
+            break;
+
+        // Halbspurnummer 2 = Spur 1 = Halbspur 0 im Emulator
+        if(half_track_nr < 2 || half_track_nr - 2 >= (unsigned int)(NUM_TRACKS*2))
+            continue;
+
+        const unsigned int half_track = half_track_nr - 2;
+        const uint16_t size = NIBTrackToGCR(raw, density, GCRImage + half_track * GCR_TRACK_SIZE);
+        NIBClearNoise(GCRImage + half_track * GCR_TRACK_SIZE, size);
+        TrackSize[half_track] = size;
+        entry_present[half_track] = true;
+        loaded_tracks++;
+    }
+
+    // Fehlende Halbspuren zwischen zwei Spuren mit gleichem Inhalt: Die Disk wurde dann auf mehreren Kopfpositionen gleich beschrieben (z.B. Predator,
+    // Spur 35 + 36 mit Sonder-ID). Ein Kopf zwischen beiden liest dieselben Daten. NIB Images enthalten Halbspuren nur auf Wunsch, die Daten fehlen dann einfach.
+    // Nur bei gleichem Inhalt der Nachbarn ergaenzen, sonst bleibt die Halbspur unformatiert (viele Kopierschutzabfragen erwarten das).
+    for(int half_track=1; half_track<NUM_TRACKS*2-1; half_track+=2)
+    {
+        if(entry_present[half_track] || TrackSize[half_track] != 0)
+            continue;
+        if(TrackSize[half_track-1] == 0 || TrackSize[half_track+1] == 0)
+            continue;
+
+        uint8_t *lower = GCRImage + (half_track-1) * GCR_TRACK_SIZE;
+        uint8_t *upper = GCRImage + (half_track+1) * GCR_TRACK_SIZE;
+        if(NIBTracksEquivalent(lower, TrackSize[half_track-1], upper, TrackSize[half_track+1]))
+        {
+            memcpy(GCRImage + half_track * GCR_TRACK_SIZE, lower, TrackSize[half_track-1]);
+            TrackSize[half_track] = TrackSize[half_track-1];
+        }
+    }
+
+    return loaded_tracks > 0;
+}
+
+// Zufallszahl fuer schwache Bits (xorshift32). Der Startwert wird beim Hard Reset gesetzt, damit Laeufe reproduzierbar bleiben.
+uint32_t Floppy1541::ReadNoiseNext()
+{
+    ReadNoiseSeed ^= ReadNoiseSeed << 13;
+    ReadNoiseSeed ^= ReadNoiseSeed >> 17;
+    ReadNoiseSeed ^= ReadNoiseSeed << 5;
+    return ReadNoiseSeed;
+}
+
+// Wandelt das Rauschen eines NIB Images in Bereiche ohne Fluss (Nullbits) um.
+// Wo auf der Disk kein Fluss ist, liefert die Leseelektronik ein Muster aus 1en im Abstand von 4 Zellen ($11/$22/$44/$88), das bei jeder Umdrehung
+// anders aussieht (freilaufender Teiler + zufaellige Flussumkehrungen, siehe RotateDisk). nibtools speichert davon nur eine zufaellige Probe.
+// Gueltiges GCR hat nie mehr als 2 Nullen zwischen zwei 1en. Eine 1, die auf beiden Seiten mindestens 3 Nullen neben sich hat, ist deshalb Rauschen
+// und wird entfernt, den Rest erzeugt der Emulator beim Lesen selbst neu (mit den echten Flussumkehrungen dazwischen, z.B. die Signatur im X-Out Schutz).
+void Floppy1541::NIBClearNoise(uint8_t *data, uint16_t size)
+{
+    const uint32_t nbits = (uint32_t)size * 8;
+    if(nbits == 0)
+        return;
+
+    std::vector<uint32_t> pulses;
+    pulses.reserve(nbits / 2);
+    for(uint32_t i=0; i<nbits; i++)
+    {
+        if(data[i >> 3] & (0x80 >> (i & 7)))
+            pulses.push_back(i);
+    }
+
+    const size_t count = pulses.size();
+    if(count < 2)
+        return;
+
+    // Entscheidung immer anhand der urspruenglichen Abstaende (ringfoermig)
+    std::vector<uint32_t> noise;
+    for(size_t i=0; i<count; i++)
+    {
+        const uint32_t prev = pulses[(i + count - 1) % count];
+        const uint32_t next = pulses[(i + 1) % count];
+        const uint32_t gap_prev = (pulses[i] + nbits - prev - 1) % nbits;
+        const uint32_t gap_next = (next + nbits - pulses[i] - 1) % nbits;
+        if(gap_prev >= 3 && gap_next >= 3)
+            noise.push_back(pulses[i]);
+    }
+
+    for(size_t i=0; i<noise.size(); i++)
+        data[noise[i] >> 3] &= (uint8_t)~(0x80 >> (noise[i] & 7));
+}
+
+// Prueft, ob zwei Spuren (je eine Umdrehung) denselben Inhalt haben, auch wenn sie an unterschiedlicher Stelle beginnen.
+// Wie beim Spurschnitt werden die Syncs auf ein Byte zusammengefasst, weil ihre Laenge je Spur um ein Byte schwankt.
+bool Floppy1541::NIBTracksEquivalent(const uint8_t *a, uint16_t size_a, const uint8_t *b, uint16_t size_b)
+{
+    static const uint32_t PATTERN_MAX = 24;
+    static const uint32_t PATTERN_MIN = 8;
+    static const int MIN_SCORE = 950;                   // Mindest-Uebereinstimmung in Promille
+
+    // Laengen duerfen nur geringfuegig abweichen (Sync-Laengen)
+    const int diff = (int)size_a - (int)size_b;
+    if(diff > 64 || diff < -64)
+        return false;
+
+    auto collapse = [](const uint8_t *src, uint16_t size, uint8_t *dst) -> uint32_t {
+        uint32_t n = 0;
+        for(uint32_t i=0; i<size; i++)
+        {
+            if(src[i] == 0xFF && n > 0 && dst[n-1] == 0xFF)
+                continue;
+            dst[n++] = src[i];
+        }
+        return n;
+    };
+
+    uint8_t ca[GCR_TRACK_SIZE];
+    uint8_t cb[GCR_TRACK_SIZE];
+    const uint32_t na = collapse(a, size_a, ca);
+    const uint32_t nb = collapse(b, size_b, cb);
+
+    // Anker: erstes Byte hinter einem Sync in a, mit den folgenden Bytes bis zum naechsten Sync
+    uint32_t anchor = 0;
+    for(uint32_t k=1; k<na; k++)
+    {
+        if(ca[k] != 0xFF && ca[k-1] == 0xFF)
+        {
+            anchor = k;
+            break;
+        }
+    }
+    if(anchor == 0)
+        return false;
+
+    uint32_t plen = 0;
+    while(plen < PATTERN_MAX && anchor + plen < na && ca[anchor + plen] != 0xFF)
+        plen++;
+    if(plen < PATTERN_MIN)
+        return false;
+
+    // Anker in b suchen (ringfoermig)
+    for(uint32_t o=1; o<nb; o++)
+    {
+        if(cb[o] == 0xFF || cb[o-1] != 0xFF)
+            continue;
+
+        bool match = true;
+        for(uint32_t i=0; i<plen && match; i++)
+            match = (cb[(o + i) % nb] == ca[anchor + i]);
+        if(!match)
+            continue;
+
+        const uint32_t n = (na < nb) ? na : nb;
+        uint32_t matches = 0;
+        for(uint32_t j=0; j<n; j++)
+        {
+            if(ca[(anchor + j) % na] == cb[(o + j) % nb])
+                matches++;
+        }
+        if((int)(matches * 1000 / n) >= MIN_SCORE)
+            return true;
+    }
+    return false;
+}
+
+// Schneidet aus den 8192 Rohbytes einer Spur genau eine Umdrehung heraus (liefert die Laenge in Bytes, 0 = unformatierte Spur ohne Sync).
+// Der Dump enthaelt mehr als eine Umdrehung und beginnt an beliebiger Stelle. Die Umdrehungslaenge steht nicht im Image und wird gesucht:
+// Ab einem Spuranfang (erstes Byte hinter einem Sync) wird um die Nominallaenge der Dichte herum der Punkt gesucht, an dem sich die Daten wiederholen.
+// Die Syncs werden dabei auf ein Byte zusammengefasst, weil ihre Laenge von Umdrehung zu Umdrehung um ein Byte abweichen kann.
+// Ohne eindeutige Wiederholung (z.B. gezielt zerstoerte Spur) wird die Nominallaenge ab dem ersten Sync verwendet.
+uint16_t Floppy1541::NIBTrackToGCR(const uint8_t *raw, unsigned int density, uint8_t *destination)
+{
+    static const uint32_t RAW_SIZE = 8192;
+    static const uint32_t SEARCH_RANGE = 500;           // Suchbereich um die Nominallaenge (Laufwerke drehen etwas schneller oder langsamer)
+    static const uint32_t MIN_COMPARE = 128;            // Mindestlaenge des Vergleichs (nach dem Zusammenfassen der Syncs)
+    static const int MIN_SCORE = 600;                   // Mindest-Uebereinstimmung in Promille
+    static const int GOOD_SCORE = 950;                  // Ab hier wird nicht weiter gesucht
+    static const unsigned int MAX_STARTS = 8;           // Anzahl Spuranfaenge, die probiert werden
+    static const uint16_t nominal_size[4] = {6250, 6666, 7142, 7692};
+
+    const uint32_t nominal = nominal_size[density & 3];
+
+    uint8_t c[RAW_SIZE];            // Spur mit zusammengefassten Syncs
+    uint16_t idx[RAW_SIZE];         // Position des Bytes in den Rohdaten
+    uint32_t nc = 0;
+    uint32_t ff_count = 0;
+
+    for(uint32_t i=0; i<RAW_SIZE; i++)
+    {
+        if(raw[i] == 0xFF)
+        {
+            ff_count++;
+            if(nc > 0 && c[nc-1] == 0xFF)
+                continue;
+        }
+        c[nc] = raw[i];
+        idx[nc] = (uint16_t)i;
+        nc++;
+    }
+
+    // Spur nur aus Syncs (Killer Track)
+    if(ff_count == RAW_SIZE)
+    {
+        memset(destination, 0xFF, nominal);
+        return (uint16_t)nominal;
+    }
+
+    // Ende eines Syncs (mindestens 2 Bytes $FF) vor Position k im zusammengefassten Strom
+    auto is_sync_end = [&](uint32_t k) -> bool {
+        return k >= 1 && c[k] != 0xFF && c[k-1] == 0xFF && (idx[k] - idx[k-1]) >= 2;
+    };
+
+    uint32_t first_sync_start = 0;
+    bool sync_found = false;
+    for(uint32_t k=1; k<nc; k++)
+    {
+        if(is_sync_end(k))
+        {
+            first_sync_start = idx[k-1];
+            sync_found = true;
+            break;
+        }
+    }
+
+    // Keine Syncs: Daten sind nicht lesbar, die Spur gilt als unformatiert
+    if(!sync_found)
+        return 0;
+
+    int best_score = -1;
+    uint32_t best_start = 0;
+    uint32_t best_size = 0;
+    unsigned int starts_tried = 0;
+
+    for(uint32_t k=1; k<nc && starts_tried<MAX_STARTS; k++)
+    {
+        if(!is_sync_end(k))
+            continue;
+
+        const uint32_t start = idx[k];
+        if(start + nominal - SEARCH_RANGE >= RAW_SIZE)
+            break;
+
+        starts_tried++;
+
+        for(uint32_t kk=k+1; kk<nc; kk++)
+        {
+            if(idx[kk] < start + nominal - SEARCH_RANGE)
+                continue;
+            if(idx[kk] > start + nominal + SEARCH_RANGE)
+                break;
+            if(!is_sync_end(kk))
+                continue;
+
+            // Vorwaerts: ab dem Spuranfang bis zum Ende des Dumps. Rueckwaerts: der Bereich vor dem Spuranfang (der Dump beginnt oft mitten
+            // in einem Sektor, dann ist hinter dem Spuranfang kaum noch Platz fuer eine Wiederholung, davor aber schon).
+            const uint32_t n = nc - kk;
+            if(n + k < MIN_COMPARE)
+                break;
+
+            const uint32_t size = idx[kk] - start;
+            if(size > (uint32_t)GCR_TRACK_SIZE)
+                continue;
+
+            uint32_t matches = 0;
+            for(uint32_t j=0; j<n; j++)
+            {
+                if(c[k+j] == c[kk+j])
+                    matches++;
+            }
+
+            uint32_t matches_back = 0;
+            for(uint32_t j=0; j<k; j++)
+            {
+                if(c[k-1-j] == c[kk-1-j])
+                    matches_back++;
+            }
+
+            // Der bessere Wert zaehlt: Der Bereich vor dem ersten Sync ist beim Start des Dumps nicht immer ausgerichtet, dann darf er das
+            // Ergebnis nicht verschlechtern.
+            int score = (int)((matches + matches_back) * 1000 / (n + k));
+            if(n >= MIN_COMPARE)
+            {
+                const int score_forward = (int)(matches * 1000 / n);
+                if(score_forward > score)
+                    score = score_forward;
+            }
+            if(score > best_score)
+            {
+                best_score = score;
+                best_start = start;
+                best_size = size;
+            }
+        }
+
+        if(best_score >= GOOD_SCORE)
+            break;
+    }
+
+    if(best_score >= MIN_SCORE)
+    {
+        memcpy(destination, raw + best_start, best_size);
+        return (uint16_t)best_size;
+    }
+
+    // Keine Wiederholung gefunden: Nominallaenge ab dem Anfang des ersten Syncs (ringfoermig), damit der Sync selbst in der Spur bleibt
+    for(uint32_t i=0; i<nominal; i++)
+        destination[i] = raw[(first_sync_start + i) % RAW_SIZE];
+    return (uint16_t)nominal;
 }
 
 void Floppy1541::UnLoadDiskImage()
@@ -464,6 +838,9 @@ inline void Floppy1541::CheckImageWrite()
             break;
 
         case G64:
+            break;
+
+        case NIB:
             break;
         }
     }
@@ -1416,6 +1793,42 @@ inline void Floppy1541::RotateDisk()
             ScanSectorMap();
 
         bool bit = PeekGCRBit(GCRBitTrackPos);
+
+        // Leseelektronik wie bei der echten Hardware (und VICE rotation.c): Ohne Flussumkehr laeuft der Teiler frei und liefert
+        // alle 4 Bitzellen eine 1. Nach ca. 18us (6 Zellen) ohne echte Flussumkehr kommen zufaellige Flussumkehrungen im Abstand von
+        // 1 bis 8 Zellen (schwache Bits / Bereiche ohne Fluss, z.B. Kopierschutz X-Out Spur 18 Sektor 6). Gueltiges GCR hat nie mehr
+        // als 2 Nullen hintereinander und bleibt davon unberuehrt.
+        if(bit)
+        {
+            NoFluxCells = 0;
+            CellsSinceOne = 0;
+            RandFluxCountdown = 0;
+        }
+        else
+        {
+            if(NoFluxCells < 255)
+                NoFluxCells++;
+
+            if(++CellsSinceOne >= 4)
+            {
+                bit = true;
+                CellsSinceOne = 0;
+            }
+
+            if(NoFluxCells == READ_NOISE_START)
+            {
+                bit = true;
+                CellsSinceOne = 0;
+                RandFluxCountdown = 1 + (int)(ReadNoiseNext() % 8);
+            }
+            else if(RandFluxCountdown > 0 && --RandFluxCountdown == 0)
+            {
+                bit = true;
+                CellsSinceOne = 0;
+                RandFluxCountdown = 1 + (int)(ReadNoiseNext() % 8);
+            }
+        }
+
         ReadShift = (ReadShift << 1) | (bit ? 1 : 0);
 
         if(bit)

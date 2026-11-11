@@ -28,7 +28,8 @@ enum C64_FILE_TYPES
 	TAP,
 	WAV,
 	CRT,
-	FRZ
+	FRZ,
+	NIB
 };
 
 #endif // C64_FILE_TYPES_H

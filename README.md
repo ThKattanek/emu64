@@ -18,7 +18,7 @@
 - Multi-Plattform Support (Windows, Linux)
 - SDL2-basierte Audio- und Video-Ausgabe, OpenGL mit CRT-Emulation (Shader/Filter)
 - SID wahlweise mit eigener Engine oder reSID (zur Laufzeit wählbar)
-- Bitgenaue 1541-Floppyemulation (D64 mit 35/40/42 Spuren, G64, Fastloader), Datasette (TAP, T64)
+- Bitgenaue 1541-Floppyemulation (D64 mit 35/40/42 Spuren, G64, NIB (nur lesend), Fastloader, schwache Bits), Datasette (TAP, T64)
 - Steckmodule (CRT, u.a. EasyFlash), REU und GeoRAM
 - Eingebauter Debugger mit zyklusgenauer Einzelschrittanzeige des Bildaufbaus
 - Warp-Modus, Videoaufnahme (ffmpeg), Screenshots, Snapshots

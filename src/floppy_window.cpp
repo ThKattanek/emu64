@@ -74,7 +74,7 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QStr
 
     connect(ui->FileBrowser,SIGNAL(SelectFile(QString)),this,SLOT(OnSelectFile(QString)));
     connect(ui->FileBrowser,SIGNAL(WriteProtectedChanged(bool)),this,SLOT(OnWriteProtectedChanged(bool)));
-    ui->FileBrowser->SetFileFilter(QStringList()<<"*.d64"<<"*.g64");
+    ui->FileBrowser->SetFileFilter(QStringList()<<"*.d64"<<"*.g64"<<"*.nib");
     ui->FileBrowser->EnableWriteProtectCheck(true);
 
     // Kontextmenü erstellen
@@ -248,6 +248,16 @@ void FloppyWindow::OnSelectFile(QString filename)
 
             // D64 Name ermitteln und anzeigen
             ui->DiskName->setText("G64 IMAGE");
+
+            emit ChangeFloppyImage(FloppyNr);
+        }
+
+        if("NIB" == AktFileName[FloppyNr].right(3).toUpper())
+        {
+            // D64 File-Anzeige löschen
+            ui->D64FileTable->clear();
+
+            ui->DiskName->setText("NIB IMAGE");
 
             emit ChangeFloppyImage(FloppyNr);
         }
