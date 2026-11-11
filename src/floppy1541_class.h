@@ -117,6 +117,7 @@ private:
 
     void CheckImageWrite();
     bool NIBImageToGCRImage(FILE *file);
+    bool NIBTracksEquivalent(const uint8_t *a, uint16_t size_a, const uint8_t *b, uint16_t size_b);
     uint16_t NIBTrackToGCR(const uint8_t *raw, unsigned int density, uint8_t *destination);
     void D64ImageToGCRImage();
     void SectorToGCR(unsigned int spur, unsigned int sektor, uint16_t disk_id);

@@ -479,6 +479,7 @@ bool Floppy1541::NIBImageToGCRImage(FILE *file)
         return false;
 
     int loaded_tracks = 0;
+    bool entry_present[NUM_TRACKS*2] = {false};
 
     for(uint32_t entry=0; entry<NIB_MAX_ENTRIES; entry++)
     {
@@ -499,10 +500,103 @@ bool Floppy1541::NIBImageToGCRImage(FILE *file)
         const unsigned int half_track = half_track_nr - 2;
         const uint16_t size = NIBTrackToGCR(raw, density, GCRImage + half_track * GCR_TRACK_SIZE);
         TrackSize[half_track] = size;
+        entry_present[half_track] = true;
         loaded_tracks++;
     }
 
+    // Fehlende Halbspuren zwischen zwei Spuren mit gleichem Inhalt: Die Disk wurde dann auf mehreren Kopfpositionen gleich beschrieben (z.B. Predator,
+    // Spur 35 + 36 mit Sonder-ID). Ein Kopf zwischen beiden liest dieselben Daten. NIB Images enthalten Halbspuren nur auf Wunsch, die Daten fehlen dann einfach.
+    // Nur bei gleichem Inhalt der Nachbarn ergaenzen, sonst bleibt die Halbspur unformatiert (viele Kopierschutzabfragen erwarten das).
+    for(int half_track=1; half_track<NUM_TRACKS*2-1; half_track+=2)
+    {
+        if(entry_present[half_track] || TrackSize[half_track] != 0)
+            continue;
+        if(TrackSize[half_track-1] == 0 || TrackSize[half_track+1] == 0)
+            continue;
+
+        uint8_t *lower = GCRImage + (half_track-1) * GCR_TRACK_SIZE;
+        uint8_t *upper = GCRImage + (half_track+1) * GCR_TRACK_SIZE;
+        if(NIBTracksEquivalent(lower, TrackSize[half_track-1], upper, TrackSize[half_track+1]))
+        {
+            memcpy(GCRImage + half_track * GCR_TRACK_SIZE, lower, TrackSize[half_track-1]);
+            TrackSize[half_track] = TrackSize[half_track-1];
+        }
+    }
+
     return loaded_tracks > 0;
+}
+
+// Prueft, ob zwei Spuren (je eine Umdrehung) denselben Inhalt haben, auch wenn sie an unterschiedlicher Stelle beginnen.
+// Wie beim Spurschnitt werden die Syncs auf ein Byte zusammengefasst, weil ihre Laenge je Spur um ein Byte schwankt.
+bool Floppy1541::NIBTracksEquivalent(const uint8_t *a, uint16_t size_a, const uint8_t *b, uint16_t size_b)
+{
+    static const uint32_t PATTERN_MAX = 24;
+    static const uint32_t PATTERN_MIN = 8;
+    static const int MIN_SCORE = 950;                   // Mindest-Uebereinstimmung in Promille
+
+    // Laengen duerfen nur geringfuegig abweichen (Sync-Laengen)
+    const int diff = (int)size_a - (int)size_b;
+    if(diff > 64 || diff < -64)
+        return false;
+
+    auto collapse = [](const uint8_t *src, uint16_t size, uint8_t *dst) -> uint32_t {
+        uint32_t n = 0;
+        for(uint32_t i=0; i<size; i++)
+        {
+            if(src[i] == 0xFF && n > 0 && dst[n-1] == 0xFF)
+                continue;
+            dst[n++] = src[i];
+        }
+        return n;
+    };
+
+    uint8_t ca[GCR_TRACK_SIZE];
+    uint8_t cb[GCR_TRACK_SIZE];
+    const uint32_t na = collapse(a, size_a, ca);
+    const uint32_t nb = collapse(b, size_b, cb);
+
+    // Anker: erstes Byte hinter einem Sync in a, mit den folgenden Bytes bis zum naechsten Sync
+    uint32_t anchor = 0;
+    for(uint32_t k=1; k<na; k++)
+    {
+        if(ca[k] != 0xFF && ca[k-1] == 0xFF)
+        {
+            anchor = k;
+            break;
+        }
+    }
+    if(anchor == 0)
+        return false;
+
+    uint32_t plen = 0;
+    while(plen < PATTERN_MAX && anchor + plen < na && ca[anchor + plen] != 0xFF)
+        plen++;
+    if(plen < PATTERN_MIN)
+        return false;
+
+    // Anker in b suchen (ringfoermig)
+    for(uint32_t o=1; o<nb; o++)
+    {
+        if(cb[o] == 0xFF || cb[o-1] != 0xFF)
+            continue;
+
+        bool match = true;
+        for(uint32_t i=0; i<plen && match; i++)
+            match = (cb[(o + i) % nb] == ca[anchor + i]);
+        if(!match)
+            continue;
+
+        const uint32_t n = (na < nb) ? na : nb;
+        uint32_t matches = 0;
+        for(uint32_t j=0; j<n; j++)
+        {
+            if(ca[(anchor + j) % na] == cb[(o + j) % nb])
+                matches++;
+        }
+        if((int)(matches * 1000 / n) >= MIN_SCORE)
+            return true;
+    }
+    return false;
 }
 
 // Schneidet aus den 8192 Rohbytes einer Spur genau eine Umdrehung heraus (liefert die Laenge in Bytes, 0 = unformatierte Spur ohne Sync).
