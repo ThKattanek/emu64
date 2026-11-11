@@ -16,10 +16,11 @@ Hier nun alle Kommandozeilenparameter und dessen beschreibung...
 emu64 [PARAMETER]
 
 -a, --autostart <Dateiname>
-    Lädt ein C64 Programm (prg,t00 ...) und startet es gleich.
+    Lädt ein C64 Programm (prg,t00 ...) oder ein Diskimage (d64, g64, nib) und startet es gleich.
 
 -m, --mount-disk <laufwerksnummer> <Dateiname>
-    Mountet ein Diskimage. Die Laufwerksnummer muss zwischen 8 und 11 liegen.
+    Mountet ein Diskimage (d64, g64, nib). Die Laufwerksnummer muss zwischen 8 und 11 liegen.
+    NIB Images (nibtools, MNIB-1541-RAW) werden nur gelesen, Schreibzugriffe der Floppy bleiben im Speicher.
     Bsp.: --mount-disk 8 ~\c64\test.d64
 
 --mount-crt <Dateiname>
