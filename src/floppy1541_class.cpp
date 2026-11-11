@@ -731,7 +731,7 @@ uint16_t Floppy1541::NIBTrackToGCR(const uint8_t *raw, unsigned int density, uin
             continue;
 
         const uint32_t start = idx[k];
-        if(start + nominal - SEARCH_RANGE + MIN_COMPARE > RAW_SIZE)
+        if(start + nominal - SEARCH_RANGE >= RAW_SIZE)
             break;
 
         starts_tried++;
@@ -745,8 +745,10 @@ uint16_t Floppy1541::NIBTrackToGCR(const uint8_t *raw, unsigned int density, uin
             if(!is_sync_end(kk))
                 continue;
 
+            // Vorwaerts: ab dem Spuranfang bis zum Ende des Dumps. Rueckwaerts: der Bereich vor dem Spuranfang (der Dump beginnt oft mitten
+            // in einem Sektor, dann ist hinter dem Spuranfang kaum noch Platz fuer eine Wiederholung, davor aber schon).
             const uint32_t n = nc - kk;
-            if(n < MIN_COMPARE)
+            if(n + k < MIN_COMPARE)
                 break;
 
             const uint32_t size = idx[kk] - start;
@@ -760,7 +762,22 @@ uint16_t Floppy1541::NIBTrackToGCR(const uint8_t *raw, unsigned int density, uin
                     matches++;
             }
 
-            const int score = (int)(matches * 1000 / n);
+            uint32_t matches_back = 0;
+            for(uint32_t j=0; j<k; j++)
+            {
+                if(c[k-1-j] == c[kk-1-j])
+                    matches_back++;
+            }
+
+            // Der bessere Wert zaehlt: Der Bereich vor dem ersten Sync ist beim Start des Dumps nicht immer ausgerichtet, dann darf er das
+            // Ergebnis nicht verschlechtern.
+            int score = (int)((matches + matches_back) * 1000 / (n + k));
+            if(n >= MIN_COMPARE)
+            {
+                const int score_forward = (int)(matches * 1000 / n);
+                if(score_forward > score)
+                    score = score_forward;
+            }
             if(score > best_score)
             {
                 best_score = score;
