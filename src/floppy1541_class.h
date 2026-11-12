@@ -119,6 +119,8 @@ private:
     bool NIBImageToGCRImage(const uint8_t *data, size_t data_size);
     bool NIBTracksEquivalent(const uint8_t *a, uint16_t size_a, const uint8_t *b, uint16_t size_b);
     void NIBClearNoise(uint8_t *data, uint16_t size);
+    uint16_t NIBAlignToSector0(uint8_t *data, uint16_t size);
+    uint16_t NIBReduceSync(uint8_t *data, uint16_t size, unsigned int density);
     uint32_t ReadNoiseNext();
     uint16_t NIBTrackToGCR(const uint8_t *raw, unsigned int density, uint8_t *destination);
     void D64ImageToGCRImage();

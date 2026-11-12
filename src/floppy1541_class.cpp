@@ -553,8 +553,11 @@ bool Floppy1541::NIBImageToGCRImage(const uint8_t *data, size_t data_size)
             continue;
 
         const unsigned int half_track = half_track_nr - 2;
-        const uint16_t size = NIBTrackToGCR(raw, density, GCRImage + half_track * GCR_TRACK_SIZE);
-        NIBClearNoise(GCRImage + half_track * GCR_TRACK_SIZE, size);
+        uint8_t *track_data = GCRImage + half_track * GCR_TRACK_SIZE;
+        uint16_t size = NIBTrackToGCR(raw, density, track_data);
+        size = NIBAlignToSector0(track_data, size);
+        size = NIBReduceSync(track_data, size, density);
+        NIBClearNoise(track_data, size);
         TrackSize[half_track] = size;
         entry_present[half_track] = true;
         loaded_tracks++;
@@ -580,6 +583,91 @@ bool Floppy1541::NIBImageToGCRImage(const uint8_t *data, size_t data_size)
     }
 
     return loaded_tracks > 0;
+}
+
+// Dreht den Spurring so, dass er wie bei nibtools (nibconv) am ersten vollen $FF Byte des Syncs vor Sektor 0 beginnt.
+// Ein NIB Dump beginnt an beliebiger Stelle der Spur. Die Lage der Sektoren zueinander ist von Spur zu Spur dann zufaellig, und Lader mit knappem
+// Timing (z.B. 4th & Inches) verpassen dadurch den naechsten Sektor. Spuren ohne Sektor 0 (Kopierschutz) bleiben unveraendert.
+uint16_t Floppy1541::NIBAlignToSector0(uint8_t *data, uint16_t size)
+{
+    if(size < 16)
+        return size;
+
+    for(uint32_t i=0; i<size; i++)
+    {
+        const uint8_t prev = data[(i + size - 1) % size];
+        if(data[i] == 0xFF || prev != 0xFF)
+            continue;
+
+        // Header Block: $52, Header-ID 8, Pruefsumme, Sektor 0 (GCR kodiert)
+        const uint8_t b0 = data[i];
+        const uint8_t b1 = data[(i + 1) % size];
+        const uint8_t b2 = data[(i + 2) % size];
+        const uint8_t b3 = data[(i + 3) % size];
+        if(b0 != 0x52 || (b1 & 0xC0) != 0x40 || (b2 & 0x0F) != 0x05 || (b3 & 0xFC) != 0x28)
+            continue;
+
+        // Anfang des Syncs
+        uint32_t start = i;
+        uint32_t n = 0;
+        while(data[(start + size - 1) % size] == 0xFF && n < size)
+        {
+            start = (start + size - 1) % size;
+            n++;
+        }
+
+        if(start == 0)
+            return size;
+
+        uint8_t temp[GCR_TRACK_SIZE];
+        memcpy(temp, data + start, size - start);
+        memcpy(temp + (size - start), data, start);
+        memcpy(data, temp, size);
+        return size;
+    }
+    return size;
+}
+
+// Kuerzt zu lange Spuren wie nibconv: Eine NIB Aufnahme kann eine Umdrehung mit weniger als 300 U/min enthalten (z.B. 7843 statt 7692 Bytes).
+// Der Emulator dreht die Spur mit festem Zellentakt, die Umdrehung dauert dann zu lange und knappe Lader scheitern. nibconv kuerzt auf die Kapazitaet bei
+// 295 U/min, indem es Syncs schrittweise auf mindestens 4 Bytes verkuerzt (je Durchgang 1 Byte pro Sync).
+uint16_t Floppy1541::NIBReduceSync(uint8_t *data, uint16_t size, unsigned int density)
+{
+    static const uint32_t BYTES_PER_MINUTE[4] = {1875000, 2000000, 2142857, 2307692};
+    static const uint32_t REAL_RPM = 295;
+    static const uint32_t MIN_SYNC = 4;
+
+    uint32_t capacity = BYTES_PER_MINUTE[density & 3] / REAL_RPM;
+    if(capacity > (uint32_t)GCR_TRACK_SIZE)
+        capacity = GCR_TRACK_SIZE;
+
+    uint32_t length = size;
+    while(length > capacity)
+    {
+        uint32_t skipped = 0;
+        uint32_t run = 0;
+        uint32_t out = 0;
+        for(uint32_t i=0; i<length; i++)
+        {
+            if(data[i] == 0xFF && length - skipped >= capacity)
+            {
+                if(run == MIN_SYNC)
+                    skipped++;
+                else
+                    data[out++] = 0xFF;
+                run++;
+            }
+            else
+            {
+                run = 0;
+                data[out++] = data[i];
+            }
+        }
+        if(skipped == 0)
+            break;
+        length -= skipped;
+    }
+    return (uint16_t)length;
 }
 
 // Zufallszahl fuer schwache Bits (xorshift32). Der Startwert wird beim Hard Reset gesetzt, damit Laeufe reproduzierbar bleiben.
