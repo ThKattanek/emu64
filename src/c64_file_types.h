@@ -8,7 +8,6 @@
 // Dieser Sourcecode ist Copyright geschützt!   //
 // Geistiges Eigentum von Th.Kattanek           //
 //                                              //
-// Letzte Änderung am 29.06.2021                //
 // www.emu64.de                                 //
 //                                              //
 //////////////////////////////////////////////////
@@ -29,7 +28,8 @@ enum C64_FILE_TYPES
 	WAV,
 	CRT,
 	FRZ,
-	NIB
+	NIB,
+	NBZ
 };
 
 #endif // C64_FILE_TYPES_H

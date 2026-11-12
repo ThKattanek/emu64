@@ -18,7 +18,6 @@
 #include <math.h>
 #include <cstdio>
 #include <mutex>
-#include <functional>
 #include "delegate.h"
 
 #include "./mos6502_class.h"
@@ -117,7 +116,7 @@ private:
     /// Funktionen ///
 
     void CheckImageWrite();
-    bool NIBImageToGCRImage(FILE *file);
+    bool NIBImageToGCRImage(const uint8_t *data, size_t data_size);
     bool NIBTracksEquivalent(const uint8_t *a, uint16_t size_a, const uint8_t *b, uint16_t size_b);
     void NIBClearNoise(uint8_t *data, uint16_t size);
     uint32_t ReadNoiseNext();

@@ -196,6 +196,7 @@ SOURCES += \
     mos6526_port.cpp \
     mos6569_class.cpp \
     mos6581_8085_class.cpp \
+    nbz_class.cpp \
     new_romset_window.cpp \
     oscilloscope_widget.cpp \
     oscilloscope_window.cpp \
@@ -271,6 +272,7 @@ HEADERS += \
     mos6526_port.h \
     mos6569_class.h \
     mos6581_8085_class.h \
+    nbz_class.h \
     new_romset_window.h \
     oscilloscope_widget.h \
     oscilloscope_window.h \

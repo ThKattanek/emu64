@@ -74,7 +74,7 @@ FloppyWindow::FloppyWindow(QWidget *parent, QSettings *_ini, C64Class *c64, QStr
 
     connect(ui->FileBrowser,SIGNAL(SelectFile(QString)),this,SLOT(OnSelectFile(QString)));
     connect(ui->FileBrowser,SIGNAL(WriteProtectedChanged(bool)),this,SLOT(OnWriteProtectedChanged(bool)));
-    ui->FileBrowser->SetFileFilter(QStringList()<<"*.d64"<<"*.g64"<<"*.nib");
+    ui->FileBrowser->SetFileFilter(QStringList()<<"*.d64"<<"*.g64"<<"*.nib"<<"*.nbz");
     ui->FileBrowser->EnableWriteProtectCheck(true);
 
     // Kontextmenü erstellen
@@ -249,7 +249,7 @@ void FloppyWindow::OnSelectFile(QString filename)
             emit ChangeFloppyImage(FloppyNr);
         }
 
-        if("G64" == AktFileName[FloppyNr].right(3).toUpper() || "NIB" == AktFileName[FloppyNr].right(3).toUpper())
+        if("G64" == AktFileName[FloppyNr].right(3).toUpper() || "NIB" == AktFileName[FloppyNr].right(3).toUpper() || "NBZ" == AktFileName[FloppyNr].right(3).toUpper())
         {
             emit ChangeFloppyImage(FloppyNr);
             UpdateDirFromDrive(FloppyNr);
@@ -262,14 +262,14 @@ bool FloppyWindow::IsD64File(const QString &filename)
     return "D64" == filename.right(3).toUpper();
 }
 
-// Bei G64/NIB wird das Directory aus dem GCR Image des Laufwerks decodiert (Image muss bereits im Laufwerk liegen)
+// Bei G64/NIB/NBZ wird das Directory aus dem GCR Image des Laufwerks decodiert (Image muss bereits im Laufwerk liegen)
 void FloppyWindow::UpdateDirFromDrive(int floppynr)
 {
     if(floppynr < 0 || floppynr >= MAX_FLOPPY_NUM) return;
     if(IsD64File(AktFileName[floppynr])) return;
 
     QString ext = AktFileName[floppynr].right(3).toUpper();
-    if(ext != "G64" && ext != "NIB") return;
+    if(ext != "G64" && ext != "NIB" && ext != "NBZ") return;
 
     d64[floppynr].ReLoad(c64->floppy[floppynr]->GetCurrentD64ImageBuffer(), c64->floppy[floppynr]->GetCurrentD64Tracks());
 
