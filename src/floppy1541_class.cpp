@@ -14,9 +14,11 @@
 
 #include "./floppy1541_class.h"
 #include "./c64_file_types.h"
+#include "./nbz_class.h"
 
 #include <cstring>
 #include <vector>
+//#include <functional>
 
 const uint8_t Floppy1541::d64_track_zone[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
                                               1,1,1,1,1,1,1,
@@ -264,6 +266,31 @@ void Floppy1541::SetFloppySoundVolume(float_t volume)
     Volume = volume;
 }
 
+// Liest eine Datei komplett in den Speicher (nur bis max_size, groessere Dateien sind kein gueltiges NIB/NBZ)
+static bool ReadWholeFile(FILE *file, std::vector<uint8_t> &data, size_t max_size)
+{
+    data.clear();
+
+    if(fseek(file, 0, SEEK_END) != 0)
+        return false;
+
+    const long file_size = ftell(file);
+    if(file_size <= 0 || (unsigned long)file_size > max_size)
+        return false;
+
+    if(fseek(file, 0, SEEK_SET) != 0)
+        return false;
+
+    data.resize((size_t)file_size);
+    if(fread(data.data(), 1, data.size(), file) != data.size())
+    {
+        data.clear();
+        return false;
+    }
+
+    return true;
+}
+
 bool Floppy1541::LoadDiskImage(FILE *file, int typ)
 {
     size_t reading_elements;
@@ -435,18 +462,34 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
         break;
 
     case NIB:
+    case NBZ:
         // Diskwechsel simulieren
         StartDiskChange();
 
         if (file == nullptr)
             return false;
 
-        for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i]=0x00;
-        for(int i=0;i<NUM_TRACKS*2;i++)
-            TrackSize[i] = 0;
+        {
+            // NIB und NBZ werden komplett im Speicher gehalten. NBZ ist eine komprimierte NIB Datei und wird zuerst entpackt.
+            std::vector<uint8_t> image_data;
+            if(!ReadWholeFile(file, image_data, NBZ::MAX_UNPACKED_SIZE + 65536))
+                return false;
 
-        if(!NIBImageToGCRImage(file))
-            return false;
+            if(typ == NBZ)
+            {
+                std::vector<uint8_t> unpacked;
+                if(!NBZ::Decompress(image_data.data(), image_data.size(), unpacked))
+                    return false;
+                image_data.swap(unpacked);
+            }
+
+            for(int i=0;i<G64_IMAGE_SIZE;i++) GCRImage[i]=0x00;
+            for(int i=0;i<NUM_TRACKS*2;i++)
+                TrackSize[i] = 0;
+
+            if(!NIBImageToGCRImage(image_data.data(), image_data.size()))
+                return false;
+        }
 
         InitEmptyTracks();
 
@@ -469,23 +512,21 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
 // NIB Image (MNIB-1541-RAW, nibtools): 256 Byte Header, danach je Halbspur 8192 Bytes Rohdaten (GCR Bytes wie sie der Lesekopf liefert).
 // Header: Offset 0 Kennung "MNIB-1541-RAW", ab Offset 16 je Halbspur 2 Bytes (Halbspurnummer 2=Spur 1, 3=Spur 1.5, 4=Spur 2 ... und Dichte in Bit 0-1), Ende bei Halbspurnummer 0.
 // Die Spurdaten folgen in der Reihenfolge der Header Eintraege.
-bool Floppy1541::NIBImageToGCRImage(FILE *file)
+bool Floppy1541::NIBImageToGCRImage(const uint8_t *data, size_t data_size)
 {
     static const uint32_t NIB_HEADER_SIZE = 256;
     static const uint32_t NIB_TRACK_SIZE = 8192;
     static const uint32_t NIB_MAX_ENTRIES = (NIB_HEADER_SIZE - 16) / 2;
 
-    uint8_t header[NIB_HEADER_SIZE];
-    uint8_t raw[NIB_TRACK_SIZE];
-
-    if(fseek(file, 0, SEEK_SET) != 0)
+    if(data == nullptr || data_size < NIB_HEADER_SIZE)
         return false;
 
-    if(fread(header, 1, NIB_HEADER_SIZE, file) != NIB_HEADER_SIZE)
-        return false;
+    const uint8_t *header = data;
 
     if(0 != memcmp(header, "MNIB-1541-RAW", 13))
         return false;
+
+    size_t pos = NIB_HEADER_SIZE;
 
     int loaded_tracks = 0;
     bool entry_present[NUM_TRACKS*2] = {false};
@@ -499,8 +540,11 @@ bool Floppy1541::NIBImageToGCRImage(FILE *file)
             break;
 
         // Unvollstaendige Datei: Es zaehlen nur komplette Spuren
-        if(fread(raw, 1, NIB_TRACK_SIZE, file) != NIB_TRACK_SIZE)
+        if(data_size - pos < NIB_TRACK_SIZE)
             break;
+
+        const uint8_t *raw = data + pos;
+        pos += NIB_TRACK_SIZE;
 
         // Halbspurnummer 2 = Spur 1 = Halbspur 0 im Emulator
         if(half_track_nr < 2 || half_track_nr - 2 >= (unsigned int)(NUM_TRACKS*2))

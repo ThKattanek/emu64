@@ -584,6 +584,9 @@ int MainWindow::OnInit(bool nogui)
             if(file_info.suffix().toUpper() == "NIB")
                 typ = NIB;
 
+            if(file_info.suffix().toUpper() == "NBZ")
+                typ = NBZ;
+
             FILE *file = qfopen(floppy_window->GetAktFilename(i), "r+b");
             c64->LoadDiskImage(i,file, typ);
 
@@ -1254,6 +1257,9 @@ void MainWindow::AutoLoadAndRun(QString filename)
     if(file_info.suffix().toUpper() == "NIB")
         typ = NIB;
 
+    if(file_info.suffix().toUpper() == "NBZ")
+        typ = NBZ;
+
     if(file_info.suffix().toUpper() == "CRT")
     {
         cartridge_window->SetCartridgeImage(filename);
@@ -1532,7 +1538,7 @@ void MainWindow::on_actionAutostart_triggered()
         lastAutoloadPath = QDir::homePath();
     }
 
-    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),lastAutoloadPath,tr("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.tap *.d64 *.g64 *.nib *.crt *.frz);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
+    QString filename = QFileDialog::getOpenFileName(this,tr("C64 Dateien öffnen "),lastAutoloadPath,tr("C64 Programm Dateien ") + "(*.prg *.c64 *.p00 *.t64 *.tap *.d64 *.g64 *.nib *.nbz *.crt *.frz);;" + tr("Alle Dateien ") + "(*.*)",0,QFileDialog::DontUseNativeDialog);
     if(filename != "")
     {
         AutoLoadAndRun(filename);
@@ -1649,6 +1655,9 @@ void MainWindow::OnChangeFloppyImage(int floppynr)
 
     if(file_info.suffix().toUpper() == "NIB")
         typ = NIB;
+
+    if(file_info.suffix().toUpper() == "NBZ")
+        typ = NBZ;
 
     FILE *file = qfopen(floppy_window->GetAktFilename(floppynr), "r+b");
     c64->LoadDiskImage(floppynr,file, typ);
