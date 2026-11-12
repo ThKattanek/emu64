@@ -421,7 +421,7 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
         for(int i=0;i<NUM_TRACKS*2;i++)
             TrackSize[i] = 0;
 
-        for(int i=0;i<trackanzahl;i++)
+        for(int i=0;i<trackanzahl && i<84;i++)
         {
             if(trackpos[i] != 0)
             {
@@ -432,10 +432,12 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
                     return false;
 
                 // Die letzte Spur im G64 kann kuerzer sein als die maximale Spurgroesse (Dateiende), sie muss nur ihre eigene Laenge enthalten
-                if(TrackSize[i] > tracksize-2)
+                // Der Abstand der Spuren im Speicher ist immer GCR_TRACK_SIZE, unabhaengig von der Spurgroesse im G64 Header
+                // (andere Tools wie nibconv schreiben z.B. 7815). Gelesen wird nur die tatsaechliche Spurlaenge.
+                if(TrackSize[i] > tracksize || TrackSize[i] > GCR_TRACK_SIZE)
                     return false;
 
-                reading_elements = fread(GCRImage+(i*tracksize),1,tracksize-2,file);
+                reading_elements = fread(GCRImage+(i*GCR_TRACK_SIZE),1,TrackSize[i],file);
                 if(reading_elements < size_t(TrackSize[i]))
                     return false;
             }
