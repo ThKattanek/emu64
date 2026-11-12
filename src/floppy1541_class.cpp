@@ -122,6 +122,7 @@ Floppy1541::Floppy1541(bool *reset, int samplerate, int buffersize, bool *floppy
 
     Jumper = 0;
     via1->Jumper = &Jumper;
+    ImageReadOnly = false;
     WriteProtect = WriteProtectAkt = false;
     via2->WriteProtect = &WriteProtect;
     via2->DiskMotorOn = &DiskMotorOn;
@@ -350,6 +351,7 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
         ImageWriteStatus = false;
         ImageDirectoryWriteStatus = false;
         ImageTyp = D64;
+        ImageReadOnly = false;
 
         return true;
         break;
@@ -459,6 +461,8 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
         ImageWriteStatus = false;
         ImageDirectoryWriteStatus = false;
         ImageTyp = G64;
+        ImageReadOnly = true;
+        WriteProtect = WriteProtectAkt = true;
 
         return true;
         break;
@@ -504,6 +508,8 @@ bool Floppy1541::LoadDiskImage(FILE *file, int typ)
         ImageWriteStatus = false;
         ImageDirectoryWriteStatus = false;
         ImageTyp = NIB;
+        ImageReadOnly = true;
+        WriteProtect = WriteProtectAkt = true;
 
         return true;
         break;
@@ -947,6 +953,7 @@ void Floppy1541::UnLoadDiskImage()
         D64Image[i] = 0;
     for(int i=0;i<G64_IMAGE_SIZE;i++)
         GCRImage[i] = 0;
+    ImageReadOnly = false;
     WriteProtect = false;
 
     fclose(image_file);
@@ -1440,7 +1447,8 @@ void Floppy1541::SetDeviceNumber(uint8_t number)
 
 void Floppy1541::SetWriteProtect(bool status)
 {
-    WriteProtect = WriteProtectAkt = status;
+    // G64, NIB und NBZ sind immer schreibgeschuetzt (Schreiben wird noch nicht unterstuetzt)
+    WriteProtect = WriteProtectAkt = status || ImageReadOnly;
 }
 
 void Floppy1541::GetFloppyInfo(FLOPPY_INFO *fi)

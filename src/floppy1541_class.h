@@ -152,6 +152,7 @@ private:
     bool    FloppyEnabled;
     bool    WriteProtect;
     bool    WriteProtectAkt;            // Wird zusätzlich für Diskwechselsimaltion benötigt
+    bool    ImageReadOnly;              // G64, NIB und NBZ Images werden (noch) nicht beschrieben: Die Floppy ist dann immer schreibgeschützt
 
     int     DiskChangeSimState;         // 0 = momentan kein Diskwechsel
     int     DiskChangeSimCycleCounter;
