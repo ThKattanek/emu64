@@ -1,6 +1,7 @@
 Alle Änderungen ab V5.2.0 bis jetzt
 -----------------------------------
 
+- Fixed: Floppy - G64, NIB und NBZ Images werden immer schreibgeschuetzt gemountet, da das Schreiben auf diese Formate noch nicht unterstuetzt wird. Im FloppyWindow ist der Schreibschutz bei diesen Images angehakt und nicht aenderbar.
 - Fixed: [#377] Floppy - NIB: Die Spuren werden beim Laden wie bei nibconv/nibtools am ersten vollen Sync-Byte vor Sektor 0 ausgerichtet und zu lange Spuren durch Verkuerzen der Syncs (mindestens 4 Bytes) auf die Kapazitaet bei 295 U/min gebracht. Dadurch laeuft z.B. "4th & Inches" (Accolade) mit Schnell-Loader wieder (PAL).
 - Fixed: [#381] Floppy - G64 Images mit einer anderen Spurgroesse im Header als 7928 (z.B. von nibconv/nibtools erzeugt, 7815) wurden falsch geladen (Spuren lagen an falschen Stellen, lange Spuren wurden abgelehnt, ?FILE NOT FOUND). Der Abstand der Spuren im Speicher ist jetzt unabhaengig vom Header.
 - NEW! [#384] Floppy - NBZ Images (mit dem LZ Verfahren von nibtools komprimierte NIB Dateien, z.B. C64 Preservation Project) werden unterstützt. Die Datei wird beim Laden im Speicher entpackt und dann wie ein NIB Image behandelt (nur Lesen). Beschädigte NBZ Dateien werden abgelehnt.

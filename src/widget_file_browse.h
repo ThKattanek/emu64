@@ -50,6 +50,7 @@ public:
     void SetIni(QSettings *ini, const QString &local_group = QString(), const QString &local_name = QString());
     void EnableWriteProtectCheck(bool enabled);
     bool isFileWriteProtect(QString filename);
+    static bool isReadOnlyImage(const QString &filename);  // G64, NIB und NBZ: Schreiben wird noch nicht unterstützt
     ~WidgetFileBrowse();
 
 signals:

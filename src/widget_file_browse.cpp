@@ -204,8 +204,17 @@ void WidgetFileBrowse::EnableWriteProtectCheck(bool enabled)
     ui->WriteProtected->setVisible(enabled);
 }
 
+bool WidgetFileBrowse::isReadOnlyImage(const QString &filename)
+{
+    const QString suffix = QFileInfo(filename).suffix().toLower();
+    return suffix == "g64" || suffix == "nib" || suffix == "nbz";
+}
+
 bool WidgetFileBrowse::isFileWriteProtect(QString filename)
 {
+    if(isReadOnlyImage(filename))
+        return true;
+
     QFileInfo file(filename);
     QFile::Permissions permissions = file.permissions();
 
@@ -319,12 +328,15 @@ void WidgetFileBrowse::on_listView_filebrowser_clicked(const QModelIndex &index)
 #endif
         {
             ShowZipList(false);
-            ui->WriteProtected->setEnabled(true);
+
+            // G64, NIB und NBZ sind immer schreibgeschützt (der Haken ist gesetzt und nicht änderbar)
+            const bool read_only_image = isReadOnlyImage(AktFileName);
+            ui->WriteProtected->setEnabled(!read_only_image);
 
             QFileInfo file(AktFileName);
             QFile::Permissions permissions = file.permissions();
 
-            bool wp = !permissions.testFlag(QFile::WriteOwner);
+            bool wp = read_only_image || !permissions.testFlag(QFile::WriteOwner);
 
             ui->WriteProtected->setChecked(wp);
 
