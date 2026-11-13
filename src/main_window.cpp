@@ -518,7 +518,7 @@ int MainWindow::OnInit(bool nogui)
         ui->FloppyTabel->setCellWidget(i,0,w);
         ui->FloppyTabel->setColumnWidth(0,w->width());
         connect(w,SIGNAL(ChangeEnableFloppy()),debugger_window,SLOT(onChangeFloppyStatus()));
-        connect(w,SIGNAL(LoadImage(int)),floppy_window,SLOT(OnChangeFloppyNummer(int)));
+        connect(w,SIGNAL(LoadFloppyImage(int)),floppy_window,SLOT(OnChangeFloppyNummer(int)));
         connect(w,SIGNAL(RemoveImage(int)),floppy_window,SLOT(OnRemoveImage(int)));
     }
     LogText(tr(">> Alle Floppy Lauferke in Tabelle eingetragen\n").toUtf8());

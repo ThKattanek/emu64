@@ -43,7 +43,7 @@ public:
 
 signals:
    void ChangeEnableFloppy(void);
-   void LoadImage(int floppynr);
+   void LoadFloppyImage(int floppynr);
    void RemoveImage(int floppynr);
 
 private slots:
