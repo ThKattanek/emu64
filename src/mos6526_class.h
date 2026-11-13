@@ -116,6 +116,10 @@ private:
     bool        timer_a_underflow_old;      // Timer A hatte im vorigen Takt einen Unterlauf
     bool        timer_b_underflow_old;      // Timer B hatte im vorigen Takt einen Unterlauf
     bool        cnt_pin_old;
+    uint8_t     sdr_bits;           // Serieller Ausgabemodus: verbleibende halbe Bits (16 = Byte beginnt, 1 = letztes Bit ist raus)
+    bool        sdr_valid;          // Ein neues SDR Byte wartet, waehrend das alte noch hinausgeschoben wird
+    uint8_t     sdr_load_delay;     // Takte bis ein geschriebenes SDR wirksam wird
+    uint8_t     sdr_irq_delay;      // Takte bis der SDR Interrupt gesetzt wird
 
     uint32_t    clock_counter_latch;
     uint32_t    clock_counter;

@@ -84,6 +84,10 @@ void MOS6526::Reset()
     timer_a_underflow_old = false;
     timer_b_underflow_old = false;
     cnt_pin_old = false;
+    sdr_bits = 0;
+    sdr_valid = false;
+    sdr_load_delay = 0;
+    sdr_irq_delay = 0;
 
     prev_lp = 0x10;
 
@@ -440,6 +444,7 @@ inline void MOS6526::TimerCount()
 
     bool timer_a_underflow = TimerStep(&timer_a);
     bool timer_b_underflow = TimerStep(&timer_b);
+    bool timer_a_underflow_prev = timer_a_underflow_old;
     timer_a_underflow_old = timer_a_underflow;
     timer_b_underflow_old = timer_b_underflow;
 
@@ -448,6 +453,19 @@ inline void MOS6526::TimerCount()
     {
         TriggerInterrupt(1);
         pb_6 ^= 0x01;
+
+        // Serieller Ausgabemodus: Jeder Unterlauf von Timer A schaltet CNT um, zwei Unterlaeufe ergeben ein Bit.
+        // Nach dem 15. Unterlauf ist das letzte Bit draussen, der SDR Interrupt folgt 3 Takte spaeter.
+        // Folgen die Unterlaeufe in aufeinanderfolgenden Takten (Latch 0), wird die CNT Flanke nicht mehr erkannt und nicht geschoben.
+        if((cra & 0x40) && !timer_a_underflow_prev && sdr_bits && (--sdr_bits & 1) && sdr_bits == 1)
+        {
+            sdr_irq_delay = 3;
+            if(sdr_valid)
+            {
+                sdr_valid = false;
+                sdr_bits = 17;
+            }
+        }
     }
 
     /// Timer B Unterlauf ///
@@ -456,6 +474,20 @@ inline void MOS6526::TimerCount()
         TriggerInterrupt(2);
         pb_7 ^= 0x01;
     }
+
+    /// Serieller Ausgabemodus: verzoegerte Ereignisse ///
+    if(sdr_load_delay && --sdr_load_delay == 0)
+    {
+        if(sdr_bits == 0)
+            sdr_bits = 16;
+        else if(sdr_bits == 1)
+            sdr_bits = 17;
+        else
+            sdr_valid = true;
+    }
+
+    if(sdr_irq_delay && --sdr_irq_delay == 0)
+        TriggerInterrupt(8);
 }
 
 void MOS6526::WriteIO(uint16_t address, uint8_t value)
@@ -553,9 +585,14 @@ void MOS6526::WriteIO(uint16_t address, uint8_t value)
     case 12:
         io[address]=value;
         sdr = value;
-        if((cra & 0x40))
+        // Im Ausgabemodus beginnt das Hinausschieben nach 2 Takten, der Interrupt kommt erst danach (siehe TimerCount)
+        if(cra & 0x40)
         {
-            TriggerInterrupt(8);	// Fake SDR interrupt for programs that need it
+            sdr_load_delay = 2;
+
+            // Laeuft Timer A mit Latch 0 oder 1, dann ist der SDR Flag laut VICE Testbench (cia-sdr-icr) sofort zu sehen
+            if(timer_a.cr_start && timer_a.latch <= 1)
+                TriggerInterrupt(8);
         }
         break;
 
