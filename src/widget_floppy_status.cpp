@@ -256,7 +256,7 @@ void WidgetFloppyStatus::on_PowerLED_clicked()
 
 void WidgetFloppyStatus::on_InstertImage_clicked()
 {
-    emit LoadImage(GeraeteID-8);
+    emit LoadFloppyImage(GeraeteID-8);
 }
 
 void WidgetFloppyStatus::on_EjectImage_clicked()
