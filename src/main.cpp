@@ -158,6 +158,10 @@ int main(int argc, char *argv[])
         if (app->alreadyExists())
         {
             app->sendMessages(ArgsToStringList(argc, argv));
+
+            // Aufräumen vor dem Beenden, sonst meldet Qt "QThreadStorage: entry ... destroyed before end of thread"
+            delete app;
+            delete cmd_line;
             return 0;
         }
         else
