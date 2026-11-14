@@ -16,6 +16,7 @@
 #define GEORAM_CLASS_H
 
 #include <cstdint>
+#include <cstdio>
 
 // 512KiB, 1MiB, 2MiB, 4MiB
 
@@ -40,8 +41,8 @@ class GEORAMClass
 
     void Remove(void);
     void Insert(void);
-    int LoadRamImage(const char *filename);
-    int SaveRamImage(const char *filename);
+    int LoadRamImage(FILE *file);
+    int SaveRamImage(FILE *file);
     void ClearRAM(void);
     void SetGeoRamType(uint8_t type);   // _GEORAM or _NEORAM
     uint8_t GetGeoRamMode();            // return _512, _1024, _2048, _4096

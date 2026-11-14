@@ -23,14 +23,52 @@
 
 #include <iostream>
 
+#ifdef _WIN32
+#include <windows.h>
+#include <shellapi.h>
+#include <vector>
+#endif
+
 #if (!defined(SINGLE_THREADED_PLAYBACK) and defined(Q_WS_X11))
 #include <X11/Xlib.h>
 #endif
 
 #undef main
 
+// Argumente (UTF-8) in eine QStringList wandeln
+static QStringList ArgsToStringList(int argc, char *argv[])
+{
+    QStringList list;
+    for(int i=0; i<argc; i++) list << QString::fromUtf8(argv[i]);
+    return list;
+}
+
 int main(int argc, char *argv[])
 {
+#ifdef _WIN32
+    // Unter Windows liegt argv in der ANSI-Codepage vor, Zeichen wie "└┘┌┐" gehen dabei verloren (#209).
+    // Deshalb wird die Unicode-Kommandozeile geholt und nach UTF-8 gewandelt.
+    std::vector<QByteArray> utf8_args;
+    std::vector<char*> utf8_argv;
+    {
+        int wargc = 0;
+        wchar_t **wargv = CommandLineToArgvW(GetCommandLineW(), &wargc);
+        if(wargv != nullptr)
+        {
+            for(int i=0; i<wargc; i++)
+                utf8_args.push_back(QString::fromWCharArray(wargv[i]).toUtf8());
+            LocalFree(wargv);
+
+            for(auto &a : utf8_args)
+                utf8_argv.push_back(a.data());
+            utf8_argv.push_back(nullptr);
+
+            argc = static_cast<int>(utf8_args.size());
+            argv = utf8_argv.data();
+        }
+    }
+#endif
+
 #if (!defined(SINGLE_THREADED_PLAYBACK) and defined(Q_WS_X11))
     XInitThreads();
 #endif
@@ -119,9 +157,11 @@ int main(int argc, char *argv[])
     {
         if (app->alreadyExists())
         {
-	    QStringList args;
-            for(int i=0;i<argc;i++) args << argv[i];
-	    app->sendMessages(args);
+            app->sendMessages(ArgsToStringList(argc, argv));
+
+            // Aufräumen vor dem Beenden, sonst meldet Qt "QThreadStorage: entry ... destroyed before end of thread"
+            delete app;
+            delete cmd_line;
             return 0;
         }
         else
@@ -225,15 +265,14 @@ int main(int argc, char *argv[])
 
     w->log = log;
     w->no_write_ini_exit = true;
+    w->use_sdl_renderer_cmd = cmd_line->FoundCommand(CMD_USE_SDL_RENDERER);
 
 	if(w->OnInit(cmd_line->FoundCommand(CMD_NOGUI)) == 0)
     {
         w->no_write_ini_exit = false;
         if(isFirstInstance)
         {
-            QStringList msg_list;
-            for(int i=0;i<argc;i++) msg_list << argv[i];
-            w->OnMessage(msg_list);
+            w->OnMessage(ArgsToStringList(argc, argv));
         }
 
         ret = app->exec();

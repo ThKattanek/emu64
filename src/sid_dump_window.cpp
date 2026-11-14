@@ -17,6 +17,7 @@
 
 #include "sid_dump_window.h"
 #include "ui_sid_dump_window.h"
+#include "./utils.h"
 
 SidDumpWindow::SidDumpWindow(QWidget *parent, C64Class *c64) :
     QDialog(parent),
@@ -62,7 +63,7 @@ void SidDumpWindow::on_SidDumpStart_clicked()
         return;
     }
 
-    if(c64->StartSidDump(filename.toLocal8Bit()))
+    if(c64->StartSidDump(qfopen(filename, "wb")))
     {
         ui->SidDumpStart->setEnabled(false);
         ui->SidDumpStop->setEnabled(true);

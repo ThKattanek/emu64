@@ -141,16 +141,16 @@ public:
 
     void InsertREU();
     void RemoveREU();
-    int LoadREUImage(const char *filename);
-    int SaveREUImage(const char *filename);
+    int LoadREUImage(FILE *file);
+    int SaveREUImage(FILE *file);
     void ClearREURam();
     uint8_t GetREUMode();
     void SetREUMode(uint16_t mode);
 
     void InsertGeoRam();
     void RemoveGeoRam();
-    int LoadGeoRamImage(const char *filename);
-    int SaveGeoRamImage(const char *filename);
+    int LoadGeoRamImage(FILE *file);
+    int SaveGeoRamImage(FILE *file);
     void ClearGeoRam();
     uint8_t GetGeoRamMode();
     void SetGeoRamMode(uint8_t mode);
@@ -172,7 +172,7 @@ public:
     void GetC64CpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg);
     void GetVicReg(VIC_STRUCT *vic_reg);
     void GetIECStatus(IEC_STRUCT *iec);
-    bool StartDebugLogging(const char *filename);
+    bool StartDebugLogging(FILE *file);
     void StopDebugLogging();
     int Disassemble(FILE* file, uint16_t pc, bool line_draw);
 
@@ -182,11 +182,11 @@ public:
     void UpdateBreakGroup();
     void DeleteAllBreakGroups();
     int GetBreakGroupCount();
-    int LoadBreakGroups(const char *filename);
-    bool SaveBreakGroups(const char *filename);
-    bool ExportPRG(const char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
-    bool ExportRAW(const char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
-    bool ExportASM(const char *filename, uint16_t start_adresse, uint16_t end_adresse, int source);
+    int LoadBreakGroups(FILE *file);
+    bool SaveBreakGroups(FILE *file);
+    bool ExportPRG(FILE *file, uint16_t start_adresse, uint16_t end_adresse, int source);
+    bool ExportRAW(FILE *file, uint16_t start_adresse, uint16_t end_adresse, int source);
+    bool ExportASM(FILE *file, uint16_t start_adresse, uint16_t end_adresse, int source);
     void JoystickNewScan();
     void StartRecJoystickMapping(int slot_nr);
     void StopRecJoystickMapping();
@@ -219,7 +219,7 @@ public:
     void StopVideoRecord();
     int GetRecordedFrameCount();
 
-    bool StartIECDump(const char *filename);
+    bool StartIECDump(FILE *file);
     void StopIECDump();
 
     void SetSidEmulation(int sid_emulation);            // SID Emulation (EMU64_SID oder RESID_SID)
@@ -234,7 +234,7 @@ public:
     void SetSidDigiBoost(bool enable);                  // Es wird die DigiBoost Funktion der SID's "8580" emuliert. Dadurch werden Samples beim 8580 lauter abgespielt.
     void EnableWriteToAllEmulationSids(bool enable);    // Es wird immer in allen Registern der emulierten SID's (EMU64_SID und RESID_SID) geschrieben, egal welche gerade aktiv ist.
 
-    bool StartSidDump(const char *filename);
+    bool StartSidDump(FILE *file);
     void StopSidDump();
     int GetSidDumpFrames();
 

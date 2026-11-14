@@ -17,6 +17,7 @@
 
 #include "./video_capture_window.h"
 #include "./ui_video_capture_window.h"
+#include "./utils.h"
 
 VideoCaptureWindow::VideoCaptureWindow(QWidget *parent, C64Class *c64) :
     QDialog(parent),
@@ -73,7 +74,7 @@ void VideoCaptureWindow::on_CaptureStart_clicked()
         return;
     }
 
-    if(c64->StartVideoRecord(filename.toLocal8Bit(),ui->AudioBitrate->value() * 1000, ui->VideoBitrate->value()*1000))
+    if(c64->StartVideoRecord(qfname(filename),ui->AudioBitrate->value() * 1000, ui->VideoBitrate->value()*1000))
     {
         ui->CaptureStart->setEnabled(false);
         ui->CaptureStop->setEnabled(true);

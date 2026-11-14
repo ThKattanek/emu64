@@ -31,16 +31,20 @@ SIDDumpClass::~SIDDumpClass(void)
     StopCapture();
 }
 
-bool SIDDumpClass::StartCapture(const char* filename)
+bool SIDDumpClass::StartCapture(FILE *file)
 {
-    if(PlayEnable) return false;
+    if(PlayEnable)
+    {
+        if(file != nullptr) fclose(file);
+        return false;
+    }
     StopCapture();
 
     CaptureEnable = true;
     CycleCounter = 0;
     CycleCounts = 0;
 
-    CaptureFile = fopen (filename,"wb");
+    CaptureFile = file;
     if (CaptureFile == NULL)
     {
         return false;
@@ -112,7 +116,7 @@ void SIDDumpClass::CycleTickCapture(void)
     CycleCounter = 0;
 }
 
-bool SIDDumpClass::LoadDump(char* filename)
+bool SIDDumpClass::LoadDump(FILE *file)
 {
     int reading_bytes;
 
@@ -122,7 +126,7 @@ bool SIDDumpClass::LoadDump(char* filename)
         delete Dump;
     }
 
-    PlayFile = fopen(filename, "rb");
+    PlayFile = file;
     if (PlayFile == NULL)
     {
         return false;

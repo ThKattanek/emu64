@@ -38,11 +38,9 @@ void GEORAMClass::Remove(void)
     geo_ram_insert = false;
 }
 
-int GEORAMClass::LoadRamImage(const char *filename)
+int GEORAMClass::LoadRamImage(FILE *file)
 {
     /// load georam image ...
-    FILE* file;
-    file = fopen(filename, "rb");
     if (file == NULL)
     {
         return 1;
@@ -93,11 +91,9 @@ int GEORAMClass::LoadRamImage(const char *filename)
     return 0;
 }
 
-int GEORAMClass::SaveRamImage(const char *filename)
+int GEORAMClass::SaveRamImage(FILE *file)
 {
     /// save georam image ...
-    FILE* file;
-    file = fopen(filename, "wb");
     if (file == NULL)
         return 1;
 

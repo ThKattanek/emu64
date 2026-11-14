@@ -3811,14 +3811,14 @@ void C64Class::RemoveREU()
     HardReset();
 }
 
-int C64Class::LoadREUImage(const char *filename)
+int C64Class::LoadREUImage(FILE *file)
 {
-    return reu->LoadRAM(filename);
+    return reu->LoadRAM(file);
 }
 
-int C64Class::SaveREUImage(const char *filename)
+int C64Class::SaveREUImage(FILE *file)
 {
-    return reu->SaveRAM(filename);
+    return reu->SaveRAM(file);
 }
 
 void C64Class::ClearREURam()
@@ -3859,14 +3859,14 @@ void C64Class::RemoveGeoRam()
     HardReset();
 }
 
-int C64Class::LoadGeoRamImage(const char *filename)
+int C64Class::LoadGeoRamImage(FILE *file)
 {
-    return geo->LoadRamImage(filename);
+    return geo->LoadRamImage(file);
 }
 
-int C64Class::SaveGeoRamImage(const char *filename)
+int C64Class::SaveGeoRamImage(FILE *file)
 {
-    return geo->SaveRamImage(filename);
+    return geo->SaveRamImage(file);
 }
 
 void C64Class::ClearGeoRam()
@@ -3987,9 +3987,9 @@ void C64Class::GetIECStatus(IEC_STRUCT *iec)
     iec->DATA_IN = !!(floppy_iec_wire & 128);
 }
 
-bool C64Class::StartDebugLogging(const char *filename)
+bool C64Class::StartDebugLogging(FILE *file)
 {
-    debug_logging_file = fopen (filename, "w");
+    debug_logging_file = file;
     if (debug_logging_file == nullptr)
     {
         return false;
@@ -4224,9 +4224,8 @@ reading_elements = fread(&variable,sizeof(variable),1,file); \
         return -3; \
 }
 
-int C64Class::LoadBreakGroups(const char *filename)
+int C64Class::LoadBreakGroups(FILE *file)
 {
-    FILE *file;
     char Kennung[10];
     uint8_t Version;
     uint8_t Groupanzahl;
@@ -4234,7 +4233,6 @@ int C64Class::LoadBreakGroups(const char *filename)
 
     DeleteAllBreakGroups();
 
-    file = fopen (filename, "rb");
     if (file == nullptr)
     {
         /// Datei konnte nicht geöffnet werden ///
@@ -4390,13 +4388,11 @@ int C64Class::LoadBreakGroups(const char *filename)
     return 0;
 }
 
-bool C64Class::SaveBreakGroups(const char *filename)
+bool C64Class::SaveBreakGroups(FILE *file)
 {
-    FILE *file;
     char Kennung[]  = "EMU64_BPT";
     uint8_t Version    = 2;
 
-    file = fopen (filename, "wb");
     if (file == nullptr)
     {
         return false;
@@ -4444,10 +4440,11 @@ bool C64Class::SaveBreakGroups(const char *filename)
     return true;
 }
 
-bool C64Class::ExportPRG(const char *filename, uint16_t start_adresse, uint16_t end_adresse, int source)
+bool C64Class::ExportPRG(FILE *file, uint16_t start_adresse, uint16_t end_adresse, int source)
 {
-    FILE *file;
     uint8_t *RAM;
+
+    if(file == nullptr) return false;
 
     if(source > 0)
     {
@@ -4455,11 +4452,9 @@ bool C64Class::ExportPRG(const char *filename, uint16_t start_adresse, uint16_t 
     }
     else RAM = mmu->GetRAMPointer();
 
-    if(RAM == nullptr) return false;
-
-    file = fopen (filename, "wb");
-    if (file == nullptr)
+    if(RAM == nullptr)
     {
+        fclose(file);
         return false;
     }
 
@@ -4470,10 +4465,11 @@ bool C64Class::ExportPRG(const char *filename, uint16_t start_adresse, uint16_t 
     return true;
 }
 
-bool C64Class::ExportRAW(const char *filename, uint16_t start_adresse, uint16_t end_adresse, int source)
+bool C64Class::ExportRAW(FILE *file, uint16_t start_adresse, uint16_t end_adresse, int source)
 {
-    FILE *file;
     uint8_t *RAM;
+
+    if(file == nullptr) return false;
 
     if(source > 0)
     {
@@ -4481,11 +4477,9 @@ bool C64Class::ExportRAW(const char *filename, uint16_t start_adresse, uint16_t 
     }
     else RAM = mmu->GetRAMPointer();
 
-    if(RAM == nullptr) return false;
-
-    file = fopen (filename, "wb");
-    if (file == nullptr)
+    if(RAM == nullptr)
     {
+        fclose(file);
         return false;
     }
     for(int i=start_adresse; i < end_adresse + 1; i++) fwrite(&RAM[i], 1, 1, file);
@@ -4494,11 +4488,8 @@ bool C64Class::ExportRAW(const char *filename, uint16_t start_adresse, uint16_t 
     return true;
 }
 
-bool C64Class::ExportASM(const char *filename, uint16_t start_adresse, uint16_t end_adresse, int source)
+bool C64Class::ExportASM(FILE *file, uint16_t start_adresse, uint16_t end_adresse, int source)
 {
-    FILE *file;
-
-    file = fopen (filename, "w");
     if (file == nullptr)
     {
         return false;
@@ -4671,7 +4662,7 @@ int C64Class::GetRecordedFrameCount()
     return video_capture->GetRecordedFrameCount();
 }
 
-bool C64Class::StartIECDump(const char *filename)
+bool C64Class::StartIECDump(FILE *file)
 {
     char VersionString[256];
 
@@ -4681,7 +4672,7 @@ bool C64Class::StartIECDump(const char *filename)
     iec_export_vdc.SetTimeScaleString("989 ns");
     iec_export_vdc.SetModuleString("IEC-BUS");
 
-    if(!iec_export_vdc.Open(filename)) return false;
+    if(!iec_export_vdc.Open(file)) return false;
 
     iec_is_dumped = true;
 
@@ -4794,13 +4785,14 @@ void C64Class::EnableWriteToAllEmulationSids(bool enable)
     write_to_all_emulation_sids = enable;
 }
 
-bool C64Class::StartSidDump(const char *filename)
+bool C64Class::StartSidDump(FILE *file)
 {
     if(current_sid_dump != nullptr)
     {
-        current_sid_dump->StartCapture(filename);
+        current_sid_dump->StartCapture(file);
         return true;
     }
+    if(file != nullptr) fclose(file);
     return false;
 }
 

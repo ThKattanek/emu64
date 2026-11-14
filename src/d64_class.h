@@ -33,7 +33,7 @@ class D64Class
     int LoadD64(FILE *file);                                    // 0 = ok, 1 = Fehler (Datei fehlt/zu klein)
     void ReLoad(const uint8_t* d64_image_buffer, int tracks);   // Image vom Emulator (35, 40 oder 42 Spuren)
     void UnLoadD64();
-    bool ExportPrg(int file_number, const char* filename);
+    bool ExportPrg(int file_number, FILE *file);
 
     char        d64_name[D64_NAME_LENGHT+1];
     uint16_t    file_count;
