@@ -13,6 +13,8 @@
 //////////////////////////////////////////////////
 
 #include <cstring>
+#include <utility>
+#include <vector>
 #include "./d64_class.h"
 
 D64Class::D64Class()
@@ -61,6 +63,95 @@ bool D64Class::CreateDiskImage(FILE *file, const char *diskname, const char *dis
     for(int i=0 ;i<324; i++) fwrite(block, 1, 256, file);
 
     fclose(file);
+
+    return true;
+}
+
+bool D64Class::BuildPrgDiskImage(uint8_t *image, const char *file_name, const uint8_t *prg, size_t prg_size)
+{
+    const int tracks = 35;
+    const int dir_track = 18;
+
+    if(image == nullptr || file_name == nullptr || prg == nullptr || prg_size == 0)
+        return false;
+
+    const size_t blocks = (prg_size + 253) / 254;
+    if(blocks > 660)
+        return false;
+
+    memset(image, 0, D64_IMAGE_SIZE);
+
+    uint8_t *bam = image + D64_TRACK_INDEX[dir_track] * 256;
+    uint8_t *dir = bam + 256;
+
+    // Leere BAM: alle Sektoren frei
+    bam[0] = dir_track; bam[1] = 1; bam[2] = 0x41;
+    for(int t=1; t<=tracks; t++)
+    {
+        int n = D64_NUM_SECTORS[t-1];
+        bam[4*t] = static_cast<uint8_t>(n);
+        for(int s=0; s<n; s++) bam[4*t + 1 + s/8] |= static_cast<uint8_t>(1 << (s%8));
+    }
+
+    auto alloc = [&](int t, int s) {
+        bam[4*t + 1 + s/8] &= static_cast<uint8_t>(~(1 << (s%8)));
+        bam[4*t]--;
+    };
+    auto is_free = [&](int t, int s) { return (bam[4*t + 1 + s/8] & (1 << (s%8))) != 0; };
+
+    alloc(dir_track, 0);
+    alloc(dir_track, 1);
+
+    // Diskname und ID
+    memset(bam + 0x90, 0xA0, 0x1B);
+    memcpy(bam + 0x90, "EMU64", 5);
+    bam[0xA2] = '0'; bam[0xA3] = '0';
+    bam[0xA5] = '2'; bam[0xA6] = 'A';
+
+    // Sektorkette (Interleave 10, Spur 18 wird uebersprungen)
+    std::vector<std::pair<int,int>> chain;
+    int track = 1, want = 0;
+    while(chain.size() < blocks)
+    {
+        if(track > tracks) return false;
+        if(track == dir_track || bam[4*track] == 0) { track++; want = 0; continue; }
+        int n = D64_NUM_SECTORS[track-1];
+        int s = want % n;
+        while(!is_free(track, s)) s = (s + 1) % n;
+        alloc(track, s);
+        chain.push_back(std::make_pair(track, s));
+        want = (s + 10) % n;
+    }
+
+    for(size_t i=0; i<chain.size(); i++)
+    {
+        uint8_t *sec = image + (D64_TRACK_INDEX[chain[i].first] + chain[i].second) * 256;
+        size_t offset = i * 254;
+        size_t len = prg_size - offset;
+        if(len > 254) len = 254;
+
+        if(i + 1 < chain.size())
+        {
+            sec[0] = static_cast<uint8_t>(chain[i+1].first);
+            sec[1] = static_cast<uint8_t>(chain[i+1].second);
+        }
+        else
+        {
+            sec[0] = 0;
+            sec[1] = static_cast<uint8_t>(len + 1);
+        }
+        memcpy(sec + 2, prg + offset, len);
+    }
+
+    // Verzeichniseintrag
+    dir[0] = 0; dir[1] = 0xFF;
+    dir[2] = 0x82;
+    dir[3] = static_cast<uint8_t>(chain[0].first);
+    dir[4] = static_cast<uint8_t>(chain[0].second);
+    memset(dir + 5, 0xA0, 16);
+    for(int i=0; i<16 && file_name[i] != 0; i++) dir[5+i] = static_cast<uint8_t>(file_name[i]);
+    dir[0x1E] = static_cast<uint8_t>(blocks & 0xFF);
+    dir[0x1F] = static_cast<uint8_t>(blocks >> 8);
 
     return true;
 }

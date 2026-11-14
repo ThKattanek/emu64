@@ -132,6 +132,7 @@ public:
     void SoftReset();
     void HardReset();
     void SetReset(int status, int hard_reset);
+    int AutoStartPrgAsDisk(uint8_t floppy_nr, FILE *file, const char *filename);   // 0 = ok
     int LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, int typ, uint16_t entry_number = 0);
     int LoadSingleFile(FILE *file, const char* filename, int typ, uint16_t *return_start_address, uint16_t entry_number = 0);	// Filename ist nur für Logausgabe / Ausschlaggebend ist FILE*
 
@@ -421,6 +422,7 @@ public:
     static const int RESET_STALL_MS = 50;           // So lange darf der Zykluszähler stehen bleiben (Emulation angehalten)
     void            RequestReset(int request);
     uint8_t         auto_load_mode;
+    int             autostart_prg_mode = 1;         // 1 = PRG in den RAM injizieren, 2 = PRG auf eine erzeugte Disk kopieren und per LOAD laden
     char            auto_load_command_line[MAX_STRING_LENGTH];
     char            auto_load_filename[MAX_STRING_LENGTH];
     FILE*			auto_load_file;
