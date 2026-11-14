@@ -18,9 +18,11 @@
 #include "./cpu_info.h"
 #include "./savepng.h"
 #include "./t64_class.h"
+#include "./d64_class.h"
 
 #include <QDebug>
 #include <iostream>
+#include <string>
 
 void AudioMix(void *not_used, Uint8 *stream, int laenge);
 int SDLThread(void *userdat);
@@ -3479,6 +3481,74 @@ int SDLThreadLoad(void *userdat)
 }
 
 // ret 0=OK 1=nicht unterstütztes Format 2=D64 n.IO 3=G64 n.IO 4=OK nur es war ein CRT
+// Autostart Modus 2 (wie VICE "copy to D64"): Das PRG wird in ein erzeugtes D64 geschrieben,
+// in das Laufwerk gesteckt und wie ein Programm von Disk geladen (LOAD"NAME",8,1).
+int C64Class::AutoStartPrgAsDisk(uint8_t floppy_nr, FILE *file, const char *filename)
+{
+    if(file == nullptr) return 1;
+
+    std::vector<uint8_t> prg;
+    uint8_t buffer[4096];
+    size_t n;
+    while((n = fread(buffer, 1, sizeof(buffer), file)) > 0)
+        prg.insert(prg.end(), buffer, buffer + n);
+    fclose(file);
+
+    if(prg.size() < 3) return 1;
+
+    // Dateiname auf der Disk: Name ohne Pfad und Endung, Grossbuchstaben (PETSCII), max. 16 Zeichen
+    std::string name(filename);
+    size_t pos = name.find_last_of("/\\");
+    if(pos != std::string::npos) name = name.substr(pos + 1);
+    pos = name.find_last_of('.');
+    if(pos != std::string::npos && pos > 0) name = name.substr(0, pos);
+
+    char disk_name[17];
+    size_t len = 0;
+    for(size_t i=0; i<name.size() && len<16; i++)
+    {
+        unsigned char c = static_cast<unsigned char>(name[i]);
+        if(c >= 'a' && c <= 'z') c = static_cast<unsigned char>(c - 'a' + 'A');
+        if(c < 0x20 || c > 0x7e || c == '"' || c == '*' || c == '?' || c == ':' || c == ',') c = '_';
+        disk_name[len++] = static_cast<char>(c);
+    }
+    disk_name[len] = 0;
+    if(len == 0) snprintf(disk_name, sizeof(disk_name), "PROGRAM");
+
+    std::vector<uint8_t> image(D64_IMAGE_SIZE);
+    if(!D64Class::BuildPrgDiskImage(image.data(), disk_name, prg.data(), prg.size())) return 1;
+
+    FILE *tmp = tmpfile();
+    if(tmp == nullptr) return 1;
+    if(fwrite(image.data(), 1, image.size(), tmp) != image.size())
+    {
+        fclose(tmp);
+        return 1;
+    }
+    rewind(tmp);
+
+    if(!LoadDiskImage(floppy_nr, tmp, D64)) return 1;
+
+    // Laufwerk vor dem Reset einschalten, damit es zyklusgenau mit dem C64 startet
+    floppy[floppy_nr]->SetEnableFloppy(true);
+
+    KillCommandLine();
+    auto_load_mode = 0;
+
+    uint16_t load_address = static_cast<uint16_t>(prg[0] | (prg[1] << 8));
+    if(load_address <= 0x0801)
+        snprintf(auto_load_command_line, sizeof(auto_load_command_line), "LOAD\"%s\",%d,1%cRUN%c", disk_name, floppy_nr + 8, 13, 13);
+    else
+        snprintf(auto_load_command_line, sizeof(auto_load_command_line), "LOAD\"%s\",%d,1%cSYS %d%c", disk_name, floppy_nr + 8, 13, load_address, 13);
+
+    HardReset();
+    wait_reset_ready = true;
+    c64_reset_ready = false;
+    floppy_reset_ready[0] = false;
+
+    return 0;
+}
+
 int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, int typ, uint16_t entry_number)
 {
     switch(typ)
@@ -3517,6 +3587,9 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
         break;
 
     case PRG: case C64:
+        if(typ == PRG && autostart_prg_mode == 2)
+            return AutoStartPrgAsDisk(floppy_nr, file, filename);
+
         KillCommandLine();
         auto_load_mode = 1;
 

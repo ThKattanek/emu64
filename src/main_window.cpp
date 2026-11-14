@@ -1121,6 +1121,17 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             }
             c64->SetCiaModel(val == 0);
             break;
+        case CMD_AUTOSTART_PRG_MODE:
+            val = cmd_line->GetArgInt(i+1, &error);
+            if(error) break;
+
+            if(val < 1 || val > 2)
+            {
+                cmd_line->OutErrorMsg("Der Autostart PRG Modus muss 1 oder 2 sein.","--help");
+                break;
+            }
+            c64->autostart_prg_mode = val;
+            break;
         case CMD_NOSOUND:
             c64->MuteAudioOutput(true);
             break;

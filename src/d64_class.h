@@ -17,6 +17,7 @@
 
 #include <cstdio>
 #include <cstdint>
+#include <cstddef>
 
 #include "./structs.h"
 #include "./d64_layout.h"
@@ -30,6 +31,7 @@ class D64Class
     D64Class();
     ~D64Class();
     bool CreateDiskImage(FILE *file, const char* diskname, const char* diskid);
+    static bool BuildPrgDiskImage(uint8_t *image, const char* file_name, const uint8_t *prg, size_t prg_size);   // image: D64_IMAGE_SIZE Bytes, 35 Spuren mit einem PRG
     int LoadD64(FILE *file);                                    // 0 = ok, 1 = Fehler (Datei fehlt/zu klein)
     void ReLoad(const uint8_t* d64_image_buffer, int tracks);   // Image vom Emulator (35, 40 oder 42 Spuren)
     void UnLoadD64();

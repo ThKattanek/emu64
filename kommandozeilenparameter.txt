@@ -18,6 +18,12 @@ emu64 [PARAMETER]
 -a, --autostart <Dateiname>
     Lädt ein C64 Programm (prg,t00 ...) oder ein Diskimage (d64, g64, nib, nbz) und startet es gleich.
 
+--autostart-prg-mode <Modus>
+    Legt fest, wie ein PRG mit --autostart gestartet wird. Muss vor --autostart angegeben werden.
+    1 = PRG direkt in den RAM injizieren (Standard)
+    2 = PRG in ein erzeugtes D64 kopieren, in Laufwerk 8 mounten und per LOAD"NAME",8,1 laden
+        (wie VICE "-autostartprgmode 2"; ersetzt ein dort gemountetes Image)
+
 -m, --mount-disk <laufwerksnummer> <Dateiname>
     Mountet ein Diskimage (d64, g64, nib, nbz). Die Laufwerksnummer muss zwischen 8 und 11 liegen.
     NIB Images (nibtools, MNIB-1541-RAW) und NBZ (komprimiertes NIB) werden nur gelesen, Schreibzugriffe der Floppy bleiben im Speicher.
