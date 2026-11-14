@@ -108,28 +108,32 @@ int REUClass::LoadRAM(FILE *file)
     long file_size = ftell(file);    // Position ist Größe
     fseek(file, 0, SEEK_SET);   // Zeiger zurück zum Anfang setzen
 
-    if(file_size > ram_bank_count * 0x10000)
+    if(file_size > 256L * 0x10000)
     {
-        // Datei ist zu groß für die Anzahl der verfügbaren RAM-Bänke
+        // Datei ist größer als die größte REU (16MiB)
         fclose(file);
         return -2;
     }
 
-    size_t reading_bytes;
+    // Kleinste REU Größe wählen, in die das Image passt (wie bei der GeoRAM wird die Größe angepasst)
+    uint8_t new_mode = REU_128KiB;
+    while(new_mode < REU_16MiB && file_size > (128L * 1024) << new_mode)
+        new_mode++;
+    SetReuRamMode(new_mode);
 
     ClearRAM(); // Vor dem Laden den RAM löschen, um sicherzustellen, dass nicht geladene Bereiche auf 0 gesetzt sind
+
+    size_t total_read = 0;
     for(int i=0; i < ram_bank_count; i++)
-    {
-        reading_bytes = fread(ram_baenke[i], 1, 0x10000,file);
-        if(reading_bytes < 0x10000)
-        {
-            // Die Datei enthält nicht genügend Daten, um die aktuelle RAM-Bank vollständig zu laden
-            fclose(file);
-            return -3;
-        }
-    }
+        total_read += fread(ram_baenke[i], 1, 0x10000, file);
 
     fclose(file);
+
+    if(total_read < (size_t)ram_bank_count * 0x10000)
+    {
+        // Die Datei ist kleiner als die gewählte REU Größe (keine Standardgröße), der Rest bleibt 0x00
+        return -3;
+    }
     return 0;
 }
 

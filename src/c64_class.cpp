@@ -3786,6 +3786,11 @@ int C64Class::CreateNewEasyFlashImage(FILE *file, const char *crt_name)
     return crt->CreateNewEasyFlashImage(file, crt_name);
 }
 
+bool C64Class::IsREUInserted()
+{
+    return reu_is_insert;
+}
+
 void C64Class::InsertREU()
 {
     io_source = 2;
@@ -3834,6 +3839,11 @@ uint8_t C64Class::GetREUMode()
 void C64Class::SetREUMode(uint16_t mode)
 {
     reu->SetReuRamMode(mode);
+}
+
+bool C64Class::IsGeoRamInserted()
+{
+    return io_source == 3;
 }
 
 void C64Class::InsertGeoRam()

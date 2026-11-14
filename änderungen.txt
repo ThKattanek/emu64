@@ -1,6 +1,8 @@
 Alle Änderungen ab V5.2.0 bis jetzt
 -----------------------------------
 
+- NEW! [#394] REU - Beim Laden eines REU Images wird die REU Größe jetzt wie bei der GeoRAM automatisch an die Image Größe angepasst (kleinste passende Größe, Menü wird aktualisiert, Hinweis an den Benutzer). Nur Images über 16MiB werden abgelehnt.
+- NEW! [#394] REU/GeoRAM - Beim Laden eines Images wird das Modul automatisch gesteckt, falls es noch nicht gesteckt war (mit Reset des C64, das jeweils andere Modul wird entfernt). Ist das Modul schon gesteckt, bleibt der C64 unverändert.
 - Fixed: Kommandozeile - Der Parameter --use-sdl-renderer hatte keine Wirkung mehr (z.B. in einer VM kein Bild), weil er erst nach dem Start der Emulation ausgewertet wurde und der SDL Thread das Fenster bis dahin schon mit OpenGL erzeugt hatte. Er wird jetzt vor dem Start der Emulation gesetzt
 - Fixed: Kommandozeile - Beim Start einer zweiten Instanz (Weitergabe der Argumente an die laufende Instanz) erschien beim Beenden die Qt-Meldung "QThreadStorage: entry ... destroyed before end of thread". Die zweite Instanz räumt jetzt vor dem Beenden auf
 - Fixed: [#209] Kommandozeile - Dateinamen mit Sonderzeichen (z.B. "└┘┌┐EXCESSAB┌┐└┘.PRG") werden unter Windows jetzt richtig uebergeben (Unicode-Kommandozeile, intern UTF-8; auch bei Weitergabe an eine laufende Instanz). Dateien fuer REU/GeoRAM-Images, Haltepunkte, Exporte, SID-/IEC-Dump und Debug-Log werden jetzt wie bei den Images per FILE* (qfopen) uebergeben, damit Unicode-Pfade unter Windows funktionieren
