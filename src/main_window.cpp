@@ -732,6 +732,12 @@ int MainWindow::OnInit(bool nogui)
 
     LogText(tr(">> C64 Emulation wird gestartet.\n").toUtf8());
 
+    if(use_sdl_renderer_cmd)
+    {
+        c64->use_sdl_renderer = true;
+        video_crt_setup_window->DisableVideoDistortion();
+    }
+
     if(ret_error == 0) c64->StartEmulation();
     else
     {

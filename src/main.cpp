@@ -265,6 +265,7 @@ int main(int argc, char *argv[])
 
     w->log = log;
     w->no_write_ini_exit = true;
+    w->use_sdl_renderer_cmd = cmd_line->FoundCommand(CMD_USE_SDL_RENDERER);
 
 	if(w->OnInit(cmd_line->FoundCommand(CMD_NOGUI)) == 0)
     {

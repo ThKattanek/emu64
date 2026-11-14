@@ -74,6 +74,10 @@ public:
     /// von MainWindow abgefragt
     bool no_write_ini_exit;
 
+    /// Wird in der main.cpp gesetzt (--use-sdl-renderer). Muss vor dem Start der
+    /// Emulation gelten, da das SDL Fenster dort schon erzeugt wird.
+    bool use_sdl_renderer_cmd = false;
+
     /// C64 Klasse ///
     C64Class *c64;
     VideoCrtClass *video_crt_output;
