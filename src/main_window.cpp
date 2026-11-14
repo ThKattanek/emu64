@@ -397,7 +397,7 @@ int MainWindow::OnInit(bool nogui)
 
     SetC64ScreenTitle();
     c64->EnableScreenshots(ScreenshotsEnable);
-    c64->SetScreenshotDir(screenshotPath.toLocal8Bit());
+    c64->SetScreenshotDir(qfname(screenshotPath));
 
     /// Window Klassen erstellen ///
     /// Unter MAC sollte ohne übergabe des this Zeigers die Klasseb erstellt werden
@@ -923,10 +923,12 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
 
     arg = new char*[string_list.length()];
 
+    // Argumente als UTF-8 (Sonderzeichen in Dateinamen, #209)
     for(int i=0; i<argc; i++)
     {
-        arg[i] = new char[string_list.at(i).size()+1];
-        strncpy(arg[i],string_list.at(i).toLatin1().data(), string_list.at(i).size()+1);
+        const QByteArray utf8 = string_list.at(i).toUtf8();
+        arg[i] = new char[utf8.size()+1];
+        memcpy(arg[i], utf8.constData(), utf8.size()+1);
     }
 
     CommandLineClass *cmd_line = new CommandLineClass(argc, arg, "emu64",command_list, command_list_count);
@@ -1713,7 +1715,7 @@ void MainWindow::on_actionREU_laden_triggered()
 
     if(filename != "")
     {
-        int ret = c64->LoadREUImage(filename.toLocal8Bit());
+        int ret = c64->LoadREUImage(qfopen(filename, "rb"));
 
         switch (ret) {
         case -1:
@@ -1743,7 +1745,7 @@ void MainWindow::on_actionREU_speichern_triggered()
     if(!CustomSaveFileDialog::GetSaveFileName(this,tr("REU Inhalt speichern"), filters, &filename, &fileext))
         return;
 
-    if(c64->SaveREUImage(filename.toLocal8Bit()) != 0)
+    if(c64->SaveREUImage(qfopen(filename, "wb")) != 0)
         QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des REU Images trat ein Fehler auf!"));
 }
 
@@ -1785,7 +1787,7 @@ void MainWindow::on_actionGEO_laden_triggered()
         ini->setValue("GeoRamLastImageDir", file_info.absolutePath());
         ini->endGroup();
 
-        if(c64->LoadGeoRamImage(filename.toLocal8Bit()) != 0)
+        if(c64->LoadGeoRamImage(qfopen(filename, "rb")) != 0)
             QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des GEORAM Images trat ein Fehler auf!"));
         else if(georam_mode != c64->GetGeoRamMode())
         {
@@ -1831,7 +1833,7 @@ void MainWindow::on_actionGEO_speichern_triggered()
     if(!CustomSaveFileDialog::GetSaveFileName(this,tr("GEORAM Inhalt speichern"), filters, &filename, &fileext))
         return;
 
-    if(c64->SaveGeoRamImage(filename.toLocal8Bit()) != 0)
+    if(c64->SaveGeoRamImage(qfopen(filename, "wb")) != 0)
         QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des GEORAM Images trat ein Fehler auf!"));
 }
 
@@ -1894,7 +1896,7 @@ void MainWindow::on_actionCPU_Logging_Start_triggered()
         fileext = fileext.toUpper();
         if(fileext == "TXT")
         {
-            if(!c64->StartDebugLogging(filename.toLatin1().constData()))
+            if(!c64->StartDebugLogging(qfopen(filename, "w")))
                 QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der Debug Logging Datei."));
         }
     }

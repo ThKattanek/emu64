@@ -19,6 +19,7 @@
 #include "./debugger_iec_window.h"
 #include "./ui_debugger_iec_window.h"
 #include "./custom_save_file_dialog.h"
+#include "./utils.h"
 
 DebuggerIECWindow::DebuggerIECWindow(QWidget *parent) :
     QDialog(parent),
@@ -106,7 +107,7 @@ void DebuggerIECWindow::on_StartExport_clicked()
 
     if(filename != "")
     {
-        if(c64->StartIECDump(filename.toLocal8Bit()))
+        if(c64->StartIECDump(qfopen(filename, "wt")))
         {
             ui->StopExport->setEnabled(true);
             ui->StartExport->setEnabled(false);

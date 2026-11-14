@@ -26,11 +26,11 @@ class SIDDumpClass
 public:
     SIDDumpClass(unsigned char* sidio);
     ~SIDDumpClass(void);
-    bool StartCapture(const char *filename);
+    bool StartCapture(FILE *file);
     void StopCapture(void);
     int  GetCycleCounts(void);
     void CycleTickCapture(void);
-    bool LoadDump(char* filename);
+    bool LoadDump(FILE *file);
     void ClearDump(void);
     void PlayDump(void);
     void StopDump(void);

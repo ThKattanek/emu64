@@ -20,6 +20,7 @@
 #include "./custom_save_file_dialog.h"
 #include "./micro_code_string_tbl_6510.h"
 #include "./cpu_info.h"
+#include "./utils.h"
 
 DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     QDialog(parent),
@@ -1984,8 +1985,8 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
     if(filename != "")
     {
         int ret;
-        if(current_source > 0) ret = c64->floppy[currnet_floppy_nr]->LoadBreakGroups(filename.toLocal8Bit());
-        else ret = c64->LoadBreakGroups(filename.toLocal8Bit());
+        if(current_source > 0) ret = c64->floppy[currnet_floppy_nr]->LoadBreakGroups(qfopen(filename, "rb"));
+        else ret = c64->LoadBreakGroups(qfopen(filename, "rb"));
 
         if(ret != 0)
         {
@@ -2048,12 +2049,12 @@ void DebuggerWindow::on_SaveBreakpoints_clicked()
 
     if(current_source > 0)
     {
-        if(!c64->floppy[currnet_floppy_nr]->SaveBreakGroups(filename.toLocal8Bit()))
+        if(!c64->floppy[currnet_floppy_nr]->SaveBreakGroups(qfopen(filename, "wb")))
             QMessageBox::warning(this,tr("Fehler..."),tr("Die Haltepunkte konnten nicht gespeichert werden."));
     }
     else
     {
-        if(!c64->SaveBreakGroups(filename.toLocal8Bit()))
+        if(!c64->SaveBreakGroups(qfopen(filename, "wb")))
             QMessageBox::warning(this,tr("Fehler..."),tr("Die Haltepunkte konnten nicht gespeichert werden."));
     }
 }
@@ -2124,7 +2125,7 @@ void DebuggerWindow::on_ExportDisAss_clicked()
     fileext = fileext.toUpper();
     if(fileext == "TXT")
     {
-        if(!c64->ExportASM(filename.toLocal8Bit(),start,end,current_source))
+        if(!c64->ExportASM(qfopen(filename, "w"),start,end,current_source))
             QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der Disassembler Datei."));
     }
 
@@ -2135,13 +2136,13 @@ void DebuggerWindow::on_ExportDisAss_clicked()
             QMessageBox::warning(this,tr("Fehler..."),tr("Floppy RAM geht nur von $0000 - $07FF (2KB)."));
             return;
         }
-        if(!c64->ExportPRG(filename.toLocal8Bit(),start,end,current_source))
+        if(!c64->ExportPRG(qfopen(filename, "wb"),start,end,current_source))
             QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der Programm Datei."));
     }
 
     if(fileext == "RAW")
     {
-        if(!c64->ExportRAW(filename.toLocal8Bit(),start,end,current_source))
+        if(!c64->ExportRAW(qfopen(filename, "wb"),start,end,current_source))
             QMessageBox::warning(this,tr("Fehler..."),tr("Fehler beim speichern der RAW Datei."));
     }
 }

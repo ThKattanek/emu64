@@ -43,8 +43,8 @@ public:
     void SetReuRamMode(uint8_t mode);   // _128, _256, _512, _1024, _2048, _4096, _8192, _16384
     uint8_t GetReuRamMode();            // return _128, _256, _512, _1024, _2048, _4096, _8192, _16384
 
-    int LoadRAM(const char *filename);
-    int SaveRAM(const char *filename);
+    int LoadRAM(FILE *file);
+    int SaveRAM(FILE *file);
     void ClearRAM(void);
     void Reset(void);
     void OneZyklus(void);

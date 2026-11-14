@@ -78,8 +78,8 @@ public:
     void UpdateBreakGroup();
     void DeleteAllBreakGroups();
     int GetBreakGroupCount();
-    int LoadBreakGroups(const char *filename);
-    bool SaveBreakGroups(const char *filename);
+    int LoadBreakGroups(FILE *file);
+    bool SaveBreakGroups(FILE *file);
     bool CheckBreakpoints();
     bool CheckImageDirectoryWrite();
     uint8_t *GetCurrentD64ImageBuffer();

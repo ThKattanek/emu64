@@ -16,6 +16,8 @@
 #ifndef VCD_CLASS_H
 #define VCD_CLASS_H
 
+#include <cstdio>
+
 #define MAX_WIRES 256
 
 class VCDClass
@@ -26,10 +28,10 @@ public:
 
     ///
     /// \brief Erstellt und öffnet das VCD Ausgabefile.
-    /// \param filename Der Dateiname des VCD Files
+    /// \param vcd_file Bereits geöffnetes VCD File (Besitz geht an die Klasse über, Close() schließt es)
     /// \return true = wenn alles ok, false = ein Fehler ist aufgetreten
     ///
-    bool Open(const char *filename);
+    bool Open(FILE *vcd_file);
 
     ///
     /// \brief Schließt das VCD Ausgabefile

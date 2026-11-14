@@ -347,7 +347,7 @@ void FloppyWindow::OnD64FileStart0(bool)
     uint8_t floppy_nr = static_cast<uint8_t>(ui->FloppySelect->currentIndex());
 	QString filename = tmp_path + "/tmp.prg";
 
-	if(d64[floppy_nr].ExportPrg(file_index,filename.toLocal8Bit()))
+	if(d64[floppy_nr].ExportPrg(file_index,qfopen(filename, "wb")))
     {
 		FILE *file = qfopen(filename, "rb");
 
@@ -375,7 +375,7 @@ void FloppyWindow::OnD64FileStart3(bool)
     uint8_t floppy_nr = static_cast<uint8_t>(ui->FloppySelect->currentIndex());
 	QString filename = tmp_path + "/tmp.prg";
 
-	if(d64[floppy_nr].ExportPrg(file_index,filename.toLocal8Bit()))
+	if(d64[floppy_nr].ExportPrg(file_index,qfopen(filename, "wb")))
     {
 		QFileInfo file_info(filename);
 
@@ -452,7 +452,7 @@ void FloppyWindow::OnPRGExport(bool)
 
     if(filename != "")
     {
-        if(!d64[floppy_nr].ExportPrg(file_index,filename.toLocal8Bit()))
+        if(!d64[floppy_nr].ExportPrg(file_index,qfopen(filename, "wb")))
         {
             QMessageBox::critical(this,"C64 Datei Export","Fehler beim exportieren der C64 Datei.\nDie Datei konnte nicht exortiert.");
         }

@@ -2327,9 +2327,8 @@ reading_elements = fread(&variable,sizeof(variable),1,file); \
         return -3; \
 }
 
-int Floppy1541::LoadBreakGroups(const char *filename)
+int Floppy1541::LoadBreakGroups(FILE *file)
 {
-    FILE *file;
     char Kennung[10];
     char Version;
     unsigned char Groupanzahl;
@@ -2337,7 +2336,6 @@ int Floppy1541::LoadBreakGroups(const char *filename)
 
     DeleteAllBreakGroups();
 
-    file = fopen (filename, "rb");
     if (file == NULL)
     {
         /// Datei konnte nicht geöffnet werden ///
@@ -2494,13 +2492,11 @@ int Floppy1541::LoadBreakGroups(const char *filename)
     return 0;
 }
 
-bool Floppy1541::SaveBreakGroups(const char *filename)
+bool Floppy1541::SaveBreakGroups(FILE *file)
 {
-    FILE *file;
     char Kennung[]  = "EMU64_BPT";
     char Version    = 2;
 
-    file = fopen (filename, "wb");
     if (file == NULL)
     {
         return false;

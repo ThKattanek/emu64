@@ -39,11 +39,15 @@ VCDClass::~VCDClass()
     }
 }
 
-bool VCDClass::Open(const char *filename)
+bool VCDClass::Open(FILE *vcd_file)
 {
-    if(isOpen) return false;
+    if(isOpen)
+    {
+        if(vcd_file != nullptr) fclose(vcd_file);
+        return false;
+    }
 
-    file = fopen(filename, "wt");
+    file = vcd_file;
     if (file == NULL)
         return false;
 

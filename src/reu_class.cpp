@@ -94,11 +94,9 @@ uint8_t REUClass::GetReuRamMode()
     return reu_ram_mode;
 }
 
-int REUClass::LoadRAM(const char *filename)
+int REUClass::LoadRAM(FILE *file)
 {
     /// REU Inhalt laden ...
-    FILE* file;
-    file = fopen (filename,"rb");
     if (file == NULL)
     {
         // Datei konnte nicht geöffnet werden
@@ -135,11 +133,9 @@ int REUClass::LoadRAM(const char *filename)
     return 0;
 }
 
-int REUClass::SaveRAM(const char *filename)
+int REUClass::SaveRAM(FILE *file)
 {
     /// REU Inhalt speichern ...
-    FILE* file;
-    file = fopen (filename, "wb");
     if (file == NULL)
     {
         return 1;

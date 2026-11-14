@@ -128,13 +128,15 @@ void D64Class::UnLoadD64()
     d64_has_error_map = false;
 }
 
-bool D64Class::ExportPrg(int file_number, const char *filename)
+bool D64Class::ExportPrg(int file_number, FILE *file)
 {
-    if(file_number < 0 || file_number >= file_count) return false;
+    if(file == nullptr) return false;
 
-    FILE* file = fopen(filename, "wb");
-    if (file == nullptr)
+    if(file_number < 0 || file_number >= file_count)
+    {
+        fclose(file);
         return false;
+    }
 
     uint8_t current_track = d64_files[file_number].Track;
     uint8_t current_sector = d64_files[file_number].Sektor;
