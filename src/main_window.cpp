@@ -1722,6 +1722,7 @@ void MainWindow::on_actionREU_laden_triggered()
     if(filename != "")
     {
         uint8_t reu_mode = c64->GetREUMode();
+        bool was_inserted = c64->IsREUInserted();
         int ret = c64->LoadREUImage(qfopen(filename, "rb"));
 
         switch (ret) {
@@ -1779,6 +1780,13 @@ void MainWindow::on_actionREU_laden_triggered()
             }
             QMessageBox::information(this,tr("Emu64 Info ..."),tr("Es wurde die Speichergröße der REU auf ") + ReuSizeStr + tr(" geändert."));
         }
+
+        if(!was_inserted)
+        {
+            // REU wird beim Laden eines Images automatisch gesteckt (Reset des C64)
+            on_actionREU_einstecken_triggered();
+            // QMessageBox::information(this,tr("Emu64 Info ..."),tr("Die REU wurde gesteckt."));
+        }
     }
 }
 
@@ -1823,6 +1831,7 @@ void MainWindow::on_actionGEO_entfernen_triggered()
 void MainWindow::on_actionGEO_laden_triggered()
 {
     uint8_t georam_mode = c64->GetGeoRamMode();
+    bool was_inserted = c64->IsGeoRamInserted();
 
     ini->beginGroup("GeoRAM");
     QString geo_ram_image_path = ini->value("GeoRamLastImageDir", QDir::homePath()).toString();
@@ -1836,7 +1845,8 @@ void MainWindow::on_actionGEO_laden_triggered()
         ini->setValue("GeoRamLastImageDir", file_info.absolutePath());
         ini->endGroup();
 
-        if(c64->LoadGeoRamImage(qfopen(filename, "rb")) != 0)
+        int ret = c64->LoadGeoRamImage(qfopen(filename, "rb"));
+        if(ret != 0)
             QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Beim laden des GEORAM Images trat ein Fehler auf!"));
         else if(georam_mode != c64->GetGeoRamMode())
         {
@@ -1866,6 +1876,13 @@ void MainWindow::on_actionGEO_laden_triggered()
                 break;
             }
             QMessageBox::information(this,tr("Emu64 Info ..."),tr("Es wurde die Speichergröße der GEORAM auf ") + GeoRamSizeStr + tr(" geändert."));
+        }
+
+        if(ret == 0 && !was_inserted)
+        {
+            // GEORAM wird beim Laden eines Images automatisch gesteckt (Reset des C64)
+            on_actionGEO_einstecken_triggered();
+            // QMessageBox::information(this,tr("Emu64 Info ..."),tr("Die GEORAM wurde gesteckt."));
         }
     }
 }

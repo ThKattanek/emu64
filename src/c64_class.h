@@ -139,6 +139,7 @@ public:
     void RemoveCRT();
     int CreateNewEasyFlashImage(FILE *file, const char *crt_name);
 
+    bool IsREUInserted();
     void InsertREU();
     void RemoveREU();
     int LoadREUImage(FILE *file);
@@ -147,6 +148,7 @@ public:
     uint8_t GetREUMode();
     void SetREUMode(uint16_t mode);
 
+    bool IsGeoRamInserted();
     void InsertGeoRam();
     void RemoveGeoRam();
     int LoadGeoRamImage(FILE *file);
