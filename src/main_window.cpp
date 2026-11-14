@@ -1721,20 +1721,63 @@ void MainWindow::on_actionREU_laden_triggered()
 
     if(filename != "")
     {
+        uint8_t reu_mode = c64->GetREUMode();
         int ret = c64->LoadREUImage(qfopen(filename, "rb"));
 
         switch (ret) {
         case -1:
             QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Das REU Image konnte nicht geöffnet werden!"));
-            break;
+            return;
         case -2:
-            QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Das REU Image ist zu groß für die aktuell eingestellte REU Größe!\nImage Größe: ") + QVariant(file_info.size() / 1024.0f).toString() + "KiB");
-            break;
+            QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Das REU Image ist zu groß für die größte REU (16MiB)!\nImage Größe: ") + QVariant(file_info.size() / 1024.0f).toString() + "KiB");
+            return;
         case -3:
-            QMessageBox::warning(this,tr("Emu64 Fehler ..."),tr("Das REU Image ist kleiner als die aktuell eingestellte REU Größe!\nDas Image wurde aber trotzdem geladen, der restliche REU Speicher ist mit 0x00 gefüllt."));
+            QMessageBox::warning(this,tr("Emu64 Fehler ..."),tr("Das REU Image ist kleiner als die eingestellte REU Größe!\nDas Image wurde aber trotzdem geladen, der restliche REU Speicher ist mit 0x00 gefüllt."));
             break;
         default:
             break;
+        }
+
+        if(reu_mode != c64->GetREUMode())
+        {
+            QString ReuSizeStr;
+
+            switch (c64->GetREUMode())
+            {
+            case REU_128KiB:
+                ReuSizeStr = "128KiB";
+                on_actionREU_128KiB_triggered();
+                break;
+            case REU_256KiB:
+                ReuSizeStr = "256KiB";
+                on_actionREU_256KiB_triggered();
+                break;
+            case REU_512KiB:
+                ReuSizeStr = "512KiB";
+                on_actionREU_512KiB_triggered();
+                break;
+            case REU_1MiB:
+                ReuSizeStr = "1MiB";
+                on_actionREU_1MiB_triggered();
+                break;
+            case REU_2MiB:
+                ReuSizeStr = "2MiB";
+                on_actionREU_2MiB_triggered();
+                break;
+            case REU_4MiB:
+                ReuSizeStr = "4MiB";
+                on_actionREU_4MiB_triggered();
+                break;
+            case REU_8MiB:
+                ReuSizeStr = "8MiB";
+                on_actionREU_8MiB_triggered();
+                break;
+            default:
+                ReuSizeStr = "16MiB";
+                on_actionREU_16MiB_triggered();
+                break;
+            }
+            QMessageBox::information(this,tr("Emu64 Info ..."),tr("Es wurde die Speichergröße der REU auf ") + ReuSizeStr + tr(" geändert."));
         }
     }
 }
