@@ -1112,10 +1112,11 @@ void C64Class::DebugRefreshScreen()
 
     // Rasterstrahl markieren: Blinkende Linien über und unter der aktuellen Rasterzeile (weiß/schwarz im Wechsel),
     // roter Rahmen um die 8 Pixel des zuletzt ausgeführten Zyklus
+    // Wird aber nur angezeigt, wenn das Debugger-Fenster geöffnet ist und die Rasterposition angezeigt werden soll.
     debug_blink_phase = static_cast<int>((SDL_GetTicks() / 250) & 1);
     debug_last_refresh_ticks = SDL_GetTicks();
 
-    if(debug_beam_marker && beam_row >= 0)
+    if(debug_beam_marker && showing_raster_position && beam_row >= 0)
     {
         const uint8_t blink_color = debug_blink_phase ? 1 : 0;
         const uint8_t frame_color = 2;

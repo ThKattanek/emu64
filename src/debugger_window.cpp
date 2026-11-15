@@ -346,6 +346,7 @@ void DebuggerWindow::SetC64Pointer(C64Class *c64)
 void DebuggerWindow::showEvent(QShowEvent*)
 {
     is_one_showed = true;
+    c64->showing_raster_position = true;
     c64->SetDebugMode(true);
     RefreshGUI();
 }
@@ -358,6 +359,7 @@ void DebuggerWindow::hideEvent(QHideEvent*)
     vic_window->hide();
     iec_window->hide();
 
+    c64->showing_raster_position = false;
     c64->SetDebugMode(false);
     c64->SetDebugAnimation(false);
     ui->FullViewCheck->setChecked(false);       // Läuft eine Videoaufnahme, bleibt das Gesamtbild aktiv und die Checkbox springt zurück
