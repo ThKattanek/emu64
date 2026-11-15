@@ -594,7 +594,8 @@ int MainWindow::OnInit(bool nogui)
             floppy_window->UpdateDirFromDrive(i);
             w->SetAktFilename(floppy_window->GetAktFilename(i),floppy_window->GetAktD64Name(i));
 
-            w->SetEnableFloppy(ini->value("Enabled",false).toBool());
+            // Laufwerk 8 ist beim ersten Start (ohne ini-Eintrag) eingeschaltet, die uebrigen aus
+            w->SetEnableFloppy(ini->value("Enabled",(i == 0)).toBool());
             w->SetFloppyVolume(ini->value("VolumeMode",2).toInt());
             ini->endGroup();
         }

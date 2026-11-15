@@ -1,6 +1,8 @@
 Alle Änderungen ab V5.2.0 bis jetzt
 -----------------------------------
 
+- Fixed: [#403] VIC - Der Rasterwechsel von der letzten Zeile auf Zeile 0 ist fuer die CPU in $D011/$D012 jetzt erst einen Takt spaeter sichtbar (Zyklus 3 statt 2, die Synchronisation auf diesen Wechsel lag sonst einen Takt daneben). VICE Testbench general/fuxxortest ef2-inst4c.prg besteht jetzt.
+- Fixed: [#403] Floppy - Laufwerk 8 ist beim ersten Start (ohne gespeicherte ini) jetzt eingeschaltet, wie im VICE. VICE Testbench general/fuxxortest ef2-inst1.prg besteht jetzt (benoetigt ein Laufwerk, auch ohne Disk).
 - Fixed: [#345] Debugger - Die Rasterposition (Markierung im C64 Bild) wird nur noch angezeigt, wenn das Debugfenster geoeffnet ist, nicht mehr bei einer reinen Pause.
 - Fixed: [#400] CPU/VIC - Schreibzugriffe auf $00/$01 legen jetzt das zuletzt vom VIC in Phi1 gelesene Byte ins RAM (der Wert selbst geht in den CPU Port). VICE Testbench general/ram0001 test1.prg besteht jetzt.
 - NEW! [#393] Kommandozeile - Neuer Parameter --autostart-prg-mode <1|2>: Modus 2 kopiert ein PRG beim Autostart in ein erzeugtes D64 und laedt es per LOAD"NAME",8,1 (wie VICE -autostartprgmode 2). Standard bleibt 1 (direkt in den RAM). VICE Testbench: autostart/defaults/test.prg erwartet den Kernal-LOAD (CIA1 $dc07, CIA2 $dd00, Dateiname bei $9ffc).

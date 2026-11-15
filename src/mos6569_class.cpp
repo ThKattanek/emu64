@@ -1900,6 +1900,16 @@ void VICII::WriteIO(uint16_t address, uint8_t value)
 	}
 }
 
+// Rasterzeile wie $D011/$D012 sie der CPU zeigen. Emu64 laeuft pro Takt erst CPU, dann VIC: Der Zeilenwechsel zwischen normalen
+// Zeilen ist dadurch fuer die CPU einen Takt spaeter sichtbar als im VICE (alle anderen VIC-Ereignisse sind ebenso einen Takt
+// spaeter, die Tests stimmen relativ dazu). Der Wechsel 311 -> 0 war dagegen schon im VICE-Takt (Zyklus 2) sichtbar. Er wird
+// hier um einen Takt verzoegert, damit auch Synchronisation auf diesen Wechsel zum Rest passt (fuxxortest ef2-inst4c).
+uint16_t VICII::ReadRasterline() const
+{
+    if(current_rasterline == 0 && current_cycle == 2) return total_rasterlines - 1;
+    return current_rasterline;
+}
+
 uint8_t VICII::ReadIO(uint16_t address)
 {
     uint8_t ret;
@@ -1923,12 +1933,12 @@ uint8_t VICII::ReadIO(uint16_t address)
 
 		/// Control Register 1
 		case 0x11:	
-            if(write_reg_0x11) return (reg_ctrl_1 & 0x7F) | ((current_rasterline & 0x100) >> 1);
+            if(write_reg_0x11) return (reg_ctrl_1 & 0x7F) | ((ReadRasterline() & 0x100) >> 1);
             else return 0;
 
 		/// Rasterzähler
 		case 0x12:
-            return static_cast<uint8_t>(current_rasterline);
+            return static_cast<uint8_t>(ReadRasterline());
 
 		/// Ligthpen X
         case 0x13:
