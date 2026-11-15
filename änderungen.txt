@@ -1,6 +1,7 @@
 Alle Änderungen ab V5.2.0 bis jetzt
 -----------------------------------
 
+- Fixed: [#345] Debugger - Die Rasterposition (Markierung im C64 Bild) wird nur noch angezeigt, wenn das Debugfenster geoeffnet ist, nicht mehr bei einer reinen Pause.
 - Fixed: [#400] CPU/VIC - Schreibzugriffe auf $00/$01 legen jetzt das zuletzt vom VIC in Phi1 gelesene Byte ins RAM (der Wert selbst geht in den CPU Port). VICE Testbench general/ram0001 test1.prg besteht jetzt.
 - NEW! [#393] Kommandozeile - Neuer Parameter --autostart-prg-mode <1|2>: Modus 2 kopiert ein PRG beim Autostart in ein erzeugtes D64 und laedt es per LOAD"NAME",8,1 (wie VICE -autostartprgmode 2). Standard bleibt 1 (direkt in den RAM). VICE Testbench: autostart/defaults/test.prg erwartet den Kernal-LOAD (CIA1 $dc07, CIA2 $dd00, Dateiname bei $9ffc).
 - NEW! [#394] REU - Beim Laden eines REU Images wird die REU Größe jetzt wie bei der GeoRAM automatisch an die Image Größe angepasst (kleinste passende Größe, Menü wird aktualisiert, Hinweis an den Benutzer). Nur Images über 16MiB werden abgelehnt.

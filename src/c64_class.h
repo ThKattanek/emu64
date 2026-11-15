@@ -317,6 +317,8 @@ public:
     uint8_t         *c64_screen_buffer;
     bool            c64_screen_is_obselete;
 
+    bool            showing_raster_position = false; // true = Rasterposition wird auf dem Bildschirm angezeigt (im Debugmodus)
+
     bool            enable_distortion;
     float_t         distortion_value;
 
