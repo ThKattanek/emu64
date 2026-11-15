@@ -75,6 +75,7 @@ public:
     //bool LoadFreez(FILE *file,unsigned short version);
     void WriteIO(uint16_t address, uint8_t value);
     uint8_t ReadIO(uint16_t address);
+    uint16_t ReadRasterline() const;
     void SetLightpen(bool low);
 
     Delegate<uint8_t(uint16_t)> *ReadProcTbl;
