@@ -19,6 +19,7 @@
 #include <cstdio>
 #include <mutex>
 #include "delegate.h"
+#include "state_stream.h"
 
 #include "./mos6502_class.h"
 #include "./mos6522_class.h"
@@ -84,6 +85,10 @@ public:
     bool CheckImageDirectoryWrite();
     uint8_t *GetCurrentD64ImageBuffer();
     int GetCurrentD64Tracks();
+
+    // Quick Snapshot: Speichert/laedt den kompletten Laufwerkszustand inkl. Disk Inhalt (GCR)
+    void SaveState(StateWriter &w) const;
+    bool LoadState(StateReader &r);
 
     /// Wird mit den einzelnen Chips verbunden via "bind" ///
 
@@ -189,6 +194,8 @@ private:
     ////////// Fürs Disk Image //////////
 
     FILE *              image_file;
+    bool                DiskFromSnapshot = false;   // Disk stammt aus einem Snapshot (kein image_file, Aenderungen bleiben nur im Speicher)
+    uint8_t             stepper_bump = 0;
     int                 ImageTyp;
     //uint8_t             AktGCRWert;
     static const int	NUM_TRACKS = 42;

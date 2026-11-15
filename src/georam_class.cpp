@@ -197,3 +197,28 @@ unsigned char GEORAMClass::ReadIO2(uint16_t address)
 
     return 0;
 }
+
+void GEORAMClass::SaveState(StateWriter &w) const
+{
+    w.Bool(geo_ram_insert);
+    w.U8(geo_ram_mode);
+    w.U32(mem_frame);
+    w.U8(_dffe);
+    w.U8(_dfff);
+    w.U16(reg_start_address);
+    w.Bytes(ram, geo_ram_size_tbl[geo_ram_mode & 0x03]);
+}
+
+bool GEORAMClass::LoadState(StateReader &r)
+{
+    geo_ram_insert = r.Bool();
+    uint8_t mode = r.U8();
+    mem_frame = r.U32();
+    _dffe = r.U8();
+    _dfff = r.U8();
+    reg_start_address = r.U16();
+    if(!r.Ok() || mode > 3 || mem_frame >= MAX_GEORAM_SIZE) return false;
+    geo_ram_mode = mode;
+    r.Bytes(ram, geo_ram_size_tbl[geo_ram_mode & 0x03]);
+    return r.Ok();
+}

@@ -944,7 +944,7 @@ uint16_t Floppy1541::NIBTrackToGCR(const uint8_t *raw, unsigned int density, uin
 
 void Floppy1541::UnLoadDiskImage()
 {
-    if(image_file == nullptr)
+    if(image_file == nullptr && !DiskFromSnapshot)
         return;
 
     CheckImageWrite();
@@ -956,8 +956,10 @@ void Floppy1541::UnLoadDiskImage()
     ImageReadOnly = false;
     WriteProtect = false;
 
-    fclose(image_file);
+    if(image_file != nullptr)
+        fclose(image_file);
     image_file = nullptr;
+    DiskFromSnapshot = false;
     SectorMapDirty = true;
 }
 
@@ -2035,8 +2037,6 @@ void Floppy1541::SpurInc()
 
 void Floppy1541::SpurDec()
 {
-    static uint8_t stepper_bump = 0;
-
     if (AktHalbSpur  == 0)
     {
         UpdateGCRPointer();
@@ -2643,4 +2643,154 @@ uint8_t *Floppy1541::GetCurrentD64ImageBuffer()
 {
     GCRImageToD64Image();
     return  D64Image;
+}
+
+void Floppy1541::SaveState(StateWriter &w) const
+{
+    w.Bool(WriteProtect);
+    w.Bool(WriteProtectAkt);
+    w.Bool(ImageReadOnly);
+    w.I32(DiskChangeSimState);
+    w.I32(DiskChangeSimCycleCounter);
+    w.Bool(VIA1_IRQ);
+    w.Bool(VIA2_IRQ);
+    w.Bool(IRQ);
+    w.I32(CycleCounter);
+    w.I32(BitAccu);
+    w.I32(BitCounter);
+    w.I32(OnesCount);
+    w.Bool(SyncActive);
+    w.I32(NoFluxCells);
+    w.I32(CellsSinceOne);
+    w.I32(RandFluxCountdown);
+    w.U32(ReadNoiseSeed);
+    w.U8(ReadShift);
+    w.U8(ReadLatch);
+    w.Bool(ReadLatched);
+    w.U8(WriteShift);
+    w.U8(AktHalbSpur);
+    w.Bool(ImageWriteStatus);
+    w.Bool(ImageDirectoryWriteStatus);
+    w.U32(GCRBitTrackSize);
+    w.U32(GCRBitTrackPos);
+    w.U32(SyncBitCounter);
+    w.Bool(SyncBitsFound);
+    w.U8(FloppyIECLocal);
+    w.Bool(StepperInc);
+    w.Bool(StepperDec);
+    w.Bool(StepperAnschlag);
+    w.Bool(DiskMotorOn);
+    w.Bool(StepperIncWait);
+    w.U8(stepper_bump);
+    w.Bytes(RAM, sizeof(RAM));
+    cpu->SaveState(w);
+    via1->SaveState(w);
+    via2->SaveState(w);
+
+    // Disk
+    bool disk = (image_file != nullptr) || DiskFromSnapshot;
+    w.Bool(disk);
+    if(disk)
+    {
+        w.I32(ImageTyp);
+        w.I32(D64Tracks);
+        w.Bool(D64HasErrorMap);
+        w.Bytes(D64ErrorMap, sizeof(D64ErrorMap));
+        for(int i = 0; i < 256; i++) w.U16(TrackSize[i]);
+        w.Bytes(GCRImage, sizeof(GCRImage));
+    }
+}
+
+bool Floppy1541::LoadState(StateReader &r)
+{
+    WriteProtect = r.Bool();
+    WriteProtectAkt = r.Bool();
+    ImageReadOnly = r.Bool();
+    DiskChangeSimState = r.I32();
+    DiskChangeSimCycleCounter = r.I32();
+    VIA1_IRQ = r.Bool();
+    VIA2_IRQ = r.Bool();
+    IRQ = r.Bool();
+    CycleCounter = r.I32();
+    BitAccu = r.I32();
+    BitCounter = r.I32();
+    OnesCount = r.I32();
+    SyncActive = r.Bool();
+    NoFluxCells = r.I32();
+    CellsSinceOne = r.I32();
+    RandFluxCountdown = r.I32();
+    ReadNoiseSeed = r.U32();
+    ReadShift = r.U8();
+    ReadLatch = r.U8();
+    ReadLatched = r.Bool();
+    WriteShift = r.U8();
+    AktHalbSpur = r.U8();
+    ImageWriteStatus = r.Bool();
+    ImageDirectoryWriteStatus = r.Bool();
+    GCRBitTrackSize = r.U32();
+    GCRBitTrackPos = r.U32();
+    SyncBitCounter = r.U32();
+    SyncBitsFound = r.Bool();
+    FloppyIECLocal = r.U8();
+    StepperInc = r.Bool();
+    StepperDec = r.Bool();
+    StepperAnschlag = r.Bool();
+    DiskMotorOn = r.Bool();
+    StepperIncWait = r.Bool();
+    stepper_bump = r.U8();
+    r.Bytes(RAM, sizeof(RAM));
+    if(!cpu->LoadState(r) || !via1->LoadState(r) || !via2->LoadState(r)) return false;
+
+    bool disk = r.Bool();
+    if(!r.Ok() || AktHalbSpur >= NUM_TRACKS * 2) return false;
+
+    uint32_t bit_track_size = GCRBitTrackSize;
+    uint32_t bit_track_pos = GCRBitTrackPos;
+    uint32_t sync_bit_counter = SyncBitCounter;
+    bool sync_bits_found = SyncBitsFound;
+
+    if(disk)
+    {
+        int image_typ = r.I32();
+        int d64_tracks = r.I32();
+        bool d64_error_map = r.Bool();
+        r.Bytes(D64ErrorMap, sizeof(D64ErrorMap));
+        for(int i = 0; i < 256; i++) TrackSize[i] = r.U16();
+        r.Bytes(GCRImage, sizeof(GCRImage));
+        if(!r.Ok() || d64_tracks < 35 || d64_tracks > 42) return false;
+        for(int i = 0; i < NUM_TRACKS * 2; i++)
+            if(TrackSize[i] > GCR_TRACK_SIZE) return false;
+
+        // Die Disk wird nur im Speicher gehalten (Aenderungen werden nicht in die Imagedatei zurueckgeschrieben)
+        if(image_file != nullptr)
+        {
+            fclose(image_file);
+            image_file = nullptr;
+        }
+        DiskFromSnapshot = true;
+        ImageTyp = image_typ;
+        D64Tracks = d64_tracks;
+        D64HasErrorMap = d64_error_map;
+    }
+    else
+    {
+        if(image_file != nullptr || DiskFromSnapshot)
+        {
+            // Aktuelle Disk entfernen (ohne zurueckschreiben)
+            ImageWriteStatus = false;
+            UnLoadDiskImage();
+        }
+        memset(GCRImage, 0, sizeof(GCRImage));
+        memset(TrackSize, 0, sizeof(TrackSize));
+        DiskFromSnapshot = false;
+    }
+
+    // Zeiger neu berechnen, die Drehposition kommt unveraendert aus dem Snapshot
+    UpdateGCRPointer();
+    GCRBitTrackSize = bit_track_size;
+    GCRBitTrackPos = bit_track_pos;
+    SyncBitCounter = sync_bit_counter;
+    SyncBitsFound = sync_bits_found;
+    SectorMapDirty = true;
+    return r.Ok();
 }

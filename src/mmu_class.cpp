@@ -103,28 +103,18 @@ bool MMU::LoadCharRom(const char* filename)
     return ret;
 }
 
-/*
-bool MMU::SaveFreez(FILE* File)
+void MMU::SaveState(StateWriter &w) const
 {
-	fwrite(RAM,1,0x10000,File);
-	fwrite(FARB_RAM,1,0x0400,File);
-	return true;
+    w.Bytes(RAM, sizeof(RAM));
+    w.Bytes(FARB_RAM, sizeof(FARB_RAM));
 }
 
-bool MMU::LoadFreez(FILE* File,unsigned short Version)
+bool MMU::LoadState(StateReader &r)
 {
-	switch(Version)
-	{
-	case 0x0100:
-	case 0x0101:
-		ChangeMemMap();
-		fread(RAM,1,0x10000,File);
-		fread(FARB_RAM,1,0x0400,File);
-		break;
-	}
-	return true;
+    r.Bytes(RAM, sizeof(RAM));
+    r.Bytes(FARB_RAM, sizeof(FARB_RAM));
+    return r.Ok();
 }
-*/
 
 unsigned char* MMU::GetRAMPointer(void)
 {

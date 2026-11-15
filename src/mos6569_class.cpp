@@ -1513,202 +1513,269 @@ void VICII::OneCycle()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*
-#define fw(var) fwrite(&var,1,sizeof(var),File)
-#define fw1(var,size) fwrite(var,1,size,File)
-bool VICII::SaveFreez(FILE* File)
+void VICII::SaveState(StateWriter &w) const
 {
-
-	int Offset;
-    Offset = video_buffer_line - video_buffer;
-	fw(Offset);
-	
-    fw(draw_line_counter);
-    fw(draw_this_line);
-	fw(bitc);
-    fw1(reg_mx,8);
-    fw1(reg_my,8);
-    fw(reg_mx8);
-    fw(reg_ctrl_1);
-    fw(reg_ctrl_2);
-    fw(reg_y_scroll);
-    fw(reg_x_scroll);
-    fw(reg_vbase);
-    fw(reg_irq_raster);
-    fw(reg_lpx);
-    fw(reg_lpy);
-    fw(reg_me);
-    fw(reg_mye);
-    fw(reg_mdp);
-    fw(reg_mmc);
-    fw(reg_mxe);
-	fw(MM);
-    fw(reg_md);
-	fw(EC);
-    fw(reg_b0c);
-    fw(reg_b1c);
-    fw(reg_b2c);
-    fw(reg_b3c);
-    fw(reg_mm0);
-    fw(reg_mm1);
-    fw1(reg_mcolor,8);
-    fw(current_cycle);
-    fw(current_rasterline);
-	fw(AktXKoordinate);
-    fw(graphic_mode);
-    fw(irq_flag);
-    fw(irq_mask);
-	fw(DEN);
-	fw(VBlanking);
-	fw(FirstBAZyklus);
-    fw(badline_enable);
-    fw(badline_status);
-    fw(display_status);
-    fw(lp_triggered);
-	fw(RC);
-    fw(vc);
-    fw(vc_base);
-    fw(matrix_base);
-    fw(char_base);
-    fw(bitmap_base);
-    fw(vmli);
-    fw(c_address);
-    fw(g_address);
-    fw1(c_value_buffer_8bit,64);
-    fw1(c_value_buffer_4bit,64);
-    fw(gfx_data);
-    fw(char_data);
-    fw(color_data);
-	fw(GreyDotEnable);
-    fw(is_write_reg_ec);
-    fw(is_write_reg_b0c);
-
-	//////////////////////////////// Sprites //////////////////////////////////
-
-    fw(sprite_y_exp_flip_flop);
-	fw1(MC,8);
-    fw1(mc_base,8);
-    fw(sprite_dma);
-	fw(SpriteView);
-
-	///////////////////////////////////////////////////////////////////////////
-
-	////////////////////////////// Rahmenstufe ////////////////////////////////
-
-    fw(csel);
-    fw(rsel);
-	fw(BorderCmpYo);
-	fw(BorderCmpYu);
-    fw(border_flip_flop0);
-    fw(border_flip_flop1);
-	fw(BorderCMP_Re);
-	fw(BorderCMP_Li);
-	fw(BorderCMP_Ob);
-	fw(BorderCMP_Un);
-	return true;
+    for(unsigned i = 0; i < 8; i++) w.U16(reg_mx[i]);
+    w.Bytes(reg_my, sizeof(reg_my));
+    w.U8(reg_mx8);
+    w.U8(reg_ctrl_1);
+    w.U8(reg_ctrl_2);
+    w.U16(reg_y_scroll);
+    w.U16(reg_x_scroll);
+    w.U8(reg_vbase);
+    w.U16(reg_irq_raster);
+    w.U8(reg_lpx);
+    w.U8(reg_lpy);
+    w.U8(reg_me);
+    w.U8(reg_mye);
+    w.U8(reg_mdp);
+    w.U8(reg_mmc);
+    w.U8(reg_mxe);
+    w.U8(reg_mm);
+    w.U8(reg_md);
+    w.U8(reg_ec);
+    w.U8(reg_b0c);
+    w.U8(reg_b1c);
+    w.U8(reg_b2c);
+    w.U8(reg_b3c);
+    w.U8(reg_mm0);
+    w.U8(reg_mm1);
+    w.Bytes(reg_mcolor, sizeof(reg_mcolor));
+    w.Bytes(creg, sizeof(creg));
+    w.Bytes(creg_w_reg, sizeof(creg_w_reg));
+    w.U8(creg_cur_reg);
+    w.U8(creg_cur_val);
+    w.U8(creg_pend_reg);
+    w.U8(creg_pend_val);
+    w.U8(current_cycle);
+    w.U16(current_rasterline);
+    w.U16(new_irq_raster);
+    w.U16(current_x_coordinate);
+    w.U8(graphic_mode);
+    w.U8(irq_flag);
+    w.U8(irq_mask);
+    w.Bool(den);
+    w.Bool(vertical_blanking);
+    w.U8(first_ba_cycle);
+    w.Bool(badline_enable);
+    w.Bool(badline_status);
+    w.Bool(display_status);
+    w.Bool(display_status_g);
+    w.Bool(lp_triggered);
+    w.Bool(lp_line_low);
+    w.Bool(lp_pending);
+    w.U8(rc);
+    w.U16(vc);
+    w.U16(vc_base);
+    w.U16(matrix_base);
+    w.U16(char_base);
+    w.U16(bitmap_base);
+    w.U8(vmli);
+    w.U16(c_address);
+    w.U16(g_address);
+    w.U16(p_address);
+    w.U16(s_address);
+    for(unsigned i = 0; i < 8; i++) w.U16(s_address_byte2[i]);
+    w.U8(s_byte2_pending);
+    w.Bytes(p_data, sizeof(p_data));
+    w.Bytes(c_data_buffer_8bit, sizeof(c_data_buffer_8bit));
+    w.Bytes(c_data_buffer_4bit, sizeof(c_data_buffer_4bit));
+    w.U8(gfx_data);
+    w.U8(char_data);
+    w.U8(color_data);
+    w.Bool(is_write_reg_ec);
+    w.Bool(is_write_reg_b0c);
+    w.Bool(write_reg_0x11);
+    w.U8(sprite_y_exp_flip_flop);
+    w.Bytes(mc, sizeof(mc));
+    w.Bytes(mc_base, sizeof(mc_base));
+    w.U8(sprite_dma);
+    w.U8(sprite_view);
+    for(unsigned i = 0; i < 8; i++) w.U32(sprite_sequenzer[i]);
+    for(unsigned i = 0; i < 8; i++) w.U16(sprite_x_pipe[i]);
+    w.U8(sprite_pri_bits);
+    w.U8(sprite_mc_bits);
+    w.U8(sprite_expx_bits);
+    w.U8(sprite_pending_bits);
+    w.U8(sprite_active_bits);
+    w.U8(sprite_halt_bits);
+    for(unsigned i = 0; i < 8; i++) w.U32(sbuf_reg[i]);
+    w.Bytes(sbuf_pixel_reg, sizeof(sbuf_pixel_reg));
+    w.U8(sbuf_expx_flops);
+    w.U8(sbuf_mc_flops);
+    w.U8(csel);
+    w.U8(rsel);
+    w.Bool(border_flip_flop0);
+    w.Bool(border_flip_flop1);
+    w.Bool(border_set_v);
+    for(unsigned i = 0; i < 2; i++) w.U16(h_border_compare_left[i]);
+    for(unsigned i = 0; i < 2; i++) w.U16(h_border_compare_right[i]);
+    for(unsigned i = 0; i < 2; i++) w.U16(v_border_compare_top[i]);
+    for(unsigned i = 0; i < 2; i++) w.U16(v_border_compare_bottom[i]);
+    w.Bytes(border_line, sizeof(border_line));
+    w.U16(border_line_pos);
+    w.Bytes(colors, sizeof(colors));
+    w.U8(gfx_pipe0_g);
+    w.U8(gfx_pipe0_c);
+    w.U8(gfx_pipe0_v);
+    w.U8(gfx_pipe1_g);
+    w.U8(gfx_pipe1_c);
+    w.U8(gfx_pipe1_v);
+    w.U8(gfx_reg_g);
+    w.U8(gfx_reg_c);
+    w.U8(gfx_reg_v);
+    w.U8(gfx_pixel_reg);
+    w.U8(gfx_x_scroll);
+    w.U8(gfx_vmode11);
+    w.U8(gfx_vmode16);
+    w.U8(gfx_vmode16_2);
+    w.Bool(gfx_mc_flop);
+    w.U8(reg11_delay);
+    w.I32(draw_line_counter);
+    w.Bool(draw_this_line);
+    w.U8(last_read_gp_access);
+    w.Bytes(creg_hist, sizeof(creg_hist));
+    w.I32(current_video_buffer);
+    // Offset relativ zum Anfang beider Puffer (die Zeile kann nach dem Puffertausch noch im anderen Puffer liegen)
+    w.I32(static_cast<int32_t>(video_buffer_line - &video_buffer_back[0][0]));
+    w.Bytes(video_buffer_back, sizeof(video_buffer_back));
 }
 
-#define fr(var) fread(&var,1,sizeof(var),File)
-#define fr1(var,size) fread(var,1,size,File)
-bool VICII::LoadFreez(FILE *File,unsigned short Version)
+bool VICII::LoadState(StateReader &r, uint16_t version)
 {
-	int Offset;
-
-	switch(Version)
-	{
-	case 0x0100:
-	case 0x0101:
-
-		fr(Offset);
-        video_buffer_line = Offset + video_buffer;
-		
-        fr(draw_line_counter);
-        fr(draw_this_line);
-		fr(bitc);
-        fr1(reg_mx,8);
-        fr1(reg_my,8);
-        fr(reg_mx8);
-        fr(reg_ctrl_1);
-        fr(reg_ctrl_2);
-        fr(reg_y_scroll);
-        fr(reg_x_scroll);
-        fr(reg_vbase);
-        fr(reg_irq_raster);
-        fr(reg_lpx);
-        fr(reg_lpy);
-        fr(reg_me);
-        fr(reg_mye);
-        fr(reg_mdp);
-        fr(reg_mmc);
-        fr(reg_mxe);
-		fr(MM);
-        fr(reg_md);
-		fr(EC);
-        fr(reg_b0c);
-        fr(reg_b1c);
-        fr(reg_b2c);
-        fr(reg_b3c);
-        fr(reg_mm0);
-        fr(reg_mm1);
-        fr1(reg_mcolor,8);
-        fr(current_cycle);
-        fr(current_rasterline);
-		fr(AktXKoordinate);
-        fr(graphic_mode);
-        fr(irq_flag);
-        fr(irq_mask);
-		fr(DEN);
-		fr(VBlanking);
-		fr(FirstBAZyklus);
-        fr(badline_enable);
-        fr(badline_status);
-        fr(display_status);
-        fr(lp_triggered);
-		fr(RC);
-        fr(vc);
-        fr(vc_base);
-        fr(matrix_base);
-        fr(char_base);
-        fr(bitmap_base);
-        fr(vmli);
-        fr(c_address);
-        fr(g_address);
-        fr1(c_value_buffer_8bit,64);
-        fr1(c_value_buffer_4bit,64);
-        fr(gfx_data);
-        fr(char_data);
-        fr(color_data);
-		fr(GreyDotEnable);
-        fr(is_write_reg_ec);
-        fr(is_write_reg_b0c);
-
-		//////////////////////////////// Sprites //////////////////////////////////
-
-        fr(sprite_y_exp_flip_flop);
-		fr1(MC,8);
-        fr1(mc_base,8);
-        fr(sprite_dma);
-		fr(SpriteView);
-
-		///////////////////////////////////////////////////////////////////////////
-
-		////////////////////////////// Rahmenstufe ////////////////////////////////
-
-        fr(csel);
-        fr(rsel);
-		fr(BorderCmpYo);
-		fr(BorderCmpYu);
-        fr(border_flip_flop0);
-        fr(border_flip_flop1);
-		fr(BorderCMP_Re);
-		fr(BorderCMP_Li);
-		fr(BorderCMP_Ob);
-		fr(BorderCMP_Un);
-		break;
-	}
-	return true;
+    for(unsigned i = 0; i < 8; i++) reg_mx[i] = r.U16();
+    r.Bytes(reg_my, sizeof(reg_my));
+    reg_mx8 = r.U8();
+    reg_ctrl_1 = r.U8();
+    reg_ctrl_2 = r.U8();
+    reg_y_scroll = r.U16();
+    reg_x_scroll = r.U16();
+    reg_vbase = r.U8();
+    reg_irq_raster = r.U16();
+    reg_lpx = r.U8();
+    reg_lpy = r.U8();
+    reg_me = r.U8();
+    reg_mye = r.U8();
+    reg_mdp = r.U8();
+    reg_mmc = r.U8();
+    reg_mxe = r.U8();
+    reg_mm = r.U8();
+    reg_md = r.U8();
+    reg_ec = r.U8();
+    reg_b0c = r.U8();
+    reg_b1c = r.U8();
+    reg_b2c = r.U8();
+    reg_b3c = r.U8();
+    reg_mm0 = r.U8();
+    reg_mm1 = r.U8();
+    r.Bytes(reg_mcolor, sizeof(reg_mcolor));
+    r.Bytes(creg, sizeof(creg));
+    r.Bytes(creg_w_reg, sizeof(creg_w_reg));
+    creg_cur_reg = r.U8();
+    creg_cur_val = r.U8();
+    creg_pend_reg = r.U8();
+    creg_pend_val = r.U8();
+    current_cycle = r.U8();
+    current_rasterline = r.U16();
+    new_irq_raster = r.U16();
+    current_x_coordinate = r.U16();
+    graphic_mode = r.U8();
+    irq_flag = r.U8();
+    irq_mask = r.U8();
+    den = r.Bool();
+    vertical_blanking = r.Bool();
+    first_ba_cycle = r.U8();
+    badline_enable = r.Bool();
+    badline_status = r.Bool();
+    display_status = r.Bool();
+    display_status_g = r.Bool();
+    lp_triggered = r.Bool();
+    lp_line_low = r.Bool();
+    lp_pending = r.Bool();
+    rc = r.U8();
+    vc = r.U16();
+    vc_base = r.U16();
+    matrix_base = r.U16();
+    char_base = r.U16();
+    bitmap_base = r.U16();
+    vmli = r.U8();
+    c_address = r.U16();
+    g_address = r.U16();
+    p_address = r.U16();
+    s_address = r.U16();
+    for(unsigned i = 0; i < 8; i++) s_address_byte2[i] = r.U16();
+    s_byte2_pending = r.U8();
+    r.Bytes(p_data, sizeof(p_data));
+    r.Bytes(c_data_buffer_8bit, sizeof(c_data_buffer_8bit));
+    r.Bytes(c_data_buffer_4bit, sizeof(c_data_buffer_4bit));
+    gfx_data = r.U8();
+    char_data = r.U8();
+    color_data = r.U8();
+    is_write_reg_ec = r.Bool();
+    is_write_reg_b0c = r.Bool();
+    write_reg_0x11 = r.Bool();
+    sprite_y_exp_flip_flop = r.U8();
+    r.Bytes(mc, sizeof(mc));
+    r.Bytes(mc_base, sizeof(mc_base));
+    sprite_dma = r.U8();
+    sprite_view = r.U8();
+    for(unsigned i = 0; i < 8; i++) sprite_sequenzer[i] = r.U32();
+    for(unsigned i = 0; i < 8; i++) sprite_x_pipe[i] = r.U16();
+    sprite_pri_bits = r.U8();
+    sprite_mc_bits = r.U8();
+    sprite_expx_bits = r.U8();
+    sprite_pending_bits = r.U8();
+    sprite_active_bits = r.U8();
+    sprite_halt_bits = r.U8();
+    for(unsigned i = 0; i < 8; i++) sbuf_reg[i] = r.U32();
+    r.Bytes(sbuf_pixel_reg, sizeof(sbuf_pixel_reg));
+    sbuf_expx_flops = r.U8();
+    sbuf_mc_flops = r.U8();
+    csel = r.U8();
+    rsel = r.U8();
+    border_flip_flop0 = r.Bool();
+    border_flip_flop1 = r.Bool();
+    border_set_v = r.Bool();
+    for(unsigned i = 0; i < 2; i++) h_border_compare_left[i] = r.U16();
+    for(unsigned i = 0; i < 2; i++) h_border_compare_right[i] = r.U16();
+    for(unsigned i = 0; i < 2; i++) v_border_compare_top[i] = r.U16();
+    for(unsigned i = 0; i < 2; i++) v_border_compare_bottom[i] = r.U16();
+    r.Bytes(border_line, sizeof(border_line));
+    border_line_pos = r.U16();
+    r.Bytes(colors, sizeof(colors));
+    gfx_pipe0_g = r.U8();
+    gfx_pipe0_c = r.U8();
+    gfx_pipe0_v = r.U8();
+    gfx_pipe1_g = r.U8();
+    gfx_pipe1_c = r.U8();
+    gfx_pipe1_v = r.U8();
+    gfx_reg_g = r.U8();
+    gfx_reg_c = r.U8();
+    gfx_reg_v = r.U8();
+    gfx_pixel_reg = r.U8();
+    gfx_x_scroll = r.U8();
+    gfx_vmode11 = r.U8();
+    gfx_vmode16 = r.U8();
+    gfx_vmode16_2 = r.U8();
+    gfx_mc_flop = r.Bool();
+    reg11_delay = r.U8();
+    draw_line_counter = r.I32();
+    draw_this_line = r.Bool();
+    last_read_gp_access = r.U8();
+    r.Bytes(creg_hist, sizeof(creg_hist));
+    current_video_buffer = r.I32();
+    int32_t line_offset = r.I32();
+    r.Bytes(video_buffer_back, sizeof(video_buffer_back));
+    if(!r.Ok()) return false;
+    video_buffer = video_buffer_back[current_video_buffer & 1];
+    // Version 1: Offset relativ zu video_buffer, ab Version 2 relativ zum Anfang beider Puffer
+    int64_t line_index = static_cast<int64_t>(line_offset);
+    if(version < 2) line_index += (video_buffer - &video_buffer_back[0][0]);
+    if(line_index < 0 || line_index > 2 * static_cast<int64_t>(VIDEO_BUFFER_SIZE)) return false;
+    video_buffer_line = &video_buffer_back[0][0] + line_index;
+    if(draw_line_counter < 0) return false;
+    return true;
 }
-*/
 
 void VICII::WriteIO(uint16_t address, uint8_t value)
 {

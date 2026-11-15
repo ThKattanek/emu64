@@ -19,6 +19,7 @@
 #include "./savepng.h"
 #include "./t64_class.h"
 #include "./d64_class.h"
+#include "./state_stream.h"
 
 #include <QDebug>
 #include <iostream>
@@ -2998,6 +2999,19 @@ void C64Class::AnalyzeSDLEvent(SDL_Event *event)
             }
             break;
 
+        case SDLK_1: case SDLK_2: case SDLK_3: case SDLK_4: case SDLK_5:
+        case SDLK_6: case SDLK_7: case SDLK_8: case SDLK_9: case SDLK_0:
+            // HotKey [ALT+1..0] Quick C64 Snapshot Slot 1-10 laden, [ALT+SHIFT+1..0] Slot 1-10 speichern
+            keymod = SDL_GetModState();
+            if(KMOD_LALT == (keymod & KMOD_LALT))
+            {
+                is_hotkey = true;
+                const int slot = (event->key.keysym.sym == SDLK_0) ? 10 : (event->key.keysym.sym - SDLK_0);
+                const bool save = (keymod & KMOD_SHIFT) != 0;
+                if(QuickSnapshotEvent != nullptr) QuickSnapshotEvent(save, slot);
+            }
+            break;
+
         case SDLK_AUDIONEXT:
             is_hotkey = true;
             if(NextPrevDiskImage != nullptr) NextPrevDiskImage(true);
@@ -3653,9 +3667,12 @@ int C64Class::LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, i
         break;
 
     case FRZ:
-        //KillCommandLine();
-        //LoadFreez(filename,FreezReturn);
-        return 0;
+        if(file == nullptr) return 1;
+        {
+            int snapshot_result = LoadSnapshot(file);
+            fclose(file);
+            return snapshot_result;
+        }
         break;
 
     case CRT:
@@ -4947,6 +4964,8 @@ int C64Class::GetVicLastDisplayLineNtsc()
 
 void C64Class::NextSystemCycle()
 {
+    if(snapshot_tasks_active) CheckSnapshotTasks();
+
     CheckKeys();
 
     if(hold_next_system_cycle)
@@ -5764,4 +5783,502 @@ void C64Class::DebugLogging()
     fprintf(debug_logging_file, " %4.4X %4.4X\n", cpuReg._0314, cpuReg._0318);
     fprintf(debug_logging_file, "--------------------------------------\n");
     Disassemble(debug_logging_file, cpuReg.pc, false);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Quick C64 Snapshot (Issue #200)
+//
+// Dateiformat: "EMU64FRZ", Format-Version (u16), reserviert (u16), danach Chunks
+// (Tag[4], Version u16, Laenge u32, Daten) und zum Schluss ein CRC32 ueber alles davor.
+////////////////////////////////////////////////////////////////////////////////
+
+#define SNAPSHOT_MAGIC "EMU64FRZ"
+#define SNAPSHOT_FORMAT_VERSION 1
+#define SNAPSHOT_HEADER_SIZE 12
+
+int C64Class::SaveSnapshot(FILE *file)
+{
+    if(file == nullptr) return SNAPSHOT_ERROR_FILE;
+
+    std::vector<uint8_t> data;
+    int result = SaveSnapshotToBuffer(data);
+    if(result != SNAPSHOT_OK) return result;
+
+    if(fwrite(data.data(), 1, data.size(), file) != data.size()) return SNAPSHOT_ERROR_FILE;
+    if(fflush(file) != 0) return SNAPSHOT_ERROR_FILE;
+    return SNAPSHOT_OK;
+}
+
+bool C64Class::SaveScreenshotPng(const char *filename)
+{
+    if(c64_screen == nullptr) return false;
+
+    // Der Emulationsthread darf waehrend der Bildumrechnung kein neues Bild erzeugen
+    SDL_LockMutex(mutex1);
+    ConvertPendingVideo();
+    SDL_Surface *copy = SDL_ConvertSurface(c64_screen, c64_screen->format, 0);
+    SDL_UnlockMutex(mutex1);
+    if(copy == nullptr) return false;
+
+    // Auf einer Kopie arbeiten, damit das angezeigte Bild nicht durch das Vertauschen von Rot/Blau flackert
+    SwapRBSurface(copy);
+    int result = SDL_SavePNG(copy, filename);
+    SDL_FreeSurface(copy);
+    return result == 0;
+}
+
+int C64Class::SaveSnapshotToBuffer(std::vector<uint8_t> &out, bool already_stopped)
+{
+    StateWriter w;
+    w.Bytes(SNAPSHOT_MAGIC, 8);
+    w.U16(SNAPSHOT_FORMAT_VERSION);
+    w.U16(0);
+
+    // Emulation anhalten: Im WarpMode laeuft sie ohne Mutex in einem eigenen Thread
+    // already_stopped: Der Aufruf kommt aus dem Emulationsthread selbst (zwischen zwei Zyklen), dann darf weder
+    // der Mutex gesperrt noch der WarpMode umgeschaltet werden
+    const bool was_warp = !already_stopped && warp_mode;
+    if(was_warp) EnableWarpMode(false);
+    if(!already_stopped) SDL_LockMutex(mutex1);
+
+    bool tape_ok = true;
+
+    w.BeginChunk("MAIN", 1);
+    w.U8(vic->GetVicType());
+    w.I32(c64_frequency);
+    w.I32(sid_emulation);
+    w.U8(io_source);
+    w.U32(cycle_counter);
+    w.U32(last_reset_cycle);
+    w.I32(floppy_clock_acc);
+    w.U8(c64_iec_wire_drv);
+    w.U8(c64_iec_wire);
+    w.U8(floppy_iec_wire);
+    w.Bool(reset_wire);
+    w.Bool(rdy_ba_wire);
+    w.Bool(game_wire);
+    w.Bool(exrom_wire);
+    w.Bool(hi_ram_wire);
+    w.Bool(lo_ram_wire);
+    w.I32(reset_hold_counter);
+    w.Bool(reset_hold_soft);
+    for(int i = 0; i < 5; i++) w.Bool(cpu_states[i]);
+    w.Bool(c64_reset_ready);
+    for(int i = 0; i < MAX_FLOPPY_NUM; i++) w.Bool(floppy_reset_ready[i]);
+    w.EndChunk();
+
+    w.BeginChunk("CPU ", 1);
+    cpu->SaveState(w);
+    cpu_port.SaveState(w);
+    w.EndChunk();
+
+    w.BeginChunk("MMU ", 1);
+    mmu->SaveState(w);
+    w.EndChunk();
+
+    w.BeginChunk("CIA1", 1);
+    cia1->SaveState(w);
+    cia1_port_a.SaveState(w);
+    cia1_port_b.SaveState(w);
+    w.EndChunk();
+
+    w.BeginChunk("CIA2", 1);
+    cia2->SaveState(w);
+    cia2_port_a.SaveState(w);
+    cia2_port_b.SaveState(w);
+    w.EndChunk();
+
+    w.BeginChunk("VIC ", 2);
+    vic->SaveState(w);
+    w.EndChunk();
+
+    w.BeginChunk("SID1", 1);
+    sid1->SaveState(w);
+    w.EndChunk();
+    w.BeginChunk("SID2", 1);
+    sid2->SaveState(w);
+    w.EndChunk();
+    w.BeginChunk("RSD1", 1);
+    resid1->SaveState(w);
+    w.EndChunk();
+    w.BeginChunk("RSD2", 1);
+    resid2->SaveState(w);
+    w.EndChunk();
+
+    for(int i = 0; i < MAX_FLOPPY_NUM; i++)
+    {
+        if(!floppy[i]->GetEnableFloppy()) continue;
+        char tag[5];
+        snprintf(tag, sizeof(tag), "FLP%d", i);
+        w.BeginChunk(tag, 1);
+        floppy[i]->SaveState(w);
+        w.EndChunk();
+    }
+
+    w.BeginChunk("TAPE", 1);
+    tape_ok = tape->SaveState(w);
+    w.EndChunk();
+
+    w.BeginChunk("CRT ", 1);
+    crt->SaveState(w);
+    w.EndChunk();
+
+    if(io_source == 2)
+    {
+        w.BeginChunk("REU ", 1);
+        reu->SaveState(w);
+        w.EndChunk();
+    }
+    else if(io_source == 3)
+    {
+        w.BeginChunk("GEO ", 1);
+        geo->SaveState(w);
+        w.EndChunk();
+    }
+
+    if(!already_stopped) SDL_UnlockMutex(mutex1);
+    if(was_warp) EnableWarpMode(true);
+
+    if(!tape_ok) return SNAPSHOT_ERROR_TAPE_RECORD;
+
+    w.U32(StateCRC32(w.Data().data(), w.Data().size()));
+
+    out = w.Data();
+    return SNAPSHOT_OK;
+}
+
+int C64Class::LoadSnapshot(FILE *file)
+{
+    if(file == nullptr) return SNAPSHOT_ERROR_FILE;
+
+    // Datei komplett einlesen
+    std::vector<uint8_t> data;
+    {
+        uint8_t block[65536];
+        size_t n;
+        while((n = fread(block, 1, sizeof(block), file)) > 0)
+        {
+            data.insert(data.end(), block, block + n);
+            if(data.size() > (512u << 20)) return SNAPSHOT_ERROR_FORMAT;   // Mehr als 512 MiB kann kein gueltiger Snapshot sein
+        }
+        if(ferror(file)) return SNAPSHOT_ERROR_FILE;
+    }
+
+    return LoadSnapshotFromBuffer(data);
+}
+
+int C64Class::LoadSnapshotFromBuffer(const std::vector<uint8_t> &data, bool already_stopped)
+{
+    // Kopf und Pruefsumme
+    if(data.size() < SNAPSHOT_HEADER_SIZE + 4 || memcmp(data.data(), SNAPSHOT_MAGIC, 8) != 0)
+        return SNAPSHOT_ERROR_FORMAT;
+
+    const size_t body_end = data.size() - 4;
+    uint32_t stored_crc = static_cast<uint32_t>(data[body_end]) | (static_cast<uint32_t>(data[body_end + 1]) << 8) |
+                          (static_cast<uint32_t>(data[body_end + 2]) << 16) | (static_cast<uint32_t>(data[body_end + 3]) << 24);
+    if(StateCRC32(data.data(), body_end) != stored_crc)
+        return SNAPSHOT_ERROR_FORMAT;
+
+    uint16_t format_version = static_cast<uint16_t>(data[8] | (data[9] << 8));
+    if(format_version > SNAPSHOT_FORMAT_VERSION) return SNAPSHOT_ERROR_VERSION;
+
+    StateReader r(data.data() + SNAPSHOT_HEADER_SIZE, body_end - SNAPSHOT_HEADER_SIZE);
+    uint16_t ver;
+
+    // Vorpruefung (noch ohne etwas zu veraendern)
+    if(!r.FindChunk("MAIN", ver)) return SNAPSHOT_ERROR_FORMAT;
+    const uint8_t snapshot_vic_type = r.U8();
+    if(!r.Ok()) return SNAPSHOT_ERROR_FORMAT;
+    if(snapshot_vic_type != vic->GetVicType()) return SNAPSHOT_ERROR_VIC_TYPE;
+
+    static const char *required_chunks[] = {"CPU ", "MMU ", "CIA1", "CIA2", "VIC ", "SID1", "SID2", "RSD1", "RSD2", "TAPE", "CRT "};
+    for(const char *tag : required_chunks)
+        if(!r.FindChunk(tag, ver)) return SNAPSHOT_ERROR_FORMAT;
+
+    // Emulation anhalten
+    const bool was_warp = !already_stopped && warp_mode;
+    if(was_warp) EnableWarpMode(false);
+    if(!already_stopped) SDL_LockMutex(mutex1);
+
+    bool ok = true;
+
+    // MAIN
+    r.FindChunk("MAIN", ver);
+    r.U8();     // VIC Typ (schon geprueft)
+    r.I32();    // c64_frequency (Einstellung bleibt wie sie ist)
+    int snapshot_sid_emulation = r.I32();
+    uint8_t snapshot_io_source = r.U8();
+    uint32_t snapshot_cycle_counter = r.U32();
+    uint32_t snapshot_last_reset_cycle = r.U32();
+    int snapshot_floppy_clock_acc = r.I32();
+    uint8_t snapshot_c64_iec_wire_drv = r.U8();
+    uint8_t snapshot_c64_iec_wire = r.U8();
+    uint8_t snapshot_floppy_iec_wire = r.U8();
+    bool snapshot_reset_wire = r.Bool();
+    bool snapshot_rdy_ba_wire = r.Bool();
+    bool snapshot_game_wire = r.Bool();
+    bool snapshot_exrom_wire = r.Bool();
+    bool snapshot_hi_ram_wire = r.Bool();
+    bool snapshot_lo_ram_wire = r.Bool();
+    int snapshot_reset_hold_counter = r.I32();
+    bool snapshot_reset_hold_soft = r.Bool();
+    bool snapshot_cpu_states[5];
+    for(int i = 0; i < 5; i++) snapshot_cpu_states[i] = r.Bool();
+    bool snapshot_c64_reset_ready = r.Bool();
+    bool snapshot_floppy_reset_ready[MAX_FLOPPY_NUM];
+    for(int i = 0; i < MAX_FLOPPY_NUM; i++) snapshot_floppy_reset_ready[i] = r.Bool();
+    ok = r.Ok() && snapshot_io_source <= 3 && snapshot_reset_hold_counter >= 0 &&
+         (snapshot_sid_emulation == EMU64_SID || snapshot_sid_emulation == RESID_SID);
+
+    if(ok)
+    {
+        // Laufende Vorgaenge verwerfen
+        reset_request = 0;
+        KillCommandLine();
+        auto_load_mode = 0;
+        wait_reset_ready = false;
+
+        SetSidEmulation(snapshot_sid_emulation);
+
+        io_source = snapshot_io_source;
+        cycle_counter = snapshot_cycle_counter;
+        last_reset_cycle = snapshot_last_reset_cycle;
+        floppy_clock_acc = snapshot_floppy_clock_acc;
+        c64_iec_wire_drv = snapshot_c64_iec_wire_drv;
+        c64_iec_wire = snapshot_c64_iec_wire;
+        floppy_iec_wire = snapshot_floppy_iec_wire;
+        reset_wire = snapshot_reset_wire;
+        rdy_ba_wire = snapshot_rdy_ba_wire;
+        game_wire = snapshot_game_wire;
+        exrom_wire = snapshot_exrom_wire;
+        hi_ram_wire = snapshot_hi_ram_wire;
+        lo_ram_wire = snapshot_lo_ram_wire;
+        reset_hold_counter = snapshot_reset_hold_counter;
+        reset_hold_soft = snapshot_reset_hold_soft;
+        for(int i = 0; i < 5; i++) cpu_states[i] = snapshot_cpu_states[i];
+        c64_reset_ready = snapshot_c64_reset_ready;
+        for(int i = 0; i < MAX_FLOPPY_NUM; i++) floppy_reset_ready[i] = snapshot_floppy_reset_ready[i];
+        reu_is_insert = (io_source == 2);
+    }
+
+    if(ok) { r.FindChunk("CPU ", ver); ok = cpu->LoadState(r) && cpu_port.LoadState(r); }
+    if(ok) { r.FindChunk("MMU ", ver); ok = mmu->LoadState(r); }
+    if(ok) { r.FindChunk("CIA1", ver); ok = cia1->LoadState(r) && cia1_port_a.LoadState(r) && cia1_port_b.LoadState(r); }
+    if(ok) { r.FindChunk("CIA2", ver); ok = cia2->LoadState(r) && cia2_port_a.LoadState(r) && cia2_port_b.LoadState(r); }
+    if(ok) { r.FindChunk("VIC ", ver); ok = ver <= 2 && vic->LoadState(r, ver); }
+    if(ok) { r.FindChunk("SID1", ver); ok = sid1->LoadState(r); }
+    if(ok) { r.FindChunk("SID2", ver); ok = sid2->LoadState(r); }
+    if(ok) { r.FindChunk("RSD1", ver); ok = resid1->LoadState(r); }
+    if(ok) { r.FindChunk("RSD2", ver); ok = resid2->LoadState(r); }
+
+    for(int i = 0; ok && i < MAX_FLOPPY_NUM; i++)
+    {
+        char tag[5];
+        snprintf(tag, sizeof(tag), "FLP%d", i);
+        if(!r.FindChunk(tag, ver)) continue;
+        if(!floppy[i]->GetEnableFloppy()) floppy[i]->SetEnableFloppy(true);
+        ok = floppy[i]->LoadState(r);
+    }
+
+    if(ok) { r.FindChunk("TAPE", ver); ok = tape->LoadState(r); }
+    if(ok) { r.FindChunk("CRT ", ver); ok = crt->LoadState(r); }
+
+    if(ok)
+    {
+        if(io_source == 2)
+        {
+            ok = r.FindChunk("REU ", ver) && reu->LoadState(r);
+        }
+        else
+        {
+            reu->Remove();
+            if(io_source == 3)
+                ok = r.FindChunk("GEO ", ver) && geo->LoadState(r);
+            else
+                geo->Remove();
+        }
+    }
+
+    if(ok)
+    {
+        // Abgeleiteten Zustand neu aufbauen
+        mmu->ChangeMemMap();
+        vic_buffer = vic->video_buffer_back[(vic->current_video_buffer + 1) & 1];
+        video_convert_pending = false;
+        keys_cache_valid = false;
+        sid1->ZeroSoundBufferPos();
+        sid2->ZeroSoundBufferPos();
+        resid1->SetSoundBufferPosToZero();
+        resid2->SetSoundBufferPosToZero();
+    }
+
+    if(!already_stopped) SDL_UnlockMutex(mutex1);
+    if(was_warp) EnableWarpMode(true);
+
+    if(!ok)
+    {
+        // Der Zustand ist jetzt nur teilweise uebernommen: Sauber neu starten
+        HardReset();
+        return SNAPSHOT_ERROR_APPLY;
+    }
+    return SNAPSHOT_OK;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Snapshot Kommandozeilen Funktionen (--load-snapshot, --save-snapshot/--snapshot-at, --snapshot-selftest)
+////////////////////////////////////////////////////////////////////////////////
+
+int C64Class::LoadSnapshotFile(const char *filename)
+{
+    FILE *file = fopen(filename, "rb");
+    if(file == nullptr) return SNAPSHOT_ERROR_FILE;
+
+    int result = LoadSnapshot(file);
+    fclose(file);
+
+    // Die Zyklenzaehlung fuer --limitcycles, --snapshot-at und --snapshot-selftest beginnt ab hier neu
+    if(result == SNAPSHOT_OK) last_reset_cycle = cycle_counter;
+    return result;
+}
+
+void C64Class::SetSnapshotSaveAt(const char *filename, uint32_t cycles)
+{
+    snprintf(snapshot_save_filename, sizeof(snapshot_save_filename), "%s", filename);
+    snapshot_save_cycles = cycles;
+    snapshot_save_pending = true;
+    snapshot_tasks_active = true;
+}
+
+void C64Class::SetSnapshotSelfTest(uint32_t start_cycles, uint32_t run_cycles)
+{
+    snapshot_selftest_start = start_cycles;
+    snapshot_selftest_run = run_cycles;
+    snapshot_selftest_pending = true;
+    snapshot_tasks_active = true;
+}
+
+void C64Class::CheckSnapshotTasks()
+{
+    // Zaehlung wie bei --limitcycles: Zyklen seit dem Ende des letzten Resets (bzw. seit dem Laden eines Snapshots per Kommandozeile)
+    const uint32_t cycles = cycle_counter - last_reset_cycle;
+
+    if(snapshot_save_pending && cycles >= snapshot_save_cycles)
+    {
+        snapshot_save_pending = false;
+
+        // Wir sind im Emulationsthread zwischen zwei Zyklen: Der Zustand ist konsistent
+        std::vector<uint8_t> data;
+        int result = SaveSnapshotToBuffer(data, true);
+        bool ok = (result == SNAPSHOT_OK);
+        if(ok)
+        {
+            FILE *file = fopen(snapshot_save_filename, "wb");
+            ok = (file != nullptr) && (fwrite(data.data(), 1, data.size(), file) == data.size());
+            if(file != nullptr) fclose(file);
+        }
+
+        if(ok)
+            std::cout << "Snapshot gespeichert: " << snapshot_save_filename << " (Zyklus " << cycle_counter << ")" << std::endl;
+        else
+        {
+            std::cerr << "Snapshot konnte nicht gespeichert werden: " << snapshot_save_filename << std::endl;
+            if(SnapshotEvent != nullptr) SnapshotEvent(2);
+        }
+    }
+
+    if(snapshot_selftest_pending && cycles >= snapshot_selftest_start)
+    {
+        snapshot_selftest_pending = false;
+        SnapshotSelfTest(snapshot_selftest_run);
+    }
+
+    snapshot_tasks_active = snapshot_save_pending || snapshot_selftest_pending;
+}
+
+// Prueft ob der Snapshot den Zustand vollstaendig wiederherstellt:
+// Zustand sichern, n Zyklen laufen, Zustand sichern, den ersten Zustand laden, n Zyklen laufen, Zustand sichern.
+// Beide Endzustaende muessen identisch sein (chunkweiser Vergleich). Ergebnis auf der Konsole, Exitcode 0 = ok, 1 = Unterschied, 2 = Fehler
+void C64Class::SnapshotSelfTest(uint32_t run_cycles)
+{
+    auto run = [this](uint32_t n)
+    {
+        for(uint32_t i = 0; i < n; i++)
+        {
+            NextSystemCycle();
+
+            // Die Audio Ausgabepuffer werden hier nicht abgeholt, damit sie nicht ueberlaufen regelmaessig zuruecksetzen
+            if((i & 511) == 0)
+            {
+                sid1->ZeroSoundBufferPos();
+                sid2->ZeroSoundBufferPos();
+                resid1->SetSoundBufferPosToZero();
+                resid2->SetSoundBufferPosToZero();
+                for(int f = 0; f < MAX_FLOPPY_NUM; f++) floppy[f]->ZeroSoundBufferPos();
+                tape->ZeroSoundBufferPos();
+            }
+        }
+    };
+
+    // Chunks eines Snapshots als (Tag, Inhalt)
+    auto chunks = [](const std::vector<uint8_t> &d)
+    {
+        std::vector<std::pair<std::string, std::vector<uint8_t>>> out;
+        StateReader r(d.data() + SNAPSHOT_HEADER_SIZE, d.size() - SNAPSHOT_HEADER_SIZE - 4);
+        char tag[5];
+        uint16_t ver;
+        while(r.NextChunk(tag, ver))
+        {
+            std::vector<uint8_t> content(r.Remaining());
+            r.Bytes(content.data(), content.size());
+            out.push_back({std::string(tag), std::move(content)});
+            r.EndChunk();
+        }
+        return out;
+    };
+
+    std::vector<uint8_t> state_start, state_a, state_b;
+    const uint32_t start_cycle = cycle_counter;
+
+    int r0 = SaveSnapshotToBuffer(state_start, true);
+    run(run_cycles);
+    int r1 = SaveSnapshotToBuffer(state_a, true);
+    int r2 = LoadSnapshotFromBuffer(state_start, true);
+    run(run_cycles);
+    int r3 = SaveSnapshotToBuffer(state_b, true);
+
+    int exit_code = 0;
+    if(r0 != SNAPSHOT_OK || r1 != SNAPSHOT_OK || r2 != SNAPSHOT_OK || r3 != SNAPSHOT_OK)
+    {
+        std::cout << "SNAPSHOT-SELFTEST FEHLER: Speichern/Laden fehlgeschlagen (" << r0 << " " << r1 << " " << r2 << " " << r3 << ")" << std::endl;
+        exit_code = 2;
+    }
+    else
+    {
+        auto ca = chunks(state_a);
+        auto cb = chunks(state_b);
+        std::cout << "SNAPSHOT-SELFTEST Start bei Zyklus " << start_cycle << ", " << run_cycles << " Zyklen, Snapshot " << state_start.size() << " Bytes" << std::endl;
+
+        bool equal = (ca.size() == cb.size());
+        for(size_t i = 0; i < ca.size() && i < cb.size(); i++)
+        {
+            // reSID: read_state/write_state stellt den rate_counter (je Stimme 2 Bytes) nicht exakt wieder her (bekannte Grenze)
+            if(ca[i].first.compare(0, 3, "RSD") == 0 && ca[i].second.size() >= 89 + 3 * 40 && cb[i].second.size() >= 89 + 3 * 40)
+            {
+                for(int v = 0; v < 3; v++)
+                {
+                    ca[i].second[89 + v * 40 + 22] = ca[i].second[89 + v * 40 + 23] = 0;
+                    cb[i].second[89 + v * 40 + 22] = cb[i].second[89 + v * 40 + 23] = 0;
+                }
+            }
+
+            const bool chunk_equal = (ca[i].first == cb[i].first) && (ca[i].second == cb[i].second);
+            equal = equal && chunk_equal;
+            std::cout << "  " << ca[i].first << (chunk_equal ? " gleich" : " UNTERSCHIED") << std::endl;
+        }
+
+        std::cout << (equal ? "SNAPSHOT-SELFTEST OK" : "SNAPSHOT-SELFTEST FEHLER: Der Zustand nach dem Laden weicht ab") << std::endl;
+        exit_code = equal ? 0 : 1;
+    }
+
+    if(SnapshotEvent != nullptr) SnapshotEvent(exit_code);
 }

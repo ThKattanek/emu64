@@ -1475,3 +1475,70 @@ void MOS6502::Phi1()
     }
     else irq_is_active = false;
 }
+
+void MOS6502::SaveState(StateWriter &w) const
+{
+    w.U32(static_cast<uint32_t>(MCT - reinterpret_cast<const unsigned char*>(MicroCodeTable6502)));
+    w.U8(Pointer);
+    w.U16(Adresse);
+    w.U16(BranchAdresse);
+    w.U16(AktOpcode);
+    w.U16(AktOpcodePC);
+    w.Bool(JAMFlag);
+    w.U8(TMPByte);
+    w.U16(PC);
+    w.U8(AC);
+    w.U8(XR);
+    w.U8(YR);
+    w.U8(SP);
+    w.U8(SR);
+    w.U8(irq_state);
+    w.Bool(irq_is_low_pegel);
+    w.Bool(irq_is_active);
+    w.Bool(branch_irq_early);
+    w.Bool(branch_irq_sample);
+    w.Bool(irq_fetch_decision);
+    w.Bool(irq_delay);
+    w.U8(irq_delay_sr_value);
+    w.U32(tmp);
+    w.U32(tmp1);
+    w.U16(tmp2);
+    w.U16(src);
+    w.Bool(carry_tmp);
+    w.U8(idxReg);
+}
+
+bool MOS6502::LoadState(StateReader &r)
+{
+    uint32_t mct_offset = r.U32();
+    if(mct_offset >= sizeof(MicroCodeTable6502)) return false;
+    MCT = const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>(MicroCodeTable6502)) + mct_offset;
+    Pointer = r.U8();
+    Adresse = r.U16();
+    BranchAdresse = r.U16();
+    AktOpcode = r.U16();
+    AktOpcodePC = r.U16();
+    JAMFlag = r.Bool();
+    TMPByte = r.U8();
+    PC = r.U16();
+    AC = r.U8();
+    XR = r.U8();
+    YR = r.U8();
+    SP = r.U8();
+    SR = r.U8();
+    irq_state = r.U8();
+    irq_is_low_pegel = r.Bool();
+    irq_is_active = r.Bool();
+    branch_irq_early = r.Bool();
+    branch_irq_sample = r.Bool();
+    irq_fetch_decision = r.Bool();
+    irq_delay = r.Bool();
+    irq_delay_sr_value = r.U8();
+    tmp = r.U32();
+    tmp1 = r.U32();
+    tmp2 = r.U16();
+    src = r.U16();
+    carry_tmp = r.Bool();
+    idxReg = r.U8();
+    return r.Ok();
+}

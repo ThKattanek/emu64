@@ -17,6 +17,7 @@
 
 #include <functional>
 #include "delegate.h"
+#include "state_stream.h"
 
 #include "./mos6510_class.h"
 
@@ -36,8 +37,9 @@ public:
     bool LoadCharRom(const char *filename);
     unsigned char GetReadSource(unsigned char page);
     unsigned char GetWriteDestination(unsigned char page);
-    //bool SaveFreez(FILE* File);
-    //bool LoadFreez(FILE *File,unsigned short Version);
+    // Speichert RAM und Farb-RAM. Nach dem Laden muss ChangeMemMap() aufgerufen werden.
+    void SaveState(StateWriter &w) const;
+    bool LoadState(StateReader &r);
     /// Variablen ///
 
     MOS6510_PORT *CPU_PORT;

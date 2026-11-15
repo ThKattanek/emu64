@@ -17,6 +17,7 @@
 
 #include <functional>
 #include "delegate.h"
+#include "state_stream.h"
 
 #include "./structs.h"
 
@@ -40,6 +41,9 @@ public:
 
     void TriggerInterrupt(int typ);
     void ClearInterrupt(int typ);
+
+    void SaveState(StateWriter &w) const;
+    bool LoadState(StateReader &r);
 
     Delegate<unsigned char(unsigned short)> *ReadProcTbl;
     Delegate<void(unsigned short,unsigned char)> *WriteProcTbl;

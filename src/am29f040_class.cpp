@@ -244,3 +244,25 @@ inline int AM29F040Class::WriteOperationStatus()
          | (1 << 5)                         /* DQ5 = timeout */
          ;
 }
+
+void AM29F040Class::SaveState(StateWriter &w) const
+{
+    w.I32(flash_type);
+    w.I32(status);
+    w.U8(last_read);
+    w.U8(programm_byte);
+    w.Bool(dirty);
+}
+
+bool AM29F040Class::LoadState(StateReader &r)
+{
+    int type = r.I32();
+    int st = r.I32();
+    last_read = r.U8();
+    programm_byte = r.U8();
+    dirty = r.Bool();
+    if(!r.Ok() || type < 0 || type > 1 || st < STATUS_READ || st > STATUS_SECTOR_ERASE_SUSPEND) return false;
+    flash_type = type;
+    status = st;
+    return true;
+}

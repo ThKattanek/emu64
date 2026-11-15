@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <functional>
 #include "delegate.h"
+#include "state_stream.h"
 
 class MOS6522
 {
@@ -38,6 +39,9 @@ public:
     void OneZyklus(void);
     void WriteIO(unsigned short adresse, unsigned char);
     unsigned char ReadIO(unsigned short adresse);
+
+    void SaveState(StateWriter &w) const;
+    bool LoadState(StateReader &r);
 
     Delegate<bool(void)> SyncFound;
     Delegate<unsigned char(void)> ReadGCRByte;

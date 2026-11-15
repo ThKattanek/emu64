@@ -187,6 +187,81 @@ void ReSIDWrapperClass::Reset()
     sid->reset();
 }
 
+void ReSIDWrapperClass::SaveState(StateWriter &w) const
+{
+    reSID::SID::State st = sid->read_state();
+    w.I32(sid_model);
+    w.Bytes(io, sizeof(io));
+    w.F32(freq_conv_counter);
+    w.I32(cycle_counter);
+    w.U8(pot_x);
+    w.U8(pot_y);
+    w.Bytes(st.sid_register, sizeof(st.sid_register));
+    w.U8(st.bus_value);
+    w.I32(st.bus_value_ttl);
+    w.I32(st.write_pipeline);
+    w.U8(st.write_address);
+    w.U8(st.voice_mask);
+    for(int i = 0; i < 3; i++)
+    {
+        w.U32(st.accumulator[i]);
+        w.U32(st.shift_register[i]);
+        w.I32(st.shift_register_reset[i]);
+        w.I32(st.shift_pipeline[i]);
+        w.U16(st.pulse_output[i]);
+        w.I32(st.floating_output_ttl[i]);
+        w.U16(st.rate_counter[i]);
+        w.U16(st.rate_counter_period[i]);
+        w.U16(st.exponential_counter[i]);
+        w.U16(st.exponential_counter_period[i]);
+        w.U8(st.envelope_counter[i]);
+        w.I32(st.envelope_state[i]);
+        w.Bool(st.hold_zero[i]);
+        w.I32(st.envelope_pipeline[i]);
+    }
+}
+
+bool ReSIDWrapperClass::LoadState(StateReader &r)
+{
+    reSID::SID::State st;
+    int model = r.I32();
+    if(!r.Ok() || model < 0 || model > 1) return false;
+    SetChipModel(model);
+    r.Bytes(io, sizeof(io));
+    freq_conv_counter = r.F32();
+    cycle_counter = r.I32();
+    pot_x = r.U8();
+    pot_y = r.U8();
+    r.Bytes(st.sid_register, sizeof(st.sid_register));
+    st.bus_value = r.U8();
+    st.bus_value_ttl = r.I32();
+    st.write_pipeline = r.I32();
+    st.write_address = r.U8();
+    st.voice_mask = r.U8();
+    for(int i = 0; i < 3; i++)
+    {
+        st.accumulator[i] = r.U32();
+        st.shift_register[i] = r.U32();
+        st.shift_register_reset[i] = r.I32();
+        st.shift_pipeline[i] = r.I32();
+        st.pulse_output[i] = r.U16();
+        st.floating_output_ttl[i] = r.I32();
+        st.rate_counter[i] = r.U16();
+        st.rate_counter_period[i] = r.U16();
+        st.exponential_counter[i] = r.U16();
+        st.exponential_counter_period[i] = r.U16();
+        st.envelope_counter[i] = r.U8();
+        st.envelope_state[i] = static_cast<reSID::EnvelopeGenerator::State>(r.I32());
+        st.hold_zero[i] = r.Bool();
+        st.envelope_pipeline[i] = r.I32();
+    }
+    if(!r.Ok()) return false;
+    for(int i = 0; i < 3; i++)
+        if(static_cast<int>(st.envelope_state[i]) < 0 || static_cast<int>(st.envelope_state[i]) > 3) return false;
+    sid->write_state(st);
+    return true;
+}
+
 uint8_t ReSIDWrapperClass::ReadRegister(uint8_t offset)
 {
     switch(offset & 0x1f)

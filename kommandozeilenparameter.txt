@@ -55,6 +55,33 @@ emu64 [PARAMETER]
     Beendet den Emulator mit Exitcode 1, sobald n Zyklen seit dem Ende des letzten Resets vergangen sind
     (unabhängig davon, wann die Kommandozeile verarbeitet wurde; Läufe enden so immer am gleichen Zyklus).
 
+--load-snapshot <Dateiname>
+    Lädt einen Quick C64 Snapshot (*.frz). Danach zählen --limitcycles, --snapshot-at und --snapshot-selftest ab dem
+    Zeitpunkt des Ladens. Der Snapshot ersetzt den kompletten Zustand des C64, Parameter die den Zustand ändern
+    (--autostart, --mount-disk, --poke64, Resets) sollten daher nicht mit ihm kombiniert werden.
+    Der Snapshot muss zur eingestellten Norm (PAL/NTSC) passen. Kann er nicht geladen werden,
+    wird eine Meldung ausgegeben und Emu64 mit Exitcode 2 beendet.
+    Bsp.: emu64 --nogui --load-snapshot fehler.frz --limitcycles 500000 --exitscreenshot ende.png
+
+--save-snapshot <Dateiname>
+    Speichert einen Quick C64 Snapshot, sobald die mit --snapshot-at angegebene Zyklenzahl erreicht ist.
+    Die Emulation läuft danach weiter (z.B. bis --limitcycles). Es wird kein Vorschaubild (PNG) angelegt.
+    Gehört immer zusammen mit --snapshot-at.
+
+--snapshot-at <nZyklen>
+    Zeitpunkt für --save-snapshot in Zyklen seit dem Ende des letzten Resets (wie --limitcycles),
+    bzw. seit dem Laden mit --load-snapshot. Der Snapshot wird zyklusgenau zwischen zwei Zyklen erzeugt.
+    Bsp.: emu64 --autostart spiel.d64 --save-snapshot vor_fehler.frz --snapshot-at 8000000 --limitcycles 8100000
+
+--snapshot-selftest <StartZyklen> <LaufZyklen>
+    Prüft ob Speichern und Laden den Zustand exakt wiederherstellen: Bei StartZyklen wird der Zustand gesichert,
+    LaufZyklen weiter emuliert und der Endzustand gesichert. Danach wird der erste Zustand geladen, wieder LaufZyklen
+    emuliert und der Endzustand gesichert. Beide Endzustände müssen gleich sein (Vergleich je Chunk, siehe
+    doc/Fileformat_Snapshot_[frz]_Version1.md). Das Ergebnis wird auf der Konsole ausgegeben, Emu64 danach beendet.
+    Exitcode: 0 = ok, 1 = Unterschied im Zustand, 2 = Fehler beim Speichern/Laden.
+    Der reSID rate_counter wird beim Vergleich ignoriert (bekannte Grenze von reSID).
+    Bsp.: emu64 --nogui --autostart spiel.d64 --snapshot-selftest 6000000 400000
+
 --nosplash
     Der SplashScreen wird beim Start nicht angezeigt.
 

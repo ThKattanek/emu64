@@ -24,6 +24,7 @@
 #endif
 
 #include "mos6510_class.h"
+#include "state_stream.h"
 
 #define REW_SPEED 12 // 15-Fache Geschwindigkeit
 #define FFW_SPEED 12 // 15-Fache Geschwindigkeit
@@ -50,6 +51,10 @@ public:
     float GetTapeLenTime();
     unsigned int GetTapeLenCount();
     bool IsPressedRecord();
+
+    // Quick Snapshot (nicht moeglich waehrend der Aufnahme; WAV Baender werden nicht gesichert)
+    bool SaveState(StateWriter &w) const;
+    bool LoadState(StateReader &r);
 
     MOS6510_PORT    *CPU_PORT;
     bool            CassRead;
@@ -122,6 +127,12 @@ private:
     unsigned long PlayAddWert;
 
     unsigned short WaveTableSinus[SAMPLE_TBL_LENGTH];
+
+    // Zustand der ueber mehrere Zyklen in OneCycle erhalten bleibt
+    bool            MotorStatusTmp = false;
+    unsigned char   CPU_PORT_OLD = 0;
+    int             WaveStatus = 0;
+    int             OldWaveStatus = 0;
 };
 
 #endif // TAPE1530_H

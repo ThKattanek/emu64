@@ -92,6 +92,11 @@ public:
     /// DebugCartEvent von der C64 Klasse
     void DebugCartEvent(unsigned char value);
     bool IsDebugCartEvent;
+
+    /// SnapshotEvent von der C64 Klasse (Selbsttest / Fehler per Kommandozeile)
+    void SnapshotEvent(int exit_code);
+    bool IsSnapshotEvent;
+    int SnapshotExitCode;
     unsigned char DebugCartValue;
 
     /// CustomDataPath setzen
@@ -100,6 +105,12 @@ public:
 public slots:
     void OnMessage(QStringList msg);
     int OnInit(bool nogui);
+
+    // Quick C64 Snapshot
+    QString SnapshotSlotFilename(int slot) const;
+    bool SnapshotSave(const QString &filename, bool show_message);
+    bool SnapshotLoad(const QString &filename, bool show_message);
+    void InitSnapshotSlotMenus();
 
 private slots:
     void on_menu_main_info_triggered();
@@ -117,6 +128,8 @@ private slots:
     void on_actionC64_Programme_direkt_laden_triggered();
     void on_actionEmu64_Einstellungen_triggered();
     void on_actionScreenshot_triggered();
+    void on_actionSnapshot_Speichern_triggered();
+    void on_actionSnapshot_Laden_triggered();
     void on_actionC64_Geschwindigkeit_triggered();
     void on_actionREU_einstecken_triggered();
     void on_actionREU_entfernen_triggered();
@@ -185,6 +198,7 @@ private:
     QString langPath;            // Pfad für alle Sprachfiles
     //QString system_tmp_path;     // Pfad für alle Temporären Dateien die Emu64 erzeugt (Wird beim Start und Ende geleert)
     QString screenshotPath;      // Pfad für alle Emu64 Screenshots (nicht änderbar)
+    QString snapshotPath;        // Pfad für die Quick C64 Snapshots (Slots)
     QString romsetPath;          // Pfad für Benutzerdefinierte ROM-Sets
 
     QDir    emu64_tmp;           // QDir Object für Emu64 Temp-Verzeichnis

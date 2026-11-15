@@ -15,6 +15,7 @@
 #ifndef REU_CLASS_H
 #define REU_CLASS_H
 
+#include "state_stream.h"
 #include <cstdint>
 #include <cstdio>
 #include <functional>
@@ -49,8 +50,8 @@ public:
     void Reset(void);
     void OneZyklus(void);
 
-    bool SaveFreez(FILE *File);
-    bool LoadFreez(FILE *File,unsigned short Version);
+    void SaveState(StateWriter &w) const;
+    bool LoadState(StateReader &r);
 
     Delegate<unsigned char(unsigned short)> *ReadProcTbl;
     Delegate<void(unsigned short,unsigned char)> *WriteProcTbl;

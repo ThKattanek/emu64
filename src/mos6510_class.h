@@ -18,6 +18,7 @@
 #include "./structs.h"
 #include <functional>
 #include "delegate.h"
+#include "state_stream.h"
 
 class MOS6510
 {
@@ -34,8 +35,8 @@ public:
     void SetRegister(REG_STRUCT *reg);
     bool GetInterrupts(int typ);
     void GetInterneRegister(IREG_STRUCT *ireg);
-    //bool SaveFreez(FILE *File);
-    //bool LoadFreez(FILE *File,unsigned short Version);
+    void SaveState(StateWriter &w) const;
+    bool LoadState(StateReader &r);
 
     void TriggerInterrupt(int typ);
     void ClearInterrupt(int typ);
@@ -114,6 +115,9 @@ private:
 
     bool             shxy_dma;
     uint8_t			axa_byte;
+
+    bool            RESET_OLD = false;  // Reset Leitung vom vorigen Takt
+    unsigned char   idxReg = 0;         // Indexregister (X/Y) des aktuellen Befehls
 };
 
 #define SetAdresseLo(wert) Adresse = ((Adresse&0xFF00)|wert)
@@ -135,8 +139,8 @@ public:
     ~MOS6510_PORT(void);
     void Reset(void);
     void ConfigChanged(int tape_sense, int caps_sense,unsigned char pullup);
-    //bool SaveFreez(FILE               //IRQCounter = 0;* File);
-    //bool LoadFreez(FILE* File,unsigned short Version);
+    void SaveState(StateWriter &w) const;
+    bool LoadState(StateReader &r);
 
     /// Variablen ///
 
@@ -167,5 +171,8 @@ public:
 
     bool TAPE_SENSE;
     bool DATASETTE_MOTOR;
+
+    unsigned char OLD_DATA_OUT = 0xFF;
+    unsigned char OLD_WRITE_BIT = 0xFF;
 };
 #endif // MOS_6510_CLASS_H

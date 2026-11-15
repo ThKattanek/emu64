@@ -464,3 +464,48 @@ unsigned char MOS6522::ReadIO(unsigned short adresse)
             break;
     }
 }
+
+void MOS6522::SaveState(StateWriter &w) const
+{
+    w.Bytes(IO, sizeof(IO));
+    w.U8(PA);
+    w.U8(PB);
+    w.U8(DDRA);
+    w.U8(DDRB);
+    w.U16(TimerA);
+    w.U16(TimerALatch);
+    w.U16(TimerB);
+    w.U16(TimerBLatch);
+    w.Bool(TimerBArmed);
+    w.Bool(ATNState);
+    w.Bool(IECInterrupt);
+    w.U8(OldIECLines);
+    w.Bool(OldATNState);
+    w.U8(TmpByte);
+    w.U32(counter_sample_pb3);
+    w.U32(addition_sample_pb3);
+    w.F32(rms_pb3);
+}
+
+bool MOS6522::LoadState(StateReader &r)
+{
+    r.Bytes(IO, sizeof(IO));
+    PA = r.U8();
+    PB = r.U8();
+    DDRA = r.U8();
+    DDRB = r.U8();
+    TimerA = r.U16();
+    TimerALatch = r.U16();
+    TimerB = r.U16();
+    TimerBLatch = r.U16();
+    TimerBArmed = r.Bool();
+    ATNState = r.Bool();
+    IECInterrupt = r.Bool();
+    OldIECLines = r.U8();
+    OldATNState = r.Bool();
+    TmpByte = r.U8();
+    counter_sample_pb3 = r.U32();
+    addition_sample_pb3 = r.U32();
+    rms_pb3 = r.F32();
+    return r.Ok();
+}

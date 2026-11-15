@@ -17,6 +17,7 @@
 #define MOS_6526_PORT_H
 
 #include <stdint.h>
+#include "state_stream.h"
 
 class PORT
 {
@@ -29,8 +30,8 @@ public:
     void SetOutput(uint8_t value);
     uint8_t* GetOutputBitsPointer();
     uint8_t* GetInputBitsPointer();
-    //bool SaveFreez(FILE* File);
-    //bool LoadFreez(FILE* File,unsigned short Version);
+    void SaveState(StateWriter &w) const { w.U8(input_bits); w.U8(output_bits); }
+    bool LoadState(StateReader &r) { input_bits = r.U8(); output_bits = r.U8(); return r.Ok(); }
 private:
     uint8_t input_bits;
     uint8_t output_bits;

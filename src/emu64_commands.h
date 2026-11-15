@@ -20,10 +20,15 @@
 enum CMD_COMMAND {CMD_HELP,CMD_VERSION,CMD_MULTIPLE_INSTANCE,CMD_NOSPLASH,CMD_MINIMIZED,CMD_SOFTRESET,CMD_HARDRESET,CMD_USE_SDL_RENDERER,\
                    CMD_MOUNT_DISK,CMD_MOUNT_CRT,CMD_UMOUNT_CRT,CMD_POKE_64,CMD_LIMITCYCLES,CMD_AUTOSTART,\
                    CMD_EXIT_SCREENSHOT,CMD_DEBUG_CART,CMD_WARP_MODE,CMD_RESET_INI,CMD_VIDEOCAPTURE,CMD_DATA_PATH,CMD_VIDEO_FILTER_OFF,CMD_SET_PALETTE,\
-                   CMD_DOUBLE_TEXTURE_OFF, CMD_NOGUI, CMD_ENABLE_GEORAM, CMD_SET_GEORAM_SIZE, CMD_ENABLE_REU, CMD_SET_REU_SIZE, CMD_SET_SID_ENGINE, CMD_SET_SIDTYPE, CMD_SET_VICMODEL, CMD_SET_CIAMODEL, CMD_NOSOUND, CMD_AUTOSTART_PRG_MODE};
+                   CMD_DOUBLE_TEXTURE_OFF, CMD_NOGUI, CMD_ENABLE_GEORAM, CMD_SET_GEORAM_SIZE, CMD_ENABLE_REU, CMD_SET_REU_SIZE, CMD_SET_SID_ENGINE, CMD_SET_SIDTYPE, CMD_SET_VICMODEL, CMD_SET_CIAMODEL, CMD_NOSOUND, CMD_AUTOSTART_PRG_MODE,\
+                   CMD_LOAD_SNAPSHOT, CMD_SAVE_SNAPSHOT, CMD_SNAPSHOT_AT, CMD_SNAPSHOT_SELFTEST};
 static const CMD_STRUCT command_list[]{
     {CMD_AUTOSTART,"a","autostart","Laedt ein C64 Programm (prg,t00 ...) und startet es gleich.",1},
     {CMD_AUTOSTART_PRG_MODE,"","autostart-prg-mode","Legt fest, wie ein PRG mit --autostart gestartet wird (vor --autostart angeben). --autostart-prg-mode <Modus>\n\t\t\t\t 1=PRG in den RAM injizieren (Standard) 2=PRG auf eine erzeugte Disk kopieren und per LOAD laden",1},
+    {CMD_LOAD_SNAPSHOT,"","load-snapshot","Laedt einen Quick C64 Snapshot (*.frz). --load-snapshot <Dateiname>",1},
+    {CMD_SAVE_SNAPSHOT,"","save-snapshot","Speichert nach --snapshot-at einen Quick C64 Snapshot. --save-snapshot <Dateiname>",1},
+    {CMD_SNAPSHOT_AT,"","snapshot-at","Zeitpunkt fuer --save-snapshot in Zyklen (ab Ende des letzten Resets bzw. ab --load-snapshot). --snapshot-at <nZyklen>",1},
+    {CMD_SNAPSHOT_SELFTEST,"","snapshot-selftest","Prueft ob ein Snapshot den Zustand exakt wiederherstellt. Beendet den Emulator mit Exitcode 0 = ok, 1 = Unterschied, 2 = Fehler. --snapshot-selftest <StartZyklen> <LaufZyklen>",2},
     {CMD_MOUNT_DISK,"m","mount-disk","Mountet ein Diskimage. --mount-disk <Laufwerksnummer (8-11)> <Dateiname>",2},
     {CMD_MOUNT_CRT,"","mount-crt","Steckt ein Modulimage in den Expansionport ein. --mount-crt <Dateiname>",1},
     {CMD_UMOUNT_CRT,"","umount-crt","Entfernt ein Modulimage aus dem Expansionsport. --umount-crt",0},
