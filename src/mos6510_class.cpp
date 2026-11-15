@@ -1723,7 +1723,7 @@ bool MOS6510::OneZyklus(void)
         case 131:
             CHK_RDY
                 TMPByte = Read(PC);
-            AC = (AC | 0xEE) & XR & TMPByte;
+            AC = (AC | 0xEF) & XR & TMPByte;
             SET_SR_NZ(AC);
             PC++;
             break;
