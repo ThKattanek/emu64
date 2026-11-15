@@ -16,6 +16,7 @@
 #include <QScreen>
 #include <QStyle>
 #include <QUrl>
+#include <QTimer>
 #include <iostream>
 
 #include "./main_window.h"
@@ -552,6 +553,11 @@ int MainWindow::OnInit(bool nogui)
     /// DebugCartEvent von C64 Klasse hierher leiten
     IsDebugCartEvent = false;
     c64->DebugCartEvent = std::bind(&MainWindow::DebugCartEvent,this,std::placeholders::_1);
+
+    /// SnapshotEvent von C64 Klasse hierher leiten
+    IsSnapshotEvent = false;
+    SnapshotExitCode = 0;
+    c64->SnapshotEvent = std::bind(&MainWindow::SnapshotEvent,this,std::placeholders::_1);
     LogText(tr(">> C64Class DebugCartEvent mit MainWindow verknuepft\n").toUtf8());
 
     connect(floppy_window,SIGNAL(ChangeFloppyImage(int)),this,SLOT(OnChangeFloppyImage(int)));
@@ -801,6 +807,13 @@ void MainWindow::LimitCyclesEvent()
     on_actionBeenden_triggered();
 }
 
+void MainWindow::SnapshotEvent(int exit_code)
+{
+    SnapshotExitCode = exit_code;
+    IsSnapshotEvent = true;
+    on_actionBeenden_triggered();
+}
+
 void MainWindow::DebugCartEvent(unsigned char value)
 {
     DebugCartValue = value;
@@ -967,6 +980,11 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
     if(cmd_line == nullptr) return;
 
     bool isLimitCyclesCommand = false;
+
+    // Snapshot Parameter (--save-snapshot und --snapshot-at gehoeren zusammen, die Reihenfolge ist egal)
+    QByteArray snapshot_save_filename;
+    bool isSnapshotAt = false;
+    uint32_t snapshot_at_cycles = 0;
 
     for(int i=0; i<cmd_line->GetCommandCount() && !loop_break; i++)
     {
@@ -1189,6 +1207,50 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
             limit_cycles = val;
             isLimitCyclesCommand = true;
             break;
+        case CMD_LOAD_SNAPSHOT:
+        {
+            const int snapshot_result = c64->LoadSnapshotFile(cmd_line->GetArg(i+1));
+            if(snapshot_result != C64Class::SNAPSHOT_OK)
+            {
+                std::cerr << "Der Snapshot konnte nicht geladen werden: " << cmd_line->GetArg(i+1) << " (Fehlercode " << snapshot_result << ")" << std::endl;
+                // Emu64 wird beendet sobald die Ereignisschleife laeuft
+                SnapshotExitCode = 2;
+                IsSnapshotEvent = true;
+                QTimer::singleShot(0, this, &MainWindow::on_actionBeenden_triggered);
+                loop_break = true;
+            }
+            break;
+        }
+        case CMD_SAVE_SNAPSHOT:
+            snapshot_save_filename = QByteArray(cmd_line->GetArg(i+1));
+            break;
+        case CMD_SNAPSHOT_AT:
+            val = cmd_line->GetArgInt(i+1, &error);
+            if(error) break;
+
+            if(!(val > 0))
+            {
+                cmd_line->OutErrorMsg("Die Anzahl der Zyklen müssen groeßer als 0 sein.","--help");
+                break;
+            }
+            snapshot_at_cycles = static_cast<uint32_t>(val);
+            isSnapshotAt = true;
+            break;
+        case CMD_SNAPSHOT_SELFTEST:
+        {
+            const int start_cycles = cmd_line->GetArgInt(i+1, &error);
+            if(error) break;
+            const int run_cycles = cmd_line->GetArgInt(i+2, &error);
+            if(error) break;
+
+            if(!(start_cycles > 0 && run_cycles > 0))
+            {
+                cmd_line->OutErrorMsg("Start- und Laufzeit (in Zyklen) müssen groeßer als 0 sein.","--help");
+                break;
+            }
+            c64->SetSnapshotSelfTest(static_cast<uint32_t>(start_cycles), static_cast<uint32_t>(run_cycles));
+            break;
+        }
         case CMD_DOUBLE_TEXTURE_OFF:
             isCommandDoubleTextureOff = true;
             c64->enable_screen_doublesize = false;
@@ -1238,6 +1300,16 @@ void MainWindow::ExecuteCommandLine(QStringList string_list)
 
     if(isLimitCyclesCommand)
         c64->SetLimitCycles(limit_cycles);
+
+    if(!snapshot_save_filename.isEmpty())
+    {
+        if(isSnapshotAt)
+            c64->SetSnapshotSaveAt(snapshot_save_filename.constData(), snapshot_at_cycles);
+        else
+            cmd_line->OutErrorMsg("--save-snapshot benötigt zusätzlich --snapshot-at <nZyklen>.","--help");
+    }
+    else if(isSnapshotAt)
+        cmd_line->OutErrorMsg("--snapshot-at benötigt zusätzlich --save-snapshot <Dateiname>.","--help");
 
     if(cmd_line != nullptr) delete cmd_line;
 

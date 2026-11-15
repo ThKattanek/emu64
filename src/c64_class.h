@@ -150,8 +150,14 @@ public:
     int SaveSnapshot(FILE *file);
     bool SaveScreenshotPng(const char *filename);       // Aktuelles C64 Bild sofort als PNG speichern (UTF-8 Dateiname), z.B. als Vorschau zu einem Snapshot
     int LoadSnapshot(FILE *file);
-    int SaveSnapshotToBuffer(std::vector<uint8_t> &out);
-    int LoadSnapshotFromBuffer(const std::vector<uint8_t> &data);
+    int SaveSnapshotToBuffer(std::vector<uint8_t> &out, bool already_stopped = false);   // already_stopped: Aufruf kommt aus dem Emulationsthread (kein Mutex, kein WarpMode Wechsel)
+    int LoadSnapshotFromBuffer(const std::vector<uint8_t> &data, bool already_stopped = false);
+
+    // Kommandozeilen Funktionen (Testen mit Snapshots)
+    int LoadSnapshotFile(const char *filename);                                 // Laedt einen Snapshot, danach zaehlt --limitcycles ab hier
+    void SetSnapshotSaveAt(const char *filename, uint32_t cycles);              // Speichert nach n Zyklen (ab Reset bzw. ab Laden) einen Snapshot
+    void SetSnapshotSelfTest(uint32_t start_cycles, uint32_t run_cycles);       // Prueft nach n Zyklen ob Speichern/Laden den Zustand exakt wiederherstellt
+    std::function<void(int)> SnapshotEvent;                                     // Beendet den Emulator mit dem Exitcode (Selbsttest, Fehler)
 
     int LoadCRT(FILE *file);
     void RemoveCRT();
@@ -623,6 +629,17 @@ private:
     uint32_t    cycle_counter;
     std::atomic<uint32_t> limit_cycles_target;  // Anzahl Zyklen ab dem Ende des letzten Resets bis LimitCyclesEvent ausgelöst wird
     std::atomic<bool>     limit_cycles_active;  // true solange das Limit noch nicht erreicht wurde
+
+    // Snapshot Kommandozeilen Aufgaben, werden zu Beginn von NextSystemCycle geprueft
+    void CheckSnapshotTasks();
+    void SnapshotSelfTest(uint32_t run_cycles);
+    std::atomic<bool>     snapshot_tasks_active{false};
+    bool                  snapshot_save_pending = false;
+    uint32_t              snapshot_save_cycles = 0;
+    char                  snapshot_save_filename[MAX_STRING_LENGTH] = {};
+    bool                  snapshot_selftest_pending = false;
+    uint32_t              snapshot_selftest_start = 0;
+    uint32_t              snapshot_selftest_run = 0;
     std::atomic<uint32_t> last_reset_cycle;     // cycle_counter beim Ende des letzten Resets (Bezugspunkt für das Limit)
     bool		hold_next_system_cycle;     // Wird dieses Flag gesetzt wird verhindert das ein C64 Cylce ausgeführt wird
 

@@ -280,6 +280,7 @@ int main(int argc, char *argv[])
 
     if(w->IsLimitCyclesEvent) ret = 1;
     if(w->IsDebugCartEvent) ret = w->DebugCartValue;
+    if(w->IsSnapshotEvent) ret = w->SnapshotExitCode;
 
     if(w != nullptr) delete w;
     if(app != nullptr) delete app;

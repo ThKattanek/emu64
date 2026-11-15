@@ -92,6 +92,11 @@ public:
     /// DebugCartEvent von der C64 Klasse
     void DebugCartEvent(unsigned char value);
     bool IsDebugCartEvent;
+
+    /// SnapshotEvent von der C64 Klasse (Selbsttest / Fehler per Kommandozeile)
+    void SnapshotEvent(int exit_code);
+    bool IsSnapshotEvent;
+    int SnapshotExitCode;
     unsigned char DebugCartValue;
 
     /// CustomDataPath setzen

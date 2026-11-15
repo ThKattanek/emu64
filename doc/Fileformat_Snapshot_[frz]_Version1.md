@@ -709,16 +709,39 @@ Lesen über das Chunk-Ende hinaus liefert 0 und setzt den Fehlerzustand. `r.Rema
 
 ## 9. Testen
 
+### 9.1 Kommandozeilen-Optionen
+
+Mit diesen Optionen lassen sich Snapshots auch ohne GUI (`--nogui`) erzeugen, laden und prüfen (Details in `kommandozeilenparameter.txt`):
+
+| Option | Funktion |
+|---|---|
+| `--save-snapshot <Datei> --snapshot-at <Zyklen>` | Speichert nach den angegebenen Zyklen (gezählt wie bei `--limitcycles`) einen Snapshot, die Emulation läuft weiter. Kein PNG |
+| `--load-snapshot <Datei>` | Lädt einen Snapshot beim Start. Danach zählen `--limitcycles` und `--snapshot-at` ab dem Laden. Bei einem Fehler Exitcode 2 |
+| `--snapshot-selftest <Start> <Lauf>` | Determinismus-Prüfung (siehe 9.2). Exitcode 0 = ok, 1 = Unterschied, 2 = Fehler |
+
+Beispiel: Fehler reproduzierbar machen. Einmal bis kurz vor dem Fehler laufen lassen und speichern, danach beliebig oft direkt von dort starten:
+
+```
+emu64 --nogui --autostart spiel.d64 --save-snapshot vor_fehler.frz --snapshot-at 8000000 --limitcycles 8000001
+emu64 --nogui --load-snapshot vor_fehler.frz --limitcycles 500000 --exitscreenshot ende.png
+```
+
+Das Speichern geschieht im Emulationsthread zwischen zwei Zyklen. Dadurch funktioniert es auch im Warp-Modus (`--warp`).
+
+### 9.2 Der Selbsttest
+
 Der Kern der Funktion ist die **Determinismus-Prüfung**: Zustand speichern, weiterlaufen lassen, den gespeicherten Zustand laden, gleich lange weiterlaufen lassen und beide Endzustände vergleichen. Sie müssen identisch sein.
 
-Beim Entwickeln wurde dafür ein temporärer Selbsttest in `NextSystemCycle()` verwendet (inzwischen wieder entfernt):
+`--snapshot-selftest` (`C64Class::SnapshotSelfTest`) führt diese Prüfung aus:
 
 1. Beim Zykluszähler `N` den Zustand mit `SaveSnapshotToBuffer` sichern (`s0`).
 2. `M` Zyklen weiterlaufen lassen, Zustand sichern (`sa`).
 3. `LoadSnapshotFromBuffer(s0)`, wieder `M` Zyklen laufen lassen, Zustand sichern (`sb`).
-4. `sa` und `sb` chunkweise per CRC vergleichen.
+4. `sa` und `sb` chunkweise Byte für Byte vergleichen. In den reSID-Chunks wird der `rate_counter` ausgenommen (siehe 5.7).
 
-Wichtig: Beim manuellen Weiterlaufen müssen die Audio-Pufferpositionen (SID, reSID, Floppy, Tape) regelmäßig auf 0 gesetzt werden, sonst läuft der Soundpuffer über.
+Wichtig: Beim Weiterlaufen innerhalb des Tests müssen die Audio-Pufferpositionen (SID, reSID, Floppy, Tape) regelmäßig auf 0 gesetzt werden, sonst läuft der Soundpuffer über. Das erledigt der Selbsttest selbst.
+
+Neue Komponenten werden vom Selbsttest automatisch mitgeprüft, sobald sie als Chunk im Snapshot stehen. Ein vergessenes Feld in `SaveState`/`LoadState` zeigt sich als „UNTERSCHIED“ im betroffenen Chunk (bei einer Komponente, die im Test aktiv ist, z. B. Floppy, Tape oder Cartridge).
 
 Ergebnis mit dem Spiel *Hudson Hawk* (D64, Floppy lädt mitten im Test von der Disk), `N` zwischen 1,5 Mio. und 15 Mio. Zyklen, `M` = 400 000 Zyklen: MAIN, CPU, MMU, CIA 1/2, VIC, SID, Floppy, Tape und Cartridge waren in allen Läufen **bitgleich**. Der reSID-Chunk wich in manchen Läufen nur im `rate_counter` um 1 ab (siehe 5.7).
 
