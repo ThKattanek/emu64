@@ -901,6 +901,8 @@ void MMU::WriteZeroPage(unsigned short adresse, unsigned char wert)
     switch (adresse) 
 	{
       case 0:
+                // Die CPU legt den Wert nicht auf den Bus, das RAM bekommt das, was der VIC zuletzt in Phi1 gelesen hat
+                if (VIC_LAST_PHI1) RAM[0] = *VIC_LAST_PHI1;
                 if (CPU_PORT->DATA_SET_BIT7 && ((wert & 0x80) == 0) && CPU_PORT->DATA_FALLOFF_BIT7 == 0)
         {
                         CPU_PORT->DATA_FALLOFF_BIT7 = 1;
@@ -925,6 +927,7 @@ void MMU::WriteZeroPage(unsigned short adresse, unsigned char wert)
         break;
 
       case 1:
+                if (VIC_LAST_PHI1) RAM[1] = *VIC_LAST_PHI1;
                   if ((CPU_PORT->DIR & 0x80) && (wert & 0x80))
         {
                         CPU_PORT->DATA_SET_BIT7 = 1;

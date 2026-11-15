@@ -41,6 +41,7 @@ public:
     /// Variablen ///
 
     MOS6510_PORT *CPU_PORT;
+    const uint8_t *VIC_LAST_PHI1 = nullptr;     // Letztes vom VIC in Phi1 gelesenes Byte (landet bei CPU-Schreibzugriffen auf $00/$01 im RAM)
 
     // Zeiger für Read / Write Funktionen ///
     // Diese werden Teilweise Intern und Extern gesetzt ///
