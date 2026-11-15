@@ -527,6 +527,7 @@ mmu->EXROM = &exrom_wire;
 mmu->RAM_H = &hi_ram_wire;
 mmu->RAM_L = &lo_ram_wire;
 mmu->CPU_PORT = &cpu_port;
+mmu->VIC_LAST_PHI1 = &vic->last_read_gp_access;
 crt->exrom = &exrom_wire;
 crt->game = &game_wire;
 crt->CpuTriggerInterrupt = BindDelegate<&MOS6510::TriggerInterrupt>(cpu);
