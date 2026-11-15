@@ -16,6 +16,7 @@
 #define MOS6581_8085_CLASS_H
 
 #include "siddump.h"
+#include "state_stream.h"
 #include "mos6581_8085_voice.h"
 
 //// Sid Typen ////
@@ -67,8 +68,8 @@ public:
     void EnableDigiBoost(bool enable);
     bool OneZyklus(void);
 
-    bool SaveFreez(FILE* File);
-    bool LoadFreez(FILE *File,unsigned short Version);
+    void SaveState(StateWriter &w) const;
+    bool LoadState(StateReader &r);
 
     void WriteIO(unsigned short adresse,unsigned char wert);
     unsigned char ReadIO(unsigned short adresse);

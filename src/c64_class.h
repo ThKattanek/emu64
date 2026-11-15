@@ -136,6 +136,23 @@ public:
     int LoadAutoRun(uint8_t floppy_nr, FILE *file, const char *filename, int typ, uint16_t entry_number = 0);
     int LoadSingleFile(FILE *file, const char* filename, int typ, uint16_t *return_start_address, uint16_t entry_number = 0);	// Filename ist nur für Logausgabe / Ausschlaggebend ist FILE*
 
+    // Quick C64 Snapshot (Issue #200): kompletter Zustand des C64 in/aus eine Datei
+    enum
+    {
+        SNAPSHOT_OK = 0,
+        SNAPSHOT_ERROR_FILE,            // Datei konnte nicht gelesen/geschrieben werden
+        SNAPSHOT_ERROR_FORMAT,          // Keine Snapshot Datei oder beschaedigt
+        SNAPSHOT_ERROR_VERSION,         // Snapshot stammt aus einer neueren Version
+        SNAPSHOT_ERROR_VIC_TYPE,        // PAL/NTSC passt nicht zur aktuellen Einstellung
+        SNAPSHOT_ERROR_TAPE_RECORD,     // Waehrend einer Bandaufnahme nicht moeglich
+        SNAPSHOT_ERROR_APPLY            // Zustand konnte nicht uebernommen werden (C64 wurde zurueckgesetzt)
+    };
+    int SaveSnapshot(FILE *file);
+    bool SaveScreenshotPng(const char *filename);       // Aktuelles C64 Bild sofort als PNG speichern (UTF-8 Dateiname), z.B. als Vorschau zu einem Snapshot
+    int LoadSnapshot(FILE *file);
+    int SaveSnapshotToBuffer(std::vector<uint8_t> &out);
+    int LoadSnapshotFromBuffer(const std::vector<uint8_t> &data);
+
     int LoadCRT(FILE *file);
     void RemoveCRT();
     int CreateNewEasyFlashImage(FILE *file, const char *crt_name);
@@ -440,6 +457,7 @@ public:
     std::function<void(const char*)> LogText;
     std::function<void(void)> CloseEventC64Screen;
     std::function<void(void)> LimitCyclesEvent;
+    std::function<void(bool,int)> QuickSnapshotEvent;   // Hotkey im C64 Fenster: (true = speichern / false = laden, Slot 1-10)
     std::function<void(uint8_t)> DebugCartEvent;
     std::function<void(uint8_t *audio_buffer0, uint8_t *audio_buffer1, uint8_t *audio_buffer2, int length)> AudioOutProc;
 

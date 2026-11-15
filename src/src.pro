@@ -208,6 +208,7 @@ SOURCES += \
     sid_dump_window.cpp \
     siddump.cpp \
     single_application.cpp \
+    state_stream.cpp \
     t64_class.cpp \
     t64_entry_select_window.cpp \
     tape1530_class.cpp \
@@ -284,6 +285,7 @@ HEADERS += \
     sid_dump_window.h \
     siddump.h \
     single_application.h \
+    state_stream.h \
     structs.h \
     t64_class.h \
     t64_entry_select_window.h \

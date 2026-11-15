@@ -15,6 +15,7 @@
 #include <QCoreApplication>
 #include <QScreen>
 #include <QStyle>
+#include <QUrl>
 #include <iostream>
 
 #include "./main_window.h"
@@ -62,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent,CustomSplashScreen* splash,QTextStream *l
 
     /// Haputfenster UI setzen ///
     ui->setupUi(this);
+    InitSnapshotSlotMenus();
 
     // Center Window
     setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens().at(0)->availableGeometry()));
@@ -263,6 +265,7 @@ int MainWindow::OnInit(bool nogui)
     }
 
     screenshotPath = configPath + "/screenshots";
+    snapshotPath = configPath + "/snapshots";
     LogText((QString(">> Screenshot Path = ") + screenshotPath + QString("\n")).toUtf8());
 
     if(splash != nullptr)
@@ -525,6 +528,20 @@ int MainWindow::OnInit(bool nogui)
 
     /// Close Evend von C64 Klasse hierher leiten
     c64->CloseEventC64Screen = std::bind(&MainWindow::CloseC64Screeen,this);
+
+    // Hotkeys aus dem C64 Fenster (Alt+1..0 laden, Alt+Shift+1..0 speichern) laufen im SDL Thread, die Ausfuehrung erfolgt im GUI Thread
+    c64->QuickSnapshotEvent = [this](bool save, int slot)
+    {
+        QMetaObject::invokeMethod(this, [this, save, slot]()
+        {
+            if(save)
+                SnapshotSave(SnapshotSlotFilename(slot), true);
+            else if(QFileInfo::exists(SnapshotSlotFilename(slot)))
+                SnapshotLoad(SnapshotSlotFilename(slot), true);
+            else
+                ui->statusBar->showMessage(tr("Slot %1 ist leer.").arg(slot), 3000);
+        }, Qt::QueuedConnection);
+    };
     LogText(tr(">> SDL Window Close Event mit MainWindow verknuepft\n").toUtf8());
 
     /// LimitCyclesEvent von C64 Klasse hierher leiten
@@ -1704,6 +1721,187 @@ void MainWindow::on_actionScreenshot_triggered()
         c64->SaveScreenshot();
     }
     else QMessageBox::critical(this,tr("Emu64 Fehler ..."),tr("Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.\nÜberprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !"));
+}
+
+/// Quick C64 Snapshot ///
+
+QString MainWindow::SnapshotSlotFilename(int slot) const
+{
+    return snapshotPath + "/slot" + QString::number(slot) + ".frz";
+}
+
+void MainWindow::InitSnapshotSlotMenus()
+{
+    QMenu *save_menu = ui->menuQuick_C64_Snapshot->addMenu(tr("In Slot speichern"));
+    QMenu *load_menu = ui->menuQuick_C64_Snapshot->addMenu(tr("Aus Slot laden"));
+
+    // Beim Ueberfahren eines Eintrags erscheint das Vorschaubild (PNG) des Slots als Tooltip
+    save_menu->setToolTipsVisible(true);
+    load_menu->setToolTipsVisible(true);
+
+    QList<QAction*> save_actions;
+    QList<QAction*> load_actions;
+    for(int i=1; i<=10; i++)
+    {
+        QAction *save_action = save_menu->addAction(QString());
+        connect(save_action, &QAction::triggered, this, [this, i]() { SnapshotSave(SnapshotSlotFilename(i), true); });
+        save_actions.append(save_action);
+
+        QAction *load_action = load_menu->addAction(QString());
+        connect(load_action, &QAction::triggered, this, [this, i]() { SnapshotLoad(SnapshotSlotFilename(i), true); });
+        load_actions.append(load_action);
+    }
+
+    // Text (mit Zeitpunkt der Speicherung), Hotkey-Hinweis und Vorschaubild beim Oeffnen des Menues aktualisieren.
+    // Der Hinweis nach dem Tabulator zeigt nur den Hotkey im C64 Fenster an (Alt+1..0 laden, Alt+Shift+1..0 speichern)
+    auto update_slot_actions = [this](const QList<QAction*> &actions, const QString &hotkey_prefix, bool only_existing)
+    {
+        for(int i=0; i<actions.count(); i++)
+        {
+            const int slot = i + 1;
+            QFileInfo info(SnapshotSlotFilename(slot));
+            QString text = tr("Slot %1").arg(slot);
+            QString tooltip;
+
+            if(info.exists())
+            {
+                const QString date = info.lastModified().toString("dd.MM.yyyy HH:mm:ss");
+                text += "  (" + date + ")";
+                tooltip = "<b>" + tr("Slot %1").arg(slot) + "</b> &nbsp; " + date;
+
+                const QFileInfo png(info.path() + "/" + info.completeBaseName() + ".png");
+                if(png.exists())
+                    tooltip += "<br><img src=\"" + QUrl::fromLocalFile(png.absoluteFilePath()).toString() + "\" width=\"256\">";
+            }
+            else
+            {
+                text += "  " + tr("(leer)");
+            }
+
+            actions[i]->setText(text + "\t" + hotkey_prefix + QString::number(slot % 10));
+            actions[i]->setToolTip(tooltip);
+            actions[i]->setEnabled(!only_existing || info.exists());
+        }
+    };
+
+    connect(save_menu, &QMenu::aboutToShow, this, [update_slot_actions, save_actions]() { update_slot_actions(save_actions, "Alt+Shift+", false); });
+    connect(load_menu, &QMenu::aboutToShow, this, [update_slot_actions, load_actions]() { update_slot_actions(load_actions, "Alt+", true); });
+
+    // Menues sind vor dem ersten Oeffnen schon sinnvoll beschriftet
+    update_slot_actions(save_actions, "Alt+Shift+", false);
+    update_slot_actions(load_actions, "Alt+", true);
+}
+
+bool MainWindow::SnapshotSave(const QString &filename, bool show_message)
+{
+    QDir().mkpath(QFileInfo(filename).absolutePath());
+
+    // Erst in eine temporaere Datei schreiben, damit ein Fehler einen vorhandenen Snapshot nicht zerstoert
+    QString tmp_filename = filename + ".tmp";
+    FILE *file = qfopen(tmp_filename, "wb");
+    int result = c64->SaveSnapshot(file);
+    if(file != nullptr) fclose(file);
+
+    if(result == C64Class::SNAPSHOT_OK)
+    {
+        QFile::remove(filename);
+        if(!QFile::rename(tmp_filename, filename))
+            result = C64Class::SNAPSHOT_ERROR_FILE;
+    }
+    if(result != C64Class::SNAPSHOT_OK)
+    {
+        QFile::remove(tmp_filename);
+        QString msg;
+        switch(result)
+        {
+        case C64Class::SNAPSHOT_ERROR_TAPE_RECORD:
+            msg = tr("Während einer Bandaufnahme kann kein Snapshot gespeichert werden.");
+            break;
+        default:
+            msg = tr("Die Datei konnte nicht gelesen oder geschrieben werden.");
+            break;
+        }
+        QMessageBox::critical(this, tr("Emu64 Fehler ..."), msg);
+        return false;
+    }
+
+    // Zu jedem Snapshot gehoert ein gleichnamiges PNG (Vorschau), ein Fehler dabei ist unkritisch
+    QFileInfo snapshot_info(filename);
+    QString png_filename = snapshot_info.path() + "/" + snapshot_info.completeBaseName() + ".png";
+    if(png_filename != filename && !c64->SaveScreenshotPng(png_filename.toUtf8().constData()))
+        LogText((QString("<< Das Vorschaubild zum Snapshot konnte nicht gespeichert werden: ") + png_filename + "\n").toUtf8());
+
+    if(show_message) ui->statusBar->showMessage(tr("Der C64 Zustand wurde gespeichert."), 3000);
+    return true;
+}
+
+bool MainWindow::SnapshotLoad(const QString &filename, bool show_message)
+{
+    FILE *file = qfopen(filename, "rb");
+    if(file == nullptr)
+    {
+        QMessageBox::critical(this, tr("Emu64 Fehler ..."), tr("Die Datei konnte nicht gelesen oder geschrieben werden."));
+        return false;
+    }
+
+    int result = c64->LoadSnapshot(file);
+    fclose(file);
+
+    if(result != C64Class::SNAPSHOT_OK)
+    {
+        QString msg;
+        switch(result)
+        {
+        case C64Class::SNAPSHOT_ERROR_FORMAT:
+            msg = tr("Die Datei ist kein gültiger Emu64 Snapshot oder sie ist beschädigt.");
+            break;
+        case C64Class::SNAPSHOT_ERROR_VERSION:
+            msg = tr("Der Snapshot wurde mit einer neueren Emu64 Version erstellt.");
+            break;
+        case C64Class::SNAPSHOT_ERROR_VIC_TYPE:
+            msg = tr("Der Snapshot passt nicht zum aktuell eingestellten C64 Typ (PAL/NTSC).");
+            break;
+        case C64Class::SNAPSHOT_ERROR_APPLY:
+            msg = tr("Der Snapshot konnte nicht vollständig übernommen werden. Der C64 wurde zurückgesetzt.");
+            break;
+        default:
+            msg = tr("Die Datei konnte nicht gelesen oder geschrieben werden.");
+            break;
+        }
+        QMessageBox::critical(this, tr("Emu64 Fehler ..."), msg);
+        return false;
+    }
+
+    if(show_message) ui->statusBar->showMessage(tr("Der C64 Zustand wurde geladen."), 3000);
+    return true;
+}
+
+void MainWindow::on_actionSnapshot_Speichern_triggered()
+{
+    QString filename;
+    QString fileext;
+
+    QStringList filters;
+    filters << tr("Emu64 Snapshot Dateien (*.frz)")
+            << tr("Alle Dateien (*.*)");
+
+    QDir().mkpath(snapshotPath);
+    if(!CustomSaveFileDialog::GetSaveFileName(this, tr("C64 Zustand speichern"), filters, &filename, &fileext))
+        return;
+
+    SnapshotSave(filename, true);
+    c64->SetFocusToC64Window();
+}
+
+void MainWindow::on_actionSnapshot_Laden_triggered()
+{
+    QDir().mkpath(snapshotPath);
+    QString filename = QFileDialog::getOpenFileName(this, tr("C64 Zustand laden"), snapshotPath, tr("Emu64 Snapshot Dateien (*.frz)") + ";;" + tr("Alle Dateien (*.*)"), 0, QFileDialog::DontUseNativeDialog);
+    if(filename.isEmpty())
+        return;
+
+    SnapshotLoad(filename, true);
+    c64->SetFocusToC64Window();
 }
 
 void MainWindow::on_actionC64_Geschwindigkeit_triggered()

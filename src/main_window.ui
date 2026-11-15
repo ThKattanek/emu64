@@ -267,7 +267,18 @@ background-position: center
       <string>SID Player</string>
      </property>
     </widget>
-    <addaction name="actionQuick_C64_Snapshot"/>
+    <widget class="QMenu" name="menuQuick_C64_Snapshot">
+     <property name="statusTip">
+      <string>Den aktuellen Zustand des C64 speichern, um zu einem späteren Zeitpunkt wieder zu laden.</string>
+     </property>
+     <property name="title">
+      <string>Quick C64 Snapshot</string>
+     </property>
+     <addaction name="actionSnapshot_Speichern"/>
+     <addaction name="actionSnapshot_Laden"/>
+     <addaction name="separator"/>
+    </widget>
+    <addaction name="menuQuick_C64_Snapshot"/>
     <addaction name="actionScreenshot"/>
     <addaction name="actionSID_Dump"/>
     <addaction name="menuSID_Player"/>
@@ -521,21 +532,20 @@ background-position: center
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionQuick_C64_Snapshot">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
+  <action name="actionSnapshot_Speichern">
    <property name="text">
-    <string>Quick C64 Snapshot</string>
+    <string>Speichern ...</string>
    </property>
    <property name="statusTip">
-    <string>Den aktuellen Zustand des C64 speichern, um zu einem späteren Zeitpunkt wieder zu laden.</string>
+    <string>Den aktuellen Zustand des C64 in eine Datei speichern.</string>
    </property>
-   <property name="shortcut">
-    <string notr="true"/>
+  </action>
+  <action name="actionSnapshot_Laden">
+   <property name="text">
+    <string>Laden ...</string>
    </property>
-   <property name="iconVisibleInMenu">
-    <bool>true</bool>
+   <property name="statusTip">
+    <string>Einen gespeicherten Zustand des C64 aus einer Datei laden.</string>
    </property>
   </action>
   <action name="actionScreenshot">

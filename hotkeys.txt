@@ -1,5 +1,54 @@
-HotKeys im C64 Screen
-Stand: 24.06.2021
+HotKeys in Emu64
+Stand: 15.11.2026
 
-ALT+J   -> Tauscht die Joystick Port Belegung (Port1 <-> Port2)
-ALT+W   -> Schaltet Warp Modus an oder aus
+
+=== Im C64 Fenster (SDL Fenster) ===
+
+F11                          -> Screenshot vom C64 Bildschirm
+F12                          -> Softreset (C64 RAM bleibt erhalten)
+SHIFT+F12                    -> Hardreset (wie Aus- und Einschalten des C64)
+ALT+Return                   -> Vollbild an / aus
+ALT+J                        -> Tauscht die Joystick Port Belegung (Port1 <-> Port2)
+ALT+W                        -> Schaltet Warp Modus an oder aus
+ALT+1 .. ALT+0               -> Quick C64 Snapshot: Slot 1 bis 10 laden (0 = Slot 10)
+ALT+SHIFT+1 .. ALT+SHIFT+0   -> Quick C64 Snapshot: Slot 1 bis 10 speichern (0 = Slot 10)
+Medientaste "Weiter"         -> Naechstes Diskimage in der Floppy einlegen
+Medientaste "Zurueck"        -> Vorheriges Diskimage in der Floppy einlegen
+
+Maus im C64 Fenster:
+STRG (links) + Linke Maustaste -> Maus 1351 (C64 Maus) an / aus
+Linke Maustaste              -> Linke Taste der C64 Maus (nur wenn Maus 1351 aktiv)
+Rechte Maustaste             -> Rechte Taste der C64 Maus (nur wenn Maus 1351 aktiv)
+
+Hinweis: Die Hotkeys mit ALT werden nicht an den C64 weitergegeben.
+
+
+=== Im Hauptfenster (Menue Shortcuts, nur wenn das Hauptfenster den Fokus hat) ===
+
+ALT+R                        -> Autostart (Datei auswaehlen und starten)
+ALT+L                        -> C64 Programme direkt laden
+ALT+D                        -> Floppy 1541 II (Fenster ein-/ausblenden)
+ALT+K                        -> Datasette 1530 (Fenster ein-/ausblenden)
+ALT+M                        -> Steckmodule (Fenster ein-/ausblenden)
+F11                          -> Screenshot
+F12                          -> Softreset
+SHIFT+F12                    -> Hardreset
+ALT+Return                   -> Vollbild
+ALT+X                        -> Emu64 beenden
+
+
+=== C64 Tastatur (Standardbelegung, im Tastaturfenster aenderbar) ===
+
+Die normalen Tasten entsprechen der PC Tastatur. Besondere C64 Tasten:
+
+Backspace                    -> INST/DEL
+Entf                         -> RESTORE
+Tab                          -> RUN/STOP
+<                            -> Commodore Taste
+STRG (links)                 -> CONTROL
+Cursor Tasten                -> CRSR (Hoch / Runter / Links / Rechts)
+F1 .. F8                     -> F1 .. F8 des C64
+Shift links / rechts         -> SHIFT links / rechts
+
+Die Belegung kann im Menue "C64 Tastaturbelegung aendern" fuer jede Taste neu aufgezeichnet
+und mit "C64 Tastaturbelegung zuruecksetzen" wieder auf diese Standardwerte gestellt werden.

@@ -16,6 +16,8 @@
 #ifndef AM29F040_CLASS_H
 #define AM29F040_CLASS_H
 
+#include "state_stream.h"
+
 #include <cstdint>
 
 struct FLASH_TYPES_STRUCT
@@ -54,6 +56,9 @@ class AM29F040Class
     };
 
 public:
+    void SaveState(StateWriter &w) const;
+    bool LoadState(StateReader &r);
+
     AM29F040Class(uint8_t* flashbank,int flashtype);
     ~AM29F040Class();
 

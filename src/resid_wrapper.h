@@ -26,6 +26,7 @@
 #include "siddump.h"
 #include "./resid/sid.h"
 #include <cstdint>
+#include "state_stream.h"
 
 class ReSIDWrapperClass
 {
@@ -44,6 +45,9 @@ public:
     bool OneCycle();
 
     void SetSoundBufferPosToZero();
+
+    void SaveState(StateWriter &w) const;
+    bool LoadState(StateReader &r);
 
     short *sound_buffer;
     short *sound_buffer_v0;

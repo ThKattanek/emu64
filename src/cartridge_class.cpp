@@ -41,6 +41,9 @@ CartridgeClass::CartridgeClass()
     ResetAllLEDS();
 
     ar_freez = false;
+
+    lo_rom = rom_bank1;
+    hi_rom = rom_bank2;
 }
 
 CartridgeClass::~CartridgeClass()
@@ -877,4 +880,116 @@ void CartridgeClass::WriteRom3(uint16_t address, uint8_t value)	// 0xE000
         c64_ram[address] = value;
         break;
     }
+}
+
+void CartridgeClass::SaveState(StateWriter &w) const
+{
+    w.Bool(cartridge_is_insert);
+    if(!cartridge_is_insert) return;
+
+    w.U16(cartridge_type);
+    w.Bool(cartridge_exrom);
+    w.Bool(cartridge_game);
+    w.Bool(easyflash_jumper);
+    w.Bytes(easyflash_ram, sizeof(easyflash_ram));
+    w.U8(easyflash_bank_reg);
+    w.U32(rom_lo_bank);
+    w.U8(ar_reg);
+    w.Bool(ar_freez);
+    w.Bool(ar_active);
+    w.Bool(ar_enable_ram);
+    w.Bytes(ar_ram, sizeof(ar_ram));
+    w.U8(pla_address);
+    w.Bool(led_00);
+    w.Bool(led_00_old);
+    w.Bool(led_01);
+    w.Bool(led_01_old);
+
+    // lo_rom/hi_rom zeigen in rom_bank1/rom_bank2: Bank (1/2) und Offset speichern
+    const uint8_t *ptr[2] = { lo_rom, hi_rom };
+    for(int i = 0; i < 2; i++)
+    {
+        uint8_t bank = 0;
+        uint32_t offset = 0;
+        if(ptr[i] >= rom_bank1 && ptr[i] < rom_bank1 + sizeof(rom_bank1))
+        {
+            bank = 1;
+            offset = static_cast<uint32_t>(ptr[i] - rom_bank1);
+        }
+        else if(ptr[i] >= rom_bank2 && ptr[i] < rom_bank2 + sizeof(rom_bank2))
+        {
+            bank = 2;
+            offset = static_cast<uint32_t>(ptr[i] - rom_bank2);
+        }
+        w.U8(bank);
+        w.U32(offset);
+    }
+
+    am29f040Lo->SaveState(w);
+    am29f040Hi->SaveState(w);
+    w.Bytes(rom_bank1, sizeof(rom_bank1));
+    w.Bytes(rom_bank2, sizeof(rom_bank2));
+}
+
+bool CartridgeClass::LoadState(StateReader &r)
+{
+    bool insert = r.Bool();
+    if(!r.Ok()) return false;
+
+    if(!insert)
+    {
+        cartridge_is_insert = false;
+        lo_rom = rom_bank1;
+        hi_rom = rom_bank2;
+        ResetAllLEDS();
+        return true;
+    }
+
+    uint16_t type = r.U16();
+    bool c_exrom = r.Bool();
+    bool c_game = r.Bool();
+    easyflash_jumper = r.Bool();
+    r.Bytes(easyflash_ram, sizeof(easyflash_ram));
+    easyflash_bank_reg = r.U8();
+    rom_lo_bank = r.U32();
+    ar_reg = r.U8();
+    ar_freez = r.Bool();
+    ar_active = r.Bool();
+    ar_enable_ram = r.Bool();
+    r.Bytes(ar_ram, sizeof(ar_ram));
+    pla_address = r.U8();
+    led_00 = r.Bool();
+    led_00_old = r.Bool();
+    led_01 = r.Bool();
+    led_01_old = r.Bool();
+
+    uint8_t *ptr[2] = { rom_bank1, rom_bank2 };
+    for(int i = 0; i < 2; i++)
+    {
+        uint8_t bank = r.U8();
+        uint32_t offset = r.U32();
+        if(!r.Ok() || bank > 2) return false;
+        if(bank == 1 && offset < sizeof(rom_bank1)) ptr[i] = rom_bank1 + offset;
+        else if(bank == 2 && offset < sizeof(rom_bank2)) ptr[i] = rom_bank2 + offset;
+        else if(bank != 0) return false;
+    }
+
+    if(!am29f040Lo->LoadState(r) || !am29f040Hi->LoadState(r)) return false;
+    r.Bytes(rom_bank1, sizeof(rom_bank1));
+    r.Bytes(rom_bank2, sizeof(rom_bank2));
+    if(!r.Ok()) return false;
+
+    cartridge_type = type;
+    cartridge_exrom = c_exrom;
+    cartridge_game = c_game;
+    lo_rom = ptr[0];
+    hi_rom = ptr[1];
+    cartridge_is_insert = true;
+
+    if(ChangeLED != nullptr)
+    {
+        ChangeLED(0, led_00);
+        ChangeLED(1, led_01);
+    }
+    return true;
 }

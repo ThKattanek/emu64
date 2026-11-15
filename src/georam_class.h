@@ -15,6 +15,7 @@
 #ifndef GEORAM_CLASS_H
 #define GEORAM_CLASS_H
 
+#include "state_stream.h"
 #include <cstdint>
 #include <cstdio>
 
@@ -47,6 +48,9 @@ class GEORAMClass
     void SetGeoRamType(uint8_t type);   // _GEORAM or _NEORAM
     uint8_t GetGeoRamMode();            // return _512, _1024, _2048, _4096
     void SetGeoRamMode(uint8_t mode);   // _512, _1024, _2048, 4096
+
+    void SaveState(StateWriter &w) const;
+    bool LoadState(StateReader &r);
 
     private:
     // Variablen

@@ -269,95 +269,160 @@ void MOS6526::GetRegister(CIA_STRUCT *cia_reg)
     cia_reg->TodHr = BCD2Byte(io[11]);
 }
 
-/*
-#define frz_write(var) fwrite(&var,1,sizeof(var),File)
-bool MOS6526::SaveFreez(FILE *File)
+void MOS6526::SaveState(StateWriter &w) const
 {
-	frz_write(RESET_OLD);
-	frz_write(PBLatch);
-	frz_write(SDR);
-	frz_write(FLAG_PIN_OLD);
-	fwrite(IO,1,16,File);
-	frz_write(IntMask);
-	frz_write(CRA);
-	frz_write(CRB);
-	frz_write(ICR);
-	frz_write(NEW_CRA);
-	frz_write(NEW_CRB);
-	frz_write(WRITE_NEW_CRA);
-	frz_write(WRITE_NEW_CRB);
-	frz_write(TimerA_CNT_PHI2);
-	frz_write(TimerB_CNT_PHI2);
-	frz_write(TimerB_CNT_TimerA);
-	frz_write(TimerA_IRQ_NEXT_CYCLE);
-	frz_write(TimerB_IRQ_NEXT_CYCLE);
-	frz_write(TimerAStatus);
-	frz_write(TimerBStatus);
-	frz_write(TimerA);
-	frz_write(TimerALatch);
-	frz_write(TimerB);
-	frz_write(TimerBLatch);
-	frz_write(DDRA);
-	frz_write(DDRB);
-	frz_write(EnablePB6);
-	frz_write(EnablePB7);
-	frz_write(PB6Mode);
-	frz_write(PB7Mode);
-	frz_write(PB6);
-	frz_write(PB7);
-	frz_write(InMode);
-	frz_write(TimerANull);
-	return true;
+    w.Bytes(io, sizeof(io));
+    w.Bool(reset_wire_old);
+    w.U8(pa_latch);
+    w.U8(pb_latch);
+    w.U8(sdr);
+    w.Bool(flag_pin_old);
+    w.Bool(cnt_pin);
+    w.U8(interupt_mask);
+    w.U8(cra);
+    w.U8(crb);
+    w.U8(icr);
+    w.U8(icr_new);
+    w.U8(icr_ack);
+    w.Bool(irq_line);
+    w.Bool(ifr_done);
+    w.Bool(ifr_ack1);
+    w.Bool(ifr_ack0);
+    w.Bool(ifr_ack_m1);
+    w.Bool(ifr_d7set1);
+    w.Bool(ifr_d7set0);
+    w.Bool(ifr_raise1);
+    w.Bool(ifr_raise0);
+    w.Bool(ifr_read0);
+    w.Bool(ifr_read1);
+    w.U8(timer_b_mode);
+    w.Bool(timer_a_underflow_old);
+    w.Bool(timer_b_underflow_old);
+    w.Bool(cnt_pin_old);
+    w.U8(sdr_bits);
+    w.Bool(sdr_valid);
+    w.U8(sdr_load_delay);
+    w.U8(sdr_irq_delay);
+    w.U32(clock_counter_latch);
+    w.U32(clock_counter);
+    w.Bool(clock_is_latched);
+    w.Bool(clock_is_stopped);
+    w.U8(ddr_a);
+    w.U8(ddr_b);
+    w.Bool(enable_pb6);
+    w.Bool(enable_pb7);
+    w.U8(pb6_mode);
+    w.U8(pb7_mode);
+    w.U8(pb_6);
+    w.U8(pb_7);
+    w.U8(prev_lp);
+    w.U16(timer_a.counter);
+    w.U16(timer_a.latch);
+    w.Bool(timer_a.cr_start);
+    w.Bool(timer_a.cr_oneshot);
+    w.Bool(timer_a.cr_force_load);
+    w.Bool(timer_a.count_phi2);
+    w.Bool(timer_a.count_step);
+    w.Bool(timer_a.count2);
+    w.Bool(timer_a.count3);
+    w.Bool(timer_a.load1);
+    w.Bool(timer_a.load);
+    w.Bool(timer_a.oneshot0);
+    w.Bool(timer_a.oneshot);
+    w.U16(timer_b.counter);
+    w.U16(timer_b.latch);
+    w.Bool(timer_b.cr_start);
+    w.Bool(timer_b.cr_oneshot);
+    w.Bool(timer_b.cr_force_load);
+    w.Bool(timer_b.count_phi2);
+    w.Bool(timer_b.count_step);
+    w.Bool(timer_b.count2);
+    w.Bool(timer_b.count3);
+    w.Bool(timer_b.load1);
+    w.Bool(timer_b.load);
+    w.Bool(timer_b.oneshot0);
+    w.Bool(timer_b.oneshot);
+    w.Bytes(clock_latch, sizeof(clock_latch));
+    w.Bytes(clock_alarm, sizeof(clock_alarm));
 }
 
-#define frz_read(var) fread(&var,1,sizeof(var),File)
-bool MOS6526::LoadFreez(FILE *File,unsigned short Version)
+bool MOS6526::LoadState(StateReader &r)
 {
-	unsigned short StartAdresse;
-	
-	switch(Version)
-	{
-	case 0x0100:
-	case 0x0101:
-		frz_read(RESET_OLD);
-		frz_read(PBLatch);
-		frz_read(SDR);
-		frz_read(FLAG_PIN_OLD);
-		fwrite(IO,1,16,File);
-		frz_read(IntMask);
-		frz_read(CRA);
-		frz_read(CRB);
-		frz_read(ICR);
-		frz_read(NEW_CRA);
-		frz_read(NEW_CRB);
-		frz_read(WRITE_NEW_CRA);
-		frz_read(WRITE_NEW_CRB);
-		frz_read(TimerA_CNT_PHI2);
-		frz_read(TimerB_CNT_PHI2);
-		frz_read(TimerB_CNT_TimerA);
-		frz_read(TimerA_IRQ_NEXT_CYCLE);
-		frz_read(TimerB_IRQ_NEXT_CYCLE);
-		frz_read(TimerAStatus);
-		frz_read(TimerBStatus);
-		frz_read(TimerA);
-		frz_read(TimerALatch);
-		frz_read(TimerB);
-		frz_read(TimerBLatch);
-		frz_read(DDRA);
-		frz_read(DDRB);
-		frz_read(EnablePB6);
-		frz_read(EnablePB7);
-		frz_read(PB6Mode);
-		frz_read(PB7Mode);
-		frz_read(PB6);
-		frz_read(PB7);
-		frz_read(InMode);
-		frz_read(TimerANull);
-		break;
-	}
-	return true;
+    r.Bytes(io, sizeof(io));
+    reset_wire_old = r.Bool();
+    pa_latch = r.U8();
+    pb_latch = r.U8();
+    sdr = r.U8();
+    flag_pin_old = r.Bool();
+    cnt_pin = r.Bool();
+    interupt_mask = r.U8();
+    cra = r.U8();
+    crb = r.U8();
+    icr = r.U8();
+    icr_new = r.U8();
+    icr_ack = r.U8();
+    irq_line = r.Bool();
+    ifr_done = r.Bool();
+    ifr_ack1 = r.Bool();
+    ifr_ack0 = r.Bool();
+    ifr_ack_m1 = r.Bool();
+    ifr_d7set1 = r.Bool();
+    ifr_d7set0 = r.Bool();
+    ifr_raise1 = r.Bool();
+    ifr_raise0 = r.Bool();
+    ifr_read0 = r.Bool();
+    ifr_read1 = r.Bool();
+    timer_b_mode = r.U8();
+    timer_a_underflow_old = r.Bool();
+    timer_b_underflow_old = r.Bool();
+    cnt_pin_old = r.Bool();
+    sdr_bits = r.U8();
+    sdr_valid = r.Bool();
+    sdr_load_delay = r.U8();
+    sdr_irq_delay = r.U8();
+    clock_counter_latch = r.U32();
+    clock_counter = r.U32();
+    clock_is_latched = r.Bool();
+    clock_is_stopped = r.Bool();
+    ddr_a = r.U8();
+    ddr_b = r.U8();
+    enable_pb6 = r.Bool();
+    enable_pb7 = r.Bool();
+    pb6_mode = r.U8();
+    pb7_mode = r.U8();
+    pb_6 = r.U8();
+    pb_7 = r.U8();
+    prev_lp = r.U8();
+    timer_a.counter = r.U16();
+    timer_a.latch = r.U16();
+    timer_a.cr_start = r.Bool();
+    timer_a.cr_oneshot = r.Bool();
+    timer_a.cr_force_load = r.Bool();
+    timer_a.count_phi2 = r.Bool();
+    timer_a.count_step = r.Bool();
+    timer_a.count2 = r.Bool();
+    timer_a.count3 = r.Bool();
+    timer_a.load1 = r.Bool();
+    timer_a.load = r.Bool();
+    timer_a.oneshot0 = r.Bool();
+    timer_a.oneshot = r.Bool();
+    timer_b.counter = r.U16();
+    timer_b.latch = r.U16();
+    timer_b.cr_start = r.Bool();
+    timer_b.cr_oneshot = r.Bool();
+    timer_b.cr_force_load = r.Bool();
+    timer_b.count_phi2 = r.Bool();
+    timer_b.count_step = r.Bool();
+    timer_b.count2 = r.Bool();
+    timer_b.count3 = r.Bool();
+    timer_b.load1 = r.Bool();
+    timer_b.load = r.Bool();
+    timer_b.oneshot0 = r.Bool();
+    timer_b.oneshot = r.Bool();
+    r.Bytes(clock_latch, sizeof(clock_latch));
+    r.Bytes(clock_alarm, sizeof(clock_alarm));
+    return r.Ok();
 }
-*/
 
 inline void MOS6526::TimerReset(TIMER *timer)
 {

@@ -348,12 +348,9 @@ void TAPE1530::OneCycle()
     if(!IsTapeInsert && !IsRecTapeInsert) return;
 
     static signed short WaveOut;
-    static bool MotorStatusTmp = false;
     static unsigned char ReadByte;
     static unsigned short ReadWord;
     static unsigned char WriteByte;
-
-    static unsigned char CPU_PORT_OLD;
 
     enum
     {
@@ -364,8 +361,6 @@ void TAPE1530::OneCycle()
 
     size_t redingbytes __attribute__ ((unused));
     int CycleCounter;
-    static int WaveStatus;
-    static int OldWaveStatus;
 
     switch (TapeType)
     {
@@ -734,4 +729,109 @@ void TAPE1530::CalcTapeLenTime()
         conv_wert = Time2CounterTbl[1799];
 
     TapeLenCount = TapeLenTime * conv_wert;
+}
+
+bool TAPE1530::SaveState(StateWriter &w) const
+{
+    if(IsRecTapeInsert || TapeStatus == TAPE_IS_REC)
+        return false;
+
+    // 0 = kein Band (oder WAV Band, wird nicht gesichert), 1 = TAP
+    bool tap = IsTapeInsert && TapeType == TAP && TapeBuffer != nullptr;
+    w.U8(tap ? 1 : 0);
+    w.U8(PressedKeys);
+    w.I32(TapeStatus);
+    w.I32(LastTapeStatus);
+    w.Bool(CassRead);
+    w.Bool(MotorStatusTmp);
+    w.U8(CPU_PORT_OLD);
+    w.I32(WaveStatus);
+    w.I32(OldWaveStatus);
+    w.U32(ZyklenCounter);
+    w.F32(FreqConvCounter);
+    w.U32(WaitCounter);
+    w.F32(Counter);
+    w.U32(static_cast<uint32_t>(PlayCounter));
+    w.U32(static_cast<uint32_t>(PlayAddWert));
+    if(tap)
+    {
+        w.U8(TapeVersion);
+        w.Bool(WritePotected);
+        w.Bool(TapePosIsStart);
+        w.Bool(TapePosIsEnd);
+        w.U32(TapeBufferPos);
+        w.U32(TapePosCycles);
+        w.U32(TapeBufferSize);
+        w.Bytes(TapeBuffer, TapeBufferSize);
+    }
+    return true;
+}
+
+bool TAPE1530::LoadState(StateReader &r)
+{
+    uint8_t tap = r.U8();
+    PressedKeys = r.U8();
+    TapeStatus = r.I32();
+    LastTapeStatus = r.I32();
+    CassRead = r.Bool();
+    MotorStatusTmp = r.Bool();
+    CPU_PORT_OLD = r.U8();
+    WaveStatus = r.I32();
+    OldWaveStatus = r.I32();
+    ZyklenCounter = r.U32();
+    FreqConvCounter = r.F32();
+    WaitCounter = r.U32();
+    Counter = r.F32();
+    PlayCounter = r.U32();
+    PlayAddWert = r.U32();
+    if(!r.Ok() || tap > 1) return false;
+
+    // Eine aktuell laufende Aufnahme beenden und offene Dateien (WAV) schliessen
+    StopRecordImage();
+    if(image_file != nullptr)
+    {
+        fclose(image_file);
+        image_file = nullptr;
+    }
+
+    if(tap)
+    {
+        uint8_t version = r.U8();
+        bool write_protected = r.Bool();
+        bool pos_is_start = r.Bool();
+        bool pos_is_end = r.Bool();
+        uint32_t buffer_pos = r.U32();
+        uint32_t pos_cycles = r.U32();
+        uint32_t buffer_size = r.U32();
+        if(!r.Ok() || buffer_size == 0 || buffer_size > r.Remaining() || buffer_pos >= buffer_size) return false;
+
+        unsigned char *buffer = new unsigned char[buffer_size];
+        r.Bytes(buffer, buffer_size);
+        if(!r.Ok())
+        {
+            delete[] buffer;
+            return false;
+        }
+        delete[] TapeBuffer;
+        TapeBuffer = buffer;
+        TapeBufferSize = buffer_size;
+        TapeBufferPos = buffer_pos;
+        TapePosCycles = pos_cycles;
+        TapeVersion = version;
+        WritePotected = write_protected;
+        TapePosIsStart = pos_is_start;
+        TapePosIsEnd = pos_is_end;
+        TapeType = TAP;
+        IsTapeInsert = true;
+        CalcTapeLenTime();
+    }
+    else
+    {
+        // Kein (unterstuetztes) Band im Snapshot: Band auswerfen und Tasten loesen
+        IsTapeInsert = false;
+        PressedKeys = 0;
+        TapeStatus = TAPE_IS_STOP;
+        if(CPU_PORT != nullptr) CPU_PORT->ConfigChanged(0, 0, 0x17);
+    }
+    return true;
 }

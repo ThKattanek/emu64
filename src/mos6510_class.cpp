@@ -254,59 +254,90 @@ void MOS6510::GetInterneRegister(IREG_STRUCT* ireg)
     ireg->reset = *RESET;
 }
 
-/*
-bool MOS6510::SaveFreez(FILE *File)
+void MOS6510::SaveState(StateWriter &w) const
 {
-	unsigned short MCTOffset = MCT-(unsigned char*)MicroCodeTable6510;
-	fwrite(&MCTOffset,1,sizeof(MCTOffset),File);
-	fwrite(&Pointer,1,sizeof(Pointer),File);
-	fwrite(&Adresse,1,sizeof(Adresse),File);
-	fwrite(&BranchAdresse,1,sizeof(BranchAdresse),File);
-	fwrite(&AktOpcodePC,1,sizeof(AktOpcodePC),File);
-	fwrite(&CpuWait,1,sizeof(CpuWait),File);
-	fwrite(&JAMFlag,1,sizeof(JAMFlag),File);
-	fwrite(&TMPByte,1,sizeof(TMPByte),File);
-	fwrite(Interrupts,1,sizeof(Interrupts),File);
-	fwrite(&NMIState,1,sizeof(NMIState),File);
-	fwrite(&PC,1,sizeof(PC),File);
-	fwrite(&AC,1,sizeof(AC),File);
-	fwrite(&XR,1,sizeof(XR),File);
-	fwrite(&YR,1,sizeof(YR),File);
-	fwrite(&SP,1,sizeof(SP),File);
-	fwrite(&SR,1,sizeof(SR),File);
-	return true;
+    w.U32(static_cast<uint32_t>(MCT - reinterpret_cast<const unsigned char*>(MicroCodeTable6510)));
+    w.U8(Pointer);
+    w.U16(Adresse);
+    w.U16(BranchAdresse);
+    w.U16(AktOpcode);
+    w.U16(AktOpcodePC);
+    w.Bool(CpuWait);
+    w.U8(TMPByte);
+    w.U16(PC);
+    w.U8(AC);
+    w.U8(XR);
+    w.U8(YR);
+    w.U8(SP);
+    w.U8(SR);
+    for(int i = 0; i < IntQuellenC64; i++) w.Bool(Interrupts[i]);
+    w.U8(irq_state);
+    w.Bool(irq_is_low_pegel);
+    w.Bool(irq_is_active);
+    w.Bool(irq_fetch_decision);
+    w.Bool(nmi_hijack);
+    w.Bool(i_flag_early);
+    w.Bool(branch_irq_early);
+    w.Bool(branch_irq_sample);
+    w.Bool(branch_nmi_sample);
+    w.Bool(irq_delay);
+    w.U8(irq_delay_sr_value);
+    w.Bool(nmi_state);
+    w.Bool(nmi_edge_event);
+    w.Bool(nmi_fall_edge);
+    w.Bool(nmi_is_active);
+    w.Bool(nmi_fetch_decision);
+    w.Bool(shxy_dma);
+    w.U8(axa_byte);
+    w.Bool(RESET_OLD);
+    w.U8(idxReg);
+    w.Bool(JAMFlag);
+    w.Bool(WRITE_FF00);
 }
 
-bool MOS6510::LoadFreez(FILE *File,unsigned short Version)
+bool MOS6510::LoadState(StateReader &r)
 {
-	unsigned short MCTOffset;
-
-	switch(Version)
-	{
-	case 0x0100:
-	case 0x0101:
-		fread(&MCTOffset,1,sizeof(MCTOffset),File);
-		MCT = MCTOffset + (unsigned char*)MicroCodeTable6510;
-		fread(&Pointer,1,sizeof(Pointer),File);
-		fread(&Adresse,1,sizeof(Adresse),File);
-		fread(&BranchAdresse,1,sizeof(BranchAdresse),File);
-		fread(&AktOpcodePC,1,sizeof(AktOpcodePC),File);
-		fread(&CpuWait,1,sizeof(CpuWait),File);
-		fread(&JAMFlag,1,sizeof(JAMFlag),File);
-		fread(&TMPByte,1,sizeof(TMPByte),File);
-		fread(Interrupts,1,sizeof(Interrupts),File);
-		fread(&NMIState,1,sizeof(NMIState),File);
-		fread(&PC,1,sizeof(PC),File);
-		fread(&AC,1,sizeof(AC),File);
-		fread(&XR,1,sizeof(XR),File);
-		fread(&YR,1,sizeof(YR),File);
-		fread(&SP,1,sizeof(SP),File);
-		fread(&SR,1,sizeof(SR),File);
-		break;
-	}
-	return true;
+    uint32_t mct_offset = r.U32();
+    if(mct_offset >= sizeof(MicroCodeTable6510)) return false;
+    MCT = const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>(MicroCodeTable6510)) + mct_offset;
+    Pointer = r.U8();
+    Adresse = r.U16();
+    BranchAdresse = r.U16();
+    AktOpcode = r.U16();
+    AktOpcodePC = r.U16();
+    CpuWait = r.Bool();
+    TMPByte = r.U8();
+    PC = r.U16();
+    AC = r.U8();
+    XR = r.U8();
+    YR = r.U8();
+    SP = r.U8();
+    SR = r.U8();
+    for(int i = 0; i < IntQuellenC64; i++) Interrupts[i] = r.Bool();
+    irq_state = r.U8();
+    irq_is_low_pegel = r.Bool();
+    irq_is_active = r.Bool();
+    irq_fetch_decision = r.Bool();
+    nmi_hijack = r.Bool();
+    i_flag_early = r.Bool();
+    branch_irq_early = r.Bool();
+    branch_irq_sample = r.Bool();
+    branch_nmi_sample = r.Bool();
+    irq_delay = r.Bool();
+    irq_delay_sr_value = r.U8();
+    nmi_state = r.Bool();
+    nmi_edge_event = r.Bool();
+    nmi_fall_edge = r.Bool();
+    nmi_is_active = r.Bool();
+    nmi_fetch_decision = r.Bool();
+    shxy_dma = r.Bool();
+    axa_byte = r.U8();
+    RESET_OLD = r.Bool();
+    idxReg = r.U8();
+    JAMFlag = r.Bool();
+    WRITE_FF00 = r.Bool();
+    return r.Ok();
 }
-*/
 
 inline void MOS6510::SET_SR_NZ(unsigned char wert)
 {
@@ -387,9 +418,6 @@ inline void MOS6510::Write(unsigned short adresse, unsigned char wert)
 // Phi2
 bool MOS6510::OneZyklus(void)
 {
-    static bool RESET_OLD = false;
-    static unsigned char   idxReg = 0;
-
     unsigned int    tmp;
     unsigned int    tmp1;
     unsigned short  tmp2;
@@ -1901,11 +1929,6 @@ void MOS6510_PORT::Reset(void)
 void MOS6510_PORT::ConfigChanged(int tape_sense, int caps_sense,unsigned char pullup)
 {
     TAPE_SENSE = !!(tape_sense);
-    /* Tape Motor Status.  */
-    static unsigned char OLD_DATA_OUT = 0xFF;
-    /* Tape Write Line Status */
-    static unsigned char OLD_WRITE_BIT = 0xFF;
-
     DATA_OUT = (DATA_OUT & ~DIR)|(DATA & DIR);
     DATA_READ = (DATA | ~DIR) & (DATA_OUT | pullup);
 
@@ -1925,42 +1948,41 @@ void MOS6510_PORT::ConfigChanged(int tape_sense, int caps_sense,unsigned char pu
     }
     DIR_READ = DIR;
 }
-/*
-bool MOS6510_PORT::SaveFreez(FILE* File)
+void MOS6510_PORT::SaveState(StateWriter &w) const
 {
-	fwrite(&DIR,1,sizeof(DIR),File);
-	fwrite(&DATA,1,sizeof(DATA),File);
-	fwrite(&DIR_READ,1,sizeof(DIR_READ),File);
-	fwrite(&DATA_READ,1,sizeof(DATA_READ),File);
-	fwrite(&DATA_OUT,1,sizeof(DATA_OUT),File);
-	fwrite(&DATA_SET_CLK_BIT6,1,sizeof(DATA_SET_CLK_BIT6),File);
-	fwrite(&DATA_SET_CLK_BIT7,1,sizeof(DATA_SET_CLK_BIT7),File);
-	fwrite(&DATA_SET_BIT6,1,sizeof(DATA_SET_BIT6),File);
-	fwrite(&DATA_SET_BIT7,1,sizeof(DATA_SET_BIT7),File);
-	fwrite(&DATA_FALLOFF_BIT6,1,sizeof(DATA_FALLOFF_BIT6),File);
-	fwrite(&DATA_FALLOFF_BIT7,1,sizeof(DATA_FALLOFF_BIT7),File);
-	return true;
+    w.U8(DIR);
+    w.U8(DATA);
+    w.U8(DIR_READ);
+    w.U8(DATA_READ);
+    w.U8(DATA_OUT);
+    w.U64(DATA_SET_CLK_BIT6);
+    w.U64(DATA_SET_CLK_BIT7);
+    w.U8(DATA_SET_BIT6);
+    w.U8(DATA_SET_BIT7);
+    w.U8(DATA_FALLOFF_BIT6);
+    w.U8(DATA_FALLOFF_BIT7);
+    w.Bool(TAPE_SENSE);
+    w.Bool(DATASETTE_MOTOR);
+    w.U8(OLD_DATA_OUT);
+    w.U8(OLD_WRITE_BIT);
 }
 
-bool MOS6510_PORT::LoadFreez(FILE* File,unsigned short Version)
+bool MOS6510_PORT::LoadState(StateReader &r)
 {
-	switch(Version)
-	{
-	case 0x0100:
-	case 0x0101:
-		fread(&DIR,1,sizeof(DIR),File);
-		fread(&DATA,1,sizeof(DATA),File);
-		fread(&DIR_READ,1,sizeof(DIR_READ),File);
-		fread(&DATA_READ,1,sizeof(DATA_READ),File);
-		fread(&DATA_OUT,1,sizeof(DATA_OUT),File);
-		fread(&DATA_SET_CLK_BIT6,1,sizeof(DATA_SET_CLK_BIT6),File);
-		fread(&DATA_SET_CLK_BIT7,1,sizeof(DATA_SET_CLK_BIT7),File);
-		fread(&DATA_SET_BIT6,1,sizeof(DATA_SET_BIT6),File);
-		fread(&DATA_SET_BIT7,1,sizeof(DATA_SET_BIT7),File);
-		fread(&DATA_FALLOFF_BIT6,1,sizeof(DATA_FALLOFF_BIT6),File);
-		fread(&DATA_FALLOFF_BIT7,1,sizeof(DATA_FALLOFF_BIT7),File);
-		break;
-	}
-	return true;
+    DIR = r.U8();
+    DATA = r.U8();
+    DIR_READ = r.U8();
+    DATA_READ = r.U8();
+    DATA_OUT = r.U8();
+    DATA_SET_CLK_BIT6 = static_cast<unsigned long>(r.U64());
+    DATA_SET_CLK_BIT7 = static_cast<unsigned long>(r.U64());
+    DATA_SET_BIT6 = r.U8();
+    DATA_SET_BIT7 = r.U8();
+    DATA_FALLOFF_BIT6 = r.U8();
+    DATA_FALLOFF_BIT7 = r.U8();
+    TAPE_SENSE = r.Bool();
+    DATASETTE_MOTOR = r.Bool();
+    OLD_DATA_OUT = r.U8();
+    OLD_WRITE_BIT = r.U8();
+    return r.Ok();
 }
-*/

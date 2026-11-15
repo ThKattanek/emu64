@@ -19,6 +19,7 @@
 
 #include "./mos6526_port.h"
 #include "./structs.h"
+#include "state_stream.h"
 
 #define ClockCounterPAL 98438
 #define ClockCounterNTSC 118126
@@ -53,8 +54,8 @@ public:
     void Reset();
     void OneZyklus();
     void GetRegister(CIA_STRUCT *cia_reg);
-    //bool SaveFreez(FILE* File);
-    //bool LoadFreez(FILE *File,unsigned short Version);
+    void SaveState(StateWriter &w) const;
+    bool LoadState(StateReader &r);
     void SetSDR(uint8_t value);
     void WriteIO(uint16_t address, uint8_t value);
     uint8_t ReadIO(uint16_t address);

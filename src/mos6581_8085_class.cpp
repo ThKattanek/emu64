@@ -292,24 +292,157 @@ bool MOS6581_8085::OneZyklus(void)
     return ret;
 }
 
-bool MOS6581_8085::SaveFreez(FILE* File)
+void MOS6581_8085::SaveState(StateWriter &w) const
 {
-    fwrite(IO,1,32,File);
-    return true;
+    w.I32(SidModel);
+    w.Bytes(IO, sizeof(IO));
+    w.U8(LastWriteValue);
+    w.U16(LastWriteCounter);
+    w.U8(WriteReg);
+    w.I32(Zyklencounter);
+    w.U8(PotX);
+    w.U8(PotY);
+    w.U32(FilterKey);
+    w.U32(FilterFrequenz);
+    w.U32(FilterResonanz);
+    w.U32(Voice3Off);
+    w.U32(HpBpLp);
+    w.U32(Volume);
+    w.I32(MixerDC);
+    w.I32(Vhp);
+    w.I32(Vbp);
+    w.I32(Vlp);
+    w.I32(Vnf);
+    w.I32(w0);
+    w.I32(w0_ceil_1);
+    w.I32(w0_ceil_dt);
+    w.I32(_1024_div_Q);
+    w.I32(ext_in);
+    w.F32(FreqConvCounter);
+    for(int i = 0; i < 3; i++)
+    {
+        const VOICEClass *v = Voice[i];
+        w.Bool(v->OscEnable);
+        w.Bool(v->TestBit);
+        w.Bool(v->RingBit);
+        w.Bool(v->SyncBit);
+        w.U8(v->Waveform);
+        w.U32(v->Frequenz);
+        w.U32(v->Pulsweite);
+        w.U32(v->Accu);
+        w.U32(v->ShiftReg);
+        w.U32(v->MsbRising);
+        w.I32(v->SyncSource);
+        w.I32(v->SyncDestination);
+        w.Bool(v->KeyBit);
+        w.I32(v->State);
+        w.U32(v->RatePeriod);
+        w.U32(v->RateCounter);
+        w.U32(v->ExponentialCounterPeriod);
+        w.U32(v->ExponentialCounter);
+        w.U32(v->EnvCounter);
+        w.Bool(v->HoldZero);
+        w.U32(v->Attack);
+        w.U32(v->Decay);
+        w.U32(v->Sustain);
+        w.U32(v->Release);
+    }
+    // Verzoegerte IO Schreibzugriffe (nur die noch nicht ausgefuehrten)
+    w.Bool(IODelayEnable);
+    uint32_t pending = IODelayEnable ? static_cast<uint32_t>((IODelayWPos - IODelayRPos) & 0xFFFFF) : 0;
+    w.I32(IODelayRPos);
+    w.I32(IODelayWPos);
+    w.U32(pending);
+    for(uint32_t i = 0; i < pending; i++)
+    {
+        int pos = (IODelayRPos + static_cast<int>(i)) & 0xFFFFF;
+        w.U8(IODelayPuffer[pos][0]);
+        w.U8(IODelayPuffer[pos][1]);
+    }
 }
 
-bool MOS6581_8085::LoadFreez(FILE *File,unsigned short Version)
+bool MOS6581_8085::LoadState(StateReader &r)
 {
-    switch(Version)
+    int model = r.I32();
+    if(model != MOS_6581 && model != MOS_8580) return false;
+    SetChipType(model);
+    r.Bytes(IO, sizeof(IO));
+    LastWriteValue = r.U8();
+    LastWriteCounter = r.U16();
+    WriteReg = r.U8();
+    Zyklencounter = r.I32();
+    PotX = r.U8();
+    PotY = r.U8();
+    FilterKey = r.U32();
+    FilterFrequenz = r.U32();
+    FilterResonanz = r.U32();
+    Voice3Off = r.U32();
+    HpBpLp = r.U32();
+    Volume = r.U32();
+    MixerDC = r.I32();
+    Vhp = r.I32();
+    Vbp = r.I32();
+    Vlp = r.I32();
+    Vnf = r.I32();
+    w0 = r.I32();
+    w0_ceil_1 = r.I32();
+    w0_ceil_dt = r.I32();
+    _1024_div_Q = r.I32();
+    ext_in = r.I32();
+    FreqConvCounter = r.F32();
+    for(int i = 0; i < 3; i++)
     {
-    case 0x0100:
-    case 0x0101:
-        int size_read = fread(IO,1,32,File);
-        if(size_read == 32) for(int i=0;i<32;i++) WriteIO(i,IO[i]);
-        return false;
-        break;
+        VOICEClass *v = Voice[i];
+        v->OscEnable = r.Bool();
+        v->TestBit = r.Bool();
+        v->RingBit = r.Bool();
+        v->SyncBit = r.Bool();
+        v->Waveform = r.U8();
+        v->Frequenz = r.U32();
+        v->Pulsweite = r.U32();
+        v->Accu = r.U32();
+        v->ShiftReg = r.U32();
+        v->MsbRising = r.U32();
+        v->SyncSource = r.I32();
+        v->SyncDestination = r.I32();
+        v->KeyBit = r.Bool();
+        v->State = r.I32();
+        v->RatePeriod = r.U32();
+        v->RateCounter = r.U32();
+        v->ExponentialCounterPeriod = r.U32();
+        v->ExponentialCounter = r.U32();
+        v->EnvCounter = r.U32();
+        v->HoldZero = r.Bool();
+        v->Attack = r.U32();
+        v->Decay = r.U32();
+        v->Sustain = r.U32();
+        v->Release = r.U32();
     }
-    return true;
+    bool delay_enable = r.Bool();
+    int rpos = r.I32();
+    int wpos = r.I32();
+    uint32_t pending = r.U32();
+    if(!r.Ok() || rpos < 0 || rpos > 0xFFFFF || wpos < 0 || wpos > 0xFFFFF || pending > 0x100000) return false;
+    // Die Einstellung IO-Delay bleibt wie aktuell konfiguriert, verzoegerte Schreibzugriffe nur uebernehmen wenn sie passt
+    bool apply_delay = (delay_enable == IODelayEnable);
+    if(apply_delay)
+    {
+        IODelayRPos = rpos;
+        IODelayWPos = wpos;
+    }
+    for(uint32_t i = 0; i < pending; i++)
+    {
+        int pos = (rpos + static_cast<int>(i)) & 0xFFFFF;
+        uint8_t a = r.U8();
+        uint8_t b = r.U8();
+        if(apply_delay)
+        {
+            IODelayPuffer[pos][0] = a;
+            IODelayPuffer[pos][1] = b;
+        }
+    }
+    if(apply_delay) IODelayPuffer[IODelayWPos][0] = 0x20;
+    return r.Ok();
 }
 
 unsigned char MOS6581_8085::ReadIO(unsigned short adresse)

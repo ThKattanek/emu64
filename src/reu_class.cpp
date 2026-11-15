@@ -506,27 +506,44 @@ inline void REUClass::Reset(void)
     io[10] = 63;
 }
 
-bool REUClass::SaveFreez(FILE *File)
+void REUClass::SaveState(StateWriter &w) const
 {
-    /// REU Inhalt speichern ...
-    for(int i=0; i<32; i++) fwrite(ram_baenke[i], 1, 0x10000, File);
-    return true;
+    w.U8(reu_ram_mode);
+    w.Bool(is_reu_insert);
+    w.Bool(reu_wait_ff00);
+    w.Bool(BA_STATUS);
+    w.Bytes(io, sizeof(io));
+    w.U8(cpu_wait_counter);
+    w.Bool(tarnsfer_start);
+    w.U16(c64_address);
+    w.U16(reu_address);
+    w.U16(counter);
+    w.U8(current_bank);
+    w.U8(transfer_typ);
+    w.U8(DMAStatus);
+    for(unsigned i = 0; i < ram_bank_count; i++)
+        w.Bytes(ram_baenke[i], 0x10000);
 }
 
-bool REUClass::LoadFreez(FILE *File,unsigned short Version)
+bool REUClass::LoadState(StateReader &r)
 {
-    size_t reading_bytes;
-
-    switch(Version)
-    {
-    case 0x0101:
-        /// REU Inhalt laden ...
-        for(int i=0; i<32; i++)
-        {
-            reading_bytes = fread(ram_baenke[i], 1, 0x10000, File);
-            if(reading_bytes < 0x10000){}
-        }
-        break;
-    }
-    return true;
+    uint8_t mode = r.U8();
+    if(!r.Ok() || mode > REU_16MiB) return false;
+    SetReuRamMode(mode);
+    is_reu_insert = r.Bool();
+    reu_wait_ff00 = r.Bool();
+    BA_STATUS = r.Bool();
+    r.Bytes(io, sizeof(io));
+    cpu_wait_counter = r.U8();
+    tarnsfer_start = r.Bool();
+    c64_address = r.U16();
+    reu_address = r.U16();
+    counter = r.U16();
+    current_bank = r.U8();
+    transfer_typ = r.U8();
+    DMAStatus = r.U8();
+    if(!r.Ok() || r.Remaining() < static_cast<size_t>(ram_bank_count) * 0x10000) return false;
+    for(unsigned i = 0; i < ram_bank_count; i++)
+        r.Bytes(ram_baenke[i], 0x10000);
+    return r.Ok();
 }

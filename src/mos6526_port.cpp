@@ -55,24 +55,3 @@ void PORT::SetOutput(uint8_t value)
     output_bits = ~value;
 }
 
-/*
-bool PORT::SaveFreez(FILE* File)
-{
-    fwrite(&input_bits,1,sizeof(input_bits),File);
-    fwrite(&output_bits,1,sizeof(output_bits),File);
-	return true;
-}
-
-bool PORT::LoadFreez(FILE* File,unsigned short Version)
-{
-	switch (Version)
-	{
-	case 0x0100:
-	case 0x0101:
-        fread(&input_bits,1,sizeof(input_bits),File);
-        fread(&output_bits,1,sizeof(output_bits),File);
-		break;
-	}
-	return true;
-}
-*/

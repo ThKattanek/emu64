@@ -22,6 +22,7 @@
 #include "./structs.h"
 #include "./crt_class.h"
 #include "./am29f040_class.h"
+#include "state_stream.h"
 
 #define RAED_OK 0
 #define READ_ERROR_FILE_CURRUPT 1
@@ -44,6 +45,10 @@ public:
     void Reset();
     void Freeze();
     uint32_t ConvertDWord(uint32_t value);
+
+    // Quick Snapshot (Reihenfolge: nach dem Laden die Speicherkonfiguration neu berechnen)
+    void SaveState(StateWriter &w) const;
+    bool LoadState(StateReader &r);
 
     void WriteIO1(uint16_t adresse, uint8_t value);
     uint8_t ReadIO1(uint16_t address);
@@ -95,20 +100,20 @@ private:
 
     //// EASY FLASH (32)
     bool            easyflash_jumper;
-    uint8_t         easyflash_ram[256];		// Speziller Speicher für das EasyFlash Cartridge
-    uint8_t         easyflash_bank_reg;		// Bank Register
+    uint8_t         easyflash_ram[256] = {};		// Speziller Speicher für das EasyFlash Cartridge
+    uint8_t         easyflash_bank_reg = 0;		// Bank Register
     AM29F040Class   *am29f040Hi;
     AM29F040Class   *am29f040Lo;
 
-    uint32_t    rom_lo_bank;
+    uint32_t    rom_lo_bank = 0;
 
     //// Action Replay 4/5/6 ////
-    uint8_t     ar_reg;                     // Inhalt des zuletzt geschriebenen $DExx Wert
+    uint8_t     ar_reg = 0;                     // Inhalt des zuletzt geschriebenen $DExx Wert
     bool        ar_freez;
-    bool        ar_active;
-    bool        ar_enable_ram;
-    uint8_t     ar_ram[0x2000];             // 8KB
-    uint8_t     pla_address;
+    bool        ar_active = false;
+    bool        ar_enable_ram = false;
+    uint8_t     ar_ram[0x2000] = {};             // 8KB
+    uint8_t     pla_address = 0;
 
     CRTClass   *crt_image;
 };

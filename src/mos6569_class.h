@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <functional>
 #include "delegate.h"
+#include "state_stream.h"
 
 #include "./structs.h"
 
@@ -69,10 +70,11 @@ public:
     uint16_t GetVicDisplayNtscFirstLine();
     uint16_t GetVicDisplayNtscLastLine();
     void SetVicType(uint8_t system);
+    uint8_t GetVicType() const { return system; }
     void SetVicModel8565(bool enable);
     void OneCycle();
-    //bool SaveFreez(FILE* File);
-    //bool LoadFreez(FILE *file,unsigned short version);
+    void SaveState(StateWriter &w) const;
+    bool LoadState(StateReader &r, uint16_t version);
     void WriteIO(uint16_t address, uint8_t value);
     uint8_t ReadIO(uint16_t address);
     uint16_t ReadRasterline() const;

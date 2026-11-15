@@ -316,11 +316,6 @@ struct CARTRIDGE_INFO_STRUCT
     CHIP_INFO_STRUCT    ChipInfo[128];
 };
 
-struct FREEZ_RETURN_STRUCT
-{
-    bool    ReuInstert;
-};
-
 struct CPU_TUNING_STRUCT
 {
     int     InterruptCounterMin;
