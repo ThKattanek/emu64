@@ -1780,12 +1780,25 @@ bool MOS6510::OneZyklus(void)
             break;
         //W // Illegal [SHA]
         case 136:
-            Write(Adresse, AC & XR & ((Adresse >> 8) + 1));
-            break;
         //W // Illegal [SHS]
         case 137:
-            SP = AC & XR;
-            Write(Adresse, AC & XR & ((Adresse >> 8) + 1));
+            if(*MCT == 137)
+                SP = AC & XR;
+            if((Adresse & 0xFF) < idxReg)
+            {
+                // Seitenwechsel: Adresse Hi wird durch den Wert (A & X & (H+1)) ersetzt
+                axa_byte = (Adresse >> 8) & AC & XR;
+                Adresse = (Adresse & 0xFF) | axa_byte << 8;
+            }
+            else
+                axa_byte = AC & XR & ((Adresse >> 8) + 1);
+            if(shxy_dma)
+            {
+                // DMA: das &(H+1) entfaellt beim Wert, die Adresse bleibt davon unberuehrt
+                axa_byte = AC & XR;
+                shxy_dma = false;
+            }
+            Write(Adresse, axa_byte);
             break;
         //R // Illegal [ANC]
         case 138:
