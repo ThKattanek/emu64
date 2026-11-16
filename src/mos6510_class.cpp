@@ -1912,9 +1912,10 @@ MOS6510_PORT::~MOS6510_PORT(void)
 
 void MOS6510_PORT::Reset(void)
 {
-    DATA = 0x3f;
-    DATA_OUT = 0x3f;
-    DATA_READ = 0x3f;
+    // Nach Power-On/Reset sind DDR und DATA 0 (wie VICE c64pla_pport_reset), die Pullups sorgen fuer $37 beim Lesen
+    DATA = 0;
+    DATA_OUT = 0;
+    DATA_READ = 0;
     DIR = 0;
     DIR_READ = 0;
     DATA_SET_BIT6 = 0;
