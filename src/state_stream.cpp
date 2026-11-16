@@ -3,6 +3,9 @@
 // Emu64                                        //
 // von Thorsten Kattanek                        //
 //                                              //
+// Dieser Sourcecode ist Copyright geschützt!   //
+// Geistiges Eigentum von Th.Kattanek           //
+//                                              //
 // #file: state_stream.cpp                      //
 //                                              //
 //////////////////////////////////////////////////
