@@ -586,10 +586,9 @@ bool MOS6510::OneZyklus(void)
         //R // JAM
         case 12:
             CHK_RDY
-                CpuWait=false;
-            SR = 0x04;
-            MCT = ((unsigned char*)MicroCodeTable6510 + (0x100*MCTItemSize));
-            return 0;
+            // CPU bleibt dauerhaft stehen (nur ein RESET holt sie zurueck), IRQ/NMI haben keine Wirkung mehr
+            JAMFlag = true;
+            irq_fetch_decision = nmi_fetch_decision = false;
             break;
         //R // TMPByte von Adresse holen
         case 13:
