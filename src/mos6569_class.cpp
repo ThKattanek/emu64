@@ -963,12 +963,10 @@ inline void VICII::RenderSpriteCycle(uint8_t *slot)
         {
             // IRQ kann ausgelöst werden
             reg_mm |= sprite_collision;
+            // Das Flag liegt wie in VICE vor dem CPU Zugriff des naechsten Zyklus an, die IRQ Leitung folgt
+            // erst im naechsten VIC Zyklus (siehe Anfang von OneCycle), sofern die CPU das Flag nicht vorher quittiert
             irq_flag |= 0x04;
-            if (irq_mask & 0x04)
-            {
-                irq_flag |= 0x80;
-                CpuTriggerInterrupt(VIC_IRQ);
-            }
+            if (irq_mask & 0x04) irq_flag |= 0x80;
         }
         else reg_mm |= sprite_collision;
     }
@@ -980,11 +978,7 @@ inline void VICII::RenderSpriteCycle(uint8_t *slot)
             // IRQ kann ausgelöst werden
             reg_md |= gfx_collision;
             irq_flag |= 0x02;
-            if (irq_mask & 0x02)
-            {
-                irq_flag |= 0x80;
-                CpuTriggerInterrupt(VIC_IRQ);
-            }
+            if (irq_mask & 0x02) irq_flag |= 0x80;
         }
         else reg_md |= gfx_collision;
     }
@@ -1009,6 +1003,9 @@ void VICII::OneCycle()
     uint8_t sprite_bit = 0x01;
 
     current_x_coordinate = x_coordinates_table[current_cycle];
+
+    // IRQ Leitung fuer Kollisions Flags (kamen im Vorzyklus, die CPU konnte sie im Zyklus davor noch quittieren)
+    if(irq_flag & irq_mask & 0x06) CpuTriggerInterrupt(VIC_IRQ);
 
     // Lightpen: Auslösung einen Takt nach dem Pegelwechsel (wie VICE)
     if(lp_pending)
@@ -1066,7 +1063,13 @@ void VICII::OneCycle()
             current_rasterline++;
 
 			// Prüfen auf Raster IRQ
-            //if (current_rasterline == reg_irq_raster) RasterIRQ();
+            // Raster IRQ Flag schon in Zyklus 1 setzen (wie VICE: das Flag liegt vor dem CPU Zugriff des Zyklus an,
+            // ein Schreiben auf $D019 im selben Zyklus loescht es wieder). Die IRQ Leitung folgt erst in Zyklus 2.
+            if (current_rasterline == reg_irq_raster)
+            {
+                irq_flag |= 0x01;
+                if (irq_mask & 0x01) irq_flag |= 0x80;
+            }
             draw_this_line = (current_rasterline >= first_display_line && current_rasterline <= last_display_line);
 		}
 
@@ -1100,7 +1103,11 @@ void VICII::OneCycle()
         }
 
         // Prüfen auf Raster IRQ
-        if (current_rasterline == reg_irq_raster) RasterIRQ();
+        if (current_rasterline == reg_irq_raster)
+        {
+            if (current_rasterline == 0) RasterIRQ();
+            else if ((irq_flag & irq_mask & 0x01) != 0) CpuTriggerInterrupt(VIC_IRQ);  // Flag wurde in Zyklus 1 gesetzt und nicht im selben Zyklus quittiert
+        }
 
 		/// Sprite 5 ///
         if(sprite_dma & 0x20)  SetBALow();
