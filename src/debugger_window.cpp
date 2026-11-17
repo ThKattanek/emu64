@@ -15,6 +15,9 @@
 #include <QScreen>
 #include <QStyle>
 #include <QWheelEvent>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QPixmap>
 
 #include "./debugger_window.h"
 #include "./ui_debugger_window.h"
@@ -97,12 +100,12 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
 
     int font1_width = ui->DisAssTable->fontMetrics().averageCharWidth() + 3;
 
-    ui->DisAssTable->setColumnWidth(0, 5 * font1_width + 2);
+    ui->DisAssTable->setColumnWidth(0, 5 * font1_width + 2 + 16); // + Symbol fuer Haltepunkte
     ui->DisAssTable->setColumnWidth(1, 8 * font1_width + 2);
     ui->DisAssTable->setColumnWidth(2, 3 * font1_width + 2);
     ui->DisAssTable->setColumnWidth(3, 7 * font1_width + 2);
 
-    ui->DisAssTable->setMinimumWidth(23 * font1_width + 8);
+    ui->DisAssTable->setMinimumWidth(23 * font1_width + 8 + 16);
 
     disass_rows = 1;
     ui->DisAssTable->setRowCount(disass_rows);
@@ -156,6 +159,26 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     rw_string = QStringList() << "[READ]" << "[WRITE]";
 
     connect(ui->DisAssTable, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onShowContextMenu(QPoint)));
+
+    // Haltepunkt-Markierungen in der Disassembler-Liste (Symbol links neben der Adresse)
+    bp_hit_active = false;
+    for(int i=0; i<MAX_DISASS_ROW; i++) disass_bp_state[i] = -1;
+
+    auto make_bp_icon = [](const QColor& fill, const QColor& border, bool filled) {
+        QPixmap pixmap(12, 12);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setPen(QPen(border, 1.5));
+        painter.setBrush(filled ? QBrush(fill) : QBrush(Qt::NoBrush));
+        painter.drawEllipse(QRectF(1.5, 1.5, 9.0, 9.0));
+        return QIcon(pixmap);
+    };
+    icon_bp_active = make_bp_icon(QColor(220, 0, 0), QColor(120, 0, 0), true);
+    icon_bp_condition = make_bp_icon(QColor(255, 255, 255), QColor(240, 130, 0), false);
+    icon_bp_disabled = make_bp_icon(QColor(170, 170, 170), QColor(110, 110, 110), true);
+    icon_bp_hit = make_bp_icon(QColor(0, 200, 0), QColor(0, 100, 0), true);
+    ui->DisAssTable->setIconSize(QSize(12, 12));
 
     // Mausrad in Disassembler- und Verlaufsliste
     disass_wheel_delta = 0;
@@ -274,6 +297,8 @@ void DebuggerWindow::onTimerAnimationRefresh()
                 }
             }
         }
+        bp_hit_active = true;
+        UpdateBreakpointMarkers();
         show();
     }
 }
@@ -334,6 +359,7 @@ void DebuggerWindow::onResizeDisassList(int width, int height)
             if(item == nullptr)
             {
                 item = new QTableWidgetItem();
+                if(col == 0) disass_bp_state[i] = -1;
                 item->setBackground(table_back_color);
                 ui->DisAssTable->setItem(i, col, item);
             }
@@ -534,24 +560,47 @@ void DebuggerWindow::UpdateRegister()
 
 void DebuggerWindow::onShowContextMenu(const QPoint& pos)
 {
-    // for most widgets
-    QPoint globalPos = ui->DisAssTable->mapToGlobal(pos);
-    // for QAbstractScrollArea and derived classes you would use:
-    // QPoint globalPos = myWidget->viewport()->mapToGlobal(pos);
+    if(c64 == nullptr || disass_rows == 0) return;
+
+    int row = ui->DisAssTable->rowAt(ui->DisAssTable->viewport()->mapFrom(ui->DisAssTable, pos).y());
+    bool row_valid = (row >= 0 && row < disass_rows);
+
+    uint16_t address = row_valid ? view_code_address[row] : view_code_address[0];
+    QList<int> pure;
+    if(row_valid) pure = FindPurePcBreakGroups(address);
 
     QMenu myMenu;
-    myMenu.addAction(tr("Test1"));
-    // ...
+    QAction* jump_action = myMenu.addAction(tr("Gehe zu..."));
+    QAction* toggle_action = nullptr;
+    QAction* enable_action = nullptr;
+    bool is_enabled = false;
 
-    QAction* selectedItem = myMenu.exec(globalPos);
-    if (selectedItem)
+    if(row_valid)
     {
-        // something was chosen, do stuff
+        myMenu.addSeparator();
+        toggle_action = myMenu.addAction(pure.isEmpty() ? tr("Haltepunkt setzen") : tr("Haltepunkt entfernen"));
+        if(!pure.isEmpty())
+        {
+            is_enabled = GetCurrentBreakGroup(pure[0])->Enable;
+            enable_action = myMenu.addAction(is_enabled ? tr("Haltepunkt deaktivieren") : tr("Haltepunkt aktivieren"));
+        }
     }
-    else
+
+    QAction* selectedItem = myMenu.exec(ui->DisAssTable->mapToGlobal(pos));
+    if(selectedItem == nullptr) return;
+
+    if(selectedItem == jump_action)
     {
-        // nothing was chosen
+        // Eingabe der Zieladresse (dezimal, hexadezimal oder binaer); vorbelegt mit der Adresse der angeklickten Zeile
+        input_window->setWindowTitle(tr("Gehe zu Adresse"));
+        input_window->setRange_min(0);
+        input_window->setRange_max(0xffff);
+        input_window->setValue(address);
+        if(input_window->exec())
+            FillDisassemblyList(static_cast<uint16_t>(input_window->getValue()), true);
     }
+    else if(selectedItem == toggle_action) TogglePcBreakpoint(address);
+    else if(selectedItem == enable_action) SetPcBreakpointEnable(address, !is_enabled);
 }
 
 void DebuggerWindow::onSr_widget_ValueChange(uint8_t value)
@@ -927,7 +976,137 @@ void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
         }
     }
 
+    UpdateBreakpointMarkers();
+
     ui->DisAssScroll->setValue(address);
+}
+
+BREAK_GROUP* DebuggerWindow::GetCurrentBreakGroup(int index)
+{
+    if(current_source > 0) return c64->floppy[current_source-1]->GetBreakGroup(index);
+    return c64->GetBreakGroup(index);
+}
+
+int DebuggerWindow::GetCurrentBreakGroupCount()
+{
+    if(current_source > 0) return c64->floppy[current_source-1]->GetBreakGroupCount();
+    return c64->GetBreakGroupCount();
+}
+
+static bool BreakGroupHasOtherConditions(const BREAK_GROUP* bg)
+{
+    return bg->bAC || bg->bXR || bg->bYR || bg->bRAddress || bg->bWAddress || bg->bRWert || bg->bWWert || bg->bRZ || bg->bRZZyklus;
+}
+
+// Gruppen, die nur aus einem PC Haltepunkt auf dieser Adresse bestehen (ein- oder ausgeschaltet)
+QList<int> DebuggerWindow::FindPurePcBreakGroups(uint16_t address)
+{
+    QList<int> list;
+    if(c64 == nullptr) return list;
+
+    int count = GetCurrentBreakGroupCount();
+    for(int i=0; i<count; i++)
+    {
+        BREAK_GROUP* bg = GetCurrentBreakGroup(i);
+        if(bg != nullptr && bg->bPC && bg->iPC == address && !BreakGroupHasOtherConditions(bg))
+            list.append(i);
+    }
+    return list;
+}
+
+// 0 = kein Haltepunkt, 1 = ausgeschaltet, 2 = aktiv mit weiteren Bedingungen, 3 = aktiv (nur PC), 4 = ausgeloest
+int DebuggerWindow::GetPcBreakpointState(uint16_t address)
+{
+    int state = 0;
+    if(c64 == nullptr) return state;
+
+    int count = GetCurrentBreakGroupCount();
+    for(int i=0; i<count; i++)
+    {
+        BREAK_GROUP* bg = GetCurrentBreakGroup(i);
+        if(bg == nullptr || !bg->bPC || bg->iPC != address) continue;
+
+        int s;
+        if(!bg->Enable) s = 1;
+        else if(bp_hit_active && bg->bTrue) s = 4;
+        else s = BreakGroupHasOtherConditions(bg) ? 2 : 3;
+
+        if(s > state) state = s;
+    }
+    return state;
+}
+
+void DebuggerWindow::UpdateBreakpointMarkers()
+{
+    for(int i=0; i<disass_rows; i++)
+    {
+        int state = GetPcBreakpointState(view_code_address[i]);
+        if(state == disass_bp_state[i]) continue;
+        disass_bp_state[i] = state;
+
+        switch(state)
+        {
+        case 1: disass_pc[i]->setIcon(icon_bp_disabled); break;
+        case 2: disass_pc[i]->setIcon(icon_bp_condition); break;
+        case 3: disass_pc[i]->setIcon(icon_bp_active); break;
+        case 4: disass_pc[i]->setIcon(icon_bp_hit); break;
+        default: disass_pc[i]->setIcon(QIcon()); break;
+        }
+    }
+}
+
+// Entfernt vorhandene reine PC Haltepunkte der Adresse, sonst wird ein neuer angelegt
+void DebuggerWindow::TogglePcBreakpoint(uint16_t address)
+{
+    if(c64 == nullptr) return;
+
+    QList<int> pure = FindPurePcBreakGroups(address);
+
+    if(!pure.isEmpty())
+    {
+        for(int k=pure.size()-1; k>=0; k--)
+        {
+            int index = pure[k];
+            if(index < ui->BreakpointTree->topLevelItemCount())
+                delete ui->BreakpointTree->takeTopLevelItem(index);
+
+            if(current_source > 0) c64->floppy[current_source-1]->DelBreakGroup(index);
+            else c64->DelBreakGroup(index);
+        }
+    }
+    else
+    {
+        int index;
+        if(current_source > 0) index = c64->floppy[current_source-1]->AddBreakGroup();
+        else index = c64->AddBreakGroup();
+
+        if(index > -1)
+        {
+            BREAK_GROUP* bg = GetCurrentBreakGroup(index);
+
+            QString name = QString("PC $%1").arg(address, 4, 16, QChar('0')).toUpper();
+            snprintf(bg->Name, sizeof(bg->Name), "%s", name.toLocal8Bit().constData());
+            bg->Enable = true;
+            bg->bPC = true;
+            bg->iPC = address;
+
+            AddBreakpointTreeRoot(name, bg);
+        }
+    }
+
+    UpdateBreakpointMarkers();
+}
+
+// Schaltet die reinen PC Haltepunkte der Adresse ein/aus (ueber den Baum, damit beide Ansichten gleich bleiben)
+void DebuggerWindow::SetPcBreakpointEnable(uint16_t address, bool enable)
+{
+    QList<int> pure = FindPurePcBreakGroups(address);
+    for(int index : pure)
+    {
+        if(index < ui->BreakpointTree->topLevelItemCount())
+            ui->BreakpointTree->topLevelItem(index)->setCheckState(0, enable ? Qt::Checked : Qt::Unchecked);
+    }
+    UpdateBreakpointMarkers();
 }
 
 bool DebuggerWindow::eventFilter(QObject* obj, QEvent* event)
@@ -938,6 +1117,27 @@ bool DebuggerWindow::eventFilter(QObject* obj, QEvent* event)
         breakpoint_auto_resizing = true;
         ui->BreakpointTree->setColumnWidth(0, qMax(60, ui->BreakpointTree->viewport()->width() - breakpoint_value_width));
         breakpoint_auto_resizing = false;
+    }
+
+    if(event->type() == QEvent::MouseButtonPress && obj == ui->DisAssTable->viewport())
+    {
+        // Linksklick auf das Symbol-Feld links neben der Adresse setzt bzw. entfernt einen PC Haltepunkt
+        QMouseEvent* mouse_event = static_cast<QMouseEvent*>(event);
+        if(mouse_event->button() == Qt::LeftButton && c64 != nullptr)
+        {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+            QPoint pos = mouse_event->position().toPoint();
+#else
+            QPoint pos = mouse_event->pos();
+#endif
+            int row = ui->DisAssTable->rowAt(pos.y());
+            if(pos.x() >= 0 && pos.x() < 18 && row >= 0 && row < disass_rows)
+            {
+                if(current_source == 0 || c64->floppy[current_source-1]->GetEnableFloppy())
+                    TogglePcBreakpoint(view_code_address[row]);
+                return true;
+            }
+        }
     }
 
     if(event->type() == QEvent::Wheel)
@@ -1099,6 +1299,7 @@ void DebuggerWindow::on_ChangeSource_currentIndexChanged(int index)
     ui->AssAdressierungIn->setText("");
     memory_window->ChangeSource(current_source);
     RefreshGUI();
+    UpdateBreakpointMarkers();
 }
 
 void DebuggerWindow::on_AssAdresseIn_returnPressed()
@@ -1586,6 +1787,7 @@ void DebuggerWindow::on_DelBreakpoint_clicked()
             ui->BreakpointTree->takeTopLevelItem(bg_index);
             if(current_source > 0) c64->floppy[currnet_floppy_nr]->DelBreakGroup(bg_index);
             else c64->DelBreakGroup(bg_index);
+            UpdateBreakpointMarkers();
         }
     }
 }
@@ -1596,7 +1798,7 @@ void DebuggerWindow::AddBreakpointTreeRoot(QString name,BREAK_GROUP *bg)
     item->setText(0,name);
     item->setForeground(0,QBrush(QColor(200,0,0)));
     item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEditable);
-    item->setCheckState(0,Qt::Checked);
+    item->setCheckState(0, bg->Enable ? Qt::Checked : Qt::Unchecked);
     item->setDisabled(false);
     item->setToolTip(0,tr("Der Name des Haltepunkts kann frei gewählt werden."));
     ui->BreakpointTree->addTopLevelItem(item);
@@ -2081,10 +2283,15 @@ void DebuggerWindow::on_BreakpointTree_itemChanged(QTreeWidgetItem *item, int co
         }
         if(break_point_update_enable)c64->UpdateBreakGroup();
     }
+
+    if(break_point_update_enable) UpdateBreakpointMarkers();
 }
 
 void DebuggerWindow::ClearAllBreakpointBackcolors()
 {
+    bp_hit_active = false;
+    UpdateBreakpointMarkers();
+
     for(int i=0;i<ui->BreakpointTree->topLevelItemCount();i++)
     {
         ui->BreakpointTree->topLevelItem(i)->setBackground(0,QColor(255,255,255));
@@ -2157,6 +2364,8 @@ void DebuggerWindow::on_LoadBreakpoints_clicked()
             }
         }
     }
+
+    UpdateBreakpointMarkers();
 }
 
 void DebuggerWindow::on_SaveBreakpoints_clicked()
@@ -2195,6 +2404,7 @@ void DebuggerWindow::on_DelAllBreakpoints_clicked()
             if(current_source > 0) c64->floppy[currnet_floppy_nr]->DeleteAllBreakGroups();
             else c64->DeleteAllBreakGroups();
             ui->BreakpointTree->clear();
+            UpdateBreakpointMarkers();
         }
 }
 

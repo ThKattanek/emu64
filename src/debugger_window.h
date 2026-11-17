@@ -153,6 +153,13 @@ private:
     void AddBreakpointTreeChild(QTreeWidgetItem* parent, uint16_t value1, uint16_t value2, uint8_t checked, QString tooltip);
     void ClearAllBreakpointBackcolors();
     void RefreshGUI();
+    BREAK_GROUP* GetCurrentBreakGroup(int index);
+    int GetCurrentBreakGroupCount();
+    QList<int> FindPurePcBreakGroups(uint16_t address);
+    int GetPcBreakpointState(uint16_t address);
+    void UpdateBreakpointMarkers();
+    void TogglePcBreakpoint(uint16_t address);
+    void SetPcBreakpointEnable(uint16_t address, bool enable);
     int InstructionLength(uint16_t address);
     uint16_t PrevInstructionAddress(uint16_t address);
     void ScrollDisassList(int rows);
@@ -188,6 +195,12 @@ private:
     int16_t history_rows;
     int16_t disass_rows;
     int disass_wheel_delta;
+    int disass_bp_state[MAX_DISASS_ROW];
+    bool bp_hit_active;
+    QIcon icon_bp_active;
+    QIcon icon_bp_condition;
+    QIcon icon_bp_disabled;
+    QIcon icon_bp_hit;
     int breakpoint_value_width;
     bool breakpoint_user_resized;
     bool breakpoint_auto_resizing;
