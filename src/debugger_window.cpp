@@ -563,25 +563,43 @@ void DebuggerWindow::onShowContextMenu(const QPoint& pos)
     if(c64 == nullptr || disass_rows == 0) return;
 
     int row = ui->DisAssTable->rowAt(ui->DisAssTable->viewport()->mapFrom(ui->DisAssTable, pos).y());
-    if(row < 0 || row >= disass_rows) return;
+    bool row_valid = (row >= 0 && row < disass_rows);
 
-    uint16_t address = view_code_address[row];
-    QList<int> pure = FindPurePcBreakGroups(address);
+    uint16_t address = row_valid ? view_code_address[row] : view_code_address[0];
+    QList<int> pure;
+    if(row_valid) pure = FindPurePcBreakGroups(address);
 
     QMenu myMenu;
-    QAction* toggle_action = myMenu.addAction(pure.isEmpty() ? tr("Haltepunkt setzen") : tr("Haltepunkt entfernen"));
+    QAction* jump_action = myMenu.addAction(tr("Gehe zu..."));
+    QAction* toggle_action = nullptr;
     QAction* enable_action = nullptr;
     bool is_enabled = false;
-    if(!pure.isEmpty())
+
+    if(row_valid)
     {
-        is_enabled = GetCurrentBreakGroup(pure[0])->Enable;
-        enable_action = myMenu.addAction(is_enabled ? tr("Haltepunkt deaktivieren") : tr("Haltepunkt aktivieren"));
+        myMenu.addSeparator();
+        toggle_action = myMenu.addAction(pure.isEmpty() ? tr("Haltepunkt setzen") : tr("Haltepunkt entfernen"));
+        if(!pure.isEmpty())
+        {
+            is_enabled = GetCurrentBreakGroup(pure[0])->Enable;
+            enable_action = myMenu.addAction(is_enabled ? tr("Haltepunkt deaktivieren") : tr("Haltepunkt aktivieren"));
+        }
     }
 
     QAction* selectedItem = myMenu.exec(ui->DisAssTable->mapToGlobal(pos));
     if(selectedItem == nullptr) return;
 
-    if(selectedItem == toggle_action) TogglePcBreakpoint(address);
+    if(selectedItem == jump_action)
+    {
+        // Eingabe der Zieladresse (dezimal, hexadezimal oder binaer); vorbelegt mit der Adresse der angeklickten Zeile
+        input_window->setWindowTitle(tr("Gehe zu Adresse"));
+        input_window->setRange_min(0);
+        input_window->setRange_max(0xffff);
+        input_window->setValue(address);
+        if(input_window->exec())
+            FillDisassemblyList(static_cast<uint16_t>(input_window->getValue()), true);
+    }
+    else if(selectedItem == toggle_action) TogglePcBreakpoint(address);
     else if(selectedItem == enable_action) SetPcBreakpointEnable(address, !is_enabled);
 }
 
