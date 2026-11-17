@@ -400,6 +400,7 @@ inline unsigned char MOS6510::Read(unsigned short adresse)
 
 inline void MOS6510::Write(unsigned short adresse, unsigned char wert)
 {
+    if(irq_is_low_pegel) irq_state |= 0x80;
     if(adresse == 0xFF00) WRITE_FF00 = true;
     if(Breakpoints[adresse] & 32)
     {
@@ -451,10 +452,13 @@ bool MOS6510::OneZyklus(void)
     RESET_OLD = *RESET;
 
     // IRQ auf low Pegel prüfen
+    // Bit 7 von irq_state: Die CPU hat im Takt davor geschrieben, waehrend die Leitung aktiv war (z.B. Dummy Write eines RMW Befehls).
+    // Der Pegel bleibt fuer die Interrupt Entscheidung einen Takt erhalten (entspricht IK_IRQPEND in VICE).
     if(irq_state > 0)
         irq_is_low_pegel = true;
     else
         irq_is_low_pegel = false;
+    irq_state &= 0x7F;
 
     // NMI Flanke auswerten (die Flanke wird beim Anheben der Leitung gemerkt, damit auch kurze Impulse erkannt werden)
     nmi_fall_edge = nmi_edge_event;
