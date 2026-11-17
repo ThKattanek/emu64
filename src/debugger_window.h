@@ -90,6 +90,7 @@ public:
     ~DebuggerWindow();
     void showEvent(QShowEvent* event);
     void hideEvent(QHideEvent* event);
+    bool eventFilter(QObject* obj, QEvent* event);
     void RetranslateUi();
     void SetC64Pointer(C64Class* c64);
     void AnimationRefreshProc();
@@ -152,6 +153,9 @@ private:
     void AddBreakpointTreeChild(QTreeWidgetItem* parent, uint16_t value1, uint16_t value2, uint8_t checked, QString tooltip);
     void ClearAllBreakpointBackcolors();
     void RefreshGUI();
+    int InstructionLength(uint16_t address);
+    uint16_t PrevInstructionAddress(uint16_t address);
+    void ScrollDisassList(int rows);
 
     C64Class *c64;
     Ui::DebuggerWindow *ui;
@@ -183,6 +187,10 @@ private:
     int32_t currnet_floppy_nr;
     int16_t history_rows;
     int16_t disass_rows;
+    int disass_wheel_delta;
+    int breakpoint_value_width;
+    bool breakpoint_user_resized;
+    bool breakpoint_auto_resizing;
 };
 
 #endif // DEBUGGER_WINDOW_H

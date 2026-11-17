@@ -39,6 +39,7 @@ public:
     void SetC64Pointer(C64Class *_c64);
     void ChangeSource(int source);
     void UpdateMemoryList(void);
+    bool eventFilter(QObject* obj, QEvent* event);
 
 private slots:
     void onChangeValue(unsigned short adresse, unsigned char wert);

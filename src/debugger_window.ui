@@ -2432,11 +2432,19 @@ border-right-color: rgb(255, 255, 255);</string>
                <bool>true</bool>
               </property>
               <attribute name="headerVisible">
-               <bool>false</bool>
+               <bool>true</bool>
+              </attribute>
+              <attribute name="headerMinimumSectionSize">
+               <number>40</number>
               </attribute>
               <column>
                <property name="text">
-                <string notr="true">1</string>
+                <string>Haltepunkt</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Werte</string>
                </property>
               </column>
              </widget>

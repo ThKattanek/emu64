@@ -14,6 +14,7 @@
 
 #include <QScreen>
 #include <QStyle>
+#include <QWheelEvent>
 
 #include "./debugger_window.h"
 #include "./ui_debugger_window.h"
@@ -112,12 +113,18 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
 
     ui->BreakpointTree->setFont(font1);
     ui->BreakpointTree->setColumnCount(2);
-    ui->BreakpointTree->setColumnWidth(0, (22 * font1_width) + 10);
-    ui->BreakpointTree->setColumnWidth(1, 5 * font1_width);
     ui->BreakpointTree->setMinimumWidth(35 * font1_width);
-    // Zusaetzliche Breite geht an die erste Spalte, die zweite behaelt ihre Breite
-    ui->BreakpointTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-    ui->BreakpointTree->header()->setSectionResizeMode(1, QHeaderView::Fixed);
+
+    // Spalte "Werte" nur so breit, dass der laengste Wert reinpasst; die Trennlinie im Kopf kann der User verschieben
+    QFontMetrics break_fm(ui->BreakpointTree->font());
+    breakpoint_value_width = qMax(break_fm.horizontalAdvance("65535 - 65535"), break_fm.horizontalAdvance(tr("ERFÜLLT !"))) + 24;
+    breakpoint_user_resized = false;
+    breakpoint_auto_resizing = false;
+    ui->BreakpointTree->header()->setSectionResizeMode(0, QHeaderView::Interactive);
+    connect(ui->BreakpointTree->header(), &QHeaderView::sectionResized, this, [this](int index, int, int){
+        if(index == 0 && !breakpoint_auto_resizing) breakpoint_user_resized = true;
+    });
+    ui->BreakpointTree->viewport()->installEventFilter(this);
     new_breakpoint_found = false;
 
     ui->HistoryList->setFont(font1);
@@ -149,6 +156,13 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     rw_string = QStringList() << "[READ]" << "[WRITE]";
 
     connect(ui->DisAssTable, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(onShowContextMenu(QPoint)));
+
+    // Mausrad in Disassembler- und Verlaufsliste
+    disass_wheel_delta = 0;
+    ui->DisAssTable->installEventFilter(this);
+    ui->DisAssTable->viewport()->installEventFilter(this);
+    ui->HistoryList->installEventFilter(this);
+    ui->HistoryList->viewport()->installEventFilter(this);
 
     ////////// Load from INI ///////////
     if(ini != nullptr)
@@ -914,6 +928,105 @@ void DebuggerWindow::FillDisassemblyList(uint16_t address, bool new_refresh)
     }
 
     ui->DisAssScroll->setValue(address);
+}
+
+bool DebuggerWindow::eventFilter(QObject* obj, QEvent* event)
+{
+    if(event->type() == QEvent::Resize && obj == ui->BreakpointTree->viewport() && !breakpoint_user_resized)
+    {
+        // Solange der User die Trennlinie nicht verschoben hat, bekommt die Werte-Spalte nur ihre noetige Breite
+        breakpoint_auto_resizing = true;
+        ui->BreakpointTree->setColumnWidth(0, qMax(60, ui->BreakpointTree->viewport()->width() - breakpoint_value_width));
+        breakpoint_auto_resizing = false;
+    }
+
+    if(event->type() == QEvent::Wheel)
+    {
+        QWheelEvent* wheel_event = static_cast<QWheelEvent*>(event);
+
+        if(obj == ui->DisAssTable || obj == ui->DisAssTable->viewport())
+        {
+            // Pro Rastung 3 Zeilen (auch fuer hochaufloesende Mausraeder/Touchpads aufsummiert)
+            disass_wheel_delta += wheel_event->angleDelta().y();
+            int notches = disass_wheel_delta / 120;
+            disass_wheel_delta -= notches * 120;
+            if(notches != 0) ScrollDisassList(-notches * 3);
+            return true;
+        }
+
+        if(obj == ui->HistoryList || obj == ui->HistoryList->viewport())
+        {
+            // Die Bildlaufleiste uebernimmt Schrittweite und Richtung
+            QCoreApplication::sendEvent(ui->HistoryScroll, event);
+            return true;
+        }
+    }
+    return QDialog::eventFilter(obj, event);
+}
+
+int DebuggerWindow::InstructionLength(uint16_t address)
+{
+    static const int mode_length[12] = {1, 2, 3, 2, 3, 3, 2, 2, 2, 2, 3, 2};
+
+    uint8_t opcode;
+    if(current_source > 0)
+        opcode = c64->floppy[current_source-1]->ReadByte(address);
+    else
+        opcode = c64->ReadC64Byte(address);
+
+    int mode = (CpuOPCInfo[opcode] >> 4) & 15;
+    return (mode < 12) ? mode_length[mode] : 1;
+}
+
+// Rueckwaerts disassemblieren ist bei 6502-Code nicht eindeutig. Es wird ab mehreren Startpunkten vor der Adresse
+// vorwaerts disassembliert; der Anfang der letzten Instruktion, die genau auf die Adresse trifft, bekommt eine Stimme.
+uint16_t DebuggerWindow::PrevInstructionAddress(uint16_t address)
+{
+    int votes[4] = {0, 0, 0, 0};
+
+    for(int back=4; back<=24; back++)
+    {
+        uint16_t pos = static_cast<uint16_t>(address - back);
+        int last_len = 0;
+        int travelled = 0;
+
+        while(travelled < back)
+        {
+            last_len = InstructionLength(static_cast<uint16_t>(pos + travelled));
+            travelled += last_len;
+        }
+
+        if(travelled == back && last_len >= 1 && last_len <= 3)
+            votes[last_len]++;
+    }
+
+    int best = 1;
+    for(int len=2; len<=3; len++)
+        if(votes[len] > votes[best]) best = len;
+
+    return static_cast<uint16_t>(address - best);
+}
+
+void DebuggerWindow::ScrollDisassList(int rows)
+{
+    if(c64 == nullptr || disass_rows == 0 || rows == 0) return;
+
+    if(current_source > 0 && !c64->floppy[current_source-1]->GetEnableFloppy()) return;
+
+    uint16_t top = view_code_address[0];
+
+    if(rows > 0)
+    {
+        int idx = (rows < disass_rows) ? rows : disass_rows - 1;
+        top = view_code_address[idx];
+    }
+    else
+    {
+        for(int i=0; i<-rows; i++)
+            top = PrevInstructionAddress(top);
+    }
+
+    FillDisassemblyList(top, true);
 }
 
 void DebuggerWindow::FillHistoryList(uint8_t index)
