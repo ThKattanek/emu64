@@ -1,6 +1,8 @@
 Alle Änderungen ab V5.2.0 bis jetzt
 -----------------------------------
 
+- Fixed: [#416] CIA - Das Lesen vom ICR laesst die IRQ Leitung der CIA1 erst einen Takt spaeter los. Die CPU sieht sie im Takt des Lesens noch (3 und 4 Zyklen Befehle mit Quittierung im vorletzten Zyklus nehmen den IRQ noch an, wie VICE). VICE Testbench interrupts/cia-int cia-int-irq.prg.
+- Fixed: Rom Sets - Es konnten keine RomSets in den Einstellungen ausgewählt werden, bzw. wurden diese nicht aktiviert.
 - Fixed: [#412] CPU - SHA ($93/$9F) und SHS ($9B): Bei Seitenwechsel wird das High-Byte der Zieladresse durch den Wert A&X&(H+1) ersetzt, bei DMA entfaellt nur das &(H+1) beim Wert (wie SHX/SHY und VICE). VICE Testbench CPU/sha und CPU/shs (15 Tests).
 - Fixed: [#410] CPU - Der Datenport ($01) startet nach Power-On/Reset mit DATA = 0 statt $3F (wie VICE und echte Hardware). VICE Testbench CPU/cpuport initvalue.crt.
 - Fixed: [#409] CPU - Ein JAM Opcode ($02, $12, ...) haelt die CPU jetzt dauerhaft an (nur RESET holt sie zurueck). Vorher wurde sie neu gestartet (Reset Sequenz), IRQ/NMI liefen danach weiter. VICE Testbench CPU/cpujam jamirq.prg und jamnmi.prg.

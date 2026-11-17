@@ -191,6 +191,11 @@ inline void MOS6526::SetIrqLine(bool state)
 // Interrupt Pipeline einen Takt weiter schalten (muss pro Takt genau einmal aufgerufen werden)
 inline void MOS6526::IfrRun()
 {
+    // Das Lesen vom ICR laesst die IRQ Leitung erst einen Takt spaeter los (die CPU sieht sie im Takt des Lesens noch,
+    // VICE: IK_IRQPEND). Beim NMI (CIA2) geschieht das sofort, dort zaehlt nur die Flanke.
+    if(ifr_read0 && cia_nr == 0)
+        SetIrqLine(false);
+
     // Das Lesen vom ICR loescht die Flags erst zwei Takte spaeter
     if(ifr_ack0)
     {
@@ -818,7 +823,7 @@ uint8_t MOS6526::ReadIO(uint16_t address)
             ret = icr;
             icr &= 0x80;
             icr_new = 0;
-            SetIrqLine(false);
+            if(cia_nr != 0) SetIrqLine(false);
             return ret;
         }
 
@@ -836,7 +841,7 @@ uint8_t MOS6526::ReadIO(uint16_t address)
         ifr_read0 = true;
 
         ret = icr;
-        SetIrqLine(false);
+        if(cia_nr != 0) SetIrqLine(false);
         return ret;
 
     case 14:
