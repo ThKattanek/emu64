@@ -939,7 +939,7 @@ void SetupWindow::on_Sid6ChannelMode_toggled(bool checked)
     }
 }
 
-void SetupWindow::on_SelectRomSetCurrentIndexChanged(int index)
+void SetupWindow::on_SelectRomSet_currentIndexChanged(int index)
 {
     const QString arg1 = ui->SelectRomSet->itemText(index);
     QString kernal_rom, basic_rom, char_rom, dos1541_rom;
@@ -1255,4 +1255,5 @@ void SetupWindow::on_SidDigiBoost_clicked(bool checked)
 {
     c64->SetSidDigiBoost(checked);
 }
+
 

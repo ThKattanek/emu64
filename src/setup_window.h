@@ -75,7 +75,7 @@ private slots:
     void on_SidCycleExactEnable_toggled(bool checked);
     void on_SidFilterEnable_toggled(bool checked);
     void on_Sid6ChannelMode_toggled(bool checked);
-    void on_SelectRomSetCurrentIndexChanged(int index);
+    void on_SelectRomSet_currentIndexChanged(int index);
     void on_DeleteRomSet_clicked();
     void on_NewRomSet_clicked();
     void on_VicSpriteViewEnable_toggled(bool checked);
