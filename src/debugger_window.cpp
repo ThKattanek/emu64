@@ -115,6 +115,9 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     ui->BreakpointTree->setColumnWidth(0, (22 * font1_width) + 10);
     ui->BreakpointTree->setColumnWidth(1, 5 * font1_width);
     ui->BreakpointTree->setMinimumWidth(35 * font1_width);
+    // Zusaetzliche Breite geht an die erste Spalte, die zweite behaelt ihre Breite
+    ui->BreakpointTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+    ui->BreakpointTree->header()->setSectionResizeMode(1, QHeaderView::Fixed);
     new_breakpoint_found = false;
 
     ui->HistoryList->setFont(font1);
@@ -152,6 +155,7 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     {
         ini->beginGroup("DebuggerWindow");
         if(ini->contains("Geometry")) restoreGeometry(ini->value("Geometry").toByteArray());
+        if(ini->contains("SplitterState")) ui->splitter_disass->restoreState(ini->value("SplitterState").toByteArray());
         ini->endGroup();
     }
     ////////////////////////////////////
@@ -166,6 +170,7 @@ DebuggerWindow::~DebuggerWindow()
     {
         ini->beginGroup("DebuggerWindow");
         if(is_one_showed) ini->setValue("Geometry", saveGeometry());
+        if(is_one_showed) ini->setValue("SplitterState", ui->splitter_disass->saveState());
         if(isHidden()) ini->setValue("Show", false);
         else ini->setValue("Show", true);
         ini->endGroup();
