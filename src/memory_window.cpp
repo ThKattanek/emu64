@@ -16,6 +16,7 @@
 #include <QScreen>
 #include <QMessageBox>
 #include <QStyle>
+#include <QWheelEvent>
 
 #include "memory_window.h"
 #include "qdebug.h"
@@ -98,6 +99,20 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
     ui->MemoryTable->setMaximumWidth(w->width());
     ui->MemoryTable->setMinimumHeight((w->height()+1) * memory_rows);
     ui->MemoryTable->setMaximumHeight((w->height()+1) * memory_rows);
+
+    // Mausrad scrollt ueber die Bildlaufleiste (auch ueber den Zeilen-Widgets, die das Rad weiterreichen)
+    ui->MemoryTable->installEventFilter(this);
+    ui->MemoryTable->viewport()->installEventFilter(this);
+}
+
+bool MemoryWindow::eventFilter(QObject* obj, QEvent* event)
+{
+    if(event->type() == QEvent::Wheel && (obj == ui->MemoryTable || obj == ui->MemoryTable->viewport()))
+    {
+        QCoreApplication::sendEvent(ui->MemoryScroll, event);
+        return true;
+    }
+    return QDialog::eventFilter(obj, event);
 }
 
 MemoryWindow::~MemoryWindow()
