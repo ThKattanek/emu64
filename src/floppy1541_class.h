@@ -69,6 +69,9 @@ public:
     void SetResetReady(bool* ResetReady, uint16_t ResetReadyAdr);
     void GetFloppyInfo(FLOPPY_INFO *fi);
     uint8_t ReadByte(uint16_t address);
+    uint8_t GetCpuSP() const { return cpu->GetSP(); }
+    uint16_t GetCpuPC() const { return cpu->GetPC(); }
+    bool IsCpuOpcodeFetchNext() const { return cpu->IsOpcodeFetchNext(); }
     void WriteByte(uint16_t address, uint8_t value);
     int LoadFloppySounds(const char* motor_sound_filename, const char* motor_on_sound_filename, const char* motor_off_sound_filename, const char* anschlag_sound_filename, const char* stepper_dec_sound_filename, const char* Stepper_inc_sound_filename);
     void ResetCycleCounter();

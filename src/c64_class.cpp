@@ -466,6 +466,10 @@ c64_command_line_current_pos = 0;
 c64_command_line_status = false;
 c64_command_line_count_s = false;
 debug_mode = one_cycle = one_opcode = false;
+step_over_active = false;
+step_over_source = 0;
+step_over_return_pc = 0;
+step_over_sp = 0;
 debug_blink_phase = 0;
 debug_last_refresh_ticks = 0;
 debug_beam_marker = true;
@@ -1552,6 +1556,67 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
         else
         {
             DebugBlinkRefresh();
+
+            if(step_over_active)
+            {
+                // JSR komplett abarbeiten: Zyklen stapelweise rechnen, bis wieder der Opcode hinter dem JSR bei gleichem Stackpointer geholt wird
+                const int step_over_cycles_per_call = 20000;
+                bool step_over_finished = false;
+
+                for(int i=0; i<step_over_cycles_per_call && !step_over_finished; i++)
+                {
+                    NextSystemCycle();
+
+                    if(cpu_states[0] && debug_logging)
+                        DebugLogging();
+
+                    if((break_status != 0) || (floppy_found_breakpoint == true )) if(CheckBreakpoints()) break;
+
+                    if(iec_is_dumped)
+                    {
+                        iec_export_vdc.NextStep();
+                        iec_export_vdc.SetWire(0,c64_iec_wire & 16);
+                        iec_export_vdc.SetWire(1,c64_iec_wire & 64);
+                        iec_export_vdc.SetWire(2,c64_iec_wire & 128);
+                        iec_export_vdc.SetWire(3,floppy_iec_wire & 64);
+                        iec_export_vdc.SetWire(4,floppy_iec_wire & 128);
+                    }
+
+                    if(cpu_states[step_over_source])
+                    {
+                        // Befehlsgrenze: PC zeigt auf den naechsten, noch nicht geholten Opcode
+                        uint16_t next_pc;
+                        uint8_t sp;
+                        if(step_over_source == 0)
+                        {
+                            next_pc = cpu->GetPC();
+                            sp = cpu->GetSP();
+                        }
+                        else
+                        {
+                            next_pc = floppy[step_over_source-1]->GetCpuPC();
+                            sp = floppy[step_over_source-1]->GetCpuSP();
+                        }
+
+                        if(next_pc == step_over_return_pc && sp == step_over_sp)
+                            step_over_finished = true;
+                    }
+                }
+
+                // Bei einem Haltepunkt wurde der Lauf bereits beendet (step_over_active = false)
+                if(step_over_finished)
+                {
+                    step_over_active = false;
+                    DebugRefreshScreen();
+                    if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
+                    if(StepOverFinishedProc != nullptr) StepOverFinishedProc();
+                }
+                else if(step_over_active)
+                {
+                    if((SDL_GetTicks() - debug_last_refresh_ticks) >= 33) DebugRefreshScreen();
+                    if(AnimationRefreshProc != nullptr) AnimationRefreshProc();
+                }
+            }
 
             if(one_cycle)
             {
@@ -3994,6 +4059,7 @@ void C64Class::SetMouse1351Port(uint8_t port)
 void C64Class::SetDebugMode(bool status)
 {
     debug_mode = status;
+    step_over_active = false;
     if(debug_mode)
     {
         one_cycle = false;
@@ -4038,19 +4104,63 @@ void C64Class::SetExtRDY(bool status)
 void C64Class::OneCycle()
 {
     debug_animation = false;
+    step_over_active = false;
     one_cycle = true;
 }
 
 void C64Class::OneOpcode(int source)
 {
     debug_animation = false;
+    step_over_active = false;
     one_opcode_source = source;
     one_opcode = true;
+}
+
+// Zeigt der PC (an einer Befehlsgrenze) auf ein JSR, wird es samt Unterprogramm komplett abgearbeitet und true geliefert
+// (Ende ueber StepOverFinishedProc). Sonst wird wie bei OneOpcode genau ein Opcode abgearbeitet (false).
+bool C64Class::StepOverJsr(int source)
+{
+    uint16_t pc;
+    uint8_t opcode;
+    uint8_t sp;
+    bool at_fetch;
+
+    if(source == 0)
+    {
+        at_fetch = cpu->IsOpcodeFetchNext();
+        pc = cpu->GetPC();
+        sp = cpu->GetSP();
+        opcode = ReadC64Byte(pc);
+    }
+    else
+    {
+        if(!floppy[source-1]->GetEnableFloppy()) return false;
+        at_fetch = floppy[source-1]->IsCpuOpcodeFetchNext();
+        pc = floppy[source-1]->GetCpuPC();
+        sp = floppy[source-1]->GetCpuSP();
+        opcode = floppy[source-1]->ReadByte(pc);
+    }
+
+    if(!at_fetch || opcode != 0x20)
+    {
+        OneOpcode(source);
+        return false;
+    }
+
+    debug_animation = false;
+    one_cycle = false;
+    one_opcode = false;
+    step_over_source = source;
+    step_over_return_pc = static_cast<uint16_t>(pc + 3);
+    step_over_sp = sp;
+    step_over_active = true;
+    return true;
 }
 
 void C64Class::SetDebugAnimation(bool status)
 {
     debug_animation = status;
+    step_over_active = false;
 }
 
 void C64Class::SetDebugAnimationSpeed(int cycle_sek)
@@ -5281,6 +5391,7 @@ bool C64Class::CheckBreakpoints()
         {
             debug_mode = true;
             debug_animation = false;
+            step_over_active = false;
             one_cycle = false;
             one_opcode = false;
             sid1->SoundOutputEnable = false;
@@ -5294,6 +5405,7 @@ bool C64Class::CheckBreakpoints()
         else
         {
             debug_animation = false;
+            step_over_active = false;
             one_opcode = false;
             one_cycle = false;
             if(BreakpointProc != nullptr) BreakpointProc();

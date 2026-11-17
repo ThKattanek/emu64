@@ -112,6 +112,7 @@ private slots:
     void on_AssAdressierungIn_returnPressed();
     void on_AnimationStart_clicked();
     void on_AnimationStop_clicked();
+    void on_StepOverJsr_clicked();
     void on_AnimationSpeed_valueChanged(int value);
     void on_DisAssTable_doubleClicked(const QModelIndex &index);
     void on_DisAssScroll_valueChanged(int value);
@@ -153,6 +154,7 @@ private:
     void AddBreakpointTreeChild(QTreeWidgetItem* parent, uint16_t value1, uint16_t value2, uint8_t checked, QString tooltip);
     void ClearAllBreakpointBackcolors();
     void RefreshGUI();
+    void SetStepButtonsEnabled(bool enabled);
     BREAK_GROUP* GetCurrentBreakGroup(int index);
     int GetCurrentBreakGroupCount();
     QList<int> FindPurePcBreakGroups(uint16_t address);
@@ -190,6 +192,7 @@ private:
     bool new_refresh;
     bool break_point_update_enable;
     bool new_breakpoint_found;
+    bool new_step_over_finished;
     int32_t current_source;
     int32_t currnet_floppy_nr;
     int16_t history_rows;

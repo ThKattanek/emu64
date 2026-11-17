@@ -32,6 +32,8 @@ public:
     void ClearJAMFlag(void);
     void GetRegister(REG_STRUCT *reg);
     unsigned short GetPC() const { return PC; }
+    unsigned char GetSP() const { return SP; }
+    bool IsOpcodeFetchNext() const { return *MCT == 0; }   // Naechster Zyklus holt einen Opcode (Befehlsgrenze)
     void SetRegister(REG_STRUCT *reg);
     bool GetInterrupts(int typ);
     void GetInterneRegister(IREG_STRUCT *ireg);
