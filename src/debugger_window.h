@@ -50,8 +50,8 @@ protected:
 
     virtual void resizeEvent( QResizeEvent* e )
     {
-        (void)e;
-        emit resize(this->width(), this->height());
+        QListWidget::resizeEvent(e);
+        emit resize(viewport()->width(), viewport()->height());
     }
 };
 
@@ -72,8 +72,8 @@ protected:
 
     virtual void resizeEvent( QResizeEvent* e )
     {
-        (void)e;
-        emit resize(this->width(), this->height());
+        QTableWidget::resizeEvent(e);
+        emit resize(viewport()->width(), viewport()->height());
     }
 };
 

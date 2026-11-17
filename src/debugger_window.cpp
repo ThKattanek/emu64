@@ -263,21 +263,26 @@ void DebuggerWindow::onResizeHistoryList(int width, int height)
 {
     (void)width;
 
-    ui->HistoryList->clear();
-
-    QListWidgetItem *item = new QListWidgetItem(ui->HistoryList);
-    ui->HistoryList->addItem(item);
-
-    QRect rect = ui->HistoryList->visualItemRect(ui->HistoryList->item(0));
-
-    history_rows = height / rect.height();
-
-    for(int i=1; i<history_rows; i++)
+    // Vorhandene Eintraege werden wiederverwendet (kein clear), height ist die Viewport-Hoehe
+    if(ui->HistoryList->count() == 0)
     {
-        item = new QListWidgetItem(ui->HistoryList);
-        item->setText(QVariant(i).toString());
-        ui->HistoryList->addItem(item);
+        QListWidgetItem *item = new QListWidgetItem(ui->HistoryList);
+        item->setText("$0000");
     }
+
+    int row_height = ui->HistoryList->visualItemRect(ui->HistoryList->item(0)).height();
+    if(row_height <= 0) return;
+
+    int rows = height / row_height;
+    if(rows < 1) rows = 1;
+
+    while(ui->HistoryList->count() < rows)
+        new QListWidgetItem(ui->HistoryList);
+
+    while(ui->HistoryList->count() > rows)
+        delete ui->HistoryList->takeItem(ui->HistoryList->count() - 1);
+
+    history_rows = rows;
 
     FillHistoryList(static_cast<uint8_t>(ui->HistoryScroll->value()));
 }
@@ -286,32 +291,35 @@ void DebuggerWindow::onResizeDisassList(int width, int height)
 {
     (void)width;
 
-    ui->DisAssTable->clear();
-
+    // Vorhandene Items werden wiederverwendet (kein clear), height ist die Viewport-Hoehe
     int row_height = ui->DisAssTable->fontInfo().pixelSize();
+    if(row_height <= 0) return;
 
-    disass_rows = height / row_height;
+    int rows = height / row_height;
 
-    if(disass_rows > MAX_DISASS_ROW)
-        disass_rows = MAX_DISASS_ROW;
+    if(rows > MAX_DISASS_ROW)
+        rows = MAX_DISASS_ROW;
 
-    ui->DisAssTable->setRowCount(disass_rows);
+    ui->DisAssTable->setRowCount(rows);
+    disass_rows = rows;
+
+    QTableWidgetItem **items[4] = { disass_pc, disass_memory, disass_mnemonic, disass_addressing };
 
     for(int i=0; i<disass_rows; i++)
     {
         view_code_address[i] = 0;
-        disass_pc[i] = new QTableWidgetItem();
-        disass_pc[i]->setBackground(table_back_color);
-        ui->DisAssTable->setItem(i, 0, disass_pc[i]);
-        disass_memory[i] = new QTableWidgetItem();
-        disass_memory[i]->setBackground(table_back_color);
-        ui->DisAssTable->setItem(i, 1, disass_memory[i]);
-        disass_mnemonic[i] = new QTableWidgetItem();
-        disass_mnemonic[i]->setBackground(table_back_color);
-        ui->DisAssTable->setItem(i, 2, disass_mnemonic[i]);
-        disass_addressing[i] = new QTableWidgetItem();
-        disass_addressing[i]->setBackground(table_back_color);
-        ui->DisAssTable->setItem(i, 3, disass_addressing[i]);
+
+        for(int col=0; col<4; col++)
+        {
+            QTableWidgetItem *item = ui->DisAssTable->item(i, col);
+            if(item == nullptr)
+            {
+                item = new QTableWidgetItem();
+                item->setBackground(table_back_color);
+                ui->DisAssTable->setItem(i, col, item);
+            }
+            items[col][i] = item;
+        }
         ui->DisAssTable->setRowHeight(i, row_height);
     }
 
