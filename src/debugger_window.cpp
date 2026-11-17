@@ -129,6 +129,7 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
     });
     ui->BreakpointTree->viewport()->installEventFilter(this);
     new_breakpoint_found = false;
+    new_step_over_finished = false;
 
     ui->HistoryList->setFont(font1);
 
@@ -255,6 +256,13 @@ void DebuggerWindow::onTimerAnimationRefresh()
         memory_window->UpdateMemoryList();
         vic_window->UpdateOutputList();
         iec_window->UpdateSignals();
+    }
+
+    if(new_step_over_finished)
+    {
+        // Das JSR samt Unterprogramm ist abgearbeitet: Schaltflaechen wieder freigeben
+        new_step_over_finished = false;
+        SetStepButtonsEnabled(true);
     }
 
     if(new_breakpoint_found)
@@ -394,6 +402,7 @@ void DebuggerWindow::SetC64Pointer(C64Class *c64)
     iec_window->SetC64Pointer(c64);
     this->c64->AnimationRefreshProc = std::bind(&DebuggerWindow::AnimationRefreshProc, this);
     this->c64->BreakpointProc = std::bind(&DebuggerWindow::BreakpointProc, this);
+    this->c64->StepOverFinishedProc = [this]() { new_step_over_finished = true; };
 }
 
 void DebuggerWindow::showEvent(QShowEvent*)
@@ -1686,34 +1695,41 @@ bool DebuggerWindow::Assemble(QString address, QString mnemonic, QString address
     return false;
 }
 
+void DebuggerWindow::SetStepButtonsEnabled(bool enabled)
+{
+    ui->OneOpcode->setEnabled(enabled);
+    ui->OneZyklus->setEnabled(enabled);
+    ui->StepOverJsr->setEnabled(enabled);
+    ui->AnimationStart->setEnabled(enabled);
+    ui->AnimationStop->setEnabled(!enabled);
+    ui->DisAssScroll->setEnabled(enabled);
+
+    ui->AssAdresseIn->setEnabled(enabled);
+    ui->AssMnemonicIn->setEnabled(enabled);
+    ui->AssAdressierungIn->setEnabled(enabled);
+}
+
 void DebuggerWindow::on_AnimationStart_clicked()
 {
     ClearAllBreakpointBackcolors();
 
-    ui->OneOpcode->setEnabled(false);
-    ui->OneZyklus->setEnabled(false);
-    ui->AnimationStart->setEnabled(false);
-    ui->AnimationStop->setEnabled(true);
-    ui->DisAssScroll->setEnabled(false);
-
-    ui->AssAdresseIn->setEnabled(false);
-    ui->AssMnemonicIn->setEnabled(false);
-    ui->AssAdressierungIn->setEnabled(false);
+    SetStepButtonsEnabled(false);
 
     c64->SetDebugAnimation(true);
 }
 
+void DebuggerWindow::on_StepOverJsr_clicked()
+{
+    ClearAllBreakpointBackcolors();
+
+    // Bei einem JSR laeuft der C64 bis zur Rueckkehr; "Stop" bricht ab
+    if(c64->StepOverJsr(current_source))
+        SetStepButtonsEnabled(false);
+}
+
 void DebuggerWindow::on_AnimationStop_clicked()
 {
-    ui->OneOpcode->setEnabled(true);
-    ui->OneZyklus->setEnabled(true);
-    ui->AnimationStart->setEnabled(true);
-    ui->AnimationStop->setEnabled(false);
-    ui->DisAssScroll->setEnabled(true);
-
-    ui->AssAdresseIn->setEnabled(true);
-    ui->AssMnemonicIn->setEnabled(true);
-    ui->AssAdressierungIn->setEnabled(true);
+    SetStepButtonsEnabled(true);
 
     c64->SetDebugAnimation(false);
 }

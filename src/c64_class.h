@@ -193,6 +193,7 @@ public:
     bool SetDebugFullView(bool status);
     void SetDebugBeamMarker(bool status) { debug_beam_marker = status; if(debug_mode) DebugRefreshScreen(); }
     void OneOpcode(int source);
+    bool StepOverJsr(int source);
     void SetDebugAnimation(bool status);
     void SetDebugAnimationSpeed(int cycle_sek);
     void GetC64CpuReg(REG_STRUCT *reg,IREG_STRUCT *ireg);
@@ -460,6 +461,7 @@ public:
     std::function<void(bool next)> NextPrevDiskImage;    // true = Next ; false = Prev (wird im Emulations-Thread aufgerufen)
     std::function<void(void)> AnimationRefreshProc;
     std::function<void(void)> BreakpointProc;
+    std::function<void(void)> StepOverFinishedProc;
     std::function<void(const char*)> LogText;
     std::function<void(void)> CloseEventC64Screen;
     std::function<void(void)> LimitCyclesEvent;
@@ -655,6 +657,10 @@ private:
     bool        one_cycle;
     bool        one_opcode;
     int         one_opcode_source;
+    bool        step_over_active;           // Ein JSR wird komplett abgearbeitet (laeuft bis zur Rueckkehr)
+    int         step_over_source;
+    uint16_t    step_over_return_pc;        // Adresse hinter dem JSR
+    uint8_t     step_over_sp;               // Stackpointer vor dem JSR
     bool        cpu_states[5];              // true = Feetch / false = no Feetch ::: Index 0=C64 Cpu, 1-4 Floppy 1-4
 
     FILE*       debug_logging_file;

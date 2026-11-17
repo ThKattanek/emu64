@@ -35,6 +35,9 @@ public:
     void Reset(void);
     void ClearJAMFlag(void);
     void GetRegister(REG_STRUCT *reg);
+    unsigned char GetSP() const { return SP; }
+    unsigned short GetPC() const { return PC; }
+    bool IsOpcodeFetchNext() const { return *MCT == 0; }   // Naechster Zyklus holt einen Opcode (Befehlsgrenze)
     void SetRegister(REG_STRUCT *reg);
     void GetInterneRegister(IREG_STRUCT *ireg);
     void SET_SR_BIT6(void);
