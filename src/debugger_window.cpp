@@ -1125,7 +1125,11 @@ bool DebuggerWindow::eventFilter(QObject* obj, QEvent* event)
         QMouseEvent* mouse_event = static_cast<QMouseEvent*>(event);
         if(mouse_event->button() == Qt::LeftButton && c64 != nullptr)
         {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
             QPoint pos = mouse_event->position().toPoint();
+#else
+            QPoint pos = mouse_event->pos();
+#endif
             int row = ui->DisAssTable->rowAt(pos.y());
             if(pos.x() >= 0 && pos.x() < 18 && row >= 0 && row < disass_rows)
             {
