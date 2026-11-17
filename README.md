@@ -18,9 +18,10 @@
 - Multi-Plattform Support (Windows, Linux)
 - SDL2-basierte Audio- und Video-Ausgabe, OpenGL mit CRT-Emulation (Shader/Filter)
 - SID wahlweise mit eigener Engine oder reSID (zur Laufzeit wählbar)
-- Bitgenaue 1541-Floppyemulation (D64 mit 35/40/42 Spuren, G64, NIB und NBZ (nur lesend), Fastloader, schwache Bits), Datasette (TAP, T64)
+- Bitgenaue 1541-Floppyemulation (bis zu vier Laufwerke, D64 mit 35/40/42 Spuren, G64, NIB und NBZ (nur lesend), Fastloader, schwache Bits), Datasette (TAP, WAV), T64-Archive
 - Steckmodule (CRT, u.a. EasyFlash), REU und GeoRAM
-- Eingebauter Debugger mit zyklusgenauer Einzelschrittanzeige des Bildaufbaus
+- Eingebauter Debugger für C64 und Floppy: Disassembler/Assembler, Haltepunkte (auch direkt in der Disassembler-Liste setzbar), Speicher-, VIC- und IEC-Fenster, Einzelschritt (Zyklus, Opcode, über JSR) mit zyklusgenauer Anzeige des Bildaufbaus, Fenster in der Größe anpassbar
+- Joystick- und Maus-Unterstützung (Joystick-Zuordnung einstellbar, Maus 1351)
 - Warp-Modus, Videoaufnahme (ffmpeg), Screenshots, Snapshots
 - Kommandozeilenparameter für Autostart und Headless-Läufe (`--nogui`, `--autostart`, `--limitcycles`, ...), siehe [kommandozeilenparameter.txt](kommandozeilenparameter.txt)
 - Tastenbelegung siehe [hotkeys.txt](hotkeys.txt), Änderungen siehe [änderungen.txt](änderungen.txt)
@@ -46,7 +47,8 @@
 - qttools6-dev (Qt6) oder Qt5 inkl. Qt-Tools
 
 #### Erforderliche Bibliotheken
-- qt6 oder qt5
+- qt6 oder qt5 (bei Qt6 zusätzlich Qt5Compat, z.B. `qt6-5compat-dev`)
+- OpenMP (libgomp beim gcc, `libomp-dev` beim clang)
 - sdl2
 - sdl2-image
 - libpng
@@ -105,9 +107,15 @@ xargs rm < install_manifest.txt
 #### Tests
 Die Emulationsgenauigkeit wird mit der VICE-Testbench geprüft, siehe [testbench/README.md](testbench/README.md).
 
+#### Release-Pakete
+- Linux AppImage: `./create_linux_appimage.sh --qt /usr/lib/qt6` (siehe `--help` des Skripts)
+- Windows (32 + 64 Bit) per Cross-Build mit MXE: `./crossbuild-win-releases.sh ~/mxe`
+
 #### Weitere Informationen
 Detaillierte Anleitungen für ein Windows-Build mit MXE:
 - [Windows-Versionen unter Linux mit MXE erstellen](https://github.com/ThKattanek/emu64/wiki/Windows-Build-unter-Linux-mit-MXE-erstellen)
+
+Beschreibungen der Dateiformate (Haltepunkte `.bpt`, SID-Dump `.sdp`, Snapshot `.frz`) liegen im Ordner [doc](doc).
 
 ## Lizenz
 Dieses Projekt ist unter der GNU General Public License v2 (GPLv2) lizenziert. Siehe [LICENSE](LICENSE) für Details.
