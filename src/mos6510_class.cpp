@@ -882,7 +882,7 @@ bool MOS6510::OneZyklus(void)
         //R // SR von SP+0x0100 lesen // I-Flag wirkt erst nach dem naechsten Befehl (wie CLI/SEI)
         case 49:
             CHK_RDY
-                irq_delay_sr_value = SR;
+                irq_delay_sr_value = SR & 0xE7;   // Bit 3/4 sind Merker fuer ein blockiertes SEI
             SR = Read(SP+0x0100)|32;
             irq_delay = true;
             break;
@@ -1166,7 +1166,7 @@ bool MOS6510::OneZyklus(void)
                 i_flag_early = false;
             else
             {
-                irq_delay_sr_value = SR;
+                irq_delay_sr_value = SR & 0xE7;   // Bit 3/4 sind Merker fuer ein blockiertes SEI
                 SR &= 0xFB;
                 irq_delay = true;
             }
@@ -1193,8 +1193,11 @@ bool MOS6510::OneZyklus(void)
         case 75:
             if(!*RDY && !CpuWait)
             {
-                // RDY Wartezyklus im letzten Zyklus: Das I-Flag wird schon beim ersten Versuch geändert
+                // RDY Wartezyklus im letzten Zyklus: Das I-Flag wird schon beim ersten Versuch geändert.
+                // Ein vorher anliegender IRQ wird trotzdem noch angenommen (wie VICE, der alte I-Wert zaehlt)
+                irq_delay_sr_value = (SR & 0xE7) | 0x10 | (irq_is_low_pegel ? 0x08 : 0x00);   // Bit 4: SEI wurde blockiert, Bit 3: IRQ Pegel zu Beginn des Wartens
                 SR |= 0x04;
+                irq_delay = true;
                 i_flag_early = true;
             }
             CHK_RDY
@@ -1203,7 +1206,7 @@ bool MOS6510::OneZyklus(void)
                 i_flag_early = false;
             else
             {
-                irq_delay_sr_value = SR;
+                irq_delay_sr_value = SR & 0xE7;   // Bit 3/4 sind Merker fuer ein blockiertes SEI
                 SR |= 0x04;
                 irq_delay = true;
             }
@@ -1862,7 +1865,10 @@ bool MOS6510::OneZyklus(void)
                 }
                 else
                 {
-                    irq_fetch_decision = irq_is_low_pegel;
+                    // SEI, das im letzten Zyklus auf RDY wartet (z.B. Badline DMA): Wie bei VICE zaehlen die Wartezyklen nicht,
+                    // ein erst waehrend des Wartens aktiv gewordener IRQ wird nach dem SEI nicht mehr angenommen
+                    if(irq_delay && (irq_delay_sr_value & 0x10)) irq_fetch_decision = (irq_delay_sr_value & 0x08) != 0;
+                    else irq_fetch_decision = irq_is_low_pegel;
                     nmi_fetch_decision = nmi_is_active || nmi_fall_edge;
                 }
             }
