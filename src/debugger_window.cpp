@@ -64,7 +64,7 @@ DebuggerWindow::DebuggerWindow(QWidget* parent, QSettings* ini) :
 
     input_window = new InputBoxWindow(this);
 
-    memory_window = new MemoryWindow(this);
+    memory_window = new MemoryWindow(this, ini);
     memory_window->ChangeSource(0);
 
     vic_window = new DebuggerVicWindow(this);

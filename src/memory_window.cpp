@@ -22,15 +22,18 @@
 #include "qdebug.h"
 #include "ui_memory_window.h"
 
-MemoryWindow::MemoryWindow(QWidget *parent) :
+MemoryWindow::MemoryWindow(QWidget *parent, QSettings* ini) :
     QDialog(parent),
     ui(new Ui::MemoryWindow),
     AktViewAdresse(0),
-    NoFocusRun(true)
+    NoFocusRun(true),
+    ini(ini),
+    font_size(10),
+    wheel_zoom_delta(0)
 {
     c64 = 0;
 
-    memory_rows = 17;
+    memory_rows = 0;
 
     ui->setupUi(this);
 
@@ -38,7 +41,6 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
     setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), QGuiApplication::screens()[0]->availableGeometry()));
 
     ui->MemoryTable->setColumnCount(1);
-    ui->MemoryTable->setRowCount(memory_rows);
 
     MemScrDest << "RAM" << "KERNAL" << "BASIC" << "VIC" << "FARBRAM" << "SID" << "CIA1" << "CIA2" << "IO1" << "IO2" << "CHARROM" << "ROM-LO" << "ROM-HI" << "ROM-HI" << "ADR.OPEN";
     FloppyMemScrDest << "RAM" << "VIA1" << "VIA2" << "ROM" << "OPEN";
@@ -80,25 +82,38 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
             family = families.first(); // echte Familie aus der TTF
     }
 
-    QFont font1(family, 10);
+    memory_font = QFont(family, 10);
 
-    for(int i=0;i<memory_rows;i++)
+    for(int i=0; i<MAX_MEMORY_ROW; i++) memory_row[i] = nullptr;
+
+    if(ini != nullptr)
     {
-        memory_row[i] = new WidgetMemoryZeile(&font1, this);
-        ui->MemoryTable->setCellWidget(i,0,memory_row[i]);
-        ui->MemoryTable->setRowHeight(i,memory_row[i]->height()+1);
-        ui->MemoryTable->setColumnWidth(0,memory_row[i]->width());
-        connect(memory_row[i],SIGNAL(ChangeValue(unsigned short,unsigned char)),this,SLOT(onChangeValue(unsigned short,unsigned char)));
-        connect(this,SIGNAL(NoFocus()),memory_row[i],SLOT(onNoFocus()));
+        ini->beginGroup("MemoryWindow");
+        font_size = qBound(6, ini->value("FontSize", 10).toInt(), 40);
+        ini->endGroup();
     }
 
-    WidgetMemoryZeile *w = (WidgetMemoryZeile*)ui->MemoryTable->cellWidget(0,0);
-    w->setEnabled(false);
+    // Kopfzeile (Zeile 0) und eine Datenzeile; die weiteren Zeilen entstehen passend zur Fensterhoehe
+    SetRowCount(2);
+    ApplyFontSize(font_size);
 
-    ui->MemoryTable->setMinimumWidth(w->width());
-    ui->MemoryTable->setMaximumWidth(w->width());
-    ui->MemoryTable->setMinimumHeight((w->height()+1) * memory_rows);
-    ui->MemoryTable->setMaximumHeight((w->height()+1) * memory_rows);
+    bool geometry_restored = false;
+    if(ini != nullptr)
+    {
+        ini->beginGroup("MemoryWindow");
+        if(ini->contains("Geometry")) geometry_restored = restoreGeometry(ini->value("Geometry").toByteArray());
+        ini->endGroup();
+    }
+
+    if(!geometry_restored)
+    {
+        // Ohne gespeicherte Groesse zeigt das Fenster zunaechst 17 Zeilen (Kopfzeile + 16 Datenzeilen)
+        int row_height = memory_row[0]->height() + 1;
+        ui->MemoryTable->setMinimumHeight(17 * row_height + 2 * ui->MemoryTable->frameWidth());
+        layout()->activate();
+        resize(width(), minimumSizeHint().height());
+        ui->MemoryTable->setMinimumHeight(3 * row_height);
+    }
 
     // Mausrad scrollt ueber die Bildlaufleiste (auch ueber den Zeilen-Widgets, die das Rad weiterreichen)
     ui->MemoryTable->installEventFilter(this);
@@ -107,16 +122,117 @@ MemoryWindow::MemoryWindow(QWidget *parent) :
 
 bool MemoryWindow::eventFilter(QObject* obj, QEvent* event)
 {
-    if(event->type() == QEvent::Wheel && (obj == ui->MemoryTable || obj == ui->MemoryTable->viewport()))
+    if(obj == ui->MemoryTable || obj == ui->MemoryTable->viewport())
     {
-        QCoreApplication::sendEvent(ui->MemoryScroll, event);
-        return true;
+        if(event->type() == QEvent::Wheel)
+        {
+            QWheelEvent* wheel_event = static_cast<QWheelEvent*>(event);
+
+            if(wheel_event->modifiers() & Qt::ControlModifier)
+            {
+                // Strg + Mausrad: Schriftgroesse aendern (hochaufloesende Raeder werden aufsummiert)
+                wheel_zoom_delta += wheel_event->angleDelta().y();
+                int notches = wheel_zoom_delta / 120;
+                wheel_zoom_delta -= notches * 120;
+                if(notches != 0) ApplyFontSize(font_size + notches);
+            }
+            else
+            {
+                // Mausrad scrollt ueber die Bildlaufleiste (auch ueber den Zeilen-Widgets, die das Rad weiterreichen)
+                QCoreApplication::sendEvent(ui->MemoryScroll, event);
+            }
+            return true;
+        }
+
+        if(event->type() == QEvent::Resize && obj == ui->MemoryTable->viewport())
+            UpdateRowCountFromSize();
     }
     return QDialog::eventFilter(obj, event);
 }
 
+// Legt die Zeilen an bzw. entfernt sie. Zeile 0 ist die (leere) Kopfzeile, danach folgen die Datenzeilen.
+void MemoryWindow::SetRowCount(int rows)
+{
+    rows = qBound(2, rows, static_cast<int>(MAX_MEMORY_ROW));
+    if(rows == memory_rows) return;
+
+    if(rows < memory_rows)
+    {
+        // Die Zeilen-Widgets werden von der Tabelle geloescht
+        for(int i=rows; i<memory_rows; i++) memory_row[i] = nullptr;
+        ui->MemoryTable->setRowCount(rows);
+    }
+    else
+    {
+        ui->MemoryTable->setRowCount(rows);
+
+        for(int i=memory_rows; i<rows; i++)
+        {
+            memory_row[i] = new WidgetMemoryZeile(&memory_font, this);
+            ui->MemoryTable->setCellWidget(i,0,memory_row[i]);
+            ui->MemoryTable->setRowHeight(i,memory_row[i]->height()+1);
+            connect(memory_row[i],SIGNAL(ChangeValue(unsigned short,unsigned char)),this,SLOT(onChangeValue(unsigned short,unsigned char)));
+            connect(this,SIGNAL(NoFocus()),memory_row[i],SLOT(onNoFocus()));
+        }
+        memory_row[0]->setEnabled(false);
+    }
+
+    memory_rows = static_cast<int16_t>(rows);
+
+    // Letzte moegliche Startadresse, sodass die Datenzeilen noch komplett in $FFFF enden
+    int data_rows = memory_rows - 1;
+    ui->MemoryScroll->setPageStep(data_rows * 16);
+    ui->MemoryScroll->setMaximum(0xFFFF - (data_rows - 1) * 16);
+
+    UpdateMemoryList();
+}
+
+void MemoryWindow::UpdateRowCountFromSize()
+{
+    if(memory_row[0] == nullptr) return;
+
+    int row_height = memory_row[0]->height() + 1;
+    SetRowCount(ui->MemoryTable->viewport()->height() / row_height);
+}
+
+// Aendert die Schrift aller Zeilen; Spaltenbreite, Zeilenhoehe und Fensterbreite passen sich an
+void MemoryWindow::ApplyFontSize(int size)
+{
+    size = qBound(6, size, 40);
+    font_size = size;
+    memory_font.setPointSize(size);
+
+    for(int i=0; i<memory_rows; i++)
+    {
+        memory_row[i]->SetFont(memory_font);
+        ui->MemoryTable->setRowHeight(i, memory_row[i]->height()+1);
+    }
+
+    int row_width = memory_row[0]->width();
+    int row_height = memory_row[0]->height() + 1;
+
+    ui->MemoryTable->setColumnWidth(0, row_width);
+    ui->MemoryTable->setMinimumWidth(row_width);
+    ui->MemoryTable->setMaximumWidth(row_width);
+    ui->MemoryTable->setMinimumHeight(row_height * 3);
+
+    // Fensterbreite an die neue Zeilenbreite anpassen
+    if(layout() != nullptr) layout()->activate();
+    resize(minimumSizeHint().width(), height());
+
+    UpdateRowCountFromSize();
+}
+
 MemoryWindow::~MemoryWindow()
 {
+    if(ini != nullptr)
+    {
+        ini->beginGroup("MemoryWindow");
+        ini->setValue("Geometry", saveGeometry());
+        ini->setValue("FontSize", font_size);
+        ini->endGroup();
+    }
+
     delete ui;
 }
 
@@ -264,9 +380,9 @@ void MemoryWindow::on_jump_address_returnPressed()
 
     ui->MemoryScroll->setValue(value);
 
-    if(value < 0xff10)
-        memory_row[1]->SelectColumb(value % 16);
-    else
-        memory_row[16 - ((0xffff - value) / 16)]->SelectColumb(value % 16);
+    // Zeile der Adresse relativ zur (durch die Leiste begrenzten) Startadresse; Zeile 0 ist die Kopfzeile
+    int row = 1 + (value - AktViewAdresse) / 16;
+    if(row >= 1 && row < memory_rows && memory_row[row] != nullptr)
+        memory_row[row]->SelectColumb(value % 16);
 }
 

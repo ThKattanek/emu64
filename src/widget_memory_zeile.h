@@ -32,6 +32,7 @@ public:
     ~WidgetMemoryZeile();
     void Fill(unsigned short adr, unsigned char* byte_puffer,QString ReadSource,QString WriteDestination);
     void SelectColumb(uint8_t columb);
+    void SetFont(const QFont& font);
 
 private slots:
     void on_EditValue_0_editingFinished();

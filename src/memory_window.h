@@ -18,6 +18,7 @@
 
 #include <QDialog>
 #include <QTableWidgetItem>
+#include <QSettings>
 
 #include "c64_class.h"
 #include "widget_memory_zeile.h"
@@ -33,7 +34,7 @@ class MemoryWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit MemoryWindow(QWidget *parent = 0);
+    explicit MemoryWindow(QWidget *parent = 0, QSettings* ini = nullptr);
     ~MemoryWindow();
     void RetranslateUi();
     void SetC64Pointer(C64Class *_c64);
@@ -68,6 +69,14 @@ private:
     QStringList MemScrDest;
     QStringList FloppyMemScrDest;
 
+    void SetRowCount(int rows);
+    void UpdateRowCountFromSize();
+    void ApplyFontSize(int size);
+
+    QSettings *ini;
+    QFont memory_font;
+    int font_size;
+    int wheel_zoom_delta;
     int16_t memory_rows;
     WidgetMemoryZeile *memory_row[MAX_MEMORY_ROW];
 };
