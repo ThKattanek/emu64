@@ -163,7 +163,7 @@ void MOS6502::GetInterneRegister(IREG_STRUCT* ireg)
     ireg->address = Adresse;
     ireg->branch_address = BranchAdresse;
     ireg->tmp_byte = TMPByte;
-    ireg->irq = irq_state;
+    ireg->irq = irq_state & 0x7F;
     ireg->reset = *RESET;
 }
 
@@ -233,6 +233,7 @@ inline unsigned char MOS6502::Read(unsigned short adresse)
 
 inline void MOS6502::Write(unsigned short adresse, unsigned char wert)
 {
+    if(irq_is_low_pegel) irq_state |= 0x80;
     if(Breakpoints[adresse] & 32)
     {
         *BreakStatus |=32;
@@ -262,10 +263,13 @@ bool MOS6502::OneZyklus(void)
     }
 
     // IRQ auf low Pegel prüfen
+    // Bit 7 von irq_state: Die CPU hat im Takt davor geschrieben, waehrend die Leitung aktiv war (z.B. Dummy Write eines RMW Befehls).
+    // Der Pegel bleibt fuer die Interrupt Entscheidung einen Takt erhalten (wie beim 6510 / IK_IRQPEND in VICE).
     if(irq_state > 0)
         irq_is_low_pegel = true;
     else
         irq_is_low_pegel = false;
+    irq_state &= 0x7F;
 
     switch(*MCT)
     {
