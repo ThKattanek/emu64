@@ -1,0 +1,7 @@
+== Floppy 1541 II
+
+// Geplant: Laufwerke, Images (D64, G64, NIB, NBZ), Verzeichnis, neues D64, Floppy-Sounds
+// Platzhalter-Bild: image::floppy_window.png[] // Das Fenster Floppy 1541 II
+// Platzhalter-Bild: image::floppy_neues_d64.png[] // Ein neues Diskimage anlegen
+// Platzhalter-Bild: image::floppy_seitenleiste.png[] // Der FileBrowser mit Seitenleiste
+// Platzhalter-Bild: image::floppy_status.png[] // Statusanzeige der Laufwerke

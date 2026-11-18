@@ -1,0 +1,220 @@
+== File Formats
+
+Emu64 uses its own file formats for three purposes: breakpoints (`+.bpt+`), SID dumps (`+.sdp+`) and snapshots (`+.frz+`). All numbers are *little-endian*, there is no alignment (padding) between fields. The formats are read and written by Emu64 only.
+
+The original descriptions are located in the `+doc/+` directory of the source code. The snapshot description there (`+Fileformat_Snapshot_[frz]_Version1.md+`) additionally lists all fields of every chunk.
+
+=== Breakpoints (.bpt)
+
+The debugger stores its breakpoint groups here. A group combines several conditions. At most 255 groups are possible. Emu64 writes version 2 and reads versions 1 and 2.
+
+*File header*
+
+[cols="2,1,3,5",options="header"]
+|===
+|Offset |Bytes |Content |Meaning
+
+|0x00 – 0x09
+|10
+|`+EMU64_BPT+` with terminating 0
+|Signature
+
+|0x0A
+|1
+|`+2+`
+|Version
+
+|0x0B
+|1
+|Count
+|Number of breakpoint groups (maximum 255)
+
+|===
+
+*Breakpoint group*
+
+The groups follow one after the other, in version 2 each is 163 bytes long. The offsets are relative to the start of a group. A switch is 1 byte (0 = disabled, greater than 0 = enabled), addresses, values and lengths are 16 bit.
+
+[cols="1,1,3,6",options="header"]
+|===
+|Offset |Bytes |Field |Meaning
+
+|0
+|128
+|Name
+|Group name as a string with terminating 0 (128 bytes reserved)
+
+|128
+|1
+|Group enabled
+|0 = disabled, greater than 0 = enabled
+
+|129
+|1 + 2
+|PC
+|Switch + address
+
+|132
+|1 + 2
+|AC
+|Switch + value
+
+|135
+|1 + 2
+|XR
+|Switch + value
+
+|138
+|1 + 2
+|YR
+|Switch + value
+
+|141
+|1 + 2 + 2
+|Read from address
+|Switch + address + length of the range (since version 2)
+
+|146
+|1 + 2 + 2
+|Write to address
+|Switch + address + length of the range (since version 2)
+
+|151
+|1 + 2
+|Read value
+|Switch + value
+
+|154
+|1 + 2
+|Write value
+|Switch + value
+
+|157
+|1 + 2
+|Raster line
+|Switch + raster line
+
+|160
+|1 + 2
+|Raster line cycle
+|Switch + cycle
+
+|===
+
+Version 1 has 159 bytes per group: the two length fields for "Read from address" and "Write to address" are missing. When a version 1 file is loaded the length is set to 1.
+
+=== SID Dump (.sdp)
+
+A SID dump contains all values that were written into the SID registers over a period of time, together with the time distance between the writes. This makes it possible to drive a real or emulated SID without emulating the other C64 components.
+
+The file starts with the identifier `+SID_DUMP+` (8 bytes, no terminating 0). It is followed by a stream of packets of 3 or 4 bytes up to the end of the file, appended without gaps.
+
+[cols="1,3,6",options="header"]
+|===
+|Byte |Bits |Meaning
+
+|0
+|0 – 4
+|Number of the SID register
+
+|0
+|5 (size flag)
+|0 = wait cycles smaller than 256 (1 byte), 1 = greater than 255 (2 bytes)
+
+|1
+|0 – 7
+|Value written into the SID register
+
+|2
+|0 – 7
+|Wait cycles (with size flag 0)
+
+|2 – 3
+|0 – 15
+|Wait cycles, 16 bit little-endian (with size flag 1)
+
+|===
+
+The wait cycles are the C64 cycles that have passed since the previous packet. For more than 65535 cycles the value is limited to 65535.
+
+=== Snapshot (.frz)
+
+A Quick C64 Snapshot (for operation see the chapter "Snapshots") contains the complete state of the C64. This is what allows the emulation to continue cycle-exact at the same place after loading. Disk, tape and cartridge contents are embedded, the file is not compressed.
+
+*File structure*
+
+[cols="2,5",options="header"]
+|===
+|Part |Content
+
+|Header (12 bytes) |Magic `+EMU64FRZ+` (8 bytes), format version (u16, currently 1), reserved (u16, 0)
+|Chunks |Any number of chunks one after the other
+|Checksum (4 bytes) |CRC-32 (like zlib/PNG) over all bytes before it
+|===
+
+*Chunk structure*
+
+[cols="1,1,5",options="header"]
+|===
+|Offset |Bytes |Content
+
+|0 |4 |Tag (ASCII, padded with spaces, e.g. `+CPU +`)
+|4 |2 |Chunk version
+|6 |4 |Length of the data in bytes
+|10 |Length |Data
+|===
+
+A chunk with an unknown tag is skipped when loading, using its length. Read accesses are limited to the chunk length, so a damaged chunk can never read beyond its end. Pointers are never stored, pointers in tables are stored as offsets.
+
+*Chunks*
+
+[cols="1,4",options="header"]
+|===
+|Tag |Content
+
+|`+MAIN+`
+|C64 in general: cycle counter, reset state, lines, IEC bus, active SID engine, expansion source
+
+|`+CPU +`
+|MOS 6510 including interrupt state and CPU port
+
+|`+MMU +`
+|64 KiB RAM and 1 KiB color RAM
+
+|`+CIA1, CIA2+`
+|All registers, timers, interrupt logic, TOD, shift register, ports
+
+|`+VIC +`
+|VIC-II including raster/cycle position, pipelines and both video buffers (chunk version 2)
+
+|`+SID1, SID2+`
+|Own SID engine for SID 1 and SID 2
+
+|`+RSD1, RSD2+`
+|reSID for SID 1 and SID 2
+
+|`+FLP0 – FLP3+`
+|Floppy 1541 (active drives only): RAM, 6502, VIAs, rotation, head, complete GCR disk content
+
+|`+TAPE+`
+|Datasette: tape position, keys, motor, complete TAP content
+
+|`+CRT +`
+|Cartridge: type, registers, ROM banks, flash state, RAM
+
+|`+REU  / GEO +`
+|REU or GeoRAM (depending on the expansion source): registers, size, RAM content
+
+|===
+
+Every chunk has chunk version 1, only `+VIC +` has version 2. The order in the file does not matter when loading, every chunk is looked up by its tag.
+
+*Versioning*
+
+* The format version in the header only changes for incompatible changes to the structure. Emu64 rejects files with a greater format version.
+* If the content of a chunk changes, its chunk version is increased. The reading code keeps supporting the old versions.
+* New components are added as new chunks. Older Emu64 versions skip unknown chunks.
+* The old freeze format of Emu64 up to version 4.4 (Windows) is not supported.
+
+*Not saved* are ROM contents (they come from the active ROM set), the configuration, input devices, running autostart input, the debugger state, audio buffers and WAV tapes.
+

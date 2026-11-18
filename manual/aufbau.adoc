@@ -1,0 +1,4 @@
+== Aufbau des Emulators
+
+// Geplant: CPU, VIC-II, CIA, SID (eigene Engine und reSID), Floppy (GCR), Erweiterungen
+// Platzhalter-Bild: image::aufbau_blockdiagramm.png[] // Aufbau von Emu64 im Überblick

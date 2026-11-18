@@ -1,0 +1,192 @@
+== Kommandozeile
+
+Emu64 lässt sich mit Parametern auf der Kommandozeile steuern. Das ist nützlich für Skripte, automatische Testläufe und zum „Fernsteuern“ einer laufenden Instanz.
+
+....
+emu64 [PARAMETER]
+....
+
+// Platzhalter: Screenshot des Terminals (images/kommandozeile_help.png)
+.Ausgabe von emu64 --help im Terminal
+image::kommandozeile_help.png[]
+
+Wird Emu64 ohne den Parameter `+--multiple-instance+` aufgerufen, prüft es, ob schon eine Emu64-Instanz läuft. Ist das der Fall, werden alle Parameter an diese Instanz weitergereicht und der neue Aufruf beendet sich sofort. So kann man Emu64 sozusagen fernsteuern.
+
+[IMPORTANT]
+====
+Bei automatischen Testläufen immer `+--multiple-instance+` angeben. Ohne diesen Parameter reicht Emu64 die Argumente an eine laufende Instanz weiter und beendet sich sofort mit Exitcode 0.
+====
+
+=== Schreibweise
+
+* Argumente in `+<>+` müssen angegeben werden, sonst gibt Emu64 eine Fehlermeldung aus.
+* Argumente in `+[]+` sind optional.
+* Überall, wo eine Zahl erwartet wird, kann sie auch hexadezimal angegeben werden, indem man `+0x+` voranstellt (Beispiel: `+0xff+`).
+
+=== Programme und Datenträger laden
+
+`+-a, --autostart <Dateiname>+`::
+Lädt ein C64-Programm (PRG, T00 ...) oder ein Diskimage (D64, G64, NIB, NBZ) und startet es gleich.
+
+`+--autostart-prg-mode <Modus>+`::
+Legt fest, wie ein PRG mit `+--autostart+` gestartet wird. Muss vor `+--autostart+` angegeben werden.
++
+`+1+` = PRG direkt in den RAM injizieren (Standard) +
+`+2+` = PRG in ein erzeugtes D64 kopieren, in Laufwerk 8 mounten und per `+LOAD"NAME",8,1+` laden (wie VICE `+-autostartprgmode 2+`; ersetzt ein dort gemountetes Image)
+
+`+-m, --mount-disk <Laufwerksnummer> <Dateiname>+`::
+Mountet ein Diskimage (D64, G64, NIB, NBZ). Die Laufwerksnummer muss zwischen 8 und 11 liegen. NIB-Images (nibtools, MNIB-1541-RAW) und NBZ (komprimiertes NIB) werden nur gelesen, Schreibzugriffe der Floppy bleiben im Speicher. Beispiel: `+--mount-disk 8 ~\c64\test.d64+`
+
+`+--mount-crt <Dateiname>+`::
+Steckt ein Modulimage in den Expansionport.
+
+`+--umount-crt+`::
+Entfernt ein Modulimage aus dem Expansionport.
+
+=== Reset und Speicher
+
+`+-r, --soft-reset+`::
+Führt einen Softreset durch.
+
+`+-R, --hard-reset+`::
+Führt einen Hardreset durch.
+
+`+--poke64 <Adresse (0-65535)> <Wert (0-255)>+`::
+Schreibt ein Byte an eine C64-Adresse.
+
+=== Erweiterungen und Chip-Modelle
+
+`+--enable-georam+`::
+Aktiviert die GeoRAM.
+
+`+--set-georam-size+`::
+Setzt die Größe des GeoRAM-Speichers in KiB (512, 1024, 2048, 4096).
+
+`+--enable-reu+`::
+Aktiviert die REU.
+
+`+--set-reu-size+`::
+Setzt die Größe des REU-Speichers in KiB (128, 256, 512, 1024, 2048, 4096, 8192, 16384).
+
+`+--set-sid-engine <Engine>+`::
+Setzt die SID-Emulations-Engine: `+0+` = Emu64, `+1+` = reSID.
+
+`+--set-sidtype+`::
+Setzt den Typ des ersten SIDs: `+0+` = MOS-6581, `+1+` = MOS-8580.
+
+`+--set-vicmodel <Modell>+`::
+Setzt das Modell des VIC-II (gilt nur für diesen Start): `+0+` = MOS-6569, `+1+` = MOS-8565 (C64C).
+
+`+--set-ciamodel <Modell>+`::
+Setzt das Modell der beiden CIAs (gilt nur für diesen Start): `+0+` = MOS-6526 (alt), `+1+` = MOS-6526A (neu).
+
+=== Anzeige und Ton
+
+`+--use-sdl-renderer+`::
+Startet Emu64 mit dem SDL-Renderer. Hilft, wenn kein C64-Bild dargestellt wird (z.B. in einer virtuellen Maschine).
+
+`+--nosplash+`::
+Der Splashscreen wird beim Start nicht angezeigt.
+
+`+--nogui+`::
+Es werden keine Fenster angezeigt. Vorsicht: Sollte nur zusammen mit `+--limitcycles+` verwendet werden.
+
+`+--nosound+`::
+Die Audio-Ausgabe wird stumm geschaltet (die Emulation läuft unverändert weiter). Bei `+--nogui+` automatisch aktiv. Eine Videoaufnahme (`+--video-capture+`) enthält weiterhin den Ton.
+
+`+--minimized+`::
+Emu64 wird mit minimierten Fenstern gestartet.
+
+`+--double-texture-off+`::
+Die Video-Ausgabetextur wird temporär nicht verdoppelt. Die Fenstergröße wird beim Beenden nicht gespeichert.
+
+`+--video-filter-off+`::
+Die Video-CRT-Emulation wird temporär ausgeschaltet.
+
+`+--set-palette <Palettennummer>+`::
+Setzt eine der internen C64-Farbpaletten: `+0+` = EMU64-NEU, `+1+` = EMU64-ALT, `+2+` = CCS64, `+3+` = PC64, `+4+` = C64S, `+5+` = VICE, `+6+` = FRODO, `+7+` = PEPTO, `+8+` = Colodore, `+9+` = SW.
+
+`+--video-capture <Dateiname>+`::
+Startet die Aufzeichnung des C64-Bildschirms.
+
+=== Geschwindigkeit und Testläufe
+
+`+--warp+`::
+Aktiviert den Warp-Modus (maximale C64-Geschwindigkeit, kein Ton).
+
+`+--limitcycles <nZyklen>+`::
+Beendet den Emulator mit Exitcode 1, sobald n Zyklen seit dem Ende des letzten Resets vergangen sind (unabhängig davon, wann die Kommandozeile verarbeitet wurde; Läufe enden so immer am gleichen Zyklus).
+
+`+--exitscreenshot <Dateiname>+`::
+Speichert vor dem Beenden noch einen Screenshot als PNG.
+
+`+--debugcart+`::
+Beendet Emu64 bei einem Schreibzugriff auf `+$d7ff+` und gibt den Wert als Exitcode zurück.
+
+=== Snapshots
+
+Details zu Snapshots stehen im Kapitel „Snapshots“. Mit diesen Parametern lassen sich Fehler ab einem festen Zustand reproduzieren.
+
+`+--load-snapshot <Dateiname>+`::
+Lädt einen Quick C64 Snapshot (`+*.frz+`). Danach zählen `+--limitcycles+`, `+--snapshot-at+` und `+--snapshot-selftest+` ab dem Zeitpunkt des Ladens. Der Snapshot ersetzt den kompletten Zustand des C64; Parameter, die den Zustand ändern (`+--autostart+`, `+--mount-disk+`, `+--poke64+`, Resets), sollten daher nicht mit ihm kombiniert werden. Der Snapshot muss zur eingestellten Norm (PAL/NTSC) passen. Kann er nicht geladen werden, gibt Emu64 eine Meldung aus und beendet sich mit Exitcode 2.
+
+`+--save-snapshot <Dateiname>+`::
+Speichert einen Quick C64 Snapshot, sobald die mit `+--snapshot-at+` angegebene Zyklenzahl erreicht ist. Die Emulation läuft danach weiter (z.B. bis `+--limitcycles+`). Es wird kein Vorschaubild (PNG) angelegt. Gehört immer zusammen mit `+--snapshot-at+`.
+
+`+--snapshot-at <nZyklen>+`::
+Zeitpunkt für `+--save-snapshot+` in Zyklen seit dem Ende des letzten Resets (wie `+--limitcycles+`), bzw. seit dem Laden mit `+--load-snapshot+`. Der Snapshot wird zyklusgenau zwischen zwei Zyklen erzeugt.
+
+`+--snapshot-selftest <StartZyklen> <LaufZyklen>+`::
+Prüft, ob Speichern und Laden den Zustand exakt wiederherstellen: Bei StartZyklen wird der Zustand gesichert, LaufZyklen weiter emuliert und der Endzustand gesichert. Danach wird der erste Zustand geladen, wieder LaufZyklen emuliert und der Endzustand gesichert. Beide Endzustände müssen gleich sein (Vergleich je Chunk). Das Ergebnis wird auf der Konsole ausgegeben, Emu64 danach beendet. Der reSID-`+rate_counter+` wird beim Vergleich ignoriert (bekannte Grenze von reSID).
+
+=== Sonstiges
+
+`+--multiple-instance+`::
+Ermöglicht das Starten mehrerer Emu64-Instanzen.
+
+`+--reset-ini+`::
+Setzt die `+emu64.ini+` zurück. *Alle bisherigen Einstellungen gehen verloren!*
+
+`+--data-path <Pfad>+`::
+Angabe eines benutzerdefinierten Pfads für roms, floppy_sounds, gfx und languages.
+
+`+-?, --help+`::
+Ein Hilfetext wird angezeigt und Emu64 wird nicht gestartet.
+
+`+--version+`::
+Zeigt die aktuelle Emu64-Versionsnummer an.
+
+=== Exitcodes
+
+[cols="1,5",options="header"]
+|===
+|Exitcode |Bedeutung
+
+|0 |Normales Beenden; bei `+--snapshot-selftest+`: Zustand identisch
+|1 |`+--limitcycles+` erreicht; bei `+--snapshot-selftest+`: Unterschied im Zustand
+|2 |Fehler beim Laden oder Speichern eines Snapshots
+|Wert |Bei `+--debugcart+`: der nach `+$d7ff+` geschriebene Wert
+|===
+
+=== Beispiele
+
+Snapshot laden, 500000 Zyklen laufen lassen und einen Screenshot speichern, ohne Fenster:
+
+[source,bash]
+----
+emu64 --multiple-instance --nogui --load-snapshot fehler.frz --limitcycles 500000 --exitscreenshot ende.png
+----
+
+Einen Snapshot zyklusgenau nach 8000000 Zyklen speichern:
+
+[source,bash]
+----
+emu64 --multiple-instance --autostart spiel.d64 --save-snapshot vor_fehler.frz --snapshot-at 8000000 --limitcycles 8100000
+----
+
+Speichern und Laden von Snapshots prüfen:
+
+[source,bash]
+----
+emu64 --multiple-instance --nogui --autostart spiel.d64 --snapshot-selftest 6000000 400000
+----

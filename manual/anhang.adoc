@@ -1,0 +1,272 @@
+[appendix]
+== Hotkeys
+
+Stand: 15.11.2026
+
+=== Im C64-Fenster (SDL-Fenster)
+
+[cols="2,5",options="header"]
+|===
+|Taste |Funktion
+
+|`+F11+`
+|Screenshot vom C64-Bildschirm
+
+|`+F12+`
+|Softreset (der C64-RAM bleibt erhalten)
+
+|`+SHIFT+F12+`
+|Hardreset (wie Aus- und Einschalten des C64)
+
+|`+ALT+Return+`
+|Vollbild an / aus
+
+|`+ALT+J+`
+|Tauscht die Joystick-Port-Belegung (Port 1 und Port 2 vertauschen)
+
+|`+ALT+W+`
+|Schaltet den Warp-Modus an oder aus
+
+|`+ALT+1 .. ALT+0+`
+|Quick C64 Snapshot: Slot 1 bis 10 laden (0 = Slot 10)
+
+|`+ALT+SHIFT+1 .. ALT+SHIFT+0+`
+|Quick C64 Snapshot: Slot 1 bis 10 speichern (0 = Slot 10)
+
+|`+Medientaste Weiter+`
+|Nächstes Diskimage in der Floppy einlegen
+
+|`+Medientaste Zurück+`
+|Vorheriges Diskimage in der Floppy einlegen
+
+|===
+
+Die Hotkeys mit `+ALT+` werden nicht an den C64 weitergegeben.
+
+==== Maus im C64-Fenster
+
+[cols="2,5",options="header"]
+|===
+|Taste |Funktion
+
+|`+STRG (links) + Linke Maustaste+`
+|Maus 1351 (C64-Maus) an / aus
+
+|`+Linke Maustaste+`
+|Linke Taste der C64-Maus (nur wenn die Maus 1351 aktiv ist)
+
+|`+Rechte Maustaste+`
+|Rechte Taste der C64-Maus (nur wenn die Maus 1351 aktiv ist)
+
+|===
+
+=== Im Hauptfenster
+
+Menü-Shortcuts, die nur gelten, wenn das Hauptfenster den Fokus hat.
+
+[cols="2,5",options="header"]
+|===
+|Taste |Funktion
+
+|`+ALT+R+`
+|Autostart (Datei auswählen und starten)
+
+|`+ALT+L+`
+|C64-Programme direkt laden
+
+|`+ALT+D+`
+|Floppy 1541 II (Fenster ein-/ausblenden)
+
+|`+ALT+K+`
+|Datasette 1530 (Fenster ein-/ausblenden)
+
+|`+ALT+M+`
+|Steckmodule (Fenster ein-/ausblenden)
+
+|`+F11+`
+|Screenshot
+
+|`+F12+`
+|Softreset
+
+|`+SHIFT+F12+`
+|Hardreset
+
+|`+ALT+Return+`
+|Vollbild
+
+|`+ALT+X+`
+|Emu64 beenden
+
+|===
+
+=== C64-Tastatur (Standardbelegung)
+
+Die normalen Tasten entsprechen der PC-Tastatur. Die aktuelle Belegung zeigt das Fenster „Aktuelles C64 Key Mapping“ (Menü Hilfe / C64 Tastenbelegung anzeigen).
+
+// Platzhalter: Screenshot des Fensters (images/hotkeys_tastenbelegung.png)
+.Das Fenster „Aktuelles C64 Key Mapping“
+image::hotkeys_tastenbelegung.png[]
+
+Besondere C64-Tasten:
+
+[cols="2,5",options="header"]
+|===
+|PC-Taste |C64-Taste
+
+|`+Backspace+`
+|INST/DEL
+
+|`+Entf+`
+|RESTORE
+
+|`+Tab+`
+|RUN/STOP
+
+|`+<+`
+|Commodore-Taste
+
+|`+STRG (links)+`
+|CONTROL
+
+|`+Cursor-Tasten+`
+|CRSR (hoch / runter / links / rechts)
+
+|`+F1 .. F8+`
+|F1 .. F8 des C64
+
+|`+Shift links / rechts+`
+|SHIFT links / rechts
+
+|===
+
+Die Belegung kann im Menü „C64 Tastaturbelegung ändern“ für jede Taste neu aufgezeichnet und mit „C64 Tastaturbelegung zurücksetzen“ wieder auf diese Standardwerte gestellt werden.
+
+[appendix]
+== Kommandozeilenparameter
+
+Kurzübersicht aller Parameter. Eine ausführliche Beschreibung mit Beispielen steht im Kapitel „Kommandozeile“.
+
+[cols="2,5",options="header"]
+|===
+|Parameter |Kurzbeschreibung
+
+|`+-a, --autostart <Dateiname>+`
+|Lädt ein C64-Programm oder Diskimage und startet es
+
+|`+--autostart-prg-mode <Modus>+`
+|Startart eines PRG bei --autostart (1 = RAM, 2 = D64)
+
+|`+-m, --mount-disk <Nr> <Dateiname>+`
+|Mountet ein Diskimage in Laufwerk 8 bis 11
+
+|`+--mount-crt <Dateiname>+`
+|Steckt ein Modulimage in den Expansionport
+
+|`+--umount-crt+`
+|Entfernt das Modul
+
+|`+-r, --soft-reset+`
+|Softreset
+
+|`+-R, --hard-reset+`
+|Hardreset
+
+|`+--poke64 <Adresse> <Wert>+`
+|Schreibt ein Byte in den C64-Speicher
+
+|`+--warp+`
+|Aktiviert den Warp-Modus
+
+|`+--limitcycles <nZyklen>+`
+|Beendet Emu64 nach n Zyklen mit Exitcode 1
+
+|`+--load-snapshot <Dateiname>+`
+|Lädt einen Quick C64 Snapshot
+
+|`+--save-snapshot <Dateiname>+`
+|Speichert einen Snapshot (mit --snapshot-at)
+
+|`+--snapshot-at <nZyklen>+`
+|Zeitpunkt für --save-snapshot
+
+|`+--snapshot-selftest <Start> <Lauf>+`
+|Prüft Speichern und Laden von Snapshots
+
+|`+--nosplash+`
+|Kein Splashscreen
+
+|`+--nogui+`
+|Keine Fenster
+
+|`+--nosound+`
+|Audio stumm
+
+|`+--minimized+`
+|Fenster minimiert starten
+
+|`+--double-texture-off+`
+|Video-Textur nicht verdoppeln
+
+|`+--video-filter-off+`
+|Video-CRT-Emulation ausschalten
+
+|`+--use-sdl-renderer+`
+|SDL-Renderer verwenden
+
+|`+--set-palette <Nr>+`
+|Farbpalette wählen (0 bis 9)
+
+|`+--exitscreenshot <Dateiname>+`
+|Screenshot vor dem Beenden
+
+|`+--debugcart+`
+|Beenden bei Schreibzugriff auf $d7ff
+
+|`+--enable-georam, --set-georam-size+`
+|GeoRAM aktivieren und Größe setzen
+
+|`+--enable-reu, --set-reu-size+`
+|REU aktivieren und Größe setzen
+
+|`+--set-sid-engine <Engine>+`
+|SID-Engine (0 = Emu64, 1 = reSID)
+
+|`+--set-sidtype <Typ>+`
+|Typ des ersten SIDs
+
+|`+--set-vicmodel <Modell>+`
+|VIC-II-Modell
+
+|`+--set-ciamodel <Modell>+`
+|CIA-Modell
+
+|`+--multiple-instance+`
+|Mehrere Emu64-Instanzen erlauben
+
+|`+--reset-ini+`
+|emu64.ini zurücksetzen
+
+|`+--video-capture <Dateiname>+`
+|Startet die Videoaufnahme
+
+|`+--data-path <Pfad>+`
+|Benutzerdefinierter Datenpfad
+
+|`+-?, --help+`
+|Hilfetext anzeigen
+
+|`+--version+`
+|Versionsnummer anzeigen
+
+|===
+
+[appendix]
+== Änderungen
+
+// Geplant: Übersicht der Änderungen (Quelle: änderungen.txt)
+
+[appendix]
+== Links
+
+// Geplant: Homepage, GitHub, Forum

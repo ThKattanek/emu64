@@ -1,0 +1,4 @@
+== Emulator Architecture
+
+// Planned: CPU, VIC-II, CIA, SID (own engine and reSID), floppy (GCR), expansions
+// Placeholder image: image::en/aufbau_blockdiagramm.png[] // Overview of the Emu64 architecture

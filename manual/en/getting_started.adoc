@@ -1,0 +1,3 @@
+== Getting Started
+
+// Planned: loading and starting programs, reset, ROM sets

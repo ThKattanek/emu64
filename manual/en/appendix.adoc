@@ -1,0 +1,272 @@
+[appendix]
+== Hotkeys
+
+As of: 2026-11-15
+
+=== In the C64 Window (SDL Window)
+
+[cols="2,5",options="header"]
+|===
+|Key |Function
+
+|`+F11+`
+|Screenshot of the C64 screen
+
+|`+F12+`
+|Soft reset (C64 RAM is kept)
+
+|`+SHIFT+F12+`
+|Hard reset (like switching the C64 off and on)
+
+|`+ALT+Return+`
+|Fullscreen on / off
+
+|`+ALT+J+`
+|Swaps the joystick port assignment (port 1 and port 2)
+
+|`+ALT+W+`
+|Switches warp mode on or off
+
+|`+ALT+1 .. ALT+0+`
+|Quick C64 Snapshot: load slot 1 to 10 (0 = slot 10)
+
+|`+ALT+SHIFT+1 .. ALT+SHIFT+0+`
+|Quick C64 Snapshot: save slot 1 to 10 (0 = slot 10)
+
+|`+Media key Next+`
+|Insert the next disk image into the floppy
+
+|`+Media key Previous+`
+|Insert the previous disk image into the floppy
+
+|===
+
+Hotkeys with `+ALT+` are not passed on to the C64.
+
+==== Mouse in the C64 Window
+
+[cols="2,5",options="header"]
+|===
+|Key |Function
+
+|`+CTRL (left) + Left mouse button+`
+|Mouse 1351 (C64 mouse) on / off
+
+|`+Left mouse button+`
+|Left button of the C64 mouse (only when the 1351 mouse is active)
+
+|`+Right mouse button+`
+|Right button of the C64 mouse (only when the 1351 mouse is active)
+
+|===
+
+=== In the Main Window
+
+Menu shortcuts that only apply while the main window has the focus.
+
+[cols="2,5",options="header"]
+|===
+|Key |Function
+
+|`+ALT+R+`
+|Autostart (choose a file and start it)
+
+|`+ALT+L+`
+|Load C64 programs directly
+
+|`+ALT+D+`
+|Floppy 1541 II (show/hide window)
+
+|`+ALT+K+`
+|Datasette 1530 (show/hide window)
+
+|`+ALT+M+`
+|Cartridges (show/hide window)
+
+|`+F11+`
+|Screenshot
+
+|`+F12+`
+|Soft reset
+
+|`+SHIFT+F12+`
+|Hard reset
+
+|`+ALT+Return+`
+|Fullscreen
+
+|`+ALT+X+`
+|Quit Emu64
+
+|===
+
+=== C64 Keyboard (Default Mapping)
+
+The normal keys correspond to the PC keyboard. The current mapping is shown by the window "Current C64 Key Mapping" (menu Help / Show C64 key mapping).
+
+// Placeholder: screenshot of the window (images/en/hotkeys_tastenbelegung.png)
+.The window "Current C64 Key Mapping"
+image::en/hotkeys_tastenbelegung.png[]
+
+Special C64 keys:
+
+[cols="2,5",options="header"]
+|===
+|PC key |C64 key
+
+|`+Backspace+`
+|INST/DEL
+
+|`+Del+`
+|RESTORE
+
+|`+Tab+`
+|RUN/STOP
+
+|`+<+`
+|Commodore key
+
+|`+CTRL (left)+`
+|CONTROL
+
+|`+Cursor keys+`
+|CRSR (up / down / left / right)
+
+|`+F1 .. F8+`
+|F1 .. F8 of the C64
+
+|`+Shift left / right+`
+|SHIFT left / right
+
+|===
+
+The mapping can be re-recorded for every key with the menu "Change C64 key mapping" and reset to these defaults with "Reset C64 key mapping".
+
+[appendix]
+== Command Line Parameters
+
+Short overview of all parameters. A detailed description with examples can be found in the chapter "Command Line".
+
+[cols="2,5",options="header"]
+|===
+|Parameter |Short description
+
+|`+-a, --autostart <file>+`
+|Loads a C64 program or disk image and starts it
+
+|`+--autostart-prg-mode <mode>+`
+|How a PRG is started by --autostart (1 = RAM, 2 = D64)
+
+|`+-m, --mount-disk <no> <file>+`
+|Mounts a disk image in drive 8 to 11
+
+|`+--mount-crt <file>+`
+|Inserts a cartridge image into the expansion port
+
+|`+--umount-crt+`
+|Removes the cartridge
+
+|`+-r, --soft-reset+`
+|Soft reset
+
+|`+-R, --hard-reset+`
+|Hard reset
+
+|`+--poke64 <address> <value>+`
+|Writes a byte into C64 memory
+
+|`+--warp+`
+|Enables warp mode
+
+|`+--limitcycles <nCycles>+`
+|Quits Emu64 after n cycles with exit code 1
+
+|`+--load-snapshot <file>+`
+|Loads a Quick C64 Snapshot
+
+|`+--save-snapshot <file>+`
+|Saves a snapshot (with --snapshot-at)
+
+|`+--snapshot-at <nCycles>+`
+|Point in time for --save-snapshot
+
+|`+--snapshot-selftest <start> <run>+`
+|Tests saving and loading of snapshots
+
+|`+--nosplash+`
+|No splash screen
+
+|`+--nogui+`
+|No windows
+
+|`+--nosound+`
+|Mute audio
+
+|`+--minimized+`
+|Start with minimized windows
+
+|`+--double-texture-off+`
+|Do not double the video texture
+
+|`+--video-filter-off+`
+|Switch off the video CRT emulation
+
+|`+--use-sdl-renderer+`
+|Use the SDL renderer
+
+|`+--set-palette <no>+`
+|Choose a color palette (0 to 9)
+
+|`+--exitscreenshot <file>+`
+|Screenshot before quitting
+
+|`+--debugcart+`
+|Quit on a write access to $d7ff
+
+|`+--enable-georam, --set-georam-size+`
+|Enable GeoRAM and set its size
+
+|`+--enable-reu, --set-reu-size+`
+|Enable REU and set its size
+
+|`+--set-sid-engine <engine>+`
+|SID engine (0 = Emu64, 1 = reSID)
+
+|`+--set-sidtype <type>+`
+|Type of the first SID
+
+|`+--set-vicmodel <model>+`
+|VIC-II model
+
+|`+--set-ciamodel <model>+`
+|CIA model
+
+|`+--multiple-instance+`
+|Allow several Emu64 instances
+
+|`+--reset-ini+`
+|Reset emu64.ini
+
+|`+--video-capture <file>+`
+|Starts the video capture
+
+|`+--data-path <path>+`
+|Custom data path
+
+|`+-?, --help+`
+|Show the help text
+
+|`+--version+`
+|Show the version number
+
+|===
+
+[appendix]
+== Changes
+
+// Planned: changelog overview (source: änderungen.txt)
+
+[appendix]
+== Links
+
+// Planned: homepage, GitHub, forum

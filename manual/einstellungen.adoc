@@ -1,0 +1,9 @@
+== Einstellungen
+
+// Geplant: Emu64-Einstellungen (SID, VIC-Modell, CIA-Modell, Joystick, Pfade), Video-CRT-Einstellungen, Vollbild, Fensteroptionen
+// Platzhalter-Bild: image::setup_emulation.png[] // Einstellungen: Emulation
+// Platzhalter-Bild: image::setup_sound.png[] // Einstellungen: Sound
+// Platzhalter-Bild: image::setup_grafik.png[] // Einstellungen: Grafik
+// Platzhalter-Bild: image::setup_steuerung.png[] // Einstellungen: Steuerung
+// Platzhalter-Bild: image::video_crt_einstellungen.png[] // Video-CRT-Einstellungen
+// Platzhalter-Bild: image::user_palette.png[] // Die Benutzer-Farbpalette

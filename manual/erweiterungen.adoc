@@ -1,0 +1,91 @@
+== Erweiterungen
+
+Emu64 kann zwei Speichererweiterungen emulieren, die am Expansionport des C64 stecken: die *REU* (RAM Expansion Unit) und die *GEO- / NEO-RAM*. Beide findest du im Menü *Tools*.
+
+Der C64 hat nur einen Expansionport. Deshalb kann immer nur *eine* Erweiterung aktiv sein: Wird eine REU gesteckt, werden ein eventuell gestecktes Steckmodul (siehe Kapitel „Steckmodule“) und die GEO-RAM entfernt, und umgekehrt. Beim Einstecken und beim Entfernen führt Emu64 einen *Hardreset* des C64 durch, so wie man auch eine echte Erweiterung nur bei ausgeschaltetem C64 wechseln würde.
+
+=== REU (RAM Expansion Unit)
+
+Die REU erweitert den C64 um zusätzlichen Speicher, auf den ein DMA-Baustein schnell zugreifen kann. Programme nutzen sie zum Beispiel als RAM-Disk oder für große Datenmengen. Die Register der REU liegen ab `+$DF00+`.
+
+Emu64 emuliert nicht nur die originalen Größen (1700 mit 128 KiB, 1764 mit 256 KiB, 1750 mit 512 KiB), sondern auch größere Erweiterungen bis *16 MiB*.
+
+// Platzhalter: Screenshot des REU-Menüs (images/reu_menu.png)
+.Das Menü Tools / RAM Expansion Unit (REU)
+image::reu_menu.png[]
+
+[cols="3,5",options="header"]
+|===
+|Menüpunkt |Funktion
+
+|Speichergröße
+|Wählt die Größe der REU: 128 KiB, 256 KiB, 512 KiB, 1 MiB, 2 MiB, 4 MiB, 8 MiB oder 16 MiB. Standard sind 512 KiB. Die gewählte Größe wird in der ini gespeichert.
+
+|REU einstecken
+|Steckt die REU in den Expansionport. Ein Steckmodul oder die GEO-RAM werden dabei entfernt, der C64 macht einen Hardreset.
+
+|REU entfernen
+|Zieht die REU wieder heraus. Der C64 macht einen Hardreset.
+
+|Inhalt aus einer Datei laden
+|Lädt den Inhalt aus einer REU-Image-Datei (`+*.reu+`).
+
+|Inhalt in eine Datei speichern
+|Speichert den aktuellen REU-Inhalt in eine `+*.reu+`-Datei.
+
+|Inhalt löschen
+|Löscht den REU-Speicher (nach einer Rückfrage).
+
+|===
+
+==== REU-Images laden
+
+Beim Laden eines Images wird die REU-Größe *automatisch* angepasst: Emu64 wählt die kleinste Größe, in die das Image passt, und zeigt einen Hinweis an. Ist die REU beim Laden noch nicht gesteckt, steckt Emu64 sie automatisch (mit Hardreset des C64).
+
+// Platzhalter: Screenshot des Hinweises nach dem Laden (images/reu_load_info.png)
+.Hinweis nach dem Laden eines Images, das eine andere REU-Größe verlangt
+image::reu_load_info.png[]
+
+* Ist das Image größer als 16 MiB, wird es abgelehnt.
+* Ist das Image kleiner als die gewählte Größe (keine der Standardgrößen), wird es trotzdem geladen. Der restliche REU-Speicher bleibt mit `+$00+` gefüllt, und du bekommst eine Warnung.
+
+=== GEO- / NEO-RAM
+
+Die GeoRAM (von Berkeley Softworks für GEOS) und die dazu kompatible NeoRAM sind Speichererweiterungen, die über ein Fenster von 256 Bytes ab `+$DE00+` angesprochen werden. Darüber wird der Speicher seitenweise eingeblendet. Emu64 emuliert Größen von 512 KiB bis 4 MiB.
+
+// Platzhalter: Screenshot des GEO-/NEO-RAM-Menüs (images/geo_menu.png)
+.Das Menü Tools / GEO- / NEO-RAM
+image::geo_menu.png[]
+
+[cols="3,5",options="header"]
+|===
+|Menüpunkt |Funktion
+
+|Speichergröße
+|Wählt die Größe: 512 KiB, 1024 KiB, 2048 KiB oder 4096 KiB. Standard sind 512 KiB. Die gewählte Größe wird in der ini gespeichert.
+
+|GEO-RAM einstecken
+|Steckt die GEO-RAM in den Expansionport. Ein Steckmodul oder die REU werden dabei entfernt, der C64 macht einen Hardreset.
+
+|GEO-RAM entfernen
+|Zieht die GEO-RAM wieder heraus. Der C64 macht einen Hardreset.
+
+|Inhalt aus einer Datei laden
+|Lädt den Inhalt aus einer Image-Datei (`+*.img+`).
+
+|Inhalt in eine Datei speichern
+|Speichert den aktuellen Inhalt in eine `+*.img+`-Datei.
+
+|Inhalt löschen
+|Löscht den Speicher (nach einer Rückfrage).
+
+|===
+
+==== GEO-RAM-Images laden
+
+Auch hier wird die Größe *automatisch* an das Image angepasst, und die GEO-RAM wird gesteckt, falls sie noch nicht gesteckt war. Das Image muss genau 512 KiB, 1024 KiB, 2048 KiB oder 4096 KiB groß sein, andere Größen werden mit einer Fehlermeldung abgelehnt. Emu64 merkt sich außerdem das zuletzt benutzte Verzeichnis für GEO-RAM-Images.
+
+=== Erweiterungen in Snapshots und auf der Kommandozeile
+
+* Ein Quick C64 Snapshot (Kapitel „Snapshots“) enthält die gesteckte Erweiterung samt ihrem Speicherinhalt.
+* Auf der Kommandozeile gibt es dafür die Parameter `+--enable-reu+`, `+--set-reu-size+`, `+--enable-georam+` und `+--set-georam-size+` (Kapitel „Kommandozeile“).

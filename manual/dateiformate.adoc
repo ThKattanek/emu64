@@ -1,0 +1,220 @@
+== Dateiformate
+
+Emu64 verwendet für drei Zwecke eigene Dateiformate: Haltepunkte (`+.bpt+`), SID-Dumps (`+.sdp+`) und Snapshots (`+.frz+`). Alle Zahlen sind *Little-Endian*, zwischen den Feldern gibt es keine Ausrichtung (Padding). Die Formate werden ausschließlich von Emu64 gelesen und geschrieben.
+
+Die ursprünglichen Beschreibungen liegen im Verzeichnis `+doc/+` des Quellcodes. Die Snapshot-Beschreibung dort (`+Fileformat_Snapshot_[frz]_Version1.md+`) enthält außerdem alle Felder jedes Chunks.
+
+=== Haltepunkte (.bpt)
+
+Der Debugger speichert hier seine Haltepunkt-Gruppen. Eine Gruppe fasst mehrere Bedingungen zusammen. Es sind höchstens 255 Gruppen möglich. Emu64 schreibt Version 2 und liest Version 1 und 2.
+
+*Datei-Kopf*
+
+[cols="2,1,3,5",options="header"]
+|===
+|Offset |Bytes |Inhalt |Bedeutung
+
+|0x00 – 0x09
+|10
+|`+EMU64_BPT+` mit abschließender 0
+|Signatur
+
+|0x0A
+|1
+|`+2+`
+|Version
+
+|0x0B
+|1
+|Anzahl
+|Anzahl der Haltepunkt-Gruppen (maximal 255)
+
+|===
+
+*Haltepunkt-Gruppe*
+
+Danach folgen die Gruppen hintereinander, in Version 2 je 163 Bytes. Die Offsets gelten relativ zum Anfang einer Gruppe. Ein Schalter ist 1 Byte (0 = deaktiviert, größer 0 = aktiviert), Adressen, Werte und Längen sind 16 Bit.
+
+[cols="1,1,3,6",options="header"]
+|===
+|Offset |Bytes |Feld |Bedeutung
+
+|0
+|128
+|Name
+|Gruppenname als String mit abschließender 0 (128 Bytes reserviert)
+
+|128
+|1
+|Gruppe aktiv
+|0 = deaktiviert, größer 0 = aktiviert
+
+|129
+|1 + 2
+|PC
+|Schalter + Adresse
+
+|132
+|1 + 2
+|AC
+|Schalter + Wert
+
+|135
+|1 + 2
+|XR
+|Schalter + Wert
+
+|138
+|1 + 2
+|YR
+|Schalter + Wert
+
+|141
+|1 + 2 + 2
+|Lesen von Adresse
+|Schalter + Adresse + Länge des Bereichs (ab Version 2)
+
+|146
+|1 + 2 + 2
+|Schreiben in Adresse
+|Schalter + Adresse + Länge des Bereichs (ab Version 2)
+
+|151
+|1 + 2
+|Lesen von Wert
+|Schalter + Wert
+
+|154
+|1 + 2
+|Schreiben von Wert
+|Schalter + Wert
+
+|157
+|1 + 2
+|Rasterzeile
+|Schalter + Rasterzeile
+
+|160
+|1 + 2
+|Rasterzeilen-Zyklus
+|Schalter + Zyklus
+
+|===
+
+Version 1 hat 159 Bytes pro Gruppe: Es fehlen die beiden Längenfelder bei „Lesen von Adresse“ und „Schreiben in Adresse“. Beim Laden einer Version-1-Datei wird die Länge auf 1 gesetzt.
+
+=== SID-Dump (.sdp)
+
+Ein SID-Dump enthält alle Werte, die über einen bestimmten Zeitraum in die SID-Register geschrieben wurden, samt dem zeitlichen Abstand der Schreibzugriffe. Damit lässt sich ein realer oder emulierter SID ansteuern, ohne die übrigen C64-Komponenten zu emulieren.
+
+Die Datei beginnt mit der Kennung `+SID_DUMP+` (8 Bytes, ohne abschließende 0). Danach folgt bis zum Dateiende ein Strom aus Paketen von 3 oder 4 Bytes, die nahtlos aneinander hängen.
+
+[cols="1,3,6",options="header"]
+|===
+|Byte |Bits |Bedeutung
+
+|0
+|0 – 4
+|Nummer des SID-Registers
+
+|0
+|5 (Size-Flag)
+|0 = Wartezyklen kleiner 256 (1 Byte), 1 = größer 255 (2 Bytes)
+
+|1
+|0 – 7
+|Wert, der in das SID-Register geschrieben wird
+
+|2
+|0 – 7
+|Wartezyklen (bei Size-Flag 0)
+
+|2 – 3
+|0 – 15
+|Wartezyklen, 16 Bit Little-Endian (bei Size-Flag 1)
+
+|===
+
+Die Wartezyklen sind die C64-Zyklen, die seit dem vorherigen Paket vergangen sind. Bei mehr als 65535 Zyklen wird der Wert auf 65535 begrenzt.
+
+=== Snapshot (.frz)
+
+Ein Quick C64 Snapshot (Bedienung siehe Kapitel „Snapshots“) enthält den kompletten Zustand des C64. Das ist die Grundlage dafür, dass die Emulation nach dem Laden zyklusgenau an derselben Stelle weiterläuft. Disk-, Band- und Modulinhalte sind eingebettet, die Datei ist nicht komprimiert.
+
+*Aufbau der Datei*
+
+[cols="2,5",options="header"]
+|===
+|Teil |Inhalt
+
+|Header (12 Bytes) |Magic `+EMU64FRZ+` (8 Bytes), Format-Version (u16, aktuell 1), reserviert (u16, 0)
+|Chunks |Beliebig viele Chunks hintereinander
+|Prüfsumme (4 Bytes) |CRC-32 (wie zlib/PNG) über alle Bytes davor
+|===
+
+*Aufbau eines Chunks*
+
+[cols="1,1,5",options="header"]
+|===
+|Offset |Bytes |Inhalt
+
+|0 |4 |Tag (ASCII, mit Leerzeichen aufgefüllt, z.B. `+CPU +`)
+|4 |2 |Chunk-Version
+|6 |4 |Länge der Daten in Bytes
+|10 |Länge |Daten
+|===
+
+Ein Chunk mit unbekanntem Tag wird beim Laden anhand seiner Länge übersprungen. Lesezugriffe sind auf die Chunk-Länge begrenzt, ein beschädigter Chunk kann also nie über sein Ende hinaus lesen. Zeiger werden nie gespeichert, Zeiger in Tabellen als Offset.
+
+*Chunks*
+
+[cols="1,4",options="header"]
+|===
+|Tag |Inhalt
+
+|`+MAIN+`
+|C64 allgemein: Zykluszähler, Reset-Zustand, Leitungen, IEC-Bus, aktive SID-Engine, Erweiterungsquelle
+
+|`+CPU +`
+|MOS 6510 inklusive Interrupt-Zustand und CPU-Port
+
+|`+MMU +`
+|64 KiB RAM und 1 KiB Farb-RAM
+
+|`+CIA1, CIA2+`
+|Alle Register, Timer, Interruptlogik, TOD, Schieberegister, Ports
+
+|`+VIC +`
+|VIC-II inklusive Raster-/Zyklusposition, Pipelines und beider Videopuffer (Chunk-Version 2)
+
+|`+SID1, SID2+`
+|Eigene SID-Engine für SID 1 und SID 2
+
+|`+RSD1, RSD2+`
+|reSID für SID 1 und SID 2
+
+|`+FLP0 – FLP3+`
+|Floppy 1541 (nur aktive Laufwerke): RAM, 6502, VIAs, Rotation, Kopf, kompletter GCR-Disk-Inhalt
+
+|`+TAPE+`
+|Datasette: Bandposition, Tasten, Motor, kompletter TAP-Inhalt
+
+|`+CRT +`
+|Steckmodul: Typ, Register, ROM-Bänke, Flash-Zustand, RAM
+
+|`+REU  / GEO +`
+|REU bzw. GeoRAM (je nach Erweiterungsquelle): Register, Größe, RAM-Inhalt
+
+|===
+
+Jeder Chunk hat die Chunk-Version 1, nur `+VIC +` hat die Version 2. Die Reihenfolge in der Datei ist beim Laden nicht wichtig, jeder Chunk wird über seinen Tag gesucht.
+
+*Versionierung*
+
+* Die Format-Version im Header ändert sich nur bei inkompatiblen Änderungen am Aufbau. Emu64 lehnt Dateien mit einer größeren Format-Version ab.
+* Ändert sich der Inhalt eines Chunks, wird seine Chunk-Version erhöht. Der Lesecode unterstützt die alten Versionen weiter.
+* Neue Komponenten werden als neue Chunks ergänzt. Ältere Emu64-Versionen überspringen unbekannte Chunks.
+* Das alte Freeze-Format von Emu64 bis Version 4.4 (Windows) wird nicht unterstützt.
+
+*Nicht gespeichert* werden ROM-Inhalte (kommen aus dem aktiven ROM-Set), die Konfiguration, Eingabegeräte, laufende Autostart-Eingaben, der Debugger-Zustand, Audio-Puffer und WAV-Bänder.
+

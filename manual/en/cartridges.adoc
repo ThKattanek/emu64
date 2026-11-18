@@ -1,0 +1,5 @@
+== Cartridges
+
+// Planned: CRT files, EasyFlash (creating a new image), freezers
+// Placeholder image: image::en/cartridge_window.png[] // The window Cartridges
+// Placeholder image: image::en/cartridge_neues_easyflash.png[] // Creating a new EasyFlash image

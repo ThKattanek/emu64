@@ -1,0 +1,40 @@
+== Einführung
+=== Vorwort
+
+Schalte einen Commodore 64 ein, und es passiert dasselbe wie vor mehr als vierzig Jahren: ein blauer Bildschirm, ein heller Rahmen, ein blinkender Cursor unter dem Wort `READY.` Kein Boot-Vorgang, keine Updates, keine Anmeldung. Der Rechner wartet einfach darauf, dass du etwas damit anfängst. Genau dieses Gefühl möchte Emu64 auf deinen heutigen Computer holen.
+
+// Platzhalter: Screenshot des C64-Startbildschirms in Emu64 (images/emu64_vorwort.png)
+.Emu64 nach dem Start
+image::emu64_vorwort.png[]
+
+==== Ein Hobby mit Geschichte
+
+Emu64 ist ein reines Hobbyprojekt, und ich entwickle es ständig weiter. Das erste Mal erblickte Emu64 1994 das Licht der Welt. Damals war es noch ein DOS-Programm, zu 100 % in Assembler geschrieben. Als Windows 95 auf den Markt kam, wurde aus Assembler ... C++, und damit programmiere ich Emu64 bis heute. Aus dem kleinen Experiment von damals ist ein Emulator geworden, der unter Linux und Windows läuft und den ich bei jeder neuen Idee, jedem gemeldeten Fehler und jedem Test weiter verfeinere.
+
+==== Was Emu64 ausmacht
+
+Zwei Ziele begleiten Emu64 von Anfang an: *Kompatibilität* und *Benutzerfreundlichkeit*.
+
+*Kompatibilität* heißt bei Emu64: so genau wie möglich. Prozessor, Grafikchip, CIAs und Floppy sind zyklusgenau nachgebaut, die Floppy 1541 sogar bis auf die einzelnen Bits auf der Diskette. Deshalb laufen auch Spiele und Demos, die an die Grenzen der Hardware gehen und bei denen manch anderer Emulator ins Stolpern kommt. Ob sich dabei etwas verbessert oder verschlechtert, prüfe ich laufend mit der Testsammlung des VICE-Projekts. Mehr dazu findest du im Teil „Technik“.
+
+*Benutzerfreundlichkeit* heißt: Du sollst nicht erst eine Anleitung lesen müssen, um loszulegen. Eine Datei auf das Fenster ziehen, und das Programm startet. Das Handbuch hier ist trotzdem für dich da, damit du auch die vielen Möglichkeiten dahinter entdeckst.
+
+==== Was du mit Emu64 tun kannst
+
+* *Spiele, Demos und Programme* laden und starten, von Disketten-Images (D64, G64, NIB), Bändern (TAP) und Steckmodulen (CRT) bis zu einzelnen Programmen (PRG, T64).
+* Die *Floppy 1541 II* und die *Datasette 1530* so bedienen, wie du es von der echten Hardware kennst, samt Laufwerksgeräuschen.
+* *Steckmodule*, *REU* und *GEO-/NEO-RAM* einstecken.
+* Mit dem *Quick C64 Snapshot* den kompletten Zustand des C64 sichern und genau dort weitermachen.
+* Dem C64 mit dem *Debugger* auf die Finger schauen: Disassembler, Haltepunkte, Speicher, VIC und IEC-Bus.
+* Das Bild mit der *CRT-Emulation* wie auf dem alten Röhrenmonitor aussehen lassen, Screenshots machen oder *Video und Audio aufnehmen*.
+* Zwischen zwei SID-Emulationen wählen: der eigenen Engine und reSID.
+
+Der Weg zu allem steht in diesem Handbuch: Wenn du es eilig hast, fang mit dem Kapitel „Erste Schritte“ an. Wer genau wissen möchte, wie Emu64 im Inneren arbeitet, findet das im Teil „Technik“.
+
+==== Offen für alle
+
+Emu64 ist ein Open-Source-Projekt und wird auf GitHub gehostet: https://github.com/ThKattanek/emu64. Dort kannst du den Quelltext lesen, Fehler melden und Verbesserungen vorschlagen. Jede Rückmeldung hilft, Emu64 besser zu machen. Auch dieses Handbuch wächst mit: Mit jeder neuen Funktion wird es erweitert und aktualisiert.
+
+Und jetzt: viel Spaß beim Entdecken. Der Cursor blinkt schon.
+
+_Thorsten Kattanek_

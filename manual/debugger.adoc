@@ -1,0 +1,8 @@
+== Debugger
+
+// Geplant: Disassembler/Assembler, Haltepunkte, Speicherfenster, VIC- und IEC-Debugger, CPU-Logging
+// Platzhalter-Bild: image::debugger_window.png[] // Das Debugger-Fenster
+// Platzhalter-Bild: image::debugger_haltepunkte.png[] // Haltepunkt-Gruppen
+// Platzhalter-Bild: image::debugger_speicher.png[] // Das Speicherfenster
+// Platzhalter-Bild: image::debugger_vic.png[] // Das VIC-Fenster
+// Platzhalter-Bild: image::debugger_iec.png[] // Der IEC-Bus im Debugger

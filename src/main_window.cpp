@@ -16,6 +16,8 @@
 #include <QScreen>
 #include <QStyle>
 #include <QUrl>
+#include <QDesktopServices>
+#include <QMessageBox>
 #include <QTimer>
 #include <QDateTime>
 #include <iostream>
@@ -300,7 +302,8 @@ int MainWindow::OnInit(bool nogui)
 
     SplashMessage(tr("Sprachmenü wir erstellt."),Qt::darkBlue);
     ini->beginGroup("MainWindow");
-    CreateLanguageMenu(ini->value("lang",SystemLocale).toString());
+    currentLang = ini->value("lang",SystemLocale).toString();
+    CreateLanguageMenu(currentLang);
 
     lastAutoloadPath = ini->value("LastAutoloadDir",QDir::homePath()).toString();
 
@@ -918,6 +921,7 @@ void MainWindow::slotLanguageChanged(QAction* action)
     ret = qtTranslator.load("qt_" + action->data().toString(), langPath);
     if(!ret) LogText(QString("Failed to load qt translation for locale: " + action->data().toString()).toUtf8());
 
+    currentLang = action->data().toString();
     ini->beginGroup("MainWindow");
     ini->setValue("lang",action->data().toString());
     ini->endGroup();
@@ -2392,6 +2396,22 @@ void MainWindow::on_actionREU_8MiB_triggered()
     ui->actionREU_16MiB->setChecked(false);
 
     c64->SetREUMode(REU_8MiB);
+}
+
+void MainWindow::on_actionHandbuch_triggered()
+{
+    // Deutsch bei deutscher Sprache, sonst die englische Version
+    const QString file = currentLang.startsWith("de") ? "emu64_handbuch_de.pdf" : "emu64_manual_en.pdf";
+    const QString path = dataPath + "/manual/" + file;
+
+    if(!QFile::exists(path))
+    {
+        QMessageBox::warning(this, tr("Handbuch"), tr("Das Handbuch wurde nicht gefunden:") + "\n" + path, QMessageBox::Ok);
+        return;
+    }
+
+    if(!QDesktopServices::openUrl(QUrl::fromLocalFile(path)))
+        QMessageBox::warning(this, tr("Handbuch"), tr("Das Handbuch konnte nicht geöffnet werden."), QMessageBox::Ok);
 }
 
 void MainWindow::on_actionREU_16MiB_triggered()

@@ -1,0 +1,4 @@
+== Keyboard
+
+// Planned: Changing and resetting the key mapping, virtual C64 keyboard, hotkey table (source: hotkeys.txt)
+// Placeholder image: image::en/tastatur_virtuell.png[] // The virtual C64 keyboard

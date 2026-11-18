@@ -1,0 +1,4 @@
+== Genauigkeit und Testbench
+
+// Geplant: Zyklusgenaue Emulation, VICE-Testbench, Release-Läufe
+// Platzhalter-Bild: image::genauigkeit_testbench.png[] // Ergebnisse der VICE-Testbench

@@ -1,0 +1,5 @@
+== Datasette 1530
+
+// Geplant: TAP und WAV, Aufnahme, Zählwerk, neues Band
+// Platzhalter-Bild: image::tape_window.png[] // Das Fenster Datasette 1530
+// Platzhalter-Bild: image::tape_neues_band.png[] // Ein neues Band anlegen

@@ -1,0 +1,8 @@
+== Debugger
+
+// Planned: Disassembler/assembler, breakpoints, memory window, VIC and IEC debugger, CPU logging
+// Placeholder image: image::en/debugger_window.png[] // The debugger window
+// Placeholder image: image::en/debugger_haltepunkte.png[] // Breakpoint groups
+// Placeholder image: image::en/debugger_speicher.png[] // The memory window
+// Placeholder image: image::en/debugger_vic.png[] // The VIC window
+// Placeholder image: image::en/debugger_iec.png[] // The IEC bus in the debugger

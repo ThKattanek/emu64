@@ -1,0 +1,4 @@
+== Tastatur
+
+// Geplant: Tastaturbelegung ändern und zurücksetzen, virtuelle C64-Tastatur, Hotkeys-Tabelle (Quelle: hotkeys.txt)
+// Platzhalter-Bild: image::tastatur_virtuell.png[] // Die virtuelle C64-Tastatur

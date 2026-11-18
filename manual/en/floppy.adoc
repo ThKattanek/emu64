@@ -1,0 +1,7 @@
+== Floppy 1541 II
+
+// Planned: Drives, images (D64, G64, NIB, NBZ), directory, new D64, floppy sounds
+// Placeholder image: image::en/floppy_window.png[] // The window Floppy 1541 II
+// Placeholder image: image::en/floppy_neues_d64.png[] // Creating a new disk image
+// Placeholder image: image::en/floppy_seitenleiste.png[] // The file browser with sidebar
+// Placeholder image: image::en/floppy_status.png[] // Status display of the drives

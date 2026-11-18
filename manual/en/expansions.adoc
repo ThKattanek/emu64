@@ -1,0 +1,91 @@
+== Expansions
+
+Emu64 can emulate two memory expansions that plug into the expansion port of the C64: the *REU* (RAM Expansion Unit) and the *GEO- / NEO-RAM*. You find both in the *Tools* menu.
+
+The C64 has only one expansion port. Therefore only *one* expansion can be active at a time: if a REU is inserted, a cartridge that might be inserted (see the chapter "Cartridges") and the GEO-RAM are removed, and vice versa. When inserting and when removing, Emu64 performs a *hard reset* of the C64, just as you would only swap a real expansion with the C64 switched off.
+
+=== REU (RAM Expansion Unit)
+
+The REU extends the C64 with additional memory that a DMA chip can access quickly. Programs use it for example as a RAM disk or for large amounts of data. The registers of the REU are located from `+$DF00+`.
+
+Emu64 emulates not only the original sizes (1700 with 128 KiB, 1764 with 256 KiB, 1750 with 512 KiB) but also larger expansions up to *16 MiB*.
+
+// Placeholder: screenshot of the REU menu (images/en/reu_menu.png)
+.The menu Tools / RAM Expansion Unit (REU)
+image::en/reu_menu.png[]
+
+[cols="3,5",options="header"]
+|===
+|Menu entry |Function
+
+|Memorysize
+|Selects the size of the REU: 128 KiB, 256 KiB, 512 KiB, 1 MiB, 2 MiB, 4 MiB, 8 MiB or 16 MiB. The default is 512 KiB. The selected size is saved in the ini.
+
+|Insert REU
+|Inserts the REU into the expansion port. A cartridge or the GEO-RAM is removed, the C64 performs a hard reset.
+
+|Remove REU
+|Pulls the REU out again. The C64 performs a hard reset.
+
+|Load content from File
+|Loads the content from a REU image file (`+*.reu+`).
+
+|Save content in file
+|Saves the current REU content to a `+*.reu+` file.
+
+|Delete content
+|Deletes the REU memory (after a confirmation).
+
+|===
+
+==== Loading REU Images
+
+When an image is loaded the REU size is adjusted *automatically*: Emu64 selects the smallest size the image fits into and shows a message. If the REU is not inserted yet when loading, Emu64 inserts it automatically (with a hard reset of the C64).
+
+// Placeholder: screenshot of the message after loading (images/en/reu_load_info.png)
+.Message after loading an image that requires a different REU size
+image::en/reu_load_info.png[]
+
+* If the image is larger than 16 MiB it is rejected.
+* If the image is smaller than the selected size (not one of the standard sizes) it is loaded anyway. The remaining REU memory stays filled with `+$00+` and you get a warning.
+
+=== GEO- / NEO-RAM
+
+The GeoRAM (by Berkeley Softworks, for GEOS) and the compatible NeoRAM are memory expansions that are accessed through a window of 256 bytes from `+$DE00+`. The memory is paged in through this window. Emu64 emulates sizes from 512 KiB to 4 MiB.
+
+// Placeholder: screenshot of the GEO- / NEO-RAM menu (images/en/geo_menu.png)
+.The menu Tools / GEO- / NEO-RAM
+image::en/geo_menu.png[]
+
+[cols="3,5",options="header"]
+|===
+|Menu entry |Function
+
+|Memorysize
+|Selects the size: 512 KiB, 1024 KiB, 2048 KiB or 4096 KiB. The default is 512 KiB. The selected size is saved in the ini.
+
+|Insert GEO-RAM
+|Inserts the GEO-RAM into the expansion port. A cartridge or the REU is removed, the C64 performs a hard reset.
+
+|Remove GEO-RAM
+|Pulls the GEO-RAM out again. The C64 performs a hard reset.
+
+|Load content from File
+|Loads the content from an image file (`+*.img+`).
+
+|Save content in file
+|Saves the current content to an `+*.img+` file.
+
+|Delete content
+|Deletes the memory (after a confirmation).
+
+|===
+
+==== Loading GEO-RAM Images
+
+Here too the size is adjusted *automatically* to the image, and the GEO-RAM is inserted if it was not inserted yet. The image must be exactly 512 KiB, 1024 KiB, 2048 KiB or 4096 KiB in size, other sizes are rejected with an error message. Emu64 also remembers the last used directory for GEO-RAM images.
+
+=== Expansions in Snapshots and on the Command Line
+
+* A Quick C64 Snapshot (chapter "Snapshots") contains the inserted expansion including its memory content.
+* On the command line the parameters `+--enable-reu+`, `+--set-reu-size+`, `+--enable-georam+` and `+--set-georam-size+` are available (chapter "Command Line").

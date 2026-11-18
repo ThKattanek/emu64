@@ -766,9 +766,6 @@ background-position: center
    </property>
   </action>
   <action name="actionHandbuch">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="icon">
     <iconset resource="emu64.qrc">
      <normaloff>:/grafik/toolbar32/handbuch.png</normaloff>:/grafik/toolbar32/handbuch.png</iconset>

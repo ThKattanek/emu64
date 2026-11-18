@@ -1,0 +1,16 @@
+== Main Window and Menus
+
+// Planned: Overview of all menus: File, C64 Files, Reset, Tools, Settings, Language, Help
+
+=== Emu64 Main Window
+
+This is the main window.
+
+.Emu64 main window
+// Placeholder: English screenshot (images/en/screenshot_emu64_window_01.png)
+image::en/screenshot_emu64_window_01.png[]
+
+// Placeholder image: image::en/menues_menueleiste.png[] // The menu bar of the main window
+// Placeholder image: image::en/menues_c64_dateien.png[] // The menu C64 Files
+// Placeholder image: image::en/menues_tools.png[] // The menu Tools
+// Placeholder image: image::en/menues_einstellungen.png[] // The menu Settings

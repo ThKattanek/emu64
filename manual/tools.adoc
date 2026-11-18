@@ -1,0 +1,8 @@
+== Aufnahme und Tools
+
+// Geplant: Screenshot, Audio- und Videoaufnahme, SID-Player, SID-Dump, Audio-Oszilloskop, C64-Geschwindigkeit/Warp, Cross-Assembler, Lan64, GameBase64
+// Platzhalter-Bild: image::tools_video_aufnahme.png[] // Das Fenster Video Aufnahme
+// Platzhalter-Bild: image::tools_sid_dump.png[] // Das Fenster SID Dump
+// Platzhalter-Bild: image::tools_oszilloskop.png[] // Das Audio-Oszilloskop
+// Platzhalter-Bild: image::tools_geschwindigkeit.png[] // Die C64-Geschwindigkeit einstellen
+// Platzhalter-Bild: image::tools_cross_assembler.png[] // Der Cross Assembler

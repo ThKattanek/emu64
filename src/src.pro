@@ -400,6 +400,7 @@ win32 {
     gfx.path = $$PREFIX/gfx
     txt.path = $$PREFIX
     languages.path = $$PREFIX/languages
+    handbuch.path = $$PREFIX/manual
 } else {
     target.path = $$PREFIX/bin
     roms.path = $$PREFIX/share/$$TARGET/roms
@@ -407,6 +408,7 @@ win32 {
     gfx.path = $$PREFIX/share/$$TARGET/gfx
     txt.path = $$PREFIX/share/doc/$$TARGET
     languages.path = $$PREFIX/share/$$TARGET/languages
+    handbuch.path = $$PREFIX/share/$$TARGET/manual
     desktop.path = $$PREFIX/share/applications
     icons.path = $$PREFIX/share/icons/hicolor/64x64/apps
 }
@@ -438,6 +440,39 @@ txt.files += ../änderungen.txt
 languages.CONFIG += nostrip
 languages.files += ../grafik/flaggen/emu64_de.png
 languages.files += ../grafik/flaggen/emu64_en.png
+
+# Handbuch (PDF, deutsch und englisch) aus ../manual mit asciidoctor-pdf erzeugen
+# Ist asciidoctor-pdf nicht installiert, wird das Handbuch übersprungen (Emu64 baut trotzdem).
+!equals(QMAKE_HOST.os, Windows):ASCIIDOCTOR_PDF = $$system(command -v asciidoctor-pdf)
+
+!isEmpty(ASCIIDOCTOR_PDF) {
+    MANUAL_SRC_DIR = $$PWD/../manual
+    # Texte und Bilder: Ändert sich eines davon, werden die PDFs neu erzeugt
+    MANUAL_SRC_FILES = $$files($$MANUAL_SRC_DIR/*.adoc, true)
+    MANUAL_SRC_FILES += $$files($$MANUAL_SRC_DIR/*.png, true)
+    MANUAL_SRC_FILES += $$files($$MANUAL_SRC_DIR/*.jpg, true)
+    MANUAL_SRC_FILES += $$files($$MANUAL_SRC_DIR/*.svg, true)
+
+    manual_de.target = emu64_handbuch_de.pdf
+    manual_de.depends = $$MANUAL_SRC_FILES
+    manual_de.commands = $$ASCIIDOCTOR_PDF -a lang=de -o $$manual_de.target $$MANUAL_SRC_DIR/index.adoc
+
+    manual_en.target = emu64_manual_en.pdf
+    manual_en.depends = $$MANUAL_SRC_FILES
+    manual_en.commands = $$ASCIIDOCTOR_PDF -a lang=en -o $$manual_en.target $$MANUAL_SRC_DIR/index_en.adoc
+
+    QMAKE_EXTRA_TARGETS += manual_de manual_en
+    PRE_TARGETDEPS += emu64_handbuch_de.pdf emu64_manual_en.pdf
+
+    handbuch.CONFIG += nostrip
+    # Die PDFs existieren beim qmake-Lauf noch nicht (qmake verwirft dann .files), daher per .extra kopieren
+    handbuch.extra += -$(MKDIR) $(INSTALL_ROOT)$$handbuch.path;
+    handbuch.extra += $(INSTALL_FILE) emu64_handbuch_de.pdf $(INSTALL_ROOT)$$handbuch.path;
+    handbuch.extra += $(INSTALL_FILE) emu64_manual_en.pdf $(INSTALL_ROOT)$$handbuch.path;
+    INSTALLS += handbuch
+} else {
+    message(asciidoctor-pdf nicht gefunden: Handbuch wird nicht erzeugt.)
+}
 
 # Linux Install Startmenü Eintrag
 ## /usr/local/share/icons/hicolor/64x64/apps/

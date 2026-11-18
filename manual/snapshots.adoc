@@ -1,0 +1,139 @@
+== Snapshots
+
+Mit dem *Quick C64 Snapshot* wird der komplette Zustand des emulierten C64 zu einem beliebigen Zeitpunkt in eine Datei gespeichert und später wieder geladen. Nach dem Laden läuft die Emulation zyklusgenau an exakt derselben Stelle weiter: mit gleicher CPU-Position, gleicher Rasterposition, gleichen Timerständen und einer Floppy, die mitten im Lesevorgang steht.
+
+Das ist praktisch, um ein Spiel an einer schwierigen Stelle zu sichern, um einen Fehler immer wieder von demselben Punkt aus zu untersuchen oder um lange Ladezeiten zu überspringen.
+
+=== Bedienung
+
+Die Funktionen findest du im Menü *Tools / Quick C64 Snapshot*.
+
+// Platzhalter: Screenshot des Menüs (images/snapshot_menu.png)
+.Menü Tools / Quick C64 Snapshot
+image::snapshot_menu.png[]
+
+[cols="2,5",options="header"]
+|===
+|Eintrag |Funktion
+
+|Speichern ...
+|Speichert den Zustand in eine frei gewählte `+.frz+`-Datei.
+
+|Laden ...
+|Lädt den Zustand aus einer `+.frz+`-Datei.
+
+|In Slot speichern
+|Speichert den Zustand in einen von 10 festen Slots. Belegte Slots zeigen Datum und Uhrzeit, so siehst du, was überschrieben wird.
+
+|Aus Slot laden
+|Lädt einen Slot. Leere Slots sind ausgegraut, belegte zeigen Datum und Uhrzeit.
+
+|===
+
+In beiden Slot-Menüs erscheint beim Überfahren eines belegten Eintrags mit der Maus das Vorschaubild des Slots.
+
+// Platzhalter: Screenshot des Vorschaubilds (images/snapshot_slot_vorschau.png)
+.Vorschaubild eines Slots im Menü
+image::snapshot_slot_vorschau.png[]
+
+Snapshot-Dateien lassen sich auch wie andere C64-Dateien öffnen: über *C64 Programme direkt laden*, per Drag&Drop auf das Fenster oder über die Kommandozeile. Das lädt den Snapshot, es gibt dabei weder einen Reset noch einen Autostart.
+
+==== Hotkeys
+
+Im C64-Fenster gibt es für die zehn Slots Hotkeys:
+
+[cols="3,4",options="header"]
+|===
+|Taste |Funktion
+
+|`+ALT+1 .. ALT+9, ALT+0+`
+|Slot 1 bis 9 bzw. Slot 10 laden. Ein leerer Slot meldet „Slot n ist leer.“ in der Statuszeile.
+
+|`+ALT+SHIFT+1 .. ALT+SHIFT+9, ALT+SHIFT+0+`
+|Slot 1 bis 9 bzw. Slot 10 speichern.
+
+|===
+
+Zum Speichern ist absichtlich zusätzlich die Shift-Taste nötig, damit ein Slot nicht versehentlich überschrieben wird. Die Tasten F5 und F9 sind nicht belegt, weil sie echte C64-Tasten sind.
+
+=== Speicherort und Vorschaubild
+
+Die Slots liegen im Konfigurationsverzeichnis von Emu64, unter Linux in `+~/.config/emu64/snapshots/+`, als `+slot1.frz+` bis `+slot10.frz+`.
+
+Zu jedem gespeicherten Snapshot legt Emu64 ein gleichnamiges Bild im PNG-Format an (`+slot1.frz+` ergibt `+slot1.png+`, `+mein_spiel.frz+` ergibt `+mein_spiel.png+`), im selben Verzeichnis. Es zeigt das C64-Bild im Moment des Speicherns, wie ein normaler Screenshot inklusive der CRT-Einstellungen. Das Bild ist nicht Teil der `+.frz+`-Datei und wird zum Laden nicht gebraucht. Wenn du einen Snapshot verschiebst oder umbenennst, nimm das PNG mit, damit das Vorschaubild erhalten bleibt. Schlägt das Speichern des Bildes fehl, ist der Snapshot trotzdem gespeichert.
+
+=== Was gespeichert wird
+
+Gespeichert wird der gesamte Zustand der Hardware:
+
+* C64 allgemein: Zykluszähler, Reset-Zustand, alle Leitungen, IEC-Bus, gewählte SID-Emulation, Erweiterungsquelle
+* CPU 6510 mit Interrupt-Zustand und CPU-Port (inklusive Datasetten-Motor und Sense-Zustand)
+* 64 KiB RAM und Farb-RAM
+* beide CIAs, der VIC-II (inklusive beider Videopuffer) und beide SIDs (eigene Engine und reSID)
+* bis zu vier Floppy-Laufwerke mit dem *kompletten Disk-Inhalt*
+* die Datasette mit dem *kompletten TAP-Inhalt*
+* das Steckmodul (bei EasyFlash inklusive des geschriebenen Flash-Inhalts), die REU und die GeoRAM mit ihrem RAM-Inhalt
+
+Disk-, Band- und Modulinhalte sind im Snapshot eingebettet. Ein Snapshot funktioniert also auch dann, wenn das ursprüngliche D64, TAP oder CRT nicht mehr existiert.
+
+*Nicht gespeichert* werden:
+
+* ROM-Inhalte (Kernal, Basic, Zeichensatz, 1541-DOS): Sie kommen aus dem aktiven ROM-Set.
+* Einstellungen (Setup, Tastenbelegung, Joystick, Audio und Video, Geschwindigkeit).
+* gedrückte Tasten und die Stellung von Joystick und Maus: Nach dem Laden gilt „nichts gedrückt“.
+* laufende Autostart- und Kommandozeilen-Eingaben.
+* der Debugger-Zustand (Haltepunkte, Verlauf, Einzelschritt).
+* der Audio-Puffer und die Floppy-Sounds.
+* WAV-Bänder.
+
+=== Einschränkungen
+
+* *PAL/NTSC* muss übereinstimmen. Der Snapshot stellt die Norm nicht um.
+* Es wird nicht geprüft, ob beim Laden dasselbe *ROM-Set* aktiv ist wie beim Speichern. Ein anderes Kernal oder 1541-DOS kann zu unsinnigem Verhalten führen.
+* *WAV-Bänder* werden nicht gespeichert (nur TAP). Beim Laden eines Snapshots mit WAV-Band wird das Band ausgeworfen.
+* Während einer *Bandaufnahme* ist kein Snapshot möglich.
+* *Schreibzugriffe auf eine Disk* nach dem Laden bleiben im Speicher und werden nicht in die ursprüngliche Image-Datei zurückgeschrieben.
+* Beim *reSID* startet der Filter- und Resampler-Zustand neu. Das Ergebnis kann sich dadurch minimal unterscheiden.
+* Eine Floppy, die erst durch das Laden eingeschaltet wurde, wird im Hauptfenster nicht automatisch als „an“ dargestellt.
+* Snapshots sind nicht zwischen *inkompatiblen Format-Versionen* austauschbar. Das alte Freeze-Format von Emu64 bis Version 4.4 (Windows) wird nicht unterstützt.
+* Größe: etwa 1,6 MB mit einem Laufwerk (jede gesteckte Cartridge-ROM-Bank kommt mit je 1 MB dazu, mit REU bis zu 16 MB). Es wird nicht komprimiert.
+
+=== Fehlermeldungen
+
+[cols="3,4",options="header"]
+|===
+|Meldung |Ursache
+
+|Die Datei ist kein gültiger Emu64 Snapshot oder sie ist beschädigt.
+|Kennung, Prüfsumme oder Aufbau der Datei sind falsch.
+
+|Der Snapshot wurde mit einer neueren Emu64 Version erstellt.
+|Das Format ist neuer als das der laufenden Emu64-Version.
+
+|Der Snapshot passt nicht zum aktuell eingestellten C64 Typ (PAL/NTSC).
+|Der Snapshot stammt von einer anderen Norm.
+
+|Während einer Bandaufnahme kann kein Snapshot gespeichert werden.
+|Die Datasette steht auf Aufnahme.
+
+|Der Snapshot konnte nicht vollständig übernommen werden. Der C64 wurde zurückgesetzt.
+|Ein Teil des Snapshots war inhaltlich ungültig. Der C64 wurde teilweise überschrieben und deshalb mit einem Hardreset zurückgesetzt.
+
+|Die Datei konnte nicht gelesen oder geschrieben werden.
+|Dateisystemfehler.
+
+|===
+
+Beim Speichern wird die Datei zuerst unter einem temporären Namen (`+.tmp+`) geschrieben und erst bei Erfolg umbenannt. Ein Fehler zerstört also keinen vorhandenen Snapshot. Beim Laden wird die Datei vollständig geprüft, bevor der laufende C64 verändert wird.
+
+=== Snapshots in der Kommandozeile
+
+Snapshots lassen sich auch ohne Oberfläche erzeugen und laden. Das hilft, einen Fehler reproduzierbar zu machen: Einmal bis kurz vor den Fehler laufen lassen und speichern, danach beliebig oft direkt von dort starten.
+
+[source,bash]
+----
+emu64 --multiple-instance --nogui --autostart spiel.d64 --save-snapshot vor_fehler.frz --snapshot-at 8000000 --limitcycles 8000001
+emu64 --multiple-instance --nogui --load-snapshot vor_fehler.frz --limitcycles 500000 --exitscreenshot ende.png
+----
+
+Das Speichern geschieht zyklusgenau zwischen zwei Zyklen und funktioniert deshalb auch im Warp-Modus (`+--warp+`). Alle Parameter (`+--load-snapshot+`, `+--save-snapshot+`, `+--snapshot-at+`, `+--snapshot-selftest+`) sind im Kapitel „Kommandozeile“ beschrieben. Der Aufbau der Datei steht im Kapitel „Dateiformate“.

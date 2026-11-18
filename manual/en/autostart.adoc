@@ -1,0 +1,5 @@
+== Autostart and Direct Loading
+
+// Planned: PRG, T64 with entry selection, drag & drop
+// Placeholder image: image::en/autostart_dateidialog.png[] // The autostart dialog
+// Placeholder image: image::en/autostart_t64_auswahl.png[] // Choosing an entry of a T64 file

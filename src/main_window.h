@@ -161,6 +161,7 @@ private slots:
     void on_actionREU_4MiB_triggered();
     void on_actionREU_8MiB_triggered();
     void on_actionREU_16MiB_triggered();
+    void on_actionHandbuch_triggered();
 
     void OnChangeGrafikModi(bool fullscreen, bool palmode, bool doublemode, bool filter);
     void OnChangeFloppyImage(int floppynr);
@@ -195,6 +196,7 @@ private:
     bool nogui;					 // Wenn die GUI nicht angezeigt wird
 
     //QString appPath;           // Pfad der emu64 Datei
+    QString currentLang;         // Aktuell gewählte Sprache (z.B. "de")
     QString langPath;            // Pfad für alle Sprachfiles
     //QString system_tmp_path;     // Pfad für alle Temporären Dateien die Emu64 erzeugt (Wird beim Start und Ende geleert)
     QString screenshotPath;      // Pfad für alle Emu64 Screenshots (nicht änderbar)

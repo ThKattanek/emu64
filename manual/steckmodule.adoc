@@ -1,0 +1,5 @@
+== Steckmodule
+
+// Geplant: CRT-Dateien, EasyFlash (neues Image anlegen), Freezer
+// Platzhalter-Bild: image::cartridge_window.png[] // Das Fenster Steckmodule
+// Platzhalter-Bild: image::cartridge_neues_easyflash.png[] // Ein neues EasyFlash-Image anlegen

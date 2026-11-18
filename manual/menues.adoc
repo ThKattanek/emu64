@@ -1,0 +1,15 @@
+== Hauptfenster und Menüs
+
+// Geplant: Überblick über alle Menüs: Datei, C64 Dateien, Reset, Tools, Einstellungen, Sprache, Hilfe
+
+=== Emu64 Hauptfenster
+
+Das hier ist da!
+
+.Emu64 Hauptfenster
+image::screenshot_emu64_window_01.png[]
+
+// Platzhalter-Bild: image::menues_menueleiste.png[] // Die Menüleiste des Hauptfensters
+// Platzhalter-Bild: image::menues_c64_dateien.png[] // Das Menü C64 Dateien
+// Platzhalter-Bild: image::menues_tools.png[] // Das Menü Tools
+// Platzhalter-Bild: image::menues_einstellungen.png[] // Das Menü Einstellungen

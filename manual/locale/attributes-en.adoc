@@ -1,0 +1,2 @@
+// English is the default language of Asciidoctor, nothing to override here.
+:toc-title: Table of Contents

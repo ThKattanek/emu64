@@ -1,0 +1,11 @@
+// Sprache: Standard ist Deutsch; vorher gesetztes lang (z.B. index_en.adoc) bleibt erhalten
+ifndef::lang[:lang: de]
+ifdef::lang[include::locale/attributes-{lang}.adoc[]]
+// Ausgabe in Buchformat
+:doctype: book
+// Aktiviert die Kapitel Numerierung
+:sectnums:
+// ruby-rouge Syntaxhighlighter aktivieren
+:source-highlighter: rouge
+// Image Verzeichnis setzen
+:imagesdir: images

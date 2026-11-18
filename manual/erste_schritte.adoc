@@ -1,0 +1,3 @@
+== Erste Schritte
+
+// Geplant: Programm laden und starten, Reset, ROM-Sets

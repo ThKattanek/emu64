@@ -1,0 +1,5 @@
+== Datasette 1530
+
+// Planned: TAP and WAV, recording, counter, new tape
+// Placeholder image: image::en/tape_window.png[] // The window Datasette 1530
+// Placeholder image: image::en/tape_neues_band.png[] // Creating a new tape

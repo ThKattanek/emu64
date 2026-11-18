@@ -1,0 +1,8 @@
+== Recording and Tools
+
+// Planned: Screenshot, audio and video recording, SID player, SID dump, audio oscilloscope, C64 speed/warp, cross assembler, Lan64, GameBase64
+// Placeholder image: image::en/tools_video_aufnahme.png[] // The window Video capture
+// Placeholder image: image::en/tools_sid_dump.png[] // The window SID dump
+// Placeholder image: image::en/tools_oszilloskop.png[] // The audio oscilloscope
+// Placeholder image: image::en/tools_geschwindigkeit.png[] // Setting the C64 speed
+// Placeholder image: image::en/tools_cross_assembler.png[] // The cross assembler
