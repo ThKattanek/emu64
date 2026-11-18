@@ -380,6 +380,10 @@ FORMS += \
 TRANSLATIONS += emu64_en.ts \
                 emu64_de.ts
 
+# *.qm automatisch aus den *.ts erzeugen (landen im Build-Ordner unter .qm/ und werden von "make install" kopiert).
+# Nicht für Windows/MXE: Dort erledigt das crossbuild-win-releases.sh mit einem eigenen lrelease.
+!win32: CONFIG += lrelease
+
 RESOURCES += emu64.qrc
 RC_FILE += emu64.rc
 
