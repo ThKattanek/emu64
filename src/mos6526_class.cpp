@@ -55,10 +55,10 @@ void MOS6526::Reset()
     clock_is_stopped = true;
     io[0x0B] = 1;
 
-    if(io[14] & 0x80)
-        clock_counter = clock_counter_latch = ClockCounterPAL; // PAL
-    else
-        clock_counter = clock_counter_latch = ClockCounterNTSC; // NTSC
+    memset(clock_alarm, 0, sizeof(clock_alarm));
+    memcpy(clock_latch, io + 8, sizeof(clock_latch));
+    tod_acc = 0;
+    tod_tick_counter = 0;
 
     /////// Für REG 14 und 15 //////
     enable_pb6	= false;
@@ -101,8 +101,6 @@ void MOS6526::Reset()
 
 void MOS6526::OneZyklus()
 {
-    uint8_t t, pm;
-
     if((*reset_wire == true) && (reset_wire_old == false))
     {
         Reset();
@@ -115,40 +113,12 @@ void MOS6526::OneZyklus()
 
     TimerCount();
 
-    clock_counter--;
-    if (clock_counter==0)
+    // TOD: Netzfrequenz Impulse aus dem CPU Takt erzeugen
+    tod_acc += TOD_POWER_FREQ;
+    if(tod_acc >= TOD_CPU_CLOCK)
     {
-        clock_counter = clock_counter_latch;
-        if(!clock_is_stopped)
-        {
-            t = BCD2Byte(io[8]);
-            t++;
-            io[8] = Byte2BCD(t % 10);
-            if(t >= 10)
-            {
-                t = BCD2Byte(io[9]);
-                t++;
-                io[9] = Byte2BCD(t % 60);
-                if(t >= 60)
-                {
-                    t = BCD2Byte(io[10]);
-                    t++;
-                    io[10] = Byte2BCD(t % 60);
-                    if(t >= 60)
-                    {
-                        pm = io[11] & 0x80;
-                        t = io[11] & 0x1F;
-                        if(t == 0x11) pm ^= 0x80;
-                        if(t == 0x12) t = 1;
-                        else if(++t == 10) t = 0x10;
-                        io[11] = t | pm;
-                    }
-                }
-            }
-            /// Auf Alarm rpüfen ///
-            if(!memcmp(clock_alarm,io+8,4))
-                TriggerInterrupt(4);
-        }
+        tod_acc -= TOD_CPU_CLOCK;
+        TodTick();
     }
 
     if(flag_pin != nullptr)
@@ -315,8 +285,8 @@ void MOS6526::SaveState(StateWriter &w) const
     w.U16(sdr_shifter);
     w.Bool(sdr_cnt_out);
     w.Bool(sdr_force_finish);
-    w.U32(clock_counter_latch);
-    w.U32(clock_counter);
+    w.U32(tod_acc);
+    w.U32(tod_tick_counter);
     w.Bool(clock_is_latched);
     w.Bool(clock_is_stopped);
     w.U8(ddr_a);
@@ -394,8 +364,8 @@ bool MOS6526::LoadState(StateReader &r)
     sdr_shifter = r.U16();
     sdr_cnt_out = r.Bool();
     sdr_force_finish = r.Bool();
-    clock_counter_latch = r.U32();
-    clock_counter = r.U32();
+    tod_acc = r.U32();
+    tod_tick_counter = r.U32();
     clock_is_latched = r.Bool();
     clock_is_stopped = r.Bool();
     ddr_a = r.U8();
@@ -666,6 +636,88 @@ inline void MOS6526::SdrModeChange(uint8_t new_cra)
     sdr_cnt_out = true;
 }
 
+// Alarmzeit mit der Uhrzeit vergleichen
+inline void MOS6526::TodCheckAlarm()
+{
+    if(!memcmp(clock_alarm, io + 8, sizeof(clock_alarm)))
+        TriggerInterrupt(4);
+}
+
+// Ein Netzfrequenz Impuls (50 Hz). Modell nach VICE src/core/ciacore.c (GPL v2 oder neuer, Copyright das VICE Team).
+// Ein 3 Bit Ringzaehler (6 Zustaende) teilt auf 10 Hz: bei 50 Hz (CRA Bit 7) wird bei 4 verglichen, bei 60 Hz bei 5.
+inline void MOS6526::TodTick()
+{
+    bool update = false;
+
+    if(!clock_is_stopped)
+    {
+        update = (tod_tick_counter == ((cra & 0x80) ? 4u : 5u));
+
+        if(update)
+            tod_tick_counter = 0;
+        else if(++tod_tick_counter > 5)
+            tod_tick_counter = 0;
+    }
+
+    if(!update)
+        return;
+
+    // Die einzelnen Stellen sind Binaerzaehler, ungueltige Werte werden im Rahmen ihrer Breite weitergezaehlt
+    int ts = io[8] & 0x0F;
+    int sl = io[9] & 0x0F;
+    int sh = (io[9] >> 4) & 0x07;
+    int ml = io[10] & 0x0F;
+    int mh = (io[10] >> 4) & 0x07;
+    int hl = io[11] & 0x0F;
+    int hh = (io[11] >> 4) & 0x01;
+    int pm = io[11] & 0x80;
+
+    ts = (ts + 1) & 0x0F;
+    if(ts == 10)
+    {
+        ts = 0;
+        sl = (sl + 1) & 0x0F;
+        if(sl == 10)
+        {
+            sl = 0;
+            sh = (sh + 1) & 0x07;
+            if(sh == 6)
+            {
+                sh = 0;
+                ml = (ml + 1) & 0x0F;
+                if(ml == 10)
+                {
+                    ml = 0;
+                    mh = (mh + 1) & 0x07;
+                    if(mh == 6)
+                    {
+                        mh = 0;
+                        // 09:59:59 -> 10:00:00 und 12:59:59 -> 01:00:00
+                        if((hh == 1 && hl == 2) || (hh == 0 && hl == 9))
+                        {
+                            hl = hh;
+                            hh ^= 1;
+                        }
+                        else
+                        {
+                            hl = (hl + 1) & 0x0F;
+                            if(hh == 1 && hl == 2)
+                                pm ^= 0x80;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    io[8] = static_cast<uint8_t>(ts);
+    io[9] = static_cast<uint8_t>(sl | (sh << 4));
+    io[10] = static_cast<uint8_t>(ml | (mh << 4));
+    io[11] = static_cast<uint8_t>(hl | (hh << 4) | pm);
+
+    TodCheckAlarm();
+}
+
 void MOS6526::WriteIO(uint16_t address, uint8_t value)
 {
     address &= 0x0F;
@@ -737,26 +789,44 @@ void MOS6526::WriteIO(uint16_t address, uint8_t value)
         break;
 
     case 8: case 9: case 10: case 11:
-        if((address) == 11)
+    {
+        // Nur gueltige Bits uebernehmen, das Schreiben der Stunden (Zeit, nicht Alarm) flippt AM/PM bei 12
+        if(address == 11)
         {
             value &= 0x9F;
             if((value & 0x1F) == 0x12 && !(crb & 0x80))
                 value ^= 0x80;
         }
+        else if(address == 10 || address == 9)
+            value &= 0x7F;
+        else
+            value &= 0x0F;
+
+        bool changed;
         if(crb & 0x80)
         {
+            changed = (clock_alarm[address - 8] != value);
             clock_alarm[address - 8] = value;
         }
         else
         {
-            if(address == 8)
+            // Der Teiler wird geleert, solange die Uhr steht, und mit dem Schreiben der Zehntel gestartet
+            if(address == 8 && clock_is_stopped)
+            {
+                tod_tick_counter = 0;
                 clock_is_stopped = false;
+            }
             if(address == 11)
                 clock_is_stopped = true;
 
-            io[address]=value;
+            changed = (io[address] != value);
+            io[address] = value;
         }
+
+        if(changed)
+            TodCheckAlarm();
         break;
+    }
 
     case 12:
         io[address]=value;
@@ -812,10 +882,6 @@ void MOS6526::WriteIO(uint16_t address, uint8_t value)
         timer_a.cr_oneshot = ((value & 0x08) != 0);
         timer_a.cr_force_load = ((value & 0x10) != 0);
         timer_a.count_phi2 = ((value & 0x20) == 0x00);
-        if (value & 0x80)
-            clock_counter = clock_counter_latch = ClockCounterPAL; // PAL
-        else
-            clock_counter = clock_counter_latch = ClockCounterNTSC; // NTSC
         enable_pb6 = (value & 0x02) >> 1;
         pb6_mode = (value & 0x04) >> 2;
         break;
