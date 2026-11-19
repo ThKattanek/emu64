@@ -111,6 +111,9 @@ private:
     bool        ifr_ack1, ifr_ack0, ifr_ack_m1;     // Interrupt Flags loeschen (ack_m1: das ICR wurde vor zwei Takten gelesen)
     bool        ifr_d7set1, ifr_d7set0;     // Bit 7 im ICR setzen
     bool        ifr_raise1, ifr_raise0;     // Interrupt Ausgang anheben
+    uint32_t    cycle_counter;      // Zaehlt die Takte (nur fuer den Abstand zum letzten ICR Lesen)
+    uint32_t    icr_read_cycle;     // Takt des letzten ICR Lesezugriffs
+    bool        timer_b_bug;        // Alte CIA: Das naechste ICR Lesen liefert das TB Flag nicht (Timer B unterlief direkt nach einem ICR Lesen)
     bool        ifr_read0, ifr_read1;       // Das ICR wurde vor einem bzw. zwei Takten gelesen
     uint8_t     timer_b_mode;       // Bit 5 und 6 aus CRB (0=PHI2, 1=CNT Pin, 2/3=Unterlauf von Timer A)
     TIMER       timer_a;
