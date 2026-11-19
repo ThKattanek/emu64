@@ -89,8 +89,10 @@ void MOS6526::Reset()
     cnt_pin_old = false;
     sdr_bits = 0;
     sdr_valid = false;
-    sdr_load_delay = 0;
-    sdr_irq_delay = 0;
+    sdr_delay = SDR_CNT0 | SDR_CNT1 | SDR_CNT2 | SDR_CNT3;
+    sdr_shifter = 0;
+    sdr_cnt_out = true;
+    sdr_force_finish = false;
 
     prev_lp = 0x10;
 
@@ -309,8 +311,10 @@ void MOS6526::SaveState(StateWriter &w) const
     w.Bool(cnt_pin_old);
     w.U8(sdr_bits);
     w.Bool(sdr_valid);
-    w.U8(sdr_load_delay);
-    w.U8(sdr_irq_delay);
+    w.U32(sdr_delay);
+    w.U16(sdr_shifter);
+    w.Bool(sdr_cnt_out);
+    w.Bool(sdr_force_finish);
     w.U32(clock_counter_latch);
     w.U32(clock_counter);
     w.Bool(clock_is_latched);
@@ -386,8 +390,10 @@ bool MOS6526::LoadState(StateReader &r)
     cnt_pin_old = r.Bool();
     sdr_bits = r.U8();
     sdr_valid = r.Bool();
-    sdr_load_delay = r.U8();
-    sdr_irq_delay = r.U8();
+    sdr_delay = r.U32();
+    sdr_shifter = r.U16();
+    sdr_cnt_out = r.Bool();
+    sdr_force_finish = r.Bool();
     clock_counter_latch = r.U32();
     clock_counter = r.U32();
     clock_is_latched = r.Bool();
@@ -522,7 +528,6 @@ inline void MOS6526::TimerCount()
 
     bool timer_a_underflow = TimerStep(&timer_a);
     bool timer_b_underflow = TimerStep(&timer_b);
-    bool timer_a_underflow_prev = timer_a_underflow_old;
     timer_a_underflow_old = timer_a_underflow;
     timer_b_underflow_old = timer_b_underflow;
     timer_b.cr_start_old = timer_b.cr_start;
@@ -533,17 +538,11 @@ inline void MOS6526::TimerCount()
         TriggerInterrupt(1);
         pb_6 ^= 0x01;
 
-        // Serieller Ausgabemodus: Jeder Unterlauf von Timer A schaltet CNT um, zwei Unterlaeufe ergeben ein Bit.
-        // Nach dem 15. Unterlauf ist das letzte Bit draussen, der SDR Interrupt folgt 3 Takte spaeter.
-        // Folgen die Unterlaeufe in aufeinanderfolgenden Takten (Latch 0), wird die CNT Flanke nicht mehr erkannt und nicht geschoben.
-        if((cra & 0x40) && !timer_a_underflow_prev && sdr_bits && (--sdr_bits & 1) && sdr_bits == 1)
+        // Serieller Ausgabemodus: Der Unterlauf toggelt CNT nach ca. 1,5 Takten (Verzoegerungsleitung, siehe SdrStep)
+        if((cra & 0x40) && (sdr_bits != 0 || sdr_valid))
         {
-            sdr_irq_delay = 3;
-            if(sdr_valid)
-            {
-                sdr_valid = false;
-                sdr_bits = 17;
-            }
+            // Folgen die Unterlaeufe zu dicht aufeinander (Latch 0), wird die CNT Flanke nicht mehr erkannt
+            sdr_delay |= (sdr_delay & (SDR_TOGGLE_CNT1 | SDR_NOGGLE_CNT1)) ? SDR_NOGGLE_CNT2 : SDR_TOGGLE_CNT2;
         }
     }
 
@@ -558,18 +557,113 @@ inline void MOS6526::TimerCount()
     }
 
     /// Serieller Ausgabemodus: verzoegerte Ereignisse ///
-    if(sdr_load_delay && --sdr_load_delay == 0)
+    SdrStep();
+}
+
+// Verzoegerungsleitung des Schieberegisters: wird jeden Takt weitergeschoben solange etwas ansteht
+// Modell und Ablauf nach VICE src/core/ciacore.c (GPL v2 oder neuer, Copyright das VICE Team), dort an der echten Hardware gemessen.
+// Die Logik wurde fuer Emu64 neu geschrieben (kein Alarmsystem, ein Aufruf pro Takt aus TimerCount).
+inline void MOS6526::SdrStep()
+{
+    // Nichts zu tun, wenn weder ein Ereignis ansteht noch die CNT Historie in Bewegung ist
+    if(!(sdr_delay & SDR_ACTIVE))
+    {
+        uint32_t all_cnt = sdr_delay & SDR_ALL_CNT;
+        if(all_cnt == 0 || all_cnt == SDR_ALL_CNT)
+            return;
+    }
+
+    uint32_t feed = 0;
+
+    if(sdr_delay & SDR_SET0)
     {
         if(sdr_bits == 0)
+        {
             sdr_bits = 16;
+            sdr_shifter = (uint16_t)(sdr << 1);
+        }
         else if(sdr_bits == 1)
+        {
+            sdr_shifter |= sdr;
             sdr_bits = 17;
+        }
         else
             sdr_valid = true;
     }
 
-    if(sdr_irq_delay && --sdr_irq_delay == 0)
+    if(sdr_delay & SDR_TOGGLE_CNT0)
+    {
+        if(sdr_bits && (--sdr_bits & 1))
+        {
+            sdr_cnt_out = false;
+
+            if(sdr_bits == 1)
+            {
+                // Letztes Bit ist draussen, der Interrupt kommt 2 Takte spaeter
+                feed |= SDR_SET_IRQ2;
+
+                if(sdr_valid)
+                {
+                    sdr_shifter |= sdr;
+                    sdr_valid = false;
+                    sdr_bits = 17;
+                }
+            }
+        }
+        else
+        {
+            sdr_shifter <<= 1;
+            sdr_cnt_out = true;
+        }
+    }
+
+    if(sdr_delay & SDR_SET_IRQ0)
         TriggerInterrupt(8);
+
+    sdr_delay |= feed;
+    sdr_delay <<= 1;
+    sdr_delay &= ~SDR_CLEAR;
+
+    if(sdr_cnt_out)
+        sdr_delay |= SDR_CNT0;
+}
+
+// Wechsel der Richtung des Schieberegisters (CRA Bit 6)
+inline void MOS6526::SdrModeChange(uint8_t new_cra)
+{
+    if((sdr_bits > 1 && sdr_bits < 15) || (sdr_bits == 15 && !(sdr_delay & SDR_CNT2)))
+        sdr_delay |= SDR_SET_IRQ2;
+
+    if(!(new_cra & 0x40))
+    {
+        // Ausgabe -> Eingabe
+        const uint32_t cnt_wanted = SDR_CNT1 | SDR_CNT2;
+        bool force_finish = (sdr_delay & cnt_wanted) != cnt_wanted;
+
+        if(!force_finish)
+        {
+            if(sdr_bits != 2 && !(sdr_delay & SDR_TOGGLE_CNT2) && !(sdr_delay & SDR_TOGGLE_CNT1) && (sdr_delay & SDR_TOGGLE_CNT0))
+                force_finish = true;
+        }
+        sdr_force_finish = force_finish;
+    }
+    else
+    {
+        // Eingabe -> Ausgabe
+        if(!sdr_cnt_out && sdr_bits != 0)
+            sdr_shifter <<= 1;
+
+        if(sdr_force_finish)
+        {
+            sdr_delay |= SDR_SET_IRQ2;
+            sdr_force_finish = false;
+        }
+    }
+
+    sdr_bits = 0;
+    sdr_valid = false;
+    sdr_delay &= ~(SDR_ALL_TOGGLE_CNT | SDR_ALL_NOGGLE_CNT);
+    sdr_cnt_out = true;
 }
 
 void MOS6526::WriteIO(uint16_t address, uint8_t value)
@@ -667,15 +761,9 @@ void MOS6526::WriteIO(uint16_t address, uint8_t value)
     case 12:
         io[address]=value;
         sdr = value;
-        // Im Ausgabemodus beginnt das Hinausschieben nach 2 Takten, der Interrupt kommt erst danach (siehe TimerCount)
+        // Im Ausgabemodus beginnt das Hinausschieben nach 2 Takten (siehe SdrStep)
         if(cra & 0x40)
-        {
-            sdr_load_delay = 2;
-
-            // Laeuft Timer A mit Latch 0 oder 1, dann ist der SDR Flag laut VICE Testbench (cia-sdr-icr) sofort zu sehen
-            if(timer_a.cr_start && timer_a.latch <= 1)
-                TriggerInterrupt(8);
-        }
+            sdr_delay |= SDR_SET0;
         break;
 
     case 13:
@@ -714,6 +802,8 @@ void MOS6526::WriteIO(uint16_t address, uint8_t value)
         break;
 
     case 14:
+        if((value ^ cra) & 0x40)
+            SdrModeChange(value);
         io[address] = value;
         cra = value & 0xEF;
         if((value & 0x01) && !timer_a.cr_start)
