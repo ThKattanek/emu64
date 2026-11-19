@@ -628,7 +628,8 @@ inline void VICII::RenderGfxCycle(uint8_t *out)
     gfx_pipe1_c = gfx_pipe0_c;
     gfx_pipe1_g = gfx_pipe0_g;
 
-    if((current_cycle >= 16) && (current_cycle <= 55))
+    // Bei gesetztem vertikalen Rahmen werden keine Grafikdaten uebernommen, g=0
+    if((current_cycle >= 16) && (current_cycle <= 55) && !border_flip_flop1)
     {
         gfx_pipe0_g = gfx_data;
         gfx_x_scroll = static_cast<uint8_t>(reg_x_scroll);
@@ -647,7 +648,7 @@ inline void VICII::RenderGfxCycle(uint8_t *out)
     else gfx_pipe0_g = 0;
 }
 
-// Farbregister $d020-$d02e: Der Schreibzugriff eines Zyklus wird erst im Folgezyklus übernommen (wie cregs im VICE).
+// Farbregister $d020-$d02e: Der Schreibzugriff eines Zyklus wird erst im Folgezyklus übernommen
 // Der Zustand je Zyklus wird für die Auflösung der Pixel am Zeilenende gemerkt.
 inline void VICII::UpdateColorRegs()
 {
