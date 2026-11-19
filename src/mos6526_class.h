@@ -26,6 +26,33 @@
 #define Byte2BCD(byte)  (((((byte) / 10) << 4) + ((byte) % 10)) & 0xFF)
 #define BCD2Byte(bcd)   (((10*(((bcd) & 0xf0) >> 4)) + ((bcd) & 0xf)) & 0xFF)
 
+// Verzoegerungsleitung des Schieberegisters (Ausgabemodus), Bit 0 einer Gruppe = Ereignis tritt jetzt ein (wie VICE ciacore)
+#define SDR_TOGGLE_CNT2  0x0001u // CNT toggeln
+#define SDR_TOGGLE_CNT1  0x0002u
+#define SDR_TOGGLE_CNT0  0x0004u
+#define SDR_TOGGLE_CNT_1 0x0008u
+#define SDR_NOGGLE_CNT2  0x0010u // CNT nicht toggeln (Unterlaeufe zu dicht)
+#define SDR_NOGGLE_CNT1  0x0020u
+#define SDR_NOGGLE_CNT0  0x0040u
+#define SDR_NOGGLE_CNT_1 0x0080u
+#define SDR_SET_IRQ3     0x0100u // SDR Interrupt setzen
+#define SDR_SET_IRQ2     0x0200u
+#define SDR_SET_IRQ1     0x0400u
+#define SDR_SET_IRQ0     0x0800u
+#define SDR_CNT0         0x1000u // Historie des CNT Ausgangs
+#define SDR_CNT1         0x2000u
+#define SDR_CNT2         0x4000u
+#define SDR_CNT3         0x8000u
+#define SDR_SET3         0x00010000u // SDR ins Schieberegister laden
+#define SDR_SET2         0x00020000u
+#define SDR_SET1         0x00040000u
+#define SDR_SET0         0x00080000u
+#define SDR_CLEAR        (SDR_NOGGLE_CNT2 | SDR_SET_IRQ3 | SDR_CNT0 | SDR_SET3)
+#define SDR_ALL_CNT      (SDR_CNT0 | SDR_CNT1 | SDR_CNT2 | SDR_CNT3)
+#define SDR_ALL_TOGGLE_CNT (SDR_TOGGLE_CNT2 | SDR_TOGGLE_CNT1 | SDR_TOGGLE_CNT0 | SDR_TOGGLE_CNT_1)
+#define SDR_ALL_NOGGLE_CNT (SDR_NOGGLE_CNT2 | SDR_NOGGLE_CNT1 | SDR_NOGGLE_CNT0 | SDR_NOGGLE_CNT_1)
+#define SDR_ACTIVE       (SDR_ALL_TOGGLE_CNT | SDR_ALL_NOGGLE_CNT | SDR_SET_IRQ3 | SDR_SET_IRQ2 | SDR_SET_IRQ1 | SDR_SET_IRQ0 | SDR_SET3 | SDR_SET2 | SDR_SET1 | SDR_SET0)
+
 class MOS6526
 {
     // Zustand eines Timers (Timer A und Timer B benutzen die gleiche Struktur)
@@ -44,6 +71,7 @@ class MOS6526
         bool        load;               // Ladepipeline Stufe 2 (Latch wird in den Zaehler geladen)
         bool        oneshot0;           // OneShot Pipeline Stufe 1
         bool        oneshot;            // OneShot Pipeline Stufe 2
+        bool        cr_start_old;       // Bit 0 vom Steuerregister im vorigen Takt (Timer B zaehlt Unterlaeufe von Timer A nur, wenn er schon vorher lief)
     };
 public:
 
@@ -90,6 +118,8 @@ private:
     inline void SetIrqLine(bool state);
     inline void IfrRun();
     inline void TimerCount();
+    inline void SdrStep();
+    inline void SdrModeChange(uint8_t new_cra);
     inline void TimerReset(TIMER *timer);
     inline bool TimerStep(TIMER *timer);
     inline void CheckLP();
@@ -110,6 +140,9 @@ private:
     bool        ifr_ack1, ifr_ack0, ifr_ack_m1;     // Interrupt Flags loeschen (ack_m1: das ICR wurde vor zwei Takten gelesen)
     bool        ifr_d7set1, ifr_d7set0;     // Bit 7 im ICR setzen
     bool        ifr_raise1, ifr_raise0;     // Interrupt Ausgang anheben
+    uint32_t    cycle_counter;      // Zaehlt die Takte (nur fuer den Abstand zum letzten ICR Lesen)
+    uint32_t    icr_read_cycle;     // Takt des letzten ICR Lesezugriffs
+    bool        timer_b_bug;        // Alte CIA: Das naechste ICR Lesen liefert das TB Flag nicht (Timer B unterlief direkt nach einem ICR Lesen)
     bool        ifr_read0, ifr_read1;       // Das ICR wurde vor einem bzw. zwei Takten gelesen
     uint8_t     timer_b_mode;       // Bit 5 und 6 aus CRB (0=PHI2, 1=CNT Pin, 2/3=Unterlauf von Timer A)
     TIMER       timer_a;
@@ -119,8 +152,10 @@ private:
     bool        cnt_pin_old;
     uint8_t     sdr_bits;           // Serieller Ausgabemodus: verbleibende halbe Bits (16 = Byte beginnt, 1 = letztes Bit ist raus)
     bool        sdr_valid;          // Ein neues SDR Byte wartet, waehrend das alte noch hinausgeschoben wird
-    uint8_t     sdr_load_delay;     // Takte bis ein geschriebenes SDR wirksam wird
-    uint8_t     sdr_irq_delay;      // Takte bis der SDR Interrupt gesetzt wird
+    uint32_t    sdr_delay;          // Verzoegerungsleitung des Schieberegisters (Ereignisse in naher Zukunft/Vergangenheit, wie VICE ciacore)
+    uint16_t    sdr_shifter;        // Schieberegister (Ausgabemodus)
+    bool        sdr_cnt_out;        // Ausgangszustand der CNT Leitung im Ausgabemodus
+    bool        sdr_force_finish;   // Beim Wechsel Ausgabe->Eingabe: Byte als fertig melden
 
     uint32_t    clock_counter_latch;
     uint32_t    clock_counter;
