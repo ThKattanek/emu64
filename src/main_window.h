@@ -15,6 +15,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <functional>
 #include <QMutex>
 #include <QTextStream>
 #include <QTranslator>
@@ -111,6 +112,7 @@ public slots:
     bool SnapshotSave(const QString &filename, bool show_message);
     bool SnapshotLoad(const QString &filename, bool show_message);
     void InitSnapshotSlotMenus();
+    void RetranslateSnapshotSlotMenus();
 
 private slots:
     void on_menu_main_info_triggered();
@@ -168,6 +170,9 @@ private slots:
     void OnSetupFished(int result);
 
 private:
+    QMenu *snapshot_save_menu = nullptr;
+    QMenu *snapshot_load_menu = nullptr;
+    std::function<void()> snapshot_slot_update;
     /// Funktionen ///
     void changeEvent(QEvent *event);  
     void CreateLanguageMenu(QString defaultLocale);
