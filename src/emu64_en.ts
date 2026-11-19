@@ -2234,117 +2234,119 @@ Do you want it to overwrite?</translation>
         <translation>Change to language: </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1557"/>
-        <location filename="main_window.cpp" line="1565"/>
+        <location filename="main_window.cpp" line="1559"/>
+        <location filename="main_window.cpp" line="1567"/>
         <source>Fehler</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1557"/>
+        <location filename="main_window.cpp" line="1559"/>
         <source>Die T64 Datei konnte nicht geladen werden. Bitte überprüfen Sie die Datei.</source>
         <translation>The T64 file could not be loaded. Please check the file.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1565"/>
+        <location filename="main_window.cpp" line="1567"/>
         <source>Die T64 Datei enthält keinen Eintrag.</source>
         <translation>The T64 file does not contain any entries.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1574"/>
+        <location filename="main_window.cpp" line="1576"/>
         <source>T64 Einträge auswählen</source>
         <translation>Select T64 entries</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1608"/>
+        <location filename="main_window.cpp" line="1610"/>
         <source> / ZIP Support: Ja</source>
         <translation> / ZIP Support: Yes</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1610"/>
+        <location filename="main_window.cpp" line="1612"/>
         <source> / ZIP Support: Nein</source>
         <translation> / ZIP Support: No</translation>
     </message>
     <message>
+        <location filename="main_window.cpp" line="1879"/>
         <source>In Slot speichern </source>
         <oldsource>In Slot speichern</oldsource>
-        <translation type="vanished">Save to Slot </translation>
+        <translation>Save to Slot </translation>
     </message>
     <message>
+        <location filename="main_window.cpp" line="1880"/>
         <source>Aus Slot laden </source>
         <oldsource>Aus Slot laden</oldsource>
-        <translation type="vanished">Load from Slot </translation>
+        <translation>Load from Slot </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1836"/>
-        <location filename="main_window.cpp" line="1843"/>
+        <location filename="main_window.cpp" line="1840"/>
+        <location filename="main_window.cpp" line="1847"/>
         <source>Slot %1</source>
         <translation>Slot %1</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1851"/>
+        <location filename="main_window.cpp" line="1855"/>
         <source>(leer)</source>
         <translation>(empty)</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1891"/>
+        <location filename="main_window.cpp" line="1907"/>
         <source>Während einer Bandaufnahme kann kein Snapshot gespeichert werden.</source>
         <translation>You cannot save a snapshot while recording a band.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1894"/>
-        <location filename="main_window.cpp" line="1916"/>
-        <location filename="main_window.cpp" line="1941"/>
+        <location filename="main_window.cpp" line="1910"/>
+        <location filename="main_window.cpp" line="1932"/>
+        <location filename="main_window.cpp" line="1957"/>
         <source>Die Datei konnte nicht gelesen oder geschrieben werden.</source>
         <translation>The file could not be read or written.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1907"/>
+        <location filename="main_window.cpp" line="1923"/>
         <source>Der C64 Zustand wurde gespeichert.</source>
         <translation>The C64 state has been saved.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1929"/>
+        <location filename="main_window.cpp" line="1945"/>
         <source>Die Datei ist kein gültiger Emu64 Snapshot oder sie ist beschädigt.</source>
         <translation>The file is not a valid Emu64 snapshot, or it is corrupted.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1932"/>
+        <location filename="main_window.cpp" line="1948"/>
         <source>Der Snapshot wurde mit einer neueren Emu64 Version erstellt.</source>
         <translation>The snapshot was created using a newer version of Emu64.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1935"/>
+        <location filename="main_window.cpp" line="1951"/>
         <source>Der Snapshot passt nicht zum aktuell eingestellten C64 Typ (PAL/NTSC).</source>
         <translation>The snapshot does not match the currently selected C64 type (PAL/NTSC).</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1938"/>
+        <location filename="main_window.cpp" line="1954"/>
         <source>Der Snapshot konnte nicht vollständig übernommen werden. Der C64 wurde zurückgesetzt.</source>
         <translation>The snapshot could not be fully imported. The C64 was reset.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1948"/>
+        <location filename="main_window.cpp" line="1964"/>
         <source>Der C64 Zustand wurde geladen.</source>
         <translation>The C64 state has been loaded.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1958"/>
-        <location filename="main_window.cpp" line="1972"/>
+        <location filename="main_window.cpp" line="1974"/>
+        <location filename="main_window.cpp" line="1988"/>
         <source>Emu64 Snapshot Dateien (*.frz)</source>
         <translation>Emu64 Snapshot Files (*.frz)</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1962"/>
+        <location filename="main_window.cpp" line="1978"/>
         <source>C64 Zustand speichern</source>
         <translation>Save C64 State</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1972"/>
+        <location filename="main_window.cpp" line="1988"/>
         <source>C64 Zustand laden</source>
         <translation>Load C64 State</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2013"/>
+        <location filename="main_window.cpp" line="2029"/>
         <source>Das REU Image konnte nicht geöffnet werden!</source>
         <translation>The REU image could not be opened!</translation>
     </message>
@@ -2369,29 +2371,29 @@ Das Image wurde aber trotzdem geladen, der restliche REU Speicher ist mit 0x00 g
 However, the image was loaded anyway; the remaining REU memory is filled with 0x00.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2064"/>
-        <location filename="main_window.cpp" line="2161"/>
+        <location filename="main_window.cpp" line="2080"/>
+        <location filename="main_window.cpp" line="2177"/>
         <source>Emu64 Info ...</source>
         <translation>Emu64 Info ...</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2161"/>
+        <location filename="main_window.cpp" line="2177"/>
         <source>Es wurde die Speichergröße der GEORAM auf </source>
         <translation>The storage capacity of GEORAM was set to </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2064"/>
-        <location filename="main_window.cpp" line="2161"/>
+        <location filename="main_window.cpp" line="2080"/>
+        <location filename="main_window.cpp" line="2177"/>
         <source> geändert.</source>
         <translation> changed.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2231"/>
+        <location filename="main_window.cpp" line="2247"/>
         <source>Achtung!</source>
         <translation>Attention!</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2231"/>
+        <location filename="main_window.cpp" line="2247"/>
         <source>Bitte beachte, dass das Mitloggen der CPU eine sehr große Textdatei erzeugt. Es entstehen ca. 30MB/s an Daten. Außerdem könnte die Emulation verlangsamt werden, je nach Systemausstattung.
 
 Möchtest du fortfahren?</source>
@@ -2400,22 +2402,22 @@ Möchtest du fortfahren?</source>
 Do you want to continue?</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2237"/>
+        <location filename="main_window.cpp" line="2253"/>
         <source>Debug Logging (*.txt)</source>
         <translation>Debug logging (*.txt)</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2240"/>
+        <location filename="main_window.cpp" line="2256"/>
         <source>Export...</source>
         <translation>Export...</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2249"/>
+        <location filename="main_window.cpp" line="2265"/>
         <source>Fehler...</source>
         <translation>Error...</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2249"/>
+        <location filename="main_window.cpp" line="2265"/>
         <source>Fehler beim speichern der Debug Logging Datei.</source>
         <translation>Error saving the debug logging file.</translation>
     </message>
@@ -2706,132 +2708,130 @@ Do you want to continue?</translation>
 </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1651"/>
-        <location filename="main_window.cpp" line="1661"/>
+        <location filename="main_window.cpp" line="1653"/>
+        <location filename="main_window.cpp" line="1663"/>
         <source>C64 Dateien öffnen </source>
         <oldsource>C64 Dateien Ã¶ffnen </oldsource>
         <translation>Open C64 files </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1651"/>
-        <location filename="main_window.cpp" line="1661"/>
+        <location filename="main_window.cpp" line="1653"/>
+        <location filename="main_window.cpp" line="1663"/>
         <source>C64 Programm Dateien </source>
         <translation>C64 program files </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1651"/>
-        <location filename="main_window.cpp" line="1661"/>
+        <location filename="main_window.cpp" line="1653"/>
+        <location filename="main_window.cpp" line="1663"/>
         <source>Alle Dateien </source>
         <translation>All files </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1808"/>
         <source>In Slot speichern</source>
-        <translation>Save to Slot</translation>
+        <translation type="vanished">Save to Slot</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1809"/>
         <source>Aus Slot laden</source>
-        <translation>Load from Slot</translation>
+        <translation type="vanished">Load from Slot</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2002"/>
+        <location filename="main_window.cpp" line="2018"/>
         <source>REU Inhalt laden</source>
         <translation>Load REU content</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2002"/>
+        <location filename="main_window.cpp" line="2018"/>
         <source>REU Image Dateien</source>
         <translation>REU image file</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2016"/>
+        <location filename="main_window.cpp" line="2032"/>
         <source>Das REU Image ist zu groß für die größte REU (16MiB)!
 Image Größe: </source>
         <translation>The REU image is too large for the largest REU (16 MiB)!
 Image size: </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2019"/>
+        <location filename="main_window.cpp" line="2035"/>
         <source>Das REU Image ist kleiner als die eingestellte REU Größe!
 Das Image wurde aber trotzdem geladen, der restliche REU Speicher ist mit 0x00 gefüllt.</source>
         <translation>The REU image is smaller than the configured REU size!
 However, the image was loaded anyway; the remaining REU memory is filled with 0x00.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2064"/>
+        <location filename="main_window.cpp" line="2080"/>
         <source>Es wurde die Speichergröße der REU auf </source>
         <translation>The REU&apos;s memory size was set to </translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2089"/>
+        <location filename="main_window.cpp" line="2105"/>
         <source>Beim laden des REU Images trat ein Fehler auf!</source>
         <translation>While loading the REU image an error occured!</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2082"/>
+        <location filename="main_window.cpp" line="2098"/>
         <source>REU Image Dateien (*.reu)</source>
         <translation>REU image files (*.reu)</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1959"/>
-        <location filename="main_window.cpp" line="1972"/>
-        <location filename="main_window.cpp" line="2083"/>
-        <location filename="main_window.cpp" line="2180"/>
-        <location filename="main_window.cpp" line="2238"/>
+        <location filename="main_window.cpp" line="1975"/>
+        <location filename="main_window.cpp" line="1988"/>
+        <location filename="main_window.cpp" line="2099"/>
+        <location filename="main_window.cpp" line="2196"/>
+        <location filename="main_window.cpp" line="2254"/>
         <source>Alle Dateien (*.*)</source>
         <translation>All files (*.*)</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2085"/>
+        <location filename="main_window.cpp" line="2101"/>
         <source>REU Inhalt speichern</source>
         <translation>Save REU content</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2094"/>
+        <location filename="main_window.cpp" line="2110"/>
         <source>REU Speicher löschen ...</source>
         <oldsource>REU Speicher lÃ¶schen ...</oldsource>
         <translation>Delete REU content ...</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2094"/>
+        <location filename="main_window.cpp" line="2110"/>
         <source>Möchten Sie den Inhalt des REU Speichers wirklich löschen?</source>
         <translation>Are you sure you want to delete the REU content?</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2179"/>
+        <location filename="main_window.cpp" line="2195"/>
         <source>GEORAM Image Dateien (*.img)</source>
         <translation>GEORAM image files (*.img)</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2191"/>
+        <location filename="main_window.cpp" line="2207"/>
         <source>GEORAM Speicher löschen ...</source>
         <oldsource>GEORAM Speicher lÃ¶schen ...</oldsource>
         <translation>Delete GEO-RAM content ...</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2191"/>
+        <location filename="main_window.cpp" line="2207"/>
         <source>Möchten Sie den Inhalt des GEORAM Speichers wirklich löschen?</source>
         <translation>Are you sure you want to delete the GEO-RAM content?</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2123"/>
+        <location filename="main_window.cpp" line="2139"/>
         <source>GEORAM Inhalt laden</source>
         <translation>Load GEO-RAM content</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2123"/>
+        <location filename="main_window.cpp" line="2139"/>
         <source>GEORAM Image Dateien</source>
         <translation>GEO-RAM image files</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2133"/>
-        <location filename="main_window.cpp" line="2186"/>
+        <location filename="main_window.cpp" line="2149"/>
+        <location filename="main_window.cpp" line="2202"/>
         <source>Beim laden des GEORAM Images trat ein Fehler auf!</source>
         <translation>While loading the GEO-RAM image an error occured!</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2182"/>
+        <location filename="main_window.cpp" line="2198"/>
         <source>GEORAM Inhalt speichern</source>
         <translation>Save GEO-RAM content</translation>
     </message>
@@ -2841,21 +2841,21 @@ However, the image was loaded anyway; the remaining REU memory is filled with 0x
         <translation>Initializing C64 class.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1796"/>
-        <location filename="main_window.cpp" line="1897"/>
-        <location filename="main_window.cpp" line="1916"/>
-        <location filename="main_window.cpp" line="1944"/>
-        <location filename="main_window.cpp" line="2013"/>
-        <location filename="main_window.cpp" line="2016"/>
-        <location filename="main_window.cpp" line="2019"/>
-        <location filename="main_window.cpp" line="2089"/>
-        <location filename="main_window.cpp" line="2133"/>
-        <location filename="main_window.cpp" line="2186"/>
+        <location filename="main_window.cpp" line="1798"/>
+        <location filename="main_window.cpp" line="1913"/>
+        <location filename="main_window.cpp" line="1932"/>
+        <location filename="main_window.cpp" line="1960"/>
+        <location filename="main_window.cpp" line="2029"/>
+        <location filename="main_window.cpp" line="2032"/>
+        <location filename="main_window.cpp" line="2035"/>
+        <location filename="main_window.cpp" line="2105"/>
+        <location filename="main_window.cpp" line="2149"/>
+        <location filename="main_window.cpp" line="2202"/>
         <source>Emu64 Fehler ...</source>
         <translation>Emu64 Error ...</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="954"/>
+        <location filename="main_window.cpp" line="956"/>
         <source>C64 Bildschirm</source>
         <translation>C64 Screen</translation>
     </message>
@@ -2884,13 +2884,13 @@ However, the image was loaded anyway; the remaining REU memory is filled with 0x
         <translation>C64 speed window connected to C64 Class.</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2002"/>
-        <location filename="main_window.cpp" line="2123"/>
+        <location filename="main_window.cpp" line="2018"/>
+        <location filename="main_window.cpp" line="2139"/>
         <source>Alle Dateien</source>
         <translation>All files</translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1796"/>
+        <location filename="main_window.cpp" line="1798"/>
         <source>Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.
 Überprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !</source>
         <translation>No Screenshots possible as Emu64 couldn&apos;t create a screenshot directory.

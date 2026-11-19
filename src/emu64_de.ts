@@ -2471,289 +2471,289 @@ Soll diese überschrieben werden?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="954"/>
+        <location filename="main_window.cpp" line="956"/>
         <source>C64 Bildschirm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1557"/>
-        <location filename="main_window.cpp" line="1565"/>
+        <location filename="main_window.cpp" line="1559"/>
+        <location filename="main_window.cpp" line="1567"/>
         <source>Fehler</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1557"/>
+        <location filename="main_window.cpp" line="1559"/>
         <source>Die T64 Datei konnte nicht geladen werden. Bitte überprüfen Sie die Datei.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1565"/>
+        <location filename="main_window.cpp" line="1567"/>
         <source>Die T64 Datei enthält keinen Eintrag.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1574"/>
+        <location filename="main_window.cpp" line="1576"/>
         <source>T64 Einträge auswählen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1608"/>
+        <location filename="main_window.cpp" line="1610"/>
         <source> / ZIP Support: Ja</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1610"/>
+        <location filename="main_window.cpp" line="1612"/>
         <source> / ZIP Support: Nein</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1651"/>
-        <location filename="main_window.cpp" line="1661"/>
+        <location filename="main_window.cpp" line="1653"/>
+        <location filename="main_window.cpp" line="1663"/>
         <source>C64 Dateien öffnen </source>
         <oldsource>C64 Dateien Ã¶ffnen </oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1651"/>
-        <location filename="main_window.cpp" line="1661"/>
+        <location filename="main_window.cpp" line="1653"/>
+        <location filename="main_window.cpp" line="1663"/>
         <source>C64 Programm Dateien </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1651"/>
-        <location filename="main_window.cpp" line="1661"/>
+        <location filename="main_window.cpp" line="1653"/>
+        <location filename="main_window.cpp" line="1663"/>
         <source>Alle Dateien </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1836"/>
-        <location filename="main_window.cpp" line="1843"/>
+        <location filename="main_window.cpp" line="1840"/>
+        <location filename="main_window.cpp" line="1847"/>
         <source>Slot %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1851"/>
+        <location filename="main_window.cpp" line="1855"/>
         <source>(leer)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1891"/>
-        <source>Während einer Bandaufnahme kann kein Snapshot gespeichert werden.</source>
+        <location filename="main_window.cpp" line="1879"/>
+        <source>In Slot speichern </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1894"/>
-        <location filename="main_window.cpp" line="1916"/>
-        <location filename="main_window.cpp" line="1941"/>
-        <source>Die Datei konnte nicht gelesen oder geschrieben werden.</source>
+        <location filename="main_window.cpp" line="1880"/>
+        <source>Aus Slot laden </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="main_window.cpp" line="1907"/>
+        <source>Während einer Bandaufnahme kann kein Snapshot gespeichert werden.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="1910"/>
+        <location filename="main_window.cpp" line="1932"/>
+        <location filename="main_window.cpp" line="1957"/>
+        <source>Die Datei konnte nicht gelesen oder geschrieben werden.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main_window.cpp" line="1923"/>
         <source>Der C64 Zustand wurde gespeichert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1929"/>
+        <location filename="main_window.cpp" line="1945"/>
         <source>Die Datei ist kein gültiger Emu64 Snapshot oder sie ist beschädigt.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1932"/>
+        <location filename="main_window.cpp" line="1948"/>
         <source>Der Snapshot wurde mit einer neueren Emu64 Version erstellt.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1935"/>
+        <location filename="main_window.cpp" line="1951"/>
         <source>Der Snapshot passt nicht zum aktuell eingestellten C64 Typ (PAL/NTSC).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1938"/>
+        <location filename="main_window.cpp" line="1954"/>
         <source>Der Snapshot konnte nicht vollständig übernommen werden. Der C64 wurde zurückgesetzt.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1948"/>
+        <location filename="main_window.cpp" line="1964"/>
         <source>Der C64 Zustand wurde geladen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1958"/>
-        <location filename="main_window.cpp" line="1972"/>
+        <location filename="main_window.cpp" line="1974"/>
+        <location filename="main_window.cpp" line="1988"/>
         <source>Emu64 Snapshot Dateien (*.frz)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1962"/>
+        <location filename="main_window.cpp" line="1978"/>
         <source>C64 Zustand speichern</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1972"/>
+        <location filename="main_window.cpp" line="1988"/>
         <source>C64 Zustand laden</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2002"/>
+        <location filename="main_window.cpp" line="2018"/>
         <source>REU Inhalt laden</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2002"/>
+        <location filename="main_window.cpp" line="2018"/>
         <source>REU Image Dateien</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2013"/>
+        <location filename="main_window.cpp" line="2029"/>
         <source>Das REU Image konnte nicht geöffnet werden!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2089"/>
+        <location filename="main_window.cpp" line="2105"/>
         <source>Beim laden des REU Images trat ein Fehler auf!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2082"/>
+        <location filename="main_window.cpp" line="2098"/>
         <source>REU Image Dateien (*.reu)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1959"/>
-        <location filename="main_window.cpp" line="1972"/>
-        <location filename="main_window.cpp" line="2083"/>
-        <location filename="main_window.cpp" line="2180"/>
-        <location filename="main_window.cpp" line="2238"/>
+        <location filename="main_window.cpp" line="1975"/>
+        <location filename="main_window.cpp" line="1988"/>
+        <location filename="main_window.cpp" line="2099"/>
+        <location filename="main_window.cpp" line="2196"/>
+        <location filename="main_window.cpp" line="2254"/>
         <source>Alle Dateien (*.*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2085"/>
+        <location filename="main_window.cpp" line="2101"/>
         <source>REU Inhalt speichern</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2094"/>
+        <location filename="main_window.cpp" line="2110"/>
         <source>REU Speicher löschen ...</source>
         <oldsource>REU Speicher lÃ¶schen ...</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2094"/>
+        <location filename="main_window.cpp" line="2110"/>
         <source>Möchten Sie den Inhalt des REU Speichers wirklich löschen?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2064"/>
-        <location filename="main_window.cpp" line="2161"/>
+        <location filename="main_window.cpp" line="2080"/>
+        <location filename="main_window.cpp" line="2177"/>
         <source>Emu64 Info ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2161"/>
+        <location filename="main_window.cpp" line="2177"/>
         <source>Es wurde die Speichergröße der GEORAM auf </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2064"/>
-        <location filename="main_window.cpp" line="2161"/>
+        <location filename="main_window.cpp" line="2080"/>
+        <location filename="main_window.cpp" line="2177"/>
         <source> geändert.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1808"/>
-        <source>In Slot speichern</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="main_window.cpp" line="1809"/>
-        <source>Aus Slot laden</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="main_window.cpp" line="2016"/>
+        <location filename="main_window.cpp" line="2032"/>
         <source>Das REU Image ist zu groß für die größte REU (16MiB)!
 Image Größe: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2019"/>
+        <location filename="main_window.cpp" line="2035"/>
         <source>Das REU Image ist kleiner als die eingestellte REU Größe!
 Das Image wurde aber trotzdem geladen, der restliche REU Speicher ist mit 0x00 gefüllt.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2064"/>
+        <location filename="main_window.cpp" line="2080"/>
         <source>Es wurde die Speichergröße der REU auf </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2179"/>
+        <location filename="main_window.cpp" line="2195"/>
         <source>GEORAM Image Dateien (*.img)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2191"/>
+        <location filename="main_window.cpp" line="2207"/>
         <source>GEORAM Speicher löschen ...</source>
         <oldsource>GEORAM Speicher lÃ¶schen ...</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2191"/>
+        <location filename="main_window.cpp" line="2207"/>
         <source>Möchten Sie den Inhalt des GEORAM Speichers wirklich löschen?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2231"/>
+        <location filename="main_window.cpp" line="2247"/>
         <source>Achtung!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2231"/>
+        <location filename="main_window.cpp" line="2247"/>
         <source>Bitte beachte, dass das Mitloggen der CPU eine sehr große Textdatei erzeugt. Es entstehen ca. 30MB/s an Daten. Außerdem könnte die Emulation verlangsamt werden, je nach Systemausstattung.
 
 Möchtest du fortfahren?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2237"/>
+        <location filename="main_window.cpp" line="2253"/>
         <source>Debug Logging (*.txt)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2240"/>
+        <location filename="main_window.cpp" line="2256"/>
         <source>Export...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2249"/>
+        <location filename="main_window.cpp" line="2265"/>
         <source>Fehler...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2249"/>
+        <location filename="main_window.cpp" line="2265"/>
         <source>Fehler beim speichern der Debug Logging Datei.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2123"/>
+        <location filename="main_window.cpp" line="2139"/>
         <source>GEORAM Inhalt laden</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2123"/>
+        <location filename="main_window.cpp" line="2139"/>
         <source>GEORAM Image Dateien</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2133"/>
-        <location filename="main_window.cpp" line="2186"/>
+        <location filename="main_window.cpp" line="2149"/>
+        <location filename="main_window.cpp" line="2202"/>
         <source>Beim laden des GEORAM Images trat ein Fehler auf!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2182"/>
+        <location filename="main_window.cpp" line="2198"/>
         <source>GEORAM Inhalt speichern</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2763,16 +2763,16 @@ Möchtest du fortfahren?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1796"/>
-        <location filename="main_window.cpp" line="1897"/>
-        <location filename="main_window.cpp" line="1916"/>
-        <location filename="main_window.cpp" line="1944"/>
-        <location filename="main_window.cpp" line="2013"/>
-        <location filename="main_window.cpp" line="2016"/>
-        <location filename="main_window.cpp" line="2019"/>
-        <location filename="main_window.cpp" line="2089"/>
-        <location filename="main_window.cpp" line="2133"/>
-        <location filename="main_window.cpp" line="2186"/>
+        <location filename="main_window.cpp" line="1798"/>
+        <location filename="main_window.cpp" line="1913"/>
+        <location filename="main_window.cpp" line="1932"/>
+        <location filename="main_window.cpp" line="1960"/>
+        <location filename="main_window.cpp" line="2029"/>
+        <location filename="main_window.cpp" line="2032"/>
+        <location filename="main_window.cpp" line="2035"/>
+        <location filename="main_window.cpp" line="2105"/>
+        <location filename="main_window.cpp" line="2149"/>
+        <location filename="main_window.cpp" line="2202"/>
         <source>Emu64 Fehler ...</source>
         <translation></translation>
     </message>
@@ -2799,13 +2799,13 @@ Möchtest du fortfahren?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="2002"/>
-        <location filename="main_window.cpp" line="2123"/>
+        <location filename="main_window.cpp" line="2018"/>
+        <location filename="main_window.cpp" line="2139"/>
         <source>Alle Dateien</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.cpp" line="1796"/>
+        <location filename="main_window.cpp" line="1798"/>
         <source>Es sind keine Screenshots möglich da Emu64 kein Screenshot Verzeichnis anlegen konnte.
 Überprüfen Sie bitte die Rechte des Emu64 Verzeichnisses !</source>
         <translation type="unfinished">Es sind keine Screenshots möglich, da Emu64 kein Screenshot Verzeichnis anlegen konnte.

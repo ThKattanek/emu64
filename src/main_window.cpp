@@ -907,6 +907,7 @@ void MainWindow::CreateLanguageMenu(QString defaultLocale)
 
             action->setChecked(true);
             ui->retranslateUi(this);
+            RetranslateSnapshotSlotMenus();
         }
     }
 }
@@ -931,6 +932,7 @@ void MainWindow::slotLanguageChanged(QAction* action)
 void MainWindow::RetranslateUi()
 {
     ui->retranslateUi(this);
+    RetranslateSnapshotSlotMenus();
 
     for(int i=0; i<MAX_FLOPPY_NUM; i++)
     {
@@ -1809,8 +1811,10 @@ QString MainWindow::SnapshotSlotFilename(int slot) const
 
 void MainWindow::InitSnapshotSlotMenus()
 {
-    QMenu *save_menu = ui->menuQuick_C64_Snapshot->addMenu(tr("In Slot speichern"));
-    QMenu *load_menu = ui->menuQuick_C64_Snapshot->addMenu(tr("Aus Slot laden"));
+    QMenu *save_menu = ui->menuQuick_C64_Snapshot->addMenu(QString());
+    QMenu *load_menu = ui->menuQuick_C64_Snapshot->addMenu(QString());
+    snapshot_save_menu = save_menu;
+    snapshot_load_menu = load_menu;
 
     // Beim Ueberfahren eines Eintrags erscheint das Vorschaubild (PNG) des Slots als Tooltip
     save_menu->setToolTipsVisible(true);
@@ -1864,9 +1868,21 @@ void MainWindow::InitSnapshotSlotMenus()
     connect(save_menu, &QMenu::aboutToShow, this, [update_slot_actions, save_actions]() { update_slot_actions(save_actions, "Alt+Shift+", false); });
     connect(load_menu, &QMenu::aboutToShow, this, [update_slot_actions, load_actions]() { update_slot_actions(load_actions, "Alt+", true); });
 
-    // Menues sind vor dem ersten Oeffnen schon sinnvoll beschriftet
-    update_slot_actions(save_actions, "Alt+Shift+", false);
-    update_slot_actions(load_actions, "Alt+", true);
+    // Menues sind vor dem ersten Oeffnen schon sinnvoll beschriftet (und werden bei Sprachwechsel neu beschriftet)
+    snapshot_slot_update = [=]()
+    {
+        update_slot_actions(save_actions, "Alt+Shift+", false);
+        update_slot_actions(load_actions, "Alt+", true);
+    };
+    RetranslateSnapshotSlotMenus();
+}
+
+void MainWindow::RetranslateSnapshotSlotMenus()
+{
+    if(snapshot_save_menu == nullptr || snapshot_load_menu == nullptr) return;
+    snapshot_save_menu->setTitle(tr("In Slot speichern "));
+    snapshot_load_menu->setTitle(tr("Aus Slot laden "));
+    if(snapshot_slot_update) snapshot_slot_update();
 }
 
 bool MainWindow::SnapshotSave(const QString &filename, bool show_message)
