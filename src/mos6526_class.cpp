@@ -424,6 +424,7 @@ bool MOS6526::LoadState(StateReader &r)
     timer_b.load = r.Bool();
     timer_b.oneshot0 = r.Bool();
     timer_b.oneshot = r.Bool();
+    timer_b.cr_start_old = timer_b.cr_start;
     r.Bytes(clock_latch, sizeof(clock_latch));
     r.Bytes(clock_alarm, sizeof(clock_alarm));
     return r.Ok();
@@ -434,6 +435,7 @@ inline void MOS6526::TimerReset(TIMER *timer)
     timer->counter = 0xffff;
     timer->latch = 0xffff;
     timer->cr_start = false;
+    timer->cr_start_old = false;
     timer->cr_oneshot = false;
     timer->cr_force_load = false;
     timer->count_phi2 = true;
@@ -509,7 +511,8 @@ inline void MOS6526::TimerCount()
     if(timer_b_mode == 1 && cnt_pin_rising)
         timer_b.count_step = true;
 
-    if(timer_b_mode >= 2 && timer_a_underflow_old)
+    // (wurde Timer B erst im Takt des Unterlaufs gestartet, dann zaehlt dieser Unterlauf nicht mehr mit)
+    if(timer_b_mode >= 2 && timer_a_underflow_old && timer_b.cr_start_old)
         timer_b.count_step = true;
 
     bool timer_a_underflow = TimerStep(&timer_a);
@@ -517,6 +520,7 @@ inline void MOS6526::TimerCount()
     bool timer_a_underflow_prev = timer_a_underflow_old;
     timer_a_underflow_old = timer_a_underflow;
     timer_b_underflow_old = timer_b_underflow;
+    timer_b.cr_start_old = timer_b.cr_start;
 
     /// Timer A Unterlauf ///
     if(timer_a_underflow)

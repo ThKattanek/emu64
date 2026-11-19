@@ -44,6 +44,7 @@ class MOS6526
         bool        load;               // Ladepipeline Stufe 2 (Latch wird in den Zaehler geladen)
         bool        oneshot0;           // OneShot Pipeline Stufe 1
         bool        oneshot;            // OneShot Pipeline Stufe 2
+        bool        cr_start_old;       // Bit 0 vom Steuerregister im vorigen Takt (Timer B zaehlt Unterlaeufe von Timer A nur, wenn er schon vorher lief)
     };
 public:
 
