@@ -79,6 +79,9 @@ void MOS6526::Reset()
     ifr_d7set1 = ifr_d7set0 = false;
     ifr_raise1 = ifr_raise0 = false;
     ifr_read0 = ifr_read1 = false;
+    cycle_counter = 0;
+    icr_read_cycle = cycle_counter - 100;
+    timer_b_bug = false;
 
     timer_b_mode = 0;
     timer_a_underflow_old = false;
@@ -424,8 +427,11 @@ bool MOS6526::LoadState(StateReader &r)
     timer_b.load = r.Bool();
     timer_b.oneshot0 = r.Bool();
     timer_b.oneshot = r.Bool();
+    timer_b.cr_start_old = timer_b.cr_start;
     r.Bytes(clock_latch, sizeof(clock_latch));
     r.Bytes(clock_alarm, sizeof(clock_alarm));
+    icr_read_cycle = cycle_counter - 100;   // nicht im Snapshot: kein ICR Lesen "im Takt davor"
+    timer_b_bug = false;
     return r.Ok();
 }
 
@@ -434,6 +440,7 @@ inline void MOS6526::TimerReset(TIMER *timer)
     timer->counter = 0xffff;
     timer->latch = 0xffff;
     timer->cr_start = false;
+    timer->cr_start_old = false;
     timer->cr_oneshot = false;
     timer->cr_force_load = false;
     timer->count_phi2 = true;
@@ -509,7 +516,8 @@ inline void MOS6526::TimerCount()
     if(timer_b_mode == 1 && cnt_pin_rising)
         timer_b.count_step = true;
 
-    if(timer_b_mode >= 2 && timer_a_underflow_old)
+    // (wurde Timer B erst im Takt des Unterlaufs gestartet, dann zaehlt dieser Unterlauf nicht mehr mit)
+    if(timer_b_mode >= 2 && timer_a_underflow_old && timer_b.cr_start_old)
         timer_b.count_step = true;
 
     bool timer_a_underflow = TimerStep(&timer_a);
@@ -517,6 +525,7 @@ inline void MOS6526::TimerCount()
     bool timer_a_underflow_prev = timer_a_underflow_old;
     timer_a_underflow_old = timer_a_underflow;
     timer_b_underflow_old = timer_b_underflow;
+    timer_b.cr_start_old = timer_b.cr_start;
 
     /// Timer A Unterlauf ///
     if(timer_a_underflow)
@@ -539,8 +548,11 @@ inline void MOS6526::TimerCount()
     }
 
     /// Timer B Unterlauf ///
+    cycle_counter++;
     if(timer_b_underflow)
     {
+        // Timer B Bug der alten 6526: Unterlauf im Takt nach einem ICR Lesen, dann fehlt das TB Flag beim naechsten Lesen (VICE: CIA_IM_TBB)
+        timer_b_bug = old_model && (cycle_counter - icr_read_cycle == 1);
         TriggerInterrupt(2);
         pb_7 ^= 0x01;
     }
@@ -820,6 +832,12 @@ uint8_t MOS6526::ReadIO(uint16_t address)
             ifr_raise0 = false;
             ifr_read0 = true;
 
+            if(timer_b_bug)
+            {
+                icr &= ~0x02;
+                timer_b_bug = false;
+            }
+            icr_read_cycle = cycle_counter;
             ret = icr;
             icr &= 0x80;
             icr_new = 0;
