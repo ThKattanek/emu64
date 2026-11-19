@@ -1019,8 +1019,10 @@ void VICII::OneCycle()
     // die Prüfung gehört aber schon zur neuen Zeile (wie VICE, dort zählt raster_line vor check_badline).
     const int badline_check_line = (current_cycle == 1) ? ((current_rasterline == total_rasterlines - 1) ? 0 : current_rasterline + 1) : current_rasterline;
 
-    // Prüfen ob Badlines zugelassen sind
-    if(badline_check_line == 0x30) badline_enable = den;
+    // Prüfen ob Badlines zugelassen sind: Ist DEN irgendwann in Zeile $30 gesetzt, bleibt die Freigabe bis zum Bildende bestehen,
+    // auch wenn DEN später in der Zeile gelöscht wird. Am Bildanfang wird sie gelöscht.
+    if(badline_check_line == 0) badline_enable = false;
+    else if(badline_check_line == 0x30 && den) badline_enable = true;
 
     // Der g-Abruf dieses Zyklus sieht den Display-Zustand noch vor der Badline-Prüfung (wie VICE, wichtig für VSP)
     display_status_g = display_status;
