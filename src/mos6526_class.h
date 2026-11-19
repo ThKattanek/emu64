@@ -21,8 +21,8 @@
 #include "./structs.h"
 #include "state_stream.h"
 
-#define ClockCounterPAL 98438
-#define ClockCounterNTSC 118126
+#define TOD_CPU_CLOCK 985248    // PAL C64 Takt (Hz)
+#define TOD_POWER_FREQ 50       // Netzfrequenz der PAL Maschine (Hz), liefert den TOD Takt
 #define Byte2BCD(byte)  (((((byte) / 10) << 4) + ((byte) % 10)) & 0xFF)
 #define BCD2Byte(bcd)   (((10*(((bcd) & 0xf0) >> 4)) + ((bcd) & 0xf)) & 0xFF)
 
@@ -119,6 +119,8 @@ private:
     inline void IfrRun();
     inline void TimerCount();
     inline void SdrStep();
+    inline void TodTick();
+    inline void TodCheckAlarm();
     inline void SdrModeChange(uint8_t new_cra);
     inline void TimerReset(TIMER *timer);
     inline bool TimerStep(TIMER *timer);
@@ -157,8 +159,8 @@ private:
     bool        sdr_cnt_out;        // Ausgangszustand der CNT Leitung im Ausgabemodus
     bool        sdr_force_finish;   // Beim Wechsel Ausgabe->Eingabe: Byte als fertig melden
 
-    uint32_t    clock_counter_latch;
-    uint32_t    clock_counter;
+    uint32_t    tod_acc;            // Akkumulator: erzeugt aus dem CPU Takt die Netzfrequenz Impulse (50 Hz)
+    uint32_t    tod_tick_counter;   // Ringzaehler (0-5), teilt die Netzfrequenz auf 10 Hz
     bool        clock_is_latched;
     bool        clock_is_stopped;
     uint8_t     clock_latch[4];
