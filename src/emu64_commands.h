@@ -52,7 +52,7 @@ static const CMD_STRUCT command_list[]{
     {CMD_ENABLE_REU,"","enable-reu","Aktiviert die REU.",0},
     {CMD_SET_REU_SIZE,"","set-reu-size","Setzt die Größe des REU Speichers in KiB (128, 256, 512, 1024, 2048, 4096, 8192, 16384).",1},
     {CMD_SET_SID_ENGINE,"","set-sid-engine","Setzt die SID Emulations Engine. --set-sid-engine <Engine>\n\t\t\t\t 0=Emu64 1=reSID",1},
-    {CMD_SET_SIDTYPE,"","set-sidtype","Setzt den Typ des ersten SID's. --set-sidtype <Sidtype>\n\t\t\t\t 0=MOS-6581 1=MOS-8085",1},
+    {CMD_SET_SIDTYPE,"","set-sidtype","Setzt den Typ des ersten SID's. --set-sidtype <Sidtype>\n\t\t\t\t 0=MOS-6581 1=MOS-8580",1},
     {CMD_SET_VICMODEL,"","set-vicmodel","Setzt das Modell des VIC-II. --set-vicmodel <Modell>\n\t\t\t\t 0=MOS-6569 1=MOS-8565 (C64C)",1},
     {CMD_SET_CIAMODEL,"","set-ciamodel","Setzt das Modell der beiden CIAs. --set-ciamodel <Modell>\n\t\t\t\t 0=MOS-6526 (alt) 1=MOS-6526A (neu)",1},
     {CMD_MULTIPLE_INSTANCE,"","multiple-instance","Ermoeglicht das starten mehrerer Emu64 Instanzen.",0},
