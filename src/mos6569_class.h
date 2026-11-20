@@ -109,6 +109,7 @@ private:
     void SetBALow();
     void cAccess();
     void gAccess();
+    bool RasterCompare(uint16_t line);
     void Phi1Fetch();
     void pAccess(uint8_t sp_nr);
     void sAccess(uint8_t sp_nr);
@@ -175,6 +176,7 @@ private:
     uint8_t     current_cycle;
     uint16_t    current_rasterline;
     uint16_t    new_irq_raster;
+    bool        raster_irq_triggered; // Rasterzeilen-Vergleich traf im letzten Vergleich zu (IRQ nur bei Wechsel von Nicht-Treffer auf Treffer, wie VICE)
     uint16_t    x_coordinates_table[64];
     uint16_t    current_x_coordinate;
     uint8_t     graphic_mode;

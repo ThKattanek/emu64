@@ -69,6 +69,7 @@ VICII::VICII()
     reg_x_scroll = 0;
     reg_vbase = 0;
     reg_irq_raster = 0;
+    raster_irq_triggered = false;
     reg_lpx = 0;
     reg_lpy = 0;
     reg_me = 0;
@@ -416,6 +417,24 @@ void VICII::SetFullView(bool status)
 {
     full_view = status;
     ApplyDisplayLines();
+}
+
+// Rasterzeilen-Vergleich: Der Raster-IRQ wird nur beim Wechsel von Nicht-Treffer auf Treffer ausgeloest (wie VICE vicii-cycle.c).
+// Wird $d012 im selben Takt geaendert, in dem die Rasterzeile wechselt, bleibt der Vergleich wahr und es gibt keinen neuen IRQ
+// (VICII/rasterirq/rasterirq_hold). Liefert true, wenn ein neuer IRQ ausgeloest werden muss.
+bool VICII::RasterCompare(uint16_t line)
+{
+    if(line == reg_irq_raster)
+    {
+        if(!raster_irq_triggered)
+        {
+            raster_irq_triggered = true;
+            return true;
+        }
+    }
+    else raster_irq_triggered = false;
+
+    return false;
 }
 
 inline void VICII::RasterIRQ()
@@ -1034,6 +1053,9 @@ void VICII::OneCycle()
 
     Phi1Fetch();
 
+    // Rasterzeilen-Vergleich in jedem Zyklus ab Zyklus 3 (Zyklus 1 und 2 siehe dort), auch wenn $d012/$d011 mitten in der Zeile geschrieben wurden
+    if(current_cycle > 2 && RasterCompare(current_rasterline)) RasterIRQ();
+
     // IRQ Leitung fuer Kollisions Flags (kamen im Vorzyklus, die CPU konnte sie im Zyklus davor noch quittieren)
     if(irq_flag & irq_mask & 0x06) CpuTriggerInterrupt(VIC_IRQ);
 
@@ -1097,7 +1119,7 @@ void VICII::OneCycle()
 			// Prüfen auf Raster IRQ
             // Raster IRQ Flag schon in Zyklus 1 setzen (wie VICE: das Flag liegt vor dem CPU Zugriff des Zyklus an,
             // ein Schreiben auf $D019 im selben Zyklus loescht es wieder). Die IRQ Leitung folgt erst in Zyklus 2.
-            if (current_rasterline == reg_irq_raster)
+            if (RasterCompare(current_rasterline))
             {
                 irq_flag |= 0x01;
                 if (irq_mask & 0x01) irq_flag |= 0x80;
@@ -1135,10 +1157,17 @@ void VICII::OneCycle()
         }
 
         // Prüfen auf Raster IRQ
-        if (current_rasterline == reg_irq_raster)
+        if (current_rasterline == 0)
         {
-            if (current_rasterline == 0) RasterIRQ();
-            else if ((irq_flag & irq_mask & 0x01) != 0) CpuTriggerInterrupt(VIC_IRQ);  // Flag wurde in Zyklus 1 gesetzt und nicht im selben Zyklus quittiert
+            if (RasterCompare(0)) RasterIRQ();
+        }
+        else if (RasterCompare(current_rasterline))
+        {
+            RasterIRQ();    // erst in diesem Zyklus zugetroffen (z.B. $d012 in Zyklus 1 geschrieben)
+        }
+        else if (current_rasterline == reg_irq_raster)
+        {
+            if ((irq_flag & irq_mask & 0x01) != 0) CpuTriggerInterrupt(VIC_IRQ);  // Flag wurde in Zyklus 1 gesetzt und nicht im selben Zyklus quittiert
         }
 
 		/// Sprite 5 ///
@@ -1563,6 +1592,7 @@ void VICII::SaveState(StateWriter &w) const
     w.U16(reg_x_scroll);
     w.U8(reg_vbase);
     w.U16(reg_irq_raster);
+    w.Bool(raster_irq_triggered);
     w.U8(reg_lpx);
     w.U8(reg_lpy);
     w.U8(reg_me);
@@ -1691,6 +1721,7 @@ bool VICII::LoadState(StateReader &r, uint16_t version)
     reg_x_scroll = r.U16();
     reg_vbase = r.U8();
     reg_irq_raster = r.U16();
+    raster_irq_triggered = r.Bool();
     reg_lpx = r.U8();
     reg_lpy = r.U8();
     reg_me = r.U8();
@@ -1858,8 +1889,7 @@ void VICII::WriteIO(uint16_t address, uint8_t value)
                         reg_y_scroll = value & 7;
 
                         new_irq_raster = static_cast<uint16_t>((reg_irq_raster & 0xFF) | ((value & 0x80) << 1));
-                        if (reg_irq_raster != new_irq_raster && current_rasterline == new_irq_raster) RasterIRQ();
-                        reg_irq_raster = new_irq_raster;
+                        reg_irq_raster = new_irq_raster;     // der Vergleich erfolgt in OneCycle (wie VICE, jeden Zyklus)
 			
                         graphic_mode = ((reg_ctrl_1 & 0x60) | (reg_ctrl_2 & 0x10)) >> 4;
 		
@@ -1886,8 +1916,7 @@ void VICII::WriteIO(uint16_t address, uint8_t value)
                         //reg_irq_raster = (reg_irq_raster & 0xFF00) | wert;
 
                         new_irq_raster = (reg_irq_raster & 0xFF00) | value;
-                        if (reg_irq_raster != new_irq_raster && current_rasterline == new_irq_raster) RasterIRQ();
-                        reg_irq_raster = new_irq_raster;
+                        reg_irq_raster = new_irq_raster;     // der Vergleich erfolgt in OneCycle (wie VICE, jeden Zyklus)
 			break;
 
 		/// Sprite Enable
