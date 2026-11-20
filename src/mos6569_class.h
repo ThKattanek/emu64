@@ -109,6 +109,7 @@ private:
     void SetBALow();
     void cAccess();
     void gAccess();
+    void Phi1Fetch();
     void pAccess(uint8_t sp_nr);
     void sAccess(uint8_t sp_nr);
     void CheckBorder();
