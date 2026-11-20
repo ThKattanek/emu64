@@ -77,6 +77,7 @@ public:
     bool LoadState(StateReader &r, uint16_t version);
     void WriteIO(uint16_t address, uint8_t value);
     uint8_t ReadIO(uint16_t address);
+    uint8_t ReadIORegister(uint16_t address);
     uint16_t ReadRasterline() const;
     void SetLightpen(bool low);
 
@@ -109,6 +110,7 @@ private:
     void SetBALow();
     void cAccess();
     void gAccess();
+    void sFetch(uint8_t sp_nr);
     bool RasterCompare(uint16_t line);
     void Phi1Fetch();
     void pAccess(uint8_t sp_nr);
@@ -208,6 +210,9 @@ private:
     uint16_t    s_address;
     uint16_t    s_address_byte2[8];         // Adresse des 3. Sprite-Bytes (wird im Zyklus nach dem Sprite-Zugriff gelesen)
     uint8_t     s_byte2_pending;            // Sprites deren 3. Byte noch gelesen werden muss
+    uint8_t     s_idle_pending;             // Sprites ohne DMA: 1. und 2. Byte werden im naechsten Zyklus uebernommen (siehe sFetch)
+    uint8_t     s_idle_pending2;            // Sprites ohne DMA: 3. Byte wird im uebernaechsten Zyklus uebernommen
+    uint8_t     last_bus_phi2;              // Interner Bus des VIC in Phi2: Wert eines CPU Zugriffs auf ein VIC Register in diesem Takt, sonst $ff
     uint8_t     p_data[8];
     uint8_t     c_data_buffer_8bit[64];
     uint8_t     c_data_buffer_4bit[64];
