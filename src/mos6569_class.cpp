@@ -173,6 +173,9 @@ VICII::VICII()
     creg_cur_val = creg_pend_val = 0;
 
     s_byte2_pending = 0;
+    s_idle_pending = 0;
+    s_idle_pending2 = 0;
+    last_bus_phi2 = 0xFF;
     gfx_pipe0_g = gfx_pipe0_c = gfx_pipe0_v = 0;
     gfx_pipe1_g = gfx_pipe1_c = gfx_pipe1_v = 0;
     gfx_reg_g = gfx_reg_c = gfx_reg_v = 0;
@@ -565,6 +568,24 @@ inline void VICII::sAccess(uint8_t sp_nr)
     sprite_sequenzer[sp_nr] |= static_cast<uint32_t>(((Read(s_address)) << 8));
     s_address_byte2[sp_nr] = static_cast<uint16_t>(s_base | ((mc[sp_nr] + 2) & 0x3F));
     s_byte2_pending |= static_cast<uint8_t>(1 << sp_nr);
+}
+
+// Sprite-Abruf im Zyklus des Zeigers: Bei aktivem DMA werden die Daten aus dem Speicher gelesen. Ohne DMA fuellt der VIC den
+// Sprite-Puffer mit dem, was gerade auf dem Bus liegt: 1. und 3. Byte mit dem internen Bus (Wert eines CPU Zugriffs auf ein
+// VIC Register in Phi2 dieses bzw. des folgenden Taktes, sonst $ff), das 2. Byte mit dem Idle-Abruf ($3fff). Beginnt ein Sprite
+// ab X >= $164 in derselben Zeile, ist genau dieser Inhalt zu sehen (VICE viciisc vicii-fetch.c, Testbench VICII/sb_sprite_fetch).
+// Der CPU Zugriff eines Taktes folgt in Emu64 erst nach OneCycle, deshalb werden die Bytes erst in den naechsten Zyklen uebernommen.
+inline void VICII::sFetch(uint8_t sp_nr)
+{
+    const uint8_t bit = static_cast<uint8_t>(1 << sp_nr);
+
+    if(!*ba) sAccess(sp_nr);
+
+    if(!(sprite_dma & bit))
+    {
+        s_byte2_pending &= static_cast<uint8_t>(~bit);
+        s_idle_pending |= bit;
+    }
 }
 
 inline void VICII::CheckBorder()
@@ -1099,6 +1120,32 @@ void VICII::OneCycle()
         s_byte2_pending = 0;
     }
 
+    // Sprites ohne DMA (siehe sFetch): last_bus_phi2 ist der interne Bus der Phi2 des Vorzyklus
+    if(s_idle_pending2)
+    {
+        for(int i=0; i<8; i++)
+        {
+            if(s_idle_pending2 & (1 << i)) sprite_sequenzer[i] = (sprite_sequenzer[i] & 0xFFFF00) | last_bus_phi2;
+        }
+        s_idle_pending2 = 0;
+    }
+
+    if(s_idle_pending)
+    {
+        const uint16_t bank = static_cast<uint16_t>(*cia2_port_a << 14);
+        const uint8_t idle = Read(static_cast<uint16_t>(bank | 0x3FFF));
+
+        for(int i=0; i<8; i++)
+        {
+            if(s_idle_pending & (1 << i)) sprite_sequenzer[i] = (static_cast<uint32_t>(last_bus_phi2) << 16) | (static_cast<uint32_t>(idle) << 8);
+        }
+        s_idle_pending2 = s_idle_pending;
+        s_idle_pending = 0;
+    }
+
+    // Der interne Bus wird geleert, der CPU Zugriff dieses Taktes folgt nach OneCycle
+    last_bus_phi2 = 0xFF;
+
     switch (current_cycle)
 	{
     case 1:
@@ -1141,7 +1188,7 @@ void VICII::OneCycle()
 
 		// Sprite 3 //
         pAccess(3);
-        if(!*ba) sAccess(3);
+        sFetch(3);
 
         DrawGraphicsPseudo();
 		break;
@@ -1182,7 +1229,7 @@ void VICII::OneCycle()
 
 		// Sprite 4 //
         pAccess(4);
-        if(!*ba) sAccess(4);
+        sFetch(4);
 
         DrawGraphicsPseudo();
 		break;
@@ -1200,7 +1247,7 @@ void VICII::OneCycle()
 
 		// Sprite 5 //
         pAccess(5);
-        if(!*ba) sAccess(5);
+        sFetch(5);
 
         DrawGraphicsPseudo();
 		break;
@@ -1218,7 +1265,7 @@ void VICII::OneCycle()
 
 		// Sprite 6 //
         pAccess(6);
-        if(!*ba) sAccess(6);
+        sFetch(6);
 
         DrawGraphicsPseudo();
 		break;
@@ -1233,7 +1280,7 @@ void VICII::OneCycle()
 
 		// Sprite 7 //
         pAccess(7);
-        if(!*ba) sAccess(7);
+        sFetch(7);
 
         vmli = 0;
 
@@ -1446,7 +1493,7 @@ void VICII::OneCycle()
 
 		// Sprite 0 //
         pAccess(0);
-        if(!*ba) sAccess(0);
+        sFetch(0);
 
         DrawGraphics();
 		break;
@@ -1464,7 +1511,7 @@ void VICII::OneCycle()
 
 		// Sprite 1 //
         pAccess(1);
-        if(!*ba) sAccess(1);
+        sFetch(1);
 
         DrawGraphics();
 		break;
@@ -1482,7 +1529,7 @@ void VICII::OneCycle()
 
 		// Sprite 2 //
         pAccess(2);
-        if(!*ba) sAccess(2);
+        sFetch(2);
 
         DrawGraphicsPseudo();
 		break;
@@ -1576,6 +1623,7 @@ void VICII::OneCycle()
     }
 
     reg11_delay = reg_ctrl_1;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1646,6 +1694,9 @@ void VICII::SaveState(StateWriter &w) const
     w.U16(s_address);
     for(unsigned i = 0; i < 8; i++) w.U16(s_address_byte2[i]);
     w.U8(s_byte2_pending);
+    w.U8(s_idle_pending);
+    w.U8(s_idle_pending2);
+    w.U8(last_bus_phi2);
     w.Bytes(p_data, sizeof(p_data));
     w.Bytes(c_data_buffer_8bit, sizeof(c_data_buffer_8bit));
     w.Bytes(c_data_buffer_4bit, sizeof(c_data_buffer_4bit));
@@ -1775,6 +1826,9 @@ bool VICII::LoadState(StateReader &r, uint16_t version)
     s_address = r.U16();
     for(unsigned i = 0; i < 8; i++) s_address_byte2[i] = r.U16();
     s_byte2_pending = r.U8();
+    s_idle_pending = r.U8();
+    s_idle_pending2 = r.U8();
+    last_bus_phi2 = r.U8();
     r.Bytes(p_data, sizeof(p_data));
     r.Bytes(c_data_buffer_8bit, sizeof(c_data_buffer_8bit));
     r.Bytes(c_data_buffer_4bit, sizeof(c_data_buffer_4bit));
@@ -1850,6 +1904,7 @@ bool VICII::LoadState(StateReader &r, uint16_t version)
 void VICII::WriteIO(uint16_t address, uint8_t value)
 {
     address &= 63;
+    last_bus_phi2 = value;
 
     // Schreibzugriff auf ein Farbregister merken (wirkt erst im Folgezyklus)
     if(address >= 0x20 && address <= 0x2E)
@@ -2046,6 +2101,13 @@ uint16_t VICII::ReadRasterline() const
 }
 
 uint8_t VICII::ReadIO(uint16_t address)
+{
+    const uint8_t value = ReadIORegister(address);
+    last_bus_phi2 = value;
+    return value;
+}
+
+uint8_t VICII::ReadIORegister(uint16_t address)
 {
     uint8_t ret;
     address &= 63;
