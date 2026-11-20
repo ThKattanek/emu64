@@ -499,6 +499,33 @@ inline void VICII::gAccess()
     last_read_gp_access = gfx_data;
 }
 
+// Phi1 Abrufe, die weder g- noch p-Zugriff sind: Sprite-Byte (nur bei aktivem Sprite-DMA, sonst Idle), Refresh und Idle.
+// Der Wert liegt auf dem Datenbus und ist ueber offene Adressen ($de00-$dfff) fuer die CPU sichtbar (VICE phi1timing).
+// Refresh: $3f00 + Zaehler, der pro Bild bei $ff beginnt und je Refresh-Zugriff (5 pro Zeile) herunterzaehlt.
+inline void VICII::Phi1Fetch()
+{
+    const uint16_t bank = static_cast<uint16_t>(*cia2_port_a << 14);
+    int sprite = -1;
+
+    switch(current_cycle)
+    {
+    case 2: case 4: case 6: case 8: case 10:    sprite = 3 + (current_cycle - 2) / 2;   break;
+    case 59: case 61: case 63:                  sprite = (current_cycle - 59) / 2;      break;
+    case 11: case 12: case 13: case 14: case 15:
+        last_read_gp_access = Read(static_cast<uint16_t>(bank | 0x3F00 | ((0xFF - 5 * current_rasterline - (current_cycle - 11)) & 0xFF)));
+        return;
+    case 56: case 57:
+        break;
+    default:
+        return;
+    }
+
+    if(sprite >= 0 && (sprite_dma & (1 << sprite)))
+        last_read_gp_access = static_cast<uint8_t>((sprite_sequenzer[sprite] >> 8) & 0xFF);
+    else
+        last_read_gp_access = Read(static_cast<uint16_t>(bank | 0x3FFF));
+}
+
 inline void VICII::pAccess(uint8_t sp_nr)
 {
     p_address = static_cast<uint16_t>((*cia2_port_a<<14)|(matrix_base)|0x3F8|sp_nr);
@@ -1004,6 +1031,8 @@ void VICII::OneCycle()
     uint8_t sprite_bit = 0x01;
 
     current_x_coordinate = x_coordinates_table[current_cycle];
+
+    Phi1Fetch();
 
     // IRQ Leitung fuer Kollisions Flags (kamen im Vorzyklus, die CPU konnte sie im Zyklus davor noch quittieren)
     if(irq_flag & irq_mask & 0x06) CpuTriggerInterrupt(VIC_IRQ);
