@@ -23,6 +23,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 HW_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HW_DIR)
+sys.dont_write_bytecode = True     # kein __pycache__ im Repo
 import hwcompare  # noqa: E402
 
 MODEL_NAMES = {0: '6569', 1: '8565'}

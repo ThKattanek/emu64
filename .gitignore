@@ -14,3 +14,6 @@ manual/index.pdf
 # Testbench: lokale Einstellungen und Teilläufe
 testbench/config.local.sh
 testbench/results/partial/
+
+# Python-Cache (testbench/hardware)
+__pycache__/
