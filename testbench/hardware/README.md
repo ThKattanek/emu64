@@ -8,7 +8,7 @@
 
 Mit diesen Skripten wird ein Testprogramm auf einem echten C64 gestartet, das Bild mit einem Video-Grabber aufgenommen und auf C64-Pixelebene mit Emu64 verglichen. So lässt sich klären, was die Hardware wirklich macht, wenn Referenzbild und VICE sich widersprechen oder beide unsicher sind (in der Testliste oft als `unsafe reference` vermerkt).
 
-Entstanden bei #446 (VICII/vicii_timing): Gemessen an einem 6569 und einem 8565 lagen dort weder die Referenzbilder noch VICE ganz richtig.
+Entstanden bei #446 (VICII/vicii_timing): Gemessen an echten 6569 und 8565 lagen dort weder die Referenzbilder noch VICE ganz richtig. Die Ergebnisse aller Messungen stehen in [`MESSUNGEN.md`](MESSUNGEN.md).
 
 ### Aufbau
 
@@ -37,7 +37,7 @@ Der Grabber wird automatisch über seinen Namen gefunden (Standard `stk1160`), d
 | `hw_suite_eval.py` | Wertet die Messsätze aller Geräte aus: rendert die Tests mit einem oder mehreren Emu64-Ständen (`--emu name=binary`) und vergleicht sie mit Referenz und Hardware an den strittigen Stellen aus `suite_regions.txt` |
 | `hwcompare.py` | Auswertung: `fit`, `compare`, `profile`, `view` |
 | `grabber_ctrl.py` | Helligkeit/Kontrast des Grabbers lesen und setzen |
-| `hw_view.sh` | Grabber-Bild live in einem Fenster zeigen (ffplay, `-z 2` doppelte Größe, `-f` Vollbild, `--pixel` ohne Glättung). Solange es offen ist, ist der Grabber für Aufnahmen belegt. |
+| `hw_view.sh` | Grabber-Bild live in einem Fenster zeigen (ffplay). Standard: nur das sichtbare C64-Bild wie in den Testbench-Screenshots (384x272 mit Rahmen), `--full` ganzes Grabberbild, `-z 2` doppelte Größe, `-f` Vollbild, `--pixel` ohne Glättung, Deinterlacer bwdif mit 50 Bildern/s (`-d yadif\|field\|none`). Solange es offen ist, ist der Grabber für Aufnahmen belegt. |
 
 ### Geräte messen
 
