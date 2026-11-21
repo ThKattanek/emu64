@@ -10,6 +10,7 @@ Die Rohdaten (Aufnahmen) liegen lokal unter `build/hardware_captures/` und sind 
 |---|---|---|---|
 | C64-01 | - | nicht erfasst | MOS-6569R5 |
 | C64-02 | 250469 | MOS-8500, MOS-8580R5, MOS-8565R2, 2x MOS-6526A | MOS-8565R2 |
+| C64-04 | 250469 | CSG-8500, CSG-8580R5, CSG-8565R2, 2x CSG-6526B | CSG-8565R2 |
 | C64-05 | 250469 | CSG-8500, CSG-8580R5, CSG-8565R2, 2x CSG-6526A | CSG-8565R2 |
 | C64-07 | 250469 | CSG-8500, CSG-8580R5, CSG-8565R2, 2x CSG-6526A | CSG-8565R2 |
 | C64-06 | 250407 | MOS-6510, MOS-6581, MOS-6569R3, 2x MOS-6526R4 | MOS-6569R3 |
@@ -21,7 +22,7 @@ Messaufbau: 1541 Ultimate II+ (Firmware 3.14d, Programmstart per `runners:run_pr
 
 ## #446: ECM/BMM-Umschaltung mitten in der Zeile (2026-11-21)
 
-> **Nachtrag 8565 (2026-11-21 abends):** Von drei gemessenen 8565R2 zeigen zwei warm den Nachlauf (C64-02, C64-07), einer nicht (C64-05). Die Regel "8565: gelöschtes Bit wirkt ab Pixel 1" bildet damit die Mehrheit ab, gilt aber nicht für jeden Chip, siehe Abschnitt "Weitere 8565 (C64-05, C64-07)" unten. Die übrigen Ergebnisse (6569, ECM-Verzögerung im Grafikabruf) sind davon nicht betroffen.
+> **Nachtrag 8565 (2026-11-21 abends):** Von vier gemessenen 8565R2 zeigen drei warm den Nachlauf (C64-02, C64-04, C64-07), einer nicht (C64-05). Die Regel "8565: gelöschtes Bit wirkt ab Pixel 1" bildet damit die Mehrheit ab und bleibt Standard, gilt aber nicht für jeden Chip, siehe Abschnitt "Weitere 8565 (C64-04, C64-05, C64-07)" unten. Die übrigen Ergebnisse (6569, ECM-Verzögerung im Grafikabruf) sind davon nicht betroffen.
 
 ### Anlass
 
@@ -51,6 +52,7 @@ Folge für den ungültigen Modus (ECM+BMM, schwarz): Werden beide Bits gleichzei
 |---|---|---|---|
 | C64-01 | 8,6 | 17,6 | 6569 |
 | C64-02 | 22,5 | 9,8 | 8565 |
+| C64-04 | 23,8 | 11,0 | 8565 |
 | C64-05 | 23,3 | 14,1 | 8565 |
 | C64-07 | 22,0 | 10,1 | 8565 |
 | C64-06 | 13,4 | 19,6 | 6569 |
@@ -134,7 +136,7 @@ Ohne die ECM-Verzögerung im Grafikabruf passt die ECM-Zeile gar nicht (das ECM-
 
 Pixel 5 gewinnt in 10 von 13 Mustern. Nur ff und 7f (fast nur weißer Vordergrund) liegen knapp bei Pixel 6. Kein Unterschied zwischen R3 und R5, der nachgebildet werden müsste.
 
-### Weitere 8565 (C64-05, C64-07)
+### Weitere 8565 (C64-04, C64-05, C64-07)
 
 #### C64-05
 
@@ -175,15 +177,32 @@ Gleiche Platine und ebenfalls CSG-Chips wie C64-05. Eingeschaltet 21:38, gemesse
 
 Ergebnis: Der C64-07 hat den Nachlauf wie der C64-02 warm, und zwar schon kalt, ohne Änderung bis 45 Minuten.
 
-#### Zwischenstand 8565
+#### C64-04
+
+Gleiche Platine und CSG-Chips wie C64-05 und C64-07, aber CIAs 6526B. Eingeschaltet 23:01, gemessen kalt sowie nach 15, 30 und 45 Minuten (`C64-04_8565R2_t00/t15/t30/t45`, je 13 Muster in `muster_C64-04_8565R2_t*`).
+
+| E+B, normiert (0 = schwarz, 100 = grau) | x=111 | x=112 | x=113 |
+|---|---|---|---|
+| C64-04 a5, kalt bis 45 Min. | 2 | **0 bis 1** | 79 bis 81 |
+| C64-04 ff, kalt bis 45 Min. | 1 bis 2 | **40 bis 42** | 89 bis 90 |
+
+| C64-04, Mittel über 13 Muster | BMM | ECM | E+B |
+|---|---|---|---|
+| mit Nachlauf (aktuell), t00 / t45 | **24,5 / 25,2** | **11,4 / 12,2** | **7,1 / 7,8** |
+| ohne (VICE), t00 / t45 | 27,0 / 27,5 | 14,7 / 15,3 | 18,7 / 18,9 |
+
+Ergebnis: Nachlauf wie C64-02 (warm) und C64-07, schon kalt und ohne Änderung bis 45 Minuten.
+
+#### Ergebnis 8565
 
 | Gerät | Chips | warm | kalt |
 |---|---|---|---|
 | C64-02 | MOS | Nachlauf (1 Pixel nach der Zellgrenze) | 1 Pixel vor der Zellgrenze |
 | C64-05 | CSG | 1 Pixel vor der Zellgrenze | (nicht kalt gemessen, ab 16 Min. stabil) |
+| C64-04 | CSG | Nachlauf | Nachlauf |
 | C64-07 | CSG | Nachlauf | Nachlauf |
 
-MOS gegen CSG ist nicht die Ursache (C64-05 und C64-07 haben dieselbe Bestückung). Die Kante streut von Chip zu Chip und je nach Chip auch mit der Temperatur. Zwei von drei Geräten (und die modesplit-Referenzen von gpz' C64C) zeigen warm den Nachlauf, Emu64 bildet dieses Verhalten ab. Ein weiterer 8565 ist noch zu messen.
+MOS gegen CSG ist nicht die Ursache (C64-04, C64-05 und C64-07 haben dieselbe Bestückung). Die Kante streut von Chip zu Chip und je nach Chip auch mit der Temperatur (stark beim C64-02, gar nicht bei C64-04 und C64-07). Drei von vier Geräten und die modesplit-Referenzen von gpz' C64C zeigen warm den Nachlauf. **Entscheidung:** Emu64 behält dieses Verhalten als Standard, der C64-05 ist die Ausnahme.
 
 ### Folgen für die VICE-Testbench
 
@@ -196,7 +215,7 @@ MOS gegen CSG ist nicht die Ursache (C64-05 und C64-07 haben dieselbe Bestückun
 ### Offene Punkte
 
 - `videomode-z` Zeile 100 (x 228-244) auf dem 6569: Die Referenz liegt auf allen drei 6569 näher an der Hardware als Emu64 (z.B. C64-06: 2,99 gegen 5,64). Unabhängig von #446 (VICE-Stand und aktueller Stand sind dort gleich).
-- 8565: Kante streut je nach Chip um etwa einen Pixel (C64-02 und C64-07 mit Nachlauf, C64-05 ohne). Einen weiteren 8565 messen, dann das Standardverhalten endgültig festlegen (derzeit Nachlauf, wie die Mehrheit). Die `-8565`-Referenzen von gpz' C64C sind dabei keine Hilfe: modesplit passt zum C64-02-Verhalten, videomode zum VICE-Verhalten.
+- 8565: Die Kante streut je nach Chip um etwa einen Pixel (drei von vier mit Nachlauf). Erledigt: Emu64 behält den Nachlauf als Standard. Denkbar wäre später eine Auswahl im Setup für Chips wie den C64-05. Die `-8565`-Referenzen von gpz' C64C sind dabei keine Hilfe: modesplit passt zum C64-02-Verhalten, videomode zum VICE-Verhalten.
 
 ### Wiederholen
 
