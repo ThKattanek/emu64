@@ -294,6 +294,7 @@ public:
     uint16_t        fullscreen_height;
     bool            enable_fullscreen;
     bool            changed_graphic_modi;
+    bool            grafik_init_running;    // SDL-Thread steckt gerade in InitGrafik (#448)
     bool            enable_vsync;
     bool            changed_vsync;
     bool            changed_window_pos;
@@ -505,6 +506,7 @@ private:
     bool IsVideoConvertSkippable();
     bool IsFrameRenderNeeded();
     void ConvertPendingVideo();
+    void SaveExitScreenshot();          // Exit-Screenshot speichern, auch wenn das SDL-Fenster noch nicht angelegt ist (#448)
     void CheckKeys();
     uint16_t DisAss(FILE *file, uint16_t pc, bool line_draw, int source);
     bool CheckBreakpoints();

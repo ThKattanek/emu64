@@ -88,6 +88,7 @@ LimitCyclesEvent = nullptr;
 DebugCartEvent = nullptr;
 
 changed_graphic_modi = false;
+grafik_init_running = false;
 changed_window_pos = false;
 changed_window_size = false;
 
@@ -713,6 +714,12 @@ C64Class::~C64Class()
 
 void C64Class::StartEmulation()
 {
+    // Steuerflags vor dem Start des Threads setzen. Setzt der Thread sie selbst zurück, kann ein frühes
+    // EndEmulation (z.B. --limitcycles unter Last) überschrieben werden und der Thread endet nie (#448).
+    loop_thread_end = false;
+    loop_thread_is_end = false;
+    sdl_thread_pause = false;
+
     /// SLD Thread starten (ab hier startet auch die C64 Emulation ///
     SDL_ClearError();
     sdl_thread = SDL_CreateThread(SDLThread, "C64Thread", this);
@@ -745,23 +752,30 @@ void C64Class::EndEmulation()
         // Kein mutex1: Ein laufender Audio-Callback käme mit gesetztem hold_next_system_cycle nie zum Ende (keine Samples).
         // Kurz warten, damit ein gerade laufender Zyklus abgeschlossen ist.
         SDL_Delay(1);
-        ConvertPendingVideo();
-        SwapRBSurface(c64_screen);
-        SDL_SavePNG(c64_screen, exit_screenshot_filename);
+        SaveExitScreenshot();
         hold_next_system_cycle = false;
     }
 
     /// Loop Thread beenden ///
     loop_thread_end = true;
 
-    int time_out = 1000;    // 1000ms
+    // Der Thread kann unter Last noch einige Zeit im Aufbau des Fensters (InitGrafik) stecken. Vor SDL_Quit muss er
+    // beendet sein, sonst greift er auf die schon geschlossene X11/OpenGL-Verbindung zu und stürzt ab (#448).
+    int time_out = 10000;    // 10 s
     while (!loop_thread_is_end && time_out > 0)
     {
         SDL_Delay(1);
         time_out--;
     }
 
-    SDL_DetachThread(sdl_thread);
+    if(loop_thread_is_end)
+        SDL_WaitThread(sdl_thread, nullptr);
+    else
+    {
+        LogText("<< ERROR: SDLThread wurde nicht rechtzeitig beendet.\n");
+        SDL_DetachThread(sdl_thread);
+    }
+    sdl_thread = nullptr;
 
     SDL_PauseAudioDevice(audio_dev, 1);
     if(audio_dev > 0) SDL_CloseAudioDevice(audio_dev);
@@ -830,9 +844,6 @@ int SDLThread(void *userdat)
     c64->LogText(">> SDLThread Start.\n");
 
     SDL_Event event;
-    c64->loop_thread_end = false;
-    c64->loop_thread_is_end = false;
-    c64->sdl_thread_pause = false;
     c64->c64_screen_buffer = nullptr;
 
     while (!c64->loop_thread_end)
@@ -840,10 +851,12 @@ int SDLThread(void *userdat)
         /// Wird immer ausgeführt wenn die Funktion SetGrafikModi ausgefürt wurde ///
         if(c64->changed_graphic_modi)
         {
+            c64->grafik_init_running = true;
             c64->changed_graphic_modi = false;
             c64->LogText(">> SDLThread: InitGrafik Start.\n");
             c64->InitGrafik();
             c64->LogText(">> SDLThread: InitGrafik Ende.\n");
+            c64->grafik_init_running = false;
         }
 
         if(c64->changed_vsync)
@@ -1096,6 +1109,67 @@ void C64Class::ConvertPendingVideo()
     c64_screen_is_obselete = true;
 }
 
+void C64Class::SaveExitScreenshot()
+{
+    // Die Emulation kann enden, bevor der SDL-Thread das Fenster und c64_screen fertig angelegt hat (z.B. --nogui mit
+    // --limitcycles unter Last, #448). Die Emulation steht hier bereits, deshalb auf die Grafik warten und dann wie
+    // gewohnt aus c64_screen speichern (InitGrafik läuft beim Start mehrmals, Größe und Ausschnitt stehen erst danach fest).
+    int time_out = 10000;    // 10 s
+    bool waited = false;
+    while((c64_screen == nullptr || changed_graphic_modi || grafik_init_running) && !loop_thread_is_end && time_out > 0)
+    {
+        SDL_Delay(1);
+        time_out--;
+        waited = true;
+    }
+
+    // Normalfall: Das Bild liegt in der Surface des SDL-Fensters
+    SDL_Surface *surface = (changed_graphic_modi || grafik_init_running) ? nullptr : c64_screen;
+    SDL_Surface *own_surface = nullptr;
+
+    if(surface != nullptr)
+    {
+        if(waited && !video_convert_pending && (vic_buffer != nullptr) && (video_crt_output != nullptr) && (SDL_LockSurface(surface) == 0))
+        {
+            // c64_screen wurde neu angelegt und ist leer, das letzte Bild liegt aber schon umgerechnet nur in der alten Surface
+            video_crt_output->ConvertVideo(static_cast<void*>(surface->pixels),surface->pitch,vic_buffer,video_x_offset,current_c64_screen_width,current_c64_screen_height,504,312,false);
+            SDL_UnlockSurface(surface);
+        }
+        else ConvertPendingVideo();
+    }
+    else
+    {
+        // Notlösung, wenn die Grafik auch nach dem Warten nicht fertig ist: in eine eigene Surface umrechnen.
+        // Größe und Ausschnitt können dann noch aus einer früheren Initialisierung stammen.
+        if((current_c64_screen_width <= 0) || (current_c64_screen_height <= 0) || (vic_buffer == nullptr) || (video_crt_output == nullptr))
+        {
+            LogText("<< ERROR: Exit-Screenshot nicht moeglich, die Grafik ist noch nicht initialisiert.\n");
+            return;
+        }
+
+        own_surface = SDL_CreateRGBSurface(0, current_c64_screen_width, current_c64_screen_height, 32, 0, 0, 0, 0);
+        if((own_surface == nullptr) || (SDL_LockSurface(own_surface) != 0))
+        {
+            LogText("<< ERROR: Exit-Screenshot: SDL Surface konnte nicht erstellt werden.\n");
+            if(own_surface != nullptr) SDL_FreeSurface(own_surface);
+            return;
+        }
+
+        if(video_convert_pending)
+            video_crt_output->ConvertSkippedVideo(static_cast<void*>(own_surface->pixels),own_surface->pitch,vic_buffer,video_x_offset,current_c64_screen_width,current_c64_screen_height,504,312,false);
+        else
+            video_crt_output->ConvertVideo(static_cast<void*>(own_surface->pixels),own_surface->pitch,vic_buffer,video_x_offset,current_c64_screen_width,current_c64_screen_height,504,312,false);
+        SDL_UnlockSurface(own_surface);
+        surface = own_surface;
+        LogText("<< WARNUNG: Exit-Screenshot ohne SDL-Fenster erzeugt (Grafik nicht rechtzeitig initialisiert).\n");
+    }
+
+    SwapRBSurface(surface);
+    SDL_SavePNG(surface, exit_screenshot_filename);
+
+    if(own_surface != nullptr) SDL_FreeSurface(own_surface);
+}
+
 void C64Class::DebugRefreshScreen()
 {
     // Im Debugger (Einzelschritt/Animation) das gerade im Aufbau befindliche Bild anzeigen,
@@ -1185,6 +1259,9 @@ inline void C64Class::WarpModeCycle()
     if(limit_cycles_active && ((cycle_counter - last_reset_cycle) >= limit_cycles_target))
     {
         limit_cycles_active = false;
+        // Mit Exit-Screenshot genau hier anhalten, sonst läuft die Emulation bis EndEmulation weiter und das Bild
+        // hängt von der Rechnerlast ab (#448). EndEmulation gibt nach dem Screenshot wieder frei.
+        if(enable_exit_screenshot) hold_next_system_cycle = true;
         // Event auslösen
         if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
     }
@@ -1300,6 +1377,8 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             if(limit_cycles_active && ((cycle_counter - last_reset_cycle) >= limit_cycles_target))
             {
                 limit_cycles_active = false;
+                // Mit Exit-Screenshot genau hier anhalten (siehe WarpModeCycle, #448)
+                if(enable_exit_screenshot) hold_next_system_cycle = true;
                 // Event auslösen
                 if(LimitCyclesEvent != nullptr) LimitCyclesEvent();
             }
@@ -2332,8 +2411,6 @@ void C64Class::InitGrafikForSDL()
             SDL_SetTextureScaleMode(c64_screen_texture_sdl, SDL_ScaleModeNearest);
         LogText("\tInitGrafik SDL: Screenfilter ist deaktiviert.\n");
     }
-
-    SDL_CreateRGBSurface(0, current_c64_screen_width, current_c64_screen_height, 32, 0, 0, 0, 0);
 
     c64_screen = SDL_CreateRGBSurface(
         0,

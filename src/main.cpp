@@ -22,6 +22,7 @@
 #include "./emu64_commands.h"       // Struktur mit allen verfügbaren Kommandos
 
 #include <iostream>
+#include <csignal>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -45,6 +46,13 @@ static QStringList ArgsToStringList(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
+#ifndef _WIN32
+    // Alle Emu64-Prozesse eines Benutzers teilen sich den Socket von SingleApplication. Trennt eine andere Instanz
+    // (z.B. mit --multiple-instance) die Verbindung, bevor ihr die PID geschrieben wurde, würde SIGPIPE diesen Prozess
+    // ohne Meldung beenden (#448). Ignoriert liefert das Schreiben nur einen Fehler zurück.
+    signal(SIGPIPE, SIG_IGN);
+#endif
+
 #ifdef _WIN32
     // Unter Windows liegt argv in der ANSI-Codepage vor, Zeichen wie "└┘┌┐" gehen dabei verloren (#209).
     // Deshalb wird die Unicode-Kommandozeile geholt und nach UTF-8 gewandelt.
