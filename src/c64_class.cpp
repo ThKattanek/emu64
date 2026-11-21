@@ -483,6 +483,7 @@ last_reset_cycle = 0;
 floppy_clock_acc = 0;
 c64_iec_wire_drv = 0xff;
 hold_next_system_cycle = false;
+hold_at_frame_end = false;
 debug_animation = false;
 debug_logging = false;
 animation_speed_add = audio_spec_have.samples/audio_frequency;
@@ -747,6 +748,17 @@ void C64Class::EndEmulation()
 
     if(enable_exit_screenshot)
     {
+        // Endete das Programm über die Debugcart, zeichnet die Emulation noch das aktuelle Bild fertig und hält am Bildende
+        // selbst an (hold_at_frame_end). Darauf warten, sonst entsteht der Screenshot je nach Rechnerlast mitten im Bild (#449).
+        int frame_wait = 1000;    // 1 s, ein Bild dauert 20 ms
+        while(hold_at_frame_end && frame_wait > 0)
+        {
+            SDL_Delay(1);
+            frame_wait--;
+        }
+        // Einen nicht erreichten Halt aufheben: Er würde die Emulation sonst nach der Freigabe erneut anhalten, ein laufender
+        // Audio-Callback käme nie zum Ende und SDL_PauseAudioDevice würde hängen.
+        hold_at_frame_end = false;
         hold_next_system_cycle = true;
         // Per Frameskip ausgelassene Umrechnung des letzten fertigen Bildes nachholen.
         // Kein mutex1: Ein laufender Audio-Callback käme mit gesetztem hold_next_system_cycle nie zum Ende (keine Samples).
@@ -964,13 +976,26 @@ void C64Class::CalcDistortionGrid()
 
 void C64Class::VicRefresh(uint8_t *vic_puffer)
 {
-    if(enable_hold_vic_refresh)
+    // Debugcart-Ende mit Exit-Screenshot: Dieses Bild ist das letzte, danach steht die Emulation (#449)
+    if(hold_at_frame_end)
     {
-        vic_refresh_is_holded = true;
-        return;
+        hold_next_system_cycle = true;    // zuerst anhalten, dann melden (EndEmulation wartet auf hold_at_frame_end)
+        hold_at_frame_end = false;
     }
 
-    if((video_crt_output == nullptr) || (sdl_thread_pause == true)) return;
+    // Die Umrechnung ins Ausgabebild kann ausgesetzt sein (InitGrafik baut gerade die Grafik neu auf, SDL-Thread pausiert).
+    // Die Emulation läuft trotzdem weiter: Den VIC-Puffer wechseln und das fertige Bild zur späteren Umrechnung vormerken.
+    // Ohne den Wechsel zeichnet der VIC immer in denselben Puffer, ein Exit-Screenshot zeigt dann ein halb gezeichnetes Bild (#449).
+    if(enable_hold_vic_refresh || (video_crt_output == nullptr) || sdl_thread_pause || (c64_screen == nullptr))
+    {
+        if(enable_hold_vic_refresh) vic_refresh_is_holded = true;
+        // Auch hier festlegen, ob der VIC im nächsten Bild die Pixelfarben erzeugen muss (z.B. für den Exit-Screenshot)
+        vic->SetFrameRendering(IsFrameRenderNeeded(), (video_crt_output != nullptr) ? video_crt_output->GetDelayLineSourceRow(video_x_offset,current_c64_screen_height,504) : -1);
+        this->vic_buffer = vic_puffer;
+        vic->SwitchVideoBuffer();
+        video_convert_pending = true;
+        return;
+    }
 
     // Frameskip: Die Umrechnung ins Ausgabebild (CRT-Emulation) entfällt, wenn das Bild nicht angezeigt wird
     // (--nogui) bzw. im WarpMode schneller entsteht als es angezeigt werden kann.
@@ -1270,6 +1295,9 @@ inline void C64Class::WarpModeCycle()
     if(is_wtite_to_debug_cart && (DebugCartEvent != nullptr))
     {
         is_wtite_to_debug_cart = false;
+        // Das Programm endet: Mit Exit-Screenshot das aktuelle Bild noch fertig zeichnen und dann anhalten. So zeigt der
+        // Screenshot unabhängig von der Rechnerlast das Bild, in dem das Programm endet (#449).
+        if(enable_exit_screenshot) hold_at_frame_end = true;
         DebugCartEvent(debug_cart_value);
         DebugCartEvent = nullptr; // Nur einmal aufrufen
     }
@@ -1388,6 +1416,8 @@ void C64Class::FillAudioBuffer(uint8_t *stream, int laenge)
             if(is_wtite_to_debug_cart && (DebugCartEvent != nullptr))
             {
                 is_wtite_to_debug_cart = false;
+                // Mit Exit-Screenshot das aktuelle Bild noch fertig zeichnen und dann anhalten (siehe WarpModeCycle, #449)
+                if(enable_exit_screenshot) hold_at_frame_end = true;
                 DebugCartEvent(debug_cart_value);
                 DebugCartEvent = nullptr; // Nur einmal aufrufen
             }

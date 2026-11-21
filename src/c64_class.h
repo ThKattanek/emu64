@@ -646,6 +646,7 @@ private:
     uint32_t              snapshot_selftest_run = 0;
     std::atomic<uint32_t> last_reset_cycle;     // cycle_counter beim Ende des letzten Resets (Bezugspunkt für das Limit)
     bool		hold_next_system_cycle;     // Wird dieses Flag gesetzt wird verhindert das ein C64 Cylce ausgeführt wird
+    bool        hold_at_frame_end;          // Am Ende des aktuellen Bildes anhalten (Debugcart-Ende mit Exit-Screenshot, #449)
 
     bool        enable_debug_cart;          // Wird auf true gesetzt wenn der Debug Cart aktiviert ist
     bool        is_wtite_to_debug_cart;     // Wird auf true gesetzt wenn in den Debug Cart geschrieben wird
