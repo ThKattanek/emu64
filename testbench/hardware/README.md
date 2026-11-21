@@ -21,10 +21,9 @@ In `testbench/config.local.sh` (wird nicht eingecheckt) eintragen:
 
 ```bash
 U2_HOST="192.168.1.64"    # Adresse der Ultimate
-VIDEO_DEV="/dev/video4"   # Grabber; die Nummer ändert sich beim Umstecken
 ```
 
-Ohne diese Werte brechen die Skripte ab und listen die vorhandenen Video-Geräte auf.
+Der Grabber wird automatisch über seinen Namen gefunden (Standard `stk1160`), die Gerätenummer `/dev/videoN` ändert sich beim Umstecken. Für einen anderen Grabber `VIDEO_NAME="<name>"` eintragen (die Namen stehen in `/sys/class/video4linux/video*/name`) oder das Gerät fest mit `VIDEO_DEV="/dev/videoN"` vorgeben. Wird nichts gefunden, brechen die Skripte ab und listen die vorhandenen Video-Geräte auf.
 
 ### Skripte
 
@@ -34,8 +33,23 @@ Ohne diese Werte brechen die Skripte ab und listen die vorhandenen Video-Geräte
 | `emu_screenshot.sh <prg> <png> <0\|1>` | Gleiches Programm in Emu64 rendern (0 = 6569, 1 = 8565), Einstellungen wie die VICE-Testbench, eigenes HOME je Aufruf |
 | `patch_prg.py` | Variante eines Testprogramms mit einem geänderten Byte erzeugen (z.B. Bitmap-Füllmuster) |
 | `pattern_series.sh` | Messreihe: Varianten erzeugen, auf der Hardware aufnehmen, mit Emu64 rendern |
+| `hw_suite.sh <gerät>` | Fester Messsatz pro Gerät (`suite_tests.txt`, ca. 2,5 Minuten), erkennt den VIC-Typ selbst. Ablage unter `build/hardware_captures/suite/<gerät>/` |
+| `hw_suite_eval.py` | Wertet die Messsätze aller Geräte aus: rendert die Tests mit einem oder mehreren Emu64-Ständen (`--emu name=binary`) und vergleicht sie mit Referenz und Hardware an den strittigen Stellen aus `suite_regions.txt` |
 | `hwcompare.py` | Auswertung: `fit`, `compare`, `profile`, `view` |
 | `grabber_ctrl.py` | Helligkeit/Kontrast des Grabbers lesen und setzen |
+| `hw_view.sh` | Grabber-Bild live in einem Fenster zeigen (ffplay, `-z 2` doppelte Größe, `-f` Vollbild, `--pixel` ohne Glättung). Solange es offen ist, ist der Grabber für Aufnahmen belegt. |
+
+### Geräte messen
+
+Jeden C64 vor der Messung mindestens 15 Minuten warmlaufen lassen: Kalt liegen Kanten beim Umschalten des Videomodus um etwa ein Pixel anders (gemessen bei #446 an einem 8565R2, ab 15 Minuten stabil). Den Gerätenamen aus Nummer und VIC bilden, die Bestückung steht danach in `info.txt` im Messsatz.
+
+```bash
+./hw_suite.sh C64-06_6569R3                         # ca. 2,5 Minuten, VIC-Typ wird erkannt
+./hw_suite_eval.py --all                            # alle Geräte mit dem aktuellen Stand (EMU64_BIN)
+./hw_suite_eval.py --emu alt=/pfad/a/emu64 --emu neu=/pfad/b/emu64 C64-06_6569R3 C64-02_8565R2_t45
+```
+
+Neue strittige Stellen kommen in `suite_regions.txt`, neue Testprogramme in `suite_tests.txt`. Bereits gemessene Geräte werden bei der nächsten Auswertung automatisch mit verglichen (für neue Testprogramme muss das Gerät erneut gemessen werden).
 
 ### Wie verglichen wird
 
@@ -92,6 +106,6 @@ Für Varianten im Emu64-Code hat sich bewährt, sie vorübergehend per `getenv()
 
 These scripts run a test program on a real C64, capture the picture with a video grabber and compare it with Emu64 at C64 pixel level. They help to decide what the hardware really does when reference screenshot and VICE disagree or are uncertain (often marked `unsafe reference` in the test list).
 
-Setup: C64 with 1541 Ultimate II+ (REST API, `runners:run_prg`), a video grabber (tested: stk1160, PAL 720x576), `python3` with `numpy` and `Pillow`, `ffmpeg`, `curl`. Put `U2_HOST` and `VIDEO_DEV` into `testbench/config.local.sh`.
+Setup: C64 with 1541 Ultimate II+ (REST API, `runners:run_prg`), a video grabber (tested: stk1160, PAL 720x576), `python3` with `numpy` and `Pillow`, `ffmpeg`, `curl`. Put `U2_HOST` into `testbench/config.local.sh`. The grabber is found by its name (default `stk1160`, override with `VIDEO_NAME` or `VIDEO_DEV`).
 
 `hwcompare.py` does not sharpen the capture. Instead, every Emu64 screenshot (a hypothesis) is blurred like the grabber and adjusted in brightness and contrast, then the luma RMSE in a region is computed. The hypothesis with the smaller error matches the hardware. A single-pixel difference is decided reliably as long as the two colours differ in brightness. Measure several bitmap patterns instead of one to separate rules that look identical for a single pattern. See the German section for a complete example.
