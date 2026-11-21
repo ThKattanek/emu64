@@ -487,21 +487,38 @@ inline void VICII::gAccess()
 {
     if (display_status_g) // DisplayModus
 	{
-        // 8565: Der Videomodus für die Abrufe wirkt einen Zyklus später
-        const uint8_t r11 = color_latency ? reg_ctrl_1 : reg11_delay;
-        if (r11 & 0x20) g_address = static_cast<uint16_t>((*cia2_port_a<<14)|(bitmap_base)|((vc & 0x3FF)<<3)|rc);
-        else g_address = static_cast<uint16_t>((*cia2_port_a<<14)|char_base|(c_data_buffer_8bit[vmli]<<3)|rc);
-        if (r11 & 0x40) g_address &= 0xf9ff;
+        // Adresse des g-Abrufs für einen Wert von $d011 (BMM: Bitmap, sonst Zeichensatz; ECM: Bit 9 und 10 gelöscht)
+        auto g_addr = [this](uint8_t mode) -> uint16_t
+        {
+            uint16_t a;
+            if (mode & 0x20) a = static_cast<uint16_t>((*cia2_port_a<<14)|(bitmap_base)|((vc & 0x3FF)<<3)|rc);
+            else a = static_cast<uint16_t>((*cia2_port_a<<14)|char_base|(c_data_buffer_8bit[vmli]<<3)|rc);
+            if (mode & 0x40) a &= 0xf9ff;
+            return a;
+        };
 
-        switch(graphic_mode)
-		{
-		case 4:
-            gfx_data = Read(g_address & 0xF9FF);
-			break;
-		default:
-            gfx_data = Read(g_address);
-			break;
-		}
+        if (color_latency)
+        {
+            // 6569: Das Setzen von ECM/BMM wirkt sofort, das Löschen erst einen Zyklus später
+            //       (am echten 6569 gemessen, #446; VICE verzögert nur BMM)
+            g_address = g_addr(reg_ctrl_1 | (reg11_delay & 0x60));
+
+            // 6569: Wechselt BMM und damit der Abruf vom RAM ins Zeichen-ROM ($1000-$1fff in Bank 0 und 2),
+            //       kommt das untere Adressbyte noch aus dem Modus des Vorzyklus (wie VICE vicii_fetch_graphics)
+            if ((reg_ctrl_1 ^ reg11_delay) & 0x20)
+            {
+                const uint16_t addr_from = g_addr(reg11_delay);
+                const uint16_t addr_to = g_addr(reg_ctrl_1);
+                if (((addr_from & 0x7000) != 0x1000) && ((addr_to & 0x7000) == 0x1000))
+                    g_address = static_cast<uint16_t>((addr_from & 0x00ff) | (addr_to & 0xff00));
+            }
+        }
+        else
+        {
+            // 8565: Der Videomodus für die Abrufe wirkt einen Zyklus später (ECM und BMM)
+            g_address = g_addr(reg11_delay);        }
+
+        gfx_data = Read(g_address);
 
         char_data = c_data_buffer_8bit[vmli];
         color_data = c_data_buffer_4bit[vmli];
@@ -618,10 +635,22 @@ inline void VICII::RenderGfxCycle(uint8_t *out)
 {
     for(int i=0;i<8;i++)
     {
-        if(i == 4)
+        if(i == 1)
+        {
+            // 8565: Gelöschte ECM/BMM-Bits wirken erst ab Pixel 1, gesetzte schon ab Pixel 0 (siehe Zyklusende).
+            // reg11_delay ist hier der Wert, der am Ende des Vorzyklus gesetzt wurde. Gemessen am echten 8565 (#446).
+            if(!color_latency) gfx_vmode11 &= static_cast<uint8_t>((reg11_delay & 0x60) >> 2);
+        }
+        else if(i == 4)
         {
             gfx_vmode16 = static_cast<uint8_t>((reg_ctrl_2 & 0x10) >> 2);
             if(color_latency) gfx_vmode11 |= static_cast<uint8_t>((reg_ctrl_1 & 0x60) >> 2);
+        }
+        else if(i == 5)
+        {
+            // 6569: Ein gelöschtes BMM wirkt ab Pixel 5, ein gelöschtes ECM erst ab Pixel 6 (am echten 6569 gemessen, #446).
+            //       Werden beide gelöscht (ungültiger Modus), ist Pixel 5 deshalb schon im ECM-Textmodus.
+            if(color_latency) gfx_vmode11 &= static_cast<uint8_t>(((reg_ctrl_1 & 0x60) >> 2) | 0x10);
         }
         else if(i == 6)
         {
@@ -688,7 +717,7 @@ inline void VICII::RenderGfxCycle(uint8_t *out)
         out[i] = color;
     }
 
-    if(!color_latency) gfx_vmode11 = static_cast<uint8_t>((reg_ctrl_1 & 0x60) >> 2);
+    if(!color_latency) gfx_vmode11 |= static_cast<uint8_t>((reg_ctrl_1 & 0x60) >> 2);
 
     // Pipeline weiterschieben und die im Zyklus abgerufenen Daten übernehmen
     gfx_pipe1_v = gfx_pipe0_v;

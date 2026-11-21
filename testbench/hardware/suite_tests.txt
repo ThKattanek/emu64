@@ -1,0 +1,14 @@
+# Messsatz für hw_suite.sh / hw_suite_eval.py
+# Pfad relativ zu den VICE testprogs, Zyklen für den Emu64-Screenshot (wie in emu64-testlist.txt)
+# Der erste Eintrag dient auch zur Erkennung des VIC-Typs (6569 / 8565).
+VICII/vicii_timing/vicii_reg_timing.prg       35000000
+VICII/vicii_timing/vicii_reg_timing-a5.prg    35000000
+VICII/vicii_timing/vicii_reg_timing-ff.prg    35000000
+VICII/videomode/videomode1.prg                10000000
+VICII/videomode/videomode2.prg                10000000
+VICII/videomode/videomode-v.prg               10000000
+VICII/videomode/videomode-w.prg               10000000
+VICII/videomode/videomode-x.prg               10000000
+VICII/videomode/videomode-y.prg               10000000
+VICII/videomode/videomode-z.prg               10000000
+VICII/split-tests/modesplit/modesplit.prg     20000000
