@@ -9,8 +9,10 @@ source "$HW_DIR/../config.sh"
 # Adresse der Ultimate (REST-API unter http://<U2_HOST>/v1). Pflicht, kein Standardwert.
 U2_HOST="${U2_HOST:-}"
 
-# Video4Linux-Gerät des Grabbers (z.B. /dev/video4). Pflicht, die Nummer ändert sich beim Umstecken.
+# Video4Linux-Gerät des Grabbers (z.B. /dev/video4). Leer lassen: Dann wird das Gerät mit dem Namen VIDEO_NAME
+# gesucht (Standard stk1160, EasyCAP). Die Nummer ändert sich beim Umstecken, der Name nicht.
 VIDEO_DEV="${VIDEO_DEV:-}"
+VIDEO_NAME="${VIDEO_NAME:-stk1160}"
 
 # Ablage der Aufnahmen (unter build/ und damit git-ignoriert)
 CAPTURE_DIR="${CAPTURE_DIR:-$REPO_DIR/build/hardware_captures}"
@@ -28,6 +30,16 @@ MEASURE_CONTRAST="${MEASURE_CONTRAST-48}"
 # Vorrang vor den Standardwerten oben haben.
 [ -f "$TESTBENCH_DIR/config.local.sh" ] && source "$TESTBENCH_DIR/config.local.sh"
 
+# Grabber über den Namen finden, wenn kein Gerät fest eingetragen ist (erstes passendes /dev/videoN)
+if [ -z "$VIDEO_DEV" ] && [ -n "$VIDEO_NAME" ]; then
+    for d in $(ls -d /sys/class/video4linux/video* 2>/dev/null | sort -V); do
+        if [ "$(cat "$d/name" 2>/dev/null)" = "$VIDEO_NAME" ]; then
+            VIDEO_DEV="/dev/$(basename "$d")"
+            break
+        fi
+    done
+fi
+
 # Prüft die benötigten Einstellungen. Aufruf: hw_require u2 video  (nur die genannten werden geprüft)
 hw_require()
 {
@@ -37,7 +49,7 @@ hw_require()
         missing=1
     fi
     if [[ " $* " == *" video "* ]] && [ -z "$VIDEO_DEV" ]; then
-        echo "Fehler: VIDEO_DEV ist nicht gesetzt (Grabber, in testbench/config.local.sh eintragen). Vorhandene Geräte:" >&2
+        echo "Fehler: Kein Grabber \"$VIDEO_NAME\" gefunden (angeschlossen?). VIDEO_DEV oder VIDEO_NAME in testbench/config.local.sh eintragen. Vorhandene Geräte:" >&2
         for d in /sys/class/video4linux/video*; do
             [ -e "$d/name" ] && echo "  /dev/$(basename "$d"): $(cat "$d/name")" >&2
         done
