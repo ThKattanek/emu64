@@ -91,6 +91,10 @@ cd <hauptverzeichnis> && git worktree remove build/release-5.2.0 # wenn fertig
 
 `start.sh` ist die alte Variante für einzelne Tests und bleibt unverändert.
 
+### Messungen am echten C64
+
+Wenn Referenzbild und VICE sich widersprechen, lässt sich mit den Skripten in [`hardware/`](hardware/README.md) nachmessen, was ein echter C64 zeigt (1541 Ultimate II+ und Video-Grabber, Vergleich auf Pixelebene).
+
 ---
 
 ## English
@@ -179,3 +183,7 @@ cd <main-directory> && git worktree remove build/release-5.2.0   # when done
 6. `make_report.sh` builds the tables from all `results/emu64-*-result.txt` with the `maketable` tool of the VICE test bench. The original allows only 16 columns, so a copy with 64 columns is compiled.
 
 `start.sh` is the old way to run single tests and stays unchanged.
+
+### Measuring a real C64
+
+When a reference screenshot and VICE disagree, the scripts in [`hardware/`](hardware/README.md) measure what a real C64 shows (1541 Ultimate II+ and a video grabber, compared at pixel level).

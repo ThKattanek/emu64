@@ -1,0 +1,21 @@
+# Strittige Stellen für hw_suite_eval.py: dort unterscheiden sich Referenz, VICE und Emu64-Stände.
+# Format: <test (Dateiname ohne .prg)> <name> <y1:y2,x1:x2>   (Screenshot-Koordinaten 384x272)
+# Für jeden Test wird zusätzlich immer das Gesamtbild ausgewertet.
+vicii_reg_timing     BMM-aus           172:179,100:124
+vicii_reg_timing     ECM-aus           180:187,100:124
+vicii_reg_timing     E+B-aus           188:195,100:124
+vicii_reg_timing-a5  BMM-aus           172:179,100:124
+vicii_reg_timing-a5  ECM-aus           180:187,100:124
+vicii_reg_timing-a5  E+B-aus           188:195,100:124
+vicii_reg_timing-ff  BMM-aus           172:179,100:124
+vicii_reg_timing-ff  ECM-aus           180:187,100:124
+vicii_reg_timing-ff  E+B-aus           188:195,100:124
+videomode2           z110              109:113,140:158
+videomode-w          z100              99:103,232:248
+videomode-x          z105a             104:108,124:150
+videomode-x          z105b             104:108,278:294
+videomode-y          z100              99:103,228:244
+videomode-y          z105              104:108,200:216
+videomode-z          z100              99:103,228:244
+videomode-z          z105              104:108,200:228
+modesplit            Modusblock        40:240,40:350
