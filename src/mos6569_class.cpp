@@ -499,9 +499,9 @@ inline void VICII::gAccess()
 
         if (color_latency)
         {
-            // 6569: ECM und das Setzen von BMM wirken sofort, das Löschen von BMM erst einen Zyklus später
-            //       (Testbench VICII/vicii_timing, auch auf den Fotos der echten Hardware zu sehen, wie VICE)
-            g_address = g_addr(reg_ctrl_1 | (reg11_delay & 0x20));
+            // 6569: Das Setzen von ECM/BMM wirkt sofort, das Löschen erst einen Zyklus später
+            //       (am echten 6569 gemessen, #446; VICE verzögert nur BMM)
+            g_address = g_addr(reg_ctrl_1 | (reg11_delay & 0x60));
 
             // 6569: Wechselt BMM und damit der Abruf vom RAM ins Zeichen-ROM ($1000-$1fff in Bank 0 und 2),
             //       kommt das untere Adressbyte noch aus dem Modus des Vorzyklus (wie VICE vicii_fetch_graphics)
@@ -635,10 +635,22 @@ inline void VICII::RenderGfxCycle(uint8_t *out)
 {
     for(int i=0;i<8;i++)
     {
-        if(i == 4)
+        if(i == 1)
+        {
+            // 8565: Gelöschte ECM/BMM-Bits wirken erst ab Pixel 1, gesetzte schon ab Pixel 0 (siehe Zyklusende).
+            // reg11_delay ist hier der Wert, der am Ende des Vorzyklus gesetzt wurde. Gemessen am echten 8565 (#446).
+            if(!color_latency) gfx_vmode11 &= static_cast<uint8_t>((reg11_delay & 0x60) >> 2);
+        }
+        else if(i == 4)
         {
             gfx_vmode16 = static_cast<uint8_t>((reg_ctrl_2 & 0x10) >> 2);
             if(color_latency) gfx_vmode11 |= static_cast<uint8_t>((reg_ctrl_1 & 0x60) >> 2);
+        }
+        else if(i == 5)
+        {
+            // 6569: Ein gelöschtes BMM wirkt ab Pixel 5, ein gelöschtes ECM erst ab Pixel 6 (am echten 6569 gemessen, #446).
+            //       Werden beide gelöscht (ungültiger Modus), ist Pixel 5 deshalb schon im ECM-Textmodus.
+            if(color_latency) gfx_vmode11 &= static_cast<uint8_t>(((reg_ctrl_1 & 0x60) >> 2) | 0x10);
         }
         else if(i == 6)
         {
@@ -705,7 +717,7 @@ inline void VICII::RenderGfxCycle(uint8_t *out)
         out[i] = color;
     }
 
-    if(!color_latency) gfx_vmode11 = static_cast<uint8_t>((reg_ctrl_1 & 0x60) >> 2);
+    if(!color_latency) gfx_vmode11 |= static_cast<uint8_t>((reg_ctrl_1 & 0x60) >> 2);
 
     // Pipeline weiterschieben und die im Zyklus abgerufenen Daten übernehmen
     gfx_pipe1_v = gfx_pipe0_v;
