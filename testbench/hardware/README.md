@@ -23,7 +23,7 @@ In `testbench/config.local.sh` (wird nicht eingecheckt) eintragen:
 U2_HOST="192.168.1.64"    # Adresse der Ultimate
 ```
 
-Der Grabber wird automatisch über seinen Namen gefunden (Standard `stk1160`), die Gerätenummer `/dev/videoN` ändert sich beim Umstecken. Für einen anderen Grabber `VIDEO_NAME="<name>"` eintragen (die Namen stehen in `/sys/class/video4linux/video*/name`) oder das Gerät fest mit `VIDEO_DEV="/dev/videoN"` vorgeben. Wird nichts gefunden, brechen die Skripte ab und listen die vorhandenen Video-Geräte auf.
+Der Grabber wird automatisch über seinen Namen gefunden (Standard `stk1160`), die Gerätenummer `/dev/videoN` ändert sich beim Umstecken. Für einen anderen Grabber `VIDEO_NAME="<name>"` eintragen (die Namen stehen in `/sys/class/video4linux/video*/name`) oder das Gerät fest mit `VIDEO_DEV="/dev/videoN"` vorgeben. Wird nichts gefunden, brechen die Skripte ab und listen die vorhandenen Video-Geräte auf. Alle Skripte stellen den Grabber auf die Fernsehnorm PAL (`VIDEO_STANDARD`, Standard `PAL`; mögliche Namen mit `./grabber_ctrl.py /dev/videoN std`). Nach einem Neustart steht der stk1160 auf NTSC, ohne das gäbe es ein graues Bild in falscher Größe.
 
 ### Skripte
 
