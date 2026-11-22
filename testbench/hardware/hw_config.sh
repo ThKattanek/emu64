@@ -14,6 +14,10 @@ U2_HOST="${U2_HOST:-}"
 VIDEO_DEV="${VIDEO_DEV:-}"
 VIDEO_NAME="${VIDEO_NAME:-stk1160}"
 
+# Fernsehnorm des Grabbers. Wird vor jeder Aufnahme und Anzeige gesetzt: Nach einem Neustart steht der stk1160
+# auf NTSC (720x480, graues Bild). Mögliche Namen: ./grabber_ctrl.py /dev/videoN std
+VIDEO_STANDARD="${VIDEO_STANDARD:-PAL}"
+
 # Ablage der Aufnahmen (unter build/ und damit git-ignoriert)
 CAPTURE_DIR="${CAPTURE_DIR:-$REPO_DIR/build/hardware_captures}"
 

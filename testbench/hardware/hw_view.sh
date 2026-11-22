@@ -59,6 +59,7 @@ done
 
 hw_require video
 command -v ffplay > /dev/null || { echo "Fehler: ffplay nicht gefunden (Paket ffmpeg)." >&2; exit 1; }
+python3 "$HW_DIR/grabber_ctrl.py" "$VIDEO_DEV" std "$VIDEO_STANDARD" || exit 1
 
 case "$DEINT" in
     bwdif) DEINT_FILTER="bwdif=mode=send_field:parity=auto," ;;

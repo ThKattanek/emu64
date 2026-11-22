@@ -51,6 +51,8 @@ if [ -n "$PRG" ]; then
     sleep "$SETTLE"
 fi
 
+python3 "$HW_DIR/grabber_ctrl.py" "$VIDEO_DEV" std "$VIDEO_STANDARD" || exit 1
+
 OLD_CONTRAST=""
 if [ -n "$MEASURE_CONTRAST" ]; then
     OLD_CONTRAST=$(python3 "$HW_DIR/grabber_ctrl.py" "$VIDEO_DEV" get contrast) || exit 1
@@ -66,6 +68,7 @@ rc=$?
     echo "programm: ${PRG:-(von Hand gestartet)}"
     echo "zeit: $(date '+%Y-%m-%d %H:%M:%S')"
     echo "geraet: $VIDEO_DEV ($(cat /sys/class/video4linux/"$(basename "$VIDEO_DEV")"/name 2>/dev/null))"
+    echo "norm: $VIDEO_STANDARD"
     echo "kontrast: ${MEASURE_CONTRAST:-unverändert}"
     echo "bilder: $FRAMES"
 } > "$OUT/meta.txt"
