@@ -29,11 +29,11 @@ Der Grabber wird automatisch über seinen Namen gefunden (Standard `stk1160`), d
 
 | Skript | Zweck |
 |---|---|
-| `hw_run.sh <prg> <name>` | Programm auf dem C64 starten, warten (`SETTLE`, 7 s), `FRAMES` (20) Bilder aufnehmen nach `build/hardware_captures/<name>/` |
+| `hw_run.sh <prg> <name>` | Programm auf dem C64 starten, warten (`SETTLE`, 7 s), `FRAMES` (20) Bilder aufnehmen nach `captures/<name>/` |
 | `emu_screenshot.sh <prg> <png> <0\|1>` | Gleiches Programm in Emu64 rendern (0 = 6569, 1 = 8565), Einstellungen wie die VICE-Testbench, eigenes HOME je Aufruf |
 | `patch_prg.py` | Variante eines Testprogramms mit einem geänderten Byte erzeugen (z.B. Bitmap-Füllmuster) |
 | `pattern_series.sh` | Messreihe: Varianten erzeugen, auf der Hardware aufnehmen, mit Emu64 rendern |
-| `hw_suite.sh <gerät>` | Fester Messsatz pro Gerät (`suite_tests.txt`, ca. 2,5 Minuten), erkennt den VIC-Typ selbst. Ablage unter `build/hardware_captures/suite/<gerät>/` |
+| `hw_suite.sh <gerät>` | Fester Messsatz pro Gerät (`suite_tests.txt`, ca. 2,5 Minuten), erkennt den VIC-Typ selbst. Ablage unter `captures/suite/<gerät>/` |
 | `hw_suite_eval.py` | Wertet die Messsätze aller Geräte aus: rendert die Tests mit einem oder mehreren Emu64-Ständen (`--emu name=binary`) und vergleicht sie mit Referenz und Hardware an den strittigen Stellen aus `suite_regions.txt` |
 | `hwcompare.py` | Auswertung: `fit`, `compare`, `profile`, `view` |
 | `grabber_ctrl.py` | Helligkeit/Kontrast des Grabbers lesen und setzen |
@@ -72,8 +72,8 @@ T=<vice>/testprogs/VICII/vicii_timing
 ./hw_run.sh $T/vicii_reg_timing.prg id
 ./emu_screenshot.sh $T/vicii_reg_timing.prg /tmp/m0.png 0
 ./emu_screenshot.sh $T/vicii_reg_timing.prg /tmp/m1.png 1
-./hwcompare.py fit ../../build/hardware_captures/id /tmp/m0.png /tmp/m1.png
-./hwcompare.py compare --region Modusblock=160:198,60:140 ../../build/hardware_captures/id:6569=/tmp/m0.png,8565=/tmp/m1.png
+./hwcompare.py fit captures/id /tmp/m0.png /tmp/m1.png
+./hwcompare.py compare --region Modusblock=160:198,60:140 captures/id:6569=/tmp/m0.png,8565=/tmp/m1.png
 
 # Messreihe: Bitmap-Füllmuster (Byte 8565, Original $5a) variieren, aufnehmen und rendern
 ./pattern_series.sh -p $T/vicii_reg_timing.prg -o 8565 -e 5a -v "00 40 80 c0 5a a5 ff" -n vt6569 -m 0 -l neu
@@ -83,7 +83,7 @@ EMU64_BIN=/pfad/alte/emu64 ./pattern_series.sh -p $T/vicii_reg_timing.prg -o 856
     -v "00 40 80 c0 5a a5 ff" -n vt6569 -m 0 -l alt --no-hw
 
 # Vergleichen, je Zeile der Umschaltkante
-C=../../build/hardware_captures/vt6569
+C=captures/vt6569
 ./hwcompare.py compare --region BMM=172:179,100:124 --region ECM=180:187,100:124 --region E+B=188:195,100:124 \
     $(for v in 00 40 80 c0 5a a5 ff; do echo "$C/$v:alt=$C/$v/alt-m0.png,neu=$C/$v/neu-m0.png"; done)
 

@@ -2,7 +2,7 @@
 
 Ergebnisse der Messungen mit den Skripten in diesem Verzeichnis (siehe `README.md`). Pro Messkampagne ein Abschnitt, neueste oben.
 
-Die Rohdaten (Aufnahmen) liegen lokal unter `build/hardware_captures/` und sind wegen ihrer Größe (ca. 1 GB) nicht im Git.
+Die Rohdaten (Aufnahmen) liegen lokal unter `testbench/hardware/captures/` und sind wegen ihrer Größe (ca. 1 GB) nicht im Git. Die Rohdaten der Messungen bis 21.11.2026 (damals unter `build/hardware_captures/`) sind verloren, die Ergebnisse stehen nur noch in dieser Datei.
 
 ## Geräte
 
@@ -224,7 +224,7 @@ cd testbench/hardware
 ./hw_suite_eval.py --all                                   # alle Messsätze mit dem aktuellen Emu64 (EMU64_BIN)
 ./hw_suite_eval.py --emu alt=/pfad/emu64 --emu neu=/pfad/emu64 C64-06_6569R3
 ./hwcompare.py compare --region BMM=172:179,100:124 \
-    ../../build/hardware_captures/muster_C64-08_6569R3/ff:a=<bild-a>.png,b=<bild-b>.png
+    captures/muster_C64-08_6569R3/ff:a=<bild-a>.png,b=<bild-b>.png
 ```
 
-Die Mustermessungen liegen als `build/hardware_captures/muster_<gerät>/<muster>/` vor (mit `test.prg`), die Messsätze unter `build/hardware_captures/suite/<gerät>/`. Für die Vergleiche der Pixel-Varianten wurde Emu64 vorübergehend mit `getenv()`-Schaltern gebaut (Setzen/Löschen-Pixel, ECM-Verzögerung), diese sind im Code nicht mehr enthalten.
+Die Mustermessungen liegen als `captures/muster_<gerät>/<muster>/` vor (mit `test.prg`), die Messsätze unter `captures/suite/<gerät>/`. Für die Vergleiche der Pixel-Varianten wurde Emu64 vorübergehend mit `getenv()`-Schaltern gebaut (Setzen/Löschen-Pixel, ECM-Verzögerung), diese sind im Code nicht mehr enthalten.
