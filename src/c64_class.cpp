@@ -6107,7 +6107,7 @@ int C64Class::SaveSnapshotToBuffer(std::vector<uint8_t> &out, bool already_stopp
     cia2_port_b.SaveState(w);
     w.EndChunk();
 
-    w.BeginChunk("VIC ", 2);
+    w.BeginChunk("VIC ", 3);
     vic->SaveState(w);
     w.EndChunk();
 
@@ -6284,7 +6284,7 @@ int C64Class::LoadSnapshotFromBuffer(const std::vector<uint8_t> &data, bool alre
     if(ok) { r.FindChunk("MMU ", ver); ok = mmu->LoadState(r); }
     if(ok) { r.FindChunk("CIA1", ver); ok = cia1->LoadState(r) && cia1_port_a.LoadState(r) && cia1_port_b.LoadState(r); }
     if(ok) { r.FindChunk("CIA2", ver); ok = cia2->LoadState(r) && cia2_port_a.LoadState(r) && cia2_port_b.LoadState(r); }
-    if(ok) { r.FindChunk("VIC ", ver); ok = ver <= 2 && vic->LoadState(r, ver); }
+    if(ok) { r.FindChunk("VIC ", ver); ok = ver <= 3 && vic->LoadState(r, ver); }
     if(ok) { r.FindChunk("SID1", ver); ok = sid1->LoadState(r); }
     if(ok) { r.FindChunk("SID2", ver); ok = sid2->LoadState(r); }
     if(ok) { r.FindChunk("RSD1", ver); ok = resid1->LoadState(r); }

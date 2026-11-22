@@ -108,6 +108,8 @@ public:
 private:
     void RasterIRQ();
     void SetBALow();
+    int BALowCycles();
+    void CommitSpriteCollision(uint8_t coll);
     void cAccess();
     void gAccess();
     void sFetch(uint8_t sp_nr);
@@ -212,6 +214,9 @@ private:
     uint8_t     s_byte2_pending;            // Sprites deren 3. Byte noch gelesen werden muss
     uint8_t     s_idle_pending;             // Sprites ohne DMA: 1. und 2. Byte werden im naechsten Zyklus uebernommen (siehe sFetch)
     uint8_t     s_idle_pending2;            // Sprites ohne DMA: 3. Byte wird im uebernaechsten Zyklus uebernommen
+    uint8_t     s_bus0_pending;             // Sprites mit DMA, BA < 3 Zyklen low: 1. Byte kommt vom internen Bus (naechster Zyklus)
+    uint8_t     mm_clear_pixels;            // Anzahl folgender Pixel, deren Sprite-Sprite-Kollisionen nach dem Lesen von $d01e verfallen
+    uint8_t     s_bus2_pending;             // Sprites mit DMA, BA < 3 Zyklen low: 3. Byte kommt vom internen Bus (naechster Zyklus)
     uint8_t     last_bus_phi2;              // Interner Bus des VIC in Phi2: Wert eines CPU Zugriffs auf ein VIC Register in diesem Takt, sonst $ff
     uint8_t     p_data[8];
     uint8_t     c_data_buffer_8bit[64];

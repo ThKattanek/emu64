@@ -175,6 +175,9 @@ VICII::VICII()
     s_byte2_pending = 0;
     s_idle_pending = 0;
     s_idle_pending2 = 0;
+    s_bus0_pending = 0;
+    s_bus2_pending = 0;
+    mm_clear_pixels = 0;
     last_bus_phi2 = 0xFF;
     gfx_pipe0_g = gfx_pipe0_c = gfx_pipe0_v = 0;
     gfx_pipe1_g = gfx_pipe1_c = gfx_pipe1_v = 0;
@@ -459,6 +462,13 @@ inline void VICII::SetBALow()
     }
 }
 
+// Anzahl der Zyklen, die BA bereits low ist (0 = seit diesem Zyklus). Erst ab 3 hat der VIC den Bus auch in Phi2 (AEC).
+// BA ist spaetestens in Zyklus 11 wieder high, daher reicht die Rechnung modulo Zeilenlaenge.
+inline int VICII::BALowCycles()
+{
+    return (current_cycle - first_ba_cycle + total_cycles_per_rasterline) % total_cycles_per_rasterline;
+}
+
 inline void VICII::cAccess()
 {
     if (*ba == false)
@@ -529,6 +539,14 @@ inline void VICII::gAccess()
     else    // IdleModus
 	{
         g_address = (color_latency ? reg_ctrl_1 : reg11_delay) & 0x40 ? 0x39FF : 0x3FFF;
+
+        // DMA-Delay (VSP): Wird die Badline im Idle-Zustand mitten in der Zeile ausgelöst, holt der VIC das Idle-Byte
+        // in diesem Zyklus von einer anderen Adresse: 6569 $38ff, 8565 $3807 (auf echter Hardware gemessen,
+        // VICE-Bug #1855, Testbench VICII/vsp-tester, Auslösung in Spalte 39). Einzelne 8565 liefern auch $38c7/$38d7/$38ff.
+        // Bei Auslösung gleich am Zeilenanfang (Zyklus 16/17) bleibt es laut VICII/colorfetchbug (Hardware-Referenz)
+        // beim normalen Idle-Abruf. Dazwischen ist das Verhalten noch nicht gemessen.
+        if (display_status && badline_status && current_cycle > 17) g_address = color_latency ? 0x38FF : 0x3807;
+
         g_address |=(*cia2_port_a<<14);
         gfx_data = Read(g_address);
         char_data = 0;
@@ -596,7 +614,14 @@ inline void VICII::sFetch(uint8_t sp_nr)
 {
     const uint8_t bit = static_cast<uint8_t>(1 << sp_nr);
 
-    if(!*ba) sAccess(sp_nr);
+    if(!*ba)
+    {
+        sAccess(sp_nr);
+
+        // DMA erst in Zyklus 56 angeschaltet: BA ist noch keine 3 Zyklen low, die CPU hat in Phi2 noch den Bus.
+        // Der VIC uebernimmt dann den internen Bus statt der Speicherdaten (wie VICE prefetch_cycles, VICII/spriteenable).
+        if((sprite_dma & bit) && BALowCycles() < 3) s_bus0_pending |= bit;
+    }
 
     if(!(sprite_dma & bit))
     {
@@ -918,6 +943,7 @@ inline void VICII::RenderSpriteCycle(uint8_t *slot)
     if(!vic_config[VIC_SPRITES_ON])
     {
         for(int s=0; s<8; s++) sprite_x_pipe[s] = reg_mx[s];
+        CommitSpriteCollision(0);
         return;
     }
 
@@ -954,6 +980,7 @@ inline void VICII::RenderSpriteCycle(uint8_t *slot)
     {
         for(int k=2; k<8; k++) LatchSpriteRegs(k, dma_cycle_0, dma_cycle_2, dma2_sprite, spr_en);
         for(int s=0; s<8; s++) sprite_x_pipe[s] = reg_mx[s];
+        CommitSpriteCollision(0);
         return;
     }
 
@@ -1045,8 +1072,8 @@ inline void VICII::RenderSpriteCycle(uint8_t *slot)
                 if(pixel_pri) gfx_collision |= collision_mask;
             }
 
-            // Mehr als ein Sprite mit Pixel
-            if(collision_mask & (collision_mask - 1)) sprite_collision |= collision_mask;
+            // Mehr als ein Sprite mit Pixel (direkt nach dem Lesen von $d01e verfallen die Treffer, siehe CommitSpriteCollision)
+            if((collision_mask & (collision_mask - 1)) && k >= mm_clear_pixels) sprite_collision |= collision_mask;
         }
     }
 
@@ -1054,19 +1081,7 @@ inline void VICII::RenderSpriteCycle(uint8_t *slot)
 
     //////////////////////// Sprite Collision ///////////////////////////
 
-    if(sprite_collision && vic_config[VIC_SPR_SPR_COLL_ON])
-    {
-        if(reg_mm == 0)
-        {
-            // IRQ kann ausgelöst werden
-            reg_mm |= sprite_collision;
-            // Das Flag liegt wie in VICE vor dem CPU Zugriff des naechsten Zyklus an, die IRQ Leitung folgt
-            // erst im naechsten VIC Zyklus (siehe Anfang von OneCycle), sofern die CPU das Flag nicht vorher quittiert
-            irq_flag |= 0x04;
-            if (irq_mask & 0x04) irq_flag |= 0x80;
-        }
-        else reg_mm |= sprite_collision;
-    }
+    CommitSpriteCollision(sprite_collision);
 
     if(gfx_collision && vic_config[VIC_SPR_BCK_COLL_ON])
     {
@@ -1078,6 +1093,28 @@ inline void VICII::RenderSpriteCycle(uint8_t *slot)
             if (irq_mask & 0x02) irq_flag |= 0x80;
         }
         else reg_md |= gfx_collision;
+    }
+}
+
+// Sprite-Sprite-Kollisionen eines Zyklus nach $d01e uebernehmen. Das Lesen von $d01e loescht auf echter Hardware auch
+// die Kollisionen der folgenden 12 Pixel (der ganze naechste Zyklus und die erste Haelfte des uebernaechsten), siehe
+// Testbench VICII/spritevssprite (Referenz von echter Hardware). VICE loescht nur den naechsten Zyklus.
+inline void VICII::CommitSpriteCollision(uint8_t coll)
+{
+    mm_clear_pixels = (mm_clear_pixels > 8) ? static_cast<uint8_t>(mm_clear_pixels - 8) : 0;
+
+    if(coll && vic_config[VIC_SPR_SPR_COLL_ON])
+    {
+        if(reg_mm == 0)
+        {
+            // IRQ kann ausgelöst werden
+            reg_mm |= coll;
+            // Das Flag liegt wie in VICE vor dem CPU Zugriff des naechsten Zyklus an, die IRQ Leitung folgt
+            // erst im naechsten VIC Zyklus (siehe Anfang von OneCycle), sofern die CPU das Flag nicht vorher quittiert
+            irq_flag |= 0x04;
+            if (irq_mask & 0x04) irq_flag |= 0x80;
+        }
+        else reg_mm |= coll;
     }
 }
 
@@ -1139,12 +1176,36 @@ void VICII::OneCycle()
     // Farbregister: Schreibzugriff des Vorzyklus übernehmen und Zustand für die Pixelauflösung merken
     UpdateColorRegs();
 
-    // 3. Byte der Sprite-Daten lesen
-    if(s_byte2_pending)
+    // Sprites mit DMA, aber BA noch keine 3 Zyklen low (siehe sFetch): Phi2-Bytes vom internen Bus des Vorzyklus
+    if(s_bus2_pending)
     {
         for(int i=0; i<8; i++)
         {
-            if(s_byte2_pending & (1 << i)) sprite_sequenzer[i] |= Read(s_address_byte2[i]);
+            if(s_bus2_pending & (1 << i)) sprite_sequenzer[i] = (sprite_sequenzer[i] & 0xFFFF00) | last_bus_phi2;
+        }
+        s_bus2_pending = 0;
+    }
+
+    if(s_bus0_pending)
+    {
+        for(int i=0; i<8; i++)
+        {
+            if(s_bus0_pending & (1 << i)) sprite_sequenzer[i] = (sprite_sequenzer[i] & 0x00FFFF) | (static_cast<uint32_t>(last_bus_phi2) << 16);
+        }
+        s_bus0_pending = 0;
+    }
+
+    // 3. Byte der Sprite-Daten lesen (Phi2 dieses Zyklus; BA noch keine 3 Zyklen low: vom internen Bus, im naechsten Zyklus)
+    if(s_byte2_pending)
+    {
+        const bool aec = BALowCycles() >= 3;
+        for(int i=0; i<8; i++)
+        {
+            if(s_byte2_pending & (1 << i))
+            {
+                if(aec) sprite_sequenzer[i] |= Read(s_address_byte2[i]);
+                else s_bus2_pending |= static_cast<uint8_t>(1 << i);
+            }
         }
         s_byte2_pending = 0;
     }
@@ -1380,8 +1441,9 @@ void VICII::OneCycle()
                 mc_base[i] = mc[i];
                 if(mc_base[i] == 63)
                 {
+                    // Nur der DMA endet hier, die Anzeige (sprite_view) erst in Zyklus 58 (wie VICE). Wird der DMA
+                    // in Zyklus 55/56 neu gestartet, laeuft die Anzeige weiter (VICII/spriterestart).
                     sprite_dma  &= ~sprite_bit;
-                    sprite_view &= ~sprite_bit;
                 }
             }
         }
@@ -1475,12 +1537,15 @@ void VICII::OneCycle()
         sprite_bit = 0x01;
         for (int i=0; i<8; i++, sprite_bit<<=1) if ((sprite_dma & sprite_bit) && (reg_mye & sprite_bit)) sprite_y_exp_flip_flop ^= sprite_bit;
 
+        // Sprite 0: Wurde der DMA erst hier angeschaltet, geht BA jetzt low (VICE BaSpr1(0) in Zyklus 56)
+        if(sprite_dma & 0x01)  SetBALow();
+
         DrawGraphics();
 		break;
 	
 	case 57:
-		/// Sprite 1 ///
-        if(sprite_dma & 0x02)  SetBALow();
+		/// Sprite 0 und 1 ///
+        if(sprite_dma & 0x03)  SetBALow();
 
         DrawGraphics();
 		break;
@@ -1788,6 +1853,10 @@ void VICII::SaveState(StateWriter &w) const
     // Offset relativ zum Anfang beider Puffer (die Zeile kann nach dem Puffertausch noch im anderen Puffer liegen)
     w.I32(static_cast<int32_t>(video_buffer_line - &video_buffer_back[0][0]));
     w.Bytes(video_buffer_back, sizeof(video_buffer_back));
+    // ab Version 3
+    w.U8(s_bus0_pending);
+    w.U8(s_bus2_pending);
+    w.U8(mm_clear_pixels);
 }
 
 bool VICII::LoadState(StateReader &r, uint16_t version)
@@ -1919,6 +1988,15 @@ bool VICII::LoadState(StateReader &r, uint16_t version)
     current_video_buffer = r.I32();
     int32_t line_offset = r.I32();
     r.Bytes(video_buffer_back, sizeof(video_buffer_back));
+    s_bus0_pending = 0;
+    s_bus2_pending = 0;
+    mm_clear_pixels = 0;
+    if(version >= 3)
+    {
+        s_bus0_pending = r.U8();
+        s_bus2_pending = r.U8();
+        mm_clear_pixels = r.U8();
+    }
     if(!r.Ok()) return false;
     video_buffer = video_buffer_back[current_video_buffer & 1];
     // Version 1: Offset relativ zu video_buffer, ab Version 2 relativ zum Anfang beider Puffer
@@ -2213,6 +2291,7 @@ uint8_t VICII::ReadIORegister(uint16_t address)
 		case 0x1E:
             ret = reg_mm;
             reg_mm = 0;
+            mm_clear_pixels = 12;
             return ret;
 
 		/// Sprite - Daten Kollision
