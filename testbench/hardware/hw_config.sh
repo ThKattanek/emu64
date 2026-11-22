@@ -18,8 +18,8 @@ VIDEO_NAME="${VIDEO_NAME:-stk1160}"
 # auf NTSC (720x480, graues Bild). Mögliche Namen: ./grabber_ctrl.py /dev/videoN std
 VIDEO_STANDARD="${VIDEO_STANDARD:-PAL}"
 
-# Ablage der Aufnahmen (unter build/ und damit git-ignoriert)
-CAPTURE_DIR="${CAPTURE_DIR:-$REPO_DIR/build/hardware_captures}"
+# Ablage der Aufnahmen (git-ignoriert). Bewusst nicht unter build/, das beim Aufräumen schnell mitgelöscht wird.
+CAPTURE_DIR="${CAPTURE_DIR:-$HW_DIR/captures}"
 
 # Anzahl gemittelter Bilder pro Aufnahme und Wartezeit nach dem Programmstart in Sekunden
 FRAMES="${FRAMES:-20}"
