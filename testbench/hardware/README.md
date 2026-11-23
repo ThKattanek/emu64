@@ -30,6 +30,7 @@ Der Grabber wird automatisch über seinen Namen gefunden (Standard `stk1160`), d
 | Skript | Zweck |
 |---|---|
 | `hw_run.sh <prg> <name>` | Programm auf dem C64 starten, warten (`SETTLE`, 7 s), `FRAMES` (20) Bilder aufnehmen nach `captures/<name>/` |
+| `hw_mount.sh <image>` | Disk-Image vom PC in die Ultimate einlegen (`-d a\|b` Laufwerk, Standard A; `-m ro\|rw\|ul`, Standard schreibgeschützt; `-r` Laufwerk danach zurücksetzen), `--eject` auswerfen, `--status` Laufwerke anzeigen. Typ (d64, g64, d71, g71, d81) aus der Dateiendung oder per `-t`. Ohne `-a` wird der C64 nicht zurückgesetzt. `-a` startet danach automatisch mit `LOAD"*",8,1` und `RUN` (`-f name` für eine bestimmte Datei, Gerätenummer kommt von der Ultimate). Das geht auch, wenn ein Cartridge-Menü eingestellt ist |
 | `emu_screenshot.sh <prg> <png> <0\|1>` | Gleiches Programm in Emu64 rendern (0 = 6569, 1 = 8565), Einstellungen wie die VICE-Testbench, eigenes HOME je Aufruf |
 | `patch_prg.py` | Variante eines Testprogramms mit einem geänderten Byte erzeugen (z.B. Bitmap-Füllmuster) |
 | `pattern_series.sh` | Messreihe: Varianten erzeugen, auf der Hardware aufnehmen, mit Emu64 rendern |
